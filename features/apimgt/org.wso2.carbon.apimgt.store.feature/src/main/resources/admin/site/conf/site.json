@@ -17,7 +17,14 @@
         "keyStorePassword" : "",
         "identityAlias" : "",
         "responseSigningEnabled":"true",
-        "keyStoreName" :""
+        "keyStoreName" :"",
+        "verifyAssertionValidityPeriod": "true",
+        "audienceRestrictionsEnabled": "true",
+        "assertionSigningEnabled": "true",
+        "assertionEncryptionEnabled": "false",
+        "idpInit" : "false",
+        "idpInitSSOURL" : "https://localhost:9443/samlsso?spEntityID=API_WORKFLOW_ADMIN",
+        "externalLogoutPage" : "https://localhost:9443/samlsso?slo=true"
     },
 
 
