@@ -369,7 +369,8 @@ public class ApisApiServiceImpl extends ApisApiService {
 
             //validation for tiers
             List<String> tiersFromDTO = body.getTiers();
-            if (tiersFromDTO == null || tiersFromDTO.isEmpty()) {
+            if (!APIStatus.PROTOTYPED.toString().equals(body.getStatus()) &&
+                    (tiersFromDTO == null || tiersFromDTO.isEmpty())) {
                 RestApiUtil.handleBadRequest("No tier defined for the API", log);
             }
             //check whether the added API's tiers are all valid
