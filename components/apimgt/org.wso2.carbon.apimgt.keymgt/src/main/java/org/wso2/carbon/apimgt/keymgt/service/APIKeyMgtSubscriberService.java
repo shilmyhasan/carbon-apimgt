@@ -464,11 +464,10 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
             } else {
                 log.debug("Removing Service Provider with name : " + spAppName);
                 appMgtService.deleteApplication(spAppName, tenantDomain, tenantAwareUsername);
-
-                if (OAuthServerConfiguration.getInstance().isCacheEnabled()) {
-                    OAuthCache oAuthCache = OAuthCache.getInstance();
-                    oAuthCache.clearCacheEntry(new OAuthCacheKey(consumerKey));
-                }
+            }
+            if (OAuthServerConfiguration.getInstance().isCacheEnabled()) {
+                OAuthCache oAuthCache = OAuthCache.getInstance();
+                oAuthCache.clearCacheEntry(new OAuthCacheKey(consumerKey));
             }
         } catch (IdentityApplicationManagementException e) {
             APIUtil.handleException("Error occurred while deleting ServiceProvider", e);
