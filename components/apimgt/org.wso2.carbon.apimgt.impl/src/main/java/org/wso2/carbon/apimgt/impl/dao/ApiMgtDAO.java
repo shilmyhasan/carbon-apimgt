@@ -898,7 +898,7 @@ public class ApiMgtDAO {
         	try {
 				conn.setAutoCommit(false);
 			} catch (SQLException e) {
-
+				
 			}
             APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }
@@ -4632,7 +4632,7 @@ public class ApiMgtDAO {
                         + "concat(concat(x.USER_ID,':'),x.name))";
             }
             prepStmt = connection.prepareStatement(blockingFilerSql);
-
+            
             if (groupingId != null && !"null".equals(groupingId) && !groupingId.isEmpty()) {
                 prepStmt.setString(1, groupingId);
                 prepStmt.setString(2, subscriber.getName());
@@ -4728,64 +4728,30 @@ public class ApiMgtDAO {
      */
     public void deleteApplication(Application application) throws APIManagementException {
         Connection connection = null;
+        PreparedStatement deleteMappingQuery = null;
+        PreparedStatement prepStmt = null;
+        PreparedStatement prepStmtGetConsumerKey = null;
+        PreparedStatement deleteRegistrationQuery = null;
+        PreparedStatement deleteSubscription = null;
+        PreparedStatement deleteDomainApp = null;
+        PreparedStatement deleteAppKey = null;
+        PreparedStatement deleteApp = null;
+        ResultSet rs = null;
+
+        String getSubscriptionsQuery = SQLConstants.GET_SUBSCRIPTION_ID_OF_APPLICATION_SQL;
+
+        String getConsumerKeyQuery = SQLConstants.GET_CONSUMER_KEY_OF_APPLICATION_SQL;
+
+        String deleteKeyMappingQuery = SQLConstants.REMOVE_APPLICATION_FROM_SUBSCRIPTION_KEY_MAPPINGS_SQL;
+        String deleteSubscriptionsQuery = SQLConstants.REMOVE_APPLICATION_FROM_SUBSCRIPTIONS_SQL;
+        String deleteApplicationKeyQuery = SQLConstants.REMOVE_APPLICATION_FROM_APPLICATION_KEY_MAPPINGS_SQL;
+        String deleteDomainAppQuery = SQLConstants.REMOVE_APPLICATION_FROM_DOMAIN_MAPPINGS_SQL;
+        String deleteApplicationQuery = SQLConstants.REMOVE_APPLICATION_FROM_APPLICATIONS_SQL;
+        String deleteRegistrationEntry = SQLConstants.REMOVE_APPLICATION_FROM_APPLICATION_REGISTRATIONS_SQL;
 
         try {
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
-        } catch (SQLException e) {
-            handleException("Error while obtaining the API Manager database connection.", e);
-        }
-
-        deleteSubscriptionKeyMapping(application, connection);
-        deleteApplicationRegistration(application, connection);
-
-        if (APIConstants.DEFAULT_APPLICATION_NAME.equals(application.getName())) {
-            log.info("Preventing default application deletion. Only the OAuth information will be deleted");
-            ArrayList<String> consumerKeys = deleteKeyDomainMapping(application, connection);
-            deleteApplicationKeyMapping(application, connection);
-            commitConnection(connection);
-            deleteOAuthAppsForConsumerKeys(consumerKeys);
-            return;
-        }
-
-        deleteApplicationSubscription(application, connection);
-        ArrayList<String> consumerKeys = deleteKeyDomainMapping(application, connection);
-        deleteApplicationKeyMapping(application, connection);
-        deleteApplication(application, connection);
-        commitConnection(connection);
-        deleteOAuthAppsForConsumerKeys(consumerKeys);
-    }
-
-    /**
-     * Commit the database connection.
-     *
-     * @param connection API Manager database connection instance
-     * @throws APIManagementException if error on committing the connection
-     */
-    private void commitConnection(Connection connection) throws APIManagementException {
-        try {
-            connection.commit();
-        } catch (SQLException e) {
-            handleException("Error while committing the connection.", e);
-        }
-    }
-
-    /**
-     * Deletes AM_SUBSCRIPTION_KEY_MAPPING entries for the subscription ID's relevant to the application.
-     *
-     * @param application Application object to be deleted from the database which has the application Id
-     * @param connection  API Manager database connection instance
-     * @throws APIManagementException if error on deleting subscription key mapping entries
-     */
-    private void deleteSubscriptionKeyMapping(Application application, Connection connection)
-            throws APIManagementException {
-        PreparedStatement prepStmt = null;
-        PreparedStatement deleteMappingQuery = null;
-        ResultSet rs = null;
-        String getSubscriptionsQuery = SQLConstants.GET_SUBSCRIPTION_ID_OF_APPLICATION_SQL;
-        String deleteKeyMappingQuery = SQLConstants.REMOVE_APPLICATION_FROM_SUBSCRIPTION_KEY_MAPPINGS_SQL;
-
-        try {
             prepStmt = connection.prepareStatement(getSubscriptionsQuery);
             prepStmt.setInt(1, application.getId());
             rs = prepStmt.executeQuery();
@@ -4806,27 +4772,7 @@ public class ApiMgtDAO {
                 log.debug("Subscription Key mapping details are deleted successfully for Application - " +
                           application.getName());
             }
-        } catch (SQLException e) {
-            handleException("Error while removing subscription key mappings.", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(prepStmt, null, rs);
-            APIMgtDBUtil.closeAllConnections(deleteMappingQuery, null, null);
-        }
-    }
 
-    /**
-     * Deletes AM_APPLICATION_REGISTRATION entry for the application.
-     *
-     * @param application Application object to be deleted from the database which has the application Id
-     * @param connection  API Manager database connection instance
-     * @throws APIManagementException if error on deleting application registration information
-     */
-    private void deleteApplicationRegistration(Application application, Connection connection)
-            throws APIManagementException {
-        PreparedStatement deleteRegistrationQuery = null;
-        String deleteRegistrationEntry = SQLConstants.REMOVE_APPLICATION_FROM_APPLICATION_REGISTRATIONS_SQL;
-
-        try {
             deleteRegistrationQuery = connection.prepareStatement(deleteRegistrationEntry);
             deleteRegistrationQuery.setInt(1, application.getId());
             deleteRegistrationQuery.execute();
@@ -4835,27 +4781,7 @@ public class ApiMgtDAO {
                 log.debug("Application Registration details are deleted successfully for Application - " +
                           application.getName());
             }
-        } catch (SQLException e) {
-            handleException("Error while removing application registration information.", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(deleteRegistrationQuery, null, null);
-        }
-    }
 
-    /**
-     * Deletes AM_SUBSCRIPTION entry for the application.
-     *
-     * @param application Application object to be deleted from the database which has the application Id
-     * @param connection  API Manager database connection instance
-     * @throws APIManagementException if error on deleting application subscription information
-     */
-    private void deleteApplicationSubscription(Application application, Connection connection)
-            throws APIManagementException {
-
-        PreparedStatement deleteSubscription = null;
-        String deleteSubscriptionsQuery = SQLConstants.REMOVE_APPLICATION_FROM_SUBSCRIPTIONS_SQL;
-
-        try {
             deleteSubscription = connection.prepareStatement(deleteSubscriptionsQuery);
             deleteSubscription.setInt(1, application.getId());
             deleteSubscription.execute();
@@ -4863,34 +4789,11 @@ public class ApiMgtDAO {
             if (log.isDebugEnabled()) {
                 log.debug("Subscription details are deleted successfully for Application - " + application.getName());
             }
-        } catch (SQLException e) {
-            handleException("Error while removing application subscription information.", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(deleteSubscription, null, null);
-        }
-    }
 
-    /**
-     * Deletes AM_APP_KEY_DOMAIN_MAPPING entry for the consumer keys.
-     *
-     * @param application Application object to be deleted from the database which has the application Id
-     * @param connection  API Manager database connection instance
-     * @return consumer keys for the application
-     * @throws APIManagementException if error on deleting application key domain mappings
-     */
-    private ArrayList<String> deleteKeyDomainMapping(Application application, Connection connection)
-            throws APIManagementException {
-        PreparedStatement prepStmtGetConsumerKey = null;
-        PreparedStatement deleteDomainApp = null;
-        ResultSet rs = null;
-        String getConsumerKeyQuery = SQLConstants.GET_CONSUMER_KEY_OF_APPLICATION_SQL;
-        String deleteDomainAppQuery = SQLConstants.REMOVE_APPLICATION_FROM_DOMAIN_MAPPINGS_SQL;
-        ArrayList<String> consumerKeys = new ArrayList<String>();
-
-        try {
             prepStmtGetConsumerKey = connection.prepareStatement(getConsumerKeyQuery);
             prepStmtGetConsumerKey.setInt(1, application.getId());
             rs = prepStmtGetConsumerKey.executeQuery();
+            ArrayList<String> consumerKeys = new ArrayList<String>();
 
             deleteDomainApp = connection.prepareStatement(deleteDomainAppQuery);
             while (rs.next()) {
@@ -4913,28 +4816,7 @@ public class ApiMgtDAO {
                 }
             }
             deleteDomainApp.executeBatch();
-        } catch (SQLException e) {
-            handleException("Error while removing application key domain mapping.", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(prepStmtGetConsumerKey, null, rs);
-            APIMgtDBUtil.closeAllConnections(deleteDomainApp, null, null);
-        }
-        return consumerKeys;
-    }
 
-    /**
-     * Deletes AM_APPLICATION_KEY_MAPPING entry for the application.
-     *
-     * @param application Application object to be deleted from the database which has the application Id
-     * @param connection  API Manager database connection instance
-     * @throws APIManagementException if error on deleting application key mappings
-     */
-    public void deleteApplicationKeyMapping(Application application, Connection connection)
-            throws APIManagementException {
-        PreparedStatement deleteAppKey = null;
-        String deleteApplicationKeyQuery = SQLConstants.REMOVE_APPLICATION_FROM_APPLICATION_KEY_MAPPINGS_SQL;
-
-        try {
             deleteAppKey = connection.prepareStatement(deleteApplicationKeyQuery);
             deleteAppKey.setInt(1, application.getId());
             deleteAppKey.execute();
@@ -4943,25 +4825,7 @@ public class ApiMgtDAO {
                 log.debug("Application Key Mapping details are deleted successfully for Application - " + application
                         .getName());
             }
-        } catch (SQLException e) {
-            handleException("Error while removing application key mapping.", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(deleteAppKey, null, null);
-        }
-    }
 
-    /**
-     * Deletes AM_APPLICATION entry for the application.
-     *
-     * @param application Application object to be deleted from the database which has the application Id
-     * @param connection  API Manager database connection instance
-     * @throws APIManagementException if error on deleting application
-     */
-    private void deleteApplication(Application application, Connection connection) throws APIManagementException {
-        PreparedStatement deleteApp = null;
-        String deleteApplicationQuery = SQLConstants.REMOVE_APPLICATION_FROM_APPLICATIONS_SQL;
-
-        try {
             deleteApp = connection.prepareStatement(deleteApplicationQuery);
             deleteApp.setInt(1, application.getId());
             deleteApp.execute();
@@ -4969,23 +4833,27 @@ public class ApiMgtDAO {
             if (log.isDebugEnabled()) {
                 log.debug("Application " + application.getName() + " is deleted successfully.");
             }
-        } catch (SQLException e) {
-            handleException("Error while removing application.", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(deleteApp, null, null);
-        }
-    }
 
-    /**
-     * Deletes OAuth apps.
-     *
-     * @param consumerKeys list of consumer keys to perform the delete operation
-     * @throws APIManagementException if error on deleting OAuth apps.
-     */
-    private void deleteOAuthAppsForConsumerKeys(ArrayList<String> consumerKeys) throws APIManagementException {
-        for (String consumerKey : consumerKeys) {
-            //delete an oAuthorization server.
-            KeyManagerHolder.getKeyManagerInstance().deleteApplication(consumerKey);
+            connection.commit();
+
+            for (String consumerKey : consumerKeys) {
+                //delete on oAuthorization server.
+                KeyManagerHolder.getKeyManagerInstance().deleteApplication(consumerKey);
+            }
+        } catch (SQLException e) {
+            handleException("Error while removing application details from the database", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmtGetConsumerKey, connection, rs);
+            APIMgtDBUtil.closeAllConnections(prepStmt, null, rs);
+            APIMgtDBUtil.closeAllConnections(deleteApp, null, null);
+            APIMgtDBUtil.closeAllConnections(deleteAppKey, null, null);
+            APIMgtDBUtil.closeAllConnections(deleteMappingQuery, null, null);
+            APIMgtDBUtil.closeAllConnections(deleteRegistrationQuery, null, null);
+            APIMgtDBUtil.closeAllConnections(deleteSubscription, null, null);
+            APIMgtDBUtil.closeAllConnections(deleteDomainApp, null, null);
+            APIMgtDBUtil.closeAllConnections(deleteAppKey, null, null);
+            APIMgtDBUtil.closeAllConnections(deleteApp, null, null);
+
         }
     }
 
@@ -10649,7 +10517,7 @@ public class ApiMgtDAO {
 
     /**
      * Add a block condition
-     *
+     * 
      * @param conditionType Type of the block condition
      * @param conditionValue value related to the type
      * @param tenantDomain tenant domain the block condition should be effective
@@ -10786,7 +10654,7 @@ public class ApiMgtDAO {
 
     /**
      * Get details of a block condition by UUID
-     *
+     * 
      * @param uuid uuid of the block condition
      * @return Block conditoin represented by the UUID
      * @throws APIManagementException
@@ -10866,7 +10734,7 @@ public class ApiMgtDAO {
 
     /**
      * Update the block condition state true (Enabled) /false (Disabled) given the UUID
-     *
+     * 
      * @param conditionId id of the block condition
      * @param state blocking state
      * @return true if the operation was success
@@ -10903,7 +10771,7 @@ public class ApiMgtDAO {
 
     /**
      * Update the block condition state true (Enabled) /false (Disabled) given the UUID
-     *
+     * 
      * @param uuid UUID of the block condition
      * @param state blocking state
      * @return true if the operation was success
@@ -10940,7 +10808,7 @@ public class ApiMgtDAO {
 
     /**
      * Delete the block condition given the id
-     *
+     * 
      * @param conditionId id of the condition
      * @return true if successfully deleted
      * @throws APIManagementException
@@ -11129,7 +10997,7 @@ public class ApiMgtDAO {
         }
         return status;
     }
-
+    
     public boolean hasSubscription(String tierId, String tenantDomainWithAt, String policyLevel) throws APIManagementException{
     	 PreparedStatement checkIsExistPreparedStatement = null;
     	 Connection connection = null;
@@ -11146,8 +11014,8 @@ public class ApiMgtDAO {
             	 isExistQuery = SQLConstants.ThrottleSQLConstants.TIER_ATTACHED_TO_APPLICATION;
              } else if (PolicyConstants.POLICY_LEVEL_SUB.equals(policyLevel)) {
             	 isExistQuery = SQLConstants.ThrottleSQLConstants.TIER_HAS_SUBSCRIPTION;
-             }
-
+             } 
+        	 
              checkIsExistPreparedStatement = connection.prepareStatement(isExistQuery);
              checkIsExistPreparedStatement.setString(1, tierId);
              checkIsExistPreparedStatement.setString(2, "%"+tenantDomainWithAt);
@@ -11161,9 +11029,9 @@ public class ApiMgtDAO {
             	 if(count > 0){
             		 status = true;
             	 }
-
+                 
              }
-
+             
              connection.setAutoCommit(true);
          } catch (SQLException e) {
              String msg = "Couldn't check Subscription Exist";
@@ -11173,7 +11041,7 @@ public class ApiMgtDAO {
              APIMgtDBUtil.closeAllConnections(checkIsExistPreparedStatement, null, checkIsResultSet);
          }
          return status;
-
+    	
     }
 
 
