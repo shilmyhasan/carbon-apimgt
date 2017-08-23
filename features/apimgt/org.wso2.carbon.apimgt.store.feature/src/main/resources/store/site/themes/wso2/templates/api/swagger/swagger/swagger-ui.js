@@ -22726,11 +22726,11 @@ SwaggerUi.partials.signature = (function () {
     var type = model.definition && model.definition.type ? model.definition.type : 'object';
     name = name || model.name;
 
-    if (config.modelsToIgnore.indexOf($ref) > -1) {
+    if (config.modelsToIgnore.indexOf(type) > -1) {
       type = 'loop';
       name = modelType;
     } else {
-      config.modelsToIgnore.push($ref);
+      config.modelsToIgnore.push(type);
     }
 
     if (!model.definition) {
