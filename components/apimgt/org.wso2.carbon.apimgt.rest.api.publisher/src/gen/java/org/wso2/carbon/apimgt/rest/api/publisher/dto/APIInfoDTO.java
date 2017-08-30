@@ -35,6 +35,9 @@ public class APIInfoDTO  {
   
   private String status = null;
 
+
+  private String thumbnailUri  = null;
+
   
   /**
    **/
@@ -71,7 +74,17 @@ public class APIInfoDTO  {
     this.description = description;
   }
 
-  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("thumbnailUri")
+  public String getThumbnailUri() {
+    return thumbnailUri;
+  }
+  public void setThumbnailUri(String thumbnailUri) {
+    this.thumbnailUri = thumbnailUri;
+  }
+
   /**
    **/
   @ApiModelProperty(value = "")
