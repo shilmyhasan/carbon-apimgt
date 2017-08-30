@@ -35,6 +35,8 @@ public class APIInfoDTO  {
   
   private String status = null;
 
+
+  private String thumbnailUri  = null;
   
   /**
    **/
@@ -120,7 +122,16 @@ public class APIInfoDTO  {
     this.status = status;
   }
 
-  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("thumbnailUri")
+  public String getThumbnailUri() {
+    return thumbnailUri;
+  }
+  public void setThumbnailUri(String thumbnailUri) {
+    this.thumbnailUri = thumbnailUri;
+  }
 
   @Override
   public String toString()  {
