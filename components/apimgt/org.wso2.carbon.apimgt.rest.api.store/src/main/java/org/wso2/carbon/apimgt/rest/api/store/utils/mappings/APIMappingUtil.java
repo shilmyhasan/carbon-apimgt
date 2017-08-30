@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.apimgt.rest.api.store.utils.mappings;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.API;
@@ -113,7 +114,9 @@ public class APIMappingUtil {
         apiBusinessInformationDTO.setTechnicalOwner(model.getTechnicalOwner());
         apiBusinessInformationDTO.setTechnicalOwnerEmail(model.getTechnicalOwnerEmail());
         dto.setBusinessInformation(apiBusinessInformationDTO);
-        dto.setThumbnailUrl(model.getThumbnailUrl());
+        if (!StringUtils.isBlank(model.getThumbnailUrl())) {
+            dto.setThumbnailUrl(getThumbnailUri(model.getUUID()));
+        }
         dto.setWsdlUri(model.getWsdlUrl());
         return dto;
     }
@@ -185,6 +188,9 @@ public class APIMappingUtil {
         apiInfoDTO.setProvider(apiId.getProviderName());
         apiInfoDTO.setStatus(api.getStatus().toString());
         String providerName = api.getId().getProviderName();
+        if (!StringUtils.isBlank(api.getThumbnailUrl())) {
+            apiInfoDTO.setThumbnailUri(getThumbnailUri(api.getUUID()));
+        }
         apiInfoDTO.setProvider(APIUtil.replaceEmailDomainBack(providerName));
         return apiInfoDTO;
     }
@@ -232,5 +238,9 @@ public class APIMappingUtil {
         }
 
         return apiEndpointsList;
+    }
+
+    private static String getThumbnailUri (String uuid) {
+        return RestApiConstants.RESOURCE_PATH_THUMBNAIL.replace(RestApiConstants.APIID_PARAM, uuid);
     }
 }
