@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.FaultGatewaysException;
@@ -32,9 +33,12 @@ import org.wso2.carbon.apimgt.api.model.Documentation;
 import org.wso2.carbon.apimgt.api.model.DuplicateAPIException;
 import org.wso2.carbon.apimgt.api.model.KeyManager;
 import org.wso2.carbon.apimgt.api.model.ResourceFile;
+import org.wso2.carbon.apimgt.api.model.Scope;
 import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
 import org.wso2.carbon.apimgt.api.model.Tier;
+import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.definitions.APIDefinitionFromSwagger20;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.ApisApiService;
@@ -909,6 +913,20 @@ public class ApisApiServiceImpl extends ApisApiService {
             String thumbnailUrl = apiProvider.addResourceFile(thumbPath, apiImage);
             api.setThumbnailUrl(APIUtil.prependTenantPrefix(thumbnailUrl, api.getId().getProviderName()));
             APIUtil.setResourcePermissions(api.getId().getProviderName(), null, null, thumbPath);
+
+            //Creating URI templates due to available uri templates in returned api object only kept single template
+            //for multiple http methods
+            String apiSwaggerDefinition = apiProvider.getSwagger20Definition(api.getId());
+            if (!StringUtils.isEmpty(apiSwaggerDefinition)) {
+                APIDefinition definitionFromSwagger20 = new APIDefinitionFromSwagger20();
+                Set<URITemplate> uriTemplates = definitionFromSwagger20.getURITemplates(api, apiSwaggerDefinition);
+                api.setUriTemplates(uriTemplates);
+
+                // scopes
+                Set<Scope> scopes = definitionFromSwagger20.getScopes(apiSwaggerDefinition);
+                api.setScopes(scopes);
+            }
+
             apiProvider.updateAPI(api);
 
             String uriString = RestApiConstants.RESOURCE_PATH_THUMBNAIL
