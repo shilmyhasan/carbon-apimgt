@@ -1024,6 +1024,19 @@
                 <artifactId>org.wso2.carbon.apimgt.throttle.service.interceptors</artifactId>
                 <version>${carbon.apimgt.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1175,6 +1188,7 @@
         <carbon.broker.version>3.1.6</carbon.broker.version>
         <waffle-jna.version>1.6.wso2v2</waffle-jna.version>
         <commons-lang3.version>3.4.0.wso2v1</commons-lang3.version>
+        <powermock.version>1.7.3</powermock.version>
     </properties>
 </project>
 
