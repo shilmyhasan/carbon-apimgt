@@ -31,6 +31,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -3300,6 +3301,10 @@ public class APIProviderHostObject extends ScriptableObject {
             }
 
             if (fileHostObject != null && fileHostObject.getJavaScriptFile().getLength() != 0) {
+                String extension  = FilenameUtils.getExtension(fileHostObject.getJavaScriptFile().getName());
+                if (extension.contains("exe")) {
+                    throw new APIManagementException("File type .exe is not supported!");
+                }
                 String contentType = (String) args[10];
                 apiProvider
                         .addFileToDocumentation(apiId, doc, fileHostObject.getName(), fileHostObject.getInputStream(),
@@ -3982,6 +3987,10 @@ public class APIProviderHostObject extends ScriptableObject {
 
             try {
                 if (fileHostObject != null && fileHostObject.getJavaScriptFile().getLength() != 0) {
+                    String extension  = FilenameUtils.getExtension(fileHostObject.getJavaScriptFile().getName());
+                    if (extension.contains("exe")) {
+                        throw new APIManagementException("File type .exe is not supported!");
+                    }
                     ResourceFile resourceFile = new ResourceFile(fileHostObject.getInputStream(),
                                          fileHostObject.getJavaScriptFile().getContentType());
                     String filePath = APIUtil.getDocumentationFilePath(apiId, fileHostObject.getName());
