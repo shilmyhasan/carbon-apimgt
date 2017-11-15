@@ -4713,7 +4713,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 return hostName;
             }
             String message = "Possible Host Header Injection Attack is detected. Hostname verification failed for" +
-                    " hostname " + hostName + "Hence, host is resolved to it's default value.";
+                    " hostname " + hostName + " Hence, host is resolved to it's default value.";
             log.warn(message);
         }
         hostName = CarbonUtils.getServerConfiguration().getFirstProperty("HostName");
