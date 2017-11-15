@@ -283,13 +283,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 //ignore
             }
         }
+        hostName = verifyWhitelistedHostname(hostName);
 
-        if (hostName == null) {
-            hostName = CarbonUtils.getServerConfiguration().getFirstProperty("HostName");
-        }
-        if (hostName == null) {
-            hostName = System.getProperty("carbon.local.ip");
-        }
         String backendHttpsPort = HostObjectUtils.getBackendPort("https");
         return "https://" + hostName + ":" + backendHttpsPort;
 
@@ -4704,6 +4699,27 @@ public class APIStoreHostObject extends ScriptableObject {
             i++;
         }
         return myn;
-        
+
+    }
+    /*
+    *  This method checks whether the hostname is a valid whitelisted host name
+    *  @param hostName hostname to be validated
+    *  @return valid hostname (if the validation fail, it will return valid default host name in the configuration)
+    * */
+    private static String verifyWhitelistedHostname(String hostName) {
+        if (hostName != null) {  // Fix for Host Header Injection vulnarability
+            if (hostName.equalsIgnoreCase(CarbonUtils.getServerConfiguration().getFirstProperty("HostName"))
+                    || hostName.equalsIgnoreCase(System.getProperty("carbon.local.ip"))) {
+                return hostName;
+            }
+            String message = "Possible Host Header Injection Attack is detected. Hostname verification failed for" +
+                    " hostname " + hostName + "Hence, host is resolved to it's default value.";
+            log.warn(message);
+        }
+        hostName = CarbonUtils.getServerConfiguration().getFirstProperty("HostName");
+        if (hostName == null) {
+            hostName = System.getProperty("carbon.local.ip");
+        }
+        return hostName;
     }
 }
