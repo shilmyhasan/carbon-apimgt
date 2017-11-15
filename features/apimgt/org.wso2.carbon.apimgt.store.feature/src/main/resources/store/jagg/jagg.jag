@@ -396,8 +396,6 @@ var jagg = jagg || (function () {
 
     var getRequestSegments = function(){
         var href = request.getRequestURL()
-                log.info("get jag - > href " + href);
-
         var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)(\/[^?#]*)(\?[^#]*|)(#.*|)$/);
         return match && {
             protocol: match[1],
@@ -416,7 +414,6 @@ var jagg = jagg || (function () {
     };
 
     var getAbsoluteUrl = function (path) {
-    var log = new Log();
     var host = "";
 
     if (isReverseProxyEnabled()) {
