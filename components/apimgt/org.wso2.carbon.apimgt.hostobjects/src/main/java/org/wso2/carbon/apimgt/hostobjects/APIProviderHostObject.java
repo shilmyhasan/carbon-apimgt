@@ -71,6 +71,7 @@ import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIAuthenticationAdminClient;
+import org.wso2.carbon.apimgt.impl.utils.APIMWSDLReader;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionStringComparator;
@@ -4218,44 +4219,8 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     private static void validateWsdl(String url) throws Exception {
-
-        //If url is empty or null throw exception
-        if(StringUtils.isEmpty(url)) {
-            handleException("URL is not empty");
-        }
-
-        if(url.startsWith(APIConstants.WSDL_REGISTRY_LOCATION_PREFIX)) {
-            url = APIUtil.getServerURL() + url;
-        }
-
-        URL wsdl = new URL(url);
-        BufferedReader in = new BufferedReader(new InputStreamReader(wsdl.openStream(), Charset.defaultCharset()));
-        String inputLine;
-        boolean isWsdl2 = false;
-        boolean isWsdl10 = false;
-        StringBuilder urlContent = new StringBuilder();
-        try {
-            while ((inputLine = in.readLine()) != null) {
-                String wsdl2NameSpace = "http://www.w3.org/ns/wsdl";
-                String wsdl10NameSpace = "http://schemas.xmlsoap.org/wsdl/";
-                urlContent.append(inputLine);
-                isWsdl2 = urlContent.indexOf(wsdl2NameSpace) > 0;
-                isWsdl10 = urlContent.indexOf(wsdl10NameSpace) > 0;
-            }
-        } finally {
-                in.close();
-        }
-
-        if (isWsdl10) {
-            javax.wsdl.xml.WSDLReader wsdlReader11 = javax.wsdl.factory.WSDLFactory.newInstance().newWSDLReader();
-            wsdlReader11.readWSDL(url);
-        } else if (isWsdl2) {
-            WSDLReader wsdlReader20 = WSDLFactory.newInstance().newWSDLReader();
-            wsdlReader20.readWSDL(url);
-        } else {
-            handleException("URL is not in format of wsdl1/wsdl2");
-        }
-
+        APIMWSDLReader wsdlReader = new APIMWSDLReader(url);
+        wsdlReader.validateBaseURI();
     }
 
     private static String getWebContextRoot(String postfixUrl) {
