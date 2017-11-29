@@ -1325,44 +1325,8 @@ public final class APIUtil {
      * @throws Exception
      */
     public static boolean isWSDL2Document(String url) throws APIManagementException {
-        URL wsdl = null;
-        boolean isWsdl2 = false;
-        try {
-            wsdl = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new APIManagementException("Malformed URL encountered", e);
-        }
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(wsdl.openStream(), Charset.defaultCharset()));
-
-            String inputLine;
-            StringBuilder urlContent = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                String wsdl2NameSpace = "http://www.w3.org/ns/wsdl";
-                urlContent.append(inputLine);
-                isWsdl2 = urlContent.indexOf(wsdl2NameSpace) > 0;
-            }
-            in.close();
-            if (isWsdl2) {
-                WSDLReader wsdlReader20 = null;                
-                wsdlReader20 = WSDLFactory.newInstance().newWSDLReader();
-                wsdlReader20.readWSDL(url);                
-            }
-        } catch (IOException e) {
-            throw new APIManagementException("Error Reading Input from Stream from " + url, e);
-        } catch (WSDLException e) {
-            throw new APIManagementException("Error while reading WSDL Document from " + url, e);
-        } finally {
-            if(in != null){
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    log.error("Error when closing input stream", e);
-                }
-            }
-        }
-        return isWsdl2;
+        APIMWSDLReader wsdlReader = new APIMWSDLReader(url);
+        return wsdlReader.isWSDL2BaseURI();
     }
 
     /**
