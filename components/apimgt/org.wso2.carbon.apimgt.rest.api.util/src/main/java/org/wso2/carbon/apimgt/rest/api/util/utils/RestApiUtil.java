@@ -32,6 +32,7 @@ import org.wso2.carbon.apimgt.api.APIMgtAuthorizationFailedException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceAlreadyExistsException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceNotFoundException;
 import org.wso2.carbon.apimgt.api.APIProvider;
+import org.wso2.carbon.apimgt.api.ApplicationNameWhiteSpaceValidationException;
 import org.wso2.carbon.apimgt.api.PolicyNotFoundException;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
@@ -431,6 +432,20 @@ public class RestApiUtil {
     public static boolean isDueToResourceAlreadyExists(Throwable e) {
         Throwable rootCause = getPossibleErrorCause(e);
         return rootCause instanceof APIMgtResourceAlreadyExistsException || rootCause instanceof DuplicateAPIException;
+    }
+
+    /**
+     * Check if the specified throwable e is happened as the updated/new application name contains leading or trailing
+     * white spaces
+     *
+     * @param e throwable to check
+     * @return true if the specified throwable e is happened as the updated/new application contains leading or trailing
+     * whitespace, false otherwise
+     */
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public static boolean isDueToApplicationNameWhiteSpaceValidation(Throwable e) {
+        Throwable rootCause = getPossibleErrorCause(e);
+        return rootCause instanceof ApplicationNameWhiteSpaceValidationException;
     }
 
     /**
