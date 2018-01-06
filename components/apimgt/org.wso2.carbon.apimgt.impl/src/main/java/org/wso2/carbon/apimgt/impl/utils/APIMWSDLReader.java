@@ -20,6 +20,7 @@ package org.wso2.carbon.apimgt.impl.utils;
 import com.ibm.wsdl.extensions.http.HTTPAddressImpl;
 import com.ibm.wsdl.extensions.soap.SOAPAddressImpl;
 import com.ibm.wsdl.extensions.soap12.SOAP12AddressImpl;
+import com.ibm.wsdl.xml.WSDLReaderImpl;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -317,6 +318,9 @@ public class APIMWSDLReader {
 
 		if (log.isDebugEnabled()) {
 			log.debug("Reading  the WSDL. Base uri is " + baseURI);
+		}
+		if (reader instanceof WSDLReaderImpl) {
+			((WSDLReaderImpl)reader).setIgnoreSchemaContent(true);
 		}
 		return reader.readWSDL(null, getSecuredParsedDocumentFromURL(baseURI));
 	}
