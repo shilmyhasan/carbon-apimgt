@@ -4,7 +4,7 @@
     
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisApiIdDelete"></a>Delete an API <br><small>DELETE https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</small></h3>
+            <h4 class="operation-heading"><a name="apisApiIdDelete"></a>Delete an API</h4> <code>DELETE https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to delete an existing API proving the Id of the API.
@@ -240,7 +240,7 @@ Should be formatted as **provider-name-version**.
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisApiIdGet"></a>Get details of an API <br><small>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</small></h3>
+            <h4 class="operation-heading"><a name="apisApiIdGet"></a>Get details of an API</h4> <code>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</code>
             <p class="marked"></p>
 
             <p class="marked">Using this operation, you can retrieve complete details of a single API. You need to provide the Id of the API to retrive it.
@@ -575,7 +575,7 @@ formerly retrieved variant of the resource (Will be supported in future).
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisApiIdPut"></a>Update an API <br><small>PUT https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</small></h3>
+            <h4 class="operation-heading"><a name="apisApiIdPut"></a>Update an API</h4> <code>PUT https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to update an existing API.
@@ -1019,7 +1019,7 @@ Should be formatted as **provider-name-version**.
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisApiIdSwaggerGet"></a>Get swagger definition <br><small>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/swagger</small></h3>
+            <h4 class="operation-heading"><a name="apisApiIdSwaggerGet"></a>Get swagger definition</h4> <code>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/swagger</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to retrieve the swagger definition of an API.
@@ -1309,7 +1309,7 @@ formerly retrieved variant of the resource (Will be supported in future).
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisApiIdSwaggerPut"></a>Update swagger definition <br><small>PUT https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/swagger</small></h3>
+            <h4 class="operation-heading"><a name="apisApiIdSwaggerPut"></a>Update swagger definition</h4> <code>PUT https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/swagger</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to update the swagger definition of an existing API. Swagger definition to be updated is passed as a form data parameter `apiDefinition`.
@@ -1647,7 +1647,7 @@ Should be formatted as **provider-name-version**.
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisApiIdThumbnailGet"></a>Get thumbnail image <br><small>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/thumbnail</small></h3>
+            <h4 class="operation-heading"><a name="apisApiIdThumbnailGet"></a>Get thumbnail image</h4> <code>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/thumbnail</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to download a thumbnail image of an API.
@@ -1919,7 +1919,7 @@ formerly retrieved variant of the resource (Will be supported in future).
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisApiIdThumbnailPost"></a>Upload a thumbnail image <br><small>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/thumbnail</small></h3>
+            <h4 class="operation-heading"><a name="apisApiIdThumbnailPost"></a>Upload a thumbnail image</h4> <code>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/thumbnail</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to upload a thumbnail image of an API. The thumbnail to be uploaded should be given as a form data parameter `file`.
@@ -2233,7 +2233,7 @@ Should be formatted as **provider-name-version**.
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisChangeLifecyclePost"></a>Change API Status <br><small>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/change-lifecycle</small></h3>
+            <h4 class="operation-heading"><a name="apisChangeLifecyclePost"></a>Change API Status</h4> <code>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/change-lifecycle</code>
             <p class="marked"></p>
 
             <p class="marked">This operation is used to change the lifecycle of an API. Eg: Publish an API which is in `CREATED` state. In order to change the lifecycle, we need to provide the lifecycle `action` as a query parameter.
@@ -2566,7 +2566,7 @@ lifecycleChecklist=Deprecate Old Versions:true,Require Re-Subscription:true&quot
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisCopyApiPost"></a>Create a new API version <br><small>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/copy-api</small></h3>
+            <h4 class="operation-heading"><a name="apisCopyApiPost"></a>Create a new API version</h4> <code>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/copy-api</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to create a new version of an existing API. The new version is specified as `newVersion` query parameter. New API will be in `CREATED` state.
@@ -2824,7 +2824,7 @@ Should be formatted as **provider-name-version**.
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="apisPost"></a>Create a new API <br><small>POST https://apis.wso2.com/api/am/publisher/v0.11/apis</small></h3>
+            <h4 class="operation-heading"><a name="apisPost"></a>Create a new API</h4> <code>POST https://apis.wso2.com/api/am/publisher/v0.11/apis</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to create a new API specifying the details of the API in the payload. The new API will be in `CREATED` state.
