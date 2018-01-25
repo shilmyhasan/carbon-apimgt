@@ -76,7 +76,6 @@ public class RegistrationServiceImpl implements RegistrationService {
          * {
          * "callbackUrl": "www.google.lk",
          * "clientName": "mdm",
-         * "tokenScope": "Production",
          * "owner": "admin",
          * "grantType": "password refresh_token",
          * "saasApp": true
