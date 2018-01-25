@@ -1,8 +1,6 @@
 <div class="main-content">
     <h1><a name="API (Individual)"></a>API (Individual)</h1>
 
-    
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisApiIdDelete"></a>Delete an API</h4> <code>DELETE https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</code>
             <p class="marked"></p>
@@ -11,45 +9,29 @@
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_create</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_create' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisApiIdDelete">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
                 <div id="request-apisApiIdDelete"class="pre collapse in"><code class="json">DELETE https://localhost:9443/api/am/publisher/v0.11/apis/6fb74674-4ab8-4b52-9886-f9a376985060
 Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 </code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisApiIdDelete">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisApiIdDelete" class="pre collapse in"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
                 <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -X DELETE https://localhost:9443/api/am/publisher/v0.11/apis/6fb74674-4ab8-4b52-9886-f9a376985060</code></div>
-            
-            
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -69,7 +51,6 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -90,19 +71,16 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API ID.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -121,19 +99,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on ETag (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -152,19 +127,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on Last Modified header (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -183,62 +155,44 @@ Should be formatted as **provider-name-version**.
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Resource successfully deleted. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Resource to be deleted does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisApiIdGet"></a>Get details of an API</h4> <code>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</code>
             <p class="marked"></p>
@@ -247,36 +201,25 @@ Should be formatted as **provider-name-version**.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_view</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_view' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisApiIdGet">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
                 <div id="request-apisApiIdGet"class="pre collapse in"><code class="json">GET https://localhost:9443/api/am/publisher/v0.11/apis/7a2298c4-c905-403f-8fac-38c73301631f
 Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 </code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisApiIdGet">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisApiIdGet" class="pre collapse in"><code class="json">HTTP/1.1 200 OK
 Content-Type: application/json
 
@@ -344,14 +287,9 @@ Content-Type: application/json
       &quot;corsConfigurationEnabled&quot;: false
    }
 }</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
                 <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; https://localhost:9443/api/am/publisher/v0.11/apis/7a2298c4-c905-403f-8fac-38c73301631f</code></div>
-            
-            
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -371,7 +309,6 @@ Content-Type: application/json
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -392,19 +329,16 @@ Content-Type: application/json
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API ID.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -423,19 +357,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Media types acceptable for the response. Default is application/json.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">application/json</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -455,19 +386,16 @@ Should be formatted as **provider-name-version**.
                             <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved
 variant of the resource (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -487,19 +415,16 @@ variant of the resource (Will be supported in future).
                             <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the
 formerly retrieved variant of the resource (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -518,86 +443,62 @@ formerly retrieved variant of the resource (Will be supported in future).
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nRequested API is returned\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Requested API is returned </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#API">API</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">304</p></td>
-                        <td class="parameter"><p class="marked">Not Modified.\nEmpty body because the client has already the latest version of the requested resource (Will be supported in future).\n</p></td>
+                        <td class="parameter"><p class="marked">Not Modified. Empty body because the client has already the latest version of the requested resource (Will be supported in future). </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested API does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested API does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">406</p></td>
-                        <td class="parameter"><p class="marked">Not Acceptable.\nThe requested media type is not supported\n</p></td>
+                        <td class="parameter"><p class="marked">Not Acceptable. The requested media type is not supported </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisApiIdPut"></a>Update an API</h4> <code>PUT https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}</code>
             <p class="marked"></p>
 
             <p class="marked">This operation can be used to update an existing API.
-But the properties `name`, `version`, `context`, `provider`, `state` will not be changed by this operation.
+But the properties &#x60;name&#x60;, &#x60;version&#x60;, &#x60;context&#x60;, &#x60;provider&#x60;, &#x60;state&#x60; will not be changed by this operation.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_create</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_create' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisApiIdPut">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
                 <div id="request-apisApiIdPut"class="pre collapse in"><code class="json">PUT https://localhost:9443/api/am/publisher/v0.11/apis/7a2298c4-c905-403f-8fac-38c73301631f
 Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 Content-Type: application/json
@@ -665,18 +566,13 @@ Content-Type: application/json
       &quot;corsConfigurationEnabled&quot;: false
    }
 }</code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisApiIdPut">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisApiIdPut" class="pre collapse in"><code class="json">HTTP/1.1 200 OK
 Content-Type: application/json
 
@@ -744,14 +640,9 @@ Content-Type: application/json
       &quot;corsConfigurationEnabled&quot;: false
    }
 }</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
                 <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -H &quot;Content-Type: application/json&quot; -X PUT -d @data.json https://localhost:9443/api/am/publisher/v0.11/apis/7a2298c4-c905-403f-8fac-38c73301631f</code></div>
-            
-            
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -771,7 +662,6 @@ Content-Type: application/json
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -792,19 +682,16 @@ Content-Type: application/json
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API ID.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -823,21 +710,17 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">API object that needs to be added
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 API
-                                
                                     (<a href="#!/models#API">API</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -856,19 +739,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Media type of the entity in the body. Default is application/json.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">application/json</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -887,19 +767,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on ETag (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -918,19 +795,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on Last Modified header (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -949,75 +823,53 @@ Should be formatted as **provider-name-version**.
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nSuccessful response with updated API object\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Successful response with updated API object </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#API">API</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisApiIdSwaggerGet"></a>Get swagger definition</h4> <code>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/swagger</code>
             <p class="marked"></p>
@@ -1026,36 +878,25 @@ Should be formatted as **provider-name-version**.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_view</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_view' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisApiIdSwaggerGet">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
                 <div id="request-apisApiIdSwaggerGet"class="pre collapse in"><code class="json">GET https://localhost:9443/api/am/publisher/v0.11/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/swagger
 Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 </code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisApiIdSwaggerGet">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisApiIdSwaggerGet" class="pre collapse in"><code class="json">HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 329
@@ -1078,14 +919,9 @@ Content-Length: 329
       &quot;version&quot;: &quot;1.0.0&quot;
    }
 }</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
                 <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; https://localhost:9443/api/am/publisher/v0.11/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/swagger</code></div>
-            
-            
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -1105,7 +941,6 @@ Content-Length: 329
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1126,19 +961,16 @@ Content-Length: 329
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API ID.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1157,19 +989,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Media types acceptable for the response. Default is application/json.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">application/json</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1189,19 +1018,16 @@ Should be formatted as **provider-name-version**.
                             <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved
 variant of the resource (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1221,19 +1047,16 @@ variant of the resource (Will be supported in future).
                             <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the
 formerly retrieved variant of the resource (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -1252,108 +1075,79 @@ formerly retrieved variant of the resource (Will be supported in future).
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nRequested swagger document of the API is returned\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Requested swagger document of the API is returned </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">304</p></td>
-                        <td class="parameter"><p class="marked">Not Modified.\nEmpty body because the client has already the latest version of the requested resource (Will be supported in future).\n</p></td>
+                        <td class="parameter"><p class="marked">Not Modified. Empty body because the client has already the latest version of the requested resource (Will be supported in future). </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested API does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested API does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">406</p></td>
-                        <td class="parameter"><p class="marked">Not Acceptable.\nThe requested media type is not supported\n</p></td>
+                        <td class="parameter"><p class="marked">Not Acceptable. The requested media type is not supported </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisApiIdSwaggerPut"></a>Update swagger definition</h4> <code>PUT https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/swagger</code>
             <p class="marked"></p>
 
-            <p class="marked">This operation can be used to update the swagger definition of an existing API. Swagger definition to be updated is passed as a form data parameter `apiDefinition`.
+            <p class="marked">This operation can be used to update the swagger definition of an existing API. Swagger definition to be updated is passed as a form data parameter &#x60;apiDefinition&#x60;.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_create</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_create' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisApiIdSwaggerPut">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
                 <div id="request-apisApiIdSwaggerPut"class="pre collapse in"><code class="json">PUT https://localhost:9443/api/am/publisher/v0.11/apis/8848faaa-7fd1-478a-baa2-48a4ebb92c98/swagger
 Authorization:Bearer 5311eca3-8ac8-354e-ab36-7e2fdd6a4013
 Content-Length: 477
-Content-Type: multipart/form-data; boundary=------------------------4f51e636c0003d99
+Content-Type: multipart/form-data; boundary&#x3D;------------------------4f51e636c0003d99
 
 --------------------------4f51e636c0003d99
-Content-Disposition: form-data; name=&quot;apiDefinition&quot;
+Content-Disposition: form-data; name&#x3D;&quot;apiDefinition&quot;
 
 {&quot;paths&quot;:{&quot;\/*&quot;:{&quot;get&quot;:{&quot;x-auth-type&quot;:&quot;Application&quot;,&quot;x-throttling-tier&quot;:&quot;Unlimited&quot;,&quot;responses&quot;:{&quot;200&quot;:{&quot;description&quot;:&quot;OK&quot;}}}}},&quot;x-wso2-security&quot;:{&quot;apim&quot;:{&quot;x-wso2-scopes&quot;:[]}},&quot;swagger&quot;:&quot;2.0&quot;,&quot;info&quot;:{&quot;title&quot;:&quot;PhoneVerification&quot;,&quot;description&quot;:&quot;Verify a phone number&quot;,&quot;contact&quot;:{&quot;email&quot;:&quot;xx@ee.com&quot;,&quot;name&quot;:&quot;xx&quot;},&quot;version&quot;:&quot;1.0.0&quot;}}
 --------------------------4f51e636c0003d99--
 </code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisApiIdSwaggerPut">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisApiIdSwaggerPut" class="pre collapse in"><code class="json">HTTP/1.1 200 OK
 Content-Type: application/json
 
@@ -1375,14 +1169,9 @@ Content-Type: application/json
       &quot;version&quot;: &quot;1.0.0&quot;
    }
 }</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
-                <div class="pre"><code class="bash">curl -k -H &quot;Authorization:Bearer 5311eca3-8ac8-354e-ab36-7e2fdd6a4013&quot; -F apiDefinition=&quot;{\&quot;paths\&quot;:{\&quot;\/*\&quot;:{\&quot;get\&quot;:{\&quot;x-auth-type\&quot;:\&quot;Application\&quot;,\&quot;x-throttling-tier\&quot;:\&quot;Unlimited\&quot;,\&quot;responses\&quot;:{\&quot;200\&quot;:{\&quot;description\&quot;:\&quot;OK\&quot;}}}}},\&quot;x-wso2-security\&quot;:{\&quot;apim\&quot;:{\&quot;x-wso2-scopes\&quot;:[]}},\&quot;swagger\&quot;:\&quot;2.0\&quot;,\&quot;info\&quot;:{\&quot;title\&quot;:\&quot;PhoneVerification\&quot;,\&quot;description\&quot;:\&quot;Verify a phone number\&quot;,\&quot;contact\&quot;:{\&quot;email\&quot;:\&quot;xx@ee.com\&quot;,\&quot;name\&quot;:\&quot;xx\&quot;},\&quot;version\&quot;:\&quot;1.0.0\&quot;}}&quot; -X PUT &quot;https://localhost:9443/api/am/publisher/v0.11/apis/8848faaa-7fd1-478a-baa2-48a4ebb92c98/swagger&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -k -H &quot;Authorization:Bearer 5311eca3-8ac8-354e-ab36-7e2fdd6a4013&quot; -F apiDefinition&#x3D;&quot;{\&quot;paths\&quot;:{\&quot;\/*\&quot;:{\&quot;get\&quot;:{\&quot;x-auth-type\&quot;:\&quot;Application\&quot;,\&quot;x-throttling-tier\&quot;:\&quot;Unlimited\&quot;,\&quot;responses\&quot;:{\&quot;200\&quot;:{\&quot;description\&quot;:\&quot;OK\&quot;}}}}},\&quot;x-wso2-security\&quot;:{\&quot;apim\&quot;:{\&quot;x-wso2-scopes\&quot;:[]}},\&quot;swagger\&quot;:\&quot;2.0\&quot;,\&quot;info\&quot;:{\&quot;title\&quot;:\&quot;PhoneVerification\&quot;,\&quot;description\&quot;:\&quot;Verify a phone number\&quot;,\&quot;contact\&quot;:{\&quot;email\&quot;:\&quot;xx@ee.com\&quot;,\&quot;name\&quot;:\&quot;xx\&quot;},\&quot;version\&quot;:\&quot;1.0.0\&quot;}}&quot; -X PUT &quot;https://localhost:9443/api/am/publisher/v0.11/apis/8848faaa-7fd1-478a-baa2-48a4ebb92c98/swagger&quot;</code></div>
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -1402,7 +1191,6 @@ Content-Type: application/json
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1423,19 +1211,16 @@ Content-Type: application/json
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API ID.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <span class="param-in">Form </span>
@@ -1453,19 +1238,16 @@ Should be formatted as **provider-name-version**.
                         </td>
                         <td>
                             <p class="param-description marked">Swagger definition of the API</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1484,19 +1266,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Media type of the entity in the body. Default is application/json.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">application/json</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1515,19 +1294,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on ETag (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1546,19 +1322,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on Last Modified header (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -1577,75 +1350,53 @@ Should be formatted as **provider-name-version**.
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nSuccessful response with updated Swagger definition\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Successful response with updated Swagger definition </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. The request must be conditional but no condition has been specified. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisApiIdThumbnailGet"></a>Get thumbnail image</h4> <code>GET https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/thumbnail</code>
             <p class="marked"></p>
@@ -1654,48 +1405,32 @@ Should be formatted as **provider-name-version**.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_view</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_view' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisApiIdThumbnailGet">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
                 <div id="request-apisApiIdThumbnailGet"class="pre collapse in"><code class="json">GET https://localhost:9443/api/am/publisher/v0.11/apis/29c9ec3d-f590-467e-83e6-96d43517080f/thumbnail
 Authorization: Bearer d34baf74-3f02-3929-814e-88b27f750ba9
 </code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisApiIdThumbnailGet">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisApiIdThumbnailGet" class="pre collapse in"><code class="json">HTTP/1.1 200 OK
 Content-Type: image/jpeg
 
 [image content]</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
                 <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer d34baf74-3f02-3929-814e-88b27f750ba9&quot; https://localhost:9443/api/am/publisher/v0.11/apis/29c9ec3d-f590-467e-83e6-96d43517080f/thumbnail &gt; image.jpg</code></div>
-            
-            
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -1715,7 +1450,6 @@ Content-Type: image/jpeg
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1736,19 +1470,16 @@ Content-Type: image/jpeg
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API ID.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1767,19 +1498,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Media types acceptable for the response. Default is application/json.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">application/json</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1799,19 +1527,16 @@ Should be formatted as **provider-name-version**.
                             <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved
 variant of the resource (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -1831,19 +1556,16 @@ variant of the resource (Will be supported in future).
                             <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the
 formerly retrieved variant of the resource (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -1862,110 +1584,81 @@ formerly retrieved variant of the resource (Will be supported in future).
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nThumbnail image returned\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Thumbnail image returned </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">304</p></td>
-                        <td class="parameter"><p class="marked">Not Modified.\nEmpty body because the client has already the latest version of the requested resource (Will be supported in future).\n</p></td>
+                        <td class="parameter"><p class="marked">Not Modified. Empty body because the client has already the latest version of the requested resource (Will be supported in future). </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested Document does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested Document does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">406</p></td>
-                        <td class="parameter"><p class="marked">Not Acceptable.\nThe requested media type is not supported\n</p></td>
+                        <td class="parameter"><p class="marked">Not Acceptable. The requested media type is not supported </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisApiIdThumbnailPost"></a>Upload a thumbnail image</h4> <code>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/{apiId}/thumbnail</code>
             <p class="marked"></p>
 
-            <p class="marked">This operation can be used to upload a thumbnail image of an API. The thumbnail to be uploaded should be given as a form data parameter `file`.
+            <p class="marked">This operation can be used to upload a thumbnail image of an API. The thumbnail to be uploaded should be given as a form data parameter &#x60;file&#x60;.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_create</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_create' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisApiIdThumbnailPost">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
                 <div id="request-apisApiIdThumbnailPost"class="pre collapse in"><code class="json">POST https://localhost:9443/api/am/publisher/v0.11/apis/8848faaa-7fd1-478a-baa2-48a4ebb92c98/thumbnail
 Authorization: Bearer d34baf74-3f02-3929-814e-88b27f750ba9
-Content-Type: multipart/form-data; boundary=------------------------5e542e0e5b50e1e4
+Content-Type: multipart/form-data; boundary&#x3D;------------------------5e542e0e5b50e1e4
 Content-Length: 18333
 
 --------------------------5e542e0e5b50e1e4
-Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;image.jpg&quot;
+Content-Disposition: form-data; name&#x3D;&quot;file&quot;; filename&#x3D;&quot;image.jpg&quot;
 Content-Type: image/jpeg
 
 [image content]
 
 --------------------------5e542e0e5b50e1e4--
 </code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisApiIdThumbnailPost">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisApiIdThumbnailPost" class="pre collapse in"><code class="json">HTTP/1.1 201 Created
 Location: https://localhost:9443/api/am/publisher/v0.11/apis/8848faaa-7fd1-478a-baa2-48a4ebb92c98/thumbnail
 Content-Type: application/json
@@ -1974,14 +1667,9 @@ Content-Type: application/json
    &quot;relativePath&quot;: &quot;/apis/8848faaa-7fd1-478a-baa2-48a4ebb92c98/thumbnail&quot;,
    &quot;mediaType&quot;: &quot;image/jpeg&quot;
 }</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer d34baf74-3f02-3929-814e-88b27f750ba9&quot; https://localhost:9443/api/am/publisher/v0.11/apis/29c9ec3d-f590-467e-83e6-96d43517080f/thumbnail -F file=@image.jpg</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer d34baf74-3f02-3929-814e-88b27f750ba9&quot; https://localhost:9443/api/am/publisher/v0.11/apis/29c9ec3d-f590-467e-83e6-96d43517080f/thumbnail -F file&#x3D;@image.jpg</code></div>
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -2001,7 +1689,6 @@ Content-Type: application/json
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2022,19 +1709,16 @@ Content-Type: application/json
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API ID.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <span class="param-in">Form </span>
@@ -2052,19 +1736,16 @@ Should be formatted as **provider-name-version**.
                         </td>
                         <td>
                             <p class="param-description marked">Image to upload</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
-                                file
-                                
+                                File
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2083,19 +1764,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Media type of the entity in the body. Default is application/json.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">application/json</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2114,19 +1792,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on ETag (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2145,19 +1820,16 @@ Should be formatted as **provider-name-version**.
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on Last Modified header (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -2176,113 +1848,79 @@ Should be formatted as **provider-name-version**.
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nImage updated\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Image updated </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#FileInfo">FileInfo</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. The resource to be updated does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisChangeLifecyclePost"></a>Change API Status</h4> <code>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/change-lifecycle</code>
             <p class="marked"></p>
 
-            <p class="marked">This operation is used to change the lifecycle of an API. Eg: Publish an API which is in `CREATED` state. In order to change the lifecycle, we need to provide the lifecycle `action` as a query parameter.
+            <p class="marked">This operation is used to change the lifecycle of an API. Eg: Publish an API which is in &#x60;CREATED&#x60; state. In order to change the lifecycle, we need to provide the lifecycle &#x60;action&#x60; as a query parameter.
 
-For example, to Publish an API, `action` should be `Publish`. Note that the `Re-publish` action is available only after calling `Block`.
+For example, to Publish an API, &#x60;action&#x60; should be &#x60;Publish&#x60;. Note that the &#x60;Re-publish&#x60; action is available only after calling &#x60;Block&#x60;.
 
-Some actions supports providing additional paramters which should be provided as `lifecycleChecklist` parameter. Please see parameters table for more information.
+Some actions supports providing additional paramters which should be provided as &#x60;lifecycleChecklist&#x60; parameter. Please see parameters table for more information.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_publish</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_publish' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisChangeLifecyclePost">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
-                <div id="request-apisChangeLifecyclePost"class="pre collapse in"><code class="json">POST https://localhost:9443/api/am/publisher/v0.11/apis/change-lifecycle?apiId=890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;action=Publish
+                <div id="request-apisChangeLifecyclePost"class="pre collapse in"><code class="json">POST https://localhost:9443/api/am/publisher/v0.11/apis/change-lifecycle?apiId&#x3D;890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;action&#x3D;Publish
 Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 </code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisChangeLifecyclePost">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisChangeLifecyclePost" class="pre collapse in"><code class="json">HTTP/1.1 200 OK</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
-                <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -X POST &quot;https://localhost:9443/api/am/publisher/v0.11/apis/change-lifecycle?apiId=890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;action=Publish&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -X POST &quot;https://localhost:9443/api/am/publisher/v0.11/apis/change-lifecycle?apiId&#x3D;890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;action&#x3D;Publish&quot;</code></div>
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -2302,7 +1940,6 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2323,7 +1960,6 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 
 Supported actions are [ **Publish, Deploy as a Prototype, Demote to Created, Demote to Prototyped, Block, Deprecate, Re-Publish, Retire **]
 </p>
-                            
                                 <p><b>Accepted values: </b></p>
 
 <code>Publish</code>
@@ -2342,19 +1978,16 @@ Supported actions are [ **Publish, Deploy as a Prototype, Demote to Created, Dem
 
 <code>Retire</code>
 
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2375,19 +2008,16 @@ Supported actions are [ **Publish, Deploy as a Prototype, Demote to Created, Dem
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API I.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2413,22 +2043,19 @@ Specify checklist items by using an **&quot;attribute:&quot;** modifier.
 
 E.g.&quot;Deprecate Old Versions:true&quot; will deprecate older versions of a particular API when it is promoted to Published state from Created state. Setting &quot;Require Re-Subscription:true&quot;, you have to resubscribe to the API. Multiple checklist items can be given in &quot;attribute1:true, attribute2:false&quot; format.
 
- **Sample CURL :**  curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -X POST &quot;https://localhost:9443/api/am/publisher/v0.11/apis/change-lifecycle?apiId=890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;action=Publish&amp;
-lifecycleChecklist=Deprecate Old Versions:true,Require Re-Subscription:true&quot;
+ **Sample CURL :**  curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -X POST &quot;https://localhost:9443/api/am/publisher/v0.11/apis/change-lifecycle?apiId&#x3D;890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;action&#x3D;Publish&amp;
+lifecycleChecklist&#x3D;Deprecate Old Versions:true,Require Re-Subscription:true&quot;
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2447,19 +2074,16 @@ lifecycleChecklist=Deprecate Old Versions:true,Require Re-Subscription:true&quot
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on ETag (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2478,19 +2102,16 @@ lifecycleChecklist=Deprecate Old Versions:true,Require Re-Subscription:true&quot
                         <td>
                             <p class="param-description marked">Validator for conditional requests; based on Last Modified header (Will be supported in future).
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -2509,100 +2130,71 @@ lifecycleChecklist=Deprecate Old Versions:true,Require Re-Subscription:true&quot
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nLifecycle changed successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. Lifecycle changed successfully. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested API does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. Requested API does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. The request has not been performed because one of the preconditions is not met. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisCopyApiPost"></a>Create a new API version</h4> <code>POST https://apis.wso2.com/api/am/publisher/v0.11/apis/copy-api</code>
             <p class="marked"></p>
 
-            <p class="marked">This operation can be used to create a new version of an existing API. The new version is specified as `newVersion` query parameter. New API will be in `CREATED` state.
+            <p class="marked">This operation can be used to create a new version of an existing API. The new version is specified as &#x60;newVersion&#x60; query parameter. New API will be in &#x60;CREATED&#x60; state.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_create</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_create' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisCopyApiPost">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
-                <div id="request-apisCopyApiPost"class="pre collapse in"><code class="json">POST https://localhost:9443/api/am/publisher/v0.11/apis/copy-api?apiId=890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;newVersion=2.0.0
+                <div id="request-apisCopyApiPost"class="pre collapse in"><code class="json">POST https://localhost:9443/api/am/publisher/v0.11/apis/copy-api?apiId&#x3D;890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;newVersion&#x3D;2.0.0
 Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 </code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisCopyApiPost">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisCopyApiPost" class="pre collapse in"><code class="json">HTTP/1.1 201 Created
 Location: https://localhost:9443/api/am/publisher/v0.11/apis/25a84fc9-38c0-4578-95e8-29fb6b1c4771
 Content-Type: application/json
@@ -2671,14 +2263,9 @@ Content-Type: application/json
       &quot;corsConfigurationEnabled&quot;: false
    }
 }</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
-                <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -X POST &quot;https://localhost:9443/api/am/publisher/v0.11/apis/copy-api?apiId=890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;newVersion=2.0.0&quot;</code></div>
-            
-            
+                <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -X POST &quot;https://localhost:9443/api/am/publisher/v0.11/apis/copy-api?apiId&#x3D;890a4f4d-09eb-4877-a323-57f6ce2ed79b&amp;newVersion&#x3D;2.0.0&quot;</code></div>
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -2698,7 +2285,6 @@ Content-Type: application/json
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2716,19 +2302,16 @@ Content-Type: application/json
                         </td>
                         <td>
                             <p class="param-description marked">Version of the new API.</p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -2749,19 +2332,16 @@ Content-Type: application/json
 The combination of the provider of the API, name of the API and the version is also accepted as a valid API I.
 Should be formatted as **provider-name-version**.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -2780,74 +2360,54 @@ Should be formatted as **provider-name-version**.
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created API as entity in the body. Location header contains URL of newly created API.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. Successful response with the newly created API as entity in the body. Location header contains URL of newly created API. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
-                                
                                     
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nAPI to copy does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. API to copy does not exist. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
             <hr/>
             <h4 class="operation-heading"><a name="apisPost"></a>Create a new API</h4> <code>POST https://apis.wso2.com/api/am/publisher/v0.11/apis</code>
             <p class="marked"></p>
 
-            <p class="marked">This operation can be used to create a new API specifying the details of the API in the payload. The new API will be in `CREATED` state.
+            <p class="marked">This operation can be used to create a new API specifying the details of the API in the payload. The new API will be in &#x60;CREATED&#x60; state.
 
-There is a special capability for a user who has `APIM Admin` permission such that he can create APIs on behalf of other users. For that he can to specify `&quot;provider&quot; : &quot;some_other_user&quot;` in the payload so that the API&#39;s creator will be shown as `some_other_user` in the UI.
+There is a special capability for a user who has &#x60;APIM Admin&#x60; permission such that he can create APIs on behalf of other users. For that he can to specify &#x60;&quot;provider&quot; : &quot;some_other_user&quot;&#x60; in the payload so that the API&#39;s creator will be shown as &#x60;some_other_user&#x60; in the UI.
 </p>
 
             <h4 class="section-heading">OAuth 2.0 Scope</h4>
-            
                 <code>apim:api_create</code><span class="label label-primary" data-toggle="tooltip" title="This resource is secured with an OAuth 2.0 scope. You need to provide an access token which has 'apim:api_create' scope using Authorization header. Please see 'Getting Started' section for more information." style="margin-left: 10px">i</span>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#request-apisPost">
                 <h4 class="section-heading">
                     Request
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
 
-            
                 <div id="request-apisPost"class="pre collapse in"><code class="json">POST https://localhost:9443/api/am/publisher/v0.11/apis
 Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 
@@ -2912,18 +2472,13 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
       &quot;corsConfigurationEnabled&quot;: false
    }
 }</code></div>
-            
-            
 
             <div class="pointer" data-toggle="collapse" data-target="#response-apisPost">
                 <h4 class="section-heading">
                     Response
-                    
                         <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    
                 </h4>
             </div>
-            
                 <div id="response-apisPost" class="pre collapse in"><code class="json">HTTP/1.1 201 Created
 Location: https://localhost:9443/api/am/publisher/v0.11/apis/7a2298c4-c905-403f-8fac-38c73301631f
 Content-Type: application/json
@@ -2991,14 +2546,9 @@ Content-Type: application/json
       &quot;corsConfigurationEnabled&quot;: false
    }
 }</code></div>
-            
-            
 
             <h4 class="section-heading">Sample CURL</h4>
-            
                 <div class="pre"><code class="bash">curl -k -H &quot;Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8&quot; -H &quot;Content-Type: application/json&quot; -X POST -d @data.json https://localhost:9443/api/am/publisher/v0.11/apis</code></div>
-            
-            
 
             <h4 class="section-heading" id="scroll-to">Parameters</h4>
             <table class="table table-hover">
@@ -3018,7 +2568,6 @@ Content-Type: application/json
                     <th>Default</th>
                 </tr>
                 </thead>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3037,21 +2586,17 @@ Content-Type: application/json
                         <td>
                             <p class="param-description marked">API object that needs to be added
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 API
-                                
                                     (<a href="#!/models#API">API</a>)
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3070,19 +2615,16 @@ Content-Type: application/json
                         <td>
                             <p class="param-description marked">Media type of the entity in the body. Default is application/json.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked">application/json</p>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             
@@ -3101,19 +2643,16 @@ Content-Type: application/json
                         <td>
                             <p class="param-description marked">Holds the bearer token for apis that require authentication.
 </p>
-                            
                         </td>
                         <td>
                             <span class="param-type">
                                 String
-                                
                             </span>
                         </td>
                         <td>
                             <p class="marked"></p>
                         </td>
                     </tr>
-                
             </table>
 
             <h4 class="section-heading">Responses</h4>
@@ -3132,48 +2671,33 @@ Content-Type: application/json
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains URL of newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. Successful response with the newly created object as entity in the body. Location header contains URL of newly created entity. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#API">API</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. Invalid request or validation error. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. The entity of the request was in a not supported format. </p></td>
                         <td class="parameter">
                             <span class="parameter">
-                                
                                     <a href="#!/models#Error">Error</a>
-                                
-                                
                             </span>
                         </td>
                     </tr>
-                
                 </tbody>
             </table>
-        
-    
 </div>

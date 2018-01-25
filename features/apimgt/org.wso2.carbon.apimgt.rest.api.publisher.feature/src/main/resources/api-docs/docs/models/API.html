@@ -1,14 +1,13 @@
 <div class="main-content">
-    
 
         <h2>API</h2>
             <table class="table table-hover">
                 <colgroup>
                     <col style="width: 10%;"/>
-                    <col style="width: 45%;"/>
-                    <col style="width: 5%;"/>
+                    <col style="width: 30%;"/>
+                    <col style="width: 10%;"/>
                     <col style="width: 20%;"/>
-                    <col style="width: 20%;"/>
+                    <col style="width: 30%;"/>
                 </colgroup>
                 <thead>
                 <tr>
@@ -20,7 +19,6 @@
                 </tr>
                 </thead>
                 <tbody>
-                
                     <tr>
                         <td class="parameter">
                             <p>id</p>
@@ -29,16 +27,13 @@
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">UUID of the api registry artifact\n</p></td>
+                        <td class="parameter"><p class="marked">UUID of the api registry artifact </p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">01234567-0123-0123-0123-012345678901</p></td>
+                        <td class="parameter"> <p class="marked">01234567-0123-0123-0123-012345678901</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>name</p>
@@ -49,14 +44,11 @@
                         </td>
                         <td class="parameter"><p class="marked">Name of the API</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">CalculatorAPI</p></td>
+                        <td class="parameter"> <p class="marked">CalculatorAPI</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>description</p>
@@ -67,14 +59,11 @@
                         </td>
                         <td class="parameter"><p class="marked">A brief description about the API</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">A calculator API that supports basic operations</p></td>
+                        <td class="parameter"> <p class="marked">A calculator API that supports basic operations</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>context</p>
@@ -85,14 +74,11 @@
                         </td>
                         <td class="parameter"><p class="marked">A string that represents the context of the user&#39;s request</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">CalculatorAPI</p></td>
+                        <td class="parameter"> <p class="marked">CalculatorAPI</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>version</p>
@@ -103,14 +89,11 @@
                         </td>
                         <td class="parameter"><p class="marked">The version of the API</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">1.0.0</p></td>
+                        <td class="parameter"> <p class="marked">1.0.0</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>provider</p>
@@ -119,16 +102,13 @@
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">If the provider value is not given user invoking the api will be used as the provider.\n</p></td>
+                        <td class="parameter"><p class="marked">If the provider value is not given user invoking the api will be used as the provider. </p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">admin</p></td>
+                        <td class="parameter"> <p class="marked">admin</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>apiDefinition</p>
@@ -137,16 +117,13 @@
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">Swagger definition of the API which contains details about URI templates and scopes\n</p></td>
+                        <td class="parameter"><p class="marked">Swagger definition of the API which contains details about URI templates and scopes </p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">{&quot;paths&quot;:{&quot;/substract&quot;:{&quot;get&quot;:{&quot;x-auth-type&quot;:&quot;Application &amp; Application User&quot;,&quot;x-throttling-tier&quot;:&quot;Unlimited&quot;,&quot;parameters&quot;:[{&quot;name&quot;:&quot;x&quot;,&quot;required&quot;:true,&quot;type&quot;:&quot;string&quot;,&quot;in&quot;:&quot;query&quot;},{&quot;name&quot;:&quot;y&quot;,&quot;required&quot;:true,&quot;type&quot;:&quot;string&quot;,&quot;in&quot;:&quot;query&quot;}],&quot;responses&quot;:{&quot;200&quot;:{}}}},&quot;/add&quot;:{&quot;get&quot;:{&quot;x-auth-type&quot;:&quot;Application &amp; Application User&quot;,&quot;x-throttling-tier&quot;:&quot;Unlimited&quot;,&quot;parameters&quot;:[{&quot;name&quot;:&quot;x&quot;,&quot;required&quot;:true,&quot;type&quot;:&quot;string&quot;,&quot;in&quot;:&quot;query&quot;},{&quot;name&quot;:&quot;y&quot;,&quot;required&quot;:true,&quot;type&quot;:&quot;string&quot;,&quot;in&quot;:&quot;query&quot;}],&quot;responses&quot;:{&quot;200&quot;:{}}}}},&quot;swagger&quot;:&quot;2.0&quot;,&quot;info&quot;:{&quot;title&quot;:&quot;CalculatorAPI&quot;,&quot;version&quot;:&quot;1.0.0&quot;}}</p></td>
+                        <td class="parameter"> <p class="marked">{&quot;paths&quot;:{&quot;/substract&quot;:{&quot;get&quot;:{&quot;x-auth-type&quot;:&quot;Application &amp; Application User&quot;,&quot;x-throttling-tier&quot;:&quot;Unlimited&quot;,&quot;parameters&quot;:[{&quot;name&quot;:&quot;x&quot;,&quot;required&quot;:true,&quot;type&quot;:&quot;string&quot;,&quot;in&quot;:&quot;query&quot;},{&quot;name&quot;:&quot;y&quot;,&quot;required&quot;:true,&quot;type&quot;:&quot;string&quot;,&quot;in&quot;:&quot;query&quot;}],&quot;responses&quot;:{&quot;200&quot;:{}}}},&quot;/add&quot;:{&quot;get&quot;:{&quot;x-auth-type&quot;:&quot;Application &amp; Application User&quot;,&quot;x-throttling-tier&quot;:&quot;Unlimited&quot;,&quot;parameters&quot;:[{&quot;name&quot;:&quot;x&quot;,&quot;required&quot;:true,&quot;type&quot;:&quot;string&quot;,&quot;in&quot;:&quot;query&quot;},{&quot;name&quot;:&quot;y&quot;,&quot;required&quot;:true,&quot;type&quot;:&quot;string&quot;,&quot;in&quot;:&quot;query&quot;}],&quot;responses&quot;:{&quot;200&quot;:{}}}}},&quot;swagger&quot;:&quot;2.0&quot;,&quot;info&quot;:{&quot;title&quot;:&quot;CalculatorAPI&quot;,&quot;version&quot;:&quot;1.0.0&quot;}}</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>wsdlUri</p>
@@ -155,16 +132,13 @@
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">WSDL URL if the API is based on a WSDL endpoint\n</p></td>
+                        <td class="parameter"><p class="marked">WSDL URL if the API is based on a WSDL endpoint </p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">http://www.webservicex.com/globalweather.asmx?wsdl</p></td>
+                        <td class="parameter"> <p class="marked">http://www.webservicex.com/globalweather.asmx?wsdl</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>status</p>
@@ -175,14 +149,11 @@
                         </td>
                         <td class="parameter"><p class="marked">This describes in which status of the lifecycle the API is</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">CREATED</p></td>
+                        <td class="parameter"> <p class="marked">CREATED</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>responseCaching</p>
@@ -193,14 +164,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">Disabled</p></td>
+                        <td class="parameter"> <p class="marked">Disabled</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>cacheTimeout</p>
@@ -211,14 +179,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#integer">integer</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">300</p></td>
+                        <td class="parameter"> <p class="marked">300</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>destinationStatsEnabled</p>
@@ -229,14 +194,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">Disabled</p></td>
+                        <td class="parameter"> <p class="marked">Disabled</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>isDefaultVersion</p>
@@ -247,14 +209,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#boolean">boolean</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">false</p></td>
+                        <td class="parameter"> <p class="marked">false</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>type</p>
@@ -265,14 +224,11 @@
                         </td>
                         <td class="parameter"><p class="marked">The transport to be set. Accepted values are HTTP, WS</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">HTTP</p></td>
+                        <td class="parameter"> <p class="marked">HTTP</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>transport</p>
@@ -281,16 +237,13 @@
                                 
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">Supported transports for the API (http and/or https).\n</p></td>
+                        <td class="parameter"><p class="marked">Supported transports for the API (http and/or https). </p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#array">array</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">[&quot;http&quot;,&quot;https&quot;]</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>tags</p>
@@ -301,14 +254,11 @@
                         </td>
                         <td class="parameter"><p class="marked">Search keywords related to the API</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#array">array</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">[&quot;substract&quot;,&quot;add&quot;]</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>tiers</p>
@@ -319,14 +269,11 @@
                         </td>
                         <td class="parameter"><p class="marked">The subscription tiers selected for the particular API</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#array">array</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">[&quot;Unlimited&quot;]</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>maxTps</p>
@@ -337,14 +284,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#API_maxTps">API_maxTps</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked"></p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>thumbnailUri</p>
@@ -355,14 +299,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">/apis/01234567-0123-0123-0123-012345678901/thumbnail</p></td>
+                        <td class="parameter"> <p class="marked">/apis/01234567-0123-0123-0123-012345678901/thumbnail</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>visibility</p>
@@ -373,14 +314,11 @@
                         </td>
                         <td class="parameter"><p class="marked">The visibility level of the API. Accepts one of the following. PUBLIC, PRIVATE, RESTRICTED OR CONTROLLED.</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">PUBLIC</p></td>
+                        <td class="parameter"> <p class="marked">PUBLIC</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>visibleRoles</p>
@@ -391,14 +329,11 @@
                         </td>
                         <td class="parameter"><p class="marked">The user roles that are able to access the API</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#array">array</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">&quot;[]&quot;</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>endpointConfig</p>
@@ -409,14 +344,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">{&quot;production_endpoints&quot;:{&quot;url&quot;:&quot;https://localhost:9443/am/sample/pizzashack/v1/api/&quot;,&quot;config&quot;:{&quot;suspendErrorCode&quot;:&quot;101000&quot;,&quot;suspendDuration&quot;:&quot;2000&quot;,&quot;suspendMaxDuration&quot;:&quot;3&quot;,&quot;factor&quot;:&quot;2&quot;,&quot;retryErroCode&quot;:&quot;101000&quot;,&quot;retryTimeOut&quot;:&quot;4&quot;,&quot;retryDelay&quot;:&quot;1000&quot;,&quot;actionSelect&quot;:&quot;fault&quot;,&quot;actionDuration&quot;:&quot;3000&quot;}},&quot;sandbox_endpoints&quot;:{&quot;url&quot;:&quot;https://localhost:9443/am/sample/pizzashack/v1/api/&quot;,&quot;config&quot;:null},&quot;endpoint_type&quot;:&quot;http&quot;}</p></td>
+                        <td class="parameter"> <p class="marked">{&quot;production_endpoints&quot;:{&quot;url&quot;:&quot;https://localhost:9443/am/sample/pizzashack/v1/api/&quot;,&quot;config&quot;:{&quot;suspendErrorCode&quot;:&quot;101000&quot;,&quot;suspendDuration&quot;:&quot;2000&quot;,&quot;suspendMaxDuration&quot;:&quot;3&quot;,&quot;factor&quot;:&quot;2&quot;,&quot;retryErroCode&quot;:&quot;101000&quot;,&quot;retryTimeOut&quot;:&quot;4&quot;,&quot;retryDelay&quot;:&quot;1000&quot;,&quot;actionSelect&quot;:&quot;fault&quot;,&quot;actionDuration&quot;:&quot;3000&quot;}},&quot;sandbox_endpoints&quot;:{&quot;url&quot;:&quot;https://localhost:9443/am/sample/pizzashack/v1/api/&quot;,&quot;config&quot;:null},&quot;endpoint_type&quot;:&quot;http&quot;}</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>endpointSecurity</p>
@@ -427,14 +359,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#API_endpointSecurity">API_endpointSecurity</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked"></p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>gatewayEnvironments</p>
@@ -443,16 +372,13 @@
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">Comma separated list of gateway environments.\n</p></td>
+                        <td class="parameter"><p class="marked">Comma separated list of gateway environments. </p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">Production and Sandbox</p></td>
+                        <td class="parameter"> <p class="marked">Production and Sandbox</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>sequences</p>
@@ -463,14 +389,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#array">array</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">[]</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>subscriptionAvailability</p>
@@ -481,14 +404,11 @@
                         </td>
                         <td class="parameter"><p class="marked">The subscription availability. Accepts one of the following. current_tenant, all_tenants or specific_tenants.</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">current_tenant</p></td>
+                        <td class="parameter"> <p class="marked">current_tenant</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>subscriptionAvailableTenants</p>
@@ -499,14 +419,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#array">array</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">[&quot;tenant1&quot;,&quot;tenant2&quot;]</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>accessControl</p>
@@ -515,16 +432,13 @@
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">Is the API is restricted to certain set of publishers or creators or is it visible to all the\npublishers and creators. If the accessControl restriction is none, this API can be modified by all the\npublishers and creators, if not it can only be viewable/modifiable by certain set of publishers and creators,\n based on the restriction. Accepts one of the following. NONE or RESTRICTED.\n</p></td>
+                        <td class="parameter"><p class="marked">Is the API is restricted to certain set of publishers or creators or is it visible to all the publishers and creators. If the accessControl restriction is none, this API can be modified by all the publishers and creators, if not it can only be viewable/modifiable by certain set of publishers and creators,  based on the restriction. Accepts one of the following. NONE or RESTRICTED. </p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#string">string</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked"></p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>accessControlRoles</p>
@@ -535,14 +449,11 @@
                         </td>
                         <td class="parameter"><p class="marked">The user roles that are able to view/modify as API publisher or creator.</p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#array">array</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">[&quot;admin&quot;]</p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>businessInformation</p>
@@ -553,14 +464,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#API_businessInformation">API_businessInformation</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked"></p></td>
                     </tr>
-                
                     <tr>
                         <td class="parameter">
                             <p>corsConfiguration</p>
@@ -571,15 +479,11 @@
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
-                            
                                 <a href="#!/models#API_corsConfiguration">API_corsConfiguration</a>
-                            
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td  word-break: break-all; class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked"></p></td>
                     </tr>
-                
                 </tbody>
             </table>
-    
 </div>

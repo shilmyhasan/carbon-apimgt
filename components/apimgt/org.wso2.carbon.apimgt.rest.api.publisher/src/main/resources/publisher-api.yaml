@@ -3029,7 +3029,7 @@ definitions:
         description: The user roles that are able to access the API
         items:
           type: string
-        example: []
+        example: '[]'
       endpointConfig:
         type: string
         example: "{\"production_endpoints\":{\"url\":\"https://localhost:9443/am/sample/pizzashack/v1/api/\",\"config\":{\"suspendErrorCode\":\"101000\",\"suspendDuration\":\"2000\",\"suspendMaxDuration\":\"3\",\"factor\":\"2\",\"retryErroCode\":\"101000\",\"retryTimeOut\":\"4\",\"retryDelay\":\"1000\",\"actionSelect\":\"fault\",\"actionDuration\":\"3000\"}},\"sandbox_endpoints\":{\"url\":\"https://localhost:9443/am/sample/pizzashack/v1/api/\",\"config\":null},\"endpoint_type\":\"http\"}"
@@ -3070,7 +3070,7 @@ definitions:
         type: array
         items:
           type: string
-        example: []
+        example: ["tenant1","tenant2"]
       accessControl:
         type: string
         description: |
