@@ -4398,7 +4398,6 @@ public class ApiMgtDAO {
                     String groupIDArray[] = groupingId.split(",");
                     sqlQuery += whereClauseWithMultiGroupId;
                     prepStmt = fillQueryParams(connection, sqlQuery, groupIDArray, 3);
-                    prepStmt = connection.prepareStatement(sqlQuery);
                     prepStmt.setString(1, applicationName);
                     prepStmt.setString(2, keyType);
                     int paramIndex = groupIDArray.length + 2;
