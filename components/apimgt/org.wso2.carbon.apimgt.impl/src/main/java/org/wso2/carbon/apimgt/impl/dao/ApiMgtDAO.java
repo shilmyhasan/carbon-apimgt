@@ -1216,7 +1216,7 @@ public class ApiMgtDAO {
             }
             handleException("Failed to add subscriber data ", e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(ps, null, resultSet);
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
     }
 
