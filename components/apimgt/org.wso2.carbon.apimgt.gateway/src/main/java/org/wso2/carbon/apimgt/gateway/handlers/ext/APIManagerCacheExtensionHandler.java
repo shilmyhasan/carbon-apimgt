@@ -64,7 +64,8 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
             //Remove the super tenant cache entry.
             Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
                     getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME).remove(revokedToken);
-
+            Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
+                    getCache(APIConstants.GATEWAY_INVALID_TOKEN_CACHE_NAME).put(revokedToken, cachedTenantDomain);
             //Remove token from tenant cache.
             removeTokenFromTenantTokenCache(revokedToken, cachedTenantDomain);
 
@@ -107,7 +108,9 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
                 //Remove the tenant cache entry.
                 Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
                         getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME).remove(accessToken);
-
+                // put into invalid token cache
+                Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
+                        getCache(APIConstants.GATEWAY_INVALID_TOKEN_CACHE_NAME).put(accessToken, cachedTenantDomain);
                 if(log.isDebugEnabled()){
                     log.debug("Removed cache entry " + accessToken + " from " + cachedTenantDomain + " domain");
                 }
