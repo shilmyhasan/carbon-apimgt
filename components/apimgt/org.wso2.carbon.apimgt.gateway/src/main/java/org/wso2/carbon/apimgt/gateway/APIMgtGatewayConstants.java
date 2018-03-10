@@ -43,7 +43,7 @@ public class APIMgtGatewayConstants {
     public static final String REVOKED_ACCESS_TOKEN = "RevokedAccessToken";
     public static final String DEACTIVATED_ACCESS_TOKEN = "DeactivatedAccessToken";
     public static final String SCOPES = "Scopes";
-    public static final String REQUEST_EXECUTION_START_TIME ="request.execution.start.time";
+    public static final String REQUEST_EXECUTION_START_TIME = "request.execution.start.time";
     public static final String SYNAPSE_ENDPOINT_ADDRESS = "ENDPOINT_ADDRESS";
 
     public static final String RESOURCE_PATTERN = "^/.+?/.+?([/?].+)$";
@@ -57,5 +57,7 @@ public class APIMgtGatewayConstants {
     public static final String REQUEST_MEDIATION_LATENCY = "request_mediation_latency";
     public static final String RESPONSE_MEDIATION_LATENCY = "response_mediation_latency";
     public static final String OTHER_LATENCY = "other_latency";
+    public static final String GATEWAY_INVALID_TOKEN_CACHE_NAME = "GATEWAY_INVALID_TOKEN_CACHE";
+
 }
 

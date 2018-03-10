@@ -29,6 +29,7 @@ import org.apache.synapse.rest.RESTUtils;
 import org.apache.synapse.rest.Resource;
 import org.apache.synapse.rest.dispatch.RESTDispatcher;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
+import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.Utils;
 import org.wso2.carbon.apimgt.gateway.handlers.security.keys.APIKeyDataStore;
 import org.wso2.carbon.apimgt.gateway.handlers.security.keys.WSAPIKeyDataStore;
@@ -65,7 +66,7 @@ import javax.cache.Caching;
  */
 public class APIKeyValidator {
 
-    private APIKeyDataStore dataStore;
+    protected APIKeyDataStore dataStore;
 
     private boolean gatewayKeyCacheEnabled = true;
 
@@ -77,12 +78,7 @@ public class APIKeyValidator {
 
     public APIKeyValidator(AxisConfiguration axisConfig) {
         //check the client type from config
-        String keyValidatorClientType = APISecurityUtils.getKeyValidatorClientType();
-        if (APIConstants.API_KEY_VALIDATOR_WS_CLIENT.equals(keyValidatorClientType)) {
-            this.dataStore = new WSAPIKeyDataStore();
-        } else if (APIConstants.API_KEY_VALIDATOR_THRIFT_CLIENT.equals(keyValidatorClientType)) {
-            this.dataStore = new ThriftAPIDataStore();
-        }
+        this.dataStore = getDataStore();
 
         this.gatewayKeyCacheEnabled = isGatewayTokenCacheEnabled();
 
@@ -117,7 +113,8 @@ public class APIKeyValidator {
 
     protected Cache getInvalidTokenCache() {
         return Caching.getCacheManager(
-                APIConstants.API_MANAGER_CACHE_MANAGER).getCache(APIConstants.GATEWAY_INVALID_TOKEN_CACHE_NAME);
+                APIConstants.API_MANAGER_CACHE_MANAGER).getCache(APIMgtGatewayConstants
+                .GATEWAY_INVALID_TOKEN_CACHE_NAME);
     }
 
     protected Cache getResourceCache() {
@@ -694,5 +691,15 @@ public class APIKeyValidator {
     private ArrayList<URITemplate> getAllURITemplates(String context, String apiVersion)
             throws APISecurityException {
         return dataStore.getAllURITemplates(context, apiVersion);
+    }
+
+    protected APIKeyDataStore getDataStore() {
+        String keyValidatorClientType = APISecurityUtils.getKeyValidatorClientType();
+        if (APIConstants.API_KEY_VALIDATOR_WS_CLIENT.equals(keyValidatorClientType)) {
+            return new WSAPIKeyDataStore();
+        } else if (APIConstants.API_KEY_VALIDATOR_THRIFT_CLIENT.equals(keyValidatorClientType)) {
+            return new ThriftAPIDataStore();
+        }
+        return null;
     }
 }
