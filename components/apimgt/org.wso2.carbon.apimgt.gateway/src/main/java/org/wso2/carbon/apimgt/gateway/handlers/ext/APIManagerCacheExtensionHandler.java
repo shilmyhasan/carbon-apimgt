@@ -11,9 +11,10 @@ import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import javax.cache.Caching;
+
 import java.util.Map;
 import java.util.TreeMap;
+import javax.cache.Caching;
 
 /**
  * A simple extension handler to clear cache entries associated with the token when token revoked and refreshed.
@@ -49,7 +50,8 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
 
     private void clearCacheForAccessToken(MessageContext messageContext) {
 
-        org.apache.axis2.context.MessageContext axisMC = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+        org.apache.axis2.context.MessageContext axisMC = ((Axis2MessageContext) messageContext)
+                .getAxis2MessageContext();
         TreeMap transportHeaders =
                 ((TreeMap) axisMC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
         String revokedToken = (String) transportHeaders.get(APIMgtGatewayConstants.REVOKED_ACCESS_TOKEN);
@@ -64,7 +66,9 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
             //Remove the super tenant cache entry.
             Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
                     getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME).remove(revokedToken);
-
+            Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
+                    getCache(APIMgtGatewayConstants.GATEWAY_INVALID_TOKEN_CACHE_NAME).put(revokedToken,
+                    cachedTenantDomain);
             //Remove token from tenant cache.
             removeTokenFromTenantTokenCache(revokedToken, cachedTenantDomain);
 
@@ -89,17 +93,18 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
 
     /**
      * Removes the access token that was cached in the tenant's cache space.
-     * @param accessToken - Token to be removed from the cache.
+     *
+     * @param accessToken        - Token to be removed from the cache.
      * @param cachedTenantDomain - Tenant domain from which the token should be removed.
      */
-    private void removeTokenFromTenantTokenCache(String accessToken, String cachedTenantDomain){
+    private void removeTokenFromTenantTokenCache(String accessToken, String cachedTenantDomain) {
         //If the token was cached in the tenant cache
-        if(cachedTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(cachedTenantDomain)){
+        if (cachedTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(cachedTenantDomain)) {
 
-            if(log.isDebugEnabled()){
+            if (log.isDebugEnabled()) {
                 log.debug("Going to remove cache entry " + accessToken + " from " + cachedTenantDomain + " domain");
             }
-            try{
+            try {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().
                         setTenantDomain(cachedTenantDomain, true);
@@ -107,11 +112,14 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
                 //Remove the tenant cache entry.
                 Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
                         getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME).remove(accessToken);
-
-                if(log.isDebugEnabled()){
+                // put into invalid token cache
+                Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
+                        getCache(APIMgtGatewayConstants.GATEWAY_INVALID_TOKEN_CACHE_NAME).put(accessToken,
+                        cachedTenantDomain);
+                if (log.isDebugEnabled()) {
                     log.debug("Removed cache entry " + accessToken + " from " + cachedTenantDomain + " domain");
                 }
-            }finally{
+            } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
