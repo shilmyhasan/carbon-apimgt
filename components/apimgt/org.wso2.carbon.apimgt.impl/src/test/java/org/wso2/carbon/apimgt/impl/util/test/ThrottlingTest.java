@@ -1,6 +1,6 @@
 package org.wso2.carbon.apimgt.impl.util.test;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -25,7 +25,8 @@ import static org.mockito.Mockito.never;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({APIUtil.class, ApiMgtDAO.class, ApplicationPolicy.class, SubscriptionPolicy.class, APIPolicy.class})
-public class ThrottlingTest extends TestCase {
+public class ThrottlingTest  {
+    @Test
     public void testDeleteDefaultThrottlingPoliciesOfSuperTenant() throws APIManagementException {
         final int tenantId = -1234;
         ApiMgtDAO apiMgtDAO = Mockito.mock(ApiMgtDAO.class);
@@ -40,7 +41,7 @@ public class ThrottlingTest extends TestCase {
         Mockito.verify(apiMgtDAO,never()).addSubscriptionPolicy(Mockito.any(SubscriptionPolicy.class));
         Mockito.verify(apiMgtDAO,never()).addAPIPolicy(Mockito.any(APIPolicy.class));
     }
-
+    @Test
     public void testDeleteDefaultThrottlingPoliciesOfTenant() throws APIManagementException {
         final int tenantId = 1;
         ApiMgtDAO apiMgtDAO = Mockito.mock(ApiMgtDAO.class);
