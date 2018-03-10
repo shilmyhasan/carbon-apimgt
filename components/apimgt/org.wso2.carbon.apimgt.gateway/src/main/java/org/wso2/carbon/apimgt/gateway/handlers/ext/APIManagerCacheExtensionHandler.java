@@ -71,7 +71,7 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
                     cachedTenantDomain);
             //Remove token from tenant cache.
             removeTokenFromTenantTokenCache(revokedToken, cachedTenantDomain);
-
+            putInvalidTokenFromTenantTokenCache(revokedToken, cachedTenantDomain);
         }
 
         if (renewedToken != null) {
@@ -112,6 +112,32 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
                 //Remove the tenant cache entry.
                 Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
                         getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME).remove(accessToken);
+                if (log.isDebugEnabled()) {
+                    log.debug("Removed cache entry " + accessToken + " from " + cachedTenantDomain + " domain");
+                }
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * Insert the access token that was cached in the tenant's cache space.
+     *
+     * @param accessToken        - Token to be removed from the cache.
+     * @param cachedTenantDomain - Tenant domain from which the token should be removed.
+     */
+    private void putInvalidTokenFromTenantTokenCache(String accessToken, String cachedTenantDomain) {
+        //If the token was cached in the tenant cache
+        if (cachedTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(cachedTenantDomain)) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Going to put cache entry " + accessToken + " from " + cachedTenantDomain + " domain");
+            }
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().
+                        setTenantDomain(cachedTenantDomain, true);
                 // put into invalid token cache
                 Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).
                         getCache(APIMgtGatewayConstants.GATEWAY_INVALID_TOKEN_CACHE_NAME).put(accessToken,
