@@ -209,6 +209,7 @@ public class APIKeyValidatorClient {
                             condition.setConditionName(xsdCondition.getConditionName());
                             condition.setConditionType(xsdCondition.getConditionType());
                             condition.setConditionValue(xsdCondition.getConditionValue());
+                            condition.isInverted(xsdCondition.getInverted());
                             conditions[conditionCounter] = condition;
                         }
                     }
