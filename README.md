@@ -7,3 +7,4 @@
 - Support-5.0.3 - APIM 1.10.0
 - Support-6.0.4 - APIM 2.0.0
 - Support-6.1.66 - APIM 2.1.0
+- Support-6.2.201 - APIM 2.2.0
