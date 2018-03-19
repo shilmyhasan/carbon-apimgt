@@ -8849,15 +8849,14 @@ public class ApiMgtDAO {
             policyStatement.setString(12, policy.getUserLevel());
             policyStatement.setBoolean(10, true);
             policyStatement.setInt(13, policyId);
-            policyStatement.executeUpdate();
-            resultSet = policyStatement.getGeneratedKeys(); // Get the inserted POLICY_ID (auto incremented value)
+            int rowsUpdated = policyStatement.executeUpdate();
 
             if (driverName.contains("MS SQL")||driverName.contains("Microsoft")) {
                 st.executeUpdate("SET IDENTITY_INSERT AM_API_THROTTLE_POLICY OFF");
             }
 
             // Returns only single row
-            if (resultSet.next()) {
+            if (rowsUpdated > 0) {
                 List<Pipeline> pipelines = policy.getPipelines();
                 if(pipelines != null) {
                     for (Pipeline pipeline : pipelines) { // add each pipeline data to AM_CONDITION_GROUP table
