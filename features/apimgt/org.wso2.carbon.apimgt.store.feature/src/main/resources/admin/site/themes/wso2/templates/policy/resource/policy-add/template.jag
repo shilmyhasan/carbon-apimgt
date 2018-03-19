@@ -249,6 +249,366 @@
     </div>
 </div>
 
+<script id="designer-policy-template-inner" type="text/x-handlebars-template">
+
+    <!-- IP Condition policy -->
+    {{#each executionFlow.conditions}} {{#if_eq type "IP"}}
+    <div class="wr-hidden-operation" data-operation="ip-condition-{{../../executionFlow.id}}" style="display: block">
+        <div class="panel panel-default operation-data" data-operation="ip-condition-policy" data-operation-code="IP_CONDITION_POLICY">
+            <div id="ip-condition-heading-{{../../executionFlow.id}}" class="panel-heading" role="tab">
+                <h2 class="sub-title panel-title">
+                    <%=i18n.localize("IP Condition Policy")%>
+                        <label id="ip-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch" data-toggle="collapse" data-target="#ip-condition-body-{{../../executionFlow.id}}">
+                        <input id="ip-condition-checkbox-{{../../executionFlow.id}}" onclick="changeStatusIcon({{../../executionFlow.id}}, 'IP', this)" {{#if ../enabled}}checked{{/if}} type="checkbox" />
+                        <span class="helper"></span>
+                        <span class="text"></span>
+                    </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            <%=i18n.localize("This configuration is used to throttle by IP address.")%>
+                        </div>
+                </h2>
+            </div>
+            <div id="ip-condition-body-{{../../executionFlow.id}}" class="panel-collapse panel-body collapse {{#if ../enabled}}in{{/if}}" role="tabpanel" aria-labelledby="ip-condition-body-{{../../executionFlow.id}}">
+                <div id="ip-condition-feature-error-msg-{{../../executionFlow.id}}" class="alert alert-danger hidden" role="alert">
+                    <i class="icon fw fw-error"></i><span></span>
+                </div>
+
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="ip-condition-type"><%=i18n.localize("IP Condition Type:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <select onchange="onIpConditionChange('{{../../executionFlow.id}}', this);" class="form-control select required valid" id="ip-condition-type-{{../../executionFlow.id}}" name="ip-condition-type-{{../../executionFlow.id}}">
+                                {{#if_eq ../ipType "specific"}}
+                                    <option value="specificIp" selected><%=i18n.localize("Specific IP")%></option>
+                                    <option value="IPRange"><%=i18n.localize("IP Range")%></option>
+                                {{else}}
+                                    <option value="specificIp"><%=i18n.localize("Specific IP")%></option>
+                                    <option value="IPRange" selected><%=i18n.localize("IP Range")%></option>
+                                {{/if_eq}}
+                            </select>
+                        </div>
+                    </div>
+                    {{#if_eq ../ipType "specific"}}
+                    <div class="form-group" style="display:block" id="specific-ip-block-{{../../../executionFlow.id}}">
+                        <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("IP Address:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control required validInput" id="specific-ip-address-input-{{../../../executionFlow.id}}" name="specific-ip-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="{{../../specificIP}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="display:none" id="ip-range-block-{{../../../executionFlow.id}}">
+                        <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("Start IP Address:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control required validInput" id="ip-range-start-address-input-{{../../../executionFlow.id}}" name="ip-range-start-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="">
+                        </div>
+
+                        <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("End IP Address:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control required validInput" id="ip-range-end-address-input-{{../../../executionFlow.id}}" name="ip-range-end-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="">
+                        </div>
+                    </div>
+                    {{else}}
+                    <div class="form-group" style="display:none" id="specific-ip-block-{{../../../executionFlow.id}}">
+                        <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("IP Address:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control required validInput" id="specific-ip-address-input-{{../../../executionFlow.id}}" name="specific-ip-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="display:block" id="ip-range-block-{{../../../executionFlow.id}}">
+                        <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("Start IP Address:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control required validInput" id="ip-range-start-address-input-{{../../../executionFlow.id}}" name="ip-range-start-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="{{../../startingIP}}">
+                        </div>
+
+                        <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("End IP Address:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control required validInput" id="ip-range-end-address-input-{{../../../executionFlow.id}}" name="ip-range-end-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="{{../../endingIP}}">
+                        </div>
+                    </div>
+                    {{/if_eq}}
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="ip-invert-condition"><%=i18n.localize("Invert Condition:")%></label>
+                        <div class="col-sm-9">
+                            <label id="ip-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch">
+                                <input id="ip-condition-invert-{{../../executionFlow.id}}" {{#if ../invertCondition}}checked{{/if}} type="checkbox" />
+                                <span class="helper"></span>
+                                <span class="text"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if_eq}} {{/each}}
+    <!-- End of IP Condition policy -->
+
+    <!-- Header Condition policy -->
+    {{#each executionFlow.conditions}} {{#if_eq type "Header"}}
+    <div class="wr-hidden-operation" data-operation="header-condition-{{../../executionFlow.id}}" style="display: none">
+        <div class="panel panel-default operation-data" data-operation="header-condition-policy" data-operation-code="HEADER_CONDITION_POLICY">
+            <div id="header-condition-policy-heading" class="panel-heading" role="tab">
+                <h2 class="sub-title panel-title">
+                    <%=i18n.localize("Header Condition Policy ")%>
+                        <label id="header-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch" data-toggle="collapse" data-target="#header-condition-body-{{../../executionFlow.id}}">
+                        <input id="header-condition-checkbox-{{../../executionFlow.id}}" onclick="changeStatusIcon({{../../executionFlow.id}}, 'Header', this)" {{#if ../enabled}}checked{{/if}} type="checkbox" />
+                        <span class="helper"></span>
+                        <span class="text"></span>
+                    </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            <%=i18n.localize("This configuration is used to throttle based on Headers.")%>
+                        </div>
+                </h2>
+            </div>
+            <div id="header-condition-body-{{../../executionFlow.id}}" class="panel-collapse panel-body collapse {{#if ../enabled}}in{{/if}}" role="tabpanel" aria-labelledby="header-condition-body-{{../../executionFlow.id}}">
+                <div id="header-condition-feature-error-msg-{{../../executionFlow.id}}" class="alert alert-danger hidden" role="alert">
+                    <i class="icon fw fw-error"></i><span></span>
+                </div>
+
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="header-name"><%=i18n.localize("Header Name:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control required validInput" id="header-name-{{../../executionFlow.id}}" name="header-name-{{../../executionFlow.id}}" autofocus="autofocus" value="">
+                            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+                            <p id="header-name-help-{{../../executionFlow.id}}" class="hide">
+                                <%=i18n.localize("Name of the header.")%>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="header-value"><%=i18n.localize("Param Value:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control required validInput" id="header-value-{{../../executionFlow.id}}" name="header-value-{{../../executionFlow.id}}" autofocus="autofocus" value="">
+                            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+                            <p id="header-value-help-{{../../executionFlow.id}}" class="hide">
+                                <%=i18n.localize("Value of the header.")%>
+                            </p>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="button" onclick="addHeader('{{../../executionFlow.id}}')" id="add-new-header-{{../../executionFlow.id}}" name="add-new-header-{{../../executionFlow.id}}" class="btn btn-primary has-spinner"><%=i18n.localize("Add")%></button>
+                        </div>
+                    </div>
+                    <div {{#if keyValPairs.length}}style="display:block" {{else}}style="display:none" {{/if}} id="header-value-table-{{../../executionFlow.id}}">
+                        <table class="table table-striped table-condensed" id="header-value-table-content-{{../../executionFlow.id}}">
+                            <thead>
+                                <tr>
+                                    <th class="col-md-5">Header</th>
+                                    <th class="col-md-5">Value</th>
+                                    <th class="col-md-2">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each keyValPairs}}
+                                <tr>
+                                    <td>{{name}}</td>
+                                    <td>{{value}}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary has-spinner" onclick="removeHeaderRow(this, {{../../../executionFlow.id}})"><%=i18n.localize("Delete")%></button>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="header-invert-condition">Invert Condition:</label>
+                        <div class="col-sm-9">
+                            <label id="header-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch">
+                                <input id="header-condition-invert-{{../../executionFlow.id}}" type="checkbox" {{#if ../invertCondition}}checked{{/if}} />
+                                <span class="helper"></span>
+                                <span class="text"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if_eq}} {{/each}}
+    <!-- End of Header Condition policy -->
+
+    <!-- Query Param policy -->
+    {{#each executionFlow.conditions}} {{#if_eq type "QueryParam"}}
+    <div class="wr-hidden-operation" data-operation="query-param-condition-{{../../executionFlow.id}}" style="display: none">
+        <div class="panel panel-default operation-data" data-operation="date-condition-{{../../executionFlow.id}}" data-operation-code="QUERY_PARAM_CONDITION_POLICY">
+            <div id="query-param-condition-heading-{{../../executionFlow.id}}" class="panel-heading" role="tab">
+                <h2 class="sub-title panel-title">
+                    <%=i18n.localize("Query Param Condition Policy")%>
+                        <label id="query-param-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch" data-toggle="collapse" data-target="#query-param-condition-body-{{../../executionFlow.id}}">
+                        <input id="query-param-condition-checkbox-{{../../executionFlow.id}}" onclick="changeStatusIcon({{../../executionFlow.id}}, 'QueryParam', this)" type="checkbox" {{#if ../enabled}}checked{{/if}} />
+                        <span class="helper"></span>
+                        <span class="text"></span>
+                    </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            <%=i18n.localize("This configuration use to throttle based on query parameters.")%>
+                        </div>
+                </h2>
+            </div>
+            <div id="query-param-condition-body-{{../../executionFlow.id}}" class="panel-collapse panel-body collapse {{#if ../enabled}}in{{/if}}" role="tabpanel" aria-labelledby="query-param-condition-body-{{../../executionFlow.id}}">
+
+                <div id="query-param-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
+                    <i class="icon fw fw-error"></i><span></span>
+                </div>
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="query-param-name"><%=i18n.localize("Param Name:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control required validInput" id="query-param-name-{{../../executionFlow.id}}" name="query-param-name-{{../../executionFlow.id}}" autofocus="autofocus" value="">
+                            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+                            <p id="query-param-name-help-{{../../executionFlow.id}}" class="hide">
+                                <%=i18n.localize("Name of the query param.")%>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="query-param-name">Param Value:<span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control required validInput" id="query-param-value-{{../../executionFlow.id}}" name="query-param-value--{{../../executionFlow.id}}" autofocus="autofocus" value="">
+                            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+                            <p id="query-param-value-help-{{../../executionFlow.id}}" class="hide">
+                                <%=i18n.localize("Value of the query param.")%>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="button" onclick="addQueryParam('{{../../executionFlow.id}}')" id="add-new-query-param-{{../../executionFlow.id}}" name="add-new-query-param-{{../../executionFlow.id}}" class="btn btn-primary has-spinner"><%=i18n.localize("Add")%></button>
+                        </div>
+                    </div>
+
+                    <div {{#if keyValPairs.length}}style="display:block" {{else}}style="display:none" {{/if}} id="query-param-value-table-{{../../executionFlow.id}}">
+                        <table class="table table-striped table-condensed" id="query-param-value-table-content-{{../../executionFlow.id}}">
+                            <thead>
+                                <tr>
+                                    <th class="col-md-5">Query Param</th>
+                                    <th class="col-md-5">Value</th>
+                                    <th class="col-md-2">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each keyValPairs}}
+                                <tr>
+                                    <td class="col-md-5">{{name}}</td>
+                                    <td class="col-md-5">{{value}}</td>
+                                    <td class="col-md-2"><button type="button" class="btn btn-primary has-spinner" onclick="removeQueryParamRow(this, {{../../../executionFlow.id}})"><%=i18n.localize("Delete")%></button></td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="query-param-invert-condition"><%=i18n.localize("Invert Condition:")%></label>
+                        <div class="col-sm-9">
+                            <label id="query-param-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch">
+                                <input id="query-param-condition-invert-{{../../executionFlow.id}}" {{#if ../invertCondition}}checked{{/if}} type="checkbox" />
+                                <span class="helper"></span>`
+                                <span class="text"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if_eq}} {{/each}}
+    <!-- End of Query Param Condition policy -->
+
+    <!-- JWT Claims condition policy -->
+    {{#each executionFlow.conditions}} {{#if_eq type "JWTClaim"}}
+    <div class="wr-hidden-operation" data-operation="jwt-claim-condition-{{../../executionFlow.id}}" style="display: none">
+        <div class="panel panel-default operation-data" data-operation="jwt-claim-condition-{{executionFlow.id}}" data-operation-code="JWT_CLAIMS_CONDITION_POLICY">
+            <div id="jwt-claim-condition-heading-{{../../executionFlow.id}}" class="panel-heading" role="tab">
+                <h2 class="sub-title panel-title">
+                    <%=i18n.localize("JWT Condition Policy")%>
+                        <label id="jwt-claims-condition-policy-lbl-{{../../executionFlow.id}}" class="wr-input-control switch" data-toggle="collapse" data-target="#jwt-claim-condition-body-{{../../executionFlow.id}}">
+                        <input id="jwt-claim-condition-checkbox-{{../../executionFlow.id}}" onclick="changeStatusIcon({{../../executionFlow.id}}, 'JWTClaim', this)"  type="checkbox" {{#if ../enabled}}checked{{/if}}/>
+                        <span class="helper"></span>
+                        <span class="text"></span>`
+                    </label>
+                        <hr>
+                        <div class="panel-title-description">
+                            <%=i18n.localize("This configuration is used to define JWT claims conditions")%>
+                        </div>
+                </h2>
+            </div>
+            <div id="jwt-claim-condition-body-{{../../executionFlow.id}}" class="panel-collapse panel-body collapse {{#if ../enabled}}in{{/if}}" role="tabpanel" aria-labelledby="jwt-claim-condition-body-{{../../executionFlow.id}}">
+
+                <div id="jwt-claims-condition-feature-error-msg-{{../../executionFlow.id}}" class="alert alert-danger hidden" role="alert">
+                    <i class="icon fw fw-error"></i><span></span>
+                </div>
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="jwt-claim-name"><%=i18n.localize("Claim Name:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control required validInput" id="jwt-claim-name-{{../../executionFlow.id}}" name="jwt-claim-name-{{../../executionFlow.id}}" autofocus="autofocus" value="">
+                            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+                            <p id="jwt-claim-name-help-{{../../executionFlow.id}}" class="hide">Name of the query param.</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="jwt-claim-name"><%=i18n.localize("Claim Value:")%><span class="requiredAstrix">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control required validInput" id="jwt-claim-value-{{../../executionFlow.id}}" name="jwt-claim-value-{{../../executionFlow.id}}" autofocus="autofocus" value="">
+                            <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
+                            <p id="jwt-claim-value-help-{{../../executionFlow.id}}" class="hide">
+                                <%=i18n.localize("Value of the JWT claim.")%>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="button" onclick="addJwtClaim('{{../../executionFlow.id}}')" id="add-new-jwt-claim-{{../../executionFlow.id}}" name="add-new-jwt-claim-{{../../executionFlow.id}}" class="btn btn-primary has-spinner"><%=i18n.localize("Add")%></button>
+                        </div>
+                    </div>
+                    <div {{#if keyValPairs.length}}style="display:block" {{else}}style="display:none" {{/if}} id="jwt-claim-value-table-{{../../executionFlow.id}}">
+                        <table class="table table-striped table-condensed" id="jwt-claim-value-table-content-{{../../executionFlow.id}}">
+                            <thead>
+                                <tr>
+                                    <th class="col-md-5">Claim</th>
+                                    <th class="col-md-5">Value</th>
+                                    <th class="col-md-2">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each keyValPairs}}
+                                <tr>
+                                    <td>{{name}}</td>
+                                    <td>{{value}}</td>
+                                    <td><button type="button" class="btn btn-primary has-spinner" onclick="removeJwtClaimRow(this, {{../../../executionFlow.id}})"><%=i18n.localize("Delete")%></button></td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="jwt-claim-invert-condition"><%=i18n.localize("Invert Condition:")%></label>
+                        <div class="col-sm-9">
+                            <label id="jwt-claim-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch">
+                                <input id="jwt-claim-condition-invert-{{../../executionFlow.id}}" type="checkbox" {{#if ../invertCondition}}checked{{/if}}/>
+                                <span class="helper"></span>
+                                <span class="text"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if_eq}} {{/each}}
+    <!-- End of jwt claim Condition policy -->
+
+</script>
+
 <script id="designer-policy-template" type="text/x-handlebars-template">
 <div class="panel-group form-group accordion" role="tablist" aria-multiselectable="true">
     <div class="panel panel-default">
@@ -319,7 +679,7 @@
                                     {{/if_eq}}
                                 {{/each}}
                             </a>
-                            <a href="javascript:void(0)" onclick="showAdvanceOperation('jwt-claim-condition-{{executionFlow.id}}', this, '{{executionFlow.id}}')">
+                            <a href="javascript:void(0)" onclick="showAdvanceOperation('jwt-claim-condition-{{../../../executionFlow.id}}', this, '{{executionFlow.id}}')">
                                 <span class="wr-hidden-operations-icon fw-stack">
                                     <i class="fw fw-key fw-stack-2x"></i>
                                 </span>
@@ -336,360 +696,7 @@
                             </a>
                         </div>
                         <div class="wr-hidden-operations-content col-lg-8">
-                            <!-- IP Condition policy -->
-                            {{#each executionFlow.conditions}}
-                            {{#if_eq type "IP"}}
-                            <div class="wr-hidden-operation" data-operation="ip-condition-{{../../executionFlow.id}}" style="display: block">
-                                <div class="panel panel-default operation-data" data-operation="ip-condition-policy" data-operation-code="IP_CONDITION_POLICY">
-                                    <div id="ip-condition-heading-{{../../executionFlow.id}}" class="panel-heading" role="tab">
-                                        <h2 class="sub-title panel-title">
-                                            <%=i18n.localize("IP Condition Policy")%>
-                                            <label id="ip-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch" data-toggle="collapse" data-target="#ip-condition-body-{{../../executionFlow.id}}">
-                                                <input id="ip-condition-checkbox-{{../../executionFlow.id}}" onclick="changeStatusIcon({{../../executionFlow.id}}, 'IP', this)" {{#if ../enabled}}checked{{/if}} type="checkbox" />
-                                                <span class="helper"></span>
-                                                <span class="text"></span>
-                                            </label>
-                                            <hr>
-                                            <div class="panel-title-description">
-                                               <%=i18n.localize("This configuration is used to throttle by IP address.")%>
-                                            </div>
-                                        </h2>
-                                    </div>
-                                    <div id="ip-condition-body-{{../../executionFlow.id}}" class="panel-collapse panel-body collapse {{#if ../enabled}}in{{/if}}" role="tabpanel" aria-labelledby="ip-condition-body-{{../../executionFlow.id}}">
-                                        <div id="ip-condition-feature-error-msg-{{../../executionFlow.id}}" class="alert alert-danger hidden" role="alert">
-                                            <i class="icon fw fw-error"></i><span></span>
-                                        </div>
-
-                                        <div class="form-horizontal">
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="ip-condition-type"><%=i18n.localize("IP Condition Type:")%><span class="requiredAstrix">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <select  onchange="onIpConditionChange('{{../../executionFlow.id}}', this);" class="form-control select required valid" id="ip-condition-type-{{../../executionFlow.id}}" name="ip-condition-type-{{../../executionFlow.id}}">
-                                                        {{#if_eq ../ipType "specific"}}
-                                                            <option value="specificIp" selected><%=i18n.localize("Specific IP")%></option>
-                                                            <option value="IPRange"><%=i18n.localize("IP Range")%></option>
-                                                        {{else}}
-                                                            <option value="specificIp"><%=i18n.localize("Specific IP")%></option>
-                                                            <option value="IPRange" selected><%=i18n.localize("IP Range")%></option>
-                                                        {{/if_eq}}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            {{#if_eq ../ipType "specific"}}
-                                                <div class="form-group" style="display:block" id="specific-ip-block-{{../../../executionFlow.id}}">
-                                                    <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("IP Address:")%><span class="requiredAstrix">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <input type="text" class="form-control required validInput" id="specific-ip-address-input-{{../../../executionFlow.id}}" name="specific-ip-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="{{../../specificIP}}">
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group" style="display:none" id="ip-range-block-{{../../../executionFlow.id}}">
-                                                    <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("Start IP Address:")%><span class="requiredAstrix">*</span></label>
-                                                    <div class="col-sm-3">
-                                                        <input type="text" class="form-control required validInput" id="ip-range-start-address-input-{{../../../executionFlow.id}}" name="ip-range-start-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    </div>
-
-                                                    <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("End IP Address:")%><span class="requiredAstrix">*</span></label>
-                                                    <div class="col-sm-3">
-                                                        <input type="text" class="form-control required validInput" id="ip-range-end-address-input-{{../../../executionFlow.id}}" name="ip-range-end-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    </div>
-                                                </div>
-                                            {{else}}
-                                                <div class="form-group" style="display:none" id="specific-ip-block-{{../../../executionFlow.id}}">
-                                                    <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("IP Address:")%><span class="requiredAstrix">*</span></label>
-                                                    <div class="col-sm-9">
-                                                        <input type="text" class="form-control required validInput" id="specific-ip-address-input-{{../../../executionFlow.id}}" name="specific-ip-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group" style="display:block" id="ip-range-block-{{../../../executionFlow.id}}">
-                                                    <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("Start IP Address:")%><span class="requiredAstrix">*</span></label>
-                                                    <div class="col-sm-3">
-                                                        <input type="text" class="form-control required validInput" id="ip-range-start-address-input-{{../../../executionFlow.id}}" name="ip-range-start-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="{{../../startingIP}}">
-                                                    </div>
-
-                                                    <label class="control-label col-sm-3" for="request-count"><%=i18n.localize("End IP Address:")%><span class="requiredAstrix">*</span></label>
-                                                    <div class="col-sm-3">
-                                                        <input type="text" class="form-control required validInput" id="ip-range-end-address-input-{{../../../executionFlow.id}}" name="ip-range-end-address-input-{{../../../executionFlow.id}}" autofocus="autofocus" value="{{../../endingIP}}">
-                                                    </div>
-                                                </div>
-                                            {{/if_eq}}
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="ip-invert-condition"><%=i18n.localize("Invert Condition:")%></label>
-                                                <div class="col-sm-9">
-                                                    <label id="ip-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch">
-                                                        <input id="ip-condition-invert-{{../../executionFlow.id}}" {{#if ../invertCondition}}checked{{/if}} type="checkbox" />
-                                                        <span class="helper"></span>
-                                                        <span class="text"></span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{/if_eq}}
-                            {{/each}}
-                            <!-- End of IP Condition policy -->
-
-                            <!-- Header Condition policy -->
-                            {{#each executionFlow.conditions}}
-                            {{#if_eq type "Header"}}
-                            <div class="wr-hidden-operation" data-operation="header-condition-{{../../executionFlow.id}}" style="display: none">
-                                <div class="panel panel-default operation-data" data-operation="header-condition-policy" data-operation-code="HEADER_CONDITION_POLICY">
-                                    <div id="header-condition-policy-heading" class="panel-heading" role="tab">
-                                        <h2 class="sub-title panel-title">
-                                            <%=i18n.localize("Header Condition Policy ")%>
-                                            <label id="header-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch" data-toggle="collapse" data-target="#header-condition-body-{{../../executionFlow.id}}">
-                                                <input id="header-condition-checkbox-{{../../executionFlow.id}}" onclick="changeStatusIcon({{../../executionFlow.id}}, 'Header', this)" {{#if ../enabled}}checked{{/if}} type="checkbox" />
-                                                <span class="helper"></span>
-                                                <span class="text"></span>
-                                            </label>
-                                            <hr>
-                                            <div class="panel-title-description">
-                                                <%=i18n.localize("This configuration is used to throttle based on Headers.")%>
-                                            </div>
-                                        </h2>
-                                    </div>
-                                    <div id="header-condition-body-{{../../executionFlow.id}}" class="panel-collapse panel-body collapse {{#if ../enabled}}in{{/if}}" role="tabpanel" aria-labelledby="header-condition-body-{{../../executionFlow.id}}">
-                                        <div id="header-condition-feature-error-msg-{{../../executionFlow.id}}" class="alert alert-danger hidden" role="alert">
-                                            <i class="icon fw fw-error"></i><span></span>
-                                        </div>
-
-                                        <div class="form-horizontal">
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="header-name"><%=i18n.localize("Header Name:")%><span class="requiredAstrix">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control required validInput" id="header-name-{{../../executionFlow.id}}" name="header-name-{{../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
-                                                    <p id="header-name-help-{{../../executionFlow.id}}" class="hide"><%=i18n.localize("Name of the header.")%></p>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                 <label class="control-label col-sm-3" for="header-value"><%=i18n.localize("Param Value:")%><span class="requiredAstrix">*</span></label>
-                                                 <div class="col-sm-9">
-                                                    <input type="text" class="form-control required validInput" id="header-value-{{../../executionFlow.id}}" name="header-value-{{../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
-                                                    <p id="header-value-help-{{../../executionFlow.id}}" class="hide"><%=i18n.localize("Value of the header.")%></p>
-                                                </div>
-
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-sm-offset-3 col-sm-9">
-                                                    <button type="button" onclick="addHeader('{{../../executionFlow.id}}')" id="add-new-header-{{../../executionFlow.id}}" name="add-new-header-{{../../executionFlow.id}}" class="btn btn-primary has-spinner"><%=i18n.localize("Add")%></button>
-                                                </div>
-                                            </div>
-                                            <div {{#if keyValPairs.length}}style="display:block"{{else}}style="display:none"{{/if}} id="header-value-table-{{../../executionFlow.id}}">
-                                                <table class="table table-striped table-condensed" id="header-value-table-content-{{../../executionFlow.id}}">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="col-md-5">Header</th>
-                                                            <th class="col-md-5">Value</th>
-                                                            <th class="col-md-2">Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {{#each keyValPairs}}
-                                                            <tr>
-                                                                <td>{{name}}</td>
-                                                                <td>{{value}}</td>
-                                                                <td>
-                                                                    <button type="button" class="btn btn-primary has-spinner" onclick="removeHeaderRow(this, {{../../../executionFlow.id}})"><%=i18n.localize("Delete")%></button>
-                                                                </td>
-                                                            </tr>
-                                                        {{/each}}
-                                                     </tbody>
-                                                </table>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="header-invert-condition">Invert Condition:</label>
-                                                <div class="col-sm-9">
-                                                    <label id="header-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch">
-                                                        <input id="header-condition-invert-{{../../executionFlow.id}}" type="checkbox" {{#if ../invertCondition}}checked{{/if}} />
-                                                        <span class="helper"></span>
-                                                        <span class="text"></span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{/if_eq}}
-                            {{/each}}
-                            <!-- End of Header Condition policy -->
-
-                            <!-- Query Param policy -->
-                            {{#each executionFlow.conditions}}
-                            {{#if_eq type "QueryParam"}}
-                            <div class="wr-hidden-operation" data-operation="query-param-condition-{{../../executionFlow.id}}" style="display: none">
-                                <div class="panel panel-default operation-data" data-operation="date-condition-{{../../executionFlow.id}}" data-operation-code="QUERY_PARAM_CONDITION_POLICY">
-                                    <div id="query-param-condition-heading-{{../../executionFlow.id}}" class="panel-heading" role="tab">
-                                        <h2 class="sub-title panel-title">
-                                            <%=i18n.localize("Query Param Condition Policy")%>
-                                            <label id="query-param-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch" data-toggle="collapse" data-target="#query-param-condition-body-{{../../executionFlow.id}}">
-                                                <input id="query-param-condition-checkbox-{{../../executionFlow.id}}" onclick="changeStatusIcon({{../../executionFlow.id}}, 'QueryParam', this)" type="checkbox" {{#if ../enabled}}checked{{/if}} />
-                                                <span class="helper"></span>
-                                                <span class="text"></span>
-                                            </label>
-                                            <hr>
-                                            <div class="panel-title-description">
-                                                <%=i18n.localize("This configuration use to throttle based on query parameters.")%>
-                                            </div>
-                                        </h2>
-                                    </div>
-                                    <div id="query-param-condition-body-{{../../executionFlow.id}}" class="panel-collapse panel-body collapse {{#if ../enabled}}in{{/if}}" role="tabpanel" aria-labelledby="query-param-condition-body-{{../../executionFlow.id}}">
-
-                                        <div id="query-param-condition-policy-feature-error-msg" class="alert alert-danger hidden" role="alert">
-                                            <i class="icon fw fw-error"></i><span></span>
-                                        </div>
-                                        <div class="form-horizontal">
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="query-param-name"><%=i18n.localize("Param Name:")%><span class="requiredAstrix">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control required validInput" id="query-param-name-{{../../executionFlow.id}}" name="query-param-name-{{../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
-                                                    <p id="query-param-name-help-{{../../executionFlow.id}}" class="hide"><%=i18n.localize("Name of the query param.")%></p>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="query-param-name">Param Value:<span class="requiredAstrix">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control required validInput" id="query-param-value-{{../../executionFlow.id}}" name="query-param-value--{{../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
-                                                    <p id="query-param-value-help-{{../../executionFlow.id}}" class="hide"><%=i18n.localize("Value of the query param.")%></p>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-sm-offset-3 col-sm-9">
-                                                    <button type="button" onclick="addQueryParam('{{../.
-                                                    ./executionFlow.id}}')" id="add-new-query-param-{{../../executionFlow.id}}" name="add-new-query-param-{{../../executionFlow.id}}" class="btn btn-primary has-spinner"><%=i18n.localize("Add")%></button>
-                                                </div>
-                                            </div>
-
-                                            <div {{#if keyValPairs.length}}style="display:block"{{else}}style="display:none"{{/if}} id="query-param-value-table-{{../../executionFlow.id}}">
-                                                <table class="table table-striped table-condensed" id="query-param-value-table-content-{{../../executionFlow.id}}">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="col-md-5">Query Param</th>
-                                                            <th class="col-md-5">Value</th>
-                                                            <th class="col-md-2">Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                       {{#each keyValPairs}}
-                                                              <tr>
-                                                                <td class="col-md-5">{{name}}</td>
-                                                                <td class="col-md-5">{{value}}</td>
-                                                                <td class="col-md-2"><button type="button" class="btn btn-primary has-spinner" onclick="removeQueryParamRow(this, {{../../../executionFlow.id}})"><%=i18n.localize("Delete")%></button></td>
-                                                              </tr>
-                                                       {{/each}}
-                                                     </tbody>
-                                                </table>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="query-param-invert-condition"><%=i18n.localize("Invert Condition:")%></label>
-                                                <div class="col-sm-9">
-                                                    <label id="query-param-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch">
-                                                        <input id="query-param-condition-invert-{{../../executionFlow.id}}" {{#if ../invertCondition}}checked{{/if}} type="checkbox" />
-                                                        <span class="helper"></span>`
-                                                        <span class="text"></span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{/if_eq}}
-                            {{/each}}
-                            <!-- End of Query Param Condition policy -->
-
-                            <!-- JWT Claims condition policy -->
-                             {{#each executionFlow.conditions}}
-                            {{#if_eq type "JWTClaim"}}
-                            <div class="wr-hidden-operation" data-operation="jwt-claim-condition-{{../../executionFlow.id}}" style="display: none">
-                                <div class="panel panel-default operation-data" data-operation="jwt-claim-condition-{{executionFlow.id}}" data-operation-code="JWT_CLAIMS_CONDITION_POLICY">
-                                    <div id="jwt-claim-condition-heading-{{../../executionFlow.id}}" class="panel-heading" role="tab">
-                                        <h2 class="sub-title panel-title">
-                                            <%=i18n.localize("JWT Condition Policy")%>
-                                            <label id="jwt-claims-condition-policy-lbl-{{../../executionFlow.id}}" class="wr-input-control switch" data-toggle="collapse" data-target="#jwt-claim-condition-body-{{../../executionFlow.id}}">
-                                                <input id="jwt-claim-condition-checkbox-{{../../executionFlow.id}}" onclick="changeStatusIcon({{../../executionFlow.id}}, 'JWTClaim', this)"  type="checkbox" {{#if ../enabled}}checked{{/if}}/>
-                                                <span class="helper"></span>
-                                                <span class="text"></span>`
-                                            </label>
-                                            <hr>
-                                            <div class="panel-title-description">
-                                               <%=i18n.localize("This configuration is used to define JWT claims conditions")%>
-                                            </div>
-                                        </h2>
-                                    </div>
-                                    <div id="jwt-claim-condition-body-{{../../executionFlow.id}}" class="panel-collapse panel-body collapse {{#if ../enabled}}in{{/if}}" role="tabpanel" aria-labelledby="jwt-claim-condition-body-{{../../executionFlow.id}}">
-
-                                        <div id="jwt-claims-condition-feature-error-msg-{{../../executionFlow.id}}" class="alert alert-danger hidden" role="alert">
-                                            <i class="icon fw fw-error"></i><span></span>
-                                        </div>
-                                        <div class="form-horizontal">
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="jwt-claim-name"><%=i18n.localize("Claim Name:")%><span class="requiredAstrix">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control required validInput" id="jwt-claim-name-{{../../executionFlow.id}}" name="jwt-claim-name-{{../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
-                                                    <p id="jwt-claim-name-help-{{../../executionFlow.id}}" class="hide">Name of the query param.</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="jwt-claim-name"><%=i18n.localize("Claim Value:")%><span class="requiredAstrix">*</span></label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control required validInput" id="jwt-claim-value-{{../../executionFlow.id}}" name="jwt-claim-value-{{../../executionFlow.id}}" autofocus="autofocus" value="">
-                                                    <a class="icon-question-sign help_popup" data-trigger="hover" help_data="name_help" data-original-title="" title=""></a>
-                                                    <p id="jwt-claim-value-help-{{executionFlow.id}}" class="hide"><%=i18n.localize("Value of the JWT claim.")%></p>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="col-sm-offset-3 col-sm-9">
-                                                    <button type="button" onclick="addJwtClaim('{{../../executionFlow.id}}')" id="add-new-jwt-claim-{{../../executionFlow.id}}" name="add-new-jwt-claim-{{../../executionFlow.id}}" class="btn btn-primary has-spinner"><%=i18n.localize("Add")%></button>
-                                                </div>
-                                            </div>
-                                            <div {{#if keyValPairs.length}}style="display:block"{{else}}style="display:none"{{/if}} id="jwt-claim-value-table-{{../../executionFlow.id}}">
-                                                <table class="table table-striped table-condensed" id="jwt-claim-value-table-content-{{../../executionFlow.id}}">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="col-md-5">Claim</th>
-                                                            <th class="col-md-5">Value</th>
-                                                            <th class="col-md-2">Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    {{#each keyValPairs}}
-                                                            <tr>
-                                                                <td>{{name}}</td>
-                                                                <td>{{value}}</td>
-                                                                <td><button type="button" class="btn btn-primary has-spinner" onclick="removeJwtClaimRow(this, {{../../../executionFlow.id}})"><%=i18n.localize("Delete")%></button></td>
-                                                              </tr>
-                                                    {{/each}}
-                                                     </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label col-sm-3" for="jwt-claim-invert-condition"><%=i18n.localize("Invert Condition:")%></label>
-                                                <div class="col-sm-9">
-                                                    <label id="jwt-claim-condition-lbl-{{../../executionFlow.id}}" class="wr-input-control switch">
-                                                        <input id="jwt-claim-condition-invert-{{../../executionFlow.id}}" type="checkbox" {{#if ../invertCondition}}checked{{/if}}/>
-                                                        <span class="helper"></span>
-                                                        <span class="text"></span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{/if_eq}}
-                            {{/each}}
-                            <!-- End of jwt claim Condition policy -->
+                            
                             </div>
                             <!-- End of Restrictions -->
 
