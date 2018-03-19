@@ -120,7 +120,14 @@ var addPolicy = function () {
         "executionFlow": executionFlow
     };
     var output = Handlebars.partials['designer-policy-template'](context);
+
+    var innerSource = $("#designer-policy-template-inner").html();
+    Handlebars.partials['designer-policy-template-inner'] = Handlebars.compile(innerSource);
+    var innerOutput = Handlebars.partials['designer-policy-template-inner'](context);
+    output = $(output);
+    output.find('.wr-hidden-operations-content').append(innerOutput);
     $('#pipeline-content').append(output);
+
     $('#executionFlow-desc-' + index).editable();
     apiPolicy.executionFlows.push(executionFlow);
     console.log(apiPolicy);
@@ -370,6 +377,12 @@ var loadPolicy = function (policyName) {
                         "executionFlow": policy.executionFlows[i]
                     };
                     var output = Handlebars.partials['designer-policy-template'](context);
+
+                    var innerSource = $("#designer-policy-template-inner").html();
+                    Handlebars.partials['designer-policy-template-inner'] = Handlebars.compile(innerSource);
+                    var innerOutput = Handlebars.partials['designer-policy-template-inner'](context);
+                    output = $(output);
+                    output.find('.wr-hidden-operations-content').append(innerOutput);
                     $('#pipeline-content').append(output);
                     $('#executionFlow-desc-' + index).editable();
                     apiPolicy.executionFlows.push(policy.executionFlows[i]);
