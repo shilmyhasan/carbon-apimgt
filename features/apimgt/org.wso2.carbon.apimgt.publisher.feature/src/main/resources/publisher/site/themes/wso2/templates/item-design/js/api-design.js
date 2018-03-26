@@ -13,6 +13,9 @@ var apiLevelPolicy = {
     isAPILevel : false
 };
 
+const SWAGGER_CONTENT = "swagger-editor-content"
+const SWAGGER_CONTENT_CACHE = "swagger-editor-content-cache"
+
 Handlebars.registerHelper('countKeys', function(value){
     return Object.keys(value).length * 2 + 1;
 });
@@ -82,7 +85,7 @@ function APIDesigner(){
     Handlebars.partials['designer-resource-template'] = Handlebars.compile(source);
     if($('#scopes-template').length){
         source   = $("#scopes-template").html();
-        Handlebars.partials['scopes-template'] = Handlebars.compile(source);        
+        Handlebars.partials['scopes-template'] = Handlebars.compile(source);
     }
 
     this.init_controllers();
@@ -144,7 +147,7 @@ function APIDesigner(){
         var path = $("#resource_url_pattern").val();
         if(path.charAt(0) != "/")
             path = "/"+path;
-        
+
     	var resource_exist = false;
         $(".http_verb_select").each(function(){    //added this validation to fix https://wso2.org/jira/browse/APIMANAGER-2671
             if($(this).is(':checked')){
@@ -160,14 +163,14 @@ function APIDesigner(){
         if(resource_exist){
         	return;
         }
-        
+
         var resource = {
 
         };
         //create parameters
         var re = /\{[a-zA-Z0-9_-]*\}/g;
         var parameters = [];
-	
+
         while ((m = re.exec($("#resource_url_pattern").val())) != null) {
             if (m.index === re.lastIndex) {
                 re.lastIndex++;
@@ -178,8 +181,8 @@ function APIDesigner(){
                 "allowMultiple": false,
                 "required": true,
 				"type":"string"
-            })            
-        }        
+            })
+        }
 
         var vc=0;
         var ic=0;
@@ -187,8 +190,8 @@ function APIDesigner(){
             if($(this).is(':checked')){
                 if(!designer.check_if_resource_exist( path , $(this).val() ) ){
                     parameters = $.extend(true, [], parameters);
-    		
-    		        var method = $(this).val();               
+
+    		        var method = $(this).val();
                     var tempPara = parameters.concat();
 
                     if(method.toUpperCase() == "POST" || method.toUpperCase() == "PUT" || method.toUpperCase() == "PATCH") {
@@ -203,11 +206,11 @@ function APIDesigner(){
                                     "payload" : {
                                         "type": "string"
                                     }
-                                } 
+                                }
                             }
                         });
                     }
-                    resource[method] = { 
+                    resource[method] = {
                         responses : { '200': {
                             "description" : ""
                             }
@@ -218,7 +221,7 @@ function APIDesigner(){
                     }
                     ic++
                 }
-                vc++;                
+                vc++;
             }
         });
         if(vc==0){
@@ -233,7 +236,7 @@ function APIDesigner(){
     });
 
     isAPIUpdateValid();
-    
+
 }
 
 APIDesigner.prototype.check_if_resource_exist = function(path, method){
@@ -270,7 +273,7 @@ APIDesigner.prototype.set_default_management_values = function(){
                 operations[i]["x-auth-type"] = OPTION_DEFAULT_AUTH;
             }
             else{
-                operations[i]["x-auth-type"] = DEFAULT_AUTH;                
+                operations[i]["x-auth-type"] = DEFAULT_AUTH;
             }
         }
         if(!operations[i]["x-throttling-tier"]){
@@ -292,13 +295,13 @@ APIDesigner.prototype.get_scopes = function() {
     	var scopes = this.api_doc['x-wso2-security'].apim['x-wso2-scopes'];
     	for(var i =0; i < scopes.length ; i++ ){
     	    options.push({ "value": scopes[i].key , "text": scopes[i].name });
-    	}	
+    	}
     }
     return options;
 }
 
 APIDesigner.prototype.has_resources = function(){
-    if(Object.keys(this.api_doc.paths).length == 0) 
+    if(Object.keys(this.api_doc.paths).length == 0)
         return false;
     else
         return true;
@@ -318,8 +321,8 @@ APIDesigner.prototype.update_elements = function(resource, newValue){
     var obj = API_DESIGNER.query($(this).attr('data-path'));
     var obj = obj[0]
     if(obj["$ref"]!=undefined){
-        var obj = API_DESIGNER.query(obj["$ref"].replace("#","$").replace(/\//g,"."));  
-        var obj = obj[0];      
+        var obj = API_DESIGNER.query(obj["$ref"].replace("#","$").replace(/\//g,"."));
+        var obj = obj[0];
     }
     if ($(this).attr('data-attr-type') == "comma_seperated") {
         newValue = $.map(newValue.split(","), $.trim);
@@ -336,11 +339,11 @@ APIDesigner.prototype.update_elements = function(resource, newValue){
             obj['type'] = "string";
         }
     }
-        
+    API_DESIGNER.load_swagger_editor_content();
 };
 
 APIDesigner.prototype.update_elements_boolean = function(resource, newValue){
-    if(newValue == "true") 
+    if(newValue == "true")
         newValue = true;
     else
         newValue = false;
@@ -348,9 +351,9 @@ APIDesigner.prototype.update_elements_boolean = function(resource, newValue){
     var obj = API_DESIGNER.query($(this).attr('data-path'));
     var obj = obj[0];
     if(obj["$ref"]!=undefined ){
-        var obj = API_DESIGNER.query(obj["$ref"].replace("#","$").replace(/\//g,"."));  
-        var obj = obj[0];      
-    }    
+        var obj = API_DESIGNER.query(obj["$ref"].replace("#","$").replace(/\//g,"."));
+        var obj = obj[0];
+    }
     var i = $(this).attr('data-attr');
     obj[i] = newValue;
 };
@@ -366,13 +369,13 @@ APIDesigner.prototype.init_controllers = function(){
     $("#name").change(function(e){ APIDesigner().api_doc.info.title = $(this).val() });
     $("#description").change(function(e){ APIDesigner().api_doc.info.description = $(this).val() });
 
-    this.container.delegate( ".delete_resource", "click", function( event ) { 
+    this.container.delegate( ".delete_resource", "click", function( event ) {
     	$("#messageModal div.modal-footer").html("");
         var operations = API_DESIGNER.query($(this).attr('data-path'));
         var operations = operations[0]
         var i = $(this).attr('data-index');
         var pn = $(this).attr('data-path-name');
-        var op = $(this).attr('data-operation');        
+        var op = $(this).attr('data-operation');
         jagg.message({
             // @todo: param_string
         	content:'Do you want to remove "'+op+' : '+ Handlebars.Utils.escapeExpression(pn) +'" resource from list.',
@@ -386,7 +389,7 @@ APIDesigner.prototype.init_controllers = function(){
         			delete API_DESIGNER.api_doc.paths[pn];
         		}
         	}});
-        //delete resource if no operations       
+        //delete resource if no operations
     });
 
     this.container.delegate(".movedown_resource","click", function(){
@@ -398,8 +401,8 @@ APIDesigner.prototype.init_controllers = function(){
             operations[i] = operations[i+1];
             operations[i+1] = tmp;
         }
-        API_DESIGNER.render_resources();        
-    });     
+        API_DESIGNER.render_resources();
+    });
 
     this.container.delegate(".moveup_resource","click", function(){
         var operations = API_DESIGNER.query($(this).attr('data-path'));
@@ -410,13 +413,13 @@ APIDesigner.prototype.init_controllers = function(){
             operations[i] = operations[i-1];
             operations[i-1] = tmp;
         }
-        API_DESIGNER.render_resources();        
-    });     
+        API_DESIGNER.render_resources();
+    });
 
     this.container.delegate(".add_parameter", "click", function(event){
         var parameter = $(this).parent().find('.parameter_name').val();
         if(parameter == "") return false;
-        var resource_body = $(this).parent().parent();        
+        var resource_body = $(this).parent().parent();
         var resource = API_DESIGNER.query(resource_body.attr('data-path'));
         var resource = resource[0]
         if(resource.parameters ==undefined){
@@ -424,6 +427,8 @@ APIDesigner.prototype.init_controllers = function(){
         }
         resource.parameters.push({ name : parameter , in : "query", required : false , type: "string"});
         //@todo need to checge parent.parent to stop code brak when template change.
+        API_DESIGNER.load_swagger_editor_content();
+        API_DESIGNER.render_resource(resource_body);
         API_DESIGNER.render_resource(resource_body);
     });
 
@@ -469,13 +474,13 @@ APIDesigner.prototype.init_controllers = function(){
     $("#scope_submit").click(function(){
         if(!$("#scope_form").valid()){
             return;
-        }     
+        }
         var securityDefinitions = {
             "apim":{
                 "x-wso2-scopes":[]
             }
         };
-        var API_DESIGNER = APIDesigner();        
+        var API_DESIGNER = APIDesigner();
 		var scope = {
 			name : $("#scopeName").val(),
 			description : $("#scopeDescription").val(),
@@ -519,22 +524,22 @@ APIDesigner.prototype.init_controllers = function(){
                     });
                     return;
                 }
-			
+
 				API_DESIGNER.api_doc['x-wso2-security'].apim['x-wso2-scopes'].push(scope);
 				$("#define_scope_modal").modal('hide');
 				API_DESIGNER.render_scopes();
 				API_DESIGNER.render_resources();
-			
+
 			    } else {
 				jagg.message({
 					content : result.message,
 					type : "error"
 				});
 					return;
-				}       
+				}
 
-		}, "json"); 
-	}); 
+		}, "json");
+	});
 
     $("#swaggerEditor").click(API_DESIGNER.edit_swagger);
 
@@ -542,9 +547,10 @@ APIDesigner.prototype.init_controllers = function(){
 
     $("#close_swagger_editor").click(API_DESIGNER.close_swagger_editor);
 }
- 
+
 APIDesigner.prototype.load_api_document = function(api_document){
     this.api_doc = api_document;
+    this.load_swagger_editor_content();
     this.render_resources();
     this.render_scopes();
     $("#version").val(api_document.info.version);
@@ -554,15 +560,22 @@ APIDesigner.prototype.load_api_document = function(api_document){
     }
 };
 
+APIDesigner.prototype.load_swagger_editor_content = function (){
+    if(this.api_doc != ""){
+        var swagYaml = jsyaml.safeDump(this.api_doc);
+        window.localStorage.setItem(SWAGGER_CONTENT, swagYaml);
+        window.localStorage.setItem(SWAGGER_CONTENT_CACHE, swagYaml);
+    }
+};
 
 APIDesigner.prototype.render_scopes = function(){
-    if($('#scopes-template').length){    
+    if($('#scopes-template').length){
         context = {
             "api_doc" : this.api_doc
         }
         var output = Handlebars.partials['scopes-template'](context);
         $('#scopes_view').html(output);
-    }    
+    }
 };
 
 APIDesigner.prototype.transform = function(api_doc){
@@ -599,24 +612,24 @@ APIDesigner.prototype.render_resources = function(){
 
     /*if(typeof(TIERS) !== 'undefined'  && this.apiLevelPolicy.isAPILevel == true){
         $('#resource_details').find('.throttling_select').editable({
-            emptytext: '+ Throttling',        
+            emptytext: '+ Throttling',
             source: TIERS,
             success : this.update_elements,
             disabled : 'disabled'
         });
-    }*/   
+    }*/
 
     /*if(typeof(TIERS) !== 'undefined' && this.apiLevelPolicy.isAPILevel == false){
         $('#resource_details').find('.throttling_select').editable({
-            emptytext: '+ Throttling',        
+            emptytext: '+ Throttling',
             source: TIERS,
             success : this.update_elements
         });
-    }*/   
+    }*/
 
     if(typeof(AUTH_TYPES) !== 'undefined'){
         $('#resource_details').find('.auth_type_select').editable({
-            emptytext: '+ Auth Type',        
+            emptytext: '+ Auth Type',
             source: AUTH_TYPES,
             autotext: "always",
             display: this.display_element,
@@ -625,7 +638,7 @@ APIDesigner.prototype.render_resources = function(){
     }
 
     $('#resource_details').find('.change_summary').editable({
-        emptytext: '+ Summary',        
+        emptytext: '+ Summary',
         success : this.update_elements,
         inputclass : 'resource_summary'
     });
@@ -636,6 +649,7 @@ APIDesigner.prototype.render_resources = function(){
           '<button type="button" class="btn btn-secondary btn-sm editable-cancel">'+
             '<i class="fw fw-cancel"></i>'+
           '</button>';
+          this.load_swagger_editor_content();
 };
 
 APIDesigner.prototype.render_resource = function(container){
@@ -655,7 +669,7 @@ APIDesigner.prototype.render_resource = function(container){
         var textarea = container.find('.editor').ace({ theme: 'textmate', lang: 'javascript' ,fontSize: "10pt"});
         var decorator = container.find('.editor').data('ace');
         var aceInstance = decorator.editor.ace;
-        aceInstance.getSession().on('change', function(e) {   
+        aceInstance.getSession().on('change', function(e) {
             operation[0]["x-mediation-script"] = aceInstance.getValue();
         });
     }
@@ -714,30 +728,32 @@ APIDesigner.prototype.render_resource = function(container){
         source: [ { value:true, text:"True" },{ value:false, text:"False"} ],
         success : this.update_elements_boolean,
         mode: 'popup'
-    });   
+    });
+       this.load_swagger_editor_content();
 };
 
 APIDesigner.prototype.query = function(path){
     return jsonPath(this.api_doc,path);
 }
 
-APIDesigner.prototype.add_resource = function(resource, path){    
-    
+APIDesigner.prototype.add_resource = function(resource, path){
+
     if(path.charAt(0) != "/")
         path = "/" + path;
     if(this.api_doc.paths[path] == undefined){
-        this.api_doc.paths[path] = resource;  
+        this.api_doc.paths[path] = resource;
     }
     else{
         this.api_doc.paths[path] = $.extend({}, this.api_doc.paths[path], resource);
-    } 
+    }
+    this.load_swagger_editor_content();
     this.render_resources();
 };
 
 APIDesigner.prototype.edit_swagger = function(){
     $("body").addClass("modal-open");
     $(".wizard").hide();
-    $("#swaggerEditer").append('<iframe id="se-iframe"  style="border:0px;"background: #4a4a4a; width="100%" height="100%"></iframe>');    
+    $("#swaggerEditer").append('<iframe id="se-iframe"  style="border:0px;"background: #4a4a4a; width="100%" height="100%"></iframe>');
     document.getElementById('se-iframe').src = $("#swaggerEditer").attr("editor-url");
 
     //Added temparory navebar on top of the swagger editor
@@ -769,6 +785,8 @@ APIDesigner.prototype.close_swagger_editor = function(){
     $('#swaggerEditer').append($('.swagger_editer_header'));
     $('.tempNav').remove();
     $("#swaggerEditer").fadeOut("fast");
+    var swagYaml = window.localStorage.getItem(SWAGGER_CONTENT_CACHE);
+    window.localStorage.setItem(SWAGGER_CONTENT, swagYaml);
 };
 
 APIDesigner.prototype.update_swagger = function(){
@@ -777,9 +795,9 @@ APIDesigner.prototype.update_swagger = function(){
     $(".wizard").show();
     $('#swaggerEditer').append($('.swagger_editer_header'));
     $('.tempNav').remove();
-    $("#swaggerEditer").fadeOut("fast");    
+    $("#swaggerEditer").fadeOut("fast");
     var designer =  APIDesigner();
-    var json = jsyaml.safeLoad(designer.yaml);
+    var json = jsyaml.safeLoad(window.localStorage.getItem(SWAGGER_CONTENT));
     designer.load_api_document(json);          
 };
 
