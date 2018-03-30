@@ -135,7 +135,6 @@ public class APIGatewayManager {
                         client.updateApiForInlineScript(builder, tenantDomain, api.getId());
                     }else if (api.getImplementation().equalsIgnoreCase(APIConstants.IMPLEMENTATION_TYPE_ENDPOINT)){
                         client.updateApi(builder, tenantDomain, api.getId());
-                        client.saveEndpoint(api, builder, tenantDomain);
                     }
 
                     if(api.isDefaultVersion() || api.isPublishedDefaultVersion()){//api.isPublishedDefaultVersion() check is used to detect and update when context etc. is changed in the api which is not the default version but has a published default api
@@ -177,7 +176,6 @@ public class APIGatewayManager {
                         } else if (APIConstants.IMPLEMENTATION_TYPE_ENDPOINT
                                 .equalsIgnoreCase(api.getImplementation())) {
                             client.addApi(builder, tenantDomain, api.getId());
-                            client.addEndpoint(api, builder, tenantDomain);
                         }
 
                         if (api.isDefaultVersion()) {
@@ -221,9 +219,6 @@ public class APIGatewayManager {
                  */
                 log.error("Error occurred deploying sequences on " + environmentName, ex);
                 failedEnvironmentsMap.put(environmentName, ex.getMessage());
-            } catch (EndpointAdminException ex) {
-                log.error("Error occurred when endpoint add/update operation" + environmentName, ex);
-                failedEnvironmentsMap.put(environmentName, ex.getMessage());
             }
         }
         return failedEnvironmentsMap;
@@ -255,7 +250,6 @@ public class APIGatewayManager {
                                 log.debug("Removing API " + api.getId().getApiName() + " From environment " +
                                         environment.getName());
                             }
-                            client.deleteEndpoint(api, tenantDomain);
                             client.deleteApi(tenantDomain, api.getId());
                             undeployCustomSequences(api, tenantDomain, environment);
                         }
@@ -286,10 +280,7 @@ public class APIGatewayManager {
                     log.error("Error occurred when removing from gateway " + environmentName,
                               axisFault);
                     failedEnvironmentsMap.put(environmentName, axisFault.getMessage());
-                } catch (EndpointAdminException ex) {
-                    log.error("Error occurred when deleting endpoint from gateway" + environmentName, ex);
-                    failedEnvironmentsMap.put(environmentName, ex.getMessage());
-                }
+                } 
             }
 
         }
