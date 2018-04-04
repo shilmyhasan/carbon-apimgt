@@ -275,7 +275,7 @@ public class SAMLGroupIDExtractorImpl implements NewPostLoginExecutor {
                                 attributeValueString = getAttributeValue(attributeValues.get(0));
 
                                 if (log.isDebugEnabled()) {
-                                    log.debug(", AttributeValue : " + attributeValueString);
+                                    log.debug("AttributeValue : " + attributeValueString);
                                 }
                             }
                         }
