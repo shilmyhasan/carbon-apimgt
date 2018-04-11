@@ -125,7 +125,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                     log.debug("Cloud API doesn't have a version. Therefore, removing the version.");
                 }
             }
-            if (apiPublisherUrl == null) {
+            if (StringUtils.isBlank(apiPublisherUrl)) {
                 apiPublisherUrl = APISynchronizationConstants.DEFAULT_API_PUBLISHER_URL;
                 if (log.isDebugEnabled()) {
                     log.debug("Using default API publisher URL." + apiPublisherUrl);
@@ -269,7 +269,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
 
             String apiPublisherUrl = ConfigManager.getConfigManager()
                     .getProperty(OnPremiseGatewayConstants.API_PUBLISHER_URL_PROPERTY_KEY);
-            if (apiPublisherUrl == null) {
+            if (StringUtils.isBlank(apiPublisherUrl)) {
                 apiPublisherUrl = OnPremiseGatewayConstants.DEFAULT_API_PUBLISHER_URL;
                 if (log.isDebugEnabled()) {
                     log.debug("Using default API publisher URL: " + apiPublisherUrl);
@@ -329,7 +329,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
         } catch (OnPremiseGatewayException e) {
             throw new APISynchronizationException(e);
         }
-        if (apiPublisherUrl == null) {
+        if (StringUtils.isBlank(apiPublisherUrl)) {
             apiPublisherUrl = OnPremiseGatewayConstants.DEFAULT_API_PUBLISHER_URL;
             if (log.isDebugEnabled()) {
                 log.debug("Using default API publisher URL: " + apiPublisherUrl);
@@ -466,7 +466,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
             try {
                 String apiPublisherUrl = ConfigManager.getConfigManager()
                         .getProperty(OnPremiseGatewayConstants.API_PUBLISHER_URL_PROPERTY_KEY);
-                if (apiPublisherUrl == null) {
+                if (StringUtils.isBlank(apiPublisherUrl)) {
                     apiPublisherUrl = OnPremiseGatewayConstants.DEFAULT_API_PUBLISHER_URL;
                     if (log.isDebugEnabled()) {
                         log.debug("Using default API publisher URL: " + apiPublisherUrl);
@@ -554,7 +554,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
         try {
             String apiPublisherUrl = ConfigManager.getConfigManager()
                     .getProperty(OnPremiseGatewayConstants.API_PUBLISHER_URL_PROPERTY_KEY);
-            if (apiPublisherUrl == null) {
+            if (StringUtils.isBlank(apiPublisherUrl)) {
                 apiPublisherUrl = OnPremiseGatewayConstants.DEFAULT_API_PUBLISHER_URL;
                 if (log.isDebugEnabled()) {
                     log.debug("Using default API publisher URL: " + apiPublisherUrl);
@@ -617,7 +617,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
         try {
             String apiPublisherUrl = ConfigManager.getConfigManager()
                     .getProperty(OnPremiseGatewayConstants.API_PUBLISHER_URL_PROPERTY_KEY);
-            if (apiPublisherUrl == null) {
+            if (StringUtils.isBlank(apiPublisherUrl)) {
                 apiPublisherUrl = OnPremiseGatewayConstants.DEFAULT_API_PUBLISHER_URL;
                 if (log.isDebugEnabled()) {
                     log.debug("Using default API publisher URL: " + apiPublisherUrl);

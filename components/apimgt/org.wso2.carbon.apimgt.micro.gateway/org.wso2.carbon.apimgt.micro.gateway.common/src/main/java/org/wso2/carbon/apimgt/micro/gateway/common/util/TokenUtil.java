@@ -20,6 +20,7 @@ package org.wso2.carbon.apimgt.micro.gateway.common.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.NameValuePair;
@@ -124,7 +125,7 @@ public class TokenUtil {
         }
         String apiPublisherUrl = ConfigManager.getConfigManager()
                 .getProperty(OnPremiseGatewayConstants.API_PUBLISHER_URL_PROPERTY_KEY);
-        if (apiPublisherUrl == null) {
+        if (StringUtils.isBlank(apiPublisherUrl)) {
             apiPublisherUrl = OnPremiseGatewayConstants.DEFAULT_API_PUBLISHER_URL;
             if (log.isDebugEnabled()) {
                 log.debug("Using default API publisher URL: " + apiPublisherUrl);
