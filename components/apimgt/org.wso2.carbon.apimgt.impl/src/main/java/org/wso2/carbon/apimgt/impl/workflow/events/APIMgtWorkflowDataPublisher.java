@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.apimgt.impl.workflow.events;
 
@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /*
-* This class will act as data-publisher for workflow events.Reason for not re-using the usage
-* publisher bundle is there's a maven cyclic dependency appears if we import it from impl bundle.
-*/
+ * This class will act as data-publisher for workflow events.Reason for not re-using the usage
+ * publisher bundle is there's a maven cyclic dependency appears if we import it from impl bundle.
+ */
 
 public class APIMgtWorkflowDataPublisher {
 
@@ -58,7 +58,7 @@ public class APIMgtWorkflowDataPublisher {
     private static String wfStreamVersion;
 
     public APIMgtWorkflowDataPublisher() {
-        if (!enabled) {
+        if (!enabled || analyticsConfig.isSkipWorkFlowEventReceiverConnection()) {
             return;
         }
         if (log.isDebugEnabled()) {
@@ -77,39 +77,29 @@ public class APIMgtWorkflowDataPublisher {
 
     private static DataPublisher getDataPublisher() {
 
-        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-
         //Get DataPublisher which has been registered for the tenant.
-        DataPublisher dataPublisher = getDataPublisher(tenantDomain);
         String bamServerURL = analyticsConfig.getDasReceiverUrlGroups();
         String bamServerAuthURL = analyticsConfig.getDasReceiverAuthUrlGroups();
         String bamServerUser = analyticsConfig.getDasReceiverServerUser();
         String bamServerPassword = analyticsConfig.getDasReceiverServerPassword();
 
         //If a DataPublisher had not been registered for the tenant.
-        if (dataPublisher == null) {
 
-            try {
-                dataPublisher = new DataPublisher(null, bamServerURL, bamServerAuthURL, bamServerUser,
-                        bamServerPassword);
+        DataPublisher dataPublisher = null;
+        try {
+            dataPublisher = new DataPublisher(null, bamServerURL, bamServerAuthURL, bamServerUser,
+                    bamServerPassword);
 
-                //Add created DataPublisher.
-                addDataPublisher(tenantDomain, dataPublisher);
-            } catch (DataPublisherAlreadyExistsException e) {
-                log.warn("Attempting to register a data publisher for the tenant " + tenantDomain +
-                         " when one already exists. Returning existing data publisher");
-                return getDataPublisher(tenantDomain);
-            } catch (DataEndpointConfigurationException e) {
-                log.error("Error while creating data publisher",e);
-            } catch (DataEndpointException e) {
-                log.error("Error while creating data publisher",e);
-            } catch (DataEndpointAgentConfigurationException e) {
-                log.error("Error while creating data publisher",e);
-            } catch (TransportException e) {
-                log.error("Error while creating data publisher",e);
-            } catch (DataEndpointAuthenticationException e) {
-                log.error("Error while creating data publisher",e);
-            }
+        } catch (DataEndpointConfigurationException e) {
+            log.error("Error while creating data publisher", e);
+        } catch (DataEndpointException e) {
+            log.error("Error while creating data publisher", e);
+        } catch (DataEndpointAgentConfigurationException e) {
+            log.error("Error while creating data publisher", e);
+        } catch (TransportException e) {
+            log.error("Error while creating data publisher", e);
+        } catch (DataEndpointAuthenticationException e) {
+            log.error("Error while creating data publisher", e);
         }
 
         return dataPublisher;
@@ -117,7 +107,7 @@ public class APIMgtWorkflowDataPublisher {
 
     public boolean publishEvent(WorkflowDTO workflowDTO) {
         try {
-            if (!enabled) {
+            if (!enabled || analyticsConfig.isSkipWorkFlowEventReceiverConnection()) {
                 return true;
             }
 
@@ -128,7 +118,7 @@ public class APIMgtWorkflowDataPublisher {
                             null, (Object[]) createPayload(workflowDTO));
                 } catch (Exception e) {
                     log.error("Error while publishing workflow event" +
-                              workflowDTO.getWorkflowReference(), e);
+                            workflowDTO.getWorkflowReference(), e);
                 }
             }
         } catch (Exception e) {
@@ -139,9 +129,9 @@ public class APIMgtWorkflowDataPublisher {
 
     public Object createPayload(WorkflowDTO workflowDTO) {
         return new Object[]{workflowDTO.getWorkflowReference(),
-                            workflowDTO.getStatus().toString(), workflowDTO.getTenantDomain(),
-                            workflowDTO.getWorkflowType(), workflowDTO.getCreatedTime(),
-                            workflowDTO.getUpdatedTime()};
+                workflowDTO.getStatus().toString(), workflowDTO.getTenantDomain(),
+                workflowDTO.getWorkflowType(), workflowDTO.getCreatedTime(),
+                workflowDTO.getUpdatedTime()};
     }
 
     public static String getWFStreamName() {
@@ -149,7 +139,7 @@ public class APIMgtWorkflowDataPublisher {
     }
 
     public static String getStreamID() {
-        return getWFStreamName() + ":"+ getWFStreamVersion();
+        return getWFStreamName() + ":" + getWFStreamVersion();
     }
 
     public static String getWFStreamVersion() {
@@ -174,16 +164,17 @@ public class APIMgtWorkflowDataPublisher {
      *
      * @param tenantDomain  - The tenant domain under which the data publisher will be registered.
      * @param dataPublisher - Instance of the DataPublisher
-     * @throws org.wso2.carbon.apimgt.impl.workflow.events.DataPublisherAlreadyExistsException
-     *          - If a data publisher has already been registered under the
-     *          tenant domain
+     * @throws org.wso2.carbon.apimgt.impl.workflow.events.DataPublisherAlreadyExistsException - If a data publisher
+     *                                                                                         has already been
+     *                                                                                         registered under the
+     *                                                                                         tenant domain
      */
     public static void addDataPublisher(String tenantDomain,
                                         DataPublisher dataPublisher)
             throws DataPublisherAlreadyExistsException {
         if (dataPublisherMap.containsKey(tenantDomain)) {
             throw new DataPublisherAlreadyExistsException("A DataPublisher has already been created for the tenant " +
-                                                          tenantDomain);
+                    tenantDomain);
         }
 
         dataPublisherMap.put(tenantDomain, dataPublisher);
