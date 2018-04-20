@@ -155,6 +155,8 @@
             the stats enabled flag is set to true. -->
         <SkipEventReceiverConnection>false</SkipEventReceiverConnection>
 
+        <SkipWorkflowEventPublisher>false</SkipWorkflowEventPublisher>
+
         <!-- API Usage Data Publisher. -->
         <PublisherClass>org.wso2.carbon.apimgt.usage.publisher.APIMgtUsageDataBridgeDataPublisher</PublisherClass>
 
