@@ -679,7 +679,7 @@
                                     {{/if_eq}}
                                 {{/each}}
                             </a>
-                            <a href="javascript:void(0)" onclick="showAdvanceOperation('jwt-claim-condition-{{../../../executionFlow.id}}', this, '{{executionFlow.id}}')">
+                            <a href="javascript:void(0)" onclick="showAdvanceOperation('jwt-claim-condition-{{executionFlow.id}}', this, '{{executionFlow.id}}')">
                                 <span class="wr-hidden-operations-icon fw-stack">
                                     <i class="fw fw-key fw-stack-2x"></i>
                                 </span>
