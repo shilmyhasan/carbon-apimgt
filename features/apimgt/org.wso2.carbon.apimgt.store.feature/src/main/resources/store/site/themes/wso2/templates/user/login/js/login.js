@@ -168,8 +168,5 @@ function getAPIPublisherURL(){
 
 function login() {
 	var goto_url = $.cookie("goto_url");
-    login.loginbox.login($("#username").val(), $("#password").val(), goto_url,$("#tenant").val());
+    login.loginbox.login($("#username").val().trim(), $("#password").val(), goto_url,$("#tenant").val());
 }
-
-
-
