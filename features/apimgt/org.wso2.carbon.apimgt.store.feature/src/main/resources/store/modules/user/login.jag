@@ -19,7 +19,6 @@ var login = function (username, password,tenantMode) {
 
     result = store.login(username, password);
     username = result.user;
-    username = username.trim();
     if (result.error) {
         if (log.isDebugEnabled()) {
             log.debug("Error while authenticating user : " + username);
@@ -83,7 +82,9 @@ var loginWithSAMLToken = function (token) {
 
     var cookieString = cookie.split(";")[0].split(":")[1];
     var userName = ssoRelyingParty.getSAMLResponseNameId(token);
-    userName = userName.trim();
+    if (userName) {
+        userName = userName.trim();
+    }
     var decodedSamlReponse = ssoRelyingParty.decode(token);
     var groupId = store.getGroupIds(decodedSamlReponse);
      //Store and empty string instead of null if no group Id is found. This is done so that when checking for a string array

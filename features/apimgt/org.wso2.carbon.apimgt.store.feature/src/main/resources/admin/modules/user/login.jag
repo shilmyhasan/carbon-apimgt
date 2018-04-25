@@ -99,7 +99,9 @@ var loginWithSAMLToken = function (token) {
    // var cookieString = cookie.split(";")[0].split(":")[1];
    var cookieString = xhr.getResponseHeader("Set-Cookie");
     var userName = ssoRelyingParty.getSAMLResponseNameId(token);
-    userName = userName.trim();
+    if (userName) {
+        userName = userName.trim();
+    }
     getWorkflowCookie(username,password);
 
     return {
