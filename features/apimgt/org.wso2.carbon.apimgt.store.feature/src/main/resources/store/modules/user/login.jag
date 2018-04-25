@@ -1,5 +1,6 @@
 <%
 var login = function (username, password,tenantMode) {
+    username = username.trim();
     var result, isSuperTenant, message,
             log = new Log(),
             manager = jagg.module("manager"),
@@ -81,7 +82,9 @@ var loginWithSAMLToken = function (token) {
 
     var cookieString = cookie.split(";")[0].split(":")[1];
     var userName = ssoRelyingParty.getSAMLResponseNameId(token);
-
+    if (userName) {
+        userName = userName.trim();
+    }
     var decodedSamlReponse = ssoRelyingParty.decode(token);
     var groupId = store.getGroupIds(decodedSamlReponse);
      //Store and empty string instead of null if no group Id is found. This is done so that when checking for a string array
