@@ -5277,6 +5277,84 @@ public class ApiMgtDAO {
     /**
      * Fetches an Application by name.
      *
+     * @param applicationID Name of the Application
+     * @param userId          Name of the User.
+     * @param groupId         Group ID
+     * @throws APIManagementException
+     */
+     public boolean isAppAllowed(int applicationID, String userId, String groupId)
+            throws APIManagementException {
+        //mysql> select APP.APPLICATION_ID, APP.NAME, APP.SUBSCRIBER_ID,APP.APPLICATION_TIER,APP.CALLBACK_URL,APP
+        // .DESCRIPTION,
+        // APP.APPLICATION_STATUS from AM_SUBSCRIBER as SUB,AM_APPLICATION as APP
+        // where SUB.user_id='admin' AND APP.name='DefaultApplication' AND SUB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID;
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+
+        Application application = null;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+
+            String query = "SELECT APP.APPLICATION_ID FROM AM_SUBSCRIBER SUB, AM_APPLICATION APP";
+            String whereClause = "  WHERE SUB.USER_ID =? AND APP.APPLICATION_ID=? AND " +
+                    "SUB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID";
+            String whereClauseCaseInSensitive = "  WHERE LOWER(SUB.USER_ID) =LOWER(?) AND APP.APPLICATION_ID=? AND SUB" + "" +
+                    ".SUBSCRIBER_ID=APP.SUBSCRIBER_ID";
+            String whereClauseWithGroupId = "  WHERE  (APP.GROUP_ID = ? OR ((APP.GROUP_ID='' OR APP.GROUP_ID IS NULL)"
+                    + " AND SUB.USER_ID = ?)) AND " + "APP.APPLICATION_ID = ? AND SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID";
+
+            String whereClauseWithMultiGroupId = "  WHERE  ((APP.APPLICATION_ID IN (SELECT APPLICATION_ID  FROM " +
+                    "AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID IN ($params) AND TENANT = ?))  OR   SUB.USER_ID = ? " +
+                    "OR (APP.APPLICATION_ID IN (SELECT APPLICATION_ID FROM AM_APPLICATION WHERE GROUP_ID = ?))) " +
+                    "AND APP.APPLICATION_ID = ? AND SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID";
+
+            if (groupId != null && !"null".equals(groupId) && !groupId.isEmpty()) {
+                if (multiGroupAppSharingEnabled) {
+                    Subscriber subscriber = getSubscriber(userId);
+                    String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
+                    query += whereClauseWithMultiGroupId;
+                    String[] groupIds = groupId.split(",");
+                    int parameterIndex = groupIds.length;
+                    //
+                    prepStmt = fillQueryParams(connection, query, groupIds, 1);
+                    prepStmt.setString(++parameterIndex, tenantDomain);
+                    prepStmt.setString(++parameterIndex, userId);
+                    prepStmt.setString(++parameterIndex, tenantDomain + '/' + groupId);
+                    prepStmt.setInt(++parameterIndex, applicationID);
+                } else {
+                    query += whereClauseWithGroupId;
+                    prepStmt = connection.prepareStatement(query);
+                    prepStmt.setString(1, groupId);
+                    prepStmt.setString(2, userId);
+                    prepStmt.setInt(3, applicationID);
+                }
+            } else {
+                if (forceCaseInsensitiveComparisons) {
+                    query = query + whereClauseCaseInSensitive;
+                } else {
+                    query = query + whereClause;
+                }
+                prepStmt = connection.prepareStatement(query);
+                prepStmt.setString(1, userId);
+                prepStmt.setInt(2, applicationID);
+            }
+
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            handleException("Error while obtaining details of the Application : " + applicationID, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return false;
+    }
+
+    /**
+     * Fetches an Application by name.
+     *
      * @param applicationName Name of the Application
      * @param userId          Name of the User.
      * @param groupId         Group ID
