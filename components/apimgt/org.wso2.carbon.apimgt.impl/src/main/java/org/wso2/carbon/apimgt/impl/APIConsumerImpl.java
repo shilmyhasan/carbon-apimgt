@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.impl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -2121,6 +2122,11 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     @Override
     public SubscriptionResponse addSubscription(APIIdentifier identifier, String userId, int applicationId)
             throws APIManagementException {
+        boolean isValid = isAppAllowed(userId, applicationId);
+        if (!isValid) {
+            log.error("Application " + applicationId + " is not accessible to user " + userId);
+            throw new APIManagementException("Application is not accessible to user " + userId);
+        }
         API api = getAPI(identifier);
         WorkflowResponse workflowResponse = null;
         int subscriptionId;
@@ -2209,6 +2215,12 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     public void removeSubscription(APIIdentifier identifier, String userId, int applicationId)
             throws APIManagementException {
         boolean isTenantFlowStarted = false;
+        //check application is viewable to logged user
+        boolean isValid = isAppAllowed(userId, applicationId);
+        if (!isValid) {
+            log.error("Application " + applicationId + " is not accessible to user " + userId);
+            throw new APIManagementException("Application is not accessible to user " + userId);
+        }
 
         String providerTenantDomain = MultitenantUtils.getTenantDomain(APIUtil.
                 replaceEmailDomainBack(identifier.getProviderName()));
@@ -3327,4 +3339,22 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return false;
     }
 
+    private boolean isAppAllowed(String userId, int applicationId) {
+        org.json.JSONObject obj = new org.json.JSONObject();
+        try {
+            obj.put("user", userId);
+            obj.put("isSuperTenant", MultitenantUtils.getTenantDomain(username)
+                    == org.wso2.carbon.base.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+            String groupId = getGroupIds(obj.toString());
+            if (groupId == null) {
+                groupId = "";
+            }
+            return apiMgtDAO.isAllowedApp(applicationId, userId, groupId);
+        } catch (JSONException e) {
+            log.error("Error occurred while getting user group id for user: " + userId, e);
+        } catch (APIManagementException e) {
+            log.error("Error occurred while getting user group id for user: " + userId, e);
+        }
+        return false;
+    }
 }
