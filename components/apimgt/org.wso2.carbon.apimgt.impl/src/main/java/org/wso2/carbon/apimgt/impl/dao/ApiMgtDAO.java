@@ -5304,7 +5304,7 @@ public class ApiMgtDAO {
                     "OR (APP.APPLICATION_ID IN (SELECT APPLICATION_ID FROM AM_APPLICATION WHERE GROUP_ID = ?))) " +
                     "AND APP.APPLICATION_ID = ? AND SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID";
 
-            if (groupId != null && !"null".equals(groupId) && !groupId.isEmpty()) {
+            if (!StringUtils.isEmpty(groupId) && !"null".equals(groupId)) {
                 if (multiGroupAppSharingEnabled) {
                     Subscriber subscriber = getSubscriber(userId);
                     String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());

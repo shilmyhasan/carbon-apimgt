@@ -2313,8 +2313,8 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     private boolean validateApplication(String userId, int applicationId) {
         org.json.JSONObject obj = new org.json.JSONObject();
         try {
-                obj.put("user", userId);
-                obj.put("isSuperTenant", MultitenantUtils.getTenantDomain(username)
+                obj.put(APIConstants.USER, userId);
+                obj.put(APIConstants.IS_SUPER_TENANT, MultitenantUtils.getTenantDomain(username)
                                 == org.wso2.carbon.base.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                 String[] groupIds = getGroupIds(obj.toString());
                 StringBuilder groupIDList = new StringBuilder();
