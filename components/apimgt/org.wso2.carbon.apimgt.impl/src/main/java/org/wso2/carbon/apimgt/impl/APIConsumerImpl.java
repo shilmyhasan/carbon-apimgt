@@ -2304,6 +2304,12 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
     }
 
+    /**
+     * Check whether the application is accessible to the sepcified user
+     * @param userId username
+     * @param applicationId application ID
+     * @return true if the application is accessible by the specified user
+     */
     private boolean validateApplication(String userId, int applicationId) {
         org.json.JSONObject obj = new org.json.JSONObject();
         try {
@@ -2313,7 +2319,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 String[] groupIds = getGroupIds(obj.toString());
                 StringBuilder groupIDList = new StringBuilder();
                 if (groupIds != null) {
-                    for (int i = 0; i<groupIds.length; i++) {
+                    for (int i = 0; i < groupIds.length; i++) {
                         groupIDList = groupIDList.append(groupIds[i] + ",");
                     }
                     groupIDList.deleteCharAt(groupIDList.length() - 1);
