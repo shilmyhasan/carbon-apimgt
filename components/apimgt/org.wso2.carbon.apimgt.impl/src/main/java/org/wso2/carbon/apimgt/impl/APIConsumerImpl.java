@@ -2305,7 +2305,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     /**
-     * Check whether the application is accessible to the sepcified user
+     * Check whether the application is accessible to the specified user
      * @param userId username
      * @param applicationId application ID
      * @return true if the application is accessible by the specified user
