@@ -2320,9 +2320,9 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 }
                 return apiMgtDAO.isAppAllowed(applicationId, userId, groupIDList.toString());
             } catch (JSONException e) {
-                log.error("Error occurred while getting user group id", e);
+                log.error("Error occurred while getting user group ids", e);
             } catch (APIManagementException e) {
-                log.error("Error occurred while getting user group id", e);
+                log.error("Error occurred while getting user group ids", e);
             }
         return false;
     }

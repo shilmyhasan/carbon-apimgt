@@ -5275,24 +5275,19 @@ public class ApiMgtDAO {
     }
 
     /**
-     * Fetches an Application by name.
+     * Checks whether application is accessible to the specified user
      *
-     * @param applicationID Name of the Application
+     * @param applicationID ID of the Application
      * @param userId          Name of the User.
-     * @param groupId         Group ID
+     * @param groupId         Group IDs
      * @throws APIManagementException
      */
      public boolean isAppAllowed(int applicationID, String userId, String groupId)
             throws APIManagementException {
-        //mysql> select APP.APPLICATION_ID, APP.NAME, APP.SUBSCRIBER_ID,APP.APPLICATION_TIER,APP.CALLBACK_URL,APP
-        // .DESCRIPTION,
-        // APP.APPLICATION_STATUS from AM_SUBSCRIBER as SUB,AM_APPLICATION as APP
-        // where SUB.user_id='admin' AND APP.name='DefaultApplication' AND SUB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID;
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
 
-        Application application = null;
         try {
             connection = APIMgtDBUtil.getConnection();
 
@@ -5345,7 +5340,8 @@ public class ApiMgtDAO {
                 return true;
             }
         } catch (SQLException e) {
-            handleException("Error while obtaining details of the Application : " + applicationID, e);
+            handleException("Error while checking whether the application : " + applicationID + " is accessible " +
+                    "to user " + userId, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
         }
