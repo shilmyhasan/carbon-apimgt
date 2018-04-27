@@ -5294,8 +5294,8 @@ public class ApiMgtDAO {
             String query = "SELECT APP.APPLICATION_ID FROM AM_SUBSCRIBER SUB, AM_APPLICATION APP";
             String whereClause = "  WHERE SUB.USER_ID =? AND APP.APPLICATION_ID=? AND " +
                     "SUB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID";
-            String whereClauseCaseInSensitive = "  WHERE LOWER(SUB.USER_ID) =LOWER(?) AND APP.APPLICATION_ID=? AND SUB" + "" +
-                    ".SUBSCRIBER_ID=APP.SUBSCRIBER_ID";
+            String whereClauseCaseInSensitive = "  WHERE LOWER(SUB.USER_ID) =LOWER(?) AND APP.APPLICATION_ID=? AND SUB"
+                    + ".SUBSCRIBER_ID=APP.SUBSCRIBER_ID";
             String whereClauseWithGroupId = "  WHERE  (APP.GROUP_ID = ? OR ((APP.GROUP_ID='' OR APP.GROUP_ID IS NULL)"
                     + " AND SUB.USER_ID = ?)) AND " + "APP.APPLICATION_ID = ? AND SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID";
 
