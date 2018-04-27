@@ -5311,7 +5311,7 @@ public class ApiMgtDAO {
                     query += whereClauseWithMultiGroupId;
                     String[] groupIds = groupId.split(",");
                     int parameterIndex = groupIds.length;
-                    //
+
                     prepStmt = fillQueryParams(connection, query, groupIds, 1);
                     prepStmt.setString(++parameterIndex, tenantDomain);
                     prepStmt.setString(++parameterIndex, userId);
