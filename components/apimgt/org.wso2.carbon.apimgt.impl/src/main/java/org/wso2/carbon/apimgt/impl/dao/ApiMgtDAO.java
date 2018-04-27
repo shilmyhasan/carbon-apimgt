@@ -5326,9 +5326,9 @@ public class ApiMgtDAO {
                 }
             } else {
                 if (forceCaseInsensitiveComparisons) {
-                    query = query + whereClauseCaseInSensitive;
+                    query += whereClauseCaseInSensitive;
                 } else {
-                    query = query + whereClause;
+                    query += whereClause;
                 }
                 prepStmt = connection.prepareStatement(query);
                 prepStmt.setString(1, userId);
