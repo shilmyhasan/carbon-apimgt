@@ -489,7 +489,7 @@ public class RoleBasedScopesIssuerTestCase {
     }
 
     @Test
-    public void testGetScopes1() throws Exception {
+    public void testGetScopesOfRolesWithSpacesAndCases() throws Exception {
         AbstractUserStoreManager abstractUserStoreManager = Mockito.mock(AbstractUserStoreManager.class);
         Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);

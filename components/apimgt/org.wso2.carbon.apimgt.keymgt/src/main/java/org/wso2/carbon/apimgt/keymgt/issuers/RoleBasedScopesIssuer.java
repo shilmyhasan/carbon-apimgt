@@ -149,10 +149,9 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             List<String> authorizedScopes = new ArrayList<String>();
             String preservedCaseSensitiveValue = System.getProperty(PRESERVED_CASE_SENSITIVE_VARIABLE);
             boolean preservedCaseSensitive = JavaUtils.isTrueExplicitly(preservedCaseSensitiveValue);
-
             List<String> userRoleList;
             if (preservedCaseSensitive) {
-                userRoleList = new ArrayList<String>(Arrays.asList(userRoles));
+                userRoleList = Arrays.asList(userRoles);
             } else {
                 userRoleList = new ArrayList<String>();
                 for (String aRole : userRoles) {
