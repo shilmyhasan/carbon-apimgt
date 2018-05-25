@@ -206,6 +206,10 @@ public class ApisApiServiceImpl extends ApisApiService {
                 RestApiUtil.handleBadRequest("Error occurred while adding API. API with name " +
                         body.getName() + " already exists." , log);
             }*/
+            if (apiProvider.isApiNameWithDifferentCaseExist(body.getName())) {
+                RestApiUtil.handleBadRequest("Error occurred while adding API. API with name " + body.getName()
+                        + " already exists.", log);
+            }
 
             //Get all existing versions of  api been adding
             List<String> apiVersions = apiProvider.getApiVersionsMatchingApiName(body.getName(), username);
