@@ -1415,6 +1415,8 @@ public class APIConsumerImplTest {
                 .thenReturn("system/governance");
         PowerMockito.when(APIUtil.getAPI((GenericArtifact) Mockito.any())).thenReturn(api);
         PowerMockito.when(APIUtil.replaceEmailDomainBack(Mockito.anyString())).thenReturn(providerId);
+        PowerMockito.when(APIUtil.getLcStateFromArtifact((GovernanceArtifact) Mockito.any()))
+                .thenReturn(APIConstants.PUBLISHED);
         GenericArtifact genericArtifact1 = new GenericArtifactImpl(new QName("local"), "artifact1");
         GenericArtifact genericArtifact2 = new GenericArtifactImpl(new QName("local"), "artifact2");
         GenericArtifact[] genericArtifacts = new GenericArtifact[] { genericArtifact1, genericArtifact2 };
@@ -1467,6 +1469,8 @@ public class APIConsumerImplTest {
                 .thenReturn("system/governance");
         PowerMockito.when(APIUtil.getAPI((GenericArtifact) Mockito.any())).thenReturn(api);
         PowerMockito.when(APIUtil.replaceEmailDomainBack(Mockito.anyString())).thenReturn(providerId);
+        PowerMockito.when(APIUtil.getLcStateFromArtifact((GovernanceArtifact) Mockito.any()))
+                .thenReturn(APIConstants.PUBLISHED);
         GenericArtifact genericArtifact1 = new GenericArtifactImpl(new QName("local"), "artifact1");
         GenericArtifact genericArtifact2 = new GenericArtifactImpl(new QName("local"), "artifact2");
         GenericArtifact[] genericArtifacts = new GenericArtifact[] { genericArtifact1, genericArtifact2 };

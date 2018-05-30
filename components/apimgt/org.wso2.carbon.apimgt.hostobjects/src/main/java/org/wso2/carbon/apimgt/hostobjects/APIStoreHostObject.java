@@ -1014,7 +1014,7 @@ public class APIStoreHostObject extends ScriptableObject {
                                        APIUtil.replaceEmailDomainBack(apiIdentifier.getProviderName()));
                         currentApi.put("version", currentApi, apiIdentifier.getVersion());
                         currentApi.put("description", currentApi, api.getDescription());
-                        currentApi.put("status", currentApi, api.getStatus().toString());
+                        currentApi.put("status", currentApi, api.getStatus());
                         currentApi.put("rates", currentApi, api.getRating());
                         currentApi.put("description", currentApi, api.getDescription());
                         currentApi.put("endpoint", currentApi, api.getUrl());
@@ -1055,7 +1055,7 @@ public class APIStoreHostObject extends ScriptableObject {
                                        APIUtil.replaceEmailDomainBack(apiIdentifier.getProviderName()));
                         currentApi.put("version", currentApi, apiIdentifier.getVersion());
                         currentApi.put("description", currentApi, api.getDescription());
-                        currentApi.put("status", currentApi, api.getStatus().toString());
+                        currentApi.put("status", currentApi, api.getStatus());
                         currentApi.put("rates", currentApi, api.getRating());
                         currentApi.put("description", currentApi, api.getDescription());
                         currentApi.put("endpoint", currentApi, api.getUrl());
@@ -1364,7 +1364,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     currentApi.put("version", currentApi,
                             apiIdentifier.getVersion());
                     currentApi.put("description", currentApi, api.getDescription());
-                    currentApi.put("status", currentApi, api.getStatus().toString());
+                    currentApi.put("status", currentApi, api.getStatus());
                     currentApi.put("rates", currentApi, api.getRating());
                     if (api.getThumbnailUrl() == null) {
                         currentApi.put("thumbnailurl", currentApi,
@@ -1558,7 +1558,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 row.put("provider", row, APIUtil.replaceEmailDomainBack(apiIdentifier.getProviderName()));
                 row.put("version", row, apiIdentifier.getVersion());
                 row.put("context", row, api.getContext());
-                row.put("status", row, "Deployed"); // api.getStatus().toString()
+                row.put("status", row, "Deployed"); // api.getStatus()
                 if (api.getThumbnailUrl() == null) {
                     row.put("thumbnailurl", row, "images/api-default.png");
                 } else {
@@ -1722,7 +1722,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     row.put("provider", row, APIUtil.replaceEmailDomainBack(apiIdentifier.getProviderName()));
                     row.put("version", row, apiIdentifier.getVersion());
                     row.put("context", row, api.getContext());
-                    row.put("status", row, api.getStatus().toString()); // api.getStatus().toString()
+                    row.put("status", row, api.getStatus()); // api.getStatus()
                     if (api.getThumbnailUrl() == null) {
                         row.put("thumbnailurl", row, "images/api-default.png");
                     } else {
@@ -1895,8 +1895,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 }
 
                 if (api != null) {
-                    if(api.getStatus() == APIStatus.PUBLISHED || api.getStatus() == APIStatus.PROTOTYPED ||
-                            api.getStatus() == APIStatus.DEPRECATED){
+                    if (APIConstants.PUBLISHED.equals(api.getStatus()) || APIConstants.PROTOTYPED
+                            .equals(api.getStatus()) || APIConstants.DEPRECATED.equals(api.getStatus())) {
 
                         NativeObject row = new NativeObject();
                         apiIdentifier = api.getId();
@@ -1912,7 +1912,7 @@ public class APIStoreHostObject extends ScriptableObject {
                         String dateFormatted = dateFormat.format(api.getLastUpdated());
                         row.put("updatedDate", row, dateFormatted);
                         row.put("context", row, api.getContext());
-                        row.put("status", row, api.getStatus().getStatus());
+                        row.put("status", row, api.getStatus());
                         row.put("isOpenAPI3APIDefinition", row, isOpenAPI3APIDefinition);
 
                         String user = getUsernameFromObject(thisObj);
@@ -3036,7 +3036,7 @@ public class APIStoreHostObject extends ScriptableObject {
             apiObj.put("name", apiObj, subscribedAPI.getApiId().getApiName());
             apiObj.put("provider", apiObj, APIUtil.replaceEmailDomainBack(subscribedAPI.getApiId().getProviderName()));
             apiObj.put("version", apiObj, subscribedAPI.getApiId().getVersion());
-            apiObj.put("status", apiObj, api.getStatus().toString());
+            apiObj.put("status", apiObj, api.getStatus());
             apiObj.put("tier", apiObj, subscribedAPI.getTier().getDisplayName());
             apiObj.put("subStatus", apiObj, subscribedAPI.getSubStatus());
             apiObj.put("thumburl", apiObj, APIUtil.prependWebContextRoot(api.getThumbnailUrl()));
@@ -3401,7 +3401,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     row.put("apiProvider", row, APIUtil.replaceEmailDomainBack(subscribedAPI.getApiId().getProviderName()));
                     row.put("description", row, api.getDescription());
                     row.put("subscribedTier", row, subscribedAPI.getTier().getName());
-                    row.put("status", row, api.getStatus().getStatus());
+                    row.put("status", row, api.getStatus());
                     row.put("subStatus", row, subscribedAPI.getSubStatus());
                     row.put("thumburl", row, APIUtil.prependWebContextRoot(api.getThumbnailUrl()));
                     myn.put(i, myn, row);

@@ -820,8 +820,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             Resource apiSourceArtifact = registry.get(apiSourcePath);
             GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.API_KEY);
             GenericArtifact artifact = artifactManager.getGenericArtifact(apiSourceArtifact.getUUID());
-            APIStatus apiLcStatus = APIUtil.getApiStatus(artifact.getLifecycleState());
-            String status = (apiLcStatus != null) ? apiLcStatus.getStatus() : null;
+            String status = APIUtil.getLcStateFromArtifact(artifact);
 
             if (!APIConstants.CREATED.equals(status) && !APIConstants.PROTOTYPED.equals(status)) {
                 //api at least is in published status
@@ -978,7 +977,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         failedGateways.clear();
                         failedGateways.put("UNPUBLISHED", failedToRemoveEnvironments);
                         failedGateways.put("PUBLISHED", failedToPublishEnvironments);
-                    } else if (api.getStatus() != APIStatus.CREATED && api.getStatus() != APIStatus.RETIRED) {
+                    } else if (!APIConstants.CREATED.equals(api.getStatus()) && !APIConstants.RETIRED
+                            .equals(api.getStatus())) {
                         if ("INLINE".equals(api.getImplementation()) && api.getEnvironments().isEmpty()) {
                             api.setEnvironments(
                                     ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
@@ -1143,7 +1143,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             artifactManager.updateGenericArtifact(updateApiArtifact);
             //write API Status to a separate property. This is done to support querying APIs using custom query (SQL)
             //to gain performance
-            String apiStatus = api.getStatus().getStatus();
+            String apiStatus = api.getStatus().toUpperCase();
             saveAPIStatus(artifactPath, apiStatus);
             String[] visibleRoles = new String[0];
             String publisherAccessControlRoles = api.getAccessControlRoles();
@@ -1241,13 +1241,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             APIIdentifier apiId = new APIIdentifier(provider, name, version);
             API api = getAPI(apiId);
             if (api != null) {
-                APIStatus oldStatus = api.getStatus();
-                APIStatus newStatus = APIUtil.getApiStatus(status);
+                String oldStatus = api.getStatus();
+                String newStatus = status.toUpperCase();
                 String currentUser = this.username;
                 changeAPIStatus(api, newStatus, APIUtil.appendDomainWithUser(currentUser, tenantDomain), publishToGateway);
 
-                if ((oldStatus.equals(APIStatus.CREATED) || oldStatus.equals(APIStatus.PROTOTYPED))
-                        && newStatus.equals(APIStatus.PUBLISHED)) {
+                if ((APIConstants.CREATED.equals(oldStatus) || APIConstants.PROTOTYPED.equals(oldStatus))
+                        && APIConstants.PUBLISHED.equals(newStatus)) {
                     if (makeKeysForwardCompatible) {
                         makeAPIKeysForwardCompatible(api);
                     }
@@ -1257,7 +1257,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         for (API oldAPI : apiList) {
                             if (oldAPI.getId().getApiName().equals(name) &&
                                     versionComparator.compare(oldAPI, api) < 0 &&
-                                    (oldAPI.getStatus().equals(APIStatus.PUBLISHED))) {
+                                    (APIConstants.PUBLISHED.equals(oldAPI.getStatus()))) {
                                 changeLifeCycleStatus(oldAPI.getId(), APIConstants.API_LC_ACTION_DEPRECATE);
                             }
                         }
@@ -1284,10 +1284,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public void changeAPIStatus(API api, APIStatus status, String userId, boolean updateGatewayConfig)
+    public void changeAPIStatus(API api, String status, String userId, boolean updateGatewayConfig)
             throws APIManagementException, FaultGatewaysException {
         Map<String, Map<String, String>> failedGateways = new ConcurrentHashMap<String, Map<String, String>>();
-        APIStatus currentStatus = api.getStatus();
+        String currentStatus = api.getStatus();
         if (!currentStatus.equals(status)) {
             api.setStatus(status);
             try {
@@ -1305,8 +1305,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         api.getId().getVersion().equals(apiMgtDAO.getPublishedDefaultVersion(api.getId())));
 
                 if (APIConstants.API_GATEWAY_TYPE_SYNAPSE.equalsIgnoreCase(gatewayType) && updateGatewayConfig) {
-                    if (APIStatus.PUBLISHED.equals(status) || APIStatus.DEPRECATED.equals(status) ||
-                            APIStatus.BLOCKED.equals(status) || APIStatus.PROTOTYPED.equals(status)) {
+                    if (APIConstants.PUBLISHED.equals(status) || APIConstants.DEPRECATED.equals(status) ||
+                            APIConstants.BLOCKED.equals(status) || APIConstants.PROTOTYPED.equals(status)) {
                         Map<String, String> failedToPublishEnvironments = publishToGateway(api);
                         if (!failedToPublishEnvironments.isEmpty()) {
                             Set<String> publishedEnvironments = new HashSet<String>(api.getEnvironments());
@@ -1319,7 +1319,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         }
                     } else { // API Status : RETIRED or CREATED
                         Map<String, String> failedToRemoveEnvironments = removeFromGateway(api);
-                        if (!APIStatus.CREATED.equals(status)) {
+                        if (!APIConstants.CREATED.equals(status)) {
                             apiMgtDAO.removeAllSubscriptions(api.getId());
                         }
                         if (!failedToRemoveEnvironments.isEmpty()) {
@@ -1354,7 +1354,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public Map<String, String> propergateAPIStatusChangeToGateways(APIIdentifier identifier, APIStatus newStatus)
+    public Map<String, String> propergateAPIStatusChangeToGateways(APIIdentifier identifier, String newStatus)
             throws APIManagementException {
         Map<String, String> failedGateways = new HashMap<String, String>();
         String provider = identifier.getProviderName();
@@ -1374,7 +1374,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             APIIdentifier apiId = new APIIdentifier(provider, name, version);
             API api = getAPI(apiId);
             if (api != null) {
-                APIStatus currentStatus = api.getStatus();
+                String currentStatus = api.getStatus();
 
                 if (!currentStatus.equals(newStatus)) {
                     api.setStatus(newStatus);
@@ -1387,8 +1387,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             .equals(apiMgtDAO.getPublishedDefaultVersion(api.getId())));
 
                     if (APIConstants.API_GATEWAY_TYPE_SYNAPSE.equalsIgnoreCase(gatewayType)) {
-                        if (APIStatus.PUBLISHED.equals(newStatus) || APIStatus.DEPRECATED.equals(newStatus)
-                                || APIStatus.BLOCKED.equals(newStatus) || APIStatus.PROTOTYPED.equals(newStatus)) {
+                        if (APIConstants.PUBLISHED.equals(newStatus) || APIConstants.DEPRECATED.equals(newStatus)
+                                || APIConstants.BLOCKED.equals(newStatus) || APIConstants.PROTOTYPED.equals(newStatus)) {
                             failedGateways = publishToGateway(api);
                             //Sending Notifications to existing subscribers
                             if (APIStatus.PUBLISHED.equals(newStatus)) {
@@ -1415,7 +1415,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public boolean updateAPIforStateChange(APIIdentifier identifier, APIStatus newStatus,
+    public boolean updateAPIforStateChange(APIIdentifier identifier, String newStatus,
                                            Map<String, String> failedGatewaysMap) throws APIManagementException, FaultGatewaysException {
 
         boolean isSuccess = false;
@@ -1438,7 +1438,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             APIIdentifier apiId = new APIIdentifier(provider, name, version);
             API api = getAPI(apiId);
             if (api != null) {
-                APIStatus currentStatus = api.getStatus();
+                String currentStatus = api.getStatus();
 
                 if (!currentStatus.equals(newStatus)) {
                     api.setStatus(newStatus);
@@ -1455,8 +1455,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
                     if (failedGatewaysMap != null) {
 
-                        if (APIStatus.PUBLISHED.equals(newStatus) || APIStatus.DEPRECATED.equals(newStatus)
-                                || APIStatus.BLOCKED.equals(newStatus) || APIStatus.PROTOTYPED.equals(newStatus)) {
+                        if (APIConstants.PUBLISHED.equals(newStatus) || APIConstants.DEPRECATED.equals(newStatus)
+                                || APIConstants.BLOCKED.equals(newStatus) || APIConstants.PROTOTYPED.equals(newStatus)) {
                             Map<String, String> failedToPublishEnvironments = failedGatewaysMap;
                             if (!failedToPublishEnvironments.isEmpty()) {
                                 Set<String> publishedEnvironments = new HashSet<String>(api.getEnvironments());
@@ -1471,7 +1471,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             }
                         } else { // API Status : RETIRED or CREATED
                             Map<String, String> failedToRemoveEnvironments = failedGatewaysMap;
-                            if (!APIStatus.CREATED.equals(newStatus)) {
+                            if (!APIConstants.CREATED.equals(newStatus)) {
                                 apiMgtDAO.removeAllSubscriptions(api.getId());
                             }
                             if (!failedToRemoveEnvironments.isEmpty()) {
@@ -1562,7 +1562,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         APIVersionComparator comparator = new APIVersionComparator();
         for (String version : versions) {
             API otherApi = getAPI(new APIIdentifier(provider, apiName, version));
-            if (comparator.compare(otherApi, api) < 0 && !otherApi.getStatus().equals(APIStatus.RETIRED)) {
+            if (comparator.compare(otherApi, api) < 0 && !(APIConstants.RETIRED.equals(otherApi.getStatus()))) {
                 apiMgtDAO.makeKeysForwardCompatible(provider, apiName, version,
                         api.getId().getVersion(), api.getContext());
             }
@@ -1786,7 +1786,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             vtb.addHandler("org.wso2.carbon.apimgt.gateway.handlers.security.CORSRequestHandler"
                     , corsProperties);
         }
-        if (!api.getStatus().equals(APIStatus.PROTOTYPED)) {
+        if(!APIConstants.PROTOTYPED.equals(api.getStatus())) {
 
             Map<String, String> authProperties = new HashMap<String, String>();
             if (!StringUtils.isBlank(authorizationHeader)) {
@@ -1961,8 +1961,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             //Check the status of the existing api,if its not in 'CREATED' status set
             //the new api status as "CREATED"
-            APIStatus apiLcStatus = APIUtil.getApiStatus(artifact.getLifecycleState());
-            String status = (apiLcStatus != null) ? apiLcStatus.getStatus() : null;
+            String status = APIUtil.getLcStateFromArtifact(artifact);
             if (!APIConstants.CREATED.equals(status)) {
                 artifact.setAttribute(APIConstants.API_OVERVIEW_STATUS, APIConstants.CREATED);
             }
@@ -2525,7 +2524,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             //write API Status to a separate property. This is done to support querying APIs using custom query (SQL)
             //to gain performance
-            String apiStatus = api.getStatus().getStatus();
+            String apiStatus = api.getStatus();
             saveAPIStatus(artifactPath, apiStatus);
             String visibleRolesList = api.getVisibleRoles();
             String[] visibleRoles = new String[0];
@@ -2900,7 +2899,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     } else if ("Context".equalsIgnoreCase(searchType)) {
                         apiConstant = api.getContext();
                     } else if ("Status".equalsIgnoreCase(searchType)) {
-                        apiConstant = api.getStatus().getStatus();
+                        apiConstant = api.getStatus();
                     } else if (APIConstants.THROTTLE_TIER_DESCRIPTION_ATTRIBUTE.equalsIgnoreCase(searchType)) {
                         apiConstant = api.getDescription();
                     }
