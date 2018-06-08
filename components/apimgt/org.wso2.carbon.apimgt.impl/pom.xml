@@ -242,6 +242,14 @@
             <artifactId>powermock-api-mockito</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -307,8 +315,14 @@
                         <Export-Package>
                             !org.apache.commons.codec.*,
                             !org.wso2.carbon.apimgt.impl.dto.xsd;version="${carbon.apimgt.version}",
-                            org.wso2.carbon.apimgt.impl.*;version="${carbon.apimgt.version}"
+                            org.wso2.carbon.apimgt.impl.*;version="${carbon.apimgt.version}",
+                            !com.nimbusds.jose.*,
+                            !com.nimbusds.jwt.*
                         </Export-Package>
+                        <Embed-Dependency>
+                            nimbus-jose-jwt;scope=compile|runtime;inline=true
+                        </Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
                         <Import-Package>
                             !org.wso2.carbon.apimgt.api.model.xsd.*,
                             org.wso2.carbon.governance.api.*,
