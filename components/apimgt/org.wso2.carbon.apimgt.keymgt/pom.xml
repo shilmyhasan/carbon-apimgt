@@ -67,6 +67,14 @@
             <groupId>org.wso2.carbon.metrics</groupId>
             <artifactId>org.wso2.carbon.metrics.manager</artifactId>
         </dependency>
+		<dependency>
+			<groupId>org.wso2.orbit.com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.minidev</groupId>
+			<artifactId>json-smart</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -116,6 +124,8 @@
 							*;resolution:=optional
 						</Import-Package>
 						<Export-Package>
+							!com.nimbusds.jose.*,
+							!com.nimbusds.jwt.*,
 							!org.wso2.carbon.apimgt.keymgt.stub.validator,
 							!org.wso2.carbon.apimgt.keymgt.stub.provider,
 							!org.wso2.carbon.apimgt.keymgt.stub.subscriber,
@@ -124,6 +134,10 @@
 							!org.wso2.carbon.apimgt.keymgt.client,
 							org.wso2.carbon.apimgt.keymgt.*
 						</Export-Package>
+						<Embed-Dependency>
+							nimbus-jose-jwt;scope=compile|runtime;inline=true
+						</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
 					</instructions>
 				</configuration>
 			</plugin>
