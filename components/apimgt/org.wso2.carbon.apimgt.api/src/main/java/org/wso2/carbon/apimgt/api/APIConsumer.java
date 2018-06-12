@@ -257,7 +257,7 @@ public interface APIConsumer extends APIManager {
      * @return SubscriptionResponse subscription response object
      * @throws APIManagementException if failed to add subscription details to database
      */
-    SubscriptionResponse addSubscription(APIIdentifier identifier, String userId, int applicationId,String groupId)
+    SubscriptionResponse addSubscription(APIIdentifier identifier, String userId, int applicationId, String groupId)
             throws APIManagementException;
 
     /**
@@ -287,7 +287,7 @@ public interface APIConsumer extends APIManager {
      * @param groupId groupId of user
      * @throws APIManagementException if failed to remove subscription details from database
      */
-    void removeSubscription(APIIdentifier identifier, String userId, int applicationId,String groupId) throws APIManagementException;
+    void removeSubscription(APIIdentifier identifier, String userId, int applicationId, String groupId) throws APIManagementException;
 
 
     /** Removes a subscription specified by SubscribedAPI object
