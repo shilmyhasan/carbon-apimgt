@@ -4,8 +4,8 @@ var removeAPISubscription = function (username, applicationId, api) {
             store = jagg.module("manager").getAPIStoreObj();
 
     try {
-		var groupId = session.get("groupId");
-		status = store.removeSubscription(username, applicationId, api, groupId);
+	 var groupId = session.get("groupId");
+	 status = store.removeSubscription(username, applicationId, api, groupId);
         if (log.isDebugEnabled()) {
             log.debug("removeAPISubscription");
         }
