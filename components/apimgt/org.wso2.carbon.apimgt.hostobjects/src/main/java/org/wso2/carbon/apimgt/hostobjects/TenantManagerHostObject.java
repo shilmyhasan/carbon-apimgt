@@ -121,21 +121,26 @@ public class TenantManagerHostObject extends ScriptableObject {
             ZipEntry ze = zis.getNextEntry();
             String ext = null;
 
-            while(ze!=null){
+            while (ze != null) {
 
                 String fileName = ze.getName();
                 File newFile = new File(outputFolder + File.separator + fileName);
-                if(ze.isDirectory()){
-                    if(!newFile.exists()){
-                         boolean status = newFile.mkdir();
-                         if(status){
-                            //todo handle exception
-                         }
-                    }
+                String canonicalFileDestinationPath = newFile.getCanonicalPath();
+                String canonicalDestinationPath = new File(outputFolder).getCanonicalPath();
+                if (!canonicalFileDestinationPath.startsWith(canonicalDestinationPath)) {
+                    handleException("Attempt to upload invalid zip archive with file at " + fileName + ". File path is "
+                            + "outside target directory");
                 }
-                else{
+                if (ze.isDirectory()) {
+                    if (!newFile.exists()) {
+                        boolean status = newFile.mkdir();
+                        if (status) {
+                            //todo handle exception
+                        }
+                    }
+                } else {
                     ext = FilenameUtils.getExtension(ze.getName());
-                    if(TenantManagerHostObject.EXTENTION_WHITELIST.contains(ext)){
+                    if (TenantManagerHostObject.EXTENTION_WHITELIST.contains(ext)) {
                         //create all non exists folders
                         //else you will hit FileNotFoundException for compressed folder
                         new File(newFile.getParent()).mkdirs();
@@ -147,8 +152,9 @@ public class TenantManagerHostObject extends ScriptableObject {
                         }
 
                         fos.close();
-                    }else{
-                        log.warn("Unsupported file is uploaded with tenant theme by " + tenant + " : file name : "+ ze.getName());
+                    } else {
+                        log.warn("Unsupported file is uploaded with tenant theme by " + tenant + " : file name : " + ze
+                                .getName());
                         success = false;
                     }
 
@@ -159,11 +165,10 @@ public class TenantManagerHostObject extends ScriptableObject {
             zis.closeEntry();
             zis.close();
 
-        }catch(IOException ex){
-            handleException("Failed to deploy tenant theme",ex);
+        } catch (IOException ex) {
+            handleException("Failed to deploy tenant theme", ex);
             //todo remove if the tenant theme directory is created.
-        }
-        finally {
+        } finally {
             IOUtils.closeQuietly(zis);
             IOUtils.closeQuietly(zipInputStream);
         }
