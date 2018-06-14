@@ -135,7 +135,7 @@ public class TenantManagerHostObject extends ScriptableObject {
                     if (!newFile.exists()) {
                         boolean status = newFile.mkdir();
                         if (status) {
-                            //todo handle exception
+                            handleException("Failed to create directory " + newFile.getAbsolutePath());
                         }
                     }
                 } else {
