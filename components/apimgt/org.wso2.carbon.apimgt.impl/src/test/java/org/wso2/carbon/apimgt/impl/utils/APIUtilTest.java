@@ -1849,4 +1849,11 @@ public class APIUtilTest {
         String gatewayEndpoint = APIUtil.getGatewayEndpoint("http,https", "Production", "Production");
         Assert.assertEquals("https://localhost:8243", gatewayEndpoint);
     }
+    
+    @Test
+    public void testSanitizeUserRole () throws Exception {
+    	Assert.assertEquals("Test%26123", APIUtil.sanitizeUserRole("Test&123"));
+    	Assert.assertEquals("Test%26123%26test", APIUtil.sanitizeUserRole("Test&123&test"));
+    	Assert.assertEquals("Test123", APIUtil.sanitizeUserRole("Test123"));
+    }
 }
