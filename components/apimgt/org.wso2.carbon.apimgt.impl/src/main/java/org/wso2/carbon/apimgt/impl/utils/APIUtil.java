@@ -7071,4 +7071,18 @@ public final class APIUtil {
         }
         return 0;
     }
+    
+    /**
+     * Convert special characters to encoded value.  
+     * @param role
+     * @return encorded value
+     */
+    public static String sanitizeUserRole(String role) {
+        if (role.contains("&")) {
+            return role.replaceAll("&", "%26");
+        } else {
+            return role;
+        }
+    }
+
 }
