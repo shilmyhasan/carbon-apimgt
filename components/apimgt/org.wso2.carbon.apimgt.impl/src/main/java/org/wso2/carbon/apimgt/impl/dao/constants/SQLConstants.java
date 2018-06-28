@@ -1983,7 +1983,7 @@ public class SQLConstants {
             "   C.SCOPE_BINDING " +
             " FROM  " +
             " ((IDN_OAUTH2_SCOPE AS A  INNER JOIN  AM_API_SCOPES AS B ON A.SCOPE_ID = B.SCOPE_ID) " +
-            " INNER JOIN  IDN_OAUTH2_SCOPE_BINDING AS C ON B.SCOPE_ID = C.SCOPE_ID ) " +
+            " LEFT JOIN  IDN_OAUTH2_SCOPE_BINDING AS C ON B.SCOPE_ID = C.SCOPE_ID ) " +
             " WHERE " +
             "   B.API_ID IN (";
 
@@ -1997,7 +1997,7 @@ public class SQLConstants {
             "   C.SCOPE_BINDING " +
             " FROM  " +
             " ((IDN_OAUTH2_SCOPE A  INNER JOIN  AM_API_SCOPES B ON A.SCOPE_ID = B.SCOPE_ID) " +
-            " INNER JOIN  IDN_OAUTH2_SCOPE_BINDING C ON B.SCOPE_ID = C.SCOPE_ID ) " +
+            " LEFT JOIN  IDN_OAUTH2_SCOPE_BINDING C ON B.SCOPE_ID = C.SCOPE_ID ) " +
             " WHERE B.API_ID IN (";
 
     public static final String GET_SCOPES_BY_SCOPE_KEY_SQL =
