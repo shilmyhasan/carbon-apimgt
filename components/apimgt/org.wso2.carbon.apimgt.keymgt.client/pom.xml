@@ -85,6 +85,9 @@
 						<Bundle-SymbolicName>
 							${project.artifactId}
 						</Bundle-SymbolicName>
+						<Private-Package>
+							org.wso2.carbon.apimgt.keymgt.client.internal
+						</Private-Package>
 						<Import-Package>
 							org.apache.commons.logging.*; version="${commons.logging.imp.pkg.version}",
                             *;resolution:=optional
