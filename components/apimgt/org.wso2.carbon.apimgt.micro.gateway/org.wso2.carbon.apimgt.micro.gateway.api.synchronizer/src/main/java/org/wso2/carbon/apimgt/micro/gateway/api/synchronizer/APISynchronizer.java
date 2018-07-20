@@ -95,6 +95,7 @@ import javax.xml.transform.stream.StreamResult;
 public class APISynchronizer implements OnPremiseGatewayInitListener {
     private static final Log log = LogFactory.getLog(APISynchronizer.class);
     private String apiViewUrl = APISynchronizationConstants.EMPTY_STRING;
+    private String mediationPolicyAdminUrl = APISynchronizationConstants.EMPTY_STRING;
     private String mediationPolicyUrl = APISynchronizationConstants.EMPTY_STRING;
 
     @Override
@@ -113,6 +114,8 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
         try {
             String apiPublisherUrl = ConfigManager.getConfigManager()
                     .getProperty(APISynchronizationConstants.API_PUBLISHER_URL_PROPERTY);
+            String apiAdminUrl = ConfigManager.getConfigManager()
+                    .getProperty(APISynchronizationConstants.API_ADMIN_URL_PROPERTY);
             String apiVersion = ConfigManager.getConfigManager()
                     .getProperty(APISynchronizationConstants.API_VERSION_PROPERTY);
             if (apiVersion == null) {
@@ -132,8 +135,18 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                     log.debug("Using default API publisher URL." + apiPublisherUrl);
                 }
             }
+            if (StringUtils.isBlank(apiAdminUrl)) {
+                apiAdminUrl = APISynchronizationConstants.DEFAULT_API_ADMIN_URL;
+                if (log.isDebugEnabled()) {
+                    log.debug("Using default API admin URL." + apiAdminUrl);
+                }
+            }
             //Remove '//' which is created in cloud case.
             apiViewUrl = apiPublisherUrl + APISynchronizationConstants.API_VIEW_PATH
+                    .replace(APISynchronizationConstants.API_VERSION_PARAM, apiVersion)
+                    .replace("//", APISynchronizationConstants.URL_PATH_SEPARATOR);
+            mediationPolicyAdminUrl = apiAdminUrl + APISynchronizationConstants.
+                    API_ADMIN_VIEW_GLOBAL_MEDIATION_POLICY_PATH
                     .replace(APISynchronizationConstants.API_VERSION_PARAM, apiVersion)
                     .replace("//", APISynchronizationConstants.URL_PATH_SEPARATOR);
             mediationPolicyUrl = apiPublisherUrl + APISynchronizationConstants.API_VIEW_GLOBAL_MEDIATION_POLICY_PATH
@@ -570,6 +583,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
         String uri = apiViewUrl + APISynchronizationConstants.URL_PATH_SEPARATOR + apiId
                 + APISynchronizationConstants.API_VIEW_MEDIATION_POLICY_PATH
                 + APISynchronizationConstants.URL_PATH_SEPARATOR + seqId;
+        String uriAdmin = mediationPolicyAdminUrl + APISynchronizationConstants.URL_PATH_SEPARATOR + seqId;
         try {
             String apiPublisherUrl = ConfigManager.getConfigManager()
                     .getProperty(OnPremiseGatewayConstants.API_PUBLISHER_URL_PROPERTY_KEY);
@@ -579,17 +593,36 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                     log.debug("Using default API publisher URL: " + apiPublisherUrl);
                 }
             }
+            String apiAdminUrl = ConfigManager.getConfigManager()
+                    .getProperty(OnPremiseGatewayConstants.API_ADMIN_URL_PROPERTY_KEY);
+            if (StringUtils.isBlank(apiAdminUrl)) {
+                apiAdminUrl = OnPremiseGatewayConstants.DEFAULT_API_ADMIN_URL;
+                if (log.isDebugEnabled()) {
+                    log.debug("Using default API admin URL: " + apiAdminUrl);
+                }
+            }
             URL apiPublisherUrlValue = MicroGatewayCommonUtil.getURLFromStringUrlValue(apiPublisherUrl);
             HttpClient httpClient = APIUtil.getHttpClient(apiPublisherUrlValue.getPort(), apiPublisherUrlValue
                     .getProtocol());
             HttpGet httpGet = new HttpGet(uri);
+            URL apiAdminUrlValue = MicroGatewayCommonUtil.getURLFromStringUrlValue(apiAdminUrl);
+            HttpClient httpClientAdmin = APIUtil.getHttpClient(apiAdminUrlValue.getPort(), apiAdminUrlValue
+                    .getProtocol());
+            HttpGet httpGetAdmin = new HttpGet(uriAdmin);
             String authHeaderValue = OnPremiseGatewayConstants.AUTHORIZATION_BEARER +
                     accessTokenDTO.getAccessToken();
             httpGet.addHeader(OnPremiseGatewayConstants.AUTHORIZATION_HEADER, authHeaderValue);
+            httpGetAdmin.addHeader(OnPremiseGatewayConstants.AUTHORIZATION_HEADER, authHeaderValue);
 
             // Retrieve all API specific mediation policies from publisher REST API
-            String response = HttpRequestUtil.executeHTTPMethodWithRetry(httpClient, httpGet,
-                    OnPremiseGatewayConstants.DEFAULT_RETRY_COUNT);
+            String response = null;
+            try {
+                response = HttpRequestUtil.executeHTTPMethodWithRetry(httpClient, httpGet,
+                        OnPremiseGatewayConstants.DEFAULT_RETRY_COUNT);
+            } catch(OnPremiseGatewayException e){
+                response = HttpRequestUtil.executeHTTPMethodWithRetry(httpClientAdmin, httpGetAdmin,
+                        OnPremiseGatewayConstants.DEFAULT_RETRY_COUNT);
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Received response from GET api sequence: " + seqId);
             }
