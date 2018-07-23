@@ -27,6 +27,7 @@ public class OnPremiseGatewayConstants {
 
     public static final String API_GATEWAY_URL_PROPERTY_KEY = "api.gateway.url";
     public static final String API_PUBLISHER_URL_PROPERTY_KEY = "api.publisher.url";
+    public static final String DEFAULT_API_ADMIN_URL = "https://localhost:9443";
     public static final String DEFAULT_API_PUBLISHER_URL = "https://localhost:9443";
     public static final String API_ADMIN_URL_PROPERTY_KEY = "api.admin.url";
     public static final int DEFAULT_PORT = 9443;
