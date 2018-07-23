@@ -14,15 +14,15 @@
  *  limitations under the License.
  */
 
-package org.wso2.carbon.apimgt.keymgt.internal;
+package org.wso2.carbon.apimgt.keymgt.client.internal;
 
-import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.apache.axis2.context.ConfigurationContext;
 
 public class ServiceReferenceHolder {
 
     private static final ServiceReferenceHolder instance = new ServiceReferenceHolder();
 
-    private APIManagerConfigurationService amConfigurationService;
+    private ConfigurationContext axis2ConfigurationContext;
 
     private ServiceReferenceHolder() {
 
@@ -32,11 +32,12 @@ public class ServiceReferenceHolder {
         return instance;
     }
 
-    public APIManagerConfigurationService getAPIManagerConfigurationService() {
-        return amConfigurationService;
+    public void setAxis2ConfigurationContext(ConfigurationContext axis2ConfigurationContext) {
+        this.axis2ConfigurationContext = axis2ConfigurationContext;
     }
 
-    public void setAPIManagerConfigurationService(APIManagerConfigurationService amConfigurationService) {
-        this.amConfigurationService = amConfigurationService;
+    public ConfigurationContext getAxis2ConfigurationContext() {
+        return axis2ConfigurationContext;
     }
+
 }
