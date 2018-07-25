@@ -139,6 +139,29 @@ public class APISynchronizerTest {
         synchronizer.updateApis();
     }
 
+    @Test
+    public void updateApisWithGlobalSequences() throws Exception {
+        mockCommonCases();
+        registerClient();
+        generateAccessToken();
+        Map<String, String> testData = getTestData();
+        PowerMockito.mockStatic(HttpClients.class);
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        PowerMockito.mockStatic(ConfigManager.class);
+        ConfigManager configManager = Mockito.mock(ConfigManager.class);
+        PowerMockito.when(ConfigManager.getConfigManager()).thenReturn(configManager);
+        PowerMockito.mockStatic(APIUtil.class);
+        PowerMockito.when(APIUtil.getHttpClient(Mockito.anyInt(), Mockito.anyString())).thenReturn(httpClient);
+        PowerMockito.mockStatic(HttpRequestUtil.class);
+        PowerMockito.when(HttpRequestUtil.executeHTTPMethodWithRetry(any(HttpClient.class), any(HttpGet.class),
+                any(Integer.class))).thenReturn(testData.get(updatedApis),
+                testData.get(weatherApiInfo), testData.get(mediationPolicies))
+                .thenThrow(new OnPremiseGatewayException("Failed with 404")).thenReturn(
+                testData.get(mediationPolicyInfo));
+        APISynchronizer synchronizer = new APISynchronizer();
+        synchronizer.updateApis();
+    }
+
     public void mockCommonCases() throws UserStoreException {
         PrivilegedCarbonContext privilegedCarbonContext = Mockito.mock(PrivilegedCarbonContext.class);
         PowerMockito.mockStatic(PrivilegedCarbonContext.class);
