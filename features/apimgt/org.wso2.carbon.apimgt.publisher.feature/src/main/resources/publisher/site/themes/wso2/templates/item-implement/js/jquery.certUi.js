@@ -25,7 +25,7 @@
         this.element = $(element);
         this.options = $.extend({}, defaults, options);
         var filteredCerts = this.getCertsForEndpoint(this.options.config.cert_data, this.options.config.ep_data);
-        this.config = {"certificates": Array.from(filteredCerts)};
+        this.config = {"certificates": filteredCerts};
         this._name = name;
         certUi = this;
         this.init();
@@ -82,34 +82,43 @@
          * When loading the page, check for the user entered endpoints and retrieve the certificates.
          * */
         getCertsForEndpoint: function (certs, eps) {
-            var newCerts = new Set();
-            var endpoints = [];
-
             if (eps === undefined) {
-                return newCerts;
-            } else {
-                endpoints.push(eps.production_endpoints);
-                endpoints.push(eps.sandbox_endpoints);
+                return [];
             }
-
-            //If production_endpoints is an array, iterate through it. Otherwise get the properties.
-            if (endpoints instanceof Array) {
-                for (var eP in endpoints) {
-                    for (var cert in certs) {
-                        if (endpoints[eP] !== "" && endpoints[eP] !== undefined) {
-                            if (endpoints[eP].url.includes(certs[cert].endpoint)) {
-                                newCerts.add(certs[cert]);
-                            }
+            var productionEndpoints = eps.production_endpoints;
+            var sandboxEndpoints = eps.sandbox_endpoints;
+            var newCerts = certs.filter(function (cert) {
+                var certUrl = cert.endpoint.toLowerCase();
+                if (Array.isArray(productionEndpoints)) {
+                    for (var index in productionEndpoints) {
+                        var containInCertUrl = productionEndpoints[index].url.toLowerCase().indexOf(certUrl) !== -1;
+                        if (containInCertUrl) {
+                            return containInCertUrl;
                         }
-
+                    }
+                } else if (productionEndpoints) {
+                    // Skip if productionEndpoints is `undefined`
+                    var containInCertUrl = productionEndpoints.url.toLowerCase().indexOf(certUrl) !== -1;
+                    if (containInCertUrl) {
+                        return containInCertUrl;
                     }
                 }
-            } else {
-                newCerts = certs.filter(function (cert) {
-                    return endpoints.url.includes(cert.endpoint);
-                })
-            }
-            return Array.from(newCerts);
+                if (Array.isArray(sandboxEndpoints)) {
+                    for (var index in sandboxEndpoints) {
+                        var containInCertUrl = sandboxEndpoints[index].url.toLowerCase().indexOf(certUrl) !== -1;
+                        if (containInCertUrl) {
+                            return containInCertUrl;
+                        }
+                    }
+                } else if (sandboxEndpoints) {
+                    // Skip if sandboxEndpoints is `undefined`
+                    var containInCertUrl = sandboxEndpoints.url.toLowerCase().indexOf(certUrl) !== -1;
+                    if (containInCertUrl) {
+                        return containInCertUrl;
+                    }
+                }
+            });
+            return newCerts;
         },
 
         /**
@@ -255,20 +264,6 @@
                     i18n.t("Alias exists in trust store")
                 });
                 return;
-            } else if (aliasMatched.length === 0 && endpointMatched.length > 0) {
-                jagg.message({
-                    type: "error",
-                    content: i18n.t("Could not add certificate for Endpoint") + ", '" + ep +
-                    "'. " + i18n.t("Certificate for the endpoint") + "'" + ep + "'" + i18n.t("already exists")
-                });
-                return;
-            } else if (aliasMatched.length > 0 && endpointMatched.length > 0) {
-                jagg.message({
-                    type: "error",
-                    content: i18n.t("Could not add certificate for alias and endpoint") + "'" + alias + "' '" + ep +
-                    "'. <br/> " + i18n.t("Certificate exists for Alias : Endpoint combination")
-                });
-                return;
             } else {
             }
 
@@ -328,9 +323,9 @@
         switch (msgObject.code) {
             case (1) : {
                 if (msgObject.action === "add") {
-                    return i18n.t("Certificate is added successfully. This will be affect to all the users.");
+                    return i18n.t("The certificate was added successfully. Please note that it will be available to all users.");
                 } else {
-                    return i18n.t("Certificate is deleted Successfully. This will be affect to all the users.")
+                    return i18n.t("The certificate was deleted successfully. Note that it will not be accessible to any user hereafter.")
                 }
             }
             case (2) : {
