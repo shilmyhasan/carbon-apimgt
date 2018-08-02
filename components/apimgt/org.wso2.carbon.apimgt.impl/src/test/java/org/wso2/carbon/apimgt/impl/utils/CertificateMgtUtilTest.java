@@ -18,12 +18,15 @@
 package org.wso2.carbon.apimgt.impl.utils;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.wso2.carbon.apimgt.api.dto.CertificateInformationDTO;
 import org.wso2.carbon.apimgt.impl.certificatemgt.ResponseCode;
+import org.wso2.carbon.apimgt.impl.certificatemgt.exceptions.CertificateManagementException;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 
@@ -85,8 +88,9 @@ public class CertificateMgtUtilTest {
                     "2/Qh4Zy17IIUltCQEOIpVsS07wf/sU16c4v6xZQogxKvBLMTLKW2NzLIxA2/3xV5v1loyY/vVQ85\n" +
                     "Q877zXfwTUGO5ZN3QCGncCpCEfWbnj6pxAM=";
 
-    @BeforeClass
-    public static void init() {
+    @Before
+    public void init() {
+
         System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
         System.setProperty("javax.net.ssl.trustStore", CERT_PATH.getPath());
         certificateMgtUtils = new CertificateMgtUtils();
@@ -94,18 +98,21 @@ public class CertificateMgtUtilTest {
 
     @Test
     public void testAddCertificateToTrustStore() {
+
         ResponseCode result = certificateMgtUtils.addCertificateToTrustStore(BASE64_ENCODED_CERT_STRING, ALIAS);
         Assert.assertEquals(result, ResponseCode.SUCCESS);
     }
 
     @Test
     public void testAddExistingCertificate() {
+
         ResponseCode result = certificateMgtUtils.addCertificateToTrustStore(BASE64_ENCODED_CERT_STRING, ALIAS);
         Assert.assertEquals(result, ResponseCode.ALIAS_EXISTS_IN_TRUST_STORE);
     }
 
     @Test
     public void testDeleteCertificateFromTrustStore() {
+
         certificateMgtUtils.addCertificateToTrustStore(ALIAS, BASE64_ENCODED_CERT_STRING);
         ResponseCode responseCode = certificateMgtUtils.removeCertificateFromTrustStore(ALIAS);
         Assert.assertEquals(responseCode, ResponseCode.SUCCESS);
@@ -113,18 +120,21 @@ public class CertificateMgtUtilTest {
 
     @Test
     public void testDeleteNonExistingCertificate() {
+
         ResponseCode responseCode = certificateMgtUtils.removeCertificateFromTrustStore(ALIAS_NOT_EXIST);
         Assert.assertEquals(responseCode, ResponseCode.CERTIFICATE_NOT_FOUND);
     }
 
     @Test
     public void testAddCertificateWithCertificateException() {
+
         ResponseCode responseCode = certificateMgtUtils.addCertificateToTrustStore(ALIAS, BASE64_ENCODED_ERROR_CERT);
         Assert.assertEquals(responseCode, ResponseCode.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     public void testAddCertificateWithFileNotFoundException() throws NoSuchFieldException, IllegalAccessException {
+
         Field field = CertificateMgtUtils.class.getDeclaredField(TRUST_STORE_FIELD);
         field.setAccessible(true);
         field.set(certificateMgtUtils, INVALID_TRUST_STORE_FILE);
@@ -135,8 +145,65 @@ public class CertificateMgtUtilTest {
 
     @Test
     public void testAddExpiredCertificate() {
+
         ResponseCode responseCode = certificateMgtUtils.addCertificateToTrustStore(EXPIRED_CERTIFICATE,
                 ALIAS_EXPIRED);
         Assert.assertEquals(responseCode, ResponseCode.CERTIFICATE_EXPIRED);
+    }
+
+    @Test
+    public void testGetCertificateInformation() throws CertificateManagementException {
+
+        certificateMgtUtils.addCertificateToTrustStore(BASE64_ENCODED_CERT_STRING,
+                ALIAS);
+        CertificateInformationDTO certificateInformationDTO = certificateMgtUtils.getCertificateInformation(ALIAS);
+        Assert.assertNotNull(certificateInformationDTO);
+    }
+
+    @Test
+    public void testUpdateCertificate() throws CertificateManagementException {
+
+        ResponseCode responseCode = certificateMgtUtils.updateCertificate(BASE64_ENCODED_CERT_STRING, ALIAS);
+        Assert.assertEquals(ResponseCode.SUCCESS, responseCode);
+    }
+
+    @Test
+    public void testUpdateCertificateWithCertificateException() {
+
+        try {
+            ResponseCode responseCode = certificateMgtUtils.updateCertificate(BASE64_ENCODED_ERROR_CERT, ALIAS);
+        } catch (CertificateManagementException e) {
+            Assert.assertEquals(CertificateManagementException.class, e.getClass());
+        }
+    }
+
+    @Test
+    public void testUpdateCertificateWithExpiredCertificate() throws CertificateManagementException {
+
+        ResponseCode responseCode = certificateMgtUtils.updateCertificate(EXPIRED_CERTIFICATE, ALIAS);
+        Assert.assertEquals(ResponseCode.CERTIFICATE_EXPIRED, responseCode);
+    }
+
+    @Test
+    public void testUpdateCertificateWithCertificateNotFound() throws CertificateManagementException {
+
+        ResponseCode responseCode = certificateMgtUtils.updateCertificate(BASE64_ENCODED_CERT_STRING, ALIAS_NOT_EXIST);
+        Assert.assertEquals(ResponseCode.CERTIFICATE_NOT_FOUND, responseCode);
+    }
+
+    @Test
+    public void testUpdateCertificateWithEmptyCertificate() throws CertificateManagementException {
+
+        ResponseCode responseCode = certificateMgtUtils.updateCertificate("", ALIAS);
+        Assert.assertEquals(ResponseCode.INTERNAL_SERVER_ERROR, responseCode);
+    }
+
+    @Test
+    public void testGetCertificateContent() throws CertificateManagementException {
+
+        certificateMgtUtils.addCertificateToTrustStore(BASE64_ENCODED_CERT_STRING, ALIAS);
+        Object certificateStream = certificateMgtUtils.getCertificateContent(ALIAS);
+        Assert.assertNotNull(certificateStream);
+        Assert.assertEquals(certificateStream.getClass().getName(), ByteArrayInputStream.class.getName());
     }
 }
