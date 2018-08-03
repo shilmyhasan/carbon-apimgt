@@ -117,15 +117,15 @@ public class APIGatewayManager {
                             client.deleteDefaultApi(tenantDomain, api.getId());
                         }
                     }
-					setSecureVaultProperty(api, tenantDomain, environment);
-					undeployCustomSequences(api,tenantDomain, environment);
+					setSecureVaultProperty(client, api, tenantDomain);
+					undeployCustomSequences(client, api,tenantDomain);
 				} else {
 					if (debugEnabled) {
 						log.debug("API exists, updating existing API " + api.getId().getApiName() +
 						          " in environment " + environment.getName());
 					}
                     //Deploy the fault sequence first since it has to be available by the time the API is deployed.
-                    deployAPIFaultSequence(api, tenantDomain, environment);
+                    deployAPIFaultSequence(client, api, tenantDomain);
 
                     operation ="update";
 
@@ -144,10 +144,10 @@ public class APIGatewayManager {
                             client.addDefaultAPI(builder, tenantDomain, api.getId().getVersion(), api.getId());
                         }
                     }
-					setSecureVaultProperty(api, tenantDomain, environment);
+					setSecureVaultProperty(client, api, tenantDomain);
 
                     //Update the custom sequences of the API
-					updateCustomSequences(api, tenantDomain, environment);
+					updateCustomSequences(client, api, tenantDomain);
 				}
 			} else {
 				// If the Gateway type is 'production' and a production url has
@@ -167,7 +167,7 @@ public class APIGatewayManager {
 						          " in environment " + environment.getName());
 					}
                     //Deploy the fault sequence first since it has to be available by the time the API is deployed.
-                    deployAPIFaultSequence(api, tenantDomain, environment);
+                    deployAPIFaultSequence(client, api, tenantDomain);
 
                     if(!APIConstants.APIType.WS.toString().equals(api.getType())) {
                         //Add the API
@@ -186,10 +186,10 @@ public class APIGatewayManager {
                                 client.addDefaultAPI(builder, tenantDomain, api.getId().getVersion(), api.getId());
                             }
                         }
-                        setSecureVaultProperty(api, tenantDomain, environment);
+                        setSecureVaultProperty(client, api, tenantDomain);
 
                         //Deploy the custom sequences of the API.
-                        deployCustomSequences(api, tenantDomain, environment);
+                        deployCustomSequences(client, api, tenantDomain);
                     } else {
                         deployWebsocketAPI(api,client);
                     }
@@ -256,11 +256,11 @@ public class APIGatewayManager {
                             }
                             if ("INLINE".equals(api.getImplementation())) {
                                 client.deleteApi(tenantDomain, api.getId());
-                                undeployCustomSequences(api, tenantDomain, environment);
+                                undeployCustomSequences(client, api, tenantDomain);
                             } else {
                                 client.deleteEndpoint(api, tenantDomain);
                                 client.deleteApi(tenantDomain, api.getId());
-                                undeployCustomSequences(api, tenantDomain, environment);
+                                undeployCustomSequences(client, api, tenantDomain);
                             }
                         }
                     } else {
@@ -515,14 +515,12 @@ public class APIGatewayManager {
 	/**
 	 * Get the specified in/out sequences from api object
 	 * 
+	 * @param client APIGatewayAdminClient
 	 * @param api -API object
 	 * @param tenantDomain
-	 * @param environment
-	 * @throws APIManagementException
-	 * @throws AxisFault
 	 */
-    private void deployCustomSequences(API api, String tenantDomain, Environment environment)
-            throws APIManagementException, AxisFault {
+    private void deployCustomSequences(APIGatewayAdminClient client, API api, String tenantDomain)
+            throws APIManagementException {
 
         if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOutSequence())) {
             try {
@@ -536,11 +534,11 @@ public class APIGatewayManager {
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
                 if (APIUtil.isSequenceDefined(api.getInSequence())) {
-                    deployInSequence(api, tenantId, tenantDomain, environment);
+                    deployInSequence(client, api, tenantId, tenantDomain);
                 }
 
                 if (APIUtil.isSequenceDefined(api.getOutSequence())) {
-                	deployOutSequence(api, tenantId, tenantDomain, environment);
+                	deployOutSequence(client, api, tenantId, tenantDomain);
                 }
 
             } catch (Exception e) {
@@ -555,8 +553,8 @@ public class APIGatewayManager {
 
     }
 
-    private void deployInSequence(API api, int tenantId, String tenantDomain, Environment environment)
-            throws APIManagementException, AxisFault {
+    private void deployInSequence(APIGatewayAdminClient sequenceAdminServiceClient, API api, int tenantId,
+                                  String tenantDomain) throws APIManagementException, AxisFault {
 
         String inSequenceName = api.getInSequence();
         OMElement inSequence = APIUtil.getCustomSequence(inSequenceName, tenantId, "in", api.getId());
@@ -566,12 +564,11 @@ public class APIGatewayManager {
             if (inSequence.getAttribute(new QName("name")) != null) {
                 inSequence.getAttribute(new QName("name")).setAttributeValue(inSeqExt);
             }
-            APIGatewayAdminClient sequenceAdminServiceClient = new APIGatewayAdminClient(api.getId(), environment);
             sequenceAdminServiceClient.addSequence(inSequence, tenantDomain);
         }
     }
 
-    private void deployOutSequence(API api, int tenantId, String tenantDomain, Environment environment)
+    private void deployOutSequence(APIGatewayAdminClient client, API api, int tenantId, String tenantDomain)
             throws APIManagementException, AxisFault {
 
         String outSequenceName = api.getOutSequence();
@@ -582,7 +579,6 @@ public class APIGatewayManager {
             if (outSequence.getAttribute(new QName("name")) != null)    {
                 outSequence.getAttribute(new QName("name")).setAttributeValue(outSeqExt);
             }
-            APIGatewayAdminClient client = new APIGatewayAdminClient(api.getId(), environment);
             client.addSequence(outSequence, tenantDomain);
         }
     }
@@ -590,12 +586,11 @@ public class APIGatewayManager {
 	/**
 	 * Undeploy the sequences deployed in synapse
 	 * 
+	 * @param client APIGatewayAdminClient
 	 * @param api
 	 * @param tenantDomain
-	 * @param environment
-	 * @throws APIManagementException
 	 */
-    private void undeployCustomSequences(API api, String tenantDomain, Environment environment) {
+    private void undeployCustomSequences(APIGatewayAdminClient client, API api, String tenantDomain) {
 
         if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOutSequence())) {
             try {
@@ -607,7 +602,6 @@ public class APIGatewayManager {
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
                             (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
                 }
-                APIGatewayAdminClient client = new APIGatewayAdminClient(api.getId(), environment);
 
                 if (APIUtil.isSequenceDefined(api.getInSequence())) {
                     String inSequence = APIUtil.getSequenceExtensionName(api) + APIConstants.API_CUSTOM_SEQ_IN_EXT;
@@ -634,13 +628,13 @@ public class APIGatewayManager {
 
     /**
 	 * Update the custom sequences in gateway
+     *
+	 * @param client APIGatewayAdminClient
 	 * @param api
 	 * @param tenantDomain
-	 * @param environment
-	 * @throws APIManagementException
 	 */
-	private void updateCustomSequences(API api, String tenantDomain, Environment environment)
-	                                                                                         throws APIManagementException {
+	private void updateCustomSequences(APIGatewayAdminClient client, API api, String tenantDomain)
+            throws APIManagementException {
 
         //If sequences have been added, updated or removed.
         if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOutSequence()) ||
@@ -657,7 +651,6 @@ public class APIGatewayManager {
                 }
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-                APIGatewayAdminClient client = new APIGatewayAdminClient(api.getId(), environment);
 
                 //If an inSequence has been added, updated or removed.
                 if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOldInSequence())) {
@@ -670,7 +663,7 @@ public class APIGatewayManager {
                     //If an inSequence has been added or updated.
                     if(APIUtil.isSequenceDefined(api.getInSequence())){
                         //Deploy the inSequence
-                        deployInSequence(api, tenantId, tenantDomain, environment);
+                        deployInSequence(client, api, tenantId, tenantDomain);
                     }
                 }
 
@@ -686,7 +679,7 @@ public class APIGatewayManager {
                     //If an outSequence has been added or updated.
                     if (APIUtil.isSequenceDefined(api.getOutSequence())){
                         //Deploy outSequence
-                        deployOutSequence(api, tenantId, tenantDomain, environment);
+                        deployOutSequence(client, api, tenantId, tenantDomain);
                     }
                 }
             } catch (Exception e) {
@@ -701,7 +694,7 @@ public class APIGatewayManager {
 
     }
 
-    private void deployAPIFaultSequence(API api, String tenantDomain, Environment environment)
+    private void deployAPIFaultSequence(APIGatewayAdminClient client, API api, String tenantDomain)
             throws APIManagementException {
 
         String faultSequenceName = api.getFaultSequence();
@@ -718,9 +711,7 @@ public class APIGatewayManager {
                 tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
             }
 
-            APIGatewayAdminClient client;
 
-            client = new APIGatewayAdminClient(api.getId(), environment);
             //If a fault sequence has be defined.
             if (APIUtil.isSequenceDefined(faultSequenceName)) {
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -767,19 +758,17 @@ public class APIGatewayManager {
 
     /**
      * Store the secured endpoint username password to registry
+     * @param securityAdminClient APIGatewayAdminClient
      * @param api
      * @param tenantDomain
-     * @param environment
-     * @param operation -add,delete,update operations for an API
-     * @throws APIManagementException
      */
-	private void setSecureVaultProperty(API api, String tenantDomain, Environment environment)
+	private void setSecureVaultProperty(APIGatewayAdminClient securityAdminClient, API api, String tenantDomain)
             throws APIManagementException {
-		boolean isSecureVaultEnabled = Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
-		                                                    getAPIManagerConfiguration().getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE));
+		boolean isSecureVaultEnabled = Boolean.parseBoolean(ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                .getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE));
 		if (api.isEndpointSecured() && isSecureVaultEnabled) {
-			try {							
-				APIGatewayAdminClient securityAdminClient = new APIGatewayAdminClient(api.getId(), environment);
+			try {
 				securityAdminClient.setSecureVaultProperty(api, tenantDomain);
 			} catch (Exception e) {
 				String msg = "Error in setting secured password.";
