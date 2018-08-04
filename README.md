@@ -17,3 +17,4 @@ https://github.com/wso2-support/carbon-governance/tree/support-4.7.0
 https://github.com/wso2-support/wso2-wsdl4j/tree/support-1.6.2-wso2v4
 
 - Support-6.2.201 - APIM 2.2.0
+- Support-6.3.95 - APIM 2.5.0
