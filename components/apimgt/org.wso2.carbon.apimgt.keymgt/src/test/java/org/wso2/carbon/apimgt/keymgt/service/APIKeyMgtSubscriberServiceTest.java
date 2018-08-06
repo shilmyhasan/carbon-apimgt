@@ -2,7 +2,6 @@ package org.wso2.carbon.apimgt.keymgt.service;
 
 import org.apache.axis2.AxisFault;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -31,6 +30,7 @@ import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
 import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
@@ -41,17 +41,28 @@ import org.wso2.carbon.identity.oauth.OAuthAdminService;
 import org.wso2.carbon.identity.oauth.cache.OAuthCache;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static org.mockito.Matchers.any;
 import static org.wso2.carbon.base.CarbonBaseConstants.CARBON_HOME;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ PrivilegedCarbonContext.class, OAuthApplicationInfo.class, ApplicationManagementService.class,
+@PrepareForTest({ MultitenantUtils.class, PrivilegedCarbonContext.class, OAuthApplicationInfo.class, ApplicationManagementService.class,
         APIKeyMgtSubscriberService.class, ApiMgtDAO.class, OAuthServerConfiguration.class, OAuthCache.class,
         ServiceReferenceHolder.class, CarbonUtils.class, ServerConfiguration.class, APIUtil.class,
         APIKeyMgtUtil.class })
@@ -59,9 +70,11 @@ public class APIKeyMgtSubscriberServiceTest {
     private final int TENANT_ID = 1234;
     private final String TENANT_DOMAIN = "foo.com";
     private final String USER_NAME = "admin";
+    private final String USER_NAME_WITH_TENANT = "admin@foo.com";
     private final String SECONDARY_USER_NAME = "secondary/admin@foo.com";
     private final String APPLICATION_NAME = "foo_PRODUCTION";
     private final String APPLICATION_NAME_1 = "sample_app";
+    private final String APPLICATION_OWNER = "admin@foo.com";
     private final String CALLBACK_URL = "http://localhost";
     private final String CONSUMER_KEY = "Har2MjbxeMg3ysWEudjOKnXb3pAa";
     private final String CONSUMER_SECRET = "Ha52MfbxeFg3HJKEud156Y5GnAa";
@@ -519,7 +532,33 @@ public class APIKeyMgtSubscriberServiceTest {
         accessTokenInfo.setConsumerKey(CONSUMER_KEY);
         accessTokenInfo.setConsumerSecret(CONSUMER_SECRET);
         accessTokens.add(accessTokenInfo);
-        Mockito.when(apiMgtDAO.getAccessTokenListForUser(USER_NAME, APPLICATION_NAME)).thenReturn(accessTokens);
+        Mockito.when(apiMgtDAO.getAccessTokenListForUser(USER_NAME, APPLICATION_NAME, APPLICATION_OWNER))
+                .thenReturn(accessTokens);
+
+        UserStoreManager userStoreManager = Mockito.mock(UserStoreManager.class);
+        UserRealm userRealm = Mockito.mock(UserRealm.class);
+        CarbonContext carbonContext = Mockito.mock(CarbonContext.class);
+        PowerMockito.mockStatic(CarbonContext.class);
+        PowerMockito.when(CarbonContext.getThreadLocalCarbonContext()).thenReturn(carbonContext);
+        Mockito.when(carbonContext.getUserRealm()).thenReturn(userRealm);
+        Mockito.when(userRealm.getUserStoreManager()).thenReturn(userStoreManager);
+
+        Mockito.when(CarbonContext.getThreadLocalCarbonContext().getUsername()).thenReturn(USER_NAME);
+        PowerMockito.when(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()).thenReturn(TENANT_DOMAIN);
+
+        RealmConfiguration realmConfiguration = Mockito.mock(RealmConfiguration.class);
+        Mockito.when(userRealm.getRealmConfiguration()).thenReturn(realmConfiguration);
+        Mockito.doReturn("admin").when(realmConfiguration).getAdminRoleName();
+
+        String[] userRoles = new String[2];
+        userRoles[0] = "admin";
+        userRoles[1] = "Internal/subscriber";
+        Mockito.doReturn(userRoles).when(userStoreManager).getRoleListOfUser(any(String.class));
+
+        PowerMockito.mockStatic(MultitenantUtils.class);
+        PowerMockito.when(MultitenantUtils.getTenantDomain(APPLICATION_OWNER)).thenReturn(TENANT_DOMAIN);
+        PowerMockito.when(MultitenantUtils.getTenantAwareUsername(APPLICATION_OWNER)).thenReturn(USER_NAME);
+        PowerMockito.when(MultitenantUtils.getTenantAwareUsername(USER_NAME)).thenReturn(USER_NAME);
 
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
@@ -548,12 +587,13 @@ public class APIKeyMgtSubscriberServiceTest {
         Mockito.when(statusLine.getStatusCode()).thenReturn(200);
         Mockito.when(httpResponse.getStatusLine()).thenReturn(statusLine);
         PowerMockito.when(APIUtil.getHttpClient(Mockito.anyInt(), Mockito.anyString())).thenReturn(httpClient);
-        boolean status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME);
+        boolean status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME,
+                APPLICATION_OWNER);
         Assert.assertEquals(true, status);
 
         Mockito.when(statusLine.getStatusCode()).thenReturn(500);
         try {
-            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME);
+            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME, APPLICATION_OWNER);
             Assert.fail("APIManagementException should be thrown");
         } catch (RuntimeException e) {
             Assert.assertEquals("Token revoke failed : HTTP error code : " + 500, e.getMessage());
@@ -561,7 +601,7 @@ public class APIKeyMgtSubscriberServiceTest {
 
         Mockito.when(httpClient.execute(Mockito.any(HttpPost.class))).thenThrow(new IOException("Connection Error"));
         try {
-            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME);
+            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME, APPLICATION_OWNER);
             Assert.fail("APIManagementException should be thrown");
         } catch (APIManagementException e) {
             Assert.assertEquals("Error while creating tokens - Connection Error", e.getMessage());
@@ -570,20 +610,31 @@ public class APIKeyMgtSubscriberServiceTest {
         PowerMockito.whenNew(UrlEncodedFormEntity.class).withArguments(Matchers.anyObject(), Matchers.anyString())
                 .thenThrow(new UnsupportedEncodingException("Unsupported Encoding"));
         try {
-            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME);
+            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME, APPLICATION_OWNER);
             Assert.fail("APIManagementException should be thrown");
         } catch (APIManagementException e) {
             Assert.assertEquals("Error while preparing request for token/revoke APIs", e.getMessage());
         }
 
-        Mockito.when(apiMgtDAO.getAccessTokenListForUser(USER_NAME, APPLICATION_NAME))
+        Mockito.when(apiMgtDAO.getAccessTokenListForUser(USER_NAME, APPLICATION_NAME, APPLICATION_OWNER))
                 .thenThrow(new SQLException("Error getting AccessToken List For User"));
         try {
-            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME);
+            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME, APPLICATION_OWNER);
             Assert.fail("APIManagementException should be thrown");
         } catch (APIManagementException e) {
-            Assert.assertEquals("Error while revoking token for user=" + USER_NAME + " app=" + APPLICATION_NAME,
-                    e.getMessage());
+            Assert.assertEquals("Error while revoking token for user=" + USER_NAME + " app=" + APPLICATION_NAME
+                    + " owned by=" + APPLICATION_OWNER + " by logged in user=" + USER_NAME_WITH_TENANT, e.getMessage());
+        }
+
+        Mockito.when(userStoreManager.getRoleListOfUser(USER_NAME))
+                .thenThrow(new UserStoreException("Error getting user store information"));
+        try {
+            status = apiKeyMgtSubscriberService.revokeTokensOfUserByApp(USER_NAME, APPLICATION_NAME, APPLICATION_OWNER);
+            Assert.fail("UserStoreException should be thrown");
+        } catch (APIManagementException e) {
+            Assert.assertEquals("Error while authenticating the logged in user=" + USER_NAME_WITH_TENANT +
+                    " while revoking token for user=" + USER_NAME + " app=" + APPLICATION_NAME + " owned by=" +
+                    APPLICATION_OWNER, e.getMessage());
         }
     }
 }
