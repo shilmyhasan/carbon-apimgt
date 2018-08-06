@@ -745,8 +745,9 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
     /**
      * Service method to revoke all access tokens issued for given user under the given application. This will change
      * access token status to revoked and remove cached access tokens from memory of all gateway nodes.
+     *
      * @param userName end user name
-     * @param appName application name
+     * @param appName  application name
      * @param appOwner application owner username
      * @return if operation is success
      * @throws APIManagementException in case of revoke failure.
@@ -761,7 +762,7 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
         userName = MultitenantUtils.getTenantAwareUsername(userName);
         try {
             if (appOwner != null) {
-                if(log.isDebugEnabled()){
+                if (log.isDebugEnabled()) {
                     log.debug("appOwner parameter present in the request to revoke tokens of user=" + userName +
                             " for application=" + appName);
                 }
@@ -774,7 +775,7 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                         MultitenantUtils.getTenantAwareUsername(appOwner) : appOwner;
                 //If both app owner and logged in user in both tenants
                 if (appOwnerTenantDomain.equals(baseUserTenantDomain)) {
-                    if(log.isDebugEnabled()){
+                    if (log.isDebugEnabled()) {
                         log.debug("appOwner=" + appOwner + " and the logged in user=" + baseUserNameWithTenant +
                                 " both exist in the same tenant");
                     }
@@ -791,7 +792,7 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                     //If logged in user an admin or same as the app owner
                     if (baseUserRoles != null && (baseUserRoles.contains(adminRoleName) ||
                             baseUserNameWithTenant.equals(appOwnerUserNameWithTenant))) {
-                        if(log.isDebugEnabled()){
+                        if (log.isDebugEnabled()) {
                             log.debug("Logged in user=" + baseUserNameWithTenant +
                                     " is either the tenant admin or the same app owner of application=" + appName);
                         }
@@ -815,7 +816,7 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                 }
             } else {
                 //If appOwner field not present in the request, assume the logged in user as the application owner
-                if(log.isDebugEnabled()){
+                if (log.isDebugEnabled()) {
                     log.debug("appOwner parameter not present in the request to revoke tokens of user=" + userName +
                             " for application=" + appName);
                 }
@@ -828,8 +829,8 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
             List<String> APIRevokeURLs = new ArrayList<String>(APIGatewayURLs.size());
 
             for (String apiGatewayURL : APIGatewayURLs) {
-                String [] apiGatewayURLs = apiGatewayURL.split(",");
-                if(apiGatewayURL.length()> 1) {
+                String[] apiGatewayURLs = apiGatewayURL.split(",");
+                if (apiGatewayURL.length() > 1) {
                     //get https url
                     String apiHTTPSURL = apiGatewayURLs[1];
                     String revokeURL = apiHTTPSURL + getRevokeURLPath();

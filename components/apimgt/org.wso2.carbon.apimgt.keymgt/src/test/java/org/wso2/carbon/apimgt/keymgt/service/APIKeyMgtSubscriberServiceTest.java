@@ -62,10 +62,10 @@ import static org.mockito.Matchers.any;
 import static org.wso2.carbon.base.CarbonBaseConstants.CARBON_HOME;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ MultitenantUtils.class, PrivilegedCarbonContext.class, OAuthApplicationInfo.class, ApplicationManagementService.class,
+@PrepareForTest({MultitenantUtils.class, PrivilegedCarbonContext.class, OAuthApplicationInfo.class, ApplicationManagementService.class,
         APIKeyMgtSubscriberService.class, ApiMgtDAO.class, OAuthServerConfiguration.class, OAuthCache.class,
         ServiceReferenceHolder.class, CarbonUtils.class, ServerConfiguration.class, APIUtil.class,
-        APIKeyMgtUtil.class })
+        APIKeyMgtUtil.class})
 public class APIKeyMgtSubscriberServiceTest {
     private final int TENANT_ID = 1234;
     private final String TENANT_DOMAIN = "foo.com";
@@ -78,7 +78,7 @@ public class APIKeyMgtSubscriberServiceTest {
     private final String CALLBACK_URL = "http://localhost";
     private final String CONSUMER_KEY = "Har2MjbxeMg3ysWEudjOKnXb3pAa";
     private final String CONSUMER_SECRET = "Ha52MfbxeFg3HJKEud156Y5GnAa";
-    private final String[] GRANT_TYPES = { "password" };
+    private final String[] GRANT_TYPES = {"password"};
     private final String REFRESH_GRANT_TYPE = "refresh_token";
     private final String IMPLICIT_GRANT_TYPE = "implicit";
     private final String ACCESS_TOKEN = "ca19a540f544777860e44e75f605d927";
@@ -246,7 +246,7 @@ public class APIKeyMgtSubscriberServiceTest {
         Assert.assertNull(dto);
 
         Mockito.when(oAuthAdminService.getAllowedGrantTypes())
-                .thenReturn(new String[] { IMPLICIT_GRANT_TYPE, REFRESH_GRANT_TYPE });
+                .thenReturn(new String[]{IMPLICIT_GRANT_TYPE, REFRESH_GRANT_TYPE});
         dto = apiKeyMgtSubscriberService
                 .updateOAuthApplication(SECONDARY_USER_NAME, APPLICATION_NAME, CALLBACK_URL, CONSUMER_KEY, null);
         Assert.assertEquals(IMPLICIT_GRANT_TYPE + " " + REFRESH_GRANT_TYPE, dto.getParameter(ApplicationConstants.
@@ -356,7 +356,7 @@ public class APIKeyMgtSubscriberServiceTest {
     public void testRenewAccessToken() throws Exception {
         String tokenType = "production";
         String oldAccessToken = "s5d8v8d8f8ds5d9e7w53a1a7e5g5";
-        String[] allowedDomains = new String[] { "wso2.com" };
+        String[] allowedDomains = new String[]{"wso2.com"};
         String validityTime = "3600";
 
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
