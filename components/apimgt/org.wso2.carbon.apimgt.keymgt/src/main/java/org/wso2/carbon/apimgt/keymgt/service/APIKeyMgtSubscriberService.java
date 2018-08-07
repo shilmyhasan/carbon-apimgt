@@ -757,8 +757,11 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
         List<AccessTokenInfo> accessTokens;
         String baseUsername = CarbonContext.getThreadLocalCarbonContext().getUsername();
         String baseUserTenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        String baseUserNameWithTenant = baseUsername.concat(APIConstants.EMAIL_DOMAIN_SEPARATOR)
-                .concat(baseUserTenantDomain);
+        String baseUserNameWithoutTenant = MultitenantUtils.getTenantAwareUsername(baseUsername);
+        //Check if the username returned from CarbonContext.getThreadLocalCarbonContext() already contains domain name
+        //Otherwise append the domain name to the username
+        String baseUserNameWithTenant = (!baseUserNameWithoutTenant.equals(baseUsername)) ?
+                baseUsername : baseUsername.concat(APIConstants.EMAIL_DOMAIN_SEPARATOR).concat(baseUserTenantDomain);
         userName = MultitenantUtils.getTenantAwareUsername(userName);
         try {
             if (appOwner != null) {
@@ -782,7 +785,8 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                     UserStoreManager userstoremanager =
                             CarbonContext.getThreadLocalCarbonContext().getUserRealm().getUserStoreManager();
                     //Get the role list of logged in user
-                    Collection<String> baseUserRoles = Arrays.asList(userstoremanager.getRoleListOfUser((baseUsername)));
+                    Collection<String> baseUserRoles = Arrays.asList(userstoremanager.
+                            getRoleListOfUser((baseUserNameWithoutTenant)));
                     //Get admin role name of the current domain
                     String adminRoleName = CarbonContext
                             .getThreadLocalCarbonContext()
@@ -821,7 +825,7 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                             " for application=" + appName);
                 }
                 String appOwnerUserName = baseUserTenantDomain.equals(APIConstants.SUPER_TENANT_DOMAIN) ?
-                        baseUsername : baseUserNameWithTenant;
+                        baseUserNameWithoutTenant : baseUserNameWithTenant;
                 accessTokens = ApiMgtDAO.getAccessTokenListForUser(userName, appName, appOwnerUserName);
             }
             //find revoke urls
