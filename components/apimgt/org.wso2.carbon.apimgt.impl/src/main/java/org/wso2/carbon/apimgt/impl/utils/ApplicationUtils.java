@@ -31,6 +31,7 @@ import org.wso2.carbon.apimgt.api.model.OAuthApplicationInfo;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 
+import java.util.regex.Pattern;
 /**
  * Utility class for performing Operations related to Applications, OAuth clients.
  */
@@ -39,6 +40,7 @@ public class ApplicationUtils {
     private static ApiMgtDAO dao = ApiMgtDAO.getInstance();
 
     private static Log log = LogFactory.getLog(ApplicationUtils.class);
+    private static String APP_NAME_VALIDATING_REGEX = "^[a-zA-Z0-9 ._-]*$";
 
 
     /**
@@ -149,5 +151,22 @@ public class ApplicationUtils {
                                                  OAuthApplicationInfo oAuthApplication) throws APIManagementException {
         application.addOAuthApp(keyType,oAuthApplication);
         dao.updateApplicationKeyTypeMapping(application,keyType);
+    }
+    /**
+     * This method checks whether the Application name have only valid characters
+     *
+     * @param applicationName Name of the Application
+     * @return true of Application name is valid
+     * @throws APIManagementException
+     */
+    public static boolean isApplicationNameValid(String applicationName)
+            throws APIManagementException {
+        String spValidatorRegex = APP_NAME_VALIDATING_REGEX;
+        Pattern regexPattern = Pattern.compile(spValidatorRegex);
+        if (regexPattern.matcher(applicationName).matches()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

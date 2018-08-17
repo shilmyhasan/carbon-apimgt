@@ -475,9 +475,25 @@ public final class APIUtil {
             String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
             Resource apiResource = registry.get(artifactPath);
             api.setAccessControl(apiResource.getProperty(APIConstants.ACCESS_CONTROL));
-            api.setAccessControlRoles(
-                    APIConstants.NULL_USER_ROLE_LIST.equals(apiResource.getProperty(APIConstants.PUBLISHER_ROLES)) ?
-                            null : apiResource.getProperty(APIConstants.PUBLISHER_ROLES));
+
+            String accessControlRoles = null;
+
+            String displayPublisherRoles = apiResource.getProperty(APIConstants.DISPLAY_PUBLISHER_ROLES);
+            if (displayPublisherRoles == null) {
+
+                String publisherRoles = apiResource.getProperty(APIConstants.PUBLISHER_ROLES);
+
+                if (publisherRoles != null) {
+                    accessControlRoles = APIConstants.NULL_USER_ROLE_LIST.equals(
+                            apiResource.getProperty(APIConstants.PUBLISHER_ROLES)) ?
+                            null : apiResource.getProperty(APIConstants.PUBLISHER_ROLES);
+                }
+            } else {
+                accessControlRoles = APIConstants.NULL_USER_ROLE_LIST.equals(displayPublisherRoles) ?
+                        null : displayPublisherRoles;
+            }
+
+            api.setAccessControlRoles(accessControlRoles);
             api.setRating(getAverageRating(apiId));
             //set description
             api.setDescription(artifact.getAttribute(APIConstants.API_OVERVIEW_DESCRIPTION));

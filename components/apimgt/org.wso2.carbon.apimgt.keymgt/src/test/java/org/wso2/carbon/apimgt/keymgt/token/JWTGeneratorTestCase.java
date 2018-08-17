@@ -34,6 +34,7 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.core.tenant.TenantManager;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
@@ -195,6 +196,7 @@ public class JWTGeneratorTestCase {
     public void testGetMultiAttributeSeparator() throws Exception {
 
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        TenantManager tenantManager = Mockito.mock(TenantManager.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
 
@@ -206,6 +208,7 @@ public class JWTGeneratorTestCase {
                 .thenReturn(apiManagerConfigurationService);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
 
         String dialectUri = "dialect_uri";
         Map<String, String> configMap = new HashMap<String, String>();
@@ -244,6 +247,7 @@ public class JWTGeneratorTestCase {
     public void testGetMultiAttributeSeparatorForInvalidTenant() throws Exception {
 
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        TenantManager tenantManager = Mockito.mock(TenantManager.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
 
@@ -251,6 +255,7 @@ public class JWTGeneratorTestCase {
                 .mock(APIManagerConfigurationService.class);
         RealmService realmService = Mockito.mock(org.wso2.carbon.user.core.service.RealmService.class);
         Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
         Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
                 .thenReturn(apiManagerConfigurationService);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
@@ -284,6 +289,7 @@ public class JWTGeneratorTestCase {
     public void testGetMultiAttributeSeparatorForClaimSeparator() throws Exception {
 
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        TenantManager tenantManager = Mockito.mock(TenantManager.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
 
@@ -293,6 +299,7 @@ public class JWTGeneratorTestCase {
         Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
         Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
                 .thenReturn(apiManagerConfigurationService);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
 
@@ -333,6 +340,7 @@ public class JWTGeneratorTestCase {
     public void testGetMultiAttributeSeparatorForClaimSeparatorWhenEmpty() throws Exception {
 
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        TenantManager tenantManager = Mockito.mock(TenantManager.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
 
@@ -340,6 +348,7 @@ public class JWTGeneratorTestCase {
                 .mock(APIManagerConfigurationService.class);
         RealmService realmService = Mockito.mock(org.wso2.carbon.user.core.service.RealmService.class);
         Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
         Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
                 .thenReturn(apiManagerConfigurationService);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
@@ -382,6 +391,7 @@ public class JWTGeneratorTestCase {
     public void testGetMultiAttributeSeparatorForUserStoreException() throws Exception {
 
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        TenantManager tenantManager = Mockito.mock(TenantManager.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
 
@@ -389,6 +399,7 @@ public class JWTGeneratorTestCase {
                 .mock(APIManagerConfigurationService.class);
         RealmService realmService = Mockito.mock(org.wso2.carbon.user.core.service.RealmService.class);
         Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
         Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
                 .thenReturn(apiManagerConfigurationService);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
@@ -423,6 +434,7 @@ public class JWTGeneratorTestCase {
     public void testBuildBody() throws Exception {
 
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        TenantManager tenantManager = Mockito.mock(TenantManager.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
 
@@ -432,6 +444,7 @@ public class JWTGeneratorTestCase {
         Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
         Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
                 .thenReturn(apiManagerConfigurationService);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
 
@@ -494,6 +507,7 @@ public class JWTGeneratorTestCase {
         Mockito.when(keyStoreManager.getKeyStore(Mockito.anyString())).thenReturn(keyStore);
 
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        TenantManager tenantManager = Mockito.mock(TenantManager.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
 
@@ -501,6 +515,7 @@ public class JWTGeneratorTestCase {
                 .mock(APIManagerConfigurationService.class);
         RealmService realmService = Mockito.mock(org.wso2.carbon.user.core.service.RealmService.class);
         Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
         Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
                 .thenReturn(apiManagerConfigurationService);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);

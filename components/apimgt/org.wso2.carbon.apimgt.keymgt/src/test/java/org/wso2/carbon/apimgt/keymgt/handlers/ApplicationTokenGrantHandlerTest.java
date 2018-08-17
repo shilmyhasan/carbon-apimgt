@@ -28,44 +28,35 @@ import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
 import org.wso2.carbon.identity.oauth2.model.RequestParameter;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 
-import static org.junit.Assert.*;
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({OAuthServerConfiguration.class, String.class})
 public class ApplicationTokenGrantHandlerTest {
     @Test
     public void testAuthorizeAccessDelegation() throws Exception {
         PowerMockito.mockStatic(OAuthServerConfiguration.class);
-        String str = PowerMockito.mock(String.class);
-
-        OAuthTokenReqMessageContext authTokenReqMessageContext = Mockito.mock(OAuthTokenReqMessageContext.class);
         OAuthServerConfiguration authServerConfiguration = Mockito.mock(OAuthServerConfiguration.class);
         OAuth2AccessTokenReqDTO accessTokenReqDTO = Mockito.mock(OAuth2AccessTokenReqDTO.class);
-        RequestParameter param = Mockito.mock(RequestParameter.class);
-
-        RequestParameter[] params = new RequestParameter[2];
-        params[0] = param;
-        params[1] = param;
-        String[] paramsValues = {"0", "1"};
-
-        Mockito.when(authServerConfiguration.getInstance()).thenReturn(authServerConfiguration);
-        Mockito.when(authTokenReqMessageContext.getOauth2AccessTokenReqDTO()).thenReturn(accessTokenReqDTO);
-        Mockito.when(accessTokenReqDTO.getRequestParameters()).thenReturn(params);
-        Mockito.when(param.getKey()).thenReturn("validity_period");
-        Mockito.when(str.equals(Mockito.anyString())).thenReturn(true);
-        Mockito.when(param.getValue()).thenReturn(paramsValues);
+        RequestParameter parameter1 = new RequestParameter("validity_period", "3600");
+        RequestParameter[] requestParameters1 = {parameter1};
+        OAuthTokenReqMessageContext authTokenReqMessageContext1 = new OAuthTokenReqMessageContext(accessTokenReqDTO);
+        PowerMockito.when(authServerConfiguration.getInstance()).thenReturn(authServerConfiguration);
+        Mockito.when(accessTokenReqDTO.getRequestParameters()).thenReturn(requestParameters1);
 
         ApplicationTokenGrantHandler tokenGrantHandler = new ApplicationTokenGrantHandler();
-        Assert.assertTrue(tokenGrantHandler.authorizeAccessDelegation(authTokenReqMessageContext));
+        Assert.assertTrue(tokenGrantHandler.authorizeAccessDelegation(authTokenReqMessageContext1));
+        Assert.assertEquals(3600L, authTokenReqMessageContext1.getValidityPeriod());
 
-        //when validity period not null and not zero
-        String[] paramsValues2 = {"1", "1"};
-        Mockito.when(param.getValue()).thenReturn(paramsValues2);
-        Assert.assertTrue(tokenGrantHandler.authorizeAccessDelegation(authTokenReqMessageContext));
+        RequestParameter parameter2 = new RequestParameter("validity_period", "0");
+        RequestParameter[] requestParameters2 = {parameter2};
+        OAuthTokenReqMessageContext authTokenReqMessageContext2 = new OAuthTokenReqMessageContext(accessTokenReqDTO);
+        Mockito.when(accessTokenReqDTO.getRequestParameters()).thenReturn(requestParameters2);
+        Assert.assertTrue(tokenGrantHandler.authorizeAccessDelegation(authTokenReqMessageContext2));
+        Assert.assertEquals(-1L, authTokenReqMessageContext2.getValidityPeriod());
 
-        //params equal to null
         Mockito.when(accessTokenReqDTO.getRequestParameters()).thenReturn(null);
-        Assert.assertTrue(tokenGrantHandler.authorizeAccessDelegation(authTokenReqMessageContext));
+        OAuthTokenReqMessageContext authTokenReqMessageContext3 = new OAuthTokenReqMessageContext(accessTokenReqDTO);
+        Assert.assertTrue(tokenGrantHandler.authorizeAccessDelegation(authTokenReqMessageContext3));
+        Assert.assertEquals(-1L, authTokenReqMessageContext3.getValidityPeriod());
     }
 
 }

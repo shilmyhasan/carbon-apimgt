@@ -2320,7 +2320,11 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleApplicationNameContainSpacesException("Application name " +
                                                             "cannot contain leading or trailing white spaces");
         }
-
+        if (application.getName() != null &&
+                !ApplicationUtils.isApplicationNameValid(application.getName())) {
+            handleApplicationNameContainIllegalCharactersException("Application name contain one or more illegal" +
+                    " characters");
+        }
         if (APIUtil.isApplicationExist(userId, application.getName(), application.getGroupId())) {
             handleResourceAlreadyExistsException(
                     "A duplicate application already exists by the name - " + application.getName());
@@ -2412,7 +2416,11 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleApplicationNameContainSpacesException("Application name " +
                     "cannot contain leading or trailing white spaces");
         }
-
+        if (application.getName() != null &&
+                !ApplicationUtils.isApplicationNameValid(application.getName())) {
+            handleApplicationNameContainIllegalCharactersException("Application name contain one or more illegal" +
+                    " characters");
+        }
         apiMgtDAO.updateApplication(application);
         if (log.isDebugEnabled()) {
             log.debug("Successfully updated the Application: " + application.getId() +" in the database.");

@@ -32,6 +32,7 @@ import org.wso2.carbon.apimgt.api.APIMgtAuthorizationFailedException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceAlreadyExistsException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceNotFoundException;
 import org.wso2.carbon.apimgt.api.APIProvider;
+import org.wso2.carbon.apimgt.api.ApplicationNameIllegalCharacterValidationException;
 import org.wso2.carbon.apimgt.api.ApplicationNameWhiteSpaceValidationException;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
@@ -477,6 +478,19 @@ public class RestApiUtil {
     public static boolean isDueToApplicationNameWhiteSpaceValidation(Throwable e) {
         Throwable rootCause = getPossibleErrorCause(e);
         return rootCause instanceof ApplicationNameWhiteSpaceValidationException;
+    }
+    /**
+     * Check if the specified throwable e is happened as the updated/new application name contains special characters
+     * which are not permitted
+     *
+     * @param e throwable to check
+     * @return true if the specified throwable e is happened as the updated/new application contains special characters
+     * which are not permitted
+     */
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public static boolean isDueToApplicationNameWithIllegalCharacters(Throwable e) {
+        Throwable rootCause = getPossibleErrorCause(e);
+        return rootCause instanceof ApplicationNameIllegalCharacterValidationException;
     }
 
     /**

@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.keymgt.token;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -385,8 +386,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 byte[] der = publicCert.getEncoded();
                 digestValue.update(der);
                 byte[] digestInBytes = digestValue.digest();
+                String publicCertThumbprint = hexify(digestInBytes);
                 Base64 base64 = new Base64(true);
-                String base64UrlEncodedThumbPrint = base64.encodeToString(digestInBytes).trim();
+                String base64UrlEncodedThumbPrint = base64.encodeToString(
+                        publicCertThumbprint.getBytes(Charsets.UTF_8)).trim();
                 StringBuilder jwtHeader = new StringBuilder();
                 //Sample header
                 //{"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10"}
@@ -475,5 +478,21 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             InstantiationException, ClassNotFoundException {
         return (ClaimsRetriever) APIUtil.getClassForName(className).newInstance();
     }
+
+    private String hexify(byte bytes[]) {
+
+        char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7',
+                '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+        StringBuilder buf = new StringBuilder(bytes.length * 2);
+
+        for (int i = 0; i < bytes.length; ++i) {
+            buf.append(hexDigits[(bytes[i] & 0xf0) >> 4]);
+            buf.append(hexDigits[bytes[i] & 0x0f]);
+        }
+
+        return buf.toString();
+    }
+
 
 }

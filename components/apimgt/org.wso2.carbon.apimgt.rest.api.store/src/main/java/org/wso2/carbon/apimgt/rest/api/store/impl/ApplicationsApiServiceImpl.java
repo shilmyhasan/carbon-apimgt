@@ -159,6 +159,8 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
                         log);
             } else if (RestApiUtil.isDueToApplicationNameWhiteSpaceValidation(e)) {
                 RestApiUtil.handleBadRequest("Application name cannot contains leading or trailing white spaces", log);
+            } else if (RestApiUtil.isDueToApplicationNameWithIllegalCharacters(e)) {
+                RestApiUtil.handleBadRequest("Application name contain one or more illegal Characters", log);
             } else {
                 RestApiUtil.handleInternalServerError("Error while adding a new application for the user " + username,
                         e, log);
@@ -392,6 +394,8 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
         } catch (APIManagementException e) {
             if (RestApiUtil.isDueToApplicationNameWhiteSpaceValidation(e)) {
                 RestApiUtil.handleBadRequest("Application name cannot contains leading or trailing white spaces", log);
+            } else if (RestApiUtil.isDueToApplicationNameWithIllegalCharacters(e)) {
+                RestApiUtil.handleBadRequest("Application name contain one or more illegal Characters", log);
             } else {
                 RestApiUtil.handleInternalServerError("Error while updating application " + applicationId, e, log);
             }

@@ -44,6 +44,7 @@ import org.wso2.carbon.apimgt.api.FaultGatewaysException;
 import org.wso2.carbon.apimgt.api.PolicyDeploymentFailureException;
 import org.wso2.carbon.apimgt.api.UnsupportedPolicyTypeException;
 import org.wso2.carbon.apimgt.api.WorkflowResponse;
+import org.wso2.carbon.apimgt.api.dto.CertificateInformationDTO;
 import org.wso2.carbon.apimgt.api.dto.CertificateMetadataDTO;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.apimgt.api.model.API;
@@ -139,12 +140,14 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1170,9 +1173,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             saveAPIStatus(artifactPath, apiStatus);
             String[] visibleRoles = new String[0];
             String publisherAccessControlRoles = api.getAccessControlRoles();
-            if (publisherAccessControlRoles != null) {
-                publisherAccessControlRoles = publisherAccessControlRoles.replaceAll("\\s+", "").toLowerCase();
-            }
+
             updateAPIRolesRestrictions(artifactPath, publisherAccessControlRoles, api.getAccessControl());
 
             if (updatePermissions) {
@@ -2025,6 +2026,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (apiTargetArtifact != null) {
                 apiTargetArtifact.setProperty(APIConstants.PUBLISHER_ROLES,
                         apiSourceArtifact.getProperty(APIConstants.PUBLISHER_ROLES));
+                apiTargetArtifact.setProperty(APIConstants.DISPLAY_PUBLISHER_ROLES,
+                        apiSourceArtifact.getProperty(APIConstants.DISPLAY_PUBLISHER_ROLES));
                 apiTargetArtifact.setProperty(APIConstants.ACCESS_CONTROL,
                         apiSourceArtifact.getProperty(APIConstants.ACCESS_CONTROL));
                 registry.put(targetPath, apiTargetArtifact);
@@ -2583,18 +2586,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             String publisherAccessControlRoles = api.getAccessControlRoles();
-            if (publisherAccessControlRoles != null) {
-                // We are changing to lowercase, as registry search only supports lower-case characters.
-                publisherAccessControlRoles = publisherAccessControlRoles.replace("\\s+", "").toLowerCase();
-                if (publisherAccessControlRoles.isEmpty()) {
-                    publisherAccessControlRoles = null;
-                }
-            }
+
             APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(), visibleRoles,
                     artifactPath, registry);
-            publisherAccessControlRoles = publisherAccessControlRoles == null ?
-                    APIConstants.NULL_USER_ROLE_LIST :
-                    publisherAccessControlRoles;
+
             updateAPIRolesRestrictions(artifactPath, publisherAccessControlRoles, api.getAccessControl());
             registry.commitTransaction();
             transactionCommitted = true;
@@ -5417,6 +5412,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public int addCertificate(String userName, String certificate, String alias, String endpoint)
             throws APIManagementException {
+
         ResponseCode status = ResponseCode.INTERNAL_SERVER_ERROR;
         CertificateManager certificateManager = new CertificateManagerImpl();
         String tenantDomain = MultitenantUtils.getTenantDomain(userName);
@@ -5443,6 +5439,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public int deleteCertificate(String userName, String alias, String endpoint) throws APIManagementException {
+
         ResponseCode status = ResponseCode.INTERNAL_SERVER_ERROR;
         CertificateManager certificateManager = new CertificateManagerImpl();
         String tenantDomain = MultitenantUtils.getTenantDomain(userName);
@@ -5468,12 +5465,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public boolean isConfigured() {
+
         CertificateManager certificateManager = new CertificateManagerImpl();
         return certificateManager.isConfigured();
     }
 
     @Override
     public List<CertificateMetadataDTO> getCertificates(String userName) throws APIManagementException {
+
         CertificateManager certificateManager = new CertificateManagerImpl();
         int tenantId = 0;
         try {
@@ -5483,6 +5482,55 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException("Error while reading tenant information", e);
         }
         return certificateManager.getCertificates(tenantId);
+    }
+
+    @Override
+    public List<CertificateMetadataDTO> searchCertificates(int tenantId, String alias, String endpoint) throws
+            APIManagementException {
+
+        CertificateManager certificateManager = new CertificateManagerImpl();
+        return certificateManager.getCertificates(tenantId, alias, endpoint);
+    }
+
+    @Override
+    public boolean isCertificatePresent(int tenantId, String alias) throws APIManagementException {
+
+        CertificateManager certificateManager = new CertificateManagerImpl();
+        return certificateManager.isCertificatePresent(tenantId, alias);
+    }
+
+    @Override
+    public CertificateInformationDTO getCertificateStatus(String alias) throws APIManagementException {
+
+        CertificateManager certificateManager = new CertificateManagerImpl();
+        return certificateManager.getCertificateInformation(alias);
+    }
+
+    @Override
+    public int updateCertificate(String certificateString, String alias) throws APIManagementException {
+
+        CertificateManager certificateManager = new CertificateManagerImpl();
+        ResponseCode responseCode = certificateManager.updateCertificate(certificateString, alias);
+
+        if (ResponseCode.SUCCESS == responseCode) {
+            GatewayCertificateManager gatewayCertificateManager = new GatewayCertificateManager();
+            gatewayCertificateManager.removeFromGateways(alias);
+            gatewayCertificateManager.addToGateways(certificateString, alias);
+        }
+        return responseCode != null ? responseCode.getResponseCode() :
+                ResponseCode.INTERNAL_SERVER_ERROR.getResponseCode();
+    }
+
+    @Override
+    public int getCertificateCountPerTenant(int tenantId) throws APIManagementException {
+
+        return new CertificateManagerImpl().getCertificateCount(tenantId);
+    }
+
+    @Override
+    public ByteArrayInputStream getCertificateContent(String alias) throws APIManagementException {
+
+        return new CertificateManagerImpl().getCertificateContent(alias);
     }
 
     /**
@@ -5564,9 +5612,18 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (publisherAccessControlRoles.equalsIgnoreCase(APIConstants.NULL_USER_ROLE_LIST)) {
             publisherAccessControl = APIConstants.NO_ACCESS_CONTROL;
         }
+
+        // Replace spaces
+        publisherAccessControlRoles = publisherAccessControlRoles.replaceAll("\\s+", "");
+
         Resource apiResource = registry.get(artifactPath);
         if (apiResource != null) {
-            apiResource.setProperty(APIConstants.PUBLISHER_ROLES, publisherAccessControlRoles.replaceAll("\\s+", ""));
+            // We are changing to lowercase, as registry search only supports lower-case characters.
+            apiResource.setProperty(APIConstants.PUBLISHER_ROLES, publisherAccessControlRoles.toLowerCase());
+
+            // This property will be only used for display proposes in the Publisher UI so that the original case of
+            // the roles that were specified can be maintained.
+            apiResource.setProperty(APIConstants.DISPLAY_PUBLISHER_ROLES, publisherAccessControlRoles);
             apiResource.setProperty(APIConstants.ACCESS_CONTROL, publisherAccessControl);
             apiResource.removeProperty(APIConstants.CUSTOM_API_INDEXER_PROPERTY);
             registry.put(artifactPath, apiResource);
@@ -5733,7 +5790,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (APIUtil.hasPermission(userNameWithTenantDomain, APIConstants.Permissions.APIM_ADMIN)) {
                 return;
             }
-            String publisherAccessControlRoles = apiResource.getProperty(APIConstants.PUBLISHER_ROLES);
+            String publisherAccessControlRoles = apiResource.getProperty(APIConstants.DISPLAY_PUBLISHER_ROLES);
             if (publisherAccessControlRoles != null && !publisherAccessControlRoles.trim().isEmpty()) {
                 String[] accessControlRoleList = publisherAccessControlRoles.replaceAll("\\s+", "").split(",");
                 if (log.isDebugEnabled()) {
