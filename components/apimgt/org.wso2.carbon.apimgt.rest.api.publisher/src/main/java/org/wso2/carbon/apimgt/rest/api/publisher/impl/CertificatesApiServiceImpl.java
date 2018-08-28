@@ -251,7 +251,7 @@ public class CertificatesApiServiceImpl extends CertificatesApiService {
 
         try {
             if (StringUtils.isEmpty(alias) || StringUtils.isEmpty(endpoint)) {
-                RestApiUtil.handleBadRequest("The alias and/ or endpoint should not be empty", log);
+                RestApiUtil.handleBadRequest("The alias and endpoint should not be empty", log);
             }
 
             ContentDisposition contentDisposition = certificateDetail.getContentDisposition();

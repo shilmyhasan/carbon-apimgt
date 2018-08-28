@@ -39,11 +39,11 @@ import java.util.List;
 public class CertificateManagerImpl implements CertificateManager {
 
     private static Log log = LogFactory.getLog(CertificateManagerImpl.class);
-    private static final String PROFILE_CONFIG = "sslprofiles.xml";
-    private static final String CARBON_HOME_STRING = "carbon.home";
-    private static final char SEP = File.separatorChar;
-    private static String CARBON_HOME = System.getProperty(CARBON_HOME_STRING);
-    private static String SSL_PROFILE_FILE_PATH = CARBON_HOME + SEP + "repository" + SEP + "resources" + SEP
+    private final String PROFILE_CONFIG = "sslprofiles.xml";
+    private final String CARBON_HOME_STRING = "carbon.home";
+    private final char SEP = File.separatorChar;
+    private final String CARBON_HOME = System.getProperty(CARBON_HOME_STRING);
+    private final String SSL_PROFILE_FILE_PATH = CARBON_HOME + SEP + "repository" + SEP + "resources" + SEP
             + "security" + SEP + PROFILE_CONFIG;
     private static CertificateMgtDAO certificateMgtDAO = CertificateMgtDAO.getInstance();
     private CertificateMgtUtils certificateMgtUtils = new CertificateMgtUtils();
