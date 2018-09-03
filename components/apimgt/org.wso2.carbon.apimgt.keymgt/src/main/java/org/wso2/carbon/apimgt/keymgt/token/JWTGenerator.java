@@ -88,32 +88,24 @@ public class JWTGenerator extends AbstractJWTGenerator {
             throws APIManagementException {
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
-            String tenantAwareUserName = validationContext.getValidationInfoDTO().getEndUserName();
+            String userName = validationContext.getValidationInfoDTO().getEndUserName();
 
             try {
-                int tenantId = APIUtil.getTenantId(tenantAwareUserName);
+                int tenantId = APIUtil.getTenantId(userName);
 
                 if (tenantId != -1) {
                     UserStoreManager manager = ServiceReferenceHolder.getInstance().
                             getRealmService().getTenantUserRealm(tenantId).getUserStoreManager();
 
-                    String tenantDomain = MultitenantUtils.getTenantDomain(tenantAwareUserName);
-                    String[] split = tenantAwareUserName.split(tenantDomain);
+                    String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(userName);
 
-                    if (split.length != 1) {
-                        log.error("Could not extract username without tenant domain for: " + tenantAwareUserName);
-                        return null;
-                    }
-
-                    String username = split[0].substring(0, split[0].length() - 1);
-
-                    if (manager.isExistingUser(username)) {
+                    if (manager.isExistingUser(tenantAwareUserName)) {
                         return claimsRetriever.getClaims(tenantAwareUserName);
                     } else {
-                        log.warn("User " + tenantAwareUserName + " cannot be found by user store manager");
+                        log.warn("User " + userName + " cannot be found by user store manager");
                     }
                 } else {
-                    log.error("Tenant cannot be found for username: " + tenantAwareUserName);
+                    log.error("Tenant cannot be found for username: " + userName);
                 }
             } catch (APIManagementException e) {
                 log.error("Error while retrieving claims ", e);
