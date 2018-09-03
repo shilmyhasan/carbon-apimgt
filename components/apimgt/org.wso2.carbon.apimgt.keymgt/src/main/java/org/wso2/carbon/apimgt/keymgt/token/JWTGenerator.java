@@ -24,8 +24,13 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.token.ClaimsRetriever;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.util.UserCoreUtil;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
 import java.util.*;
 
 public class JWTGenerator extends AbstractJWTGenerator {
@@ -83,12 +88,29 @@ public class JWTGenerator extends AbstractJWTGenerator {
             throws APIManagementException {
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
-            String tenantAwareUserName = validationContext.getValidationInfoDTO().getEndUserName();
-            try {
-                return claimsRetriever.getClaims(tenantAwareUserName);
+            String userName = validationContext.getValidationInfoDTO().getEndUserName();
 
+            try {
+                int tenantId = APIUtil.getTenantId(userName);
+
+                if (tenantId != -1) {
+                    UserStoreManager manager = ServiceReferenceHolder.getInstance().
+                            getRealmService().getTenantUserRealm(tenantId).getUserStoreManager();
+
+                    String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(userName);
+
+                    if (manager.isExistingUser(tenantAwareUserName)) {
+                        return claimsRetriever.getClaims(tenantAwareUserName);
+                    } else {
+                        log.warn("User " + userName + " cannot be found by user store manager");
+                    }
+                } else {
+                    log.error("Tenant cannot be found for username: " + userName);
+                }
             } catch (APIManagementException e) {
                 log.error("Error while retrieving claims ", e);
+            } catch (UserStoreException e) {
+                log.error("Error while retrieving user store ", e);
             }
         }
         return null;
