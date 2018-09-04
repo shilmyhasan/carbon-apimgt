@@ -40,6 +40,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.Utils;
+import org.wso2.carbon.apimgt.gateway.MethodStats;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityUtils;
 import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationContext;
 import org.wso2.carbon.apimgt.gateway.utils.APIMgtGoogleAnalyticsUtils;
@@ -65,6 +66,7 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
 
     protected GoogleAnalyticsConfig config = null;
 
+    @MethodStats
 	@Override
 	public boolean handleRequest(MessageContext msgCtx) {
 		if (configKey == null) {
@@ -206,7 +208,7 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
 	 * messageContext, use that. Otherwise use a random number.
 	 * 
 	 */
-	private static String getVisitorId(String account, String userAgent, MessageContext msgCtx) 
+	private static String getVisitorId(String account, String userAgent, MessageContext msgCtx)
 			throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
 		if (msgCtx.getProperty(COOKIE_NAME) != null) {
@@ -235,6 +237,7 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
 		return "0x" + md5String.substring(0, 16);
 	}
 
+    @MethodStats
 	@Override
 	public boolean handleResponse(MessageContext arg0) {
         return true;
