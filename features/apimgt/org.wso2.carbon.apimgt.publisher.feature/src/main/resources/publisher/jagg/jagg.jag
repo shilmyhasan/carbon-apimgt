@@ -47,20 +47,19 @@ var jagg = jagg || (function () {
         return session.get("logged.user");
     };
 
-    var setUser = function (user) {
-        //if jaggery allow session reset
-        if (typeof request.getSession == "function") {
-            session = request.getSession(false);
-            try {
-                if (session && !session.isNew()) {
-                    session.invalidate();
-                }
-            } catch (e) {
-                log.warn("Session is already invalidated, continuing the flow");
-            }
-            session = request.getSession(true);
-        }
-        session.put("logged.user", user);
+    var setUser = function(user) {
+     //if jaggery allow session reset
+     if (typeof request.getSession == "function") {
+         try {
+             if (session && !session.isNew()) {
+                 session.invalidate();
+             }
+         } catch (e) {
+             log.info("Session is already invalidated, continuing on the flow");
+         }
+         session = request.getSession(true);
+     }
+     session.put("logged.user", user);
     };
 
     var getCreatePermitted = function () {
