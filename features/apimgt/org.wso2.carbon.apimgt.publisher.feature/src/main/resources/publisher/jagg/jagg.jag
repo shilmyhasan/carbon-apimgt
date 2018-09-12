@@ -48,18 +48,18 @@ var jagg = jagg || (function () {
     };
 
     var setUser = function(user) {
-     //if jaggery allow session reset
-     if (typeof request.getSession == "function") {
-         try {
-             if (session && !session.isNew()) {
-                 session.invalidate();
-             }
-         } catch (e) {
-             log.info("Session is already invalidated, continuing on the flow");
-         }
-         session = request.getSession(true);
-     }
-     session.put("logged.user", user);
+        //if jaggery allow session reset
+        if (typeof request.getSession == "function") {
+            try {
+                if (session && !session.isNew()) {
+                    session.invalidate();
+                }
+            } catch (e) {
+                log.info("Session is already invalidated, continuing on the flow");
+            }
+            session = request.getSession(true);
+        }
+        session.put("logged.user", user);
     };
 
     var getCreatePermitted = function () {
