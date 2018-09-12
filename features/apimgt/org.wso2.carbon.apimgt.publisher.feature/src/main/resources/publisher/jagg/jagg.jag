@@ -50,8 +50,13 @@ var jagg = jagg || (function () {
     var setUser = function (user) {
         //if jaggery allow session reset
         if (typeof request.getSession == "function") {
-            if (session && !session.isNew()) {
-                session.invalidate();
+            session = request.getSession(false);
+            try {
+                if (session && !session.isNew()) {
+                    session.invalidate();
+                }
+            } catch (e) {
+                log.warn("Session is already invalidated, continuing the flow");
             }
             session = request.getSession(true);
         }
