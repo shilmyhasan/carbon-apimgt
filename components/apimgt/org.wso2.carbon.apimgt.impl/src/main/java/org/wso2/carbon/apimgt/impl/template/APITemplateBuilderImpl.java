@@ -29,6 +29,7 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
@@ -93,6 +94,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
                                             "org.apache.velocity.runtime.log.Log4JLogChute" );
                 velocityengine.setProperty( "runtime.log.logsystem.log4j.logger", getVelocityLogger());
             }
+            velocityengine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, CarbonUtils.getCarbonHome());
             velocityengine.init();
 
             Template t = velocityengine.getTemplate(this.getTemplatePath());
@@ -140,6 +142,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
                                             "org.apache.velocity.runtime.log.Log4JLogChute" );
                 velocityengine.setProperty( "runtime.log.logsystem.log4j.logger", getVelocityLogger());
             }
+            velocityengine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, CarbonUtils.getCarbonHome());
             velocityengine.init();
 
             Template t = velocityengine.getTemplate(this.getPrototypeTemplatePath());
@@ -164,6 +167,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
                                             "org.apache.velocity.runtime.log.Log4JLogChute" );
                 velocityengine.setProperty( "runtime.log.logsystem.log4j.logger", getVelocityLogger());
             }
+            velocityengine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, CarbonUtils.getCarbonHome());
             velocityengine.init();
 
             ConfigContext configcontext = new APIConfigContext(this.api);

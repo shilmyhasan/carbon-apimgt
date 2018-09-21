@@ -38,14 +38,14 @@ import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
 
 public class ThrottlingPolicyTemplateBuilderTest extends TestCase {
-    
-    private final String POLICY_LOCATION = "src" + File.separator + "test" + File.separator + "resources"
-            + File.separator + "repository" + File.separator + "resources" + File.separator + "policy_templates"
-            + File.separator + "";
+
+    private final String POLICY_LOCATION =
+            "repository" + File.separator + "resources" + File.separator + "policy_templates" + File.separator + "";
     private ThrottlePolicyTemplateBuilder templateBuilder;
     
     @Override
     protected void setUp() throws Exception {
+        System.setProperty("carbon.home", ThrottlingPolicyTemplateBuilderTest.class.getResource("/").getFile());
         templateBuilder = new ThrottlePolicyTemplateBuilder();
         //set the policy file location manually for testting
         templateBuilder.setPolicyTemplateLocation(POLICY_LOCATION);
