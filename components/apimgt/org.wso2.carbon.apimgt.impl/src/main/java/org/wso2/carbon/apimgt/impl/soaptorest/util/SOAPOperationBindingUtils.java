@@ -300,7 +300,7 @@ public class SOAPOperationBindingUtils {
                 }
 
                 List<WSDLOperationParam> params = operation.getParameters();
-                if (log.isDebugEnabled()) {
+                if (log.isDebugEnabled() && params != null) {
                     log.debug("SOAP operation: " + operationName + " has " + params.size() + " parameters");
                 }
                 if (params != null) {
