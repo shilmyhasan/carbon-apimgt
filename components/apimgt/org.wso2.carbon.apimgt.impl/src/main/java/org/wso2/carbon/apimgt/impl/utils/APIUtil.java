@@ -1244,12 +1244,10 @@ public final class APIUtil {
      * @return wsdl archive path
      */
     public static String getWsdlArchivePath(APIIdentifier identifier) {
-        String wsdlArchiveResourcePath =
-                APIConstants.API_WSDL_RESOURCE_LOCATION + APIConstants.API_WSDL_ARCHIVE_LOCATION + identifier
-                        .getProviderName() +
-                        APIConstants.WSDL_PROVIDER_SEPERATOR + identifier.getApiName() + identifier.getVersion()
-                        + APIConstants.ZIP_FILE_EXTENSION;
-        return wsdlArchiveResourcePath;
+        return APIConstants.API_WSDL_RESOURCE_LOCATION + APIConstants.API_WSDL_ARCHIVE_LOCATION + identifier
+                .getProviderName() +
+                APIConstants.WSDL_PROVIDER_SEPERATOR + identifier.getApiName() + identifier.getVersion()
+                + APIConstants.ZIP_FILE_EXTENSION;
     }
 
     /**
