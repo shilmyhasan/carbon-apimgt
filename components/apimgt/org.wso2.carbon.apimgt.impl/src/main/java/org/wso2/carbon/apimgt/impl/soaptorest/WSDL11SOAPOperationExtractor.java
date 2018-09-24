@@ -596,8 +596,8 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
                 wsdlOperation.setTargetNamespace(targetNamespace);
                 wsdlOperation.setStyle(soapOperation.getStyle());
 
-                wsdlOperation.setInputParameterModel(getSoapInputParameterModel(bindingOperation, soapOperation.getStyle()));
-                wsdlOperation.setOutputParameterModel(getSoapOutputParameterModel(bindingOperation, soapOperation.getStyle()));
+                wsdlOperation.setInputParameterModel(getSoapInputParameterModel(bindingOperation));
+                wsdlOperation.setOutputParameterModel(getSoapOutputParameterModel(bindingOperation));
             }
         }
         return wsdlOperation;
@@ -610,7 +610,7 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
      * @return list of swagger models for the parameters
      * @throws APIMgtWSDLException
      */
-    private List<ModelImpl> getSoapInputParameterModel(BindingOperation bindingOperation, String soapStyle) throws APIMgtWSDLException {
+    private List<ModelImpl> getSoapInputParameterModel(BindingOperation bindingOperation) throws APIMgtWSDLException {
 
         List<ModelImpl> inputParameterModelList = new ArrayList<>();
         Operation operation = bindingOperation.getOperation();
@@ -659,7 +659,7 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
      * @return list of swagger models for the parameters
      * @throws APIMgtWSDLException
      */
-    private List<ModelImpl> getSoapOutputParameterModel(BindingOperation bindingOperation, String soapStyle) throws APIMgtWSDLException {
+    private List<ModelImpl> getSoapOutputParameterModel(BindingOperation bindingOperation) throws APIMgtWSDLException {
         List<ModelImpl> outputParameterModelList = new ArrayList<>();
         Operation operation = bindingOperation.getOperation();
         if (operation != null) {
