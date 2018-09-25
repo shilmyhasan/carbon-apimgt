@@ -42,8 +42,10 @@ public class SynapsePropertiesHandler extends AbstractHandler{
                 ((Axis2MessageContext) messageContext).getAxis2MessageContext();
         Map headers =
                 (Map) (axis2MsgContext).getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        boolean isContentTypeNotSet = headers.get("Content-Type") == null || headers.get("Content-Type").equals("");
-
+        boolean isContentTypeNotSet = false;
+        if (headers != null) {
+            isContentTypeNotSet = headers.get("Content-Type") == null || headers.get("Content-Type").equals("");
+        }
         if (isContentTypeNotSet && (httpMethod.equals(Constants.Configuration.HTTP_METHOD_POST) ||
                 httpMethod.equals(Constants.Configuration.HTTP_METHOD_PUT))) {
             ((Axis2MessageContext) messageContext).getAxis2MessageContext().
