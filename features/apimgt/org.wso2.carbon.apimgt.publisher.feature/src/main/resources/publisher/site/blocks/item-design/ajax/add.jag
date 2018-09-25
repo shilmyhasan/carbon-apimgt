@@ -58,7 +58,7 @@ if(jagg.isCSRFTokenValid())
                         }
                     }
                     }catch (e) {
-                        print({error:true,message:url+" is not a valid Swagger Definition url"});
+                        print({error:true,message: "Input URL is not a valid Swagger Definition url"});
                         return;
                    }
                 }
