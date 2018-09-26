@@ -35,6 +35,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
@@ -58,6 +59,7 @@ import org.json.simple.parser.ParseException;
 import org.w3c.dom.Document;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.APIMgtAuthorizationFailedException;
 import org.wso2.carbon.apimgt.api.doc.model.APIDefinition;
 import org.wso2.carbon.apimgt.api.doc.model.APIResource;
 import org.wso2.carbon.apimgt.api.doc.model.Operation;
@@ -137,6 +139,7 @@ import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
 import org.wso2.carbon.registry.core.pagination.PaginationContext;
+import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
@@ -3506,8 +3509,8 @@ public final class APIUtil {
 
         InputStream inSeqStream = null;
         String seqFolderLocation =
-                APIConstants.API_CUSTOM_SEQUENCES_FOLDER_LOCATION + File.separator +
-                        customSequenceType;
+                CarbonUtils.getCarbonHome() + File.separator + APIConstants.API_CUSTOM_SEQUENCES_FOLDER_LOCATION
+                        + File.separator + customSequenceType;
 
         try {
             File inSequenceDir = new File(seqFolderLocation);
@@ -3843,6 +3846,15 @@ public final class APIUtil {
 
     public static int getApplicationId(String appName, String userId) throws APIManagementException {
         return ApiMgtDAO.getInstance().getApplicationId(appName, userId);
+    }
+
+    public static int getApplicationId(String appName, String userId, String groupId) throws APIManagementException {
+        Application application = ApiMgtDAO.getInstance().getApplicationByName(appName, userId, groupId);
+        if (application != null) {
+            return application.getId();
+        } else {
+            return 0;
+        }
     }
 
     public static boolean isAPIManagementEnabled() {
@@ -7027,5 +7039,23 @@ public final class APIUtil {
             return Integer.parseInt(paginationLimit);
         }
         return 0;
+    }
+
+    public static boolean isDueToAuthorizationFailure(Throwable e) {
+        Throwable rootCause = getPossibleErrorCause(e);
+        return rootCause instanceof AuthorizationFailedException
+                || rootCause instanceof APIMgtAuthorizationFailedException;
+    }
+
+    /**
+     * Attempts to find the actual cause of the throwable 'e'
+     *
+     * @param e throwable
+     * @return the root cause of 'e' if the root cause exists, otherwise returns 'e' itself
+     */
+    private static Throwable getPossibleErrorCause (Throwable e) {
+        Throwable rootCause = ExceptionUtils.getRootCause(e);
+        rootCause = rootCause == null ? e : rootCause;
+        return rootCause;
     }
 }

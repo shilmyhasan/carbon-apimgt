@@ -160,7 +160,7 @@ public class APIProviderImplTest {
     
     @Before
     public void init() throws Exception {
-        System.setProperty("carbon.home", "");
+        System.setProperty("carbon.home", APIProviderImplTest.class.getResource("/").getFile());
         
         PowerMockito.mockStatic(ApiMgtDAO.class);
         PowerMockito.mockStatic(PrivilegedCarbonContext.class);

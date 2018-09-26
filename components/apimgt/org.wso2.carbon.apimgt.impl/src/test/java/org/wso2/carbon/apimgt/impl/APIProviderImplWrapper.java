@@ -108,8 +108,7 @@ public class APIProviderImplWrapper extends UserAwareAPIProvider {
 
     @Override
     protected ThrottlePolicyTemplateBuilder getThrottlePolicyTemplateBuilder() {
-        final String POLICY_LOCATION = "src" + File.separator + "test" + File.separator + "resources"
-                + File.separator + "repository" + File.separator + "resources" + File.separator + "policy_templates"
+        final String POLICY_LOCATION = "repository" + File.separator + "resources" + File.separator + "policy_templates"
                 + File.separator + "";
         ThrottlePolicyTemplateBuilder policyBuilder =  new ThrottlePolicyTemplateBuilder();
         policyBuilder.setPolicyTemplateLocation(POLICY_LOCATION);
