@@ -775,8 +775,7 @@ public class APIUsageStatisticsRdbmsClientImpl extends APIUsageStatisticsClient 
                             + APIUsageStatisticsClientConstants.API_PUBLISHER + ","
                             + APIUsageStatisticsClientConstants.METHOD + ","
                             + APIUsageStatisticsClientConstants.CONSUMERKEY + ","
-                            + "SUM("+ APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ") AS "
-                            + APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT+ ","
+                            + APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ","
                             + APIUsageStatisticsClientConstants.RESOURCE + " FROM " + tableName + " WHERE "
                             + APIUsageStatisticsClientConstants.CONSUMERKEY + " IN (" + keyString + ") " +
                             " AND " + APIUsageStatisticsClientConstants.TIME + " BETWEEN ? AND ?  GROUP BY "
@@ -784,6 +783,7 @@ public class APIUsageStatisticsRdbmsClientImpl extends APIUsageStatisticsClient 
                             + APIUsageStatisticsClientConstants.API + ","
                             + APIUsageStatisticsClientConstants.API_PUBLISHER + ","
                             + APIUsageStatisticsClientConstants.METHOD + ","
+                            + APIUsageStatisticsClientConstants.TOTAL_REQUEST_COUNT + ","
                             + APIUsageStatisticsClientConstants.RESOURCE;
                 }
 
