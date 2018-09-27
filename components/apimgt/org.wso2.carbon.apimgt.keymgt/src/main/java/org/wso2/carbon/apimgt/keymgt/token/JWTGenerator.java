@@ -100,7 +100,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
                     String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(userName);
 
                     if (manager.isExistingUser(tenantAwareUserName)) {
-                        return claimsRetriever.getClaims(tenantAwareUserName);
+                        return claimsRetriever.getClaims(userName);
                     } else {
                         log.warn("User " + userName + " cannot be found by user store manager");
                     }
