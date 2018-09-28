@@ -20,10 +20,12 @@ package org.wso2.carbon.apimgt.keymgt.client;
 
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.model.xsd.OAuthApplicationInfo;
+import org.wso2.carbon.apimgt.keymgt.client.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.keymgt.stub.subscriber.APIKeyMgtSubscriberServiceAPIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.stub.subscriber.APIKeyMgtSubscriberServiceAPIManagementException;
 import org.wso2.carbon.apimgt.keymgt.stub.subscriber.APIKeyMgtSubscriberServiceIdentityException;
@@ -39,16 +41,17 @@ public class SubscriberKeyMgtClient {
     private APIKeyMgtSubscriberServiceStub subscriberServiceStub;
     private volatile String cookie;
 
-    public SubscriberKeyMgtClient(String backendServerURL, String username, String password)
-            throws Exception {
+    public SubscriberKeyMgtClient(String backendServerURL, String username, String password) throws Exception {
         try {
-            subscriberServiceStub = new APIKeyMgtSubscriberServiceStub(
-                    null, backendServerURL + "APIKeyMgtSubscriberService");
+            ConfigurationContext configurationContext = ServiceReferenceHolder.getInstance()
+                    .getAxis2ConfigurationContext();
+            subscriberServiceStub = new APIKeyMgtSubscriberServiceStub(configurationContext,
+                    backendServerURL + "APIKeyMgtSubscriberService");
             ServiceClient client = subscriberServiceStub._getServiceClient();
             Options options = client.getOptions();
             options.setManageSession(true);
-            CarbonUtils.setBasicAccessSecurityHeaders(username, password,
-                                                      true, subscriberServiceStub._getServiceClient());
+            CarbonUtils
+                    .setBasicAccessSecurityHeaders(username, password, true, subscriberServiceStub._getServiceClient());
 
         } catch (Exception e) {
             String errorMsg = "Error when instantiating SubscriberKeyMgtClient.";

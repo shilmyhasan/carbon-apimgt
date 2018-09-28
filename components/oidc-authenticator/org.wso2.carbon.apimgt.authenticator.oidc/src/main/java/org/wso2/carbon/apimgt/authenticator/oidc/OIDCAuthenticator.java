@@ -333,7 +333,7 @@ public class OIDCAuthenticator implements CarbonServerAuthenticator {
 
         boolean isSignatureValid;
         JWT idToken = JWTParser.parse(oidcAuthenticationToken.getIdTokenValue());
-        JWTClaimsSet idClaims = idToken.getJWTClaimsSet();
+        ReadOnlyJWTClaimsSet idClaims = idToken.getJWTClaimsSet();
 
         // Supports only signedJWT
         if (idToken instanceof SignedJWT) {

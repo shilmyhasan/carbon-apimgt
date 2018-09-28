@@ -566,9 +566,9 @@ public class APIGatewayManager {
                 APIGatewayAdminClient client = new APIGatewayAdminClient(api.getId(), environment);
 
                 //If the sequence already exists
-                if (client.isExistingSequence(faultSequenceName, tenantDomain)) {
+                if (client.isExistingSequence(faultSeqExt, tenantDomain)) {
                     //Delete the sequence. We need to redeploy afterwards since the sequence may have been updated.
-                    client.deleteSequence(faultSequenceName, tenantDomain);
+                    client.deleteSequence(faultSeqExt, tenantDomain);
                 }
                 //Get the fault sequence xml
                 OMElement faultSequence = APIUtil.getCustomSequence(faultSequenceName, tenantId, 
