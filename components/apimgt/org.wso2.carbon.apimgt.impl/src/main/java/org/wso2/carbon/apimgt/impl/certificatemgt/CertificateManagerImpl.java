@@ -157,9 +157,14 @@ public class CertificateManagerImpl implements CertificateManager {
             log.error("Error removing the certificate for Alias '" + alias + "' from the gateway trust store. " +
                     "Alias not found.");
             return false;
+        } else if (responseCode == ResponseCode.SUCCESS) {
+            if(log.isDebugEnabled()) {
+                log.debug("The certificate with Alias '" + alias + "' is successfully removed from the Gateway " +
+                        "Trust Store.");
+            }
         } else {
-            log.info("The certificate with Alias '" + alias + "' is successfully removed from the Gateway " +
-                    "Trust Store.");
+            log.error("Error removing the certificate for Alias '" + alias + "' from the gateway trust store. " +
+                    "Alias not found.");
         }
         return touchConfigFile();
     }
