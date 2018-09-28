@@ -1244,7 +1244,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String[] visibleRoles = new String[0];
             String publisherAccessControlRoles = api.getAccessControlRoles();
             if (publisherAccessControlRoles != null) {
-                publisherAccessControlRoles = publisherAccessControlRoles.replaceAll("\\s+", "").toLowerCase();
+                publisherAccessControlRoles = publisherAccessControlRoles.toLowerCase();
             }
             updateRegistryResources(artifactPath, publisherAccessControlRoles, api.getAccessControl(),
                     api.getAdditionalProperties());
@@ -2687,7 +2687,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String publisherAccessControlRoles = api.getAccessControlRoles();
             if (publisherAccessControlRoles != null) {
                 // We are changing to lowercase, as registry search only supports lower-case characters.
-                publisherAccessControlRoles = publisherAccessControlRoles.replace("\\s+", "").toLowerCase();
+                String[] accessControlRoleList = publisherAccessControlRoles.toLowerCase().split(",");
+                for (int i=0; i< accessControlRoleList.length; i++){
+                    accessControlRoleList[i] = accessControlRoleList[i].trim();
+                }
+                publisherAccessControlRoles = StringUtils.join(accessControlRoleList, ",");
                 if (publisherAccessControlRoles.isEmpty()) {
                     publisherAccessControlRoles = null;
                 }
@@ -5414,7 +5418,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     }
                 }
             }
-            apiResource.setProperty(APIConstants.PUBLISHER_ROLES, publisherAccessControlRoles.replaceAll("\\s+", ""));
+            String[] inputRoles = publisherAccessControlRoles.split(",");
+            for (int i=0; i< inputRoles.length; i++){
+                inputRoles[i] = inputRoles[i].trim();
+            }
+            String finalRoleList = StringUtils.join(inputRoles,",");
+            apiResource.setProperty(APIConstants.PUBLISHER_ROLES, finalRoleList);
             apiResource.setProperty(APIConstants.ACCESS_CONTROL, publisherAccessControl);
             apiResource.removeProperty(APIConstants.CUSTOM_API_INDEXER_PROPERTY);
             if (additionalProperties != null && additionalProperties.size() != 0) {
@@ -5763,7 +5772,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
             String publisherAccessControlRoles = apiResource.getProperty(APIConstants.PUBLISHER_ROLES);
             if (publisherAccessControlRoles != null && !publisherAccessControlRoles.trim().isEmpty()) {
-                String[] accessControlRoleList = publisherAccessControlRoles.replaceAll("\\s+", "").split(",");
+                String[] accessControlRoleList = publisherAccessControlRoles.split(",");
+                for (int i=0; i< accessControlRoleList.length; i++){
+                    accessControlRoleList[i] = accessControlRoleList[i].trim();
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("API has restricted access to creators and publishers with the roles : " + Arrays
                             .toString(accessControlRoleList));

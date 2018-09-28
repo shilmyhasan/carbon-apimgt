@@ -4595,8 +4595,9 @@ public class APIProviderHostObject extends ScriptableObject {
         String[] inputRoles = null;
         boolean foundUserRole = false;
         boolean validateAgainstUserRoles = false;
-        if (inputRolesSet != null) {
-            inputRoles = inputRolesSet.replaceAll("\\s+", "").split(",");
+        inputRoles = inputRolesSet.split(",");
+        for (int i = 0; i < inputRoles.length; i++) {
+            inputRoles[i] = inputRoles[i].trim();
         }
         if (args.length == 3 && Boolean.parseBoolean((String) args[2])) {
             validateAgainstUserRoles = true;
