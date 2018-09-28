@@ -25,6 +25,8 @@ import org.wso2.carbon.apimgt.impl.certificatemgt.exceptions.CertificateManageme
 import org.wso2.carbon.apimgt.impl.certificatemgt.exceptions.EndpointForCertificateExistsException;
 import org.wso2.carbon.apimgt.impl.dao.CertificateMgtDAO;
 import org.wso2.carbon.apimgt.impl.utils.CertificateMgtUtils;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.CarbonContext;
 
 import java.io.File;
 import java.util.List;
@@ -113,6 +115,13 @@ public class CertificateManagerImpl implements CertificateManager {
 
     @Override
     public boolean addCertificateToGateway(String certificate, String alias) {
+
+        // Check whether the api is invoked via the APIGatewayAdmin service.
+        int loggedInTenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        if (loggedInTenantId != MultitenantConstants.SUPER_TENANT_ID) {
+            alias = alias + "_" + loggedInTenantId;
+        }
+
         boolean result;
         ResponseCode responseCode = certificateMgtUtils.addCertificateToTrustStore(certificate, alias);
         if (responseCode == ResponseCode.ALIAS_EXISTS_IN_TRUST_STORE) {
@@ -133,14 +142,29 @@ public class CertificateManagerImpl implements CertificateManager {
 
     @Override
     public boolean deleteCertificateFromGateway(String alias) {
+
+        // Check whether the api is invoked via the APIGatewayAdmin service.
+        int loggedInTenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+        if (loggedInTenantId != MultitenantConstants.SUPER_TENANT_ID) {
+            alias = alias + "_" + loggedInTenantId;
+        }
         ResponseCode responseCode = certificateMgtUtils.removeCertificateFromTrustStore(alias);
-        if (responseCode != ResponseCode.INTERNAL_SERVER_ERROR) {
-            log.info("The certificate with Alias '" + alias + "' is successfully removed from the Gateway " +
-                    "Trust Store.");
-        } else {
+        if (responseCode == ResponseCode.INTERNAL_SERVER_ERROR) {
             log.error("Error removing the certificate with Alias '" + alias + "' from the Gateway " +
                     "Trust Store.");
             return false;
+        } else if (responseCode == ResponseCode.CERTIFICATE_NOT_FOUND) {
+            log.error("Error removing the certificate for Alias '" + alias + "' from the gateway trust store. " +
+                    "Alias not found.");
+            return false;
+        } else if (responseCode == ResponseCode.SUCCESS) {
+            if(log.isDebugEnabled()) {
+                log.debug("The certificate with Alias '" + alias + "' is successfully removed from the Gateway " +
+                        "Trust Store.");
+            }
+        } else {
+            log.error("Error removing the certificate for Alias '" + alias + "' from the gateway trust store. " +
+                    "Alias not found.");
         }
         return touchConfigFile();
     }
