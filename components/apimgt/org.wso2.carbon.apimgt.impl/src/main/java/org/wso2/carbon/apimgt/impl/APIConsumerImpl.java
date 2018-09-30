@@ -24,7 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -70,6 +69,7 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
 import org.wso2.carbon.apimgt.impl.utils.ApplicationUtils;
 import org.wso2.carbon.apimgt.impl.workflow.AbstractApplicationRegistrationWorkflowExecutor;
+import org.wso2.carbon.apimgt.impl.workflow.GeneralWorkflowResponse;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowConstants;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowExecutor;
@@ -78,7 +78,6 @@ import org.wso2.carbon.apimgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
-import org.wso2.carbon.governance.api.generic.GenericArtifactFilter;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
@@ -2253,6 +2252,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 workflowDTO.setApiProvider(identifier.getProviderName());
                 workflowDTO.setTierName(identifier.getTier());
                 workflowDTO.setApplicationName(apiMgtDAO.getApplicationNameFromId(applicationId));
+                workflowDTO.setApplicationId(applicationId);
                 workflowDTO.setSubscriber(userId);
                 workflowResponse = addSubscriptionWFExecutor.execute(workflowDTO);
             } catch (WorkflowException e) {
@@ -2270,27 +2270,50 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 invalidateCachedKeys(applicationId);
             }
 
-            SubscribedAPI addedSubscription = getSubscriptionById(subscriptionId);
+            //to handle on-the-fly subscription rejection (and removal of subscription entry from the database)
+            //the response should have {"Status":"REJECTED"} in the json payload for this to work.
+            boolean subscriptionRejected = false;
+            String subscriptionStatus = null;
+            String subscriptionUUID = "";
+
+            if (workflowResponse != null) {
+                try {
+                    JSONObject wfResponseJson = (JSONObject) new JSONParser().parse(workflowResponse.getJSONPayload());
+                    if (APIConstants.SubscriptionStatus.REJECTED.equals(wfResponseJson.get("Status"))) {
+                        subscriptionRejected = true;
+                        subscriptionStatus = APIConstants.SubscriptionStatus.REJECTED;
+                    }
+                } catch (ParseException e) {
+                    log.error('\'' + workflowResponse.getJSONPayload() + "' is not a valid JSON.", e);
+                }
+            }
+
+            if (!subscriptionRejected) {
+                SubscribedAPI addedSubscription = getSubscriptionById(subscriptionId);
+                subscriptionStatus = addedSubscription.getSubStatus();
+                subscriptionUUID = addedSubscription.getUUID();
+
+                JSONObject subsLogObject = new JSONObject();
+                subsLogObject.put(APIConstants.AuditLogConstants.API_NAME, identifier.getApiName());
+                subsLogObject.put(APIConstants.AuditLogConstants.PROVIDER, identifier.getProviderName());
+                subsLogObject.put(APIConstants.AuditLogConstants.APPLICATION_ID, applicationId);
+                subsLogObject.put(APIConstants.AuditLogConstants.APPLICATION_NAME, applicationName);
+                subsLogObject.put(APIConstants.AuditLogConstants.TIER, identifier.getTier());
+
+                APIUtil.logAuditMessage(APIConstants.AuditLogConstants.SUBSCRIPTION, subsLogObject.toString(),
+                        APIConstants.AuditLogConstants.CREATED, this.username);
+
+                workflowResponse = new GeneralWorkflowResponse();
+            }
 
             if (log.isDebugEnabled()) {
                 String logMessage = "API Name: " + identifier.getApiName() + ", API Version " + identifier.getVersion()
-                        + ", Subscription Status: " + addedSubscription.getSubStatus() + " subscribe by " + userId
+                        + ", Subscription Status: " + subscriptionStatus + " subscribe by " + userId
                         + " for app " + applicationName;
                 log.debug(logMessage);
             }
 
-            JSONObject subsLogObject = new JSONObject();
-            subsLogObject.put(APIConstants.AuditLogConstants.API_NAME, identifier.getApiName());
-            subsLogObject.put(APIConstants.AuditLogConstants.PROVIDER, identifier.getProviderName());
-            subsLogObject.put(APIConstants.AuditLogConstants.APPLICATION_ID, applicationId);
-            subsLogObject.put(APIConstants.AuditLogConstants.APPLICATION_NAME, applicationName);
-            subsLogObject.put(APIConstants.AuditLogConstants.TIER, identifier.getTier());
-
-            APIUtil.logAuditMessage(APIConstants.AuditLogConstants.SUBSCRIPTION, subsLogObject.toString(),
-                    APIConstants.AuditLogConstants.CREATED, this.username);
-
-            return new SubscriptionResponse(addedSubscription.getSubStatus(), addedSubscription.getUUID(),
-                    workflowResponse);
+            return new SubscriptionResponse(subscriptionStatus, subscriptionUUID, workflowResponse);
         } else {
             throw new APIMgtResourceNotFoundException("Subscriptions not allowed on APIs in the state: " +
                     api.getStatus().getStatus());
