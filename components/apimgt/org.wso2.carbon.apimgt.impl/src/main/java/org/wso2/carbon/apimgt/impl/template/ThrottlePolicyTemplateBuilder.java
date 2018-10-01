@@ -368,7 +368,7 @@ public class ThrottlePolicyTemplateBuilder {
     }
 
     private static String getVelocityLogger() {
-        if (velocityLogPath != null) {
+        if (!"not-defined".equalsIgnoreCase(velocityLogPath)) {
             return velocityLogPath;
         } else {
             APIManagerConfigurationService config = ServiceReferenceHolder.getInstance()
