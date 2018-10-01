@@ -33,8 +33,10 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.governance.api.common.util.CheckListItemBean;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
+import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.governance.registry.extensions.aspects.utils.LifecycleConstants;
 import org.wso2.carbon.governance.registry.extensions.interfaces.Execution;
 import org.wso2.carbon.registry.core.Registry;
@@ -165,10 +167,25 @@ public class APIExecutor implements Execution {
             
             boolean deprecateOldVersions = false;
             boolean makeKeysForwardCompatible = false;
+            int deprecateOldVersionsCheckListIndex = 0, makeKeysForwardCompatibleCheckListIndex = 1;
             //If the API status is CREATED/PROTOTYPED ,check for check list items of lifecycle
-            if (APIStatus.CREATED.equals(oldStatus)|| APIStatus.PROTOTYPED.equals(oldStatus)) {
-                deprecateOldVersions = apiArtifact.isLCItemChecked(0, APIConstants.API_LIFE_CYCLE);
-                makeKeysForwardCompatible = !(apiArtifact.isLCItemChecked(1, APIConstants.API_LIFE_CYCLE));
+            if (APIStatus.CREATED.equals(oldStatus) || APIStatus.PROTOTYPED.equals(oldStatus)) {
+                CheckListItemBean[] checkListItemBeans = GovernanceUtils
+                        .getAllCheckListItemBeans(apiResource, apiArtifact, APIConstants.API_LIFE_CYCLE);
+                if (checkListItemBeans != null) {
+                    for (int index = 0; index < checkListItemBeans.length; index++) {
+                        if (APIConstants.DEPRECATE_CHECK_LIST_ITEM.equals(checkListItemBeans[index].getName())) {
+                            deprecateOldVersionsCheckListIndex = index;
+                        } else if (APIConstants.RESUBSCRIBE_CHECK_LIST_ITEM
+                                .equals(checkListItemBeans[index].getName())) {
+                            makeKeysForwardCompatibleCheckListIndex = index;
+                        }
+                    }
+                }
+                deprecateOldVersions = apiArtifact
+                        .isLCItemChecked(deprecateOldVersionsCheckListIndex, APIConstants.API_LIFE_CYCLE);
+                makeKeysForwardCompatible = !(apiArtifact
+                        .isLCItemChecked(makeKeysForwardCompatibleCheckListIndex, APIConstants.API_LIFE_CYCLE));
             }
             
             if ((APIStatus.CREATED.equals(oldStatus) || APIStatus.PROTOTYPED.equals(oldStatus))
