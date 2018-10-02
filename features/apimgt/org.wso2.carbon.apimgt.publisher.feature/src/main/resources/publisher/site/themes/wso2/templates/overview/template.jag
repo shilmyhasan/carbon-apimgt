@@ -173,7 +173,7 @@
                      <%=tag%>
                 </td>
             </tr>
-
+            <%
             }if(api.bizOwner!=''){%>
              <tr>
                 <td><%=i18n.localize("Business Owner")%></td>
