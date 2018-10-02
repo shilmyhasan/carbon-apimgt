@@ -884,8 +884,7 @@
             var designer = APIDesigner();
             designer.load_api_document(data);
             $("#swaggerUpload").modal('hide');
-            if ((typeof $("#rest-paths").val() != "undefined" &&
-            $("#rest-paths").val() != "null") || $("#soapToRestCheck").val() === "true") {
+            if ($("#soapToRestCheck").val() === "true") {
                 $("#wsdl-content").hide();
                 $(".resource_create").show();
                 $('#resource_details').show();
