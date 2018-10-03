@@ -18,4 +18,10 @@ https://github.com/wso2-support/wso2-wsdl4j/tree/support-1.6.2-wso2v4
 
 - Support-6.2.201 - APIM 2.2.0
 - Support-6.3.95 - APIM 2.5.0
+
+We need to build following additional Repo before building support-6.3.95 branch:
+
+1. identity-inbound-auth-oauth - support-6.0.14
+https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.14
+
 - Support-6.4.50 - APIM 2.6.0
