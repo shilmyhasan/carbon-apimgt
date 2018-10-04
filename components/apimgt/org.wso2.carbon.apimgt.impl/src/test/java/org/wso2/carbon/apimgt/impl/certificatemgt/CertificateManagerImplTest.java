@@ -23,6 +23,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -34,22 +35,26 @@ import org.wso2.carbon.apimgt.impl.certificatemgt.exceptions.EndpointForCertific
 import org.wso2.carbon.apimgt.impl.dao.CertificateMgtDAO;
 import org.wso2.carbon.apimgt.impl.utils.CertificateMgtUtils;
 import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.CarbonContext;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.wso2.carbon.base.CarbonBaseConstants.CARBON_HOME;
 
 /**
  * This class contains unit tests for CertificateManagerImpl class.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CertificateMgtUtils.class, CertificateMgtDAO.class})
+@PrepareForTest({CertificateMgtUtils.class, CertificateMgtDAO.class, CarbonContext.class})
 public class CertificateManagerImplTest {
 
     private static CertificateManager certificateManager;
     private static final String END_POINT = "TEST_ENDPOINT";
     private static final String ALIAS = "TEST_ALIAS";
+    private final String TENANT_DOMAIN = "foo.com";
     private static final int TENANT_ID = MultitenantConstants.SUPER_TENANT_ID;
     private static final int TENANT_2 = 1;
     private static final String TEST_PATH = CertificateManagerImplTest.class.getClassLoader().getResource
@@ -208,6 +213,11 @@ public class CertificateManagerImplTest {
 
     @Test
     public void testAddToGateway() throws IllegalAccessException, NoSuchFieldException {
+        System.setProperty(CARBON_HOME, "");
+        PowerMockito.mockStatic(CarbonContext.class);
+        CarbonContext carbonContext = Mockito.mock(CarbonContext.class);
+        PowerMockito.when(CarbonContext.getThreadLocalCarbonContext()).thenReturn(carbonContext);
+        Mockito.when(carbonContext.getTenantDomain()).thenReturn(TENANT_DOMAIN);
         PowerMockito.stub(PowerMockito.method(CertificateMgtUtils.class, "addCertificateToTrustStore"))
                 .toReturn(ResponseCode.SUCCESS);
         Field field = CertificateManagerImpl.class.getDeclaredField("SSL_PROFILE_FILE_PATH");
@@ -259,6 +269,11 @@ public class CertificateManagerImplTest {
 
     @Test
     public void testRemoveFromGateway() throws IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
+        System.setProperty(CARBON_HOME, "");
+        PowerMockito.mockStatic(CarbonContext.class);
+        CarbonContext carbonContext = Mockito.mock(CarbonContext.class);
+        PowerMockito.when(CarbonContext.getThreadLocalCarbonContext()).thenReturn(carbonContext);
+        Mockito.when(carbonContext.getTenantDomain()).thenReturn(TENANT_DOMAIN);
         PowerMockito.stub(PowerMockito.method(CertificateMgtUtils.class, "removeCertificateFromTrustStore"))
                 .toReturn(ResponseCode.SUCCESS);
         Field field = CertificateManagerImpl.class.getDeclaredField("SSL_PROFILE_FILE_PATH");
@@ -270,6 +285,11 @@ public class CertificateManagerImplTest {
 
     @Test
     public void testRemoveFromGatewayIntenalServerError() throws NoSuchFieldException, IllegalAccessException {
+        System.setProperty(CARBON_HOME, "");
+        PowerMockito.mockStatic(CarbonContext.class);
+        CarbonContext carbonContext = Mockito.mock(CarbonContext.class);
+        PowerMockito.when(CarbonContext.getThreadLocalCarbonContext()).thenReturn(carbonContext);
+        Mockito.when(carbonContext.getTenantDomain()).thenReturn(TENANT_DOMAIN);
         PowerMockito.stub(PowerMockito.method(CertificateMgtUtils.class, "removeCertificateFromTrustStore"))
                 .toReturn(ResponseCode.INTERNAL_SERVER_ERROR);
         Field field = CertificateManagerImpl.class.getDeclaredField("SSL_PROFILE_FILE_PATH");
