@@ -24,6 +24,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.model.policy.APIPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.ApplicationPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.Condition;
@@ -36,12 +42,35 @@ import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.api.model.policy.QuotaPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
+import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.utils.CarbonUtils;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({CarbonUtils.class, ServiceReferenceHolder.class})
 public class ThrottlingPolicyTemplateBuilderTest extends TestCase {
 
     private final String POLICY_LOCATION =
             "repository" + File.separator + "resources" + File.separator + "policy_templates" + File.separator + "";
     private ThrottlePolicyTemplateBuilder templateBuilder;
+    private APIManagerConfigurationService apiManagerConfigurationService;
+    private APIManagerConfiguration apiManagerConfiguration;
+
+    @Before
+    public void setup(){
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        apiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+        Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService);
+        apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.VELOCITY_LOGGER)).
+                thenReturn("not-defined");
+    }
     
     @Override
     protected void setUp() throws Exception {
