@@ -58,8 +58,14 @@ public class ThrottlingPolicyTemplateBuilderTest extends TestCase {
     private APIManagerConfigurationService apiManagerConfigurationService;
     private APIManagerConfiguration apiManagerConfiguration;
 
-    @Before
-    public void setup(){
+
+    @Override
+    protected void setUp() throws Exception {
+        System.setProperty("carbon.home", ThrottlingPolicyTemplateBuilderTest.class.getResource("/").getFile());
+        templateBuilder = new ThrottlePolicyTemplateBuilder();
+        //set the policy file location manually for testting
+        templateBuilder.setPolicyTemplateLocation(POLICY_LOCATION);
+
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
         apiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
@@ -70,14 +76,6 @@ public class ThrottlingPolicyTemplateBuilderTest extends TestCase {
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.VELOCITY_LOGGER)).
                 thenReturn("not-defined");
-    }
-    
-    @Override
-    protected void setUp() throws Exception {
-        System.setProperty("carbon.home", ThrottlingPolicyTemplateBuilderTest.class.getResource("/").getFile());
-        templateBuilder = new ThrottlePolicyTemplateBuilder();
-        //set the policy file location manually for testting
-        templateBuilder.setPolicyTemplateLocation(POLICY_LOCATION);
     }
 
     public void testGetThrottlePolicyForAPILevelPerUser() throws Exception {
