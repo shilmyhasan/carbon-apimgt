@@ -18,37 +18,59 @@
 */
 package org.wso2.carbon.apimgt.impl.template;
 
-import junit.framework.TestCase;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.model.policy.APIPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.ApplicationPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.Condition;
 import org.wso2.carbon.apimgt.api.model.policy.GlobalPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.HTTPVerbCondition;
-import org.wso2.carbon.apimgt.api.model.policy.IPCondition;
 import org.wso2.carbon.apimgt.api.model.policy.Pipeline;
-import org.wso2.carbon.apimgt.api.model.policy.Policy;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.api.model.policy.QuotaPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
+import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 
-public class ThrottlingPolicyTemplateBuilderTest extends TestCase {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ServiceReferenceHolder.class})
+public class ThrottlingPolicyTemplateBuilderTestCase {
 
     private final String POLICY_LOCATION =
             "repository" + File.separator + "resources" + File.separator + "policy_templates" + File.separator + "";
     private ThrottlePolicyTemplateBuilder templateBuilder;
-    
-    @Override
-    protected void setUp() throws Exception {
-        System.setProperty("carbon.home", ThrottlingPolicyTemplateBuilderTest.class.getResource("/").getFile());
+    private APIManagerConfigurationService apiManagerConfigurationService;
+    private APIManagerConfiguration apiManagerConfiguration;
+
+
+    @Before
+    public void init() throws Exception {
+        System.setProperty("carbon.home", ThrottlingPolicyTemplateBuilderTestCase.class.getResource("/").getFile());
         templateBuilder = new ThrottlePolicyTemplateBuilder();
         //set the policy file location manually for testting
         templateBuilder.setPolicyTemplateLocation(POLICY_LOCATION);
+
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        apiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+        Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService);
+        apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.VELOCITY_LOGGER)).
+                thenReturn("not-defined");
     }
 
     public void testGetThrottlePolicyForAPILevelPerUser() throws Exception {
