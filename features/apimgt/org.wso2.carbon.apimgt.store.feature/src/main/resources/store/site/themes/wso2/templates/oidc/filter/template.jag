@@ -39,8 +39,23 @@
 	}
 
 	if (checkSSO && !Boolean(isAuthenticated)) {
+
+	    ssoRelyingParty.setProperty("identityProviderUri", site.oidcConfiguration.identityProviderURI);
+	    ssoRelyingParty.setProperty("authorizationEndpointUri", site.oidcConfiguration.authorizationEndpointURI);
+	    ssoRelyingParty.setProperty("tokenEndpointURI", site.oidcConfiguration.tokenEndpointURI);
+	    ssoRelyingParty.setProperty("userInfoURI", site.oidcConfiguration.userInfoURI);
+	    ssoRelyingParty.setProperty("jwksURI", site.oidcConfiguration.jwksURI);
+
+        ssoRelyingParty.setProperty("client_id", site.oidcConfiguration.clientConfiguration.clientId);
+        ssoRelyingParty.setProperty("client_secret", site.oidcConfiguration.clientConfiguration.clientSecret);
+	    ssoRelyingParty.setProperty("response_type", site.oidcConfiguration.clientConfiguration.responseType);
+	    ssoRelyingParty.setProperty("authorization_type", site.oidcConfiguration.clientConfiguration.authorizationType);
+	    ssoRelyingParty.setProperty("scope", site.oidcConfiguration.clientConfiguration.scope);
+	    ssoRelyingParty.setProperty("redirect_uri", site.oidcConfiguration.clientConfiguration.redirectURI);
+	    ssoRelyingParty.setProperty("client_algorithm", site.oidcConfiguration.clientConfiguration.clientAlgorithm);
+
 %>
-		<div>
+        <div>
 
 	        <p>You are now redirected to Identity. If the
 
