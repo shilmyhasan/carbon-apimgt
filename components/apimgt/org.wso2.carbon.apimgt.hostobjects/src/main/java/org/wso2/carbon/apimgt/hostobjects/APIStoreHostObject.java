@@ -133,6 +133,7 @@ public class APIStoreHostObject extends ScriptableObject {
     private static final String httpPort = "mgt.transport.http.port";
     private static final String httpsPort = "mgt.transport.https.port";
     private static final String hostName = "carbon.local.ip";
+    private static final String adminAppName = "AdminApp";
 
     private APIConsumer apiConsumer;
 
@@ -593,7 +594,10 @@ public class APIStoreHostObject extends ScriptableObject {
 
         String username = (String) args[0];
         String password = (String) args[1];
-
+        String appContext = "";
+        if (args.length == 3) {
+            appContext = (String) args[2];
+        }
         APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
         String url = config.getFirstProperty(APIConstants.AUTH_MANAGER_URL);
         if (url == null) {
@@ -641,8 +645,10 @@ public class APIStoreHostObject extends ScriptableObject {
             } else {
                 usernameWithDomain = usernameWithDomain + APIConstants.EMAIL_DOMAIN_SEPARATOR + tenantDomain;
             }
-            boolean authorized =
-                    APIUtil.checkPermissionQuietly(usernameWithDomain, APIConstants.Permissions.API_SUBSCRIBE);
+            boolean authorized = true;
+            if (!adminAppName.equals(appContext)) {
+                authorized = APIUtil.checkPermissionQuietly(usernameWithDomain, APIConstants.Permissions.API_SUBSCRIBE);
+            }
             boolean displayPublishUrlFromStore = false;
             if (config != null) {
                 displayPublishUrlFromStore = Boolean.parseBoolean(config.getFirstProperty(APIConstants.SHOW_API_PUBLISHER_URL_FROM_STORE));
