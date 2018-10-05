@@ -3496,7 +3496,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws APIManagementException
      */
     public List<String> getCustomInSequences() throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         try {
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
@@ -3505,7 +3505,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION);
                 if (inSeqCollection != null) {
                     String[] inSeqChildPaths = inSeqCollection.getChildren();
-                    Arrays.sort(inSeqChildPaths);
                     for (String inSeqChildPath : inSeqChildPaths) {
                         Resource inSequence = registry.get(inSeqChildPath);
                         try {
@@ -3531,7 +3530,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
 
@@ -3542,7 +3541,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws APIManagementException
      */
     public List<String> getCustomOutSequences() throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         try {
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
@@ -3551,7 +3550,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION);
                 if (outSeqCollection != null) {
                     String[] outSeqChildPaths = outSeqCollection.getChildren();
-                    Arrays.sort(outSeqChildPaths);
                     for (String outSeqChildPath : outSeqChildPaths) {
                         Resource outSequence = registry.get(outSeqChildPath);
                         try {
@@ -3577,7 +3575,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -3588,7 +3586,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Deprecated
     public List<String> getCustomFaultSequences() throws APIManagementException {
 
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         try {
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
@@ -3597,7 +3595,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION);
                 if (faultSeqCollection != null) {
                     String[] faultSeqChildPaths = faultSeqCollection.getChildren();
-                    Arrays.sort(faultSeqChildPaths);
                     for (String faultSeqChildPath : faultSeqChildPaths) {
                         Resource outSequence = registry.get(faultSeqChildPath);
                         try {
@@ -3622,7 +3619,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -3723,7 +3720,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
 
     public List<String> getCustomApiInSequences(APIIdentifier apiIdentifier) throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = null;
@@ -3748,7 +3745,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         .get(customInSeqFileLocation);
                 if (inSeqCollection != null) {
                     String[] inSeqChildPaths = inSeqCollection.getChildren();
-                    Arrays.sort(inSeqChildPaths);
                     for (String inSeqChildPath : inSeqChildPaths) {
                         Resource outSequence = registry.get(inSeqChildPath);
                         try {
@@ -3778,7 +3774,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -3789,7 +3785,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
 
     public List<String> getCustomApiOutSequences(APIIdentifier apiIdentifier) throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = null;
@@ -3814,7 +3810,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(customOutSeqFileLocation);
                 if (outSeqCollection != null) {
                     String[] outSeqChildPaths = outSeqCollection.getChildren();
-                    Arrays.sort(outSeqChildPaths);
                     for (String outSeqChildPath : outSeqChildPaths) {
                         Resource outSequence = registry.get(outSeqChildPath);
                         try {
@@ -3844,7 +3839,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -3854,7 +3849,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws APIManagementException
      */
     public List<String> getCustomApiFaultSequences(APIIdentifier apiIdentifier) throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = null;
@@ -3879,7 +3874,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         .get(customOutSeqFileLocation);
                 if (faultSeqCollection != null) {
                     String[] faultSeqChildPaths = faultSeqCollection.getChildren();
-                    Arrays.sort(faultSeqChildPaths);
                     for (String faultSeqChildPath : faultSeqChildPaths) {
                         Resource faultSequence = registry.get(faultSeqChildPath);
                         try {
@@ -3909,7 +3903,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
