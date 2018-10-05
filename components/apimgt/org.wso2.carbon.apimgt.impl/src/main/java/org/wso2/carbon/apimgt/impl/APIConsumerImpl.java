@@ -159,6 +159,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     public static final String ENVIRONMENT_TYPE = "environmentType";
     public static final String API_NAME = "apiName";
     public static final String API_VERSION = "apiVersion";
+    public static final String API_PROVIDER = "apiProvider";
 
     /* Map to Store APIs against Tag */
     private ConcurrentMap<String, Set<API>> taggedAPIs = new ConcurrentHashMap<String, Set<API>>();
@@ -3953,6 +3954,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             try {
                 String apiName = (String) apiDetails.get(API_NAME);
                 String apiVersion = (String) apiDetails.get(API_VERSION);
+                String apiProvider = (String) apiDetails.get(API_PROVIDER);
                 String environmentName = (String) environmentDetails.get(ENVIRONMENT_NAME);
                 String environmentType = (String) environmentDetails.get(ENVIRONMENT_TYPE);
                 if (log.isDebugEnabled()) {
@@ -3973,7 +3975,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                             Path fileLocation = Paths.get(foundWSDLFile.getAbsolutePath());
                             byte[] updatedWSDLContent = this
                                     .getUpdatedWSDLByEnvironment(resourceUrl, Files.readAllBytes(fileLocation),
-                                            environmentName, environmentType, apiName, apiVersion);
+                                            environmentName, environmentType, apiName, apiVersion, apiProvider);
                             File updatedWSDLFile = new File(foundWSDLFile.getPath());
                             wsdlFiles.remove(foundWSDLFile);
                             FileUtils.writeByteArrayToFile(updatedWSDLFile, updatedWSDLContent);
@@ -3987,7 +3989,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
                     IOUtils.copy((InputStream) docResourceMap.get("Data"), arrayOutputStream);
                     byte[] updatedWSDLContent = this.getUpdatedWSDLByEnvironment(resourceUrl,
-                            arrayOutputStream.toByteArray(), environmentName, environmentType, apiName, apiVersion);
+                            arrayOutputStream.toByteArray(), environmentName, environmentType, apiName, apiVersion, apiProvider);
                     wsdlContent = new String(updatedWSDLContent);
                 }
             } catch (IOException e) {
@@ -4128,17 +4130,14 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
      * @throws APIManagementException
      */
     private byte[] getUpdatedWSDLByEnvironment(String wsdlResourcePath, byte[] wsdlContent, String environmentName,
-            String environmentType, String apiName, String apiVersion) throws APIManagementException {
+            String environmentType, String apiName, String apiVersion, String apiProvider) throws APIManagementException {
         APIMWSDLReader apimwsdlReader = new APIMWSDLReader(wsdlResourcePath);
         Definition definition = apimwsdlReader.getWSDLDefinitionFromByteContent(wsdlContent, false);
-        String wsdlFile = wsdlResourcePath.substring(wsdlResourcePath.lastIndexOf("/") + 1)
-                .replaceAll(APIConstants.WSDL_FILE_EXTENSION, "");
-        String provider = wsdlFile.substring(0, wsdlFile.indexOf(APIConstants.WSDL_PROVIDER_SEPERATOR));
 
         byte[] updatedWSDLContent = null;
         boolean isTenantFlowStarted = false;
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(provider));
+            String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(apiProvider));
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
@@ -4155,7 +4154,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 registry = registryService.getGovernanceSystemRegistry(tenantId);
                 API api = null;
                 if (!StringUtils.isEmpty(apiName) && !StringUtils.isEmpty(apiVersion)) {
-                    APIIdentifier apiIdentifier = new APIIdentifier(provider, apiName, apiVersion);
+                    APIIdentifier apiIdentifier = new APIIdentifier(APIUtil.replaceEmailDomain(apiProvider), apiName, apiVersion);
                     if (log.isDebugEnabled()) {
                         log.debug("Api identifier for the soap api artifact: " + apiIdentifier + "for api name: "
                                 + apiName + ", version: " + apiVersion);
