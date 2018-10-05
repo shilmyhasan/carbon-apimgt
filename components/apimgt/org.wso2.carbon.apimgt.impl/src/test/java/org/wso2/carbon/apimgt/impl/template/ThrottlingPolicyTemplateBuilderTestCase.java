@@ -18,8 +18,6 @@
 */
 package org.wso2.carbon.apimgt.impl.template;
 
-import junit.framework.TestCase;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +33,7 @@ import org.wso2.carbon.apimgt.api.model.policy.ApplicationPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.Condition;
 import org.wso2.carbon.apimgt.api.model.policy.GlobalPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.HTTPVerbCondition;
-import org.wso2.carbon.apimgt.api.model.policy.IPCondition;
 import org.wso2.carbon.apimgt.api.model.policy.Pipeline;
-import org.wso2.carbon.apimgt.api.model.policy.Policy;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.api.model.policy.QuotaPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
@@ -46,11 +42,10 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
-import org.wso2.carbon.utils.CarbonUtils;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CarbonUtils.class, ServiceReferenceHolder.class})
-public class ThrottlingPolicyTemplateBuilderTest extends TestCase {
+@PrepareForTest({ServiceReferenceHolder.class})
+public class ThrottlingPolicyTemplateBuilderTestCase {
 
     private final String POLICY_LOCATION =
             "repository" + File.separator + "resources" + File.separator + "policy_templates" + File.separator + "";
@@ -59,9 +54,9 @@ public class ThrottlingPolicyTemplateBuilderTest extends TestCase {
     private APIManagerConfiguration apiManagerConfiguration;
 
 
-    @Override
-    protected void setUp() throws Exception {
-        System.setProperty("carbon.home", ThrottlingPolicyTemplateBuilderTest.class.getResource("/").getFile());
+    @Before
+    public void init() throws Exception {
+        System.setProperty("carbon.home", ThrottlingPolicyTemplateBuilderTestCase.class.getResource("/").getFile());
         templateBuilder = new ThrottlePolicyTemplateBuilder();
         //set the policy file location manually for testting
         templateBuilder.setPolicyTemplateLocation(POLICY_LOCATION);
