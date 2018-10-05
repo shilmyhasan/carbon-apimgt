@@ -18,7 +18,7 @@ if (resourceUrl.indexOf("/documentation/files") != -1 ||
     if (environmentType != null && environmentName != null) {
         var apiName = request.getParameter(API_NAME);
         var apiVersion = request.getParameter(API_VERSION);
-	var apiProvider = request.getParameter(API_PROVIDER);
+        var apiProvider = request.getParameter(API_PROVIDER);
         if (jagg.getUser()) {
             var username = jagg.getUser().username;
         }
