@@ -4744,7 +4744,7 @@ public class ApiMgtDAO {
                         // catching the exception because when copy the api without the option "require re-subscription"
                         // need to go forward rather throwing the exception
                     } catch (SubscriptionAlreadyExistingException e) {
-                        //Not handled as an error because same subscription can be there in many previous versions. 
+                        //Not handled as an error because same subscription can be there in many previous versions.
                         //Ex: if previous version was created by another older version and if the subscriptions are
                         //Forwarded, then the third one will get same subscription from previous two versions.
                         log.info("Subscription already exists: " + e.getMessage());
@@ -5533,7 +5533,16 @@ public class ApiMgtDAO {
     public ArrayList<URITemplate> getAllURITemplatesAdvancedThrottle(String apiContext, String version) throws APIManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
+        int tenantId;
         ResultSet rs = null;
+
+        String apiTenantDomain = MultitenantUtils.getTenantDomainFromRequestURL(apiContext);
+        if (apiTenantDomain != null) {
+            tenantId = APIUtil.getTenantIdFromTenantDomain(apiTenantDomain);
+        } else {
+            tenantId = MultitenantConstants.SUPER_TENANT_ID;
+        }
+
         ArrayList<URITemplate> uriTemplates = new ArrayList<URITemplate>();
 
         // TODO : FILTER RESULTS ONLY FOR ACTIVE APIs
@@ -5543,6 +5552,7 @@ public class ApiMgtDAO {
             prepStmt = connection.prepareStatement(query);
             prepStmt.setString(1, apiContext);
             prepStmt.setString(2, version);
+            prepStmt.setInt(3, tenantId);
 
             rs = prepStmt.executeQuery();
             Map<String, Set<ConditionGroupDTO>> mapByHttpVerbURLPatternToId = new HashMap<String, Set<ConditionGroupDTO>>();
