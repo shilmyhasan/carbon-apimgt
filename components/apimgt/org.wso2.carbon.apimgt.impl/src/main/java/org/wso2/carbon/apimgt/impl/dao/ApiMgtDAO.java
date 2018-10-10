@@ -6862,7 +6862,6 @@ public class ApiMgtDAO {
         return status;
     }
 
-
     private class SubscriptionInfo {
         private int subscriptionId;
         private String tierId;

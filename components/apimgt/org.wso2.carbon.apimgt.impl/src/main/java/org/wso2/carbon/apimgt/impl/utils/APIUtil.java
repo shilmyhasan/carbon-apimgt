@@ -7542,11 +7542,4 @@ public final class APIUtil {
             return role;
         }
     }
-
-    /**
-     *
-     */
-    public static void fixNullThrottlingTiers() throws APIManagementException {
-
-    }
 }
