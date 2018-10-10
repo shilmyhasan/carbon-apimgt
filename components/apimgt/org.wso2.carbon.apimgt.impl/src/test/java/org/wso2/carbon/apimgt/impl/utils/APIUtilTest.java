@@ -42,11 +42,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
-<<<<<<< HEAD
-import org.wso2.carbon.apimgt.api.model.APIStatus;
-=======
 import org.wso2.carbon.apimgt.api.model.APIStore;
->>>>>>> 7886b7bc3e... NNINSURANCESUB-83 - Support for custom life cyecles
 import org.wso2.carbon.apimgt.api.model.CORSConfiguration;
 import org.wso2.carbon.apimgt.api.model.Documentation;
 import org.wso2.carbon.apimgt.api.model.DocumentationType;
