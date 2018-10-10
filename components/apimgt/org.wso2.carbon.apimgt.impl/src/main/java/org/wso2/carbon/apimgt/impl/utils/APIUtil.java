@@ -7058,11 +7058,4 @@ public final class APIUtil {
         rootCause = rootCause == null ? e : rootCause;
         return rootCause;
     }
-
-    /**
-     *
-     */
-    public static void fixNullThrottlingTiers() throws APIManagementException {
-
-    }
 }
