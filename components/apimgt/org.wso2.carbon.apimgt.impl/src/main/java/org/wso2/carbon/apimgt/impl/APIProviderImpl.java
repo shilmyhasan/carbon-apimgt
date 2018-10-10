@@ -1354,6 +1354,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
+    public void changeAPIStatus(API api, APIStatus status, String userId, boolean updateGatewayConfig)
+            throws APIManagementException, FaultGatewaysException {
+        changeAPIStatus(api, status.getStatus(), userId, updateGatewayConfig);
+    }
+
+    @Override
     public Map<String, String> propergateAPIStatusChangeToGateways(APIIdentifier identifier, String newStatus)
             throws APIManagementException {
         Map<String, String> failedGateways = new HashMap<String, String>();
@@ -1412,6 +1418,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         return failedGateways;
+    }
+
+    @Override
+    public Map<String, String> propergateAPIStatusChangeToGateways(APIIdentifier identifier, APIStatus newStatus)
+            throws APIManagementException {
+        return propergateAPIStatusChangeToGateways(identifier, newStatus.getStatus());
     }
 
     @Override
@@ -1510,6 +1522,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new FaultGatewaysException(failedGateways);
         }
         return isSuccess;
+    }
+
+    @Override
+    public boolean updateAPIforStateChange(APIIdentifier identifier, APIStatus newStatus,
+                                           Map<String, String> failedGatewaysMap) throws APIManagementException, FaultGatewaysException {
+        return updateAPIforStateChange(identifier, newStatus.getStatus(), failedGatewaysMap);
     }
 
     /**
