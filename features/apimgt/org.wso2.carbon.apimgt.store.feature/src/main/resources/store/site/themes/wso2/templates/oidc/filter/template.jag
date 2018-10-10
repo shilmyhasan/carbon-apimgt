@@ -62,12 +62,12 @@
 	        redirection fails, please click the post button.</p>
 
 	        <form method="post" action="<%= site.oidcConfiguration.authorizationEndpointURI%>">
-	        	<input type="hidden" name ="response_type" value="<%= site.oidcConfiguration.clientConfiguration.responseType%>"/>
-				<input type="hidden" name="scope" value="<%= site.oidcConfiguration.clientConfiguration.scope%>"/>
-				<input type="hidden" name="client_id" value="<%= site.oidcConfiguration.clientConfiguration.clientId%>"/>
-				<input type="hidden" name="redirect_uri" value="<%= site.oidcConfiguration.clientConfiguration.redirectURI%>"/>
-				<input type="hidden" name="nonce" value="<%= nonce%>"/>
-				<input type="hidden" name="state" value="<%= state%>"/>
+	            <input type="hidden" name ="response_type" value="<%= site.oidcConfiguration.clientConfiguration.responseType%>"/>
+	            <input type="hidden" name="scope" value="<%= site.oidcConfiguration.clientConfiguration.scope%>"/>
+	            <input type="hidden" name="client_id" value="<%= site.oidcConfiguration.clientConfiguration.clientId%>"/>
+	            <input type="hidden" name="redirect_uri" value="<%= site.oidcConfiguration.clientConfiguration.redirectURI%>"/>
+	            <input type="hidden" name="nonce" value="<%= nonce%>"/>
+	            <input type="hidden" name="state" value="<%= state%>"/>
 	            <p>
 	                <button type="submit">POST</button>
 	            </p>
