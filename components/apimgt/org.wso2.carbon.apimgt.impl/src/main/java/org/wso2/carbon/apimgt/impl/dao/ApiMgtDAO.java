@@ -10993,4 +10993,29 @@ public class ApiMgtDAO {
         return grpId;
     }
 
+    /**
+     * Converts all null values for THROTTLING_TIER in AM_API_URL_MAPPING table, to Unlimited.
+     * This will be executed only during startup of the server.
+     *
+     * @throws APIManagementException
+     */
+    public void convertNullThrottlingTiers() throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+
+        String query = SQLConstants.FIX_NULL_THROTTLING_TIERS;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.execute();
+            connection.commit();
+        } catch (SQLException e) {
+            handleException(
+                    "Error occurred while converting NULL throttling tiers to Unlimited in AM_API_URL_MAPPING table",
+                    e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
+        }
+    }
 }
