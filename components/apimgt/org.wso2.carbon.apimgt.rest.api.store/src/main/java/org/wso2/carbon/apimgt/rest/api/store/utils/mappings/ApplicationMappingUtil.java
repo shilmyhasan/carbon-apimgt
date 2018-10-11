@@ -60,8 +60,7 @@ public class ApplicationMappingUtil {
         application.setDescription(applicationDTO.getDescription());
         application.setCallbackUrl(applicationDTO.getCallbackUrl());
         application.setUUID(applicationDTO.getApplicationId());
-        //groupId is not honored for now. Later we can improve by checking admin privileges of the user.
-        //application.setGroupId(applicationDTO.getGroupId());
+        application.setGroupId(applicationDTO.getGroupId());
         return application;
     }
 
