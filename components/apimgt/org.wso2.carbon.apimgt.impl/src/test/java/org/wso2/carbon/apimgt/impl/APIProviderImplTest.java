@@ -49,7 +49,6 @@ import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIPublisher;
 import org.wso2.carbon.apimgt.api.model.APIStateChangeResponse;
-import org.wso2.carbon.apimgt.api.model.APIStatus;
 import org.wso2.carbon.apimgt.api.model.APIStore;
 import org.wso2.carbon.apimgt.api.model.BlockConditionsDTO;
 import org.wso2.carbon.apimgt.api.model.CORSConfiguration;
@@ -214,7 +213,7 @@ public class APIProviderImplTest {
 
         API api1 = new API(new APIIdentifier("admin", "API1", "1.0.1"));
         api1.setContext("api1context");
-        api1.setStatus(APIStatus.PUBLISHED);
+        api1.setStatus(APIConstants.PUBLISHED);
         api1.setDescription("API 1 Desciption");
         GenericArtifact genericArtifact1 = Mockito.mock(GenericArtifact.class);
         GenericArtifact genericArtifact2 = Mockito.mock(GenericArtifact.class);
@@ -351,7 +350,7 @@ public class APIProviderImplTest {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         APIPublisher publisher = Mockito.mock(APIPublisher.class);
 
         Set<APIStore> apiStores = new HashSet<APIStore>();
@@ -1092,7 +1091,7 @@ public class APIProviderImplTest {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
@@ -1113,7 +1112,7 @@ public class APIProviderImplTest {
         APIIdentifier apiId = new APIIdentifier("admin", "API2&", "1.0.2");
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
@@ -1134,7 +1133,7 @@ public class APIProviderImplTest {
         APIIdentifier apiId = new APIIdentifier("admin", "API3", "1.0.2&");
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
@@ -1156,9 +1155,9 @@ public class APIProviderImplTest {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
+        api.setStatus(APIConstants.CREATED);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
@@ -1168,7 +1167,7 @@ public class APIProviderImplTest {
 
         //Existing APIs of the provider
         API api1 = new API(new APIIdentifier("admin", "API1", "1.0.0"));
-        api1.setStatus(APIStatus.PUBLISHED);
+        api1.setStatus(APIConstants.PUBLISHED);
         API api2 = new API(new APIIdentifier("admin", "API2", "1.0.0"));
 
         //Mock Updating API
@@ -1208,7 +1207,6 @@ public class APIProviderImplTest {
     public void testUpdateAPIStatus_InvalidAPIId() throws APIManagementException, FaultGatewaysException, UserStoreException,
             RegistryException, WorkflowException {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.0");
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
         try {
@@ -1224,15 +1222,13 @@ public class APIProviderImplTest {
             RegistryException, UserStoreException {
         API api = new API(new APIIdentifier("admin", "API1", "1.0.0"));
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         Set<String> environments = new HashSet<String>();
         environments.add("Production");
         environments.add("Sandbox");
 
         api.setEnvironments(environments);
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
@@ -1260,8 +1256,8 @@ public class APIProviderImplTest {
         Map<String, String> failedGWEnv = new HashMap<String, String>();
         failedGWEnv.put("Production", "Failed to publish");
 
-        Mockito.when(gatewayManager.publishToGateway(Matchers.any(API.class), Matchers.any(APITemplateBuilder.class),
-                Matchers.anyString())).thenReturn(failedGWEnv);
+        Mockito.doReturn(failedGWEnv).when(gatewayManager).publishToGateway((API) Mockito.any(), (APITemplateBuilder) Mockito.any(),
+                Mockito.anyString());
 
         String newStatusValue = "PUBLISHED";
 
@@ -1273,13 +1269,12 @@ public class APIProviderImplTest {
             RegistryException, UserStoreException {
         API api = new API(new APIIdentifier("admin", "API1", "1.0.0"));
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         Set<String> environments = new HashSet<String>();
         environments.add("Production");
         environments.add("Sandbox");
         api.setEnvironments(environments);
-        PowerMockito.when(APIUtil.getApiStatus("RETIRED")).thenReturn(APIStatus.RETIRED);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
         Mockito.when(artifactManager.newGovernanceArtifact(Matchers.any(QName.class))).thenReturn(artifact);
@@ -1307,8 +1302,7 @@ public class APIProviderImplTest {
         failedGWEnv.put("Production", "Failed to publish");
         Mockito.when(gatewayManager.publishToGateway(Matchers.any(API.class), Matchers.any(APITemplateBuilder.class),
                 Matchers.anyString())).thenReturn(failedGWEnv);
-        Mockito.when(gatewayManager.removeFromGateway(Matchers.any(API.class),
-                Matchers.anyString())).thenReturn(failedGWEnv);
+        Mockito.doReturn(failedGWEnv).when(gatewayManager).removeFromGateway((API) Mockito.any(), Mockito.anyString());
         String newStatusValue = "RETIRED";
         apiProvider.updateAPIStatus(api.getId(), newStatusValue, true, false, true);
     }
@@ -1351,7 +1345,7 @@ public class APIProviderImplTest {
     public void testIsAPIUpdateValid() throws RegistryException, UserStoreException, APIManagementException {
         API api = new API(new APIIdentifier("admin", "API1", "1.0.0"));
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
         Resource apiSourceArtifact = Mockito.mock(Resource.class);
         Mockito.when(apiSourceArtifact.getUUID()).thenReturn("12640983654");
@@ -1378,7 +1372,7 @@ public class APIProviderImplTest {
         Assert.assertFalse(status);
 
         //API Status is PROTOTYPED and user has permission
-        api.setStatus(APIStatus.PROTOTYPED);
+        api.setStatus(APIConstants.PROTOTYPED);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("PROTOTYPED");
         //Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
 
@@ -1389,7 +1383,7 @@ public class APIProviderImplTest {
         Assert.assertTrue(status);
 
         //API Status is PROTOTYPED and user doesn't have permission
-        api.setStatus(APIStatus.PROTOTYPED);
+        api.setStatus(APIConstants.PROTOTYPED);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("PROTOTYPED");
         //Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
 
@@ -1400,7 +1394,7 @@ public class APIProviderImplTest {
         Assert.assertFalse(status);
 
         //API Status is DEPRECATED and has publish permission
-        api.setStatus(APIStatus.DEPRECATED);
+        api.setStatus(APIConstants.DEPRECATED);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("DEPRECATED");
         //Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
         PowerMockito.when(APIUtil.hasPermission(null, APIConstants.Permissions.API_PUBLISH)).thenReturn(true);
@@ -1408,7 +1402,7 @@ public class APIProviderImplTest {
         Assert.assertTrue(status);
 
         //API Status is DEPRECATED and doesn't have publish permission
-        api.setStatus(APIStatus.DEPRECATED);
+        api.setStatus(APIConstants.DEPRECATED);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("DEPRECATED");
         //Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
         PowerMockito.when(APIUtil.hasPermission(null, APIConstants.Permissions.API_PUBLISH)).thenReturn(false);
@@ -1416,7 +1410,7 @@ public class APIProviderImplTest {
         Assert.assertFalse(status);
 
         //API Status is RETIRED and has publish permission
-        api.setStatus(APIStatus.RETIRED);
+        api.setStatus(APIConstants.RETIRED);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("RETIRED");
         //Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
         PowerMockito.when(APIUtil.hasPermission(null, APIConstants.Permissions.API_PUBLISH)).thenReturn(true);
@@ -1424,7 +1418,7 @@ public class APIProviderImplTest {
         Assert.assertTrue(status);
 
         //API Status is RETIRED and doesn't have publish permission
-        api.setStatus(APIStatus.RETIRED);
+        api.setStatus(APIConstants.RETIRED);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("RETIRED");
         //Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
         PowerMockito.when(APIUtil.hasPermission(null, APIConstants.Permissions.API_PUBLISH)).thenReturn(false);
@@ -1438,7 +1432,7 @@ public class APIProviderImplTest {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.0");
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         TestUtils.mockRegistryAndUserRealm(-1);
 
         PowerMockito.mockStatic(ApiMgtDAO.class);
@@ -1468,9 +1462,9 @@ public class APIProviderImplTest {
 
         //No state changes
         Map<String, String> failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId,
-                APIStatus.CREATED);
+                APIConstants.CREATED);
         Assert.assertEquals(0, failedGatewaysReturned.size());
-        Assert.assertEquals(APIStatus.CREATED, api.getStatus());
+        Assert.assertEquals(APIConstants.CREATED, api.getStatus());
 
         ServiceReferenceHolder serviceReferenceHolder = TestUtils.mockAPIMConfiguration(APIConstants.API_GATEWAY_TYPE,
                 APIConstants.API_GATEWAY_TYPE_SYNAPSE, -1);
@@ -1479,7 +1473,7 @@ public class APIProviderImplTest {
         //Change to PUBLISHED state
         //Existing APIs of the provider
         API api1 = new API(new APIIdentifier("admin", "API1", "0.0.5"));
-        api1.setStatus(APIStatus.PUBLISHED);
+        api1.setStatus(APIConstants.PUBLISHED);
         API api2 = new API(new APIIdentifier("admin", "API2", "1.0.0"));
 
         prepareForGetAPIsByProvider(artifactManager, apiProvider, "admin", api1, api2);
@@ -1488,40 +1482,40 @@ public class APIProviderImplTest {
         PowerMockito.when(registryService.getConfigSystemRegistry(-1)).thenReturn(configRegistry);
         PowerMockito.when(configRegistry.resourceExists(APIConstants.API_TENANT_CONF_LOCATION)).thenReturn(false);
         PowerMockito.when(JavaUtils.isTrueExplicitly("false")).thenReturn(false);
-        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIStatus.PUBLISHED);
+        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.PUBLISHED);
 
         Assert.assertEquals(0, failedGatewaysReturned.size());
-        Assert.assertEquals(APIStatus.PUBLISHED, api.getStatus());
+        Assert.assertEquals(APIConstants.PUBLISHED, api.getStatus());
 
         //Change to PUBLISHED state and error thrown while publishing
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         Map<String, String> failedGWEnv = new HashMap<String, String>();
         failedGWEnv.put("Production", "Failed to publish");
         failedGateways.put("PUBLISHED", failedGWEnv);
 
         Mockito.when(gatewayManager.publishToGateway(Matchers.any(API.class), Matchers.any(APITemplateBuilder.class),
                 Matchers.anyString())).thenReturn(failedGWEnv);
-        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIStatus.PUBLISHED);
+        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.PUBLISHED);
         Assert.assertEquals(1, failedGatewaysReturned.size());
-        Assert.assertEquals(APIStatus.PUBLISHED, api.getStatus());
+        Assert.assertEquals(APIConstants.PUBLISHED, api.getStatus());
 
         //Change to RETIRED state
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         failedGateways.remove("PUBLISHED");
 
-        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIStatus.RETIRED);
+        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.RETIRED);
         Assert.assertEquals(0, failedGatewaysReturned.size());
-        Assert.assertEquals(APIStatus.RETIRED, api.getStatus());
+        Assert.assertEquals(APIConstants.RETIRED, api.getStatus());
 
         //Change to RETIRED state and error thrown while un-publishing
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         failedGateways.put("UNPUBLISHED", failedGWEnv);
         Mockito.when(gatewayManager.removeFromGateway(Matchers.any(API.class),
                 Matchers.anyString())).thenReturn(failedGWEnv);
 
-        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIStatus.RETIRED);
+        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.RETIRED);
         Assert.assertEquals(1, failedGatewaysReturned.size());
-        Assert.assertEquals(APIStatus.RETIRED, api.getStatus());
+        Assert.assertEquals(APIConstants.RETIRED, api.getStatus());
     }
 
     @Test
@@ -1529,7 +1523,7 @@ public class APIProviderImplTest {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.0");
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         TestUtils.mockRegistryAndUserRealm(-1);
         Resource resource = PowerMockito.mock(Resource.class);
@@ -1557,7 +1551,7 @@ public class APIProviderImplTest {
         //Change to PUBLISHED state
         //Existing APIs of the provider
         API api1 = new API(new APIIdentifier("admin", "API1", "0.0.5"));
-        api1.setStatus(APIStatus.PUBLISHED);
+        api1.setStatus(APIConstants.PUBLISHED);
         API api2 = new API(new APIIdentifier("admin", "API2", "1.0.0"));
 
         prepareForGetAPIsByProvider(artifactManager, apiProvider, "admin", api1, api2);
@@ -1576,7 +1570,7 @@ public class APIProviderImplTest {
         PowerMockito.when(amConfigService.getAPIManagerConfiguration()).thenReturn(amConfig);
         PowerMockito.when(amConfig.getFirstProperty(APIConstants.API_GATEWAY_TYPE)).thenReturn(APIConstants.API_GATEWAY_TYPE_SYNAPSE);
 
-        apiProvider.propergateAPIStatusChangeToGateways(apiId, APIStatus.PUBLISHED);
+        apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.PUBLISHED);
         Mockito.verify(notificationExecutor).sendAsyncNotifications(notificationDTO);
     }
 
@@ -1586,7 +1580,7 @@ public class APIProviderImplTest {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.0");
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         CORSConfiguration corsConfig = getCORSConfiguration();
         api.setCorsConfiguration(corsConfig);
@@ -1595,7 +1589,7 @@ public class APIProviderImplTest {
 
         try {
             apiProvider.propergateAPIStatusChangeToGateways(apiId,
-                    APIStatus.CREATED);
+                    APIConstants.CREATED);
         } catch (APIManagementException e) {
             Assert.assertEquals("Couldn't find an API with the name-" + apiId.getApiName() + "version-"
                     + apiId.getVersion(), e.getMessage());
@@ -1609,18 +1603,16 @@ public class APIProviderImplTest {
         API api = new API(apiId);
         api.setContext("/test");
         api.setVisibility("Public");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setWsdlUrl("https://localhost:9443/services/echo?wsdl");
 
         String newVersion = "1.0.1";
         //Create new API object
         APIIdentifier newApiId = new APIIdentifier("admin", "API1", "1.0.1");
         final API newApi = new API(newApiId);
-        newApi.setStatus(APIStatus.CREATED);
+        newApi.setStatus(APIConstants.CREATED);
         newApi.setContext("/test");
         newApi.setWsdlUrl("/registry/resource/_system/governance/apimgt/applicationdata/wsdls/admin--API11.0.0.wsdl");
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         //Create Documentation List
         List<Documentation> documentationList = getDocumentationList();
@@ -1799,20 +1791,18 @@ public class APIProviderImplTest {
         API api = new API(apiId);
         api.setContext("/test");
         api.setVisibility("Public");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setAsDefaultVersion(true);
 
         String newVersion = "1.0.1";
         //Create new API object
         APIIdentifier newApiId = new APIIdentifier("admin", "API1", "1.0.1");
         final API newApi = new API(newApiId);
-        newApi.setStatus(APIStatus.CREATED);
+        newApi.setStatus(APIConstants.CREATED);
         newApi.setContext("/test");
 
         //Mock API as a default version
         Mockito.when(apimgtDAO.getDefaultVersion(apiId)).thenReturn("1.0.0");
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         final APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, new ArrayList<Documentation>(), null);
 
@@ -1937,13 +1927,13 @@ public class APIProviderImplTest {
         API api = new API(apiId);
         api.setContext("/test");
         api.setVisibility("Public");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         String newVersion = "1.0.0";
         //Create new API object
         APIIdentifier newApiId = new APIIdentifier("admin", "API1", "1.0.1");
         final API newApi = new API(newApiId);
-        newApi.setStatus(APIStatus.CREATED);
+        newApi.setStatus(APIConstants.CREATED);
         newApi.setContext("/test");
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
@@ -1974,13 +1964,13 @@ public class APIProviderImplTest {
         API api = new API(apiId);
         api.setContext("/test");
         api.setVisibility("Public");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
 
         String newVersion = "1.0.0";
         //Create new API object
         APIIdentifier newApiId = new APIIdentifier("admin", "API1", "1.0.1");
         final API newApi = new API(newApiId);
-        newApi.setStatus(APIStatus.CREATED);
+        newApi.setStatus(APIConstants.CREATED);
         newApi.setContext("/test");
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
@@ -2100,15 +2090,14 @@ public class APIProviderImplTest {
             FaultGatewaysException {
         APIIdentifier identifier = new APIIdentifier("admin", "API1", "1.0.0");
         API api = new API(identifier);
-        api.setStatus(APIStatus.PUBLISHED);
+        api.setStatus(APIConstants.PUBLISHED);
         api.setVisibility("public");
 
         //API status change is not allowed in UpdateAPI(). Should throw an exception.
         API oldApi = new API(identifier);
-        oldApi.setStatus(APIStatus.CREATED);
+        oldApi.setStatus(APIConstants.CREATED);
         oldApi.setVisibility("public");
 
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
         Mockito.when(artifactManager.newGovernanceArtifact(Matchers.any(QName.class))).thenReturn(artifact);
         Mockito.when(APIUtil.createAPIArtifactContent(artifact, oldApi)).thenReturn(artifact);
@@ -2153,7 +2142,7 @@ public class APIProviderImplTest {
         newUriTemplates.add(uriTemplate2);
 
         final API api = new API(identifier);
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setVisibility("public");
         api.setAccessControl("all");
         api.setTransports("http,https");
@@ -2162,14 +2151,12 @@ public class APIProviderImplTest {
         api.setUriTemplates(newUriTemplates);
 
         API oldApi = new API(identifier);
-        oldApi.setStatus(APIStatus.CREATED);
+        oldApi.setStatus(APIConstants.CREATED);
         oldApi.setVisibility("public");
         oldApi.setAccessControl("all");
         oldApi.setContext("/test");
         oldApi.setEnvironments(environments);
         api.setUriTemplates(uriTemplates);
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         List<Documentation> documentationList = getDocumentationList();
 
@@ -2258,7 +2245,7 @@ public class APIProviderImplTest {
         newUriTemplates.add(uriTemplate2);
 
         final API api = new API(identifier);
-        api.setStatus(APIStatus.PUBLISHED);
+        api.setStatus(APIConstants.PUBLISHED);
         api.setVisibility("private");
         api.setVisibleRoles("admin");
         api.setAccessControl("all");
@@ -2268,7 +2255,7 @@ public class APIProviderImplTest {
         api.setUriTemplates(newUriTemplates);
 
         API oldApi = new API(identifier);
-        oldApi.setStatus(APIStatus.PUBLISHED);
+        oldApi.setStatus(APIConstants.PUBLISHED);
         oldApi.setVisibility("public");
         oldApi.setAccessControl("all");
         oldApi.setContext("/test");
@@ -2278,8 +2265,6 @@ public class APIProviderImplTest {
         jsonObject.put("test", "new_test");
         api.setAdditionalProperties(jsonObject);
         api.addProperty("secured", "false");
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         List<Documentation> documentationList = getDocumentationList();
 
@@ -2396,7 +2381,7 @@ public class APIProviderImplTest {
         newUriTemplates.add(uriTemplate2);
 
         final API api = new API(identifier);
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setVisibility("public");
         api.setAccessControl("all");
         api.setTransports("http,https");
@@ -2405,14 +2390,12 @@ public class APIProviderImplTest {
         api.setUriTemplates(newUriTemplates);
 
         API oldApi = new API(identifier);
-        oldApi.setStatus(APIStatus.CREATED);
+        oldApi.setStatus(APIConstants.CREATED);
         oldApi.setVisibility("public");
         oldApi.setAccessControl("all");
         oldApi.setContext("/test");
         oldApi.setEnvironments(environments);
         api.setUriTemplates(uriTemplates);
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         List<Documentation> documentationList = getDocumentationList();
 
@@ -2484,7 +2467,7 @@ public class APIProviderImplTest {
         newUriTemplates.add(uriTemplate2);
 
         final API api = new API(identifier);
-        api.setStatus(APIStatus.PUBLISHED);
+        api.setStatus(APIConstants.PUBLISHED);
         api.setVisibility("public");
         api.setAccessControl("all");
         api.setTransports("http,https");
@@ -2493,14 +2476,15 @@ public class APIProviderImplTest {
         api.setUriTemplates(newUriTemplates);
 
         API oldApi = new API(identifier);
-        oldApi.setStatus(APIStatus.PUBLISHED);
+        oldApi.setStatus(APIConstants.PUBLISHED);
         oldApi.setVisibility("public");
         oldApi.setAccessControl("all");
         oldApi.setContext("/test");
         oldApi.setEnvironments(environments);
         api.setUriTemplates(uriTemplates);
 
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
+        PowerMockito.when(APIUtil.getLcStateFromArtifact((GovernanceArtifact) Mockito.any()))
+                .thenReturn(APIConstants.PUBLISHED);
 
         final APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
@@ -2562,12 +2546,11 @@ public class APIProviderImplTest {
         Map<String, String> failedToPubGWEnv = new HashMap<String, String>();
         failedToPubGWEnv.put("Production", "Failed to publish");
         Map<String, String> failedToUnPubGWEnv = new HashMap<String, String>();
-        failedToUnPubGWEnv.put("Production", "Failed to unpublish");
+        Mockito.doReturn(failedToUnPubGWEnv).when(gatewayManager)
+                .removeFromGateway((API) Mockito.any(), Mockito.anyString());
+        Mockito.doReturn(failedToPubGWEnv).when(gatewayManager)
+                .publishToGateway((API) Mockito.any(), (APITemplateBuilder) Mockito.any(), Mockito.anyString());
 
-        Mockito.when(gatewayManager.removeFromGateway(Matchers.any(API.class),
-                Matchers.anyString())).thenReturn(failedToUnPubGWEnv);
-        Mockito.when(gatewayManager.publishToGateway(Matchers.any(API.class), Matchers.any(APITemplateBuilder.class),
-                Matchers.anyString())).thenReturn(failedToPubGWEnv);
         apiProvider.updateAPI(api);
     }
 
@@ -2579,8 +2562,6 @@ public class APIProviderImplTest {
         String path = APIConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR +
                 identifier.getProviderName() + RegistryConstants.PATH_SEPARATOR +
                 identifier.getApiName() + RegistryConstants.PATH_SEPARATOR + identifier.getVersion();
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
         Resource apiSourceArtifact = Mockito.mock(Resource.class);
@@ -2639,8 +2620,6 @@ public class APIProviderImplTest {
                 identifier.getProviderName() + RegistryConstants.PATH_SEPARATOR +
                 identifier.getApiName() + RegistryConstants.PATH_SEPARATOR + identifier.getVersion();
 
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
-
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
         Resource apiSourceArtifact = Mockito.mock(Resource.class);
@@ -2658,8 +2637,6 @@ public class APIProviderImplTest {
         String path = APIConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR +
                 identifier.getProviderName() + RegistryConstants.PATH_SEPARATOR +
                 identifier.getApiName() + RegistryConstants.PATH_SEPARATOR + identifier.getVersion();
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
 
@@ -2714,7 +2691,6 @@ public class APIProviderImplTest {
     public void testDeleteAPI_WithActiveSubscriptions() throws RegistryException, UserStoreException,
             APIManagementException, WorkflowException {
         APIIdentifier identifier = new APIIdentifier("admin-AT-carbon.super", "API1", "1.0.0");
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
         Mockito.when(apimgtDAO.getAPISubscriptionCountByAPI(identifier)).thenReturn(1L);
         try {
@@ -3111,7 +3087,7 @@ public class APIProviderImplTest {
 
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setAsDefaultVersion(true);
         api.setEnvironments(environments);
 
@@ -3136,7 +3112,7 @@ public class APIProviderImplTest {
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
                 thenReturn(apiSourcePath);
         Mockito.doNothing().when(artifactManager).updateGenericArtifact(artifact);
-        apiProvider.updateAPIforStateChange(apiId, APIStatus.PUBLISHED, failedGWEnv);
+        apiProvider.updateAPIforStateChange(apiId, APIConstants.PUBLISHED, failedGWEnv);
         //From the 2 environments, only 1 was successful
         Assert.assertEquals(2, api.getEnvironments().size());
     }
@@ -3151,7 +3127,7 @@ public class APIProviderImplTest {
 
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setAsDefaultVersion(true);
         api.setEnvironments(environments);
 
@@ -3176,7 +3152,7 @@ public class APIProviderImplTest {
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
                 thenReturn(apiSourcePath);
         Mockito.doNothing().when(artifactManager).updateGenericArtifact(artifact);
-        boolean status = apiProvider.updateAPIforStateChange(apiId, APIStatus.RETIRED, failedGWEnv);
+        boolean status = apiProvider.updateAPIforStateChange(apiId, APIConstants.RETIRED, failedGWEnv);
 
         Assert.assertEquals(2, api.getEnvironments().size());
         Assert.assertEquals(true, status);
@@ -3192,7 +3168,7 @@ public class APIProviderImplTest {
 
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setAsDefaultVersion(true);
         api.setEnvironments(environments);
 
@@ -3220,7 +3196,7 @@ public class APIProviderImplTest {
                 thenReturn(apiSourcePath);
         Mockito.doNothing().when(artifactManager).updateGenericArtifact(artifact);
         try {
-            apiProvider.updateAPIforStateChange(apiId, APIStatus.PUBLISHED, failedGWEnv);
+            apiProvider.updateAPIforStateChange(apiId, APIConstants.PUBLISHED, failedGWEnv);
         } catch (FaultGatewaysException e) {
             Assert.assertTrue(e.getFaultMap().contains("Failed to publish"));
         }
@@ -3237,7 +3213,7 @@ public class APIProviderImplTest {
 
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setAsDefaultVersion(true);
         api.setEnvironments(environments);
 
@@ -3265,7 +3241,7 @@ public class APIProviderImplTest {
                 thenReturn(apiSourcePath);
         Mockito.doNothing().when(artifactManager).updateGenericArtifact(artifact);
         try {
-            apiProvider.updateAPIforStateChange(apiId, APIStatus.RETIRED, failedGWEnv);
+            apiProvider.updateAPIforStateChange(apiId, APIConstants.RETIRED, failedGWEnv);
         } catch (FaultGatewaysException e) {
             Assert.assertTrue(e.getFaultMap().contains("Failed to un-publish"));
         }
@@ -3285,7 +3261,7 @@ public class APIProviderImplTest {
 
         API api = new API(apiId);
         api.setContext("/test");
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setAsDefaultVersion(true);
         api.setEnvironments(environments);
 
@@ -3293,7 +3269,7 @@ public class APIProviderImplTest {
         Map<String, String> failedGWEnv = new HashMap<String, String>();
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
         try {
-            apiProvider.updateAPIforStateChange(apiId, APIStatus.PUBLISHED, failedGWEnv);
+            apiProvider.updateAPIforStateChange(apiId, APIConstants.PUBLISHED, failedGWEnv);
         } catch (APIManagementException e) {
             Assert.assertEquals("Couldn't find an API with the name-" + apiId.getApiName() + "version-"
                     + apiId.getVersion(), e.getMessage());
@@ -3419,7 +3395,7 @@ public class APIProviderImplTest {
         //APIs of the provider
         API api1 = new API(new APIIdentifier("admin", "API1", "1.0.1"));
         api1.setContext("api1context");
-        api1.setStatus(APIStatus.PUBLISHED);
+        api1.setStatus(APIConstants.PUBLISHED);
         api1.setDescription("API 1 Desciption");
 
         Set<URITemplate> uriTemplates = new HashSet<URITemplate>();
@@ -3435,7 +3411,7 @@ public class APIProviderImplTest {
 
         API api2 = new API(new APIIdentifier("admin", "API2", "1.0.0"));
         api2.setContext("api2context");
-        api2.setStatus(APIStatus.CREATED);
+        api2.setStatus(APIConstants.CREATED);
         api2.setDescription("API 2 Desciption");
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
@@ -3501,7 +3477,7 @@ public class APIProviderImplTest {
     public void testSearchAPIs_NoProviderId() throws APIManagementException, RegistryException {
         API api1 = new API(new APIIdentifier("admin", "API1", "1.0.1"));
         api1.setContext("api1context");
-        api1.setStatus(APIStatus.PUBLISHED);
+        api1.setStatus(APIConstants.PUBLISHED);
         api1.setDescription("API 1 Desciption");
 
         Set<URITemplate> uriTemplates = new HashSet<URITemplate>();
@@ -3517,7 +3493,7 @@ public class APIProviderImplTest {
 
         API api2 = new API(new APIIdentifier("admin", "API2", "1.0.0"));
         api2.setContext("api2context");
-        api2.setStatus(APIStatus.CREATED);
+        api2.setStatus(APIConstants.CREATED);
         api2.setDescription("API 2 Desciption");
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, null, null);
@@ -3886,7 +3862,7 @@ public class APIProviderImplTest {
         Mockito.when(sequence.getContentStream()).thenReturn(responseStream);
         Mockito.when(sequence2.getContentStream()).thenReturn(responseStream2);
     }
-    
+
     /**
      * This method can be used when invoking getAPIsByProvider()
      */
@@ -4220,15 +4196,13 @@ public class APIProviderImplTest {
         uriTemplates.add(uriTemplate1);
 
         final API api = new API(identifier);
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setVisibility("public");
         api.setAccessControl("all");
         api.setTransports("http,https");
         api.setContext("/test");
         api.setEnvironments(environments);
         api.setUriTemplates(uriTemplates);
-
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
 
         List<Documentation> documentationList = getDocumentationList();
 
@@ -4292,7 +4266,7 @@ public class APIProviderImplTest {
         uriTemplates.add(uriTemplate1);
 
         final API api = new API(identifier);
-        api.setStatus(APIStatus.CREATED);
+        api.setStatus(APIConstants.CREATED);
         api.setVisibility("public");
         api.setAccessControl("all");
         api.setTransports("http,https");
@@ -4301,7 +4275,6 @@ public class APIProviderImplTest {
         api.setUriTemplates(uriTemplates);
         api.setVisibleRoles("role1 role2");
 
-        PowerMockito.when(APIUtil.getApiStatus("PUBLISHED")).thenReturn(APIStatus.PUBLISHED);
         List<Documentation> documentationList = getDocumentationList();
         final APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, documentationList, null);
 
