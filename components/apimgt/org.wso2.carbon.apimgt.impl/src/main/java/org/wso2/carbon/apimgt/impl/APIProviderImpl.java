@@ -5394,8 +5394,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (!registry.resourceExists(artifactPath)) {
             return;
         }
-        // Replace spaces
-        publisherAccessControlRoles = publisherAccessControlRoles.replaceAll("\\s+", "");
         Resource apiResource = registry.get(artifactPath);
         if (apiResource != null) {
             if (additionalProperties != null) {
