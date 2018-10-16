@@ -1397,7 +1397,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                 || APIConstants.BLOCKED.equals(newStatus) || APIConstants.PROTOTYPED.equals(newStatus)) {
                             failedGateways = publishToGateway(api);
                             //Sending Notifications to existing subscribers
-                            if (APIStatus.PUBLISHED.equals(newStatus)) {
+                            if (APIConstants.PUBLISHED.equals(newStatus)) {
                                 List<APIIdentifier> oldPublishedAPIList = getOldPublishedAPIList(api);
                                 sendEmailNotification(api, oldPublishedAPIList);
                             }
@@ -1626,7 +1626,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         for (API oldAPI : apiList) {
             if (oldAPI.getId().getApiName().equals(api.getId().getApiName()) &&
                     versionComparator.compare(oldAPI, api) < 0 &&
-                    (oldAPI.getStatus().equals(APIStatus.PUBLISHED))) {
+                    (oldAPI.getStatus().equals(APIConstants.PUBLISHED))) {
                 oldPublishedAPIList.add(oldAPI.getId());
             }
         }
