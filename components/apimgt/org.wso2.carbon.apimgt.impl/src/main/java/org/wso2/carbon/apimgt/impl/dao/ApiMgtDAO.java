@@ -5379,6 +5379,12 @@ public class ApiMgtDAO {
                 application.setUUID(rs.getString("UUID"));
                 application.setTier(rs.getString("APPLICATION_TIER"));
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
+
+                if (multiGroupIdEnabled) {
+                    if (application.getGroupId().isEmpty()) {
+                        application.setGroupId(getGroupId(applicationId));
+                    }
+                }
             }
         } catch (SQLException e) {
             handleException("Error while obtaining details of the Application : " + applicationId, e);
@@ -5426,6 +5432,12 @@ public class ApiMgtDAO {
                 application.setUUID(rs.getString("UUID"));
                 application.setTier(rs.getString("APPLICATION_TIER"));
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
+
+                if (multiGroupIdEnabled) {
+                    if (application.getGroupId().isEmpty()) {
+                        application.setGroupId(getGroupId(rs.getInt("APPLICATION_ID")));
+                    }
+                }
 
                 Timestamp createdTime = rs.getTimestamp("CREATED_TIME");
                 application.setCreatedTime(createdTime == null ? null : String.valueOf(createdTime.getTime()));
