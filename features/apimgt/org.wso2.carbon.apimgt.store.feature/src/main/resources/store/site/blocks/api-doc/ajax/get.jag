@@ -103,6 +103,13 @@ var log = new Log();
 
         var store = jagg.module("manager").getAPIStoreObj();
         gatewayURL = store.getHTTPsGatewayEndpointURLs();
+        //populate the security definitions
+        var default_implicit = {
+                "type":"oauth2",
+                "authorizationUrl": "",
+                "flow": "implicit",
+                "scopes":{}
+        };
 
         if(jsonObj["x-wso2-security"]!= undefined){
             var scopeList = jsonObj["x-wso2-security"]["apim"]["x-wso2-scopes"];
@@ -148,13 +155,9 @@ var log = new Log();
            
             }
         }
-            //populate the security definitions
-            var default_implicit = {
-                "type":"oauth2",
-                "authorizationUrl": urlArr[0]+"/authorize",
-                "flow": "implicit",
-                "scopes":{}
-            };
+     
+        default_implicit.authorizationUrl = urlArr[0] + "/authorize";
+
             if(jsonObj["securityDefinitions"] == undefined){
                 jsonObj["securityDefinitions"] = {};
             }
