@@ -111,7 +111,11 @@ var getAPIConsumerObj = function() {
 
     var APIManagerFactory = Packages.org.wso2.carbon.apimgt.impl.APIManagerFactory;
 
-    return APIManagerFactory.getInstance().getAPIConsumer(user);
+    if (user) {
+        return APIManagerFactory.getInstance().getAPIConsumer(user.username);
+    } else {
+        return APIManagerFactory.getInstance().getAPIConsumer()
+    }
 };
 
 var loadTenantRegistry = function (tenantDomain) {

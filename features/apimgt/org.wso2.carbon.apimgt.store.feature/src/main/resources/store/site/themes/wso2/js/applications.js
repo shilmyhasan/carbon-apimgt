@@ -528,6 +528,7 @@ $("#application-actions").each(function(){
     $('#application-table').on( 'click', 'a.deleteApp', function () {
     	var appName = $(this).attr("data-id");
     	var apiCount = $(this).attr("data-count");
+    	var appId = $(this).attr("data-appId");
     	$('#messageModal').html($('#confirmation-data').html());
         if(apiCount > 0){
             $('#messageModal h3.modal-title').html(i18n.t("Confirm Delete"));
@@ -541,8 +542,8 @@ $("#application-actions").each(function(){
         $('#messageModal a.btn-other').html(i18n.t("No"));
         $('#messageModal a.btn-primary').click(function() {
             jagg.post("/site/blocks/application/application-remove/ajax/application-remove.jag", {
-                action:"removeApplication",
-                application:appName
+                action:"removeApplicationById",
+                applicationId:appId
             }, function (result) {
                 if (!result.error) {
                 	window.location.reload(true);
