@@ -1992,11 +1992,7 @@ paths:
       description: |
         This operation can be used to retrieve the list of gateway environments available.
       parameters:
-        - in: query
-          name: apiId
-          description: |
-            Will return environment list for the provided API.
-          type: string
+        - $ref: '#/parameters/apiId-Q'
       tags:
         - Environment (Collection)
       responses:
@@ -2042,6 +2038,7 @@ parameters:
       Should be formatted as **provider-name-version**.
     required: true
     type: string
+    x-encoded: true
 
 # API Identifier
 # Specified as part of the query string
@@ -2054,6 +2051,7 @@ parameters:
       Should be formatted as **provider-name-version**.
     required: true
     type: string
+    x-encoded: true
 
 
 # Document Identifier
@@ -2296,6 +2294,9 @@ definitions:
       status:
         type: string
         example: CREATED
+      thumbnailUri:
+        type: string
+        example: /apis/01234567-0123-0123-0123-012345678901/thumbnail
 
 #-----------------------------------------------------
 # The API resource

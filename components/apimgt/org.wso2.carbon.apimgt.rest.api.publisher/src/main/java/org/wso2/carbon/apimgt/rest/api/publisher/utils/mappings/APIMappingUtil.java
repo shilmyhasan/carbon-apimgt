@@ -34,13 +34,15 @@ import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 
 public class APIMappingUtil {
 
     private static final Log log = LogFactory.getLog(APIMappingUtil.class);
 
-    public static APIIdentifier getAPIIdentifierFromApiId(String apiId) {
+    public static APIIdentifier getAPIIdentifierFromApiId(String apiId) throws UnsupportedEncodingException {
         //if apiId contains -AT-, that need to be replaced before splitting
         apiId = APIUtil.replaceEmailDomainBack(apiId);
         String[] apiIdDetails = apiId.split(RestApiConstants.API_ID_DELIMITER);
@@ -50,9 +52,9 @@ public class APIMappingUtil {
         }
 
         // apiId format: provider-apiName-version
-        String providerName = apiIdDetails[0];
-        String apiName = apiIdDetails[1];
-        String version = apiIdDetails[2];
+        String providerName = URLDecoder.decode(apiIdDetails[0], RestApiConstants.CHARSET);
+        String apiName = URLDecoder.decode(apiIdDetails[1], RestApiConstants.CHARSET);
+        String version = URLDecoder.decode(apiIdDetails[2], RestApiConstants.CHARSET);
         String providerNameEmailReplaced = APIUtil.replaceEmailDomain(providerName);
         return new APIIdentifier(providerNameEmailReplaced, apiName, version);
     }
@@ -85,7 +87,12 @@ public class APIMappingUtil {
         if (RestApiUtil.isUUID(apiId)) {
             api = apiProvider.getLightweightAPIByUUID(apiId, requestedTenantDomain);
         } else {
-            APIIdentifier apiIdentifier = getAPIIdentifierFromApiId(apiId);
+            APIIdentifier apiIdentifier;
+            try {
+                apiIdentifier = getAPIIdentifierFromApiId(apiId);
+            } catch (UnsupportedEncodingException e) {
+                throw new APIManagementException("Couldn't decode value",e);
+            }
 
             //Checks whether the logged in user's tenant and the API's tenant is equal
             RestApiUtil.validateUserTenantWithAPIIdentifier(apiIdentifier);
@@ -110,7 +117,12 @@ public class APIMappingUtil {
         if (RestApiUtil.isUUID(apiId)) {
             api = apiProvider.getAPIbyUUID(apiId, requestedTenantDomain);
         } else {
-            APIIdentifier apiIdentifier = getAPIIdentifierFromApiId(apiId);
+            APIIdentifier apiIdentifier;
+            try {
+                apiIdentifier = getAPIIdentifierFromApiId(apiId);
+            } catch (UnsupportedEncodingException e) {
+                throw new APIManagementException("Couldn't decode value", e);
+            }
 
             //Checks whether the logged in user's tenant and the API's tenant is equal
             RestApiUtil.validateUserTenantWithAPIIdentifier(apiIdentifier);
