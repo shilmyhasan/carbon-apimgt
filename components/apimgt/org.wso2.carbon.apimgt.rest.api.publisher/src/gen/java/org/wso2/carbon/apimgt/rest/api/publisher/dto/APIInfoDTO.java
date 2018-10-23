@@ -34,9 +34,9 @@ public class APIInfoDTO  {
   
   
   private String status = null;
-
-
-  private String thumbnailUri  = null;
+  
+  
+  private String thumbnailUri = null;
 
   
   /**
@@ -74,17 +74,7 @@ public class APIInfoDTO  {
     this.description = description;
   }
 
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("thumbnailUri")
-  public String getThumbnailUri() {
-    return thumbnailUri;
-  }
-  public void setThumbnailUri(String thumbnailUri) {
-    this.thumbnailUri = thumbnailUri;
-  }
-
+  
   /**
    **/
   @ApiModelProperty(value = "")
@@ -134,6 +124,18 @@ public class APIInfoDTO  {
   }
 
   
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("thumbnailUri")
+  public String getThumbnailUri() {
+    return thumbnailUri;
+  }
+  public void setThumbnailUri(String thumbnailUri) {
+    this.thumbnailUri = thumbnailUri;
+  }
+
+  
 
   @Override
   public String toString()  {
@@ -147,6 +149,7 @@ public class APIInfoDTO  {
     sb.append("  version: ").append(version).append("\n");
     sb.append("  provider: ").append(provider).append("\n");
     sb.append("  status: ").append(status).append("\n");
+    sb.append("  thumbnailUri: ").append(thumbnailUri).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

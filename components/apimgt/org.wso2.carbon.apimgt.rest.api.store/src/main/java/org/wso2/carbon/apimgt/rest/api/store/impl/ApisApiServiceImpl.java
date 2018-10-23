@@ -41,6 +41,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -192,6 +193,9 @@ public class ApisApiServiceImpl extends ApisApiService {
         } catch (UserStoreException e) {
             String errorMessage = "Error while checking availability of tenant " + requestedTenantDomain;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (UnsupportedEncodingException e) {
+            String errorMessage = "Error while Decoding apiId" + apiId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }
@@ -243,6 +247,9 @@ public class ApisApiServiceImpl extends ApisApiService {
             }
         } catch (UserStoreException e) {
             String errorMessage = "Error while checking availability of tenant " + requestedTenantDomain;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (UnsupportedEncodingException e) {
+            String errorMessage = "Error while Decoding apiId" + apiId;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
@@ -363,6 +370,9 @@ public class ApisApiServiceImpl extends ApisApiService {
         } catch (UserStoreException e) {
             String errorMessage = "Error while checking availability of tenant " + requestedTenantDomain;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (UnsupportedEncodingException e) {
+            String errorMessage = "Error while Decoding apiId" + apiId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }
@@ -406,6 +416,9 @@ public class ApisApiServiceImpl extends ApisApiService {
         } catch (UserStoreException e) {
             String errorMessage = "Error while checking availability of tenant " + requestedTenantDomain;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (UnsupportedEncodingException e) {
+            String errorMessage = "Error while Decoding apiId" + apiId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }
@@ -445,6 +458,9 @@ public class ApisApiServiceImpl extends ApisApiService {
                 String errorMessage = "Error while retrieving thumbnail of API : " + apiId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
+        } catch (UnsupportedEncodingException e) {
+            String errorMessage = "Error while Decoding apiId" + apiId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }

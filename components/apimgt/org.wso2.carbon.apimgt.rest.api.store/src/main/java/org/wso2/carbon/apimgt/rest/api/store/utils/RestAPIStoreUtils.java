@@ -39,6 +39,7 @@ import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -128,7 +129,7 @@ public class RestAPIStoreUtils {
         //this is just to check whether the user has access to the api or the api exists. 
         try {
             APIMappingUtil.getAPIIdentifierFromApiIdOrUUID(apiId, tenantDomain);
-        } catch (APIManagementException e) {
+        } catch (APIManagementException | UnsupportedEncodingException e) {
             if (RestApiUtil.isDueToAuthorizationFailure(e)) {
                 String message =
                         "user " + username + " failed to access the API " + apiId + " due to an authorization failure";
