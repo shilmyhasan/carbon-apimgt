@@ -50,12 +50,11 @@ public class SubscriptionMappingUtil {
         SubscriptionDTO subscriptionDTO = new SubscriptionDTO();
         subscriptionDTO.setSubscriptionId(subscription.getUUID());
         APIIdentifier apiId = subscription.getApiId();
-        APIIdentifier apiIdEmailReplacedBack = new APIIdentifier(APIUtil.replaceEmailDomainBack(
-                URLEncoder.encode(apiId.getProviderName(), RestApiConstants.CHARSET)
-                        .replace(RestApiConstants.API_ID_DELIMITER, RestApiConstants.URL_ENCODED_API_ID_DELIMITER)),
+        APIIdentifier apiIdEmailReplacedBack = new APIIdentifier(APIUtil.replaceEmailDomainBack(apiId.getProviderName()
+                .replace(RestApiConstants.API_ID_DELIMITER, RestApiConstants.URL_ENCODED_API_ID_DELIMITER)),
                 URLEncoder.encode(apiId.getApiName(), RestApiConstants.CHARSET)
                         .replace(RestApiConstants.API_ID_DELIMITER, RestApiConstants.URL_ENCODED_API_ID_DELIMITER),
-                URLEncoder.encode(apiId.getVersion(), RestApiConstants.CHARSET)
+                apiId.getVersion()
                         .replace(RestApiConstants.API_ID_DELIMITER, RestApiConstants.URL_ENCODED_API_ID_DELIMITER));
         subscriptionDTO.setApiIdentifier(apiIdEmailReplacedBack.toString());
         subscriptionDTO.setApplicationId(subscription.getApplication().getUUID());
