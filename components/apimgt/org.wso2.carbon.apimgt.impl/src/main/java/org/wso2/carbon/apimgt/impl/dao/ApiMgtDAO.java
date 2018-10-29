@@ -5381,7 +5381,7 @@ public class ApiMgtDAO {
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
 
                 if (multiGroupIdEnabled) {
-                    if (application.getGroupId().isEmpty()) {
+                    if (application.getGroupId() == null || application.getGroupId().isEmpty()) {
                         application.setGroupId(getGroupId(applicationId));
                     }
                 }
@@ -5434,7 +5434,7 @@ public class ApiMgtDAO {
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
 
                 if (multiGroupIdEnabled) {
-                    if (application.getGroupId().isEmpty()) {
+                    if (application.getGroupId() == null || application.getGroupId().isEmpty()) {
                         application.setGroupId(getGroupId(rs.getInt("APPLICATION_ID")));
                     }
                 }
