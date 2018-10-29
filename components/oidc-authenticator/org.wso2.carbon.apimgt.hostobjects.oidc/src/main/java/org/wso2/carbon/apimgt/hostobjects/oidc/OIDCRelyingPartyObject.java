@@ -101,6 +101,64 @@ public class OIDCRelyingPartyObject extends ScriptableObject {
 
 
     /**
+     * Building authentication request URL. This URL allows to redirect in to OIDC server and authenticate.
+     * @param cx        - Context
+     * @param thisObj   - This Object
+     * @param args      - takes nonce and state parameters
+     * @param funObj    - Function
+     * @return URL which redirects to OIDC server and allow to authenticate
+     * @throws Exception
+     */
+    public static String jsFunction_buildAuthRequestUrl(Context cx, Scriptable thisObj, Object[] args,
+                                                        Function funObj) throws Exception {
+
+        int argLength = args.length;
+        if (argLength != 2 || !(args[0] instanceof String) || !(args[1] instanceof String)) {
+            throw new ScriptException("Invalid argument. Nonce or State not set properly");
+        }
+
+        String nonce = (String) args[0];
+        String state = (String) args[1];
+
+        OIDCRelyingPartyObject relyingPartyObject = (OIDCRelyingPartyObject) thisObj;
+
+        try {
+            log.debug(" Building auth request Url");
+
+            URIBuilder uriBuilder = new URIBuilder(relyingPartyObject.getOIDCProperty(OIDCConstants.
+                    AUTHORIZATION_ENDPOINT_URI));
+
+            uriBuilder.addParameter(OIDCConstants.RESPONSE_TYPE,
+                    relyingPartyObject.getOIDCProperty(OIDCConstants.RESPONSE_TYPE));
+            uriBuilder.addParameter(OIDCConstants.CLIENT_ID,
+                    relyingPartyObject.getOIDCProperty(OIDCConstants.CLIENT_ID));
+            uriBuilder.addParameter(OIDCConstants.SCOPE,
+                    relyingPartyObject.getOIDCProperty(OIDCConstants.SCOPE));
+            uriBuilder.addParameter(OIDCConstants.REDIRECT_URI,
+                    relyingPartyObject.getOIDCProperty(OIDCConstants.REDIRECT_URI));
+            uriBuilder.addParameter(OIDCConstants.NONCE,
+                    nonce);
+            uriBuilder.addParameter(OIDCConstants.STATE,
+                    state);
+
+            // Optional parameters:
+            //for (Map.Entry<String, String> option : options.entrySet()) {
+            // uriBuilder.addParameter(option.getKey(), option.getValue());
+            //}
+            //uriBuilder.addParameter("requestURI", requestURI);
+
+            return uriBuilder.build().toString();
+
+        } catch (URISyntaxException e) {
+            log.error("Build Auth Request Failed", e);
+            throw new Exception("Build Auth Request Failed", e);
+
+        }
+
+    }
+
+
+    /**
      * @param cx      - Context
      * @param thisObj - This object
      * @param args    - argument list

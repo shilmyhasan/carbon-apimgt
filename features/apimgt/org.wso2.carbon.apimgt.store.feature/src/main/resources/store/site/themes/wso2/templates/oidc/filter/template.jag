@@ -39,24 +39,41 @@
 	}
 
 	if (checkSSO && !Boolean(isAuthenticated)) {
+
+	    ssoRelyingParty.setProperty("identityProviderUri", site.oidcConfiguration.identityProviderURI);
+	    ssoRelyingParty.setProperty("authorizationEndpointUri", site.oidcConfiguration.authorizationEndpointURI);
+	    ssoRelyingParty.setProperty("tokenEndpointURI", site.oidcConfiguration.tokenEndpointURI);
+	    ssoRelyingParty.setProperty("userInfoURI", site.oidcConfiguration.userInfoURI);
+	    ssoRelyingParty.setProperty("jwksURI", site.oidcConfiguration.jwksURI);
+
+        ssoRelyingParty.setProperty("client_id", site.oidcConfiguration.clientConfiguration.clientId);
+        ssoRelyingParty.setProperty("client_secret", site.oidcConfiguration.clientConfiguration.clientSecret);
+	    ssoRelyingParty.setProperty("response_type", site.oidcConfiguration.clientConfiguration.responseType);
+	    ssoRelyingParty.setProperty("authorization_type", site.oidcConfiguration.clientConfiguration.authorizationType);
+	    ssoRelyingParty.setProperty("scope", site.oidcConfiguration.clientConfiguration.scope);
+	    ssoRelyingParty.setProperty("redirect_uri", site.oidcConfiguration.clientConfiguration.redirectURI);
+	    ssoRelyingParty.setProperty("client_algorithm", site.oidcConfiguration.clientConfiguration.clientAlgorithm);
+
+        var authRequest = ssoRelyingParty.buildAuthRequestUrl(nonce, state);
 %>
-		<div>
+<div>
 
 	        <p>You are now redirected to Identity. If the
 
 	        redirection fails, please click the post button.</p>
 
-	        <form method="post" action="<%=site.oidcConfiguration.authorizationEndpointURI%>">
-	        	<input type="hidden" name ="response_type" value="<%= site.oidcConfiguration.clientConfiguration.responseType%>"/>
-				<input type="hidden" name="scope" value="<%= site.oidcConfiguration.clientConfiguration.scope%>"/>
-				<input type="hidden" name="client_id" value="<%=site.oidcConfiguration.clientConfiguration.clientId%>"/>
-				<input type="hidden" name="redirect_uri" value="<%= site.oidcConfiguration.clientConfiguration.redirectURI%>"/>
-				<input type="hidden" name="nonce" value="<%= nonce %>"/>
-				<input type="hidden" name="state" value="<%= state%>"/>
+	        <form method="post" action="<%=authRequest%>">
+
 	            <p>
+
+
+
 	                <button type="submit">POST</button>
+
 	            </p>
+
 	        </form>
+
 	    </div>
 
 	    <script type = "text/javascript" >
@@ -67,3 +84,6 @@
 
 <%  }  %>
 <% }); %>
+
+
+
