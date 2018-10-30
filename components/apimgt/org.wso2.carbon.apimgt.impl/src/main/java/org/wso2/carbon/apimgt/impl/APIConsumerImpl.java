@@ -1971,6 +1971,32 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return subscribedAPIs;
     }
 
+
+    private Set<SubscribedAPI> getLightWeightSubscribedAPIs(Subscriber subscriber, String groupingId) throws
+            APIManagementException {
+        Set<SubscribedAPI> originalSubscribedAPIs;
+        Set<SubscribedAPI> subscribedAPIs = new HashSet<SubscribedAPI>();
+        try {
+            originalSubscribedAPIs = apiMgtDAO.getSubscribedAPIs(subscriber, groupingId);
+            if (originalSubscribedAPIs != null && !originalSubscribedAPIs.isEmpty()) {
+                Map<String, Tier> tiers = APIUtil.getTiers(tenantId);
+                for (SubscribedAPI subscribedApi : originalSubscribedAPIs) {
+                    Application application = subscribedApi.getApplication();
+                    if (application != null) {
+                        int applicationId = application.getId();
+                    }
+                    Tier tier = tiers.get(subscribedApi.getTier().getName());
+                    subscribedApi.getTier().setDisplayName(tier != null ? tier.getDisplayName() : subscribedApi
+                            .getTier().getName());
+                    subscribedAPIs.add(subscribedApi);
+                }
+            }
+        } catch (APIManagementException e) {
+            handleException("Failed to get APIs of " + subscriber.getName(), e);
+        }
+        return subscribedAPIs;
+    }
+
     @Override
     public Set<SubscribedAPI> getSubscribedAPIs(Subscriber subscriber, String applicationName, String groupingId)
             throws APIManagementException {
@@ -3122,6 +3148,12 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return applications;
 	}
 
+    @Override
+    public Application[] getLightWeightApplications(Subscriber subscriber, String groupingId) throws
+            APIManagementException {
+        return apiMgtDAO.getLightWeightApplications(subscriber, groupingId);
+    }
+
     /**
      * Returns all API keys associated with given application id.
      *
@@ -3540,6 +3572,19 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return data.toJSONString();
     }
 
+    @Override
+    public Set<SubscribedAPI> getLightWeightSubscribedIdentifiers(Subscriber subscriber, APIIdentifier apiIdentifier,
+            String groupingId) throws APIManagementException {
+        Set<SubscribedAPI> subscribedAPISet = new HashSet<SubscribedAPI>();
+        Set<SubscribedAPI> subscribedAPIs = getLightWeightSubscribedAPIs(subscriber, groupingId);
+        for (SubscribedAPI api : subscribedAPIs) {
+            if (api.getApiId().equals(apiIdentifier)) {
+                subscribedAPISet.add(api);
+            }
+        }
+        return subscribedAPISet;
+    }
+
     /**
      * To check authorization of the API against current logged in user. If the user is not authorized an exception
      * will be thrown.
@@ -3663,7 +3708,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     APIIdentifier apiIdentifier = new APIIdentifier(provider, apiName, apiVersion);
                     if (log.isDebugEnabled()) {
                         log.debug("Api identifier for the soap api artifact: " + apiIdentifier + "for api name: "
-                                + apiName + ", version: " + apiVersion);
+                                          + apiName + ", version: " + apiVersion);
                     }
                     GenericArtifact apiArtifact = APIUtil.getAPIArtifact(apiIdentifier, registry);
                     api = APIUtil.getAPI(apiArtifact);
@@ -3677,7 +3722,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     }
                 } else {
                     handleException("Artifact does not exist in the registry for api name: " + apiName +
-                            " and version: " + apiVersion);
+                                            " and version: " + apiVersion);
                 }
 
                 if (api != null) {
@@ -3685,7 +3730,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                         apimwsdlReader.setServiceDefinition(definition, api, environmentName, environmentType);
                         if (log.isDebugEnabled()) {
                             log.debug("Soap api with context:" + api.getContext() + " in " + environmentName
-                                    + " with environment type" + environmentType);
+                                              + " with environment type" + environmentType);
                         }
                         updatedWSDLContent = apimwsdlReader.getWSDL(definition);
                     } catch (APIManagementException e) {
