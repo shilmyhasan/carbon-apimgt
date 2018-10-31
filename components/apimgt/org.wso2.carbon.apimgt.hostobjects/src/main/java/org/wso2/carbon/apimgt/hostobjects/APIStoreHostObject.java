@@ -1983,6 +1983,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 }
         	}
         }
+
         return myn;
     }
 
@@ -2000,9 +2001,9 @@ public class APIStoreHostObject extends ScriptableObject {
                     json.put("sandbox", APIStoreHostObject.getHttpsEnviromentUrl(environment));
                     return json;
                 } else {
-                    String envType = environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION) ? "production" : "sandbox";
+                    String environmentType = environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION) ? "production" : "sandbox";
                     if ( environment.isDefault() ) {
-                        json.put(envType, APIStoreHostObject.getHttpsEnviromentUrl(environment));
+                        json.put(environmentType, APIStoreHostObject.getHttpsEnviromentUrl(environment));
                     }
                 }
             }
@@ -2285,7 +2286,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     throw new APIManagementException("Tier " + tier + " is not allowed for user " + userId);
                 }
             }
-
+            
 	    	/* Tenant based validation for subscription*/
             String userDomain = MultitenantUtils.getTenantDomain(userId);
             boolean subscriptionAllowed = false;
@@ -3633,7 +3634,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     }
                     int index = username.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
                     /*
-                     * if there is a different domain provided by the user other than one given in the configuration,
+                     * if there is a different domain provided by the user other than one given in the configuration, 
                      * add the correct signup domain. Here signup domain refers to the user storage
                      */
 
@@ -3918,7 +3919,7 @@ public class APIStoreHostObject extends ScriptableObject {
         String username = (String) args[0];
         String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(username));
         UserRegistrationConfigDTO signupConfig = SelfSignUpUtil.getSignupConfiguration(tenantDomain);
-        //add user storage info
+        //add user storage info 
         username = SelfSignUpUtil.getDomainSpecificUserName(username, signupConfig );
         String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(username);
         boolean exists = false;
@@ -4233,7 +4234,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
             String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(userName));
             UserRegistrationConfigDTO signupConfig = SelfSignUpUtil.getSignupConfiguration(tenantDomain);
-            //add user storage info
+            //add user storage info 
 			userName = SelfSignUpUtil.getDomainSpecificUserName(userName, signupConfig );
             try {
                 valid = APIUtil.checkPermissionQuietly(userName, APIConstants.Permissions.API_SUBSCRIBE);

@@ -21,15 +21,15 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import java.io.Serializable;
 
 public class Environment implements Serializable {
-
+    
     private String type = APIConstants.GATEWAY_ENV_TYPE_HYBRID;
-
+    
     private String name;
-
+    
     private String serverURL;
-
+    
     private String userName;
-
+    
     private String password;
 
     private String apiGatewayEndpoint;
