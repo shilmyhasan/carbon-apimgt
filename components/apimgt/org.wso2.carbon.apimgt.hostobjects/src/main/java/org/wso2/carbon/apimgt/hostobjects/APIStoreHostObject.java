@@ -2030,9 +2030,9 @@ public class APIStoreHostObject extends ScriptableObject {
         return json;
     }
 
-    private static String getHttpsEnviromentUrl(Environment environment){
-        for (String url: environment.getApiGatewayEndpoint().split(",")){
-            if (url.startsWith("https:")){
+    private static String getHttpsEnviromentUrl(Environment environment) {
+        for (String url : environment.getApiGatewayEndpoint().split(",")) {
+            if (url.startsWith("https:")) {
                 return url;
             }
         }
