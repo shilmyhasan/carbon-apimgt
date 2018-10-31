@@ -1995,10 +1995,16 @@ public class APIStoreHostObject extends ScriptableObject {
         JSONObject json = new JSONObject();
 
             for ( Environment environment : environments.values()) {
+                if(environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_HYBRID)){
+                    json.put("production", APIStoreHostObject.getHttpsEnviromentUrl(environment));
+                    json.put("sandbox", APIStoreHostObject.getHttpsEnviromentUrl(environment));
+                    return json;
+                } else {
                     String envType = environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION) ? "production" : "sandbox";
                     if ( environment.isDefault() ) {
                         json.put(envType, APIStoreHostObject.getHttpsEnviromentUrl(environment));
                     }
+                }
             }
 
             if(json.get("production") == null){
