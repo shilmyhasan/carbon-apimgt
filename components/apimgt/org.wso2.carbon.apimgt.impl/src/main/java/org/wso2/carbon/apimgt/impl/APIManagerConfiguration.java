@@ -195,6 +195,12 @@ public class APIManagerConfiguration {
                     } else {
                         environment.setShowInConsole(true);
                     }
+                    String isDefault = environmentElem.getAttributeValue(new QName("isDefault"));
+                    if (isDefault != null) {
+                        environment.setDefault(Boolean.parseBoolean(isDefault));
+                    } else {
+                        environment.setDefault(false);
+                    }
                     environment.setName(APIUtil.replaceSystemProperty(
                             environmentElem.getFirstChildWithName(new QName("Name")).getText()));
                     environment.setServerURL(APIUtil.replaceSystemProperty(
@@ -376,7 +382,7 @@ public class APIManagerConfiguration {
             list.add(value);
         }
     }
-    
+
     public Map<String, Environment> getApiGatewayEnvironments() {
         return apiGatewayEnvironments;
     }
@@ -404,7 +410,7 @@ public class APIManagerConfiguration {
         try {
             keyManagerURL = new URL(configuration.get(APIConstants.KEYMANAGER_SERVERURL).get(0));
             String hostname = keyManagerURL.getHost();
-            
+
             int port = keyManagerURL.getPort();
             if (port == -1) {
                 if (APIConstants.HTTPS_PROTOCOL.equals(keyManagerURL.getProtocol())) {
@@ -412,9 +418,9 @@ public class APIManagerConfiguration {
                 } else {
                     port = APIConstants.HTTP_PROTOCOL_PORT;
                 }
-            }           
+            }
             System.setProperty(APIConstants.KEYMANAGER_PORT, String.valueOf(port));
-            
+
             if (hostname.equals(System.getProperty(APIConstants.CARBON_LOCALIP))) {
                 System.setProperty(APIConstants.KEYMANAGER_HOSTNAME, "localhost");
             } else {
@@ -466,13 +472,13 @@ public class APIManagerConfiguration {
             if (workflowDCREPElement != null) {
                 workflowProperties.setdCREndPoint(APIUtil.replaceSystemProperty(workflowDCREPElement.getText()));
             }
-            
+
             OMElement workflowTokenEpElement = workflowConfigurationElement
                     .getFirstChildWithName(new QName(APIConstants.WorkflowConfigConstants.WORKFLOW_TOKEN_EP));
             if (workflowTokenEpElement != null) {
                 workflowProperties.setTokenEndPoint(APIUtil.replaceSystemProperty(workflowTokenEpElement.getText()));
-            }            
-            
+            }
+
             String workflowServerPassword;
             String workflowServerPasswordKey = APIConstants.WorkflowConfigConstants.WORKFLOW + "."
                     + APIConstants.WorkflowConfigConstants.WORKFLOW_SERVER_PASSWORD;
@@ -485,7 +491,7 @@ public class APIManagerConfiguration {
                 workflowServerPassword = APIUtil.replaceSystemProperty(workflowServerPassword);
             }
             workflowProperties.setServerPassword(workflowServerPassword);
-            
+
             String dcrEPPassword;
             String dcrEPPasswordKey = APIConstants.WorkflowConfigConstants.WORKFLOW + "."
                     + APIConstants.WorkflowConfigConstants.WORKFLOW_DCR_EP_PASSWORD;
@@ -990,5 +996,5 @@ public class APIManagerConfiguration {
     public WorkflowProperties getWorkflowProperties() {
         return workflowProperties;
     }
-    
+
 }
