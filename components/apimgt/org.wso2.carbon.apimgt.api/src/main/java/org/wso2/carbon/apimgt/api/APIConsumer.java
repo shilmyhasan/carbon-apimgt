@@ -430,6 +430,18 @@ public interface APIConsumer extends APIManager {
 
     Application[] getApplications(Subscriber subscriber, String groupingId) throws APIManagementException;
 
+
+    /**
+     * Returns a list of applications for a given subscriber
+     *
+     * @param subscriber Subscriber
+     * @param groupingId the groupId to which the applications must belong.
+     * @return Applications
+     * @throws APIManagementException if failed to applications for given subscriber
+     */
+
+    Application[] getLightWeightApplications(Subscriber subscriber, String groupingId) throws APIManagementException;
+
     /**
      * Returns a list of applications for a given subscriber
      *  @param subscriber Subscriber
@@ -646,4 +658,5 @@ public interface APIConsumer extends APIManager {
     String getWSDLDocument(String username, String tenantDomain, String resourceUrl, Map environmentDetails,
             Map apiDetails) throws APIManagementException;
 
+    Set<SubscribedAPI> getLightWeightSubscribedIdentifiers(Subscriber subscriber, APIIdentifier apiIdentifier, String groupingId) throws APIManagementException;
 }
