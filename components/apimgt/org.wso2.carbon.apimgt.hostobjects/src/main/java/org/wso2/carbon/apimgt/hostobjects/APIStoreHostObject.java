@@ -1988,38 +1988,39 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static JSONObject jsFunction_getHTTPsGatewayEndpointURLsWithType(Context cx, Scriptable thisObj,
-                                                                             Object[] args, Function funObj)
+                                                                            Object[] args, Function funObj)
             throws ScriptException, APIManagementException {
 
         APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
         Map<String, Environment> environments = config.getApiGatewayEnvironments();
         JSONObject json = new JSONObject();
 
-            for ( Environment environment : environments.values()) {
-                if(environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_HYBRID)){
+        for (Environment environment : environments.values()) {
+            if (environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_HYBRID)) {
+                json.put("production", APIStoreHostObject.getHttpsEnviromentUrl(environment));
+                json.put("sandbox", APIStoreHostObject.getHttpsEnviromentUrl(environment));
+                return json;
+            } else {
+                String environmentType = environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION)
+                        ? "production" : "sandbox";
+                if (environment.isDefault()) {
+                    json.put(environmentType, APIStoreHostObject.getHttpsEnviromentUrl(environment));
+                }
+            }
+        }
+
+        if (json.get("production") == null) {
+            for (Environment environment : environments.values()) {
+                if (environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION)) {
                     json.put("production", APIStoreHostObject.getHttpsEnviromentUrl(environment));
-                    json.put("sandbox", APIStoreHostObject.getHttpsEnviromentUrl(environment));
-                    return json;
-                } else {
-                    String environmentType = environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION) ? "production" : "sandbox";
-                    if ( environment.isDefault() ) {
-                        json.put(environmentType, APIStoreHostObject.getHttpsEnviromentUrl(environment));
-                    }
+                    break;
                 }
             }
+        }
 
-            if(json.get("production") == null){
-                for ( Environment environment : environments.values()) {
-                    if ( environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION) ) {
-                        json.put("production", APIStoreHostObject.getHttpsEnviromentUrl(environment));
-                        break;
-                    }
-                }
-            }
-
-            if(json.get("sandbox") == null){
-                for ( Environment environment : environments.values()) {
-                    if ( environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_SANDBOX) ) {
+            if (json.get("sandbox") == null) {
+                for (Environment environment : environments.values()) {
+                    if (environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_SANDBOX) ) {
                         json.put("sandbox", APIStoreHostObject.getHttpsEnviromentUrl(environment));
                         break;
                     }
