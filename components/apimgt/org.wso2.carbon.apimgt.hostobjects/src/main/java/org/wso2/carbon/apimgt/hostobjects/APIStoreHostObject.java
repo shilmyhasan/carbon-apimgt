@@ -1987,7 +1987,7 @@ public class APIStoreHostObject extends ScriptableObject {
         return myn;
     }
 
-    public static JSONObject jsFunction_getHTTPsGatewayEndpointURLsWithType(Context cx, Scriptable thisObj,
+    public static JSONObject jsFunction_getHTTPSGatewayEndpointURLsWithType(Context cx, Scriptable thisObj,
                                                                             Object[] args, Function funObj)
             throws ScriptException, APIManagementException {
 
@@ -1996,41 +1996,46 @@ public class APIStoreHostObject extends ScriptableObject {
         JSONObject json = new JSONObject();
 
         for (Environment environment : environments.values()) {
-            if (environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_HYBRID)) {
-                json.put("production", APIStoreHostObject.getHttpsEnviromentUrl(environment));
-                json.put("sandbox", APIStoreHostObject.getHttpsEnviromentUrl(environment));
+            if (APIConstants.GATEWAY_ENV_TYPE_HYBRID.equals(environment.getType())) {
+                json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION,
+                        APIStoreHostObject.getHttpsEnvironmentUrl(environment));
+                json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX,
+                        APIStoreHostObject.getHttpsEnvironmentUrl(environment));
                 return json;
             } else {
-                String environmentType = environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION)
+                String environmentType = APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())
                         ? "production" : "sandbox";
                 if (environment.isDefault()) {
-                    json.put(environmentType, APIStoreHostObject.getHttpsEnviromentUrl(environment));
+                    json.put(environmentType,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
                 }
             }
         }
 
         if (json.get("production") == null) {
             for (Environment environment : environments.values()) {
-                if (environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION)) {
-                    json.put("production", APIStoreHostObject.getHttpsEnviromentUrl(environment));
+                if (APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
                     break;
                 }
             }
         }
 
-            if (json.get("sandbox") == null) {
-                for (Environment environment : environments.values()) {
-                    if (environment.getType().equals(APIConstants.GATEWAY_ENV_TYPE_SANDBOX) ) {
-                        json.put("sandbox", APIStoreHostObject.getHttpsEnviromentUrl(environment));
-                        break;
-                    }
+        if (json.get("sandbox") == null) {
+            for (Environment environment : environments.values()) {
+                if (APIConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environment.getType())) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
+                    break;
                 }
             }
+        }
 
         return json;
     }
 
-    private static String getHttpsEnviromentUrl(Environment environment) {
+    private static String getHttpsEnvironmentUrl(Environment environment) {
         for (String url : environment.getApiGatewayEndpoint().split(",")) {
             if (url.startsWith("https:")) {
                 return url;
