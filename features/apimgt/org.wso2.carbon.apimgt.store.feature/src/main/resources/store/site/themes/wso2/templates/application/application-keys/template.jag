@@ -7,7 +7,7 @@
 //@todo add help buttons
 	var type = outputs.type;
     var app = outputs.app;
-
+    
     var gatewayurlendpoint = outputs.gatewayurl;
     var customURL = jagg.module("domains").getCustomizedGatewayURL(jagg.getTenantDomain(), "https");
     if (customURL != null) {
@@ -82,15 +82,15 @@
 		  	<h4><%=i18n.localize("Generating Access Tokens")%></h4>
 		  	<p><%=i18n.localize("The following cURL command shows how to generate an access token using the Password Grant type.")%></p>
 			<div class="highlight"><pre>
-		 <a data-clipboard-text='curl -k -d "grant_type=password&username={{ username }}&password={{ password }}" -H "Authorization: Basic {{basickey}}" <%= gatewayurlendpoint %>/token ' class="pull-right copy-button"  title="<%=i18n.localize("Copy")%>"><i class="fw fw-copy"></i></a><textarea class="curl_command">curl -k -d "grant_type=password&username={{ username }}&password={{ password }}" \
+		 <a data-clipboard-text='curl -k -d "grant_type=password&username={{ username }}&password={{ password }}" -H "Authorization: Basic {{basickey}}" {{gatewayurlendpoint}}/token ' class="pull-right copy-button"  title="<%=i18n.localize("Copy")%>"><i class="fw fw-copy"></i></a><textarea class="curl_command">curl -k -d "grant_type=password&username={{ username }}&password={{ password }}" \
 	    -H "Authorization: Basic {{# if show_keys }}{{basickey}}{{else}}Base64(consumer-key:consumer-secret){{/if}}" \
-	     <%= gatewayurlendpoint %>/token</textarea></pre>
+	      {{gatewayurlendpoint}}/token</textarea></pre>
 	        </div>
 	        <p><%=i18n.localize("In a similar manner, you can generate an access token using the Client Credential grant type with the following cURL command.")%></p>
 			<div class="highlight"><pre>
-			<a data-clipboard-text='curl -k -d "grant_type=client_credentials" -H "Authorization: Basic {{basickey}}" <%= gatewayurlendpoint %>/token ' class="pull-right copy-button"  title="<%=i18n.localize("Copy")%>"><i class="fw fw-copy"></i></a><textarea class="curl_command">curl -k -d "grant_type=client_credentials" \
+			<a data-clipboard-text='curl -k -d "grant_type=client_credentials" -H "Authorization: Basic {{basickey}}"  {{gatewayurlendpoint}}/token ' class="pull-right copy-button"  title="<%=i18n.localize("Copy")%>"><i class="fw fw-copy"></i></a><textarea class="curl_command">curl -k -d "grant_type=client_credentials" \
 	    -H "Authorization: Basic {{# if show_keys }}{{basickey}}{{else}}Base64(consumer-key:consumer-secret){{/if}}" \
-	     <%= gatewayurlendpoint %>/token</textarea></pre>
+	      {{gatewayurlendpoint}}/token</textarea></pre>
 	        </div>        
 		  </div>
 		</div>
