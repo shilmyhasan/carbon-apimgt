@@ -13,17 +13,6 @@
     if (customURL != null) {
         gatewayurlendpoint = customURL;
     }
-
-    var groupId = session.get("groupId");
-    var user = jagg.getUser().username;
-
-    var applicationUtils = Packages.org.wso2.carbon.apimgt.impl.utils.ApplicationUtils;
-    var result = applicationUtils.retrieveApplication(app.name, user, groupId);
-
-    var isOwner = true;
-    if (!result.getSubscriber().getName().equalsIgnoreCase(user)) {
-        isOwner = false;
-    }
 %>
 
 
@@ -65,21 +54,18 @@
 		    <div class="input-group">
 		      <input type="{{# if show_keys }}text{{else}}password{{/if}}" readonly="readonly" class="form-control" id="ConsumerKey" title="<%=i18n.localize("Consumer Key")%>" placeholder="<%=i18n.localize("Consumer Key")%>" value="{{ConsumerKey}}">
 		      <div class="input-group-btn">
-		      	<button class="btn btn-default copy-button" data-clipboard-text="{{ConsumerKey}}"
-		      	        type="button" title="<%=i18n.localize("Copy")%>">
+		      	<button class="btn btn-default copy-button" data-clipboard-text="{{ConsumerKey}}"  type="button" title="<%=i18n.localize("Copy")%>">
                     <i class="fw fw-copy"></i>
                 </button>		      
 		      </div>
 		    </div>
 		  </div>
-
 		  <div class="form-group">
 		    <label class="" for="ConsumerSecret"><%=i18n.localize("Consumer Secret")%></label>
 		    <div class="input-group">
 		      <input type="{{# if show_keys }}text{{else}}password{{/if}}" readonly="readonly" class="form-control" title="<%=i18n.localize("Consumer Secret")%>" id="ConsumerSecret" placeholder="<%=i18n.localize("Consumer Secret")%>" value="{{ConsumerSecret}}">
 		      <div class="input-group-btn">
-		      	<button class="btn btn-default copy-button" data-clipboard-text="{{ConsumerSecret}}"
-		      	        type="button" title="<%=i18n.localize("Copy")%>">
+		      	<button class="btn btn-default copy-button" data-clipboard-text="{{ConsumerSecret}}"  type="button" title="<%=i18n.localize("Copy")%>">
                     <i class="fw fw-copy"></i>
                 </button>		      
 		      </div>
@@ -88,24 +74,23 @@
 
 		  {{> grants this}}
 		  {{> callback_url this}}
-		  <% if (isOwner == true) { %>
 		  <button class=" btn btn-primary update_grants"><%=i18n.localize("Update")%></button>
-		  <%}%>
+
 
 		<div class="row add-margin-top-5x">
 		  <div class="col-md-12">
 		  	<h4><%=i18n.localize("Generating Access Tokens")%></h4>
 		  	<p><%=i18n.localize("The following cURL command shows how to generate an access token using the Password Grant type.")%></p>
 			<div class="highlight"><pre>
-		 <a id="curlButtonPassword" data-clipboard-text='curl -k -d "grant_type=password&username={{ username }}&password={{ password }}" -H "Authorization: Basic {{basickey}}" <%= gatewayurlendpoint %>/token ' class="pull-right copy-button"  title="<%=i18n.localize("Copy")%>"><i class="fw fw-copy"></i></a><textarea class="curl_command">curl -k -d "grant_type=password&username={{ username }}&password={{ password }}" \
+		 <a data-clipboard-text='curl -k -d "grant_type=password&username={{ username }}&password={{ password }}" -H "Authorization: Basic {{basickey}}" {{gatewayurlendpoint}}/token ' class="pull-right copy-button"  title="<%=i18n.localize("Copy")%>"><i class="fw fw-copy"></i></a><textarea class="curl_command">curl -k -d "grant_type=password&username={{ username }}&password={{ password }}" \
 	    -H "Authorization: Basic {{# if show_keys }}{{basickey}}{{else}}Base64(consumer-key:consumer-secret){{/if}}" \
-	     <%= gatewayurlendpoint %>/token</textarea></pre>
+	      {{gatewayurlendpoint}}/token</textarea></pre>
 	        </div>
-	        <p><%=i18n.localize("In a similar manner, you can generate an access token using the Client Credentials grant type with the following cURL command.")%></p>
+	        <p><%=i18n.localize("In a similar manner, you can generate an access token using the Client Credential grant type with the following cURL command.")%></p>
 			<div class="highlight"><pre>
-			<a id="curlButtonClient" data-clipboard-text='curl -k -d "grant_type=client_credentials" -H "Authorization: Basic {{basickey}}" <%= gatewayurlendpoint %>/token ' class="pull-right copy-button"  title="<%=i18n.localize("Copy")%>"><i class="fw fw-copy"></i></a><textarea class="curl_command">curl -k -d "grant_type=client_credentials" \
+			<a data-clipboard-text='curl -k -d "grant_type=client_credentials" -H "Authorization: Basic {{basickey}}"  {{gatewayurlendpoint}}/token ' class="pull-right copy-button"  title="<%=i18n.localize("Copy")%>"><i class="fw fw-copy"></i></a><textarea class="curl_command">curl -k -d "grant_type=client_credentials" \
 	    -H "Authorization: Basic {{# if show_keys }}{{basickey}}{{else}}Base64(consumer-key:consumer-secret){{/if}}" \
-	     <%= gatewayurlendpoint %>/token</textarea></pre>
+	      {{gatewayurlendpoint}}/token</textarea></pre>
 	        </div>        
 		  </div>
 		</div>
@@ -122,20 +107,12 @@
 		    </div>
 		  </div>
 		  <p>
-		  {{#if Key}}
-			{{#ifCond Key ''}}
-				<%=i18n.localize("Enable Client-Credentials grant type to generate test access tokens.")%>
-			{{else}}
-				<%=i18n.localize("Above token has a validity period of")%> <strong>{{ ValidityTime }}</strong> <%=i18n.localize("seconds.")%>
-				{{#if KeyScope}}
-					<%=i18n.localize("And the token has")%> ( <strong>{{KeyScope}}</strong> ) <%=i18n.localize("scopes.")%>
-				{{/if}}
-			{{/ifCond}}
-		  {{else}}
-			<%=i18n.localize("Enable Client-Credentials grant type to generate test access tokens.")%>
+		  <%=i18n.localize("Above token has a validity period of")%> <strong>{{ ValidityTime }}</strong> <%=i18n.localize("seconds.")%>
+		  {{#if KeyScope}}
+			<%=i18n.localize("And the token has")%> ( <strong>{{KeyScope}}</strong> ) <%=i18n.localize("scopes.")%>
 		  {{/if}}
 		  </p>
-	  	<form class="add-margin-top-5x well">
+	  	<form class="add-margin-top-5x well scope-selection-form">
 	  	    <div class="form-group">
                 <label for="" class="control-label"><%=i18n.localize("Scopes")%></label>
                   <select class="selectpicker scope_select dropup form-control"  multiple title="{{#if Scopes}}Select..{{else}}No Scopes Found..{{/if}}" {{#if Scopes}}{{else}}disabled{{/if}}>
@@ -151,11 +128,7 @@
                       <div class="input-group-addon"><%=i18n.localize("Seconds")%></div>
                     </div>
             </div>
-            {{#if ClientCredentials}}
-                <button class=" btn btn-primary regenerate" data-load-text="<%= i18n.localize("Generating") %>"><%=i18n.localize("Re-generate")%></button>
-            {{else}}
-                <button disabled="disabled" class=" btn btn-primary regenerate" data-load-text="<%= i18n.localize("Generating") %>"><%=i18n.localize("Re-generate")%></button>
-            {{/if}}
+            <button class=" btn btn-primary regenerate" data-load-text="<%= i18n.localize("Generating") %>"><%=i18n.localize("Re-generate")%></button>
 		</form>		  	
 	  </div>
 	</div>
@@ -184,7 +157,7 @@
 					Clean up
 		</button>
 	{{/ifCond}}
-	
+
 	{{#ifCond keyState 'APPROVED'}}
 		<%=i18n.localize("Error! You have partially created keys. Please click the Clean Up button and try again.")%>
 		<button title="<%=i18n.localize("Error! You have partially created keys. Please click the Clean Up button and try again.")%>"  class="btn btn-primary btn-providekeys generateAgainBtn"
@@ -205,26 +178,24 @@
 		  <div class="col-md-12 col-lg-9">
 		  	  {{> grants this}}
 		  	  {{> callback_url this}}
-			  <form class="add-margin-top-5x well">
-				<div class="form-group">
-				    <label for="" class="control-label"><%=i18n.localize("Scopes")%></label>
-				    <select id="scopes" class="selectpicker scope_select dropup form-control"  multiple title="{{#if Scopes}}Select..{{else}}No Scopes Found..{{/if}}" {{#if Scopes}}{{else}}disabled{{/if}}>
-				        {{#each Scopes}}
-				            <option title="{{scopeName}}" data-content="<strong>{{scopeKey}}</strong> : <span>{{scopeName}}.</span>">{{scopeKey}}</option>
-				        {{/each}}
-				    </select>
-				</div>
-				<div class="form-group">
-				    <label><%=i18n.localize("Access token validity period")%> </label>
-				    <div class="input-group col-sm-6">
-				      <input type="text" size="10" title="validity_time" value='{{ValidityTime}}' class="form-control form-control-md validity_time">
-				      <div class="input-group-addon"><%=i18n.localize("Seconds")%></div>
-				    </div>
-				</div>
-				<% if (isOwner == true) { %>
-				<button  class="btn btn-primary generatekeys" data-load-text="<%= i18n.localize("Generating") %>"><%=i18n.localize("Generate keys")%></button>
-				<%}%>
-              		  </form>
+			  <form class="add-margin-top-5x well scope-selection-form">
+                <div class="form-group">
+                    <label for="" class="control-label"><%=i18n.localize("Scopes")%></label>
+                      <select id="scopes" class="selectpicker scope_select dropup form-control"  multiple title="{{#if Scopes}}Select..{{else}}No Scopes Found..{{/if}}" {{#if Scopes}}{{else}}disabled{{/if}}>
+                        {{#each Scopes}}
+                            <option title="{{scopeName}}" data-content="<strong>{{scopeKey}}</strong> : <span>{{scopeName}}.</span>">{{scopeKey}}</option>
+                        {{/each}}
+                      </select>
+                </div>
+                <div class="form-group">
+                    <label><%=i18n.localize("Access token validity period")%> </label>
+                    <div class="input-group col-sm-6">
+                      <input type="text" size="10" title="validity_time" value='{{ValidityTime}}' class="form-control form-control-md validity_time">
+                      <div class="input-group-addon"><%=i18n.localize("Seconds")%></div>
+                    </div>
+                </div>
+			    <button  class="btn btn-primary generatekeys" data-load-text="<%= i18n.localize("Generating") %>"><%=i18n.localize("Generate keys")%></button>
+              </form>
 		  </div>
 	    </div>
 	  {{/unless}}

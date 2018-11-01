@@ -36,6 +36,16 @@ public class Environment implements Serializable {
 
     private String description;
 
+    private boolean isDefault;
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
+    }
+
     public boolean isShowInConsole() {
         return showInConsole;
     }
