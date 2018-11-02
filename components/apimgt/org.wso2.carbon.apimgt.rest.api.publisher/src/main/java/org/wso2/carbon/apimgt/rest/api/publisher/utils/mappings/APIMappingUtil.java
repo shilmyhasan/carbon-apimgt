@@ -702,7 +702,8 @@ public class APIMappingUtil {
             throws APIManagementException {
         JSONObject apiTenantConfig;
         try {
-            APIMRegistryServiceImpl apimRegistryService = new APIMRegistryServiceImpl();            String content = apimRegistryService.getConfigRegistryResourceContent(tenantDomainName,
+            APIMRegistryServiceImpl apimRegistryService = new APIMRegistryServiceImpl();
+            String content = apimRegistryService.getConfigRegistryResourceContent(tenantDomainName,
                     APIConstants.API_TENANT_CONF_LOCATION);
             if (content != null) {
                 JSONParser parser = new JSONParser();
