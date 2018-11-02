@@ -679,7 +679,7 @@ public class APIMappingUtil {
             securityDTO.setUsername(api.getEndpointUTUsername());
             String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId()
                     .getProviderName()));
-             if (checkExposeEndpointSecurityPasswordEnabled(tenantDomain)) {
+            if (checkExposeEndpointSecurityPasswordEnabled(tenantDomain)) {
                 securityDTO.setPassword(api.getEndpointUTPassword());
             } else {
                 securityDTO.setPassword(""); //Do not expose password
