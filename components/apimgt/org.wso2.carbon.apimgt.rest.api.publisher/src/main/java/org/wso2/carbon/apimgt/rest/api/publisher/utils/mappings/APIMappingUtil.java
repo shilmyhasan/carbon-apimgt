@@ -679,7 +679,7 @@ public class APIMappingUtil {
             securityDTO.setUsername(api.getEndpointUTUsername());
             String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId()
                     .getProviderName()));
-            if (checkExposeEndpointSecurityPasswordEnabled(tenantDomain)) {
+            if (checkEndpointSecurityPasswordEnabled(tenantDomain)) {
                 securityDTO.setPassword(api.getEndpointUTPassword());
             } else {
                 securityDTO.setPassword(""); //Do not expose password
@@ -698,7 +698,7 @@ public class APIMappingUtil {
      * @return boolean as config enabled or not
      * @throws APIManagementException
      */
-    private static boolean checkExposeEndpointSecurityPasswordEnabled(String tenantDomainName)
+    private static boolean checkEndpointSecurityPasswordEnabled(String tenantDomainName)
             throws APIManagementException {
         JSONObject apiTenantConfig;
         try {
@@ -709,7 +709,7 @@ public class APIMappingUtil {
                 JSONParser parser = new JSONParser();
                 apiTenantConfig = (JSONObject) parser.parse(content);
                 if (apiTenantConfig != null) {
-                    Object value = apiTenantConfig.get(APIConstants.API_TENANT_CONF_ENABLE_EXPOSE_ENDPOINT_PASSWORD);
+                    Object value = apiTenantConfig.get(APIConstants.API_TENANT_CONF_EXPOSE_ENDPOINT_PASSWORD);
                     if (value != null) {
                         return Boolean.parseBoolean(value.toString());
                     }
@@ -717,17 +717,17 @@ public class APIMappingUtil {
             }
         } catch (UserStoreException e) {
             String msg = "UserStoreException thrown when getting API tenant config from registry while reading " +
-                    "EnableExposeEndpointPassword config";
+                    "ExposeEndpointPassword config";
             log.error(msg, e);
             throw new APIManagementException(msg, e);
         } catch (RegistryException e) {
             String msg = "RegistryException thrown when getting API tenant config from registry while reading " +
-                    "EnableExposeEndpointPassword config";
+                    "ExposeEndpointPassword config";
             log.error(msg, e);
             throw new APIManagementException(msg, e);
         } catch (ParseException e) {
             String msg = "ParseException thrown when parsing API tenant config from registry while reading " +
-                    "EnableExposeEndpointPassword config";
+                    "ExposeEndpointPassword config";
             log.error(msg, e);
             throw new APIManagementException(msg, e);
         }

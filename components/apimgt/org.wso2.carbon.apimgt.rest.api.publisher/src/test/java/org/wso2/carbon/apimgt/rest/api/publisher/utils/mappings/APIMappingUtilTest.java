@@ -132,7 +132,7 @@ public class APIMappingUtilTest {
         api.setEndpointUTUsername("testuser");
         api.setEndpointUTPassword("password");
 
-        String json = "{\"EnableExposeEndpointPassword\":\"true\"}";
+        String json = "{\"ExposeEndpointPassword\":\"true\"}";
         PowerMockito.mockStatic(APIUtil.class);
         PowerMockito.mockStatic(MultitenantUtils.class);
         PowerMockito.when(APIUtil.replaceEmailDomainBack(api.getId().getProviderName())).thenReturn("admin");
@@ -176,14 +176,14 @@ public class APIMappingUtilTest {
                 "'true'", apiDetailedDTO);
         Assert.assertEquals(apiDetailedDTO.getEndpointSecurity().getPassword(), "password");
 
-        json = "{\"EnableExposeEndpointPassword\": true}";
+        json = "{\"ExposeEndpointPassword\": true}";
         Mockito.when(resource.getContent()).thenReturn(json.getBytes());
         apiDetailedDTO = APIMappingUtil.fromAPItoDTO(api);
         Assert.assertNotNull("Conversion from API to dto failed with endpoint security expose password is " +
                 "true", apiDetailedDTO);
         Assert.assertEquals(apiDetailedDTO.getEndpointSecurity().getPassword(), "password");
 
-        json = "{\"EnableExposeEndpointPassword\": false}";
+        json = "{\"ExposeEndpointPassword\": false}";
         Mockito.when(resource.getContent()).thenReturn(json.getBytes());
         apiDetailedDTO = APIMappingUtil.fromAPItoDTO(api);
         Assert.assertNotNull("Conversion from API to dto failed with endpoint security expose password false",
@@ -199,7 +199,7 @@ public class APIMappingUtilTest {
         Assert.assertEquals("Conversion from API to dto failed when expose endpoint password config not exist",
                 apiDetailedDTO.getEndpointSecurity().getPassword(), "");
 
-        json = "{\"EnableExposeEndpointPassword\":\"123\"}";
+        json = "{\"ExposeEndpointPassword\":\"123\"}";
         Mockito.when(resource.getContent()).thenReturn(json.getBytes());
         apiDetailedDTO = APIMappingUtil.fromAPItoDTO(api);
         Assert.assertNotNull("Conversion from API to dto failed when expose endpoint password config is '123'",
@@ -208,15 +208,15 @@ public class APIMappingUtilTest {
                 apiDetailedDTO.getEndpointSecurity().getPassword(), "");
 
         try {
-            json = "{\"EnableExposeEndpointPassword\": aaa}";
+            json = "{\"ExposeEndpointPassword\": aaa}";
             Mockito.when(resource.getContent()).thenReturn(json.getBytes());
             APIDetailedDTO apiDetailDTO = APIMappingUtil.fromAPItoDTO(api);
         } catch (APIManagementException ex) {
             Assert.assertTrue(ex.getMessage().contains("ParseException thrown when parsing API tenant config from " +
-                    "registry while reading EnableExposeEndpointPassword config"));
+                    "registry while reading ExposeEndpointPassword config"));
         }
 
-        json = "{\"EnableExposeEndpointPassword\": false}";
+        json = "{\"ExposeEndpointPassword\": false}";
 
         try {
             Mockito.when(resource.getContent()).thenReturn(json.getBytes());
@@ -224,11 +224,11 @@ public class APIMappingUtilTest {
             APIDetailedDTO apiDetailDTO = APIMappingUtil.fromAPItoDTO(api);
         } catch (APIManagementException ex) {
             Assert.assertTrue(ex.getMessage().contains("UserStoreException thrown when getting API tenant config from " +
-                    "registry while reading EnableExposeEndpointPassword config"));
+                    "registry while reading ExposeEndpointPassword config"));
         }
 
         try {
-            json = "{\"EnableExposeEndpointPassword\": false}";
+            json = "{\"ExposeEndpointPassword\": false}";
             Mockito.when(resource.getContent()).thenReturn(json.getBytes());
             Mockito.doThrow(RegistryException.class).when(registryService).getConfigSystemRegistry(-1234);
             Mockito.reset(tenantManager);
@@ -236,7 +236,7 @@ public class APIMappingUtilTest {
             APIDetailedDTO apiDetailDTO = APIMappingUtil.fromAPItoDTO(api);
         } catch (APIManagementException ex) {
             Assert.assertTrue(ex.getMessage().contains("RegistryException thrown when getting API tenant config from " +
-                    "registry while reading EnableExposeEndpointPassword config"));
+                    "registry while reading ExposeEndpointPassword config"));
         }
     }
 
