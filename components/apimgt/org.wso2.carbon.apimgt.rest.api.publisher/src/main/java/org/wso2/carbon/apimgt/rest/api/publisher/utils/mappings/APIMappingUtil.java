@@ -854,5 +854,4 @@ public class APIMappingUtil {
     private static String getThumbnailUri (String uuid) {
         return RestApiConstants.RESOURCE_PATH_THUMBNAIL.replace(RestApiConstants.APIID_PARAM, uuid);
     }
-
 }
