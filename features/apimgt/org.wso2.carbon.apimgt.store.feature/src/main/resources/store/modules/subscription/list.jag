@@ -110,7 +110,7 @@ var getApplicationKeysOfApplication = function (applicationId) {
 		log.error(e.message);
 		return {
 			error:e,
-			subscriptions:null
+			apikeys:null
 		};
 	}
 };
