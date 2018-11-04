@@ -2419,7 +2419,6 @@ public class APIProviderImplTest {
         oldApi.setEnvironments(environments);
         api.setUriTemplates(uriTemplates);
 
-
         List<Documentation> documentationList = getDocumentationList();
 
         final APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, documentationList, null);
