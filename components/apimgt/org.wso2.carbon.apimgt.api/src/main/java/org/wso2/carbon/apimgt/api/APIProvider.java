@@ -659,6 +659,15 @@ public interface APIProvider extends APIManager {
     void saveSwaggerDefinition(API api, String jsonText) throws APIManagementException;
 
     /**
+     * This method validates the existence of all the resource level throttling tiers in URI templates of API
+     *
+     * @param api   API
+     * @param userName current logged user
+     * @throws APIManagementException
+     */
+    void validateResourceThrottlingTiers(API api, String userName) throws APIManagementException;
+
+    /**
      * This method is used to initiate the web service calls and cluster messages related to stats publishing status
      *
      * @param receiverUrl   event receiver url
