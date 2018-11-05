@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.apimgt.keymgt;
 
+import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -25,7 +26,10 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.wso2.carbon.utils.CarbonUtils;
+import org.slf4j.MDC;
+import org.wso2.carbon.apimgt.impl.APIConstants;
+
+import java.util.Map;
 
 /**
  * This class provides AspectJ configurations
@@ -34,6 +38,10 @@ import org.wso2.carbon.utils.CarbonUtils;
 public class MethodTimeLogger
 {
     private static final Log log = LogFactory.getLog("correlation");
+    private static boolean isEnabled = false;
+    private static boolean logAllMethods = false;
+    private static boolean isSet = false;
+    private static boolean isLogAllSet = false;
 
     /**
      * This is an AspectJ pointcut defined to apply to all methods within the package,
@@ -58,12 +66,14 @@ public class MethodTimeLogger
      */
     @Pointcut("execution(* *(..)) && if()")
     public static boolean pointCutAll() {
-        boolean enabled = false;
-        String config = System.getProperty("logAllMethods");
-        if (config != null && !config.equals("")) {
-            enabled = config.contains("org.wso2.carbon.apimgt.keymgt");
+        if (!isLogAllSet) {
+            String config = System.getProperty(APIConstants.LOG_ALL_METHODS);
+            if (config != null && !config.equals("")) {
+                logAllMethods = config.contains("org.wso2.carbon.apimgt.keymgt");
+                isLogAllSet = true;
+            }
         }
-        return enabled;
+        return logAllMethods;
     }
 
     /**
@@ -73,12 +83,14 @@ public class MethodTimeLogger
      */
     @Pointcut("if()")
     public static boolean isConfigEnabled() {
-        boolean enabled = false;
-        String config = System.getProperty("enableCorrelationLogs");
-        if (config != null && !config.equals("")) {
-            enabled = Boolean.parseBoolean(config);
+        if (!isSet) {
+            String config = System.getProperty(APIConstants.ENABLE_CORRELATION_LOGS);
+            if (config != null && !config.equals("")) {
+                isEnabled = Boolean.parseBoolean(config);
+                isSet = true;
+            }
         }
-        return enabled;
+        return isEnabled;
     }
 
     /**
@@ -110,6 +122,16 @@ public class MethodTimeLogger
         }
         stringBuilder.append("]");
         argString = stringBuilder.toString();
+        MessageContext messageContext = MessageContext.getCurrentMessageContext();
+        if (messageContext != null) {
+            Map headers = (Map) messageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+            if (headers != null) {
+                String correlationId = (String) headers.get(APIConstants.AM_ACTIVITY_ID);
+                if (correlationId != null) {
+                    MDC.put(APIConstants.CORRELATION_ID, correlationId);
+                }
+            }
+        }
         log.info((System.currentTimeMillis() - start) + "|METHOD|" + MethodSignature.class.cast(point.getSignature()).getDeclaringTypeName() +
                 "|" + MethodSignature.class.cast(point.getSignature()).getMethod().getName()+ "|" + argString);
         return result;
