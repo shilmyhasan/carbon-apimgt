@@ -287,19 +287,21 @@ include("/jagg/jagg.jag");
 
           var applicationId = request.getParameter("applicationId");
           mod = jagg.module("subscription");
-          result = mod.getApplicationKeysOfApplication(applicationId);
-          if (result.error) {
-              obj = {
-                  error:result.error,
-                  message:result.message
-              };
-          } else {
-              obj = {
-                  error:false,
-                  apikeys:result.apikeys
-              }
+          if (applicationId != null) {
+               result = mod.getApplicationKeysOfApplication(applicationId);
+               if (result.error) {
+                    obj = {
+                        error:result.error,
+                        message:result.message
+                    };
+               } else {
+                    obj = {
+                        error:false,
+                        apikeys:result.apikeys
+                    }
+               }
+               print(obj);
           }
-          print(obj);
     }
     else {
         print({
