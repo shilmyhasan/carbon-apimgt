@@ -659,4 +659,6 @@ public interface APIConsumer extends APIManager {
             Map apiDetails) throws APIManagementException;
 
     Set<SubscribedAPI> getLightWeightSubscribedIdentifiers(Subscriber subscriber, APIIdentifier apiIdentifier, String groupingId) throws APIManagementException;
+
+    Set<APIKey> getApplicationKeysOfApplication(int applicationId) throws APIManagementException;
 }
