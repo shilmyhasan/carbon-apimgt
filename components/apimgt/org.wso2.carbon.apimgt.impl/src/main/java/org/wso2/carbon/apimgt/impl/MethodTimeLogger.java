@@ -27,7 +27,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.MDC;
-import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.Map;
 
@@ -63,7 +62,7 @@ public class MethodTimeLogger
     @Pointcut("execution(* *(..)) && if()")
     public static boolean pointCutAll() {
         if (!isLogAllSet) {
-            String config = System.getProperty("logAllMethods");
+            String config = System.getProperty(APIConstants.LOG_ALL_METHODS);
             if (config != null && !config.equals("")) {
                 logAllMethods = config.contains("org.wso2.carbon.apimgt.impl");
                 isLogAllSet = true;
@@ -80,7 +79,7 @@ public class MethodTimeLogger
     @Pointcut("if()")
     public static boolean isConfigEnabled() {
         if (!isSet) {
-            String config = System.getProperty("enableCorrelationLogs");
+            String config = System.getProperty(APIConstants.ENABLE_CORRELATION_LOGS);
             if (config != null && !config.equals("")) {
                 isEnabled = Boolean.parseBoolean(config);
                 isSet = true;
@@ -122,9 +121,9 @@ public class MethodTimeLogger
         if (messageContext != null) {
             Map headers = (Map) messageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
             if (headers != null) {
-                String correlationId = (String) headers.get("activityid");
+                String correlationId = (String) headers.get(APIConstants.AM_ACTIVITY_ID);
                 if (correlationId != null) {
-                    MDC.put("Correlation-ID", correlationId);
+                    MDC.put(APIConstants.CORRELATION_ID, correlationId);
                 }
             }
         }
