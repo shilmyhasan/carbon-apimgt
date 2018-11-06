@@ -148,7 +148,9 @@ public class LogsHandler extends AbstractSynapseHandler {
                     String applIdHeader = (String) messageContext.getProperty(APP_ID_HEADER);
                     String uuIdHeader = (String) messageContext.getProperty(UUID_HEADER);
                     String correlationIdHeader = (String) messageContext.getProperty(CORRELATION_ID_HEADER);
-                    MDC.put(APIConstants.CORRELATION_ID, correlationIdHeader);
+                    if (correlationIdHeader != null) {
+                        MDC.put(APIConstants.CORRELATION_ID, correlationIdHeader);
+                    }
                     log.info(beTotalLatency + "|HTTP|" + apiName + "|" + apiMethod + "|" + apiCTX + apiElectedRsrc + "|"
                             + apiTo + "|" + authHeader + "|" + orgIdHeader + "|" + SrcIdHeader
                             + "|" + applIdHeader + "|" + uuIdHeader + "|" + requestSize
