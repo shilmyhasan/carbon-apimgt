@@ -91,6 +91,7 @@ import org.wso2.carbon.identity.user.registration.stub.UserRegistrationAdminServ
 import org.wso2.carbon.identity.user.registration.stub.UserRegistrationAdminServiceStub;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserDTO;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserFieldDTO;
+import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserRealm;
@@ -4609,7 +4610,7 @@ public class APIStoreHostObject extends ScriptableObject {
         String username = getUsernameFromObject(thisObj);
         // Set anonymous user if no user is login to the system
         if (username == null) {
-            username = APIConstants.END_USER_ANONYMOUS;
+            username = RegistryConstants.ANONYMOUS_USER;
         }
         String resource = (String) args[1];
         String tenantDomain = (String) args[0];
