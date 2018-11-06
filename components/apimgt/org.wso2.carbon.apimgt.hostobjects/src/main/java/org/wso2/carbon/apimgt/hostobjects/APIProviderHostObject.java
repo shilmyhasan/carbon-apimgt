@@ -1018,12 +1018,7 @@ public class APIProviderHostObject extends ScriptableObject {
             Set<URITemplate> uriTemplates = definitionFromOpenAPISpec.getURITemplates(api,
                     (String) apiData.get("swagger", apiData));
             api.setUriTemplates(uriTemplates);
-            String username = ((APIProviderHostObject) thisObj).getUsername();
-            // Set anonymous user if no user is login to the system
-            if (username == null) {
-                username = APIConstants.END_USER_ANONYMOUS;
-            }
-            apiProvider.validateResourceThrottlingTiers(api, username);
+            apiProvider.validateResourceThrottlingTiers(api, tenantDomain);
             // Save the swagger definition in the registry
             apiProvider.saveSwaggerDefinition(api, (String) apiData.get("swagger", apiData));
         }

@@ -662,10 +662,10 @@ public interface APIProvider extends APIManager {
      * This method validates the existence of all the resource level throttling tiers in URI templates of API
      *
      * @param api   API
-     * @param userName current logged user
+     * @param tenantDomain tenant domain
      * @throws APIManagementException
      */
-    void validateResourceThrottlingTiers(API api, String userName) throws APIManagementException;
+    void validateResourceThrottlingTiers(API api, String tenantDomain) throws APIManagementException;
 
     /**
      * This method is used to initiate the web service calls and cluster messages related to stats publishing status
