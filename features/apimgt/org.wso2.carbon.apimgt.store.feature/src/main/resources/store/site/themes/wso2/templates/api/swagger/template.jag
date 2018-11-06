@@ -229,6 +229,7 @@ $(document).ready(function(){
 var show_environments = function(){
     var type = $(".keytype option:selected").val();
     $("#environment_name").children('optgroup').hide();
+    $("#api-gateways").children().hide();
     $("#api-gateways").children("option[class='" + type + "']").show();
     $("#api-gateways").children("option[class='hybrid']").show();
     $("#micro-gateways").children("option[class='microgw-label']").show();
@@ -260,7 +261,6 @@ var select_environment = function() {
     var selectedEnvironment = $("#environment_name");
     var gatewayType = $("#environment_name option:selected").attr('data-attr');
     var name = selectedEnvironment.val();
-    debugger;
 
     if(gatewayType == "microGW"){
          $("#sub_app_list").hide();
