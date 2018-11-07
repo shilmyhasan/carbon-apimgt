@@ -119,8 +119,8 @@ public class MethodTimeLogger
         }
         stringBuilder.append("]");
         argString = stringBuilder.toString();
-        MessageContext messageContext = MessageContext.getCurrentMessageContext();
-        if(MDC.get(APIConstants.CORRELATION_ID) != null) {
+        if(MDC.get(APIConstants.CORRELATION_ID) == null) {
+            MessageContext messageContext = MessageContext.getCurrentMessageContext();
             if (messageContext != null) {
                 Map headers = (Map) messageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
                 if (headers != null) {
