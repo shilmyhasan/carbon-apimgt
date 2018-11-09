@@ -437,9 +437,6 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
                     }
                     //we do not honor the subscriber coming from the request body as we can't change the subscriber of the application
                     Application application = ApplicationMappingUtil.fromDTOtoApplication(body, username);
-                    //groupId of the request body is not honored for now.
-                    // Later we can improve by checking admin privileges of the user.
-                    application.setGroupId(oldApplication.getGroupId());
                     //we do not honor the application id which is sent via the request body
                     application.setUUID(oldApplication.getUUID());
 
