@@ -1389,31 +1389,15 @@ public class ApiMgtDAO {
                 subscribedAPI.setUUID(result.getString("SUB_UUID"));
                 subscribedAPI.setTier(new Tier(result.getString(APIConstants.SUBSCRIPTION_FIELD_TIER_ID)));
 
-//                Application application = new Application(result.getString("APP_NAME"), subscriber);
-//                application.setUUID(result.getString("APP_UUID"));
-                // int applicationId = result.getInt("APP_ID");
-                // Application application = applicationCache.get(applicationId);
-//                if (application == null) {
                 Application application = new Application(result.getString("APP_NAME"), subscriber);
                 application.setId(result.getInt("APP_ID"));
                 application.setOwner(result.getString("OWNER"));
                 application.setCallbackUrl(result.getString("CALLBACK_URL"));
                 application.setUUID(result.getString("APP_UUID"));
 
-//                Map<String, OAuthApplicationInfo> oauthApps = getOAuthApplications(applicationId);
-
-//                for (Map.Entry<String, OAuthApplicationInfo> entry : oauthApps.entrySet()) {
-//                    application.addOAuthApp(entry.getKey(), entry.getValue());
-//                }
-
                 if (multiGroupIdEnabled) {
                     application.setGroupId(getGroupId(application.getId()));
-//                    application.setOwner(result.getString("OWNER"));
                 }
-
-//                    applicationCache.put(applicationId, application);
-//                }
-//                subscribedAPI.setApplication(application);
 
                 int subscriptionId = result.getInt("SUBS_ID");
                 Set<APIKey> apiKeys = getAPIKeysBySubscription(subscriptionId);
@@ -1421,19 +1405,6 @@ public class ApiMgtDAO {
                     subscribedAPI.addKey(key);
                 }
 
-//                if (!map.containsKey(application.getName())) {
-//                    map.put(application.getName(), new TreeSet<SubscribedAPI>(new Comparator<SubscribedAPI>() {
-//                        public int compare(SubscribedAPI o1, SubscribedAPI o2) {
-//                            int placement = o1.getApiId().getApiName().compareTo(o2.getApiId().getApiName());
-//                            if (placement == 0) {
-//                                return new APIVersionComparator().compare(new API(o1.getApiId()), new API(o2.getApiId
-//                                        ()));
-//                            }
-//                            return placement;
-//                        }
-//                    }));
-//                }
-//                map.get(application.getName()).add(subscribedAPI);
                 subscribedAPI.setApplication(application);
                 subscribedAPIs.add(subscribedAPI);
 
@@ -5827,13 +5798,11 @@ public class ApiMgtDAO {
                     }
                     String[] groupIds = groupId.split(",");
                     int parameterIndex = groupIds.length;
-                    //
                     prepStmt = fillQueryParams(connection, query, groupIds, 1);
                     prepStmt.setString(++parameterIndex, tenantDomain);
                     prepStmt.setString(++parameterIndex, userId);
                     prepStmt.setString(++parameterIndex, applicationName);
                 } else {
-//                    query += whereClauseWithGroupId;
                     if (forceCaseInsensitiveComparisons) {
                         query = query + whereClauseWithGroupIdCaseInSensitive;
                     } else {
@@ -5904,7 +5873,6 @@ public class ApiMgtDAO {
                 String subscriberId = rs.getString("SUBSCRIBER_ID");
                 String subscriberName = rs.getString("USER_ID");
 
-
                 Subscriber subscriber = new Subscriber(subscriberName);
                 subscriber.setId(Integer.parseInt(subscriberId));
                 application = new Application(applicationName, subscriber);
@@ -5946,13 +5914,7 @@ public class ApiMgtDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
             String query = SQLConstants.GET_APPLICATION_BY_ID_SQL;
-/*
-            String whereClause = "";
-            String whereClauseWithGroupId = "  AND (APP.GROUP_ID = ? OR ((APP.GROUP_ID='' OR APP.GROUP_ID IS NULL))";
 
-            String whereClauseWithMultiGroupId = " AND (APP.APPLICATION_ID IN (SELECT APPLICATION_ID  FROM " +
-                    "AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID IN ($params) AND TENANT = ?))";
-*/
             String whereClause = "  AND SUB.USER_ID =?";
             String whereClauseCaseInSensitive = "  AND LOWER(SUB.USER_ID) =LOWER(?)";
             String whereClauseWithGroupId = "  AND  (APP.GROUP_ID = ? OR ((APP.GROUP_ID='' OR APP.GROUP_ID IS NULL)"
@@ -5981,7 +5943,6 @@ public class ApiMgtDAO {
                     prepStmt.setString(++parameterIndex, tenantDomain);
                     prepStmt.setInt(1, applicationId);
                     prepStmt.setString(++parameterIndex, userId);
-//                    prepStmt.setString(++parameterIndex, applicationName);
                 } else {
                     if (forceCaseInsensitiveComparisons) {
                         query = query + whereClauseWithGroupIdCaseInSensitive;
@@ -5992,7 +5953,6 @@ public class ApiMgtDAO {
                     prepStmt.setInt(1, applicationId);
                     prepStmt.setString(2, groupId);
                     prepStmt.setString(3, userId);
-//                    prepStmt.setString(3, applicationName);
                 }
             } else {
                 if (forceCaseInsensitiveComparisons) {
@@ -6003,12 +5963,7 @@ public class ApiMgtDAO {
                 prepStmt = connection.prepareStatement(query);
                 prepStmt.setInt(1, applicationId);
                 prepStmt.setString(2, userId);
-//                prepStmt.setString(2, applicationName);
             }
-/*            String query = SQLConstants.GET_APPLICATION_BY_ID_SQL;
-            prepStmt = connection.prepareStatement(query);
-            prepStmt.setInt(1, applicationId);*/
-
             rs = prepStmt.executeQuery();
             if (rs.next()) {
                 String applicationName = rs.getString("NAME");

@@ -3094,219 +3094,216 @@ public class APIStoreHostObject extends ScriptableObject {
 
             if (application != null) {
                 int i = 0;
-//                for (Application application : applications) {
+                long startLoop = 0;
+                if (log.isDebugEnabled()) {
+                    startLoop = System.currentTimeMillis();
+                }
 
-                    long startLoop = 0;
+                NativeArray apisArray = new NativeArray(0);
+                Set<Scope> scopeSet = new LinkedHashSet<Scope>();
+                NativeArray scopesArray = new NativeArray(0);
+
+                if (appId == application.getId()) {
+
+                    //get Number of subscriptions for the given application by the subscriber.
+                    subscriptionCount = apiConsumer.getSubscriptionCountByApplicationId(subscriber,
+                            application.getId(), groupingId);
+                    //get subscribed APIs set as per the starting and ending indexes for application.
+                    Set<SubscribedAPI> subscribedAPIs;
+                    subscribedAPIs = apiConsumer.getPaginatedSubscribedAPIs(subscriber, application.getId(), startSubIndex, endSubIndex, groupingId);
+
+                    List<APIIdentifier> identifiers = new ArrayList<APIIdentifier>();
+                    for (SubscribedAPI subscribedAPI : subscribedAPIs) {
+                        addAPIObj(subscribedAPI, apisArray, thisObj, application);
+                        identifiers.add(subscribedAPI.getApiId());
+
+                    }
+
+                    if (!identifiers.isEmpty()) {
+                        //get scopes for subscribed apis
+                        scopeSet = apiConsumer.getScopesBySubscribedAPIs(identifiers);
+                        for (Scope scope : scopeSet) {
+                            NativeObject scopeObj = new NativeObject();
+                            scopeObj.put("scopeKey", scopeObj, scope.getKey());
+                            scopeObj.put("scopeName", scopeObj, scope.getName());
+                            scopesArray.put(scopesArray.getIds().length, scopesArray, scopeObj);
+                        }
+                    }
+                }
+
+                if (ApplicationStatus.APPLICATION_APPROVED.equals(application.getStatus())) {
+                    NativeObject appObj = new NativeObject();
+                    appObj.put("id", appObj, application.getId());
+                    appObj.put("name", appObj, application.getName());
+                    appObj.put("callbackUrl", appObj, application.getCallbackUrl());
+                    APIKey prodKey = getAppKey(application, APIConstants.API_KEY_TYPE_PRODUCTION);
+
+                    OAuthApplicationInfo prodApp = application.getOAuthApp("PRODUCTION");
+
+                    String prodKeyScope = "";
+                    if (prodKey != null && prodKey.getTokenScope() != null) {
+                        //convert scope keys to names
+                        prodKeyScope = getScopeNamesbyKey(prodKey.getTokenScope(), scopeSet);
+                    }
+
+                    boolean prodEnableRegenarateOption = true;
+
+                    // When the Production Access Token is successfully created.
+                    if (prodKey != null && prodKey.getAccessToken() != null && prodApp != null) {
+                        String jsonString = prodApp.getJsonString();
+
+                        String prodConsumerKey = prodApp.getClientId();
+                        String prodConsumerSecret = prodApp.getClientSecret();
+                        appObj.put("prodKey", appObj, prodKey.getAccessToken());
+
+                        appObj.put("prodKeyScope", appObj, prodKeyScope);
+                        appObj.put("prodKeyScopeValue", appObj, prodKey.getTokenScope());
+                        appObj.put("prodConsumerKey", appObj, prodConsumerKey);
+                        appObj.put("prodConsumerSecret", appObj, prodConsumerSecret);
+                        appObj.put("prodJsonString", appObj, jsonString);
+
+                        //appObj.put("prodAuthorizedDomains", appObj, prodKey.getAuthorizedDomains());
+
+                        if (isApplicationAccessTokenNeverExpire(prodKey.getValidityPeriod())) {
+                            appObj.put("prodValidityTime", appObj, -1);
+                            prodEnableRegenarateOption = false;
+                        } else {
+                            appObj.put("prodValidityTime", appObj, prodKey.getValidityPeriod());
+                        }
+                        appObj.put("prodRegenerateOption", appObj, prodEnableRegenarateOption);
+                        appObj.put("prodKeyState", appObj, prodKey.getState());
+                    } // Prod Token is not generated, but consumer key & secret is available
+                    else if (prodKey != null && prodApp != null) {
+                        String jsonString = prodApp.getJsonString();
+                        String prodConsumerKey = prodApp.getClientId();
+                        String prodConsumerSecret = prodApp.getClientSecret();
+
+                        appObj.put("prodKey", appObj, null);
+                        appObj.put("prodKeyScope", appObj, null);
+                        appObj.put("prodKeyScopeValue", appObj, null);
+                        appObj.put("prodConsumerKey", appObj, prodConsumerKey);
+                        appObj.put("prodConsumerSecret", appObj, prodConsumerSecret);
+                        appObj.put("prodRegenarateOption", appObj, prodEnableRegenarateOption);
+                        appObj.put("prodAuthorizedDomains", appObj, null);
+                        appObj.put("prodJsonString", appObj, jsonString);
+                        if (isApplicationAccessTokenNeverExpire(
+                                getApplicationAccessTokenValidityPeriodInSeconds())) {
+                            appObj.put("prodValidityTime", appObj, -1);
+                        } else {
+                            appObj.put("prodValidityTime", appObj,
+                                    getApplicationAccessTokenValidityPeriodInSeconds());
+                        }
+                        appObj.put("prodKeyState", appObj, prodKey.getState());
+                    } else {
+                        appObj.put("prodKey", appObj, null);
+                        appObj.put("prodKeyScope", appObj, null);
+                        appObj.put("prodKeyScopeValue", appObj, null);
+                        appObj.put("prodConsumerKey", appObj, null);
+                        appObj.put("prodConsumerSecret", appObj, null);
+                        appObj.put("prodRegenarateOption", appObj, prodEnableRegenarateOption);
+                        appObj.put("prodAuthorizedDomains", appObj, null);
+                        if (isApplicationAccessTokenNeverExpire(
+                                getApplicationAccessTokenValidityPeriodInSeconds())) {
+                            appObj.put("prodValidityTime", appObj, -1);
+                        } else {
+                            appObj.put("prodValidityTime", appObj,
+                                    getApplicationAccessTokenValidityPeriodInSeconds());
+                        }
+                        if (prodKey != null) {
+                            if (prodKey.getState() != null) {
+                                appObj.put("prodKeyState", appObj, prodKey.getState());
+                            }
+                        }
+                        appObj.put("prodJsonString", appObj, null);
+                    }
+
+                    APIKey sandboxKey = getAppKey(application, APIConstants.API_KEY_TYPE_SANDBOX);
+
+                    OAuthApplicationInfo sandApp = application.getOAuthApp("SANDBOX");
+                    boolean sandEnableRegenarateOption = true;
+
+                    String sandKeyScope = "";
+                    if (sandboxKey != null && sandboxKey.getTokenScope() != null) {
+                        //convert scope keys to names
+                        sandKeyScope = getScopeNamesbyKey(sandboxKey.getTokenScope(), scopeSet);
+                    }
+
+                    if (sandboxKey != null && sandboxKey.getConsumerKey() != null && sandApp != null) {
+                        String jsonString = sandApp.getJsonString();
+
+                        String sandboxConsumerKey = sandApp.getClientId();
+                        String sandboxConsumerSecret = sandApp.getClientSecret();
+                        appObj.put("sandboxKey", appObj, sandboxKey.getAccessToken());
+
+                        appObj.put("sandKeyScope", appObj, sandKeyScope);
+                        appObj.put("sandKeyScopeValue", appObj, sandboxKey.getTokenScope());
+                        appObj.put("sandboxConsumerKey", appObj, sandboxConsumerKey);
+                        appObj.put("sandboxConsumerSecret", appObj, sandboxConsumerSecret);
+                        appObj.put("sandboxKeyState", appObj, sandboxKey.getState());
+                        appObj.put("sandboxJsonString", appObj, jsonString);
+
+                        //appObj.put("sandboxAuthorizedDomains", appObj, sandboxKey.getAuthorizedDomains());
+                        if (isApplicationAccessTokenNeverExpire(sandboxKey.getValidityPeriod())) {
+                            appObj.put("sandValidityTime", appObj, -1);
+                            sandEnableRegenarateOption = false;
+                        } else {
+                            appObj.put("sandValidityTime", appObj, sandboxKey.getValidityPeriod());
+                        }
+                        appObj.put("sandRegenarateOption", appObj, sandEnableRegenarateOption);
+                    } else if (sandboxKey != null && sandApp != null) {
+                        String jsonString = sandApp.getJsonString();
+                        String sandboxConsumerKey = sandApp.getClientId();
+                        String sandboxConsumerSecret = sandApp.getClientSecret();
+                        appObj.put("sandboxKey", appObj, null);
+                        appObj.put("sandKeyScope", appObj, null);
+                        appObj.put("sandKeyScopeValue", appObj, null);
+                        appObj.put("sandboxConsumerKey", appObj, sandboxConsumerKey);
+                        appObj.put("sandboxConsumerSecret", appObj, sandboxConsumerSecret);
+                        appObj.put("sandRegenarateOption", appObj, sandEnableRegenarateOption);
+                        appObj.put("sandboxAuthorizedDomains", appObj, null);
+                        appObj.put("sandboxKeyState", appObj, sandboxKey.getState());
+                        appObj.put("sandboxJsonString", appObj, jsonString);
+                        if (isApplicationAccessTokenNeverExpire(
+                                getApplicationAccessTokenValidityPeriodInSeconds())) {
+                            appObj.put("sandValidityTime", appObj, -1);
+                        } else {
+                            appObj.put("sandValidityTime", appObj,
+                                    getApplicationAccessTokenValidityPeriodInSeconds());
+                        }
+                    } else {
+                        appObj.put("sandboxKey", appObj, null);
+                        appObj.put("sandKeyScope", appObj, null);
+                        appObj.put("sandKeyScopeValue", appObj, null);
+                        appObj.put("sandboxConsumerKey", appObj, null);
+                        appObj.put("sandboxConsumerSecret", appObj, null);
+                        appObj.put("sandRegenarateOption", appObj, sandEnableRegenarateOption);
+                        appObj.put("sandboxAuthorizedDomains", appObj, null);
+                        appObj.put("sandboxJsonString", appObj, null);
+                        if (isApplicationAccessTokenNeverExpire(
+                                getApplicationAccessTokenValidityPeriodInSeconds())) {
+                            appObj.put("sandValidityTime", appObj, -1);
+                        } else {
+                            appObj.put("sandValidityTime", appObj,
+                                    getApplicationAccessTokenValidityPeriodInSeconds());
+                        }
+                        if (sandboxKey != null) {
+                            if (sandboxKey.getState() != null) {
+                                appObj.put("sandboxKeyState", appObj, sandboxKey.getState());
+                            }
+                        }
+                    }
+
                     if (log.isDebugEnabled()) {
-                        startLoop = System.currentTimeMillis();
+                        log.debug("getSubscribedAPIs loop took : " +
+                                (System.currentTimeMillis() - startLoop) + "ms");
                     }
+                    appObj.put("subscriptions", appObj, apisArray);
+                    appObj.put("scopes", appObj, scopesArray);
 
-                    NativeArray apisArray = new NativeArray(0);
-                    Set<Scope> scopeSet = new LinkedHashSet<Scope>();
-                    NativeArray scopesArray = new NativeArray(0);
-
-                    if ( appId == application.getId()) {
-
-                        //get Number of subscriptions for the given application by the subscriber.
-                        subscriptionCount = apiConsumer.getSubscriptionCountByApplicationId(subscriber,
-                                application.getId(), groupingId);
-                        //get subscribed APIs set as per the starting and ending indexes for application.
-                        Set<SubscribedAPI> subscribedAPIs;
-                        subscribedAPIs = apiConsumer.getPaginatedSubscribedAPIs(subscriber, application.getId(), startSubIndex, endSubIndex, groupingId);
-
-                        List<APIIdentifier> identifiers = new ArrayList<APIIdentifier>();
-                        for (SubscribedAPI subscribedAPI : subscribedAPIs) {
-                            addAPIObj(subscribedAPI, apisArray, thisObj, application);
-                            identifiers.add(subscribedAPI.getApiId());
-
-                        }
-
-                        if (!identifiers.isEmpty()) {
-                            //get scopes for subscribed apis
-                            scopeSet = apiConsumer.getScopesBySubscribedAPIs(identifiers);
-                            for (Scope scope : scopeSet) {
-                                NativeObject scopeObj = new NativeObject();
-                                scopeObj.put("scopeKey", scopeObj, scope.getKey());
-                                scopeObj.put("scopeName", scopeObj, scope.getName());
-                                scopesArray.put(scopesArray.getIds().length, scopesArray, scopeObj);
-                            }
-                        }
-                    }
-
-                    if (ApplicationStatus.APPLICATION_APPROVED.equals(application.getStatus())) {
-                        NativeObject appObj = new NativeObject();
-                        appObj.put("id", appObj, application.getId());
-                        appObj.put("name", appObj, application.getName());
-                        appObj.put("callbackUrl", appObj, application.getCallbackUrl());
-                        APIKey prodKey = getAppKey(application, APIConstants.API_KEY_TYPE_PRODUCTION);
-
-                        OAuthApplicationInfo prodApp = application.getOAuthApp("PRODUCTION");
-
-                        String prodKeyScope = "";
-                        if (prodKey != null && prodKey.getTokenScope() != null) {
-                            //convert scope keys to names
-                            prodKeyScope = getScopeNamesbyKey(prodKey.getTokenScope(), scopeSet);
-                        }
-
-                        boolean prodEnableRegenarateOption = true;
-
-                        // When the Production Access Token is successfully created.
-                        if (prodKey != null && prodKey.getAccessToken() != null && prodApp != null) {
-                            String jsonString = prodApp.getJsonString();
-
-                            String prodConsumerKey = prodApp.getClientId();
-                            String prodConsumerSecret = prodApp.getClientSecret();
-                            appObj.put("prodKey", appObj, prodKey.getAccessToken());
-
-                            appObj.put("prodKeyScope", appObj, prodKeyScope);
-                            appObj.put("prodKeyScopeValue", appObj, prodKey.getTokenScope());
-                            appObj.put("prodConsumerKey", appObj, prodConsumerKey);
-                            appObj.put("prodConsumerSecret", appObj, prodConsumerSecret);
-                            appObj.put("prodJsonString", appObj, jsonString);
-
-                            //appObj.put("prodAuthorizedDomains", appObj, prodKey.getAuthorizedDomains());
-
-                            if (isApplicationAccessTokenNeverExpire(prodKey.getValidityPeriod())) {
-                                appObj.put("prodValidityTime", appObj, -1);
-                                prodEnableRegenarateOption = false;
-                            } else {
-                                appObj.put("prodValidityTime", appObj, prodKey.getValidityPeriod());
-                            }
-                            appObj.put("prodRegenerateOption", appObj, prodEnableRegenarateOption);
-                            appObj.put("prodKeyState", appObj, prodKey.getState());
-                        } // Prod Token is not generated, but consumer key & secret is available
-                        else if (prodKey != null && prodApp != null) {
-                            String jsonString = prodApp.getJsonString();
-                            String prodConsumerKey = prodApp.getClientId();
-                            String prodConsumerSecret = prodApp.getClientSecret();
-
-                            appObj.put("prodKey", appObj, null);
-                            appObj.put("prodKeyScope", appObj, null);
-                            appObj.put("prodKeyScopeValue", appObj, null);
-                            appObj.put("prodConsumerKey", appObj, prodConsumerKey);
-                            appObj.put("prodConsumerSecret", appObj, prodConsumerSecret);
-                            appObj.put("prodRegenarateOption", appObj, prodEnableRegenarateOption);
-                            appObj.put("prodAuthorizedDomains", appObj, null);
-                            appObj.put("prodJsonString", appObj, jsonString);
-                            if (isApplicationAccessTokenNeverExpire(
-                                    getApplicationAccessTokenValidityPeriodInSeconds())) {
-                                appObj.put("prodValidityTime", appObj, -1);
-                            } else {
-                                appObj.put("prodValidityTime", appObj,
-                                        getApplicationAccessTokenValidityPeriodInSeconds());
-                            }
-                            appObj.put("prodKeyState", appObj, prodKey.getState());
-                        } else {
-                            appObj.put("prodKey", appObj, null);
-                            appObj.put("prodKeyScope", appObj, null);
-                            appObj.put("prodKeyScopeValue", appObj, null);
-                            appObj.put("prodConsumerKey", appObj, null);
-                            appObj.put("prodConsumerSecret", appObj, null);
-                            appObj.put("prodRegenarateOption", appObj, prodEnableRegenarateOption);
-                            appObj.put("prodAuthorizedDomains", appObj, null);
-                            if (isApplicationAccessTokenNeverExpire(
-                                    getApplicationAccessTokenValidityPeriodInSeconds())) {
-                                appObj.put("prodValidityTime", appObj, -1);
-                            } else {
-                                appObj.put("prodValidityTime", appObj,
-                                        getApplicationAccessTokenValidityPeriodInSeconds());
-                            }
-                            if (prodKey != null) {
-                                if (prodKey.getState() != null) {
-                                    appObj.put("prodKeyState", appObj, prodKey.getState());
-                                }
-                            }
-                            appObj.put("prodJsonString", appObj, null);
-                        }
-
-                        APIKey sandboxKey = getAppKey(application, APIConstants.API_KEY_TYPE_SANDBOX);
-
-                        OAuthApplicationInfo sandApp = application.getOAuthApp("SANDBOX");
-                        boolean sandEnableRegenarateOption = true;
-
-                        String sandKeyScope = "";
-                        if (sandboxKey != null && sandboxKey.getTokenScope() != null) {
-                            //convert scope keys to names
-                            sandKeyScope = getScopeNamesbyKey(sandboxKey.getTokenScope(), scopeSet);
-                        }
-
-                        if (sandboxKey != null && sandboxKey.getConsumerKey() != null && sandApp != null) {
-                            String jsonString = sandApp.getJsonString();
-
-                            String sandboxConsumerKey = sandApp.getClientId();
-                            String sandboxConsumerSecret = sandApp.getClientSecret();
-                            appObj.put("sandboxKey", appObj, sandboxKey.getAccessToken());
-
-                            appObj.put("sandKeyScope", appObj, sandKeyScope);
-                            appObj.put("sandKeyScopeValue", appObj, sandboxKey.getTokenScope());
-                            appObj.put("sandboxConsumerKey", appObj, sandboxConsumerKey);
-                            appObj.put("sandboxConsumerSecret", appObj, sandboxConsumerSecret);
-                            appObj.put("sandboxKeyState", appObj, sandboxKey.getState());
-                            appObj.put("sandboxJsonString", appObj, jsonString);
-
-                            //appObj.put("sandboxAuthorizedDomains", appObj, sandboxKey.getAuthorizedDomains());
-                            if (isApplicationAccessTokenNeverExpire(sandboxKey.getValidityPeriod())) {
-                                appObj.put("sandValidityTime", appObj, -1);
-                                sandEnableRegenarateOption = false;
-                            } else {
-                                appObj.put("sandValidityTime", appObj, sandboxKey.getValidityPeriod());
-                            }
-                            appObj.put("sandRegenarateOption", appObj, sandEnableRegenarateOption);
-                        } else if (sandboxKey != null && sandApp != null) {
-                            String jsonString = sandApp.getJsonString();
-                            String sandboxConsumerKey = sandApp.getClientId();
-                            String sandboxConsumerSecret = sandApp.getClientSecret();
-                            appObj.put("sandboxKey", appObj, null);
-                            appObj.put("sandKeyScope", appObj, null);
-                            appObj.put("sandKeyScopeValue", appObj, null);
-                            appObj.put("sandboxConsumerKey", appObj, sandboxConsumerKey);
-                            appObj.put("sandboxConsumerSecret", appObj, sandboxConsumerSecret);
-                            appObj.put("sandRegenarateOption", appObj, sandEnableRegenarateOption);
-                            appObj.put("sandboxAuthorizedDomains", appObj, null);
-                            appObj.put("sandboxKeyState", appObj, sandboxKey.getState());
-                            appObj.put("sandboxJsonString", appObj, jsonString);
-                            if (isApplicationAccessTokenNeverExpire(
-                                    getApplicationAccessTokenValidityPeriodInSeconds())) {
-                                appObj.put("sandValidityTime", appObj, -1);
-                            } else {
-                                appObj.put("sandValidityTime", appObj,
-                                        getApplicationAccessTokenValidityPeriodInSeconds());
-                            }
-                        } else {
-                            appObj.put("sandboxKey", appObj, null);
-                            appObj.put("sandKeyScope", appObj, null);
-                            appObj.put("sandKeyScopeValue", appObj, null);
-                            appObj.put("sandboxConsumerKey", appObj, null);
-                            appObj.put("sandboxConsumerSecret", appObj, null);
-                            appObj.put("sandRegenarateOption", appObj, sandEnableRegenarateOption);
-                            appObj.put("sandboxAuthorizedDomains", appObj, null);
-                            appObj.put("sandboxJsonString", appObj, null);
-                            if (isApplicationAccessTokenNeverExpire(
-                                    getApplicationAccessTokenValidityPeriodInSeconds())) {
-                                appObj.put("sandValidityTime", appObj, -1);
-                            } else {
-                                appObj.put("sandValidityTime", appObj,
-                                        getApplicationAccessTokenValidityPeriodInSeconds());
-                            }
-                            if (sandboxKey != null) {
-                                if (sandboxKey.getState() != null) {
-                                    appObj.put("sandboxKeyState", appObj, sandboxKey.getState());
-                                }
-                            }
-                        }
-
-                        if (log.isDebugEnabled()) {
-                            log.debug("getSubscribedAPIs loop took : " +
-                                    (System.currentTimeMillis() - startLoop) + "ms");
-                        }
-                        appObj.put("subscriptions", appObj, apisArray);
-                        appObj.put("scopes", appObj, scopesArray);
-
-                        applicationList.put(0, applicationList, appObj);
-                        result.put("applications", result, applicationList);
-                        result.put("totalLength", result, subscriptionCount);
-                    }
-//                }
+                    applicationList.put(0, applicationList, appObj);
+                    result.put("applications", result, applicationList);
+                    result.put("totalLength", result, subscriptionCount);
+                }
             } else {
                 String message = "Application " + appId + " does not exist. ";
                 log.error(message);
