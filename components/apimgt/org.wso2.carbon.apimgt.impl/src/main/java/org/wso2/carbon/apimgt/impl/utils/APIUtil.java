@@ -1420,6 +1420,7 @@ public final class APIUtil {
 
     public static void handleException(String msg) throws APIManagementException {
         log.error(msg);
+
         throw new APIManagementException(msg);
     }
 

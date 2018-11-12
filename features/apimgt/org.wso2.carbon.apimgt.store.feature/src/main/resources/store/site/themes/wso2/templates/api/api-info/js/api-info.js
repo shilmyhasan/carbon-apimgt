@@ -118,7 +118,7 @@ function triggerSubscribe() {
                     window.location.reload();
                 });
                 $('#messageModal a.btn-primary').click(function() {
-                    urlPrefix = "name=" + applicationName + "&" + urlPrefix;
+                    urlPrefix = "name=" + applicationName + "&appId=" + applicationId + "&" + urlPrefix;
                     location.href = "../site/pages/application.jag?" + urlPrefix+"#subscription";
                  });
                    $('#messageModal').modal();

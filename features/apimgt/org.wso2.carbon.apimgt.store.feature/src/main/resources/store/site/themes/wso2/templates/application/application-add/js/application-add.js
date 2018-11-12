@@ -42,7 +42,7 @@ $(document).ready(function () {
             groupId:groupId
         }, function (result) {
             if (result.error == false) {
-                status=result.status;
+                status = result.status;
                 var date = new Date();
                 date.setTime(date.getTime() + (3 * 1000));
                 $.cookie('highlight','true',{ expires: date});
@@ -52,10 +52,10 @@ $(document).ready(function () {
                     jagg.message({content:i18n.t('Return to API detail page?'),type:'confirm',okCallback:function(){
                     window.location.href = apiViewUrl + "?" +  apiPath;
                     },cancelCallback:function(){
-                        window.location = jagg.url("/site/pages/application.jag?name=" + application );
+                        window.location = jagg.url("/site/pages/application.jag?name=" + application + "&appId=" + result.applicationId);
                     }});
                 } else{
-                    window.location =  jagg.url("/site/pages/application.jag?name=" + application );
+                    window.location =  jagg.url("/site/pages/application.jag?name=" + application + "&appId=" + result.applicationId);
                 }
 
             } else {

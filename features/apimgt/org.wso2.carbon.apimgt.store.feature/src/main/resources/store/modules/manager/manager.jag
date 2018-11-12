@@ -118,6 +118,15 @@ var getAPIConsumerObj = function() {
     }
 };
 
+var getApplicationId = function(applicationName, username, groupId) {
+    var util = Packages.org.wso2.carbon.apimgt.impl.utils.APIUtil;
+    return util.getApplicationId(applicationName, username, groupId);
+};
+
+var getAPIUtil = function() {
+    return Packages.org.wso2.carbon.apimgt.impl.utils.APIUtil;
+};
+
 var loadTenantRegistry = function (tenantDomain) {
     try {
         if (tenantDomain != null && tenantDomain != "") {

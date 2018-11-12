@@ -29,6 +29,7 @@ $(document).ready(function () {
 
     var updateApplication = function(){
         var application = $("#application-name").val();
+        var appId = $("#appId").val();
         var tier = $("#appTier").val();
         var apiPath = $("#apiPath").val();
         var goBack = $("#goBack").val();
@@ -44,10 +45,11 @@ $(document).ready(function () {
             tier:tier,
             descriptionNew:description,
             groupIdOld:groupIdOld,
-            groupIdNew:groupIdNew
+            groupIdNew:groupIdNew,
+            appId: appId
         }, function (result) {
             if (result.error == false) {                
-                window.location = jagg.url("/site/pages/application.jag?name="+application);
+                window.location = jagg.url("/site/pages/application.jag?name=" + application + "&appId=" + appId);
             } else {
                 jagg.message({content:result.message,type:"error"});
             }

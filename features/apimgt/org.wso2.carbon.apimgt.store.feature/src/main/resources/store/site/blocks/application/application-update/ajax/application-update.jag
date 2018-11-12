@@ -46,6 +46,19 @@ include("/jagg/jagg.jag");
         callbackUrlNew = request.getParameter("callbackUrlNew");
         groupIdNew = request.getParameter("groupIdNew");
         groupIdOld = request.getParameter("groupIdOld");
+        var applicationId = request.getParameter("appId");
+        username = user.username;
+        var consumer = jagg.module("manager").getAPIConsumerObj();
+        var application = consumer.getApplicationById(applicationId);
+        var subscriber = application.getSubscriber().getName();
+        if (subscriber != username) {
+            print({
+                error: true,
+                message: "Only application owner can update the application"
+            });
+            return;
+        }
+
         if(null == request.getParameter("callbackUrlNew")){
             callbackUrlNew = "";
         }else{
@@ -53,10 +66,9 @@ include("/jagg/jagg.jag");
         }        
         descriptionNew = request.getParameter("descriptionNew");
         tier = request.getParameter("tier");
-        username = user.username;
 
         mod = jagg.module("application");
-        result = mod.updateApplication(applicationNew,applicationOld,username,tier,callbackUrlNew,descriptionNew,groupIdOld,groupIdNew);
+        result = mod.updateApplication(applicationNew, applicationOld, username, tier, callbackUrlNew, descriptionNew, groupIdOld, groupIdNew, applicationId);
 
         //If name of the selected application is edited,add the new name  to   session
         var selectedApp = session.get("selectedApp");
