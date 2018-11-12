@@ -21,7 +21,7 @@ function triggerSubscribe() {
     ).attr('disabled', 'disabled');
 
     jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag", {
-        action:"addSubscription",
+        action:"addAPISubscriptionByAppId",
         applicationId:applicationId,
         name:api.name,
         version:api.version,
