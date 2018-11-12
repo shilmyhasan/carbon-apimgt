@@ -88,7 +88,6 @@ include("/jagg/jagg.jag");
         provider = request.getParameter("provider");
         tier = request.getParameter("tier");
         applicationName = request.getParameter("applicationName");
-        applicationId = request.getParameter("appId");
         username = user.username;
 
         mod = jagg.module("subscription");
@@ -125,7 +124,6 @@ include("/jagg/jagg.jag");
         version = request.getParameter("version");
         provider = request.getParameter("provider");
         tier = request.getParameter("tier");
-        applicationName = request.getParameter("applicationName");
         applicationId = request.getParameter("appId");
         username = user.username;
 
