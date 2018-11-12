@@ -247,7 +247,7 @@ GrantTypes.prototype.getMap = function(selected){
             
             this.element.find('.generatekeys').buttonLoader('start');
             jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag", {
-                action: "generateApplicationKey",
+                action: "generateApplicationKeyByApplicationId",
                 application: this.app.name,
                 keytype: this.type,
                 callbackUrl: this.app.callbackUrl,

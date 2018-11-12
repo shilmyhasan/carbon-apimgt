@@ -239,7 +239,6 @@ include("/jagg/jagg.jag");
         }
 
         var application = request.getParameter("application");
-        var applicationId = request.getParameter("appId");
         var keyType = request.getParameter("keytype");
         var callbackUrl = request.getParameter("callbackUrl");
         var username = user.username;
@@ -275,7 +274,76 @@ include("/jagg/jagg.jag");
         }
 
         mod = jagg.module("subscription");
-var log = new Log();
+        var log = new Log();
+
+        result = mod.generateApplicationKey(username, application , keyType, callbackUrl, accessAllowDomainsArr,
+                validityTime, retryAfterFailure, tokenScope,groupingId, JSON.stringify(jsonParamsObject));
+
+        if (result.error) {
+            obj = {
+                error: result.error,
+                message: msg.error.authError(action, username)
+            };
+        } else {
+            obj = {
+                error: false,
+                data: {
+                    key: result.key
+                }
+            }
+        }
+        print(obj);
+
+    } else if (action == "generateApplicationKeyByApplicationId" && request.getMethod() == 'POST') {
+
+        if (!user) {
+            if (!ssoEnabled) {
+                print({
+                    error: true,
+                    message: msg.error.loginRequired(action)
+                });
+            }
+            return;
+        }
+
+        var application = request.getParameter("application");
+        var applicationId = request.getParameter("appId");
+        var keyType = request.getParameter("keytype");
+        var callbackUrl = request.getParameter("callbackUrl");
+        var username = user.username;
+        var accessAllowDomains = request.getParameter("authorizedDomains");
+
+        if (accessAllowDomains == null) {
+            accessAllowDomains = "ALL";
+        }
+	    var tokenScope = request.getParameter("tokenScope");
+        //var tokenScope = "default";
+
+        var accessAllowDomainsArr = accessAllowDomains.split(",");
+        var validityTime = request.getParameter("validityTime");
+        var retryAfterFailure = request.getParameter("retryAfterFailure");
+        var jsonParams = request.getParameter("jsonParams");
+	    var groupingId=session.get("groupId");
+
+        if (retryAfterFailure == null) {
+            retryAfterFailure = false;
+        }
+
+        if (jsonParams != null) {
+            //convert json string in to a javascript array. Then we can add user name attribute in to it.
+            var jsonParamsObject = JSON.parse(jsonParams);
+
+            jsonParamsObject.username = user.username;
+
+        } else {
+            var jsonParamsObject = {
+                username : user.username
+            };
+
+        }
+
+        mod = jagg.module("subscription");
+        var log = new Log();
 
         result = mod.generateApplicationKeyByApplicationId(username, application , keyType, callbackUrl, accessAllowDomainsArr,
                 validityTime, retryAfterFailure, tokenScope,groupingId, JSON.stringify(jsonParamsObject), applicationId);
