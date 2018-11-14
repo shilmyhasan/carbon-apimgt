@@ -89,7 +89,7 @@ var addAPISubscriptionByAppId = function (api, tier, applicationId, username) {
             store = jagg.module("manager").getAPIStoreObj();
 
     try {
-
+        var groupingId = session.get("groupId");
         var subscriptionResponse = Packages.org.wso2.carbon.apimgt.api.model.SubscriptionResponse;
 		subscriptionResponse = store.addAPISubscriptionByAppId(api.provider, api.name, api.version, tier, applicationId, username, groupingId);
         var workflowResponse = Packages.org.wso2.carbon.apimgt.api.WorkflowResponse;
