@@ -91,6 +91,7 @@ function updateApplication(linkObj){
     jagg.sessionAwareJS({redirect:'site/pages/applications.jag'});
     var theTr = $(linkObj).parent().parent().parent();
     var applicationOld = $(theTr).attr('data-value');
+    var appId = $(this).attr("data-appId");
     var applicationNew = $('input.app_name_new',theTr).val();
     var callbackUrlNew = $('input.callback_new',theTr).val();
     var descriptionNew = $('input.description-new',theTr).val();
@@ -115,6 +116,7 @@ function updateApplication(linkObj){
             applicationNew:applicationNew,
             tier:tier,
             callbackUrlNew:callbackUrlNew,
+            appId: appId,
             descriptionNew:descriptionNew
         }, function (result) {
             if (result.error == false) {
