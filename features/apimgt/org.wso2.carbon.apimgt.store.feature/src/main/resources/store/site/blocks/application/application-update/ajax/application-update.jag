@@ -46,6 +46,51 @@ include("/jagg/jagg.jag");
         callbackUrlNew = request.getParameter("callbackUrlNew");
         groupIdNew = request.getParameter("groupIdNew");
         groupIdOld = request.getParameter("groupIdOld");
+        if(null == request.getParameter("callbackUrlNew")){
+            callbackUrlNew = "";
+        }else{
+            callbackUrlNew = request.getParameter("callbackUrlNew");
+        }        
+        descriptionNew = request.getParameter("descriptionNew");
+        tier = request.getParameter("tier");
+        username = user.username;
+
+        mod = jagg.module("application");
+        result = mod.updateApplication(applicationNew, applicationOld, username, tier, callbackUrlNew, descriptionNew, groupIdOld, groupIdNew);
+
+        //If name of the selected application is edited,add the new name  to   session
+        var selectedApp = session.get("selectedApp");
+        if (applicationOld != applicationNew && applicationOld == selectedApp) {
+            session.put("selectedApp", applicationNew);
+        }
+
+        if (result.error) {
+            obj = {
+                error:true,
+                message:result.error
+            };
+        } else {
+            obj = {
+                error:false
+            }
+        }
+        print(obj);
+    } else if (action == "updateApplicationById" && request.getMethod() == 'POST') {
+        if (!user) {
+            if(!ssoEnabled){
+		print({
+		    error:true,
+                    message:msg.error.loginRequired(action)
+            	});
+	    }
+	    return;
+        }
+
+        applicationOld = request.getParameter("applicationOld");
+        applicationNew = request.getParameter("applicationNew");
+        callbackUrlNew = request.getParameter("callbackUrlNew");
+        groupIdNew = request.getParameter("groupIdNew");
+        groupIdOld = request.getParameter("groupIdOld");
         var applicationId = request.getParameter("appId");
         username = user.username;
         var consumer = jagg.module("manager").getAPIConsumerObj();
@@ -59,16 +104,16 @@ include("/jagg/jagg.jag");
             return;
         }
 
-        if(null == request.getParameter("callbackUrlNew")){
+        if (null == request.getParameter("callbackUrlNew")) {
             callbackUrlNew = "";
-        }else{
+        } else {
             callbackUrlNew = request.getParameter("callbackUrlNew");
-        }        
+        }
         descriptionNew = request.getParameter("descriptionNew");
         tier = request.getParameter("tier");
 
         mod = jagg.module("application");
-        result = mod.updateApplication(applicationNew, applicationOld, username, tier, callbackUrlNew, descriptionNew, groupIdOld, groupIdNew, applicationId);
+        result = mod.updateApplicationById(applicationNew, applicationOld, username, tier, callbackUrlNew, descriptionNew, groupIdOld, groupIdNew, applicationId);
 
         //If name of the selected application is edited,add the new name  to   session
         var selectedApp = session.get("selectedApp");
