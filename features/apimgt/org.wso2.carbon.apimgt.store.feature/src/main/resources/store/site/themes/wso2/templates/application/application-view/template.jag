@@ -62,6 +62,16 @@ for(var i=0;i < outputs.tiers.length; i++){
        </div>
   </div>
 <%}%>
+
+<%
+  var applicationUtils = Packages.org.wso2.carbon.apimgt.impl.utils.ApplicationUtils;
+  var result = applicationUtils.retrieveApplicationById(application.id);
+//  var isOwner = true;
+  if (!result.getSubscriber().getName().equalsIgnoreCase(user.username)) {
+%>
+    <style>#appEditButton{display:none}</style>
+  <%}%>
+
   <div class="form-group">
     <label class="col-sm-3 control-label"><%=i18n.localize("Description")%></label>
     <div class="col-sm-9">
@@ -93,7 +103,8 @@ for(var i=0;i < outputs.tiers.length; i++){
             ValidityTime: oauthapp.prodValidityTime,
             keyState: oauthapp.prodKeyState,
             grants: prodGrants,
-            gatewayurlendpoint: gatewayurlendpointproduction
+            gatewayurlendpoint: gatewayurlendpointproduction,
+            id:application.id
         }
       %>
       </div>
@@ -118,15 +129,16 @@ for(var i=0;i < outputs.tiers.length; i++){
             ValidityTime: oauthapp.sandValidityTime,
             keyState: oauthapp.sandboxKeyState,
             grants:sandboxGrants,
-            gatewayurlendpoint: gatewayurlendpointsandbox
+            gatewayurlendpoint: gatewayurlendpointsandbox,
+            id:application.id
         }
       %>      
       <div role="tabpanel" class="tab-pane fade sandbox-keys" id="sandbox">
+      </div>      
+      <div role="tabpanel" class="tab-pane fade" id="subscription">      
+      <% jagg.includeBlock("subscription/subscribed-apis", { "application": application }); %>    
       </div>
-      <div role="tabpanel" class="tab-pane fade" id="subscription">
-      <% jagg.includeBlock("subscription/subscribed-apis", { "application": application }); %>
-      </div>
-      <% } %>
+      <% } %>      
     </div>
   </div>
   <% if(application.status == "APPROVED"){ %>
