@@ -3942,7 +3942,7 @@ public class APIStoreHostObject extends ScriptableObject {
             String callbackUrl = (String) args[4];
             String description = (String) args[5];
             String applicationId = "";
-            if (args.length > 7) {
+            if (args.length > 8) {
                 applicationId = (String) args[8];
             }
             String groupingId = null;
