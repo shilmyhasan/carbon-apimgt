@@ -27,6 +27,8 @@ import org.wso2.carbon.apimgt.rest.api.publisher.dto.SubscriptionListDTO;
 import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,12 +45,17 @@ public class SubscriptionMappingUtil {
      * @param subscription SubscribedAPI object
      * @return SubscriptionDTO corresponds to SubscribedAPI object
      */
-    public static SubscriptionDTO fromSubscriptionToDTO(SubscribedAPI subscription) {
+    public static SubscriptionDTO fromSubscriptionToDTO(SubscribedAPI subscription)
+            throws UnsupportedEncodingException {
         SubscriptionDTO subscriptionDTO = new SubscriptionDTO();
         subscriptionDTO.setSubscriptionId(subscription.getUUID());
         APIIdentifier apiId = subscription.getApiId();
-        APIIdentifier apiIdEmailReplacedBack = new APIIdentifier(
-                APIUtil.replaceEmailDomainBack(apiId.getProviderName()), apiId.getApiName(), apiId.getVersion());
+        APIIdentifier apiIdEmailReplacedBack = new APIIdentifier(APIUtil.replaceEmailDomainBack(apiId.getProviderName()
+                .replace(RestApiConstants.API_ID_DELIMITER, RestApiConstants.URL_ENCODED_API_ID_DELIMITER)),
+                URLEncoder.encode(apiId.getApiName(), RestApiConstants.CHARSET)
+                        .replace(RestApiConstants.API_ID_DELIMITER, RestApiConstants.URL_ENCODED_API_ID_DELIMITER),
+                apiId.getVersion()
+                        .replace(RestApiConstants.API_ID_DELIMITER, RestApiConstants.URL_ENCODED_API_ID_DELIMITER));
         subscriptionDTO.setApiIdentifier(apiIdEmailReplacedBack.toString());
         subscriptionDTO.setApplicationId(subscription.getApplication().getUUID());
         subscriptionDTO.setStatus(SubscriptionDTO.StatusEnum.valueOf(subscription.getSubStatus()));
@@ -65,7 +72,7 @@ public class SubscriptionMappingUtil {
      * @return SubscriptionListDTO object containing SubscriptionDTOs
      */
     public static SubscriptionListDTO fromSubscriptionListToDTO(List<SubscribedAPI> subscriptions, int limit,
-            int offset) {
+            int offset) throws UnsupportedEncodingException {
         SubscriptionListDTO subscriptionListDTO = new SubscriptionListDTO();
         List<SubscriptionDTO> subscriptionDTOs = subscriptionListDTO.getList();
         if (subscriptionDTOs == null) {
@@ -130,7 +137,7 @@ public class SubscriptionMappingUtil {
      * @return a dto containing all subscriptions
      */
     public static SubscriptionListDTO fromUserApplicationAPIUsageArrayToDTO(UserApplicationAPIUsage[] allApiUsage,
-            Integer limit, Integer offset) {
+            Integer limit, Integer offset) throws UnsupportedEncodingException {
         List<SubscribedAPI> subscribedAPIs = new ArrayList<>();
         for (UserApplicationAPIUsage usage : allApiUsage) {
             Collections.addAll(subscribedAPIs, usage.getApiSubscriptions());

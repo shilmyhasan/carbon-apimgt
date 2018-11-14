@@ -34,6 +34,7 @@ import org.wso2.carbon.apimgt.rest.api.publisher.utils.mappings.APIMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.utils.mappings.SubscriptionMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
@@ -82,8 +83,9 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
                         allApiUsage.length);
             }
             return Response.ok().entity(subscriptionListDTO).build();
-        } catch (APIManagementException e) {
-            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+        } catch (APIManagementException | UnsupportedEncodingException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, apiId, e, log);
             } else {
@@ -124,7 +126,7 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
             SubscribedAPI updatedSubscription = apiProvider.getSubscriptionByUUID(subscriptionId);
             SubscriptionDTO subscriptionDTO = SubscriptionMappingUtil.fromSubscriptionToDTO(updatedSubscription);
             return Response.ok().entity(subscriptionDTO).build();
-        } catch (APIManagementException e) {
+        } catch (APIManagementException | UnsupportedEncodingException e) {
             String msg = "Error while blocking the subscription " + subscriptionId;
             RestApiUtil.handleInternalServerError(msg, e, log);
         }
@@ -160,7 +162,7 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
             SubscribedAPI updatedSubscribedAPI = apiProvider.getSubscriptionByUUID(subscriptionId);
             SubscriptionDTO subscriptionDTO = SubscriptionMappingUtil.fromSubscriptionToDTO(updatedSubscribedAPI);
             return Response.ok().entity(subscriptionDTO).build();
-        } catch (APIManagementException e) {
+        } catch (APIManagementException | UnsupportedEncodingException e) {
             String msg = "Error while unblocking the subscription " + subscriptionId;
             RestApiUtil.handleInternalServerError(msg, e, log);
         }
@@ -190,7 +192,7 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
             } else {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_SUBSCRIPTION, subscriptionId, log);
             }
-        } catch (APIManagementException e) {
+        } catch (APIManagementException | UnsupportedEncodingException e) {
             String msg = "Error while getting the subscription " + subscriptionId;
             RestApiUtil.handleInternalServerError(msg, e, log);
         }
