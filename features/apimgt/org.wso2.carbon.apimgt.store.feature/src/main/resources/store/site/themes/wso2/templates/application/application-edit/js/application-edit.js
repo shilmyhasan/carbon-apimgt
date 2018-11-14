@@ -39,7 +39,7 @@ $(document).ready(function () {
         var groupIdNew = $("#groupId").val();
         var groupIdOld = $("#groupId-old").val();
         jagg.post("/site/blocks/application/application-update/ajax/application-update.jag", {
-            action:"updateApplication",
+            action:"updateApplicationById",
             applicationNew:application,
             applicationOld:applicationOld,
             tier:tier,
