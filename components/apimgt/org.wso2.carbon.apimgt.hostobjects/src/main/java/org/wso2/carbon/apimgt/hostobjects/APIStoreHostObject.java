@@ -4522,7 +4522,7 @@ public class APIStoreHostObject extends ScriptableObject {
         } catch (MalformedURLException e) {
             handleException("Error while getting host url " + url, e);
         } catch (AxisFault axisFault) {
-            handleException("Error while checking the ability to login ", axisFault);
+            handleException("Error while checking the ability to login for user " + username, axisFault);
         } catch (RemoteException e) {
             handleException("Error while getting claims of tenant " + tenantDomain, e);
         } catch (LoginAuthenticationExceptionException e) {
