@@ -4466,7 +4466,7 @@ public class APIStoreHostObject extends ScriptableObject {
             // set tenant specific sign up user storage
             if (signupConfig != null && !signupConfig.getSignUpDomain().isEmpty()) {
                 if (!signupConfig.isSignUpEnabled()) {
-                    handleException("Self sign up has been disabled for this tenant domain");
+                    handleException("Self sign up has been disabled for" + tenantDomain);
                 }
             }
             username = signupConfig.getAdminUserName();
@@ -4475,7 +4475,7 @@ public class APIStoreHostObject extends ScriptableObject {
             String host = null;
             host = new URL(url).getHost();
             if (!authAdminStub.login(username, password, host)) {
-                handleException("Login failed. Please recheck the username and password and try again.");
+                handleException("Login failed for " + username + " Please recheck the username and password and try again.");
             }
 
             ServiceContext serviceContext = authAdminStub.
