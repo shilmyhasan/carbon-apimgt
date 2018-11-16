@@ -4523,7 +4523,7 @@ public class APIStoreHostObject extends ScriptableObject {
         } catch (MalformedURLException e) {
             log.error("Error while checking the ability to login", e);
         } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();
+            log.error("Error while checking the ability to login", axisFault );
         } catch (RemoteException e) {
             log.error("Error while checking the ability to login", e);
         } catch (LoginAuthenticationExceptionException e) {
