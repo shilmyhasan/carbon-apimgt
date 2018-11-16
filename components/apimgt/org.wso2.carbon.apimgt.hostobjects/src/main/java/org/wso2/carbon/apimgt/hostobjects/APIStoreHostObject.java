@@ -4474,7 +4474,7 @@ public class APIStoreHostObject extends ScriptableObject {
             String host = null;
             host = new URL(url).getHost();
             if (!authAdminStub.login(username, password, host)) {
-                handleException("Login failed. Please recheck the username and password and try again..");
+                handleException("Login failed. Please recheck the username and password and try again.");
             }
 
             ServiceContext serviceContext = authAdminStub.
@@ -4525,7 +4525,7 @@ public class APIStoreHostObject extends ScriptableObject {
         } catch (RemoteException e) {
             handleException("Error while getting claims", e);
         } catch (LoginAuthenticationExceptionException e) {
-            handleException("Error while checking the ability to login", e);
+            handleException("Error while checking the ability to login for " + tenantDomain , e);
         } catch (ClaimMetadataManagementServiceClaimMetadataException e) {
             handleException("Error while retrieving user registration fields", e);
         }
