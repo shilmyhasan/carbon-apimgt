@@ -3633,7 +3633,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static void jsFunction_addUser(Context cx, Scriptable thisObj, Object[] args, Function funObj)
-            throws APIManagementException, AxisFault {
+            throws APIManagementException {
         String customErrorMsg = null;
 
         if (args != null && isStringArray(args)) {
@@ -4405,7 +4405,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static NativeArray jsFunction_getUserFields(Context cx, Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, APIManagementException, AxisFault {
+            throws ScriptException {
         String tenantDomain = args[0].toString();
         UserFieldDTO[] userFields = getOrderedUserFieldDTO(tenantDomain);
         NativeArray myn = new NativeArray(0);
@@ -4431,41 +4431,41 @@ public class APIStoreHostObject extends ScriptableObject {
         return false;
     }
 
-    private static UserFieldDTO[] getOrderedUserFieldDTO(String tenantDomain) throws APIManagementException, AxisFault {
+    private static UserFieldDTO[] getOrderedUserFieldDTO(String tenantDomain) {
         ClaimMetadataManagementServiceStub stub;
         UserFieldDTO[] userFields = null;
         APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
         String url = config.getFirstProperty(APIConstants.AUTH_MANAGER_URL);
 
-        if (url == null) {
-            handleException("API key manager URL unspecified");
-        }
-
-        AuthenticationAdminStub authAdminStub = new AuthenticationAdminStub(null, url + "AuthenticationAdmin");
-        ServiceClient client = authAdminStub._getServiceClient();
-        Options options = client.getOptions();
-        options.setManageSession(true);
-
-        boolean isTenantFlowStarted = false;
-
-        if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-            isTenantFlowStarted = true;
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-        }
-        // get the signup configuration
-        UserRegistrationConfigDTO signupConfig = SelfSignUpUtil.getSignupConfiguration(tenantDomain);
-        // set tenant specific sign up user storage
-        if (signupConfig != null && !signupConfig.getSignUpDomain().isEmpty()) {
-            if (!signupConfig.isSignUpEnabled()) {
-                handleException("Self sign up has been disabled for this tenant domain");
-            }
-        }
-        String username = signupConfig.getAdminUserName();
-        String password = signupConfig.getAdminPassword();
-
-        String host = null;
         try {
+            if (url == null) {
+                handleException("API key manager URL unspecified");
+            }
+
+            AuthenticationAdminStub authAdminStub = new AuthenticationAdminStub(null, url + "AuthenticationAdmin");
+            ServiceClient client = authAdminStub._getServiceClient();
+            Options options = client.getOptions();
+            options.setManageSession(true);
+
+            boolean isTenantFlowStarted = false;
+
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            // get the signup configuration
+            UserRegistrationConfigDTO signupConfig = SelfSignUpUtil.getSignupConfiguration(tenantDomain);
+            // set tenant specific sign up user storage
+            if (signupConfig != null && !signupConfig.getSignUpDomain().isEmpty()) {
+                if (!signupConfig.isSignUpEnabled()) {
+                    handleException("Self sign up has been disabled for this tenant domain");
+                }
+            }
+            String username = signupConfig.getAdminUserName();
+            String password = signupConfig.getAdminPassword();
+
+            String host = null;
             host = new URL(url).getHost();
             if (!authAdminStub.login(username, password, host)) {
                 handleException("Login failed. Please recheck the username and password and try again..");
@@ -4512,13 +4512,16 @@ public class APIStoreHostObject extends ScriptableObject {
             userFields = userFieldDTOS.toArray(new UserFieldDTO[0]);
             Arrays.sort(userFields, new HostObjectUtils.RequiredUserFieldComparator());
             Arrays.sort(userFields, new HostObjectUtils.UserFieldComparator());
-
+        } catch (APIManagementException e) {
+            log.error("Error when enabling self sign up for tenant domain", e);
         } catch (MalformedURLException e) {
             log.error("Error while checking the ability to login", e);
+        } catch (AxisFault axisFault) {
+            axisFault.printStackTrace();
         } catch (RemoteException e) {
             log.error("Error while checking the ability to login", e);
         } catch (LoginAuthenticationExceptionException e) {
-            log.error("Error while checking the ability to login", e );
+            log.error("Error while checking the ability to login", e);
         } catch (ClaimMetadataManagementServiceClaimMetadataException e) {
             log.error("Error while retrieving User registration Fields", e);
         }
