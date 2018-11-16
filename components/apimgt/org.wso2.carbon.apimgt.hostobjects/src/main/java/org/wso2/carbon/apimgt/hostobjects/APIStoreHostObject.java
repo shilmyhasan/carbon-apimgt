@@ -4405,7 +4405,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static NativeArray jsFunction_getUserFields(Context cx, Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException {
+            throws ScriptException, APIManagementException {
 
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
 
@@ -4437,7 +4437,7 @@ public class APIStoreHostObject extends ScriptableObject {
         return false;
     }
 
-    private static UserFieldDTO[] getOrderedUserFieldDTO(String tenantDomain) {
+    private static UserFieldDTO[] getOrderedUserFieldDTO(String tenantDomain) throws APIManagementException {
         ClaimMetadataManagementServiceStub stub;
         UserFieldDTO[] userFields = null;
         APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
@@ -4518,18 +4518,16 @@ public class APIStoreHostObject extends ScriptableObject {
             userFields = userFieldDTOS.toArray(new UserFieldDTO[0]);
             Arrays.sort(userFields, new HostObjectUtils.RequiredUserFieldComparator());
             Arrays.sort(userFields, new HostObjectUtils.UserFieldComparator());
-        } catch (APIManagementException e) {
-            log.error("Error when enabling self sign up for tenant domain", e);
         } catch (MalformedURLException e) {
-            log.error("Error while checking the ability to login", e);
+            handleException("Error while checking the ability to login", e);
         } catch (AxisFault axisFault) {
-            log.error("Error while checking the ability to login", axisFault );
+            handleException("Error while checking the ability to login", axisFault );
         } catch (RemoteException e) {
-            log.error("Error while checking the ability to login", e);
+            handleException("Error while getting claims", e);
         } catch (LoginAuthenticationExceptionException e) {
-            log.error("Error while checking the ability to login", e);
+            handleException("Error while checking the ability to login", e);
         } catch (ClaimMetadataManagementServiceClaimMetadataException e) {
-            log.error("Error while retrieving User registration Fields", e);
+            handleException("Error while retrieving user registration fields", e);
         }
         return userFields;
     }
