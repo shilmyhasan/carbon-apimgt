@@ -4409,7 +4409,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
 
-        if (args != null && args[0] != null) {
+        if (args != null && args.length > 0 && args[0] != null) {
             tenantDomain = args[0].toString();
         }
 
