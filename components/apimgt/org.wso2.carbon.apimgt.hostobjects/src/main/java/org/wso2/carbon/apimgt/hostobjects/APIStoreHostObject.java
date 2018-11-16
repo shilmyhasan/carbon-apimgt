@@ -4442,6 +4442,7 @@ public class APIStoreHostObject extends ScriptableObject {
         UserFieldDTO[] userFields = null;
         APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
         String url = config.getFirstProperty(APIConstants.AUTH_MANAGER_URL);
+        String username = "";
 
         try {
             if (url == null) {
@@ -4468,7 +4469,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     handleException("Self sign up has been disabled for this tenant domain");
                 }
             }
-            String username = signupConfig.getAdminUserName();
+            username = signupConfig.getAdminUserName();
             String password = signupConfig.getAdminPassword();
 
             String host = null;
@@ -4519,15 +4520,15 @@ public class APIStoreHostObject extends ScriptableObject {
             Arrays.sort(userFields, new HostObjectUtils.RequiredUserFieldComparator());
             Arrays.sort(userFields, new HostObjectUtils.UserFieldComparator());
         } catch (MalformedURLException e) {
-            handleException("Error while checking the ability to login", e);
+            handleException("Error while getting host url " + url, e);
         } catch (AxisFault axisFault) {
-            handleException("Error while checking the ability to login", axisFault );
+            handleException("Error while checking the ability to login ", axisFault);
         } catch (RemoteException e) {
-            handleException("Error while getting claims", e);
+            handleException("Error while getting claims of tenant " + tenantDomain, e);
         } catch (LoginAuthenticationExceptionException e) {
-            handleException("Error while checking the ability to login for " + tenantDomain , e);
+            handleException("Error while checking the ability to login for user " + username, e);
         } catch (ClaimMetadataManagementServiceClaimMetadataException e) {
-            handleException("Error while retrieving user registration fields", e);
+            handleException("Error while retrieving user registration fields for tenant " + tenantDomain, e);
         }
         return userFields;
     }
