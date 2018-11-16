@@ -69,7 +69,6 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.claim.metadata.mgt.stub</artifactId>
-            <version>5.11.148</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.governance</groupId>

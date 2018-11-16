@@ -4514,13 +4514,13 @@ public class APIStoreHostObject extends ScriptableObject {
             Arrays.sort(userFields, new HostObjectUtils.UserFieldComparator());
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            log.error("Error while checking the ability to login", e);
         } catch (RemoteException e) {
-            e.printStackTrace();
+            log.error("Error while checking the ability to login", e);
         } catch (LoginAuthenticationExceptionException e) {
-            e.printStackTrace();
+            log.error("Error while checking the ability to login", e );
         } catch (ClaimMetadataManagementServiceClaimMetadataException e) {
-            e.printStackTrace();
+            log.error("Error while retrieving User registration Fields", e);
         }
         return userFields;
     }
