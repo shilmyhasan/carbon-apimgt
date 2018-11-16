@@ -4406,7 +4406,14 @@ public class APIStoreHostObject extends ScriptableObject {
 
     public static NativeArray jsFunction_getUserFields(Context cx, Scriptable thisObj, Object[] args, Function funObj)
             throws ScriptException {
-        String tenantDomain = args[0].toString();
+
+        String tenantDomain = "";
+        if (args != null) {
+            tenantDomain = args[0].toString();
+        } else {
+            tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        }
+
         UserFieldDTO[] userFields = getOrderedUserFieldDTO(tenantDomain);
         NativeArray myn = new NativeArray(0);
         int limit = userFields.length;
