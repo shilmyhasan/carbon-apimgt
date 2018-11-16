@@ -85,10 +85,13 @@ import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.PermissionUpdateUtil;
+import org.wso2.carbon.identity.claim.metadata.mgt.stub.ClaimMetadataManagementServiceClaimMetadataException;
+import org.wso2.carbon.identity.claim.metadata.mgt.stub.dto.ClaimPropertyDTO;
+import org.wso2.carbon.identity.claim.metadata.mgt.stub.dto.LocalClaimDTO;
 import org.wso2.carbon.identity.oauth.OAuthAdminService;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.user.registration.stub.UserRegistrationAdminServiceException;
-import org.wso2.carbon.identity.user.registration.stub.UserRegistrationAdminServiceStub;
+import org.wso2.carbon.identity.claim.metadata.mgt.stub.ClaimMetadataManagementServiceStub;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserDTO;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserFieldDTO;
 import org.wso2.carbon.registry.core.RegistryConstants;
@@ -3630,7 +3633,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static void jsFunction_addUser(Context cx, Scriptable thisObj, Object[] args, Function funObj)
-                                                                                    throws APIManagementException {
+            throws APIManagementException, AxisFault {
         String customErrorMsg = null;
 
         if (args != null && isStringArray(args)) {
@@ -3645,7 +3648,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
             /* fieldValues will contain values up to last field user entered */
             String fieldValues[] = fields.split("\\|");
-            UserFieldDTO[] userFields = getOrderedUserFieldDTO();
+            UserFieldDTO[] userFields = getOrderedUserFieldDTO(tenantDomain);
             for (int i = 0; i < fieldValues.length; i++) {
                 if (fieldValues[i] != null) {
                     userFields[i].setFieldValue(fieldValues[i]);
@@ -4402,8 +4405,9 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static NativeArray jsFunction_getUserFields(Context cx, Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException {
-        UserFieldDTO[] userFields = getOrderedUserFieldDTO();
+            throws ScriptException, APIManagementException, AxisFault {
+        String tenantDomain = args[0].toString();
+        UserFieldDTO[] userFields = getOrderedUserFieldDTO(tenantDomain);
         NativeArray myn = new NativeArray(0);
         int limit = userFields.length;
         for (int i = 0; i < limit; i++) {
@@ -4427,28 +4431,99 @@ public class APIStoreHostObject extends ScriptableObject {
         return false;
     }
 
-    private static UserFieldDTO[] getOrderedUserFieldDTO() {
-        UserRegistrationAdminServiceStub stub;
+    private static UserFieldDTO[] getOrderedUserFieldDTO(String tenantDomain) throws APIManagementException, AxisFault {
+        ClaimMetadataManagementServiceStub stub;
         UserFieldDTO[] userFields = null;
-        try {
-            APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-            String url = config.getFirstProperty(APIConstants.AUTH_MANAGER_URL);
-            if (url == null) {
-                handleException("API key manager URL unspecified");
+        APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        String url = config.getFirstProperty(APIConstants.AUTH_MANAGER_URL);
+
+        if (url == null) {
+            handleException("API key manager URL unspecified");
+        }
+
+        AuthenticationAdminStub authAdminStub = new AuthenticationAdminStub(null, url + "AuthenticationAdmin");
+        ServiceClient client = authAdminStub._getServiceClient();
+        Options options = client.getOptions();
+        options.setManageSession(true);
+
+        boolean isTenantFlowStarted = false;
+
+        if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            isTenantFlowStarted = true;
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+        }
+        // get the signup configuration
+        UserRegistrationConfigDTO signupConfig = SelfSignUpUtil.getSignupConfiguration(tenantDomain);
+        // set tenant specific sign up user storage
+        if (signupConfig != null && !signupConfig.getSignUpDomain().isEmpty()) {
+            if (!signupConfig.isSignUpEnabled()) {
+                handleException("Self sign up has been disabled for this tenant domain");
             }
-            stub = new UserRegistrationAdminServiceStub(null, url + "UserRegistrationAdminService");
-            ServiceClient client = stub._getServiceClient();
-            Options option = client.getOptions();
+        }
+        String username = signupConfig.getAdminUserName();
+        String password = signupConfig.getAdminPassword();
+
+        String host = null;
+        try {
+            host = new URL(url).getHost();
+            if (!authAdminStub.login(username, password, host)) {
+                handleException("Login failed. Please recheck the username and password and try again..");
+            }
+
+            ServiceContext serviceContext = authAdminStub.
+                    _getServiceClient().getLastOperationContext().getServiceContext();
+            String sessionCookie = (String) serviceContext.getProperty(HTTPConstants.COOKIE_STRING);
+
+            stub = new ClaimMetadataManagementServiceStub(null, url + "ClaimMetadataManagementService");
+            ServiceClient client1 = stub._getServiceClient();
+            Options option = client1.getOptions();
             option.setManageSession(true);
-            userFields = stub.readUserFieldsForUserRegistration(UserCoreConstants.DEFAULT_CARBON_DIALECT);
+            option.setProperty(HTTPConstants.COOKIE_STRING, sessionCookie);
+
+            LocalClaimDTO[] localClaimDTOS = null;
+            ArrayList<UserFieldDTO> userFieldDTOS = new ArrayList<UserFieldDTO>();
+            localClaimDTOS = stub.getLocalClaims();
+
+            for (LocalClaimDTO dto : localClaimDTOS) {
+                boolean isSupported = false;
+                boolean isRequired = false;
+                String displayName = "";
+                for (ClaimPropertyDTO dto2 : dto.getClaimProperties()) {
+                    if ("SupportedByDefault".equalsIgnoreCase(dto2.getPropertyName())) {
+                        isSupported = Boolean.parseBoolean(dto2.getPropertyValue());
+                    }
+                    if ("Required".equalsIgnoreCase(dto2.getPropertyName())) {
+                        isRequired = Boolean.parseBoolean(dto2.getPropertyValue());
+                    }
+                    if ("DisplayName".equalsIgnoreCase(dto2.getPropertyName())) {
+                        displayName = dto2.getPropertyValue();
+                    }
+                }
+                if (isSupported) {
+                    UserFieldDTO userFieldDTO = new UserFieldDTO();
+                    userFieldDTO.setRequired(isRequired);
+                    userFieldDTO.setClaimUri(dto.getLocalClaimURI());
+                    userFieldDTO.setFieldName(displayName);
+                    userFieldDTOS.add(userFieldDTO);
+                }
+            }
+
+            userFields = userFieldDTOS.toArray(new UserFieldDTO[0]);
             Arrays.sort(userFields, new HostObjectUtils.RequiredUserFieldComparator());
             Arrays.sort(userFields, new HostObjectUtils.UserFieldComparator());
-        } catch (Exception e) {
-            log.error("Error while retrieving User registration Fields", e);
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (LoginAuthenticationExceptionException e) {
+            e.printStackTrace();
+        } catch (ClaimMetadataManagementServiceClaimMetadataException e) {
+            e.printStackTrace();
         }
         return userFields;
     }
-
 
     private static void updateRolesOfUser(String serverURL, String adminUsername,
                                           String adminPassword, String userName, String role) throws Exception {
