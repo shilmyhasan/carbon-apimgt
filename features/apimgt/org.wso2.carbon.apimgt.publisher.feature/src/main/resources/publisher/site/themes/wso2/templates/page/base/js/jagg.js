@@ -99,6 +99,7 @@ var jagg = jagg || {};
                         $('#messageModal').modal('hide');
                     }
                     if (typeof params.okCallback == "function") {
+                        $('#messageModal').modal('hide');
                         params.okCallback()
                     }
 
