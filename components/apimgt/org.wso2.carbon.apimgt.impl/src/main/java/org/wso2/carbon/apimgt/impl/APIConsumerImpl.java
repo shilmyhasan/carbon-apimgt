@@ -149,7 +149,7 @@ import javax.wsdl.Definition;
  * class which is visible to them. These extensions may add additional features like
  * security to this class.
  */
-class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
+public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
     private static final Log log = LogFactory.getLog(APIConsumerImpl.class);
     public static final char COLON_CHAR = ':';
@@ -3982,8 +3982,8 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                             wsdlFiles.add(updatedWSDLFile);
                         }
                         wsdlFiles.addAll(xsdFiles);
-                        getZipFileFromFileList(folderToImport + APIConstants.UPDATED_WSDL_ZIP, wsdlFiles);
-                        wsdlContent = folderToImport + APIConstants.UPDATED_WSDL_ZIP;
+                        getZipFileFromFileList(folderToImport.getCanonicalPath() + APIConstants.UPDATED_WSDL_ZIP, wsdlFiles);
+                        wsdlContent = folderToImport.getCanonicalPath() + APIConstants.UPDATED_WSDL_ZIP;
                     }
                 } else {
                     ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
@@ -4020,7 +4020,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             for (File file : fileList) {
                 String path = file.getAbsolutePath().substring(
                         file.getAbsolutePath().indexOf(APIConstants.API_WSDL_EXTRACTED_DIRECTORY)
-                                + APIConstants.API_WSDL_EXTRACTED_DIRECTORY.length());
+                                + APIConstants.API_WSDL_EXTRACTED_DIRECTORY.length() + 1);
                 ZipEntry ze = new ZipEntry(path);
                 zos.putNextEntry(ze);
                 try (FileInputStream in = new FileInputStream(file)) {
@@ -4087,7 +4087,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             }
             String storeVisibilityRoles = apiResource.getProperty(APIConstants.STORE_VIEW_ROLES);
             if (storeVisibilityRoles != null && !storeVisibilityRoles.trim().isEmpty()) {
-                String[] storeVisibilityRoleList = storeVisibilityRoles.replaceAll("\\s+", "").split(",");
+                String[] storeVisibilityRoleList = storeVisibilityRoles.split(",");
                 if (log.isDebugEnabled()) {
                     log.debug("API has restricted access to users with the roles : " + Arrays
                             .toString(storeVisibilityRoleList));

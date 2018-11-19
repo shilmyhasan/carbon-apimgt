@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.FaultGatewaysException;
+import org.wso2.carbon.apimgt.api.dto.CertificateInformationDTO;
+import org.wso2.carbon.apimgt.api.dto.CertificateMetadataDTO;
 import org.wso2.carbon.apimgt.api.model.*;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
@@ -27,6 +29,7 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;
 
@@ -40,6 +43,7 @@ import java.util.*;
  * available operations. However if the user attempts to execute a privileged operation
  * when the object had been created in the anonymous mode, an exception will be thrown.
  */
+@MethodStats
 public class UserAwareAPIProvider extends APIProviderImpl {
     protected String username;
     private static final Log log = LogFactory.getLog(UserAwareAPIProvider.class);
@@ -470,5 +474,60 @@ public class UserAwareAPIProvider extends APIProviderImpl {
             throws APIManagementException {
         checkAccessControlPermission(apiIdentifier);
         return super.getSequenceFileContent(apiIdentifier, sequenceType, sequenceName);
+    }
+
+    @Override
+    public int addCertificate(String userName, String certificate, String alias, String endpoint) throws APIManagementException {
+        checkCreatePermission();
+        return super.addCertificate(userName, certificate, alias, endpoint);
+    }
+
+    @Override
+    public int deleteCertificate(String userName, String alias, String endpoint) throws APIManagementException {
+        checkCreatePermission();
+        return super.deleteCertificate(userName, alias, endpoint);
+    }
+
+    @Override
+    public List<CertificateMetadataDTO> getCertificates(String userName) throws APIManagementException {
+        checkCreatePermission();
+        return super.getCertificates(userName);
+    }
+
+    @Override
+    public List<CertificateMetadataDTO> searchCertificates(int tenantId, String alias, String endpoint)
+            throws APIManagementException {
+        checkCreatePermission();
+        return super.searchCertificates(tenantId, alias, endpoint);
+    }
+
+    @Override
+    public boolean isCertificatePresent(int tenantId, String alias) throws APIManagementException {
+        checkCreatePermission();
+        return super.isCertificatePresent(tenantId, alias);
+    }
+
+    @Override
+    public CertificateInformationDTO getCertificateStatus(String alias) throws APIManagementException {
+        checkCreatePermission();
+        return super.getCertificateStatus(alias);
+    }
+
+    @Override
+    public int updateCertificate(String certificateString, String alias) throws APIManagementException {
+        checkCreatePermission();
+        return super.updateCertificate(certificateString, alias);
+    }
+
+    @Override
+    public int getCertificateCountPerTenant(int tenantId) throws APIManagementException {
+        checkCreatePermission();
+        return super.getCertificateCountPerTenant(tenantId);
+    }
+
+    @Override
+    public ByteArrayInputStream getCertificateContent(String alias) throws APIManagementException {
+        checkCreatePermission();
+        return super.getCertificateContent(alias);
     }
 }

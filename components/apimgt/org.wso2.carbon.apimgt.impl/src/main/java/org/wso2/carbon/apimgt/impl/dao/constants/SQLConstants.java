@@ -1766,6 +1766,10 @@ public class SQLConstants {
             "   AND API_NAME = ? " +
             "   AND" + " API_VERSION = ? ";
 
+    public static final String FIX_NULL_THROTTLING_TIERS =
+            "UPDATE AM_API_URL_MAPPING SET THROTTLING_TIER = 'Unlimited' WHERE " +
+                     " THROTTLING_TIER IS NULL";
+
     public static final String REMOVE_APPLICATION_MAPPINGS_BY_CONSUMER_KEY_SQL =
             "DELETE FROM AM_APPLICATION_KEY_MAPPING WHERE CONSUMER_KEY = ?";
 
@@ -2824,7 +2828,7 @@ public class SQLConstants {
 				+ " INNER JOIN  AM_API API ON AUM.API_ID = API.API_ID"
 				+ " LEFT OUTER JOIN AM_API_THROTTLE_POLICY pol ON AUM.THROTTLING_TIER = pol.NAME "
 				+ " LEFT OUTER JOIN AM_CONDITION_GROUP grp ON pol.POLICY_ID  = grp.POLICY_ID"
-				+ " where API.CONTEXT= ? AND API.API_VERSION = ?"
+				+ " where API.CONTEXT= ? AND API.API_VERSION = ? AND pol.TENANT_ID = ?"
 				/*+ " GROUP BY AUM.HTTP_METHOD,AUM.URL_PATTERN, AUM.URL_MAPPING_ID"*/
 				+ " ORDER BY AUM.URL_MAPPING_ID";
         public static final String ADD_BLOCK_CONDITIONS_SQL =
@@ -2867,11 +2871,14 @@ public class SQLConstants {
         public static final String GET_CERTIFICATES = "SELECT * FROM AM_CERTIFICATE_METADATA WHERE TENANT_ID=?";
 
         public static final String GET_CERTIFICATE_ALL_TENANTS = "SELECT * FROM AM_CERTIFICATE_METADATA WHERE " +
-                "(ALIAS=? OR END_POINT=?)";
+                "(ALIAS=?)";
         public static final String GET_CERTIFICATE_TENANT = "SELECT * FROM AM_CERTIFICATE_METADATA WHERE TENANT_ID=? " +
                 "AND (ALIAS=? OR END_POINT=?)";
 
         public static final String DELETE_CERTIFICATES = "DELETE FROM AM_CERTIFICATE_METADATA WHERE TENANT_ID=? " +
-                "AND (ALIAS=? OR END_POINT=?)";
+                "AND ALIAS=?";
+
+        public static final String CERTIFICATE_COUNT_QUERY = "SELECT COUNT(*) AS count FROM AM_CERTIFICATE_METADATA " +
+                "WHERE TENANT_ID=?";
     }
 }

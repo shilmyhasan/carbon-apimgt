@@ -38,6 +38,7 @@ import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
+import org.wso2.carbon.apimgt.gateway.MethodStats;
 import org.wso2.carbon.apimgt.gateway.handlers.Utils;
 import org.wso2.carbon.apimgt.gateway.handlers.security.oauth.OAuthAuthenticator;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
@@ -139,6 +140,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         return authenticator;
     }
 
+    @MethodStats
     @edu.umd.cs.findbugs.annotations.SuppressWarnings(value = "EXS_EXCEPTION_SOFTENING_RETURN_FALSE",
             justification = "Error is sent through payload")
     public boolean handleRequest(MessageContext messageContext) {
@@ -214,6 +216,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         return APIUtil.isAnalyticsEnabled();
     }
 
+    @MethodStats
     public boolean handleResponse(MessageContext messageContext) {
         return true;
     }
@@ -295,6 +298,14 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         errorMessage.setText(APISecurityConstants.getAuthenticationFailureMessage(e.getErrorCode()));
         OMElement errorDetail = fac.createOMElement("description", ns);
         errorDetail.setText(APISecurityConstants.getFailureMessageDetailDescription(e.getErrorCode(), e.getMessage()));
+
+        // if custom auth header is configured, the error message should specify its name instead of default value
+        if (e.getErrorCode() == APISecurityConstants.API_AUTH_MISSING_CREDENTIALS) {
+            String errorDescription =
+                    APISecurityConstants.getFailureMessageDetailDescription(e.getErrorCode(), e.getMessage()) + "'"
+                            + authorizationHeader + " : Bearer ACCESS_TOKEN" + "'";
+            errorDetail.setText(errorDescription);
+        }
 
         payload.addChild(errorCode);
         payload.addChild(errorMessage);

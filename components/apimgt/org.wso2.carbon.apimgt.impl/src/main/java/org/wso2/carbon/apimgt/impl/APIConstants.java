@@ -111,6 +111,8 @@ public final class APIConstants {
 
     public static final String API_TENANT_CONF_IS_UNLIMITED_TIER_PAID = "IsUnlimitedTierPaid";
 
+    public static final String API_TENANT_CONF_EXPOSE_ENDPOINT_PASSWORD = "ExposeEndpointPassword";
+
     public static final String API_CATEGORY_FREE = "Free";
 
     public static final String API_CATEGORY_FREEMIUM = "Freemium";
@@ -1073,6 +1075,8 @@ public final class APIConstants {
     public static final String SWAGGER_SCOPE_KEY = "key";
     public static final String SWAGGER_NAME = "name";
     public static final String SWAGGER_DESCRIPTION = "description";
+    public static final String SWAGGER_SERVERS = "servers";
+    public static final String SWAGGER_SUMMARY = "summary";
     public static final String SWAGGER_ROLES = "roles";
     public static final String SWAGGER_TITLE = "title";
     public static final String SWAGGER_EMAIL = "email";
@@ -1154,6 +1158,8 @@ public final class APIConstants {
     }
 
     public static final String API_LC_ACTION_DEPRECATE = "Deprecate";
+    public static final String DEPRECATE_CHECK_LIST_ITEM = "Deprecate old versions after publish the API";
+    public static final String RESUBSCRIBE_CHECK_LIST_ITEM = "Requires re-subscription when publish the API";
 
     public static final String METRICS_PREFIX = "org.wso2.am";
 
@@ -1450,4 +1456,13 @@ public final class APIConstants {
     public static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
     public static final String JSON_FILENAME_EXTENSION = ".json";
     public static final String JSON_GZIP_FILENAME_EXTENSION = ".json.gz";
+
+    /**
+     * Constants for correlation logging
+     * */
+    public static final String CORRELATION_ID = "Correlation-ID";
+    public static final String ENABLE_CORRELATION_LOGS = "enableCorrelationLogs";
+    public static final String CORRELATION_LOGGER = "correlation";
+    public static final String LOG_ALL_METHODS = "logAllMethods";
+    public static final String AM_ACTIVITY_ID = "activityid";
 }

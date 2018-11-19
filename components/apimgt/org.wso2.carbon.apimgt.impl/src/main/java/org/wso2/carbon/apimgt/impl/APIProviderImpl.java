@@ -44,6 +44,7 @@ import org.wso2.carbon.apimgt.api.FaultGatewaysException;
 import org.wso2.carbon.apimgt.api.PolicyDeploymentFailureException;
 import org.wso2.carbon.apimgt.api.UnsupportedPolicyTypeException;
 import org.wso2.carbon.apimgt.api.WorkflowResponse;
+import org.wso2.carbon.apimgt.api.dto.CertificateInformationDTO;
 import org.wso2.carbon.apimgt.api.dto.CertificateMetadataDTO;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.apimgt.api.model.API;
@@ -144,12 +145,14 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -673,6 +676,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public void addAPI(API api) throws APIManagementException {
         validateApiInfo(api);
+        String tenantDomain = MultitenantUtils
+                .getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+        validateResourceThrottlingTiers(api, tenantDomain);
         createAPI(api);
 
         if (log.isDebugEnabled()) {
@@ -681,8 +687,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         int tenantId;
-        String tenantDomain = MultitenantUtils
-                .getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
         try {
             tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
                     .getTenantId(tenantDomain);
@@ -1011,6 +1015,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 throw new APIManagementException(
                         "Error in retrieving Tenant Information while updating api :" + api.getId().getApiName(), e);
             }
+            validateResourceThrottlingTiers(api, tenantDomain);
             apiMgtDAO.updateAPI(api, tenantId);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully updated the API: " + api.getId() + " in the database");
@@ -1491,8 +1496,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             failedGateways = publishToGateway(api);
                             //Sending Notifications to existing subscribers
                             if (APIConstants.PUBLISHED.equals(newStatus)) {
-                                List<APIIdentifier> oldPublishedAPIList = getOldPublishedAPIList(api);
-                                sendEmailNotification(api, oldPublishedAPIList);
+                                sendEmailNotification(api);
                             }
                         } else { // API Status : RETIRED or CREATED
                             failedGateways = removeFromGateway(api);
@@ -1731,10 +1735,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * This method used to send notifications to the previous subscribers of older versions of a given API
      *
      * @param api
-     * @param apiIdentifiers
      * @throws APIManagementException
      */
-    private void sendEmailNotification(API api, List<APIIdentifier> apiIdentifiers) throws APIManagementException {
+    private void sendEmailNotification(API api) throws APIManagementException {
         try {
             String isNotificationEnabled = "false";
             Registry configRegistry = ServiceReferenceHolder.getInstance().getRegistryService().
@@ -1748,6 +1751,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
             if (JavaUtils.isTrueExplicitly(isNotificationEnabled)) {
+                List<APIIdentifier> apiIdentifiers = getOldPublishedAPIList(api);
                 for (APIIdentifier oldAPI : apiIdentifiers) {
                     Properties prop = new Properties();
                     prop.put(NotifierConstants.API_KEY, oldAPI);
@@ -3511,6 +3515,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION);
                 if (inSeqCollection != null) {
                     String[] inSeqChildPaths = inSeqCollection.getChildren();
+                    Arrays.sort(inSeqChildPaths);
                     for (String inSeqChildPath : inSeqChildPaths) {
                         Resource inSequence = registry.get(inSeqChildPath);
                         try {
@@ -3530,6 +3535,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(customInSeqFileLocation);
                 if (inSeqCollection != null) {
                     String[] inSeqChildPaths = inSeqCollection.getChildren();
+                    Arrays.sort(inSeqChildPaths);
                     for (String inSeqChildPath : inSeqChildPaths) {
                         Resource inSequence = registry.get(inSeqChildPath);
                         try {
@@ -3582,6 +3588,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION);
                 if (outSeqCollection != null) {
                     String[] outSeqChildPaths = outSeqCollection.getChildren();
+                    Arrays.sort(outSeqChildPaths);
                     for (String childPath : outSeqChildPaths) {
                         Resource outSequence = registry.get(childPath);
                         try {
@@ -3601,6 +3608,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(customOutSeqFileLocation);
                 if (outSeqCollection != null) {
                     String[] outSeqChildPaths = outSeqCollection.getChildren();
+                    Arrays.sort(outSeqChildPaths);
                     for (String outSeqChildPath : outSeqChildPaths) {
                         Resource outSequence = registry.get(outSeqChildPath);
                         try {
@@ -3630,7 +3638,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws APIManagementException
      */
     public List<String> getCustomInSequences() throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         try {
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
@@ -3664,7 +3672,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
 
@@ -3675,7 +3683,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws APIManagementException
      */
     public List<String> getCustomOutSequences() throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         try {
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
@@ -3709,7 +3717,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -3720,7 +3728,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Deprecated
     public List<String> getCustomFaultSequences() throws APIManagementException {
 
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         try {
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
@@ -3753,7 +3761,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -3788,6 +3796,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                 APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION);
                 if (faultSeqCollection != null) {
                     String[] faultSeqChildPaths = faultSeqCollection.getChildren();
+                    Arrays.sort(faultSeqChildPaths);
                     for (String faultSeqChildPath : faultSeqChildPaths) {
                         Resource outSequence = registry.get(faultSeqChildPath);
                         try {
@@ -3810,6 +3819,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         (org.wso2.carbon.registry.api.Collection) registry.get(customOutSeqFileLocation);
                 if (faultSeqCollection != null) {
                     String[] faultSeqChildPaths = faultSeqCollection.getChildren();
+                    Arrays.sort(faultSeqChildPaths);
                     for (String faultSeqChildPath : faultSeqChildPaths) {
                         Resource faultSequence = registry.get(faultSeqChildPath);
                         try {
@@ -3852,7 +3862,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
 
     public List<String> getCustomApiInSequences(APIIdentifier apiIdentifier) throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = null;
@@ -3906,7 +3916,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -3917,7 +3927,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
 
     public List<String> getCustomApiOutSequences(APIIdentifier apiIdentifier) throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = null;
@@ -3971,7 +3981,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -3981,7 +3991,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws APIManagementException
      */
     public List<String> getCustomApiFaultSequences(APIIdentifier apiIdentifier) throws APIManagementException {
-        List<String> sequenceList = new ArrayList<String>();
+        Set<String> sequenceList = new TreeSet<>();
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = null;
@@ -4035,7 +4045,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return sequenceList;
+        return new ArrayList<>(sequenceList);
     }
 
     /**
@@ -4139,6 +4149,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public String[] getConsumerKeys(APIIdentifier apiIdentifier) throws APIManagementException {
 
         return apiMgtDAO.getConsumerKeys(apiIdentifier);
+    }
+
+    @Override
+    public void validateResourceThrottlingTiers(API api, String tenantDomain) throws APIManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Validating x-throttling tiers defined in swagger api definition resource");
+        }
+        Map<String, Tier> tierMap = APIUtil.getTiers(APIConstants.TIER_RESOURCE_TYPE, tenantDomain);
+        if (tierMap != null) {
+            Set<URITemplate> uriTemplates = api.getUriTemplates();
+            for (URITemplate template : uriTemplates) {
+                if (template.getThrottlingTier() != null && !tierMap.containsKey(template.getThrottlingTier())) {
+                    String message = "Invalid x-throttling tier " + template.getThrottlingTier() +
+                            " found in api definition for resource " + template.getHTTPVerb() + " " +
+                            template.getUriTemplate();
+                    log.error(message);
+                    throw new APIManagementException(message);
+                }
+            }
+        }
     }
 
     @Override
@@ -5215,6 +5245,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public int addCertificate(String userName, String certificate, String alias, String endpoint)
             throws APIManagementException {
+
         ResponseCode responseCode = ResponseCode.INTERNAL_SERVER_ERROR;
         CertificateManager certificateManager = new CertificateManagerImpl();
         String tenantDomain = MultitenantUtils.getTenantDomain(userName);
@@ -5241,6 +5272,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public int deleteCertificate(String userName, String alias, String endpoint) throws APIManagementException {
+
         ResponseCode responseCode = ResponseCode.INTERNAL_SERVER_ERROR;
         CertificateManager certificateManager = new CertificateManagerImpl();
         String tenantDomain = MultitenantUtils.getTenantDomain(userName);
@@ -5266,12 +5298,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public boolean isConfigured() {
+
         CertificateManager certificateManager = new CertificateManagerImpl();
         return certificateManager.isConfigured();
     }
 
     @Override
     public List<CertificateMetadataDTO> getCertificates(String userName) throws APIManagementException {
+
         CertificateManager certificateManager = new CertificateManagerImpl();
         int tenantId = 0;
         try {
@@ -5281,6 +5315,55 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException("Error while reading tenant information", e);
         }
         return certificateManager.getCertificates(tenantId);
+    }
+
+    @Override
+    public List<CertificateMetadataDTO> searchCertificates(int tenantId, String alias, String endpoint) throws
+            APIManagementException {
+
+        CertificateManager certificateManager = new CertificateManagerImpl();
+        return certificateManager.getCertificates(tenantId, alias, endpoint);
+    }
+
+    @Override
+    public boolean isCertificatePresent(int tenantId, String alias) throws APIManagementException {
+
+        CertificateManager certificateManager = new CertificateManagerImpl();
+        return certificateManager.isCertificatePresent(tenantId, alias);
+    }
+
+    @Override
+    public CertificateInformationDTO getCertificateStatus(String alias) throws APIManagementException {
+
+        CertificateManager certificateManager = new CertificateManagerImpl();
+        return certificateManager.getCertificateInformation(alias);
+    }
+
+    @Override
+    public int updateCertificate(String certificateString, String alias) throws APIManagementException {
+
+        CertificateManager certificateManager = new CertificateManagerImpl();
+        ResponseCode responseCode = certificateManager.updateCertificate(certificateString, alias);
+
+        if (ResponseCode.SUCCESS == responseCode) {
+            GatewayCertificateManager gatewayCertificateManager = new GatewayCertificateManager();
+            gatewayCertificateManager.removeFromGateways(alias);
+            gatewayCertificateManager.addToGateways(certificateString, alias);
+        }
+        return responseCode != null ? responseCode.getResponseCode() :
+                ResponseCode.INTERNAL_SERVER_ERROR.getResponseCode();
+    }
+
+    @Override
+    public int getCertificateCountPerTenant(int tenantId) throws APIManagementException {
+
+        return new CertificateManagerImpl().getCertificateCount(tenantId);
+    }
+
+    @Override
+    public ByteArrayInputStream getCertificateContent(String alias) throws APIManagementException {
+
+        return new CertificateManagerImpl().getCertificateContent(alias);
     }
 
     /**
@@ -5388,8 +5471,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (!registry.resourceExists(artifactPath)) {
             return;
         }
-        // Replace spaces
-        publisherAccessControlRoles = publisherAccessControlRoles.replaceAll("\\s+", "");
         Resource apiResource = registry.get(artifactPath);
         if (apiResource != null) {
             if (additionalProperties != null) {
