@@ -7800,6 +7800,71 @@ public class ApiMgtDAO {
         }
     }
 
+    public void addScopes(Connection conn, Set<?> objects, int api_id, int tenantID) throws APIManagementException {
+
+        PreparedStatement ps = null, ps2 = null;
+        ResultSet rs = null;
+
+        String scopeEntry = SQLConstants.ADD_SCOPE_ENTRY_SQL;
+        String scopeLink = SQLConstants.ADD_SCOPE_LINK_SQL;
+        try {
+
+            String scopeId = "SCOPE_ID";
+            if (conn.getMetaData().getDriverName().contains("PostgreSQL")) {
+                scopeId = "scope_id";
+            }
+
+            if (objects != null) {
+                for (Object object : objects) {
+                    ps = conn.prepareStatement(scopeEntry, new String[]{scopeId});
+                    ps2 = conn.prepareStatement(scopeLink);
+
+                    if (object instanceof URITemplate) {
+                        URITemplate uriTemplate = (URITemplate) object;
+
+                        if (uriTemplate.getScope() == null) {
+                            continue;
+                        }
+                        ps.setString(1, uriTemplate.getScope().getKey());
+                        ps.setString(2, uriTemplate.getScope().getName());
+                        ps.setString(3, uriTemplate.getScope().getDescription());
+                        ps.setInt(4, tenantID);
+                        ps.setString(5, uriTemplate.getScope().getRoles());
+                        ps.execute();
+                        rs = ps.getGeneratedKeys();
+                        if (rs.next()) {
+                            uriTemplate.getScope().setId(rs.getInt(1));
+                        }
+
+                        ps2.setInt(1, api_id);
+                        ps2.setInt(2, uriTemplate.getScope().getId());
+                        ps2.execute();
+                    } else if (object instanceof Scope) {
+                        Scope scope = (Scope) object;
+                        ps.setString(1, scope.getKey());
+                        ps.setString(2, scope.getName());
+                        ps.setString(3, scope.getDescription());
+                        ps.setInt(4, tenantID);
+                        ps.setString(5, scope.getRoles());
+                        ps.execute();
+                        rs = ps.getGeneratedKeys();
+                        if (rs.next()) {
+                            scope.setId(rs.getInt(1));
+                        }
+                        ps2.setInt(1, api_id);
+                        ps2.setInt(2, scope.getId());
+                        ps2.execute();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            handleException("Error occurred while creating scopes ", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, null, rs);
+            APIMgtDBUtil.closeAllConnections(ps2, null, null);
+        }
+    }
+
     public Set<Scope> getAPIScopes(APIIdentifier identifier) throws APIManagementException {
         Connection conn = null;
         ResultSet resultSet = null;
@@ -7980,13 +8045,21 @@ public class ApiMgtDAO {
             prepStmt.setInt(1, apiId);
             prepStmt.execute();
 
+            addScopes(connection, api.getUriTemplates(), apiId, tenantId);
             connection.commit();
         } catch (SQLException e) {
-            handleException("Error while deleting Scopes for API : " + api.getId(), e);
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                }
+            } catch (SQLException e1) {
+                handleException("Error occurred while Rolling back changes done on Scopes updating", e1);
+            }
+            handleException("Error while updating Scopes for API : " + api.getId(), e);
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
         }
-        addScopes(api.getUriTemplates(), apiId, tenantId);
+
     }
 
     public HashMap<String, String> getResourceToScopeMapping(APIIdentifier identifier) throws APIManagementException {
