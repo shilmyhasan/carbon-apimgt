@@ -7802,11 +7802,10 @@ public class ApiMgtDAO {
 
     public void addScopes(Connection conn, Set<?> objects, int api_id, int tenantID) throws APIManagementException {
 
-        PreparedStatement ps = null, ps2 = null;
+        PreparedStatement ps = null;
         ResultSet rs = null;
-
+        List<Integer> scopeIds = new ArrayList<Integer>();
         String scopeEntry = SQLConstants.ADD_SCOPE_ENTRY_SQL;
-        String scopeLink = SQLConstants.ADD_SCOPE_LINK_SQL;
         try {
 
             String scopeId = "SCOPE_ID";
@@ -7817,7 +7816,6 @@ public class ApiMgtDAO {
             if (objects != null) {
                 for (Object object : objects) {
                     ps = conn.prepareStatement(scopeEntry, new String[]{scopeId});
-                    ps2 = conn.prepareStatement(scopeLink);
 
                     if (object instanceof URITemplate) {
                         URITemplate uriTemplate = (URITemplate) object;
@@ -7833,12 +7831,10 @@ public class ApiMgtDAO {
                         ps.execute();
                         rs = ps.getGeneratedKeys();
                         if (rs.next()) {
-                            uriTemplate.getScope().setId(rs.getInt(1));
+                            int scopeIdValue = rs.getInt(1);
+                            uriTemplate.getScope().setId(scopeIdValue);
+                            scopeIds.add(scopeIdValue);
                         }
-
-                        ps2.setInt(1, api_id);
-                        ps2.setInt(2, uriTemplate.getScope().getId());
-                        ps2.execute();
                     } else if (object instanceof Scope) {
                         Scope scope = (Scope) object;
                         ps.setString(1, scope.getKey());
@@ -7849,19 +7845,42 @@ public class ApiMgtDAO {
                         ps.execute();
                         rs = ps.getGeneratedKeys();
                         if (rs.next()) {
-                            scope.setId(rs.getInt(1));
+                            int scopeIdValue = rs.getInt(1);
+                            scope.setId(scopeIdValue);
+                            scopeIds.add(scopeIdValue);
                         }
-                        ps2.setInt(1, api_id);
-                        ps2.setInt(2, scope.getId());
-                        ps2.execute();
                     }
                 }
+
+                addScopeLinks(conn, scopeIds, api_id);
             }
         } catch (SQLException e) {
             handleException("Error occurred while creating scopes ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, null, rs);
-            APIMgtDBUtil.closeAllConnections(ps2, null, null);
+        }
+    }
+
+    private void addScopeLinks(Connection connection, List<Integer> scopeIds, int apiId) throws APIManagementException {
+
+        String scopeLink = SQLConstants.ADD_SCOPE_LINK_SQL;
+        PreparedStatement ps = null;
+
+        try {
+            if (scopeIds != null) {
+                ps = connection.prepareStatement(scopeLink);
+                for (Integer scopeId : scopeIds) {
+
+                    ps.setInt(1, apiId);
+                    ps.setInt(2, scopeId);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+        } catch (SQLException e) {
+            handleException("Error occurred while creating scope links ", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, null, null);
         }
     }
 
