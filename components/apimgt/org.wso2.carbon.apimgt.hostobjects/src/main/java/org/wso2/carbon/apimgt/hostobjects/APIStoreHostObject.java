@@ -4496,6 +4496,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 boolean isSupported = false;
                 boolean isRequired = false;
                 String displayName = "";
+                int displayOrder = 0;
                 for (ClaimPropertyDTO dto2 : dto.getClaimProperties()) {
                     if ("SupportedByDefault".equalsIgnoreCase(dto2.getPropertyName())) {
                         isSupported = Boolean.parseBoolean(dto2.getPropertyValue());
@@ -4506,12 +4507,16 @@ public class APIStoreHostObject extends ScriptableObject {
                     if ("DisplayName".equalsIgnoreCase(dto2.getPropertyName())) {
                         displayName = dto2.getPropertyValue();
                     }
+                    if ("DisplayOrder".equalsIgnoreCase(dto2.getPropertyName())) {
+                        displayOrder = Integer.parseInt(dto2.getPropertyValue());
+                    }
                 }
                 if (isSupported) {
                     UserFieldDTO userFieldDTO = new UserFieldDTO();
                     userFieldDTO.setRequired(isRequired);
                     userFieldDTO.setClaimUri(dto.getLocalClaimURI());
                     userFieldDTO.setFieldName(displayName);
+                    userFieldDTO.setDisplayOrder(displayOrder);
                     userFieldDTOS.add(userFieldDTO);
                 }
             }
