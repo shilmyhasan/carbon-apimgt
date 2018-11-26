@@ -134,6 +134,7 @@ public class ApiMgtDAO {
 
     private boolean forceCaseInsensitiveComparisons = false;
     private boolean multiGroupIdEnabled = false;
+    private final Object scopeMutex = new Object();
 
     private ApiMgtDAO() {
         APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
@@ -5292,11 +5293,13 @@ public class ApiMgtDAO {
                 applicationId = rs.getInt(1);
             }
 
-            connection.commit();
 
             if (api.getScopes() != null) {
-                addScopes(api.getScopes(), applicationId, tenantId);
+                synchronized (scopeMutex) {
+                    addScopes(connection, api.getScopes(), applicationId, tenantId);
+                }
             }
+            connection.commit();
             addURLTemplates(applicationId, api, connection);
             String tenantUserName = MultitenantUtils
                     .getTenantAwareUsername(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
@@ -6357,8 +6360,10 @@ public class ApiMgtDAO {
                 }
             }
             connection.commit();
+            synchronized (scopeMutex){
+                updateScopes(api, tenantId);
+            }
 
-            updateScopes(api, tenantId);
             updateURLTemplates(api);
         } catch (SQLException e) {
             handleException("Error while updating the API: " + api.getId() + " in the database", e);
@@ -6452,7 +6457,9 @@ public class ApiMgtDAO {
 
             id = getAPIID(apiId, connection);
 
-            removeAPIScope(apiId);
+            synchronized (scopeMutex) {
+                removeAPIScope(apiId);
+            }
 
             prepStmt = connection.prepareStatement(deleteSubscriptionQuery);
             prepStmt.setInt(1, id);
@@ -7800,7 +7807,8 @@ public class ApiMgtDAO {
         }
     }
 
-    public void addScopes(Connection conn, Set<?> objects, int api_id, int tenantID) throws APIManagementException {
+    public void addScopes(Connection conn, Set<?> objects, int api_id, int tenantID)
+            throws APIManagementException {
 
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -7855,6 +7863,8 @@ public class ApiMgtDAO {
                 addScopeLinks(conn, scopeIds, api_id);
             }
         } catch (SQLException e) {
+            log.info("Error when adding scopes - Id - excep Query: " + scopeEntry + " - ps - " +
+                    ps.toString());
             handleException("Error occurred while creating scopes ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, null, rs);
@@ -7878,6 +7888,8 @@ public class ApiMgtDAO {
                 ps.executeBatch();
             }
         } catch (SQLException e) {
+            log.info("Error when adding scope links - Id - excep Query: " + scopeLink + " - ps - " +
+                    ps.toString());
             handleException("Error occurred while creating scope links ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, null, null);
@@ -8067,6 +8079,7 @@ public class ApiMgtDAO {
             addScopes(connection, api.getUriTemplates(), apiId, tenantId);
             connection.commit();
         } catch (SQLException e) {
+            log.info("Error in update scopes in API - " + api + " - Id - ##updateScopes" );
             try {
                 if (connection != null) {
                     connection.rollback();
@@ -8078,7 +8091,6 @@ public class ApiMgtDAO {
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, connection, null);
         }
-
     }
 
     public HashMap<String, String> getResourceToScopeMapping(APIIdentifier identifier) throws APIManagementException {
