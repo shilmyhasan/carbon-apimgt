@@ -1025,34 +1025,43 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
                 //If gateway(s) exist, remove resource paths saved on the cache.
 
-                if (gatewayExists && isAPIPublished && !oldApi.getUriTemplates().equals(api.getUriTemplates())) {
-                    Set<URITemplate> resourceVerbs = api.getUriTemplates();
+            if (gatewayExists && isAPIPublished && !oldApi.getUriTemplates().equals(api.getUriTemplates())) {
+                Set<URITemplate> resourceVerbs = api.getUriTemplates();
 
-                    Map<String, Environment> gatewayEns = config.getApiGatewayEnvironments();
-                    for (Environment environment : gatewayEns.values()) {
-                        try {
-                            if(resourceVerbs != null){
-                                for (URITemplate resourceVerb : resourceVerbs) {
-                                    String resourceURLContext = resourceVerb.getUriTemplate();
+                String disabledResourceCacheInvalidation = System.getProperty(APIConstants.
+                        DISABLE_RESOURCE_CACHE_INVALIDATION);
+                Map<String, Environment> gatewayEns = config.getApiGatewayEnvironments();
+                for (Environment environment : gatewayEns.values()) {
+                    try {
+                        if (resourceVerbs != null) {
+                            for (URITemplate resourceVerb : resourceVerbs) {
+                                String resourceURLContext = resourceVerb.getUriTemplate();
+                                if (StringUtils.isEmpty(disabledResourceCacheInvalidation) ||
+                                        !Boolean.parseBoolean(disabledResourceCacheInvalidation)) {
                                     invalidateResourceCache(api.getContext(), api.getId().getVersion(),
                                             resourceURLContext, resourceVerb.getHTTPVerb(), environment);
                                     if (log.isDebugEnabled()) {
                                         log.debug("Calling invalidation cache");
                                     }
+                                } else if (Boolean.parseBoolean(disabledResourceCacheInvalidation)) {
+                                    if (log.isDebugEnabled()) {
+                                        log.debug("Calling resource cache invalidation disabled");
+                                    }
                                 }
                             }
-                        } catch (AxisFault ex) {
+                        }
+                    } catch (AxisFault ex) {
                              /*
                             didn't throw this exception to handle multiple gateway publishing feature therefore
                             this didn't break invalidating cache from the all the gateways if one gateway is
                             unreachable
                              */
-                            log.error("Error while invalidating from environment " +
-                                      environment.getName(), ex);
-                        }
+                        log.error("Error while invalidating from environment " +
+                                environment.getName(), ex);
                     }
-
                 }
+
+            }
 
 
                 // update apiContext cache
@@ -1099,7 +1108,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             //This is a fix for broken APIs after migrating from 1.10 to 2.0.0.
             //This sets the endpoint security of the APIs based on the old artifact.
             APIGatewayManager gatewayManager = APIGatewayManager.getInstance();
-            if (gatewayManager.isAPIPublished(api, tenantDomain)) {
+            if (isAPIPublished(api)) {
                 if ((!api.isEndpointSecured() && !api.isEndpointAuthDigest())) {
                     boolean isSecured = Boolean.parseBoolean(
                                                  artifact.getAttribute(APIConstants.API_OVERVIEW_ENDPOINT_SECURED));
@@ -1694,15 +1703,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     }
 
-    private boolean isAPIPublished(API api)throws APIManagementException {
-            String tenantDomain = null;
-			if (api.getId().getProviderName().contains("AT")) {
-				String provider = api.getId().getProviderName().replace("-AT-", "@");
-				tenantDomain = MultitenantUtils.getTenantDomain( provider);
-			}
-            APIGatewayManager gatewayManager = APIGatewayManager.getInstance();
-            return gatewayManager.isAPIPublished(api, tenantDomain);
+    private boolean isAPIPublished(API api) throws APIManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Checking whether API: " + api.getId().getApiName() + " has been published");
         }
+        return !(APIConstants.CREATED).equalsIgnoreCase(api.getStatus());
+    }
 
     private APITemplateBuilder getAPITemplateBuilder(API api) throws APIManagementException {
         APITemplateBuilderImpl vtb = new APITemplateBuilderImpl(api);
