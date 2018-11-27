@@ -34,7 +34,7 @@ import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
-import java.util.regex.Pattern;
+import com.google.re2j.Pattern;
 
 /**
  * This mediator would protect the backend resources from the threat vulnerabilities by matching the
