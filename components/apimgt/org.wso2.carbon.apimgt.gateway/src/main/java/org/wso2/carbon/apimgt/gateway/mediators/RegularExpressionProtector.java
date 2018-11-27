@@ -62,7 +62,9 @@ public class RegularExpressionProtector extends AbstractMediator {
         }
         Object messageProperty = messageContext.getProperty(APIMgtGatewayConstants.REGEX_PATTERN);
         if (messageProperty != null) {
-            pattern = Pattern.compile(messageProperty.toString(), Pattern.CASE_INSENSITIVE);
+            if (pattern == null) {
+                pattern = Pattern.compile(messageProperty.toString(), Pattern.CASE_INSENSITIVE);
+            }
         } else {
             GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
                     "Threat detection key words are missing");
