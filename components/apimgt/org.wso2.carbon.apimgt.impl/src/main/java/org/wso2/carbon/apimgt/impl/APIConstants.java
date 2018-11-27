@@ -467,6 +467,7 @@ public final class APIConstants {
     public static final String SCOPE_CACHE_ENABLED = CACHE_CONFIGS + "EnableScopeCache";
     public static final String PUBLISHER_ROLE_CACHE_ENABLED = CACHE_CONFIGS + "EnablePublisherRoleCache";
     public static final String DEFAULT_CACHE_TIMEOUT = "Cache.DefaultCacheTimeout";
+    public static final String DISABLE_RESOURCE_CACHE_INVALIDATION = "DisableResourceCacheInvalidation";
 
     public static final String API_KEY_VALIDATOR = "APIKeyValidator.";
     public static final String API_KEY_VALIDATOR_URL = API_KEY_VALIDATOR + "ServerURL";
