@@ -161,7 +161,13 @@ public class APIMgtResponseHandler extends APIMgtCommonExecutionPublisher {
             responsePublisherDTO.setEventTime(endTime);//This is the timestamp response event published
             responsePublisherDTO
                     .setDestination((String) mc.getProperty(APIMgtGatewayConstants.SYNAPSE_ENDPOINT_ADDRESS));
-            responsePublisherDTO.setResponseCode((Integer) axis2MC.getProperty(SynapseConstants.HTTP_SC));
+            int responseCode;
+            if(axis2MC.getProperty(SynapseConstants.HTTP_SC) instanceof  String){
+                responseCode = Integer.parseInt((String) axis2MC.getProperty(SynapseConstants.HTTP_SC));
+            } else {
+                responseCode = (Integer) axis2MC.getProperty(SynapseConstants.HTTP_SC);
+            }
+            responsePublisherDTO.setResponseCode(responseCode);
 
             String url = (String) mc.getProperty(RESTConstants.REST_URL_PREFIX);
 
