@@ -1025,43 +1025,43 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
                 //If gateway(s) exist, remove resource paths saved on the cache.
 
-            if (gatewayExists && isAPIPublished && !oldApi.getUriTemplates().equals(api.getUriTemplates())) {
-                Set<URITemplate> resourceVerbs = api.getUriTemplates();
+                if (gatewayExists && isAPIPublished && !oldApi.getUriTemplates().equals(api.getUriTemplates())) {
+                    Set<URITemplate> resourceVerbs = api.getUriTemplates();
 
-                String disabledResourceCacheInvalidation = System.getProperty(APIConstants.
-                        DISABLE_RESOURCE_CACHE_INVALIDATION);
-                Map<String, Environment> gatewayEns = config.getApiGatewayEnvironments();
-                for (Environment environment : gatewayEns.values()) {
-                    try {
-                        if (resourceVerbs != null) {
-                            for (URITemplate resourceVerb : resourceVerbs) {
-                                String resourceURLContext = resourceVerb.getUriTemplate();
-                                if (StringUtils.isEmpty(disabledResourceCacheInvalidation) ||
-                                        !Boolean.parseBoolean(disabledResourceCacheInvalidation)) {
-                                    invalidateResourceCache(api.getContext(), api.getId().getVersion(),
-                                            resourceURLContext, resourceVerb.getHTTPVerb(), environment);
-                                    if (log.isDebugEnabled()) {
-                                        log.debug("Calling invalidation cache");
-                                    }
-                                } else if (Boolean.parseBoolean(disabledResourceCacheInvalidation)) {
-                                    if (log.isDebugEnabled()) {
-                                        log.debug("Calling resource cache invalidation disabled");
+                    String disabledResourceCacheInvalidation = System.getProperty(APIConstants.
+                            DISABLE_RESOURCE_CACHE_INVALIDATION);
+                    Map<String, Environment> gatewayEns = config.getApiGatewayEnvironments();
+                    for (Environment environment : gatewayEns.values()) {
+                        try {
+                            if (resourceVerbs != null) {
+                                for (URITemplate resourceVerb : resourceVerbs) {
+                                    String resourceURLContext = resourceVerb.getUriTemplate();
+                                    if (StringUtils.isEmpty(disabledResourceCacheInvalidation) ||
+                                            !Boolean.parseBoolean(disabledResourceCacheInvalidation)) {
+                                        invalidateResourceCache(api.getContext(), api.getId().getVersion(),
+                                                resourceURLContext, resourceVerb.getHTTPVerb(), environment);
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Calling invalidation cache");
+                                        }
+                                    } else if (Boolean.parseBoolean(disabledResourceCacheInvalidation)) {
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Calling resource cache invalidation disabled");
+                                        }
                                     }
                                 }
                             }
+                        } catch (AxisFault ex) {
+                                 /*
+                                didn't throw this exception to handle multiple gateway publishing feature therefore
+                                this didn't break invalidating cache from the all the gateways if one gateway is
+                                unreachable
+                                 */
+                            log.error("Error while invalidating from environment " +
+                                    environment.getName(), ex);
                         }
-                    } catch (AxisFault ex) {
-                             /*
-                            didn't throw this exception to handle multiple gateway publishing feature therefore
-                            this didn't break invalidating cache from the all the gateways if one gateway is
-                            unreachable
-                             */
-                        log.error("Error while invalidating from environment " +
-                                environment.getName(), ex);
                     }
-                }
 
-            }
+                }
 
 
                 // update apiContext cache
