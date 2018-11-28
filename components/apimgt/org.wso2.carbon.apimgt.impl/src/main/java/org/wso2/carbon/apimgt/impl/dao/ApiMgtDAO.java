@@ -7863,8 +7863,6 @@ public class ApiMgtDAO {
                 addScopeLinks(conn, scopeIds, api_id);
             }
         } catch (SQLException e) {
-            log.info("Error when adding scopes - Id - excep Query: " + scopeEntry + " - ps - " +
-                    ps.toString());
             handleException("Error occurred while creating scopes ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, null, rs);
@@ -7888,8 +7886,6 @@ public class ApiMgtDAO {
                 ps.executeBatch();
             }
         } catch (SQLException e) {
-            log.info("Error when adding scope links - Id - excep Query: " + scopeLink + " - ps - " +
-                    ps.toString());
             handleException("Error occurred while creating scope links ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, null, null);
@@ -8079,7 +8075,6 @@ public class ApiMgtDAO {
             addScopes(connection, api.getUriTemplates(), apiId, tenantId);
             connection.commit();
         } catch (SQLException e) {
-            log.info("Error in update scopes in API - " + api + " - Id - ##updateScopes" );
             try {
                 if (connection != null) {
                     connection.rollback();
