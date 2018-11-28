@@ -21,20 +21,31 @@ package org.wso2.carbon.apimgt.gateway.mediators;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.rest.RESTUtils;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.threatprotection.utils.ThreatProtectorConstants;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import com.google.re2j.Pattern;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
+import javax.xml.stream.XMLStreamException;
 
 /**
  * This mediator would protect the backend resources from the threat vulnerabilities by matching the
@@ -60,6 +71,9 @@ public class RegularExpressionProtector extends AbstractMediator {
         if (logger.isDebugEnabled()) {
             logger.debug("RegularExpressionProtector mediator is activated...");
         }
+        checkAllowedTenants(messageContext);
+        checkPayloadSize(messageContext);
+
         Object messageProperty = messageContext.getProperty(APIMgtGatewayConstants.REGEX_PATTERN);
         if (messageProperty != null) {
             if (pattern == null) {
@@ -89,6 +103,82 @@ public class RegularExpressionProtector extends AbstractMediator {
         checkRequestHeaders(messageContext);
         checkRequestPath(messageContext);
         return true;
+    }
+
+    /**
+     * This method drops message flow if the request payload size exceeds the system property
+     * 'payloadSizeLimitForRegexThreatProtector' value defined. If this system property is not defined, this check won't
+     * be done.
+     *
+     * @param messageContext contains the message properties of the relevant API request which was
+     *                       enabled the regexValidator message mediation in flow.
+     */
+    private void checkAllowedTenants(MessageContext messageContext) {
+        String allowedTenants = System.getProperty(APIMgtGatewayConstants.REGEX_THREAT_PROTECTOR_ENABLED_TENANTS);
+        if (allowedTenants == null) {
+            return;
+        }
+        List<String> allowedTenantsList = Arrays.asList(allowedTenants.split(","));
+        String tenantDomain = MultitenantUtils.getTenantDomainFromRequestURL(RESTUtils.getFullRequestPath
+                (messageContext));
+        if (StringUtils.isEmpty(tenantDomain)) {
+            tenantDomain = org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        }
+
+        if (!allowedTenantsList.contains(tenantDomain)) {
+            GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
+                    "This tenant is not allowed to use Regex Threat Protector");
+        }
+    }
+
+    /**
+     * This method drops message flow if the request payload size exceeds the system property
+     * 'payloadSizeLimitForRegexThreatProtector' value defined. If this system property is not defined, this check won't
+     * be done.
+     *
+     * @param messageContext contains the message properties of the relevant API request which was
+     *                       enabled the regexValidator message mediation in flow.
+     */
+    private void checkPayloadSize(MessageContext messageContext) {
+        Integer payloadSizeLimit = Integer.getInteger(APIMgtGatewayConstants.PAYLOAD_SIZE_LIMIT_FOR_REGEX_TREAT_PROTECTOR);
+        if (payloadSizeLimit==null) {
+            return;
+        }
+
+        long requestPayloadSize = 0;
+        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext)
+                .getAxis2MessageContext();
+        Map headers = (Map) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        String contentLength = (String) headers.get(HttpHeaders.CONTENT_LENGTH);
+        if (contentLength != null) {
+            requestPayloadSize = Integer.parseInt(contentLength);
+
+        } else {  //When chunking is enabled
+            try {
+                RelayUtils.buildMessage(axis2MC);
+            } catch (IOException ex) {
+                //In case of an exception, it won't be propagated up,and set response size to 0
+                log.error("Error occurred while building the message to" +
+                        " calculate the request body size", ex);
+            } catch (XMLStreamException ex) {
+                log.error("Error occurred while building the message to calculate the request" +
+                        " body size", ex);
+            }
+
+            SOAPEnvelope env = messageContext.getEnvelope();
+            if (env != null) {
+                SOAPBody soapbody = env.getBody();
+                if (soapbody != null) {
+                    byte[] size = soapbody.toString().getBytes(Charset.defaultCharset());
+                    requestPayloadSize = size.length;
+                }
+            }
+        }
+
+        if (requestPayloadSize > payloadSizeLimit) {
+            GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE, "Payload size limit for " +
+                    "Regular Threat Protector mediator exceeded. So the request will be dropped");
+        }
     }
 
     /**
