@@ -85,6 +85,17 @@ public interface APIConsumer extends APIManager {
      * @return Set of API
      * @throws APIManagementException if failed to get top rated APIs
      */
+    Map<String,Object> getAllPaginatedPublishedLightWeightAPIs(String tenantDomain, int start, int end)
+            throws APIManagementException;
+
+    /**
+     * Returns top rated APIs
+     *
+     * @param limit if -1, no limit. Return everything else, limit the return list to specified value.
+     * @param lightWeight overloads the light weight implementation of the method
+     * @return Set of API
+     * @throws APIManagementException if failed to get top rated APIs
+     */
     Set<API> getTopRatedAPIs(int limit) throws APIManagementException;
 
     /**
@@ -702,16 +713,32 @@ public interface APIConsumer extends APIManager {
                                                    boolean returnAPITags) throws APIManagementException;
 
     /**
-     * Revokes the oldAccessToken generating a new one.
-     *
-     * @param oldAccessToken          Token to be revoked
-     * @param clientId                Consumer Key for the Application
-     * @param clientSecret            Consumer Secret for the Application
-     * @param validityTime            Desired Validity time for the token
-     * @param jsonInput               Additional parameters if Authorization server needs any.
-     * @return Details of the newly generated Access Token.
-     * @throws APIManagementException
+     * Returns a paginated list of all Light Weight APIs in given Status list. If a given API has multiple APIs,
+     * only the latest version will be included in this list.
+     * @param tenantDomain tenant domain
+     * @param start starting number
+     * @param end ending number
+     * @param Status One or more Statuses
+     * @param returnAPITags If true, tags of each API is returned
+     * @return set of API
+     * @throws APIManagementException if failed to API set
      */
+    Map<String,Object> getAllPaginatedLightWeightAPIsByStatus(String tenantDomain,int start,int end, String[] Status,
+                                                   boolean returnAPITags) throws APIManagementException;
+
+    /**
+     * Returns a paginated list of all APIs in given Status list. If a given API has multiple APIs,
+     * only the latest version will be included in this list.
+     * @param tenantDomain tenant domain
+     * @param start starting number
+     * @param end ending numbeer
+     * @param returnAPITags If true, tags of each API is returned
+     * @param lightWeight Additional parameter loads the light weight implementation of the above method
+     *                    (methodd overloaded)
+     * @return set of API
+     * @throws APIManagementException if failed to API set
+     */
+
     AccessTokenInfo renewAccessToken(String oldAccessToken, String clientId, String clientSecret, String validityTime,
                                      String[] requestedScopes, String jsonInput) throws
             APIManagementException;
