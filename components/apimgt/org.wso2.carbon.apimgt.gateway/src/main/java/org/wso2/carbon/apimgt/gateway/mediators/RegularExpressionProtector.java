@@ -42,6 +42,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 import com.google.re2j.Pattern;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -71,8 +72,14 @@ public class RegularExpressionProtector extends AbstractMediator {
         if (logger.isDebugEnabled()) {
             logger.debug("RegularExpressionProtector mediator is activated...");
         }
-        checkAllowedTenants(messageContext);
-        checkPayloadSize(messageContext);
+
+        if (!isTenantAllowed(messageContext)) {
+            return true;
+        }
+
+        if (isPayloadSizeExceeded(messageContext)) {
+            return true;
+        }
 
         Object messageProperty = messageContext.getProperty(APIMgtGatewayConstants.REGEX_PATTERN);
         if (messageProperty != null) {
@@ -82,6 +89,7 @@ public class RegularExpressionProtector extends AbstractMediator {
         } else {
             GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
                     "Threat detection key words are missing");
+            return true;
         }
         messageProperty = messageContext.getProperty(APIMgtGatewayConstants.ENABLED_CHECK_BODY);
         if (messageProperty != null) {
@@ -99,24 +107,29 @@ public class RegularExpressionProtector extends AbstractMediator {
         if (messageProperty != null) {
             threatType = String.valueOf(messageProperty);
         }
-        checkRequestBody(messageContext);
-        checkRequestHeaders(messageContext);
-        checkRequestPath(messageContext);
+
+        if (isRequestBodyVulnerable(messageContext) || isRequestHeadersVulnerable(messageContext) ||
+                isRequestPathVulnerable(messageContext)) {
+            return true;
+        }
         return true;
     }
 
     /**
-     * This method drops message flow if the request payload size exceeds the system property
-     * 'payloadSizeLimitForRegexThreatProtector' value defined. If this system property is not defined, this check won't
-     * be done.
+     * Using Regex Threat Protector mediator will be restricted to the tenants defined by the system property
+     * 'regexThreatProtectorEnabledTenants' as a list of comma separated values and super tenant. If this system
+     * property is not defined, then this restriction will not be applied at all. If invoked API is existing within a
+     * tenant, which was defined in this list, this method returns true. If this system property is not defined, this
+     * check won't be done and so will return true, hence all the tenants will be allowed to use this mediator
      *
      * @param messageContext contains the message properties of the relevant API request which was
      *                       enabled the regexValidator message mediation in flow.
+     * @return true if the tenant is allowed to use this Mediator
      */
-    private void checkAllowedTenants(MessageContext messageContext) {
+    private boolean isTenantAllowed(MessageContext messageContext) {
         String allowedTenants = System.getProperty(APIMgtGatewayConstants.REGEX_THREAT_PROTECTOR_ENABLED_TENANTS);
         if (allowedTenants == null) {
-            return;
+            return true;
         }
         List<String> allowedTenantsList = Arrays.asList(allowedTenants.split(","));
         String tenantDomain = MultitenantUtils.getTenantDomainFromRequestURL(RESTUtils.getFullRequestPath
@@ -125,24 +138,30 @@ public class RegularExpressionProtector extends AbstractMediator {
             tenantDomain = org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         }
 
-        if (!allowedTenantsList.contains(tenantDomain)) {
+        if (!allowedTenantsList.contains(tenantDomain) &&
+                !tenantDomain.equals(org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
-                    "This tenant is not allowed to use Regex Threat Protector");
+                    "This tenant is not allowed to use Regular Expression Threat Protector mediator");
+            return false;
+        } else {
+            return true;
         }
     }
 
     /**
-     * This method drops message flow if the request payload size exceeds the system property
-     * 'payloadSizeLimitForRegexThreatProtector' value defined. If this system property is not defined, this check won't
-     * be done.
+     * This method returns true if the request payload size exceeds the system property
+     * 'payloadSizeLimitForRegexThreatProtector' value (in KB) defined. If this system property is not defined, this
+     * check won't be done.
      *
      * @param messageContext contains the message properties of the relevant API request which was
      *                       enabled the regexValidator message mediation in flow.
+     * @return true if the payload size has exceeded the defined value in system property
      */
-    private void checkPayloadSize(MessageContext messageContext) {
+    private boolean isPayloadSizeExceeded(MessageContext messageContext) {
+        // payloadSizeLimit is in KB
         Integer payloadSizeLimit = Integer.getInteger(APIMgtGatewayConstants.PAYLOAD_SIZE_LIMIT_FOR_REGEX_TREAT_PROTECTOR);
-        if (payloadSizeLimit==null) {
-            return;
+        if (payloadSizeLimit == null) {
+            return false;
         }
 
         long requestPayloadSize = 0;
@@ -175,9 +194,12 @@ public class RegularExpressionProtector extends AbstractMediator {
             }
         }
 
-        if (requestPayloadSize > payloadSizeLimit) {
-            GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE, "Payload size limit for " +
-                    "Regular Threat Protector mediator exceeded. So the request will be dropped");
+        if (requestPayloadSize > payloadSizeLimit * 1024) {
+            GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE, "Exceeded Request Payload size limit " +
+                    "allowed to be used with Regular Expression Threat Protector mediator");
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -186,8 +208,9 @@ public class RegularExpressionProtector extends AbstractMediator {
      *
      * @param messageContext contains the message properties of the relevant API request which was
      *                       enabled the regexValidator message mediation in flow.
+     * @return true if the request body contains matching vulnerable key words.
      */
-    private void checkRequestBody(MessageContext messageContext) {
+    private boolean isRequestBodyVulnerable(MessageContext messageContext) {
         SOAPEnvelope soapEnvelope;
         SOAPBody soapBody;
         OMElement omElement;
@@ -196,15 +219,15 @@ public class RegularExpressionProtector extends AbstractMediator {
         if (enabledCheckBody) {
             soapEnvelope = axis2MC.getEnvelope();
             if (soapEnvelope == null) {
-                return;
+                return false;
             }
             soapBody = soapEnvelope.getBody();
             if (soapBody == null) {
-                return;
+                return false;
             }
             omElement = soapBody.getFirstElement();
             if (omElement == null) {
-                return;
+                return false;
             }
             String payload = omElement.toString();
             if (pattern != null && payload != null && pattern.matcher(payload).find()) {
@@ -214,16 +237,20 @@ public class RegularExpressionProtector extends AbstractMediator {
                 }
                 GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
                         threatType + " " + APIMgtGatewayConstants.PAYLOAD_THREAT_MSG);
+                return true;
             }
         }
+        return false;
     }
 
     /**
-     * This method checks whether the request header contains matching vulnerable keywords.
-     * * @param messageContext contains the message properties of the relevant API request which was
-     * enabled the regexValidator message mediation in flow.
+     * This method checks whether the request path contains matching vulnerable keywords.
+     *
+     * @param messageContext contains the message properties of the relevant API request which was
+     *                       enabled the regexValidator message mediation in flow.
+     * @return true if request path contains matching vulnerable keywords.
      */
-    private void checkRequestPath(MessageContext messageContext) {
+    private boolean isRequestPathVulnerable(MessageContext messageContext) {
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext)
                 messageContext).getAxis2MessageContext();
         String parameter = null;
@@ -236,6 +263,7 @@ public class RegularExpressionProtector extends AbstractMediator {
                 logger.error(message, e);
                 GatewayUtils.handleThreat(messageContext, ThreatProtectorConstants.HTTP_SC_CODE,
                         message + e.getMessage());
+                return true;
             }
             if (pattern != null && parameter != null && pattern.matcher(parameter).find()) {
                 if (logger.isDebugEnabled()) {
@@ -244,8 +272,10 @@ public class RegularExpressionProtector extends AbstractMediator {
                 }
                 GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
                         threatType + " " + APIMgtGatewayConstants.QPARAM_THREAT_MSG);
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -253,8 +283,9 @@ public class RegularExpressionProtector extends AbstractMediator {
      *
      * @param messageContext contains the message properties of the relevant API request which was
      *                       enabled the regexValidator message mediation in flow.
+     * @return true if request Headers contain matching vulnerable keywords
      */
-    private void checkRequestHeaders(MessageContext messageContext) {
+    private boolean isRequestHeadersVulnerable(MessageContext messageContext) {
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext)
                 messageContext).getAxis2MessageContext();
         if (enabledCheckHeaders) {
@@ -266,8 +297,10 @@ public class RegularExpressionProtector extends AbstractMediator {
                 }
                 GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
                         threatType + " " + APIMgtGatewayConstants.HTTP_HEADER_THREAT_MSG);
+                return true;
             }
         }
+        return false;
     }
 
     /**
