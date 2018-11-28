@@ -79,11 +79,15 @@ public interface APIConsumer extends APIManager {
     Map<String,Object> getAllPaginatedPublishedAPIs(String tenantDomain, int start, int end) throws APIManagementException;
 
     /**
-     * Returns top rated APIs
-     *
-     * @param limit if -1, no limit. Return everything else, limit the return list to specified value.
-     * @return Set of API
-     * @throws APIManagementException if failed to get top rated APIs
+     * Returns a paginated list of all published APIs. If a given API has multiple APIs,
+     * only the latest version will be included
+     * in this list.
+     * light weight implementation of getAllPaginatedPublishesAPIs.
+     * @param tenantDomain tenant domain
+     * @param start starting number
+     * @param end ending number
+     * @return set of API
+     * @throws APIManagementException if failed to API set
      */
     Map<String,Object> getAllPaginatedPublishedLightWeightAPIs(String tenantDomain, int start, int end)
             throws APIManagementException;
@@ -92,7 +96,6 @@ public interface APIConsumer extends APIManager {
      * Returns top rated APIs
      *
      * @param limit if -1, no limit. Return everything else, limit the return list to specified value.
-     * @param lightWeight overloads the light weight implementation of the method
      * @return Set of API
      * @throws APIManagementException if failed to get top rated APIs
      */
@@ -711,34 +714,30 @@ public interface APIConsumer extends APIManager {
      */
     Map<String,Object> getAllPaginatedAPIsByStatus(String tenantDomain,int start,int end, String[] Status,
                                                    boolean returnAPITags) throws APIManagementException;
-
     /**
-     * Returns a paginated list of all Light Weight APIs in given Status list. If a given API has multiple APIs,
+     * Returns a paginated list of all APIs in given Status list. If a given API has multiple APIs,
      * only the latest version will be included in this list.
+     * Light wieght implementation of getAllPaginatedAPIsByStatus
      * @param tenantDomain tenant domain
      * @param start starting number
-     * @param end ending number
-     * @param Status One or more Statuses
+     * @param end ending numbeer
      * @param returnAPITags If true, tags of each API is returned
      * @return set of API
      * @throws APIManagementException if failed to API set
      */
     Map<String,Object> getAllPaginatedLightWeightAPIsByStatus(String tenantDomain,int start,int end, String[] Status,
                                                    boolean returnAPITags) throws APIManagementException;
-
     /**
-     * Returns a paginated list of all APIs in given Status list. If a given API has multiple APIs,
-     * only the latest version will be included in this list.
-     * @param tenantDomain tenant domain
-     * @param start starting number
-     * @param end ending numbeer
-     * @param returnAPITags If true, tags of each API is returned
-     * @param lightWeight Additional parameter loads the light weight implementation of the above method
-     *                    (methodd overloaded)
-     * @return set of API
-     * @throws APIManagementException if failed to API set
+     * Revokes the oldAccessToken generating a new one.
+     *
+     * @param oldAccessToken          Token to be revoked
+     * @param clientId                Consumer Key for the Application
+     * @param clientSecret            Consumer Secret for the Application
+     * @param validityTime            Desired Validity time for the token
+     * @param jsonInput               Additional parameters if Authorization server needs any.
+     * @return Details of the newly generated Access Token.
+     * @throws APIManagementException
      */
-
     AccessTokenInfo renewAccessToken(String oldAccessToken, String clientId, String clientSecret, String validityTime,
                                      String[] requestedScopes, String jsonInput) throws
             APIManagementException;
