@@ -1652,7 +1652,9 @@ public class APIStoreHostObject extends ScriptableObject {
         //    return getPaginatedAPIsByStatus(apiConsumer, tenantDomain, start, end, statusList, returnAPItags);
         //}
     }
-    private static NativeObject getPaginatedLightWeightAPIsByStatus(APIConsumer apiConsumer, String tenantDomain, int start, int end, String[] status, boolean returnAPItags) {
+    private static NativeObject getPaginatedLightWeightAPIsByStatus(APIConsumer apiConsumer, String tenantDomain,
+                                                                    int start, int end, String[] status,
+                                                                    boolean returnAPItags) {
         Set<API> apiSet;
         Map<String, Object> resultMap;
         NativeArray myn = new NativeArray(0);
@@ -1664,9 +1666,11 @@ public class APIStoreHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             } else {
                 PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
+                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
             }
-            resultMap = apiConsumer.getAllPaginatedLightWeightAPIsByStatus(tenantDomain, start, end, status, returnAPItags);
+            resultMap = apiConsumer.getAllPaginatedLightWeightAPIsByStatus(tenantDomain, start, end, status,
+                    returnAPItags);
 
         } catch (APIManagementException e) {
             log.error("Error from Registry API while getting API Information", e);
