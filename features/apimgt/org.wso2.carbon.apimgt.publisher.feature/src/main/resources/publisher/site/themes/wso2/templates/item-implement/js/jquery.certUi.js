@@ -95,28 +95,22 @@
                         if (containInCertUrl) {
                             return containInCertUrl;
                         }
-                    }
+                            }
                 } else if (productionEndpoints) {
                     // Skip if productionEndpoints is `undefined`
-                    var containInCertUrl = productionEndpoints.url.toLowerCase().indexOf(certUrl) !== -1;
-                    if (containInCertUrl) {
-                        return containInCertUrl;
-                    }
-                }
+                    return productionEndpoints.url.toLowerCase().indexOf(certUrl) !== -1;
+                        }
                 if (Array.isArray(sandboxEndpoints)) {
                     for (var index in sandboxEndpoints) {
                         var containInCertUrl = sandboxEndpoints[index].url.toLowerCase().indexOf(certUrl) !== -1;
                         if (containInCertUrl) {
                             return containInCertUrl;
-                        }
-                    }
-                } else if (sandboxEndpoints) {
-                    // Skip if sandboxEndpoints is `undefined`
-                    var containInCertUrl = sandboxEndpoints.url.toLowerCase().indexOf(certUrl) !== -1;
-                    if (containInCertUrl) {
-                        return containInCertUrl;
                     }
                 }
+                } else if (sandboxEndpoints) {
+                    // Skip if sandboxEndpoints is `undefined`
+                    return sandboxEndpoints.url.toLowerCase().indexOf(certUrl) !== -1;
+            }
             });
             return newCerts;
         },
@@ -262,6 +256,20 @@
                     type: "error",
                     content: i18n.t("Could not add certificate for alias") + ", '" + alias + "'. " +
                     i18n.t("Alias exists in trust store")
+                });
+                return;
+            } else if (aliasMatched.length === 0 && endpointMatched.length > 0) {
+                jagg.message({
+                    type: "error",
+                    content: i18n.t("Could not add certificate for Endpoint") + ", '" + ep +
+                    "'. " + i18n.t("Certificate for the endpoint") + "'" + ep + "'" + i18n.t("already exists")
+                });
+                return;
+            } else if (aliasMatched.length > 0 && endpointMatched.length > 0) {
+                jagg.message({
+                    type: "error",
+                    content: i18n.t("Could not add certificate for alias and endpoint") + "'" + alias + "' '" + ep +
+                    "'. <br/> " + i18n.t("Certificate exists for Alias : Endpoint combination")
                 });
                 return;
             } else {
