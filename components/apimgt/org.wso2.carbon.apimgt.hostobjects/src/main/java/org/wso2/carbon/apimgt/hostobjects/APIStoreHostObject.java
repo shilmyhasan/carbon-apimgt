@@ -1621,7 +1621,6 @@ public class APIStoreHostObject extends ScriptableObject {
         return getPaginatedAPIsByStatus(apiConsumer, tenantDomain, start, end, statusList, returnAPItags);
     }
 
-    //Get Publsihed APIS for Light Weight APIs
     public static NativeObject jsFunction_getAllPaginatedPublishedLightWeightAPIs(Context cx, Scriptable thisObj,
                                                                        Object[] args, Function funObj)
             throws ScriptException, APIManagementException {
@@ -1643,14 +1642,7 @@ public class APIStoreHostObject extends ScriptableObject {
         if (args.length > 3 && args[3] != null) {
             returnAPItags = Boolean.parseBoolean((String) args[3]);
         }
-        //if(args.length > 4 && args[4] != null) {
-        //    lightWeight = lWeight;
-        //}
-        //if(lightWeight == true) {
         return getPaginatedLightWeightAPIsByStatus(apiConsumer, tenantDomain, start, end, statusList, returnAPItags);
-        //} else {
-        //    return getPaginatedAPIsByStatus(apiConsumer, tenantDomain, start, end, statusList, returnAPItags);
-        //}
     }
     private static NativeObject getPaginatedLightWeightAPIsByStatus(APIConsumer apiConsumer, String tenantDomain,
                                                                     int start, int end, String[] status,

@@ -77,8 +77,6 @@ include("/jagg/jagg.jag");
         } 
 	print(result);
     } else if (action == "getAllPaginatedPublishedAPIs") {
-              var log = new Log();
-              log.info("get to start");
               if (!user) {
                   if(!ssoEnabled){
 			print({
@@ -94,10 +92,8 @@ include("/jagg/jagg.jag");
               var end=request.getParameter("end");
               var returnAPITags = request.getParameter("returnAPITags");
               mod = jagg.module("api");
-
-              log.info("gets here");
               result = mod.getAllPaginatedPublishedAPIs(tenant, start, end, returnAPITags);
-              log.info(result);
+
               if (result.error) {
                   obj = {
                       error:result.error,
@@ -126,10 +122,7 @@ include("/jagg/jagg.jag");
           var end=request.getParameter("end");
           var returnAPITags = request.getParameter("returnAPITags");
           mod = jagg.module("api");
-          var log = new Log();
-          log.info("gets here");
           result = mod.getAllPaginatedPublishedLightWeightAPIs(tenant, start, end, returnAPITags);
-          log.info(result);
           if (result.error) {
               obj = {
                   error:result.error,
