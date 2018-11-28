@@ -3834,11 +3834,13 @@ public class ApiMgtDAO {
             if (subscriber != null) {
                 int subscriberId = getSubscriber(userName).getId();
                 connection = APIMgtDBUtil.getConnection();
+                connection.setAutoCommit(false);
                 prepStmt = connection.prepareStatement(sqlQuery);
                 prepStmt.setString(1, userName);
                 prepStmt.setInt(2, subscriberId);
                 prepStmt.setString(3, application.getUUID());
                 prepStmt.executeUpdate();
+                connection.commit();
                 isAppUpdated = true;
             } else {
                 String errorMessage = "Error when retrieving subscriber details for user " + userName;
@@ -5520,6 +5522,12 @@ public class ApiMgtDAO {
                 application.setTier(rs.getString("APPLICATION_TIER"));
                 application.setTokenType(rs.getString("TOKEN_TYPE"));
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
+
+                if (multiGroupAppSharingEnabled) {
+                    if (application.getGroupId().isEmpty()) {
+                        application.setGroupId(getGroupId(applicationId));
+                    }
+                }
             }
             if (application != null) {
                 Map<String,String> applicationAttributes = getApplicationAttributes(connection, applicationId);
@@ -11785,6 +11793,7 @@ public class ApiMgtDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
             ps = connection.prepareStatement(SQLConstants.REMOVE_APPLICATION_ATTRIBUTES_BY_ATTRIBUTE_NAME_SQL);
             ps.setString(1, attributeKey);
             ps.setInt(2, applicationId);

@@ -43,6 +43,7 @@ import static org.wso2.carbon.apimgt.impl.soaptorest.util.SOAPOperationBindingUt
 public class WSDLSOAPOperationExtractorImplTestCase {
 
     private static Set<WSDLSOAPOperation> operations;
+    private static Set<WSDLSOAPOperation> rpcOperations;
 
     @Before
     public void setup() throws Exception {
@@ -156,6 +157,42 @@ public class WSDLSOAPOperationExtractorImplTestCase {
         Assert.assertNotNull(parameterModelMap.get("ItemSearchRequest").getProperties().get("Availability"));
         Assert.assertEquals("string",
                 parameterModelMap.get("ItemSearchRequest").getProperties().get("Availability").getType());
+    }
+
+    @Test
+    public void testGetWsdlDefinitionInRpc() throws Exception {
+        APIMWSDLReader wsdlReader = new APIMWSDLReader(Thread.currentThread().getContextClassLoader()
+                .getResource("wsdls/rpctypewsdl.wsdl").toExternalForm());
+        byte[] wsdlContent = wsdlReader.getWSDL();
+        WSDLSOAPOperationExtractor processor = new WSDL11SOAPOperationExtractor(wsdlReader);
+        Assert.assertTrue("WSDL definition parsing failed for RPC WSDL", processor.init(wsdlContent));
+    }
+
+    @Test
+    public void testReadSoapBindingOperationsForRpc() throws Exception {
+        if (rpcOperations != null) {
+            Assert.assertTrue("WSDL operation processing failed ", rpcOperations.iterator().hasNext());
+            Assert.assertTrue("Incorrect  namespace for RPC WSDL",
+                    rpcOperations.iterator().next().getTargetNamespace().equals("http://192.168.101.33/WSCimenta2"));
+        }
+    }
+
+    @Test
+    public void testParseOperationInputParametersForRpc() throws Exception {
+        if (rpcOperations != null) {
+            Assert.assertTrue("WSDL operation processing failed", rpcOperations.iterator().hasNext());
+            Assert.assertTrue("WSDL operation parameters are not set",
+                    rpcOperations.iterator().next().getInputParameterModel().size() > 0);
+        }
+    }
+
+    @Test
+    public void testParseOperationOutputParametersForRpc() throws Exception {
+        if (rpcOperations != null) {
+            Assert.assertTrue("WSDL operation processing failed", rpcOperations.iterator().hasNext());
+            Assert.assertTrue("WSDL operation output parameters are not set",
+                    rpcOperations.iterator().next().getOutputParameterModel().size() > 0);
+        }
     }
 
     public static API getAPIForTesting() {

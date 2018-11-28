@@ -673,6 +673,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public void addAPI(API api) throws APIManagementException {
         validateApiInfo(api);
+        String tenantDomain = MultitenantUtils
+                .getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+        validateResourceThrottlingTiers(api, tenantDomain);
         createAPI(api);
 
         if (log.isDebugEnabled()) {
@@ -681,8 +684,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         int tenantId;
-        String tenantDomain = MultitenantUtils
-                .getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
         try {
             tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
                     .getTenantId(tenantDomain);
@@ -1011,6 +1012,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 throw new APIManagementException(
                         "Error in retrieving Tenant Information while updating api :" + api.getId().getApiName(), e);
             }
+            validateResourceThrottlingTiers(api, tenantDomain);
             apiMgtDAO.updateAPI(api, tenantId);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully updated the API: " + api.getId() + " in the database");
@@ -1491,8 +1493,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             failedGateways = publishToGateway(api);
                             //Sending Notifications to existing subscribers
                             if (APIConstants.PUBLISHED.equals(newStatus)) {
-                                List<APIIdentifier> oldPublishedAPIList = getOldPublishedAPIList(api);
-                                sendEmailNotification(api, oldPublishedAPIList);
+                                sendEmailNotification(api);
                             }
                         } else { // API Status : RETIRED or CREATED
                             failedGateways = removeFromGateway(api);
@@ -1731,10 +1732,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * This method used to send notifications to the previous subscribers of older versions of a given API
      *
      * @param api
-     * @param apiIdentifiers
      * @throws APIManagementException
      */
-    private void sendEmailNotification(API api, List<APIIdentifier> apiIdentifiers) throws APIManagementException {
+    private void sendEmailNotification(API api) throws APIManagementException {
         try {
             String isNotificationEnabled = "false";
             Registry configRegistry = ServiceReferenceHolder.getInstance().getRegistryService().
@@ -1748,6 +1748,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
             if (JavaUtils.isTrueExplicitly(isNotificationEnabled)) {
+                List<APIIdentifier> apiIdentifiers = getOldPublishedAPIList(api);
                 for (APIIdentifier oldAPI : apiIdentifiers) {
                     Properties prop = new Properties();
                     prop.put(NotifierConstants.API_KEY, oldAPI);
@@ -4145,6 +4146,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public String[] getConsumerKeys(APIIdentifier apiIdentifier) throws APIManagementException {
 
         return apiMgtDAO.getConsumerKeys(apiIdentifier);
+    }
+
+    @Override
+    public void validateResourceThrottlingTiers(API api, String tenantDomain) throws APIManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Validating x-throttling tiers defined in swagger api definition resource");
+        }
+        Map<String, Tier> tierMap = APIUtil.getTiers(APIConstants.TIER_RESOURCE_TYPE, tenantDomain);
+        if (tierMap != null) {
+            Set<URITemplate> uriTemplates = api.getUriTemplates();
+            for (URITemplate template : uriTemplates) {
+                if (template.getThrottlingTier() != null && !tierMap.containsKey(template.getThrottlingTier())) {
+                    String message = "Invalid x-throttling tier " + template.getThrottlingTier() +
+                            " found in api definition for resource " + template.getHTTPVerb() + " " +
+                            template.getUriTemplate();
+                    log.error(message);
+                    throw new APIManagementException(message);
+                }
+            }
+        }
     }
 
     @Override

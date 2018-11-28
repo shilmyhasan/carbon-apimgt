@@ -678,8 +678,15 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
                                     ModelImpl model = new ModelImpl();
                                     model.setType(ObjectProperty.TYPE);
                                     model.setName(message.getQName().getLocalPart());
-                                    model.addProperty(part.getName(),
-                                            getPropertyFromDataType(part.getTypeName().getLocalPart()));
+                                    if (getPropertyFromDataType(part.getTypeName().getLocalPart()) instanceof RefProperty) {
+                                        RefProperty property = (RefProperty) getPropertyFromDataType(part.getTypeName()
+                                                .getLocalPart());
+                                        property.set$ref("#/definitions/" + part.getTypeName().getLocalPart());
+                                        model.addProperty(part.getName(), property);
+                                    } else {
+                                        model.addProperty(part.getName(),
+                                                getPropertyFromDataType(part.getTypeName().getLocalPart()));
+                                    }
                                     parameterModelMap.put(model.getName(), model);
                                     inputParameterModelList.add(model);
                                 }
@@ -725,8 +732,15 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
                                     ModelImpl model = new ModelImpl();
                                     model.setType(ObjectProperty.TYPE);
                                     model.setName(message.getQName().getLocalPart());
-                                    model.addProperty(part.getName(),
-                                            getPropertyFromDataType(part.getTypeName().getLocalPart()));
+                                    if (getPropertyFromDataType(part.getTypeName().getLocalPart()) instanceof RefProperty) {
+                                        RefProperty property = (RefProperty) getPropertyFromDataType(part.getTypeName()
+                                                .getLocalPart());
+                                        property.set$ref("#/definitions/" + part.getTypeName().getLocalPart());
+                                        model.addProperty(part.getName(), property);
+                                    } else {
+                                        model.addProperty(part.getName(),
+                                                getPropertyFromDataType(part.getTypeName().getLocalPart()));
+                                    }
                                     parameterModelMap.put(model.getName(), model);
                                     outputParameterModelList.add(model);
                                 }

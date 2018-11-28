@@ -1,0 +1,519 @@
+<definitions xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://192.168.101.33/WSCimenta2" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://192.168.101.33/WSCimenta2">
+    <types>
+        <xsd:schema targetNamespace="http://192.168.101.33/WSCimenta2">
+            <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+            <xsd:import namespace="http://schemas.xmlsoap.org/wsdl/"/>
+        </xsd:schema>
+    </types>
+    <message name="ListaInmueblesRequest">
+        <part name="provincia" type="xsd:integer"/>
+        <part name="localidad" type="xsd:decimal"/>
+        <part name="tipo_promocion" type="xsd:string"/>
+        <part name="tipo_gestion" type="xsd:string"/>
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="tipo_inmueble" type="xsd:string"/>
+        <part name="estado" type="xsd:integer"/>
+    </message>
+    <message name="ListaInmueblesResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="FichaInmuebleRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="id_inmueble" type="xsd:string"/>
+    </message>
+    <message name="FichaInmuebleResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaVisitasRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="id_inmueble" type="xsd:string"/>
+        <part name="entidad" type="xsd:integer"/>
+        <part name="oficina" type="xsd:string"/>
+        <part name="NIF_contacto" type="xsd:string"/>
+        <part name="fecha_desde" type="xsd:date"/>
+        <part name="fecha_hasta" type="xsd:date"/>
+    </message>
+    <message name="ListaVisitasResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="DetalleVisitaRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="id_inmueble" type="xsd:string"/>
+        <part name="entidad" type="xsd:integer"/>
+        <part name="oficina" type="xsd:string"/>
+        <part name="id_visita" type="xsd:integer"/>
+        <part name="NIF_contacto" type="xsd:string"/>
+    </message>
+    <message name="DetalleVisitaResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ConsultaPropuestasRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="id_inmueble" type="xsd:string"/>
+        <part name="entidad" type="xsd:integer"/>
+        <part name="oficina" type="xsd:string"/>
+        <part name="NIF_contacto" type="xsd:string"/>
+    </message>
+    <message name="ConsultaPropuestasResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaPromocionesRequest">
+        <part name="tipo_promocion" type="xsd:string"/>
+    </message>
+    <message name="ListaPromocionesResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="TiposInmuebleRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+    </message>
+    <message name="TiposInmuebleResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaLocalidadesRequest">
+        <part name="provincia" type="xsd:integer"/>
+    </message>
+    <message name="ListaLocalidadesResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaAPIsRequest"/>
+    <message name="ListaAPIsResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaRepresentantesAPIsRequest">
+        <part name="id_agencia" type="xsd:integer"/>
+    </message>
+    <message name="ListaRepresentantesAPIsResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaLocalizacionesRequest"/>
+    <message name="ListaLocalizacionesResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaOficiosRequest"/>
+    <message name="ListaOficiosResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="AltaContactoRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="id_inmueble" type="xsd:string"/>
+        <part name="nombre" type="xsd:string"/>
+        <part name="apellidos" type="xsd:string"/>
+        <part name="tipo_documento" type="xsd:string"/>
+        <part name="NIF_contacto" type="xsd:string"/>
+        <part name="sexo" type="xsd:string"/>
+        <part name="fecha_inscripcion" type="xsd:date"/>
+        <part name="hora_inscripcion" type="xsd:time"/>
+        <part name="comercial" type="xsd:string"/>
+        <part name="telefono" type="xsd:string"/>
+        <part name="via" type="xsd:string"/>
+        <part name="domicilio" type="xsd:string"/>
+        <part name="numero" type="xsd:integer"/>
+        <part name="escalera" type="xsd:string"/>
+        <part name="piso" type="xsd:string"/>
+        <part name="puerta" type="xsd:string"/>
+        <part name="pais" type="xsd:integer"/>
+        <part name="provincia" type="xsd:integer"/>
+        <part name="poblacion" type="xsd:decimal"/>
+        <part name="codigo_postal" type="xsd:string"/>
+        <part name="procedencia" type="xsd:string"/>
+    </message>
+    <message name="AltaContactoResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="AltaVisitaRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="id_inmueble" type="xsd:string"/>
+        <part name="NIF_contacto" type="xsd:string"/>
+        <part name="fecha_prevista" type="xsd:date"/>
+        <part name="fecha_real" type="xsd:date"/>
+        <part name="observaciones" type="xsd:string"/>
+        <part name="entidad" type="xsd:integer"/>
+        <part name="oficina" type="xsd:string"/>
+        <part name="comercial_CM2" type="xsd:string"/>
+        <part name="agencia" type="xsd:integer"/>
+        <part name="entrega_llaves" type="xsd:string"/>
+        <part name="fecha_salida_llaves" type="xsd:date"/>
+    </message>
+    <message name="AltaVisitaResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="AltaPropuestaRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="id_inmueble" type="xsd:string"/>
+        <part name="id_visita" type="xsd:integer"/>
+        <part name="NIF_contacto" type="xsd:string"/>
+        <part name="fecha" type="xsd:date"/>
+        <part name="importe" type="xsd:decimal"/>
+        <part name="tipo_gestion" type="xsd:string"/>
+        <part name="entrada" type="xsd:decimal"/>
+        <part name="aplazado" type="xsd:decimal"/>
+        <part name="hipoteca" type="xsd:decimal"/>
+        <part name="observaciones" type="xsd:string"/>
+        <part name="entidad" type="xsd:integer"/>
+        <part name="oficina" type="xsd:string"/>
+    </message>
+    <message name="AltaPropuestaResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="AltaIncidenciaRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+        <part name="id_inmueble" type="xsd:string"/>
+        <part name="id_visita" type="xsd:integer"/>
+        <part name="id_localizacion" type="xsd:integer"/>
+        <part name="id_oficio" type="xsd:integer"/>
+        <part name="observaciones" type="xsd:string"/>
+    </message>
+    <message name="AltaIncidenciaResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaPromocionesECRequest">
+        <part name="id_evento" type="xsd:string"/>
+        <part name="provincia" type="xsd:integer"/>
+        <part name="localidad" type="xsd:decimal"/>
+        <part name="tipo_promocion" type="xsd:string"/>
+        <part name="tipo_gestion" type="xsd:string"/>
+    </message>
+    <message name="ListaPromocionesECResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaEventosComercialesRequest">
+        <part name="id_promocion" type="xsd:integer"/>
+    </message>
+    <message name="ListaEventosComercialesResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ConsultaEventosRequest">
+        <part name="id_evento" type="xsd:string"/>
+        <part name="id_promocion" type="xsd:integer"/>
+    </message>
+    <message name="ConsultaEventosResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ConsultaAccionesRequest"/>
+    <message name="ConsultaAccionesResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaEntidadesRequest"/>
+    <message name="ListaEntidadesResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaOficinasRequest">
+        <part name="entidad" type="xsd:integer"/>
+    </message>
+    <message name="ListaOficinasResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <message name="ListaComercialesRequest"/>
+    <message name="ListaComercialesResponse">
+        <part name="return" type="xsd:string"/>
+    </message>
+    <portType name="ApplicationServicesPortType">
+        <operation name="ListaInmuebles">
+            <input message="tns:ListaInmueblesRequest"/>
+            <output message="tns:ListaInmueblesResponse"/>
+        </operation>
+        <operation name="FichaInmueble">
+            <input message="tns:FichaInmuebleRequest"/>
+            <output message="tns:FichaInmuebleResponse"/>
+        </operation>
+        <operation name="ListaVisitas">
+            <input message="tns:ListaVisitasRequest"/>
+            <output message="tns:ListaVisitasResponse"/>
+        </operation>
+        <operation name="DetalleVisita">
+            <input message="tns:DetalleVisitaRequest"/>
+            <output message="tns:DetalleVisitaResponse"/>
+        </operation>
+        <operation name="ConsultaPropuestas">
+            <input message="tns:ConsultaPropuestasRequest"/>
+            <output message="tns:ConsultaPropuestasResponse"/>
+        </operation>
+        <operation name="ListaPromociones">
+            <input message="tns:ListaPromocionesRequest"/>
+            <output message="tns:ListaPromocionesResponse"/>
+        </operation>
+        <operation name="TiposInmueble">
+            <input message="tns:TiposInmuebleRequest"/>
+            <output message="tns:TiposInmuebleResponse"/>
+        </operation>
+        <operation name="ListaLocalidades">
+            <input message="tns:ListaLocalidadesRequest"/>
+            <output message="tns:ListaLocalidadesResponse"/>
+        </operation>
+        <operation name="ListaAPIs">
+            <input message="tns:ListaAPIsRequest"/>
+            <output message="tns:ListaAPIsResponse"/>
+        </operation>
+        <operation name="ListaRepresentantesAPIs">
+            <input message="tns:ListaRepresentantesAPIsRequest"/>
+            <output message="tns:ListaRepresentantesAPIsResponse"/>
+        </operation>
+        <operation name="ListaLocalizaciones">
+            <input message="tns:ListaLocalizacionesRequest"/>
+            <output message="tns:ListaLocalizacionesResponse"/>
+        </operation>
+        <operation name="ListaOficios">
+            <input message="tns:ListaOficiosRequest"/>
+            <output message="tns:ListaOficiosResponse"/>
+        </operation>
+        <operation name="AltaContacto">
+            <input message="tns:AltaContactoRequest"/>
+            <output message="tns:AltaContactoResponse"/>
+        </operation>
+        <operation name="AltaVisita">
+            <input message="tns:AltaVisitaRequest"/>
+            <output message="tns:AltaVisitaResponse"/>
+        </operation>
+        <operation name="AltaPropuesta">
+            <input message="tns:AltaPropuestaRequest"/>
+            <output message="tns:AltaPropuestaResponse"/>
+        </operation>
+        <operation name="AltaIncidencia">
+            <input message="tns:AltaIncidenciaRequest"/>
+            <output message="tns:AltaIncidenciaResponse"/>
+        </operation>
+        <operation name="ListaPromocionesEC">
+            <input message="tns:ListaPromocionesECRequest"/>
+            <output message="tns:ListaPromocionesECResponse"/>
+        </operation>
+        <operation name="ListaEventosComerciales">
+            <input message="tns:ListaEventosComercialesRequest"/>
+            <output message="tns:ListaEventosComercialesResponse"/>
+        </operation>
+        <operation name="ConsultaEventos">
+            <input message="tns:ConsultaEventosRequest"/>
+            <output message="tns:ConsultaEventosResponse"/>
+        </operation>
+        <operation name="ConsultaAcciones">
+            <input message="tns:ConsultaAccionesRequest"/>
+            <output message="tns:ConsultaAccionesResponse"/>
+        </operation>
+        <operation name="ListaEntidades">
+            <input message="tns:ListaEntidadesRequest"/>
+            <output message="tns:ListaEntidadesResponse"/>
+        </operation>
+        <operation name="ListaOficinas">
+            <input message="tns:ListaOficinasRequest"/>
+            <output message="tns:ListaOficinasResponse"/>
+        </operation>
+        <operation name="ListaComerciales">
+            <input message="tns:ListaComercialesRequest"/>
+            <output message="tns:ListaComercialesResponse"/>
+        </operation>
+    </portType>
+    <binding name="ApplicationServicesBinding" type="tns:ApplicationServicesPortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="ListaInmuebles">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaInmuebles" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaInmuebles" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaInmuebles" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="FichaInmueble">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/FichaInmueble" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/FichaInmueble" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/FichaInmueble" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaVisitas">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaVisitas" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaVisitas" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaVisitas" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="DetalleVisita">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/DetalleVisita" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/DetalleVisita" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/DetalleVisita" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ConsultaPropuestas">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ConsultaPropuestas" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ConsultaPropuestas" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ConsultaPropuestas" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaPromociones">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaPromociones" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaPromociones" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaPromociones" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="TiposInmueble">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/TiposInmueble" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/TiposInmueble" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/TiposInmueble" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaLocalidades">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaLocalidades" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaLocalidades" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaLocalidades" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaAPIs">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaAPIs" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaAPIs" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaAPIs" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaRepresentantesAPIs">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaRepresentantesAPIs" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaRepresentantesAPIs" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaRepresentantesAPIs" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaLocalizaciones">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaLocalizaciones" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaLocalizaciones" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaLocalizaciones" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaOficios">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaOficios" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaOficios" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaOficios" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="AltaContacto">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/AltaContacto" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/AltaContacto" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/AltaContacto" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="AltaVisita">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/AltaVisita" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/AltaVisita" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/AltaVisita" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="AltaPropuesta">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/AltaPropuesta" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/AltaPropuesta" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/AltaPropuesta" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="AltaIncidencia">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/AltaIncidencia" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/AltaIncidencia" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/AltaIncidencia" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaPromocionesEC">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaPromocionesEC" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaPromocionesEC" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaPromocionesEC" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaEventosComerciales">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaEventosComerciales" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaEventosComerciales" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaEventosComerciales" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ConsultaEventos">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ConsultaEventos" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ConsultaEventos" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ConsultaEventos" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ConsultaAcciones">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ConsultaAcciones" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ConsultaAcciones" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ConsultaAcciones" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaEntidades">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaEntidades" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaEntidades" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaEntidades" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaOficinas">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaOficinas" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaOficinas" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaOficinas" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+        <operation name="ListaComerciales">
+            <soap:operation soapAction="http://myserver/wscimenta2/wsserver.php/ListaComerciales" style="rpc"/>
+            <input>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaComerciales" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </input>
+            <output>
+                <soap:body use="encoded" namespace="http://192.168.101.33/WSCimenta2/ListaComerciales" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="ApplicationServices">
+        <port name="ApplicationServicesPort" binding="tns:ApplicationServicesBinding">
+            <soap:address location="http://myserver/wscimenta2/wsserver.php"/>
+        </port>
+    </service>
+</definitions>
