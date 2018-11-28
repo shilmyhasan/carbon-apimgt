@@ -717,7 +717,9 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
      */
     @Override
     public Map<String, Object> getAllPaginatedLightWeightAPIsByStatus(String tenantDomain,
-                                                           int start, int end, final String[] apiStatus, boolean returnAPITags) throws APIManagementException {
+                                                           int start, int end, final String[] apiStatus,
+                                                                      boolean returnAPITags)
+            throws APIManagementException {
 
         Map<String,Object> result=new HashMap<String, Object>();
         SortedSet<API> apiSortedSet = new TreeSet<API>(new APINameComparator());
@@ -729,7 +731,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         try {
             Registry userRegistry;
             boolean isTenantMode=(tenantDomain != null);
-            if ((isTenantMode && this.tenantDomain==null) || (isTenantMode && isTenantDomainNotMatching(tenantDomain))) {//Tenant store anonymous mode
+            if ((isTenantMode && this.tenantDomain==null) || (isTenantMode && isTenantDomainNotMatching(tenantDomain))) {
+                //Tenant store anonymous mode
                 int tenantId = getTenantId(tenantDomain);
                 // explicitly load the tenant's registry
                 APIUtil.loadTenantRegistry(tenantId);
@@ -793,8 +796,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
                     // Check to see if we can speculate that there are more APIs to be loaded
                     if (maxPaginationLimit == totalLength) {
-                        isMore = true;  // More APIs exist so we cannot determine the total API count without incurring a
-                        // performance hit
+                        isMore = true;  // More APIs exist so we cannot determine the total API count without
+                        // incurring a performance hit
                         --totalLength; // Remove the additional 1 we added earlier when setting max pagination limit
                     }
                     int tempLength = 0;
@@ -805,7 +808,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                             api = APIUtil.getLightWeightAPI(artifact);
                         } catch (APIManagementException e) {
                             //log and continue since we want to load the rest of the APIs.
-                            log.error("Error while loading API " + artifact.getAttribute(APIConstants.API_OVERVIEW_NAME),
+                            log.error("Error while loading API " + artifact.getAttribute(
+                                    APIConstants.API_OVERVIEW_NAME),
                                     e);
                         }
                         if (api != null) {
