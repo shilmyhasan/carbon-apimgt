@@ -589,11 +589,10 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
     /**
      * The method to get Light Weight APIs to Store view      *
-     *
      * @return Set<API>  Set of APIs
      * @throws APIManagementException
      */
-    public Map<String,Object> getAllPaginatedPublishedLightWeightAPIs(String tenantDomain, int start, int end)
+    public Map<String, Object> getAllPaginatedPublishedLightWeightAPIs(String tenantDomain, int start, int end)
             throws APIManagementException {
         Boolean displayAPIsWithMultipleStatus = false;
         try {
@@ -602,7 +601,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
             displayAPIsWithMultipleStatus = APIUtil.isAllowDisplayAPIsWithMultipleStatus();
-        }finally {
+        } finally {
             endTenantFlow();
         }
         Map<String, List<String>> listMap = new HashMap<String, List<String>>();
@@ -612,7 +611,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             listMap.put(APIConstants.API_OVERVIEW_STATUS, new ArrayList<String>() {{
                 add(APIConstants.PUBLISHED);
             }});
-        } else{
+        } else {
             return getAllPaginatedAPIs(tenantDomain, start, end);
         }
         Map<String, Object> result = new HashMap<String, Object>();
@@ -717,21 +716,21 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
      */
     @Override
     public Map<String, Object> getAllPaginatedLightWeightAPIsByStatus(String tenantDomain,
-                                                           int start, int end, final String[] apiStatus,
+                                                                      int start, int end, final String[] apiStatus,
                                                                       boolean returnAPITags)
             throws APIManagementException {
 
-        Map<String,Object> result=new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<String, Object>();
         SortedSet<API> apiSortedSet = new TreeSet<API>(new APINameComparator());
         SortedSet<API> apiVersionsSortedSet = new TreeSet<API>(new APIVersionComparator());
-        int totalLength=0;
+        int totalLength = 0;
         boolean isMore = false;
         String criteria = "lcState=";
 
         try {
             Registry userRegistry;
-            boolean isTenantMode=(tenantDomain != null);
-            if ((isTenantMode && this.tenantDomain==null) || (isTenantMode && isTenantDomainNotMatching(tenantDomain))) {
+            boolean isTenantMode = (tenantDomain != null);
+            if ((isTenantMode && this.tenantDomain == null) || (isTenantMode && isTenantDomainNotMatching(tenantDomain))) {
                 //Tenant store anonymous mode
                 int tenantId = getTenantId(tenantDomain);
                 // explicitly load the tenant's registry

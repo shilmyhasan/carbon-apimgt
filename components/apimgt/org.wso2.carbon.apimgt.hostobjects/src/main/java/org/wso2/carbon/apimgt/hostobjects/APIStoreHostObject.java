@@ -1687,7 +1687,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     row.put("provider", row, APIUtil.replaceEmailDomainBack(apiIdentifier.getProviderName()));
                     row.put("version", row, apiIdentifier.getVersion());
                     row.put("context", row, api.getContext());
-                    row.put("status", row, api.getStatus()); // api.getStatus().toString()
+                    row.put("status", row, api.getStatus());
                     if (api.getThumbnailUrl() == null) {
                         row.put("thumbnailurl", row, "images/api-default.png");
                     } else {
