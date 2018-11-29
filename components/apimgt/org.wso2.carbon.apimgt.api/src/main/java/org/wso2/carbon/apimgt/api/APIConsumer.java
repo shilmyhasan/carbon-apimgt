@@ -80,9 +80,8 @@ public interface APIConsumer extends APIManager {
 
     /**
      * Returns a paginated list of all published APIs. If a given API has multiple APIs,
-     * only the latest version will be included
-     * in this list.
-     * light weight implementation of getAllPaginatedPublishesAPIs.
+     * only the latest version will be included in this list.
+     * Light weight implementation of getAllPaginatedPublishesAPIs.
      * @param tenantDomain tenant domain
      * @param start starting number
      * @param end ending number
