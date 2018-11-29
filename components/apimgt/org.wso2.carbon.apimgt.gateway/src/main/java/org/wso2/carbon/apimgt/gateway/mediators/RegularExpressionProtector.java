@@ -77,11 +77,18 @@ public class RegularExpressionProtector extends AbstractMediator {
             return true;
         }
 
-        if (isPayloadSizeExceeded(messageContext)) {
-            return true;
+        Object messageProperty = messageContext.getProperty(APIMgtGatewayConstants.ENABLED_CHECK_BODY);
+        if (messageProperty != null) {
+            enabledCheckBody = Boolean.valueOf(messageProperty.toString());
         }
 
-        Object messageProperty = messageContext.getProperty(APIMgtGatewayConstants.REGEX_PATTERN);
+        if (isContentAware()) {
+            if (isPayloadSizeExceeded(messageContext)) {
+                return true;
+            }
+        }
+
+        messageProperty = messageContext.getProperty(APIMgtGatewayConstants.REGEX_PATTERN);
         if (messageProperty != null) {
             if (pattern == null) {
                 pattern = Pattern.compile(messageProperty.toString(), Pattern.CASE_INSENSITIVE);
@@ -91,10 +98,7 @@ public class RegularExpressionProtector extends AbstractMediator {
                     "Threat detection key words are missing");
             return true;
         }
-        messageProperty = messageContext.getProperty(APIMgtGatewayConstants.ENABLED_CHECK_BODY);
-        if (messageProperty != null) {
-            enabledCheckBody = Boolean.valueOf(messageProperty.toString());
-        }
+
         messageProperty = messageContext.getProperty(APIMgtGatewayConstants.ENABLED_CHECK_PATHPARAM);
         if (messageProperty != null) {
             enabledCheckPathParam = Boolean.valueOf(messageProperty.toString());
@@ -173,17 +177,6 @@ public class RegularExpressionProtector extends AbstractMediator {
             requestPayloadSize = Integer.parseInt(contentLength);
 
         } else {  //When chunking is enabled
-            try {
-                RelayUtils.buildMessage(axis2MC);
-            } catch (IOException ex) {
-                //In case of an exception, it won't be propagated up,and set response size to 0
-                log.error("Error occurred while building the message to" +
-                        " calculate the request body size", ex);
-            } catch (XMLStreamException ex) {
-                log.error("Error occurred while building the message to calculate the request" +
-                        " body size", ex);
-            }
-
             SOAPEnvelope env = messageContext.getEnvelope();
             if (env != null) {
                 SOAPBody soapbody = env.getBody();
@@ -195,8 +188,9 @@ public class RegularExpressionProtector extends AbstractMediator {
         }
 
         if (requestPayloadSize > payloadSizeLimit * 1024) {
-            GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE, "Exceeded Request Payload size limit " +
-                    "allowed to be used with Regular Expression Threat Protector mediator");
+            GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE, "Exceeded Request Payload " +
+                    "size limit allowed to be used with the enabledCheckBody option of Regular Expression Threat " +
+                    "Protector mediator");
             return true;
         } else {
             return false;
