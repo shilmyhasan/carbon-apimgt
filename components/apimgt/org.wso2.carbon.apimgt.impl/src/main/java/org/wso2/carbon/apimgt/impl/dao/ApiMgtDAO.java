@@ -5524,7 +5524,7 @@ public class ApiMgtDAO {
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
 
                 if (multiGroupAppSharingEnabled) {
-                    if (application.getGroupId().isEmpty()) {
+                    if (StringUtils.isEmpty(application.getGroupId())) {
                         application.setGroupId(getGroupId(applicationId));
                     }
                 }
@@ -5584,7 +5584,7 @@ public class ApiMgtDAO {
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
 
                 if (multiGroupAppSharingEnabled) {
-                    if (application.getGroupId().isEmpty()) {
+                    if (StringUtils.isEmpty(application.getGroupId())) {
                         application.setGroupId(getGroupId(application.getId()));
                     }
                 }
@@ -11516,7 +11516,7 @@ public class ApiMgtDAO {
                 application.setKeyType(rs.getString("KEY_TYPE"));
 
                 if (multiGroupAppSharingEnabled) {
-                    if (application.getGroupId().isEmpty()) {
+                    if (StringUtils.isEmpty(application.getGroupId())) {
                         application.setGroupId(getGroupId(application.getId()));
                     }
                 }
