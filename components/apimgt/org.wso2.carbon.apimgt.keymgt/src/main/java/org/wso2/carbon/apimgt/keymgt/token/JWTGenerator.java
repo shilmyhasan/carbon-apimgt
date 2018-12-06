@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.keymgt.MethodStats;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
@@ -63,7 +64,13 @@ public class JWTGenerator extends AbstractJWTGenerator {
         String userType = validationContext.getValidationInfoDTO().getUserType();
         String applicationTier = validationContext.getValidationInfoDTO().getApplicationTier();
         String enduserTenantId = String.valueOf(APIUtil.getTenantId(endUserName));
-        Map<String, String> appAttributes = getApplicationAttributes(Integer.parseInt(applicationId));
+        Application application = getApplicationbyId(Integer.parseInt(applicationId));
+        String uuid = null;
+        Map<String, String> appAttributes = null;
+        if (application != null) {
+            appAttributes = application.getApplicationAttributes();
+            uuid = application.getUUID();
+        }
 
         Map<String, String> claims = new LinkedHashMap<String, String>(20);
 
@@ -80,6 +87,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
         claims.put(dialect + "/usertype", userType);
         claims.put(dialect + "/enduser", APIUtil.getUserNameWithTenantSuffix(endUserName));
         claims.put(dialect + "/enduserTenantId", enduserTenantId);
+        claims.put(dialect + "/applicationUUId", uuid);
         try {
             if (appAttributes != null && !appAttributes.isEmpty()) {
                 String stringAppAttributes = new ObjectMapper().writeValueAsString(appAttributes);
