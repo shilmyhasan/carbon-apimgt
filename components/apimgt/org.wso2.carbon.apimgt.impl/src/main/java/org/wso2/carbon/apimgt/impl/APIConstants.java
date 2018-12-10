@@ -467,6 +467,7 @@ public final class APIConstants {
     public static final String SCOPE_CACHE_ENABLED = CACHE_CONFIGS + "EnableScopeCache";
     public static final String PUBLISHER_ROLE_CACHE_ENABLED = CACHE_CONFIGS + "EnablePublisherRoleCache";
     public static final String DEFAULT_CACHE_TIMEOUT = "Cache.DefaultCacheTimeout";
+    public static final String DISABLE_RESOURCE_CACHE_INVALIDATION = "DisableResourceCacheInvalidation";
 
     public static final String API_KEY_VALIDATOR = "APIKeyValidator.";
     public static final String API_KEY_VALIDATOR_URL = API_KEY_VALIDATOR + "ServerURL";
@@ -1368,4 +1369,15 @@ public final class APIConstants {
     public static final String USER = "user";
     public static final String IS_SUPER_TENANT = "isSuperTenant";
     public static final String NULL_GROUP_ID_LIST = "null";
+
+    public static final String KEY_SUFFIX = "_KEY";
+
+    /**
+     * Constants for correlation logging
+     * */
+    public static final String CORRELATION_ID = "Correlation-ID";
+    public static final String ENABLE_CORRELATION_LOGS = "enableCorrelationLogs";
+    public static final String CORRELATION_LOGGER = "correlation";
+    public static final String LOG_ALL_METHODS = "logAllMethods";
+    public static final String AM_ACTIVITY_ID = "activityid";
 }

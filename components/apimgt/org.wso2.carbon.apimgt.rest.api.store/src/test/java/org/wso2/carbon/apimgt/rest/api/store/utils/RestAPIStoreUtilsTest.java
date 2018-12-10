@@ -66,6 +66,7 @@ public class RestAPIStoreUtilsTest {
     private final String ADMIN = "admin";
     private Application application;
     private Set<SubscribedAPI> subscriptions;
+    Cache appCache;
 
     @Before @SuppressWarnings("unchecked")
     public void init() throws Exception {
@@ -73,7 +74,7 @@ public class RestAPIStoreUtilsTest {
         application = new Application(applicationUuid, new Subscriber(ADMIN));
         application.setGroupId("group1");
         application.setUUID(applicationUuid);
-
+        appCache = Mockito.mock(Cache.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
         PowerMockito.doReturn(serviceReferenceHolder).when(ServiceReferenceHolder.class, "getInstance");
@@ -100,7 +101,7 @@ public class RestAPIStoreUtilsTest {
         CacheManager cacheManager = Mockito.mock(CacheManager.class);
         PowerMockito.doReturn(cacheManager)
                 .when(Caching.class, "getCacheManager", APIConstants.API_MANAGER_CACHE_MANAGER);
-        Cache appCache = Mockito.mock(Cache.class);
+
         Cache filteredAppCache = Mockito.mock(Cache.class);
         Mockito.doReturn(appCache).when(cacheManager).getCache(APIConstants.APP_SUBSCRIPTION_SCOPE_CACHE);
         Mockito.doReturn(filteredAppCache).when(cacheManager)
@@ -140,6 +141,7 @@ public class RestAPIStoreUtilsTest {
      */
     @Test @SuppressWarnings("unchecked")
     public void getScopesForApplicationWithCache() throws Exception {
+        Mockito.doReturn(new LinkedHashSet<Set<Scope>>()).when(appCache).get(Mockito.anyString());
         ScopeListDTO scopeListDTO = RestAPIStoreUtils.getScopesForApplication(ADMIN, application, false);
         Assert.assertNotNull("Scope list was null for the application", scopeListDTO);
         Assert.assertEquals("Random scope list has been added to the application with no scopes", 0,

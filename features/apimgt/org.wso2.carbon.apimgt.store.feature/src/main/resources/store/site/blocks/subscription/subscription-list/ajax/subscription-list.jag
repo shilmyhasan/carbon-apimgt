@@ -183,6 +183,7 @@ include("/jagg/jagg.jag");
         print(obj);
     }else if (action == "getSubscriptionByApplication") {
         var appname = request.getParameter("app");
+        var appId = request.getParameter("appId");
         if (!user) {
             if(!ssoEnabled){
                 print({
@@ -202,6 +203,52 @@ include("/jagg/jagg.jag");
         }
 
         result = mod.getAPISubscriptionsForApplication(username, appname, groupId);
+
+        if (result.error) {
+            if (result.error.javaException instanceof org.wso2.carbon.apimgt.api.ApplicationNotFoundException) {
+                obj = {
+                    "subscriptionCallbackResponse" : {
+                        "error" : "true",
+                        "message" : result.error.javaException.message
+                    }
+                };
+                response.status = 404;
+                response.contentType = "application/json";
+            } else {
+                obj = {
+                    error:result.error,
+                    message:result.message
+                };
+            }
+        } else {
+            obj = {
+                error:false,
+                apis:result.subscriptions
+            }
+        }
+        print(obj);
+    } else if (action == "getSubscriptionForApplicationById") {
+        var appname = request.getParameter("app");
+        var appId = request.getParameter("appId");
+        if (!user) {
+            if(!ssoEnabled){
+                print({
+                    error:true,
+                    message:msg.error.loginRequired(action)
+                });
+            }
+            return;
+        }
+        username = user.username;
+
+        mod = jagg.module("subscription");
+
+        var groupId = session.get("groupId");
+        if (jagg.isMultiGroupEnabled()) {
+            groupId = request.getParameter("groupId");
+        }
+
+        result = mod.getAPISubscriptionsForApplicationById(username, appname, groupId, appId);
 
         if (result.error) {
             if (result.error.javaException instanceof org.wso2.carbon.apimgt.api.ApplicationNotFoundException) {
@@ -274,7 +321,36 @@ include("/jagg/jagg.jag");
         }
         print(obj);
 
-    } else {
+    } else if(action == "getApplicationKeysByAppId") {
+          if (!user) {
+              if(!ssoEnabled){
+                  print({
+                      error:true,
+                      message:msg.error.loginRequired(action)
+                  });
+              }
+              return;
+          }
+
+          var applicationId = request.getParameter("applicationId");
+          mod = jagg.module("subscription");
+          if (applicationId != null) {
+               result = mod.getApplicationKeysOfApplication(applicationId);
+               if (result.error) {
+                    obj = {
+                        error:result.error,
+                        message:result.message
+                    };
+               } else {
+                    obj = {
+                        error:false,
+                        apikeys:result.apikeys
+                    }
+               }
+               print(obj);
+          }
+    }
+    else {
         print({
             error:true,
             message:msg.error.invalidAction(action)

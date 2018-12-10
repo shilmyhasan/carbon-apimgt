@@ -222,11 +222,13 @@ GrantTypes.prototype.getMap = function(selected){
             var elem = this.element.find(".generateAgainBtn");
             var keyType = elem.attr("data-keyType");
             var applicationName = elem.attr("data-applicationName");
+            var applicationId = elem.attr("data-appid");
 
             jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag", {
-                action:"cleanUpApplicationRegistration",
+                action:"cleanUpApplicationRegistrationByApplicationId",
                 applicationName:applicationName,
-                keyType:keyType
+                keyType:keyType,
+                appId:applicationId,
             }, function (result) {
                 if (!result.error) {
                     location.reload();
@@ -245,13 +247,14 @@ GrantTypes.prototype.getMap = function(selected){
             
             this.element.find('.generatekeys').buttonLoader('start');
             jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag", {
-                action: "generateApplicationKey",
+                action: "generateApplicationKeyByApplicationId",
                 application: this.app.name,
                 keytype: this.type,
                 callbackUrl: this.app.callbackUrl,
                 validityTime: validity_time,
                 tokenScope: scopes,
                 jsonParams:'{"grant_types":"'+selected+'"}',
+                appId: this.app.id,
             }, $.proxy(function (result) {
                 this.element.find('.generatekeys').buttonLoader('stop');
                 if (!result.error) {
@@ -312,8 +315,9 @@ GrantTypes.prototype.getMap = function(selected){
                            .map(function(){ return $( this ).val();}).get().join(",");
 
             jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag", {
-                action:"updateClientApplication",
+                action:"updateClientApplicationByAppId",
                 application:this.app.name,
+                appId:this.app.id,
                 keytype:this.type,
                 jsonParams:'{"grant_types":"'+selected+'"}',
                 callbackUrl:this.app.callbackUrl
@@ -390,7 +394,10 @@ $("#subscription-actions").each(function(){
 
     var sub_list = $('#subscription-table').datatables_extended({
         "ajax": {
-            "url": jagg.getBaseUrl()+ "/site/blocks/subscription/subscription-list/ajax/subscription-list.jag?action=getSubscriptionByApplication&app="+$("#subscription-table").attr('data-app')+"&groupId="+$("#subscription-table").attr('data-grp'),
+            "url": jagg.getBaseUrl()+ "/site/blocks/subscription/subscription-list/ajax/subscription-list.jag?action=getSubscriptionForApplicationById&app=" +
+            $("#subscription-table").attr('data-app') +
+            "&appId=" + $("#subscription-table").attr('data-appid') +
+            "&groupId=" + $("#subscription-table").attr('data-grp'),
             "dataSrc": function ( json ) {
             	if(json.apis.length > 0){
             		$('#subscription-table-wrap').removeClass("hide");
@@ -435,7 +442,7 @@ $("#subscription-actions").each(function(){
 	           }, function (result) {
 	            if (!result.error) {
 	            	window.location.reload(true);
-	            	urlPrefix = "name=" + $("#subscription-table").attr('data-app') + "&" + urlPrefix;
+	            	urlPrefix = "name=" + $("#subscription-table").attr('data-app') + "&appId=" + $("#subscription-table").attr('data-appid') + "&" + urlPrefix;
                     location.href = "../../site/pages/application.jag?" + urlPrefix+"#subscription";
 	            } else {
 	                jagg.message({content:result.message,type:"error"});
@@ -466,6 +473,7 @@ $("#application-actions").each(function(){
             "dataSrc": function ( json ) {
                 if(json.applications.length > 0){
                     $('#application-table-wrap').removeClass("hide");
+                    $('#application-table-nodata').addClass("hide");
                 }
                 else{
                     $('#application-table-nodata').removeClass("hide");
@@ -515,6 +523,10 @@ $("#application-actions").each(function(){
             { "data": "apiCount" },
             { "data": "name",
               "render": function ( data, type, rec, meta ) {
+                  rec.isOwner = true;
+                  if (rec.owner !== null && loggedInUser.toLowerCase() !== rec.owner.toLowerCase()) {
+                      rec.isOwner = false;
+                  }
                   rec.isActive = false;
                   if(rec.status=='APPROVED'){
                       rec.isActive = true;
@@ -529,6 +541,8 @@ $("#application-actions").each(function(){
     	var appName = $(this).attr("data-id");
     	var apiCount = $(this).attr("data-count");
     	$('#messageModal').html($('#confirmation-data').html());
+    	var appId = $(this).attr("data-appId");
+    	$('#messageModal').html($('#confirmation-data').html());
         if(apiCount > 0){
             $('#messageModal h3.modal-title').html(i18n.t("Confirm Delete"));
             $('#messageModal div.modal-body').text('\n\n' +i18n.t("This application is subscribed to ")
@@ -541,8 +555,8 @@ $("#application-actions").each(function(){
         $('#messageModal a.btn-other').html(i18n.t("No"));
         $('#messageModal a.btn-primary').click(function() {
             jagg.post("/site/blocks/application/application-remove/ajax/application-remove.jag", {
-                action:"removeApplication",
-                application:appName
+                action:"removeApplicationById",
+                applicationId:appId
             }, function (result) {
                 if (!result.error) {
                 	window.location.reload(true);
