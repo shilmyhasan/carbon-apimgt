@@ -5877,7 +5877,7 @@ public final class APIUtil {
     public static HttpClient getHttpClient(int port, String protocol) {
         final String HTTP_PROXY_HOST = "wso2.proxyHost";
         final String HTTP_PROXY_PORT = "wso2.proxyPort";
-
+        final String PASS_THROUGH_HTTP = "passthru-http";
         SchemeRegistry registry = new SchemeRegistry();
         SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
         String ignoreHostnameVerification = System.getProperty("org.wso2.ignoreHostnameVerification");
@@ -5888,10 +5888,10 @@ public final class APIUtil {
         org.apache.axis2.description.Parameter sslVerifyClient = axis2Config.getTransportIn(APIConstants.HTTPS_PROTOCOL)
                 .getParameter(APIConstants.SSL_VERIFY_CLIENT);
 
-        org.apache.axis2.description.Parameter proxyHostValue = axis2Config.getTransportOut("passthru-http")
+        org.apache.axis2.description.Parameter proxyHostValue = axis2Config.getTransportOut(PASS_THROUGH_HTTP)
                 .getParameter(HTTP_PROXY_HOST);
 
-        org.apache.axis2.description.Parameter proxyPortValue = axis2Config.getTransportOut("passthru-http")
+        org.apache.axis2.description.Parameter proxyPortValue = axis2Config.getTransportOut(PASS_THROUGH_HTTP)
                 .getParameter(HTTP_PROXY_PORT);
 
         if (sslVerifyClient != null) {
