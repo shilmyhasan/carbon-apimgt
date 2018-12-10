@@ -39,7 +39,9 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -5749,6 +5751,9 @@ public final class APIUtil {
      * @return
      */
     public static HttpClient getHttpClient(int port, String protocol) {
+        final String HTTP_PROXY_HOST = "wso2.proxyHost";
+        final String HTTP_PROXY_PORT = "wso2.proxyPort";
+
         SchemeRegistry registry = new SchemeRegistry();
         SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
         String ignoreHostnameVerification = System.getProperty("org.wso2.ignoreHostnameVerification");
@@ -5758,6 +5763,13 @@ public final class APIUtil {
                 .getAxisConfiguration();
         org.apache.axis2.description.Parameter sslVerifyClient = axis2Config.getTransportIn(APIConstants.HTTPS_PROTOCOL)
                 .getParameter(APIConstants.SSL_VERIFY_CLIENT);
+
+        org.apache.axis2.description.Parameter proxyHostValue = axis2Config.getTransportOut("passthru-http")
+                .getParameter(HTTP_PROXY_HOST);
+
+        org.apache.axis2.description.Parameter proxyPortValue = axis2Config.getTransportOut("passthru-http")
+                .getParameter(HTTP_PROXY_PORT);
+
         if (sslVerifyClient != null) {
             sslValue = (String) sslVerifyClient.getValue();
         }
@@ -5792,7 +5804,14 @@ public final class APIUtil {
         }
         HttpParams params = new BasicHttpParams();
         ThreadSafeClientConnManager tcm = new ThreadSafeClientConnManager(registry);
-        return new DefaultHttpClient(tcm, params);
+        HttpClient httpClient = new DefaultHttpClient(tcm, params);
+        if (proxyHostValue != null && proxyPortValue != null) {
+            String proxyHost = (String) proxyHostValue.getValue();
+            String proxyPort = (String) proxyPortValue.getValue();
+            HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+            httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+        }
+        return httpClient;
 
     }
 
