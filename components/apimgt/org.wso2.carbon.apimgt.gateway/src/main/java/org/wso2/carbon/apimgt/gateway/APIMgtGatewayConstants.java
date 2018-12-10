@@ -70,6 +70,9 @@ public class APIMgtGatewayConstants {
     public static final String ENABLED_CHECK_HEADERS  = "enabledCheckHeaders";
     public static final String REST_URL_POSTFIX = "REST_URL_POSTFIX";
     public static final String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
+    public static final String REGEX_THREAT_PROTECTOR_ENABLED_TENANTS = "regexThreatProtectorEnabledTenants";
+    public static final String PAYLOAD_SIZE_LIMIT_FOR_REGEX_TREAT_PROTECTOR = "payloadSizeLimitForRegexThreatProtector";
+
 
     /**
      * Constants for handling threat protection exceptions.
@@ -88,6 +91,7 @@ public class APIMgtGatewayConstants {
     public static final String XML_VALIDATION = "xmlValidation";
     public static final String SCHEMA_VALIDATION = "schemaValidation";
     public static final String XSD_URL = "xsdURL";
+    public static final String UTF8 = "UTF-8";
 
 }
 

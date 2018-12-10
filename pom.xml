@@ -1377,6 +1377,12 @@
                 <artifactId>org.wso2.carbon.tenant.common</artifactId>
                 <version>${carbon.commons.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.google.re2j</groupId>
+                <artifactId>re2j</artifactId>
+                <version>${re2j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1571,6 +1577,7 @@
         <maven.findbugsplugin.version>3.0.4</maven.findbugsplugin.version>
         <httpcore.version>4.3.3.wso2v1</httpcore.version>
         <slf4j.wso2.version>1.5.10.wso2v1</slf4j.wso2.version>
+        <re2j.version>1.2</re2j.version>
     </properties>
 </project>
 
