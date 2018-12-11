@@ -5866,10 +5866,6 @@ public final class APIUtil {
         }
     }
 
-    public static HttpClient getHttpClient(int port, String protocol) {
-        return getHttpClient(port, protocol, "");
-    }
-
     /**
      * Return a http client instance
      *
@@ -5877,9 +5873,7 @@ public final class APIUtil {
      * @param protocol- service endpoint protocol http/https
      * @return
      */
-    public static HttpClient getHttpClient(int port, String protocol, String host) {
-        Boolean removeProxy = false;
-        String nonProxyHost = System.getProperty("http.nonProxyHosts");
+    public static HttpClient getHttpClient(int port, String protocol) {
         SchemeRegistry registry = new SchemeRegistry();
         SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
         String ignoreHostnameVerification = System.getProperty("org.wso2.ignoreHostnameVerification");
@@ -5922,16 +5916,7 @@ public final class APIUtil {
                 registry.register(new Scheme(APIConstants.HTTP_PROTOCOL, 80, PlainSocketFactory.getSocketFactory()));
             }
         }
-        if (StringUtils.isEmpty(host) || StringUtils.contains(nonProxyHost, host)) {
-            removeProxy = true;
-        }
-        HttpParams params = new BasicHttpParams();
-        ThreadSafeClientConnManager tcm = new ThreadSafeClientConnManager(registry);
-        if (!removeProxy) {
-            return new SystemDefaultHttpClient(params);
-        } else {
-            return new DefaultHttpClient(tcm, params);
-        }
+        return new SystemDefaultHttpClient();
     }
 
     private static SSLSocketFactory createSocketFactory() throws APIManagementException {
