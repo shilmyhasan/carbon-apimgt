@@ -221,7 +221,8 @@ public class WSO2APIPublisher implements APIPublisher {
             URL storeURL = new URL(storeEndpoint);
             int externalStorePort = storeURL.getPort();
             String externalStoreProtocol = storeURL.getProtocol();
-            return APIUtil.getHttpClient(externalStorePort, externalStoreProtocol);
+            String host = storeURL.getHost();
+            return APIUtil.getHttpClient(externalStorePort, externalStoreProtocol, host);
         } catch (MalformedURLException e) {
             throw new APIManagementException("Error while initializing HttpClient due to malformed URL", e);
         }

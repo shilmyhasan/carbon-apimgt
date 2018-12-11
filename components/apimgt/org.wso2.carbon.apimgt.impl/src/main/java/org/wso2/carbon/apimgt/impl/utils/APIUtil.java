@@ -39,13 +39,18 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
-import org.apache.http.impl.client.SystemDefaultHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.xerces.util.SecurityManager;
@@ -5911,7 +5916,90 @@ public final class APIUtil {
                 registry.register(new Scheme(APIConstants.HTTP_PROTOCOL, 80, PlainSocketFactory.getSocketFactory()));
             }
         }
-        return new SystemDefaultHttpClient();
+        HttpParams params = new BasicHttpParams();
+        ThreadSafeClientConnManager tcm = new ThreadSafeClientConnManager(registry);
+        return new DefaultHttpClient(tcm, params);
+    }
+
+    /**
+     * Return a http client instance
+     *
+     * @param port      - server port
+     * @param protocol- service endpoint protocol http/https
+     * @param host - hostname
+     * @return
+     */
+    public static HttpClient getHttpClient(int port, String protocol, String host) {
+        final String proxyHost = System.getProperty(APIConstants.HTTP_PROXY_HOST);
+        final String proxyPort = System.getProperty(APIConstants.HTTP_PROXY_PORT);
+        final String nonProxyHostsValue = System.getProperty(APIConstants.HTTP_NON_PROXY_HOST);
+        boolean byPassProxy = false;
+        SchemeRegistry registry = new SchemeRegistry();
+        SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+        String ignoreHostnameVerification = System.getProperty("org.wso2.ignoreHostnameVerification");
+        String sslValue = null;
+
+        AxisConfiguration axis2Config = ServiceReferenceHolder.getContextService().getServerConfigContext()
+                .getAxisConfiguration();
+        org.apache.axis2.description.Parameter sslVerifyClient = axis2Config.getTransportIn(APIConstants.HTTPS_PROTOCOL)
+                .getParameter(APIConstants.SSL_VERIFY_CLIENT);
+        if (sslVerifyClient != null) {
+            sslValue = (String) sslVerifyClient.getValue();
+        }
+
+        if (ignoreHostnameVerification != null && "true".equalsIgnoreCase(ignoreHostnameVerification)) {
+            X509HostnameVerifier hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+            socketFactory.setHostnameVerifier(hostnameVerifier);
+        }
+
+        if (StringUtils.isEmpty(host) || StringUtils.contains(nonProxyHostsValue, host)) {
+            byPassProxy = true;
+        }
+        if (APIConstants.HTTPS_PROTOCOL.equals(protocol)) {
+            try {
+                if (APIConstants.SSL_VERIFY_CLIENT_STATUS_REQUIRE.equals(sslValue)) {
+                    socketFactory = createSocketFactory();
+                    if (ignoreHostnameVerification != null && "true".equalsIgnoreCase(ignoreHostnameVerification)) {
+                        X509HostnameVerifier hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+                        socketFactory.setHostnameVerifier(hostnameVerifier);
+                    }
+                }
+                if (byPassProxy) {
+                    if (port >= 0) {
+                        registry.register(new Scheme(APIConstants.HTTPS_PROTOCOL, port, socketFactory));
+                    } else {
+                        registry.register(new Scheme(APIConstants.HTTPS_PROTOCOL, 443, socketFactory));
+                    }
+                } else {
+                    if (port >= 0) {
+                        registry.register(new Scheme(APIConstants.HTTPS_PROTOCOL, port, socketFactory));
+                        registry.register(new Scheme(APIConstants.HTTP_PROTOCOL,
+                                Integer.parseInt(proxyPort), PlainSocketFactory.getSocketFactory()));
+                    } else {
+                        registry.register(new Scheme(APIConstants.HTTPS_PROTOCOL, 443, socketFactory));
+                        registry.register(new Scheme(APIConstants.HTTP_PROTOCOL, Integer.parseInt(proxyPort),
+                                PlainSocketFactory.getSocketFactory()));
+                    }
+                }
+            } catch (APIManagementException e) {
+                log.error(e);
+            }
+        } else if (APIConstants.HTTP_PROTOCOL.equals(protocol)) {
+            if (port >= 0) {
+                registry.register(new Scheme(APIConstants.HTTP_PROTOCOL, port, PlainSocketFactory.getSocketFactory()));
+            } else {
+                registry.register(new Scheme(APIConstants.HTTP_PROTOCOL, 80, PlainSocketFactory.getSocketFactory()));
+            }
+        }
+        HttpParams params = new BasicHttpParams();
+        ThreadSafeClientConnManager tcm = new ThreadSafeClientConnManager(registry);
+        HttpClient httpClient = new DefaultHttpClient(tcm, params);
+
+        if (byPassProxy) {
+            HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+            httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+        }
+        return httpClient;
     }
 
     private static SSLSocketFactory createSocketFactory() throws APIManagementException {
