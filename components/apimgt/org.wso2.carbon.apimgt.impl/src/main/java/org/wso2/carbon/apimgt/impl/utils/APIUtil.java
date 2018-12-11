@@ -3991,8 +3991,10 @@ public final class APIUtil {
     }
 
     public static boolean updateNullThrottlingTierAtStartup() {
-        String isNullThrottlingTierUpdateEnabled = CarbonUtils.getServerConfiguration()
-                .getFirstProperty("APIManagement.UpdateNullThrottlingTierAtStartup");
+        APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String isNullThrottlingTierUpdateEnabled = configuration
+                .getFirstProperty("StartupConfiguration.UpdateNullThrottlingTier");
         return isNullThrottlingTierUpdateEnabled == null || Boolean.parseBoolean(isNullThrottlingTierUpdateEnabled);
     }
 
