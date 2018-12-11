@@ -252,7 +252,7 @@ public class APIManagerComponent {
             }
 
             //Update all NULL THROTTLING_TIER values to Unlimited
-            boolean isNullThrottlingTierConversionEnabled = false;
+            boolean isNullThrottlingTierConversionEnabled = APIUtil.updateNullThrottlingTierAtStartup();
             try {
                 if (isNullThrottlingTierConversionEnabled) {
                     ApiMgtDAO.getInstance().convertNullThrottlingTiers();
