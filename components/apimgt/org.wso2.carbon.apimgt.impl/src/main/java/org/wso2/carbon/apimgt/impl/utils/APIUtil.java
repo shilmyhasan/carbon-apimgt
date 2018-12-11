@@ -45,11 +45,7 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.SystemDefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.xerces.util.SecurityManager;
@@ -5883,7 +5879,6 @@ public final class APIUtil {
                 .getAxisConfiguration();
         org.apache.axis2.description.Parameter sslVerifyClient = axis2Config.getTransportIn(APIConstants.HTTPS_PROTOCOL)
                 .getParameter(APIConstants.SSL_VERIFY_CLIENT);
-
         if (sslVerifyClient != null) {
             sslValue = (String) sslVerifyClient.getValue();
         }
