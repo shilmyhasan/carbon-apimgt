@@ -3990,9 +3990,10 @@ public final class APIUtil {
                 "APIManagement.LoadAPIContextsInServerStartup"));
     }
 
-    public static boolean updateNullThrottlingTierAtStartup(){
-        return Boolean.parseBoolean(CarbonUtils.getServerConfiguration().getFirstProperty(
-                "APIManagement.UpdateNullThrottlingTierAtStartup"));
+    public static boolean updateNullThrottlingTierAtStartup() {
+        String isNullThrottlingTierUpdateEnabled = CarbonUtils.getServerConfiguration()
+                .getFirstProperty("APIManagement.UpdateNullThrottlingTierAtStartup");
+        return isNullThrottlingTierUpdateEnabled == null || Boolean.parseBoolean(isNullThrottlingTierUpdateEnabled);
     }
 
     public static Set<APIStore> getExternalAPIStores(int tenantId) throws APIManagementException {
