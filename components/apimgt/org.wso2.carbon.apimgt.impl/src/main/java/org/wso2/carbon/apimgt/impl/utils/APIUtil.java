@@ -3990,6 +3990,10 @@ public final class APIUtil {
                 "APIManagement.LoadAPIContextsInServerStartup"));
     }
 
+    public static boolean updateNullThrottlingTierAtStartup(){
+        return false;
+    }
+
     public static Set<APIStore> getExternalAPIStores(int tenantId) throws APIManagementException {
         SortedSet<APIStore> apistoreSet = new TreeSet<APIStore>(new APIStoreNameComparator());
         apistoreSet.addAll(getExternalStores(tenantId));
