@@ -1906,10 +1906,6 @@ public final class APIUtil {
                     store.setPublisher((APIPublisher) getClassForName(className).newInstance());
                     store.setType(type); //Set Store type [eg:wso2]
                     String name = storeElem.getAttributeValue(new QName(APIConstants.EXTERNAL_API_STORE_ID));
-                    String proxyEnabled =
-                            storeElem.getAttributeValue(new QName(APIConstants.EXTERNAL_API_STORE_PROXY_ENABLED));
-                    boolean isProxyEnabled = proxyEnabled != null && (Boolean.parseBoolean(proxyEnabled));
-                    store.setProxyEnabled(isProxyEnabled);
                     if (name == null) {
                         log.error("The ExternalAPIStore name attribute is not defined in api-manager.xml.");
                     }
@@ -1923,6 +1919,10 @@ public final class APIUtil {
                             new QName(APIConstants.EXTERNAL_API_STORE_ENDPOINT)).getText()));
                     //Set store endpoint, which is used to publish APIs
                     store.setPublished(false);
+                    OMElement proxyConfig = storeElem.getFirstChildWithName(
+                            new QName(APIConstants.EXTERNAL_API_STORE_PROXY_ENABLED));
+                    boolean isProxyEnabled = proxyConfig != null && (Boolean.parseBoolean(proxyConfig.getText()));
+                    store.setProxyEnabled(isProxyEnabled);
                     if (APIConstants.WSO2_API_STORE_TYPE.equals(type)) {
                         OMElement password = storeElem.getFirstChildWithName(new QName(
                                 APIConstants.EXTERNAL_API_STORE_PASSWORD));
