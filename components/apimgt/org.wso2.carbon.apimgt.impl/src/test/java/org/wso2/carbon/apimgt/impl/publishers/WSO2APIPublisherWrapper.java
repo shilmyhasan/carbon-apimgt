@@ -28,7 +28,7 @@ public class WSO2APIPublisherWrapper extends WSO2APIPublisher {
     }
 
     @Override
-    protected HttpClient getHttpClient(String storeEndpoint) {
+    protected HttpClient getHttpClient(String storeEndpoint, boolean isProxyEnabled) {
         return client;
     }
 }
