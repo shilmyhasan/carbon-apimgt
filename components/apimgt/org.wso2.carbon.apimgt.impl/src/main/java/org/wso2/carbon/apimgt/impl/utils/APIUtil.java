@@ -5995,7 +5995,7 @@ public final class APIUtil {
         ThreadSafeClientConnManager tcm = new ThreadSafeClientConnManager(registry);
         HttpClient httpClient = new DefaultHttpClient(tcm, params);
 
-        if (byPassProxy) {
+        if (!byPassProxy) {
             HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
             httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
         }
