@@ -213,6 +213,7 @@ public class APIStateChangeWSWorkflowExecutor extends WorkflowExecutor {
 
                 super.execute(workflowDTO);
             } else {
+                super.execute(workflowDTO);
                 // For any other states, act as simpleworkflow executor.
                 workflowDTO.setStatus(WorkflowStatus.APPROVED);
                 // calling super.complete() instead of complete() to act as the simpleworkflow executor
