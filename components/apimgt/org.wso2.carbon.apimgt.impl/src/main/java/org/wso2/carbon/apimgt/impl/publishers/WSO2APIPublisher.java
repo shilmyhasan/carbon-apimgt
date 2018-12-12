@@ -89,10 +89,10 @@ public class WSO2APIPublisher implements APIPublisher {
             boolean authenticated = authenticateAPIM(store,httpContext);
             if(authenticated){  //First try to login to store
                 boolean added = addAPIToStore(api, store.getEndpoint(), store.getUsername(), httpContext,
-                                              store.getDisplayName());
+                                              store.getDisplayName(), store.isProxyEnabled());
                 if (added) {   //If API creation success,then try publishing the API
                     published = publishAPIToStore(api.getId(), store.getEndpoint(), store.getUsername(),
-                                                  httpContext,store.getDisplayName());
+                                                  httpContext,store.getDisplayName(), store.isProxyEnabled());
                 }
                 logoutFromExternalStore(store, httpContext);
             }
@@ -114,7 +114,7 @@ public class WSO2APIPublisher implements APIPublisher {
             boolean authenticated = authenticateAPIM(store,httpContext);
             if (authenticated) {
                 deleted = deleteWSO2Store(apiId, store.getUsername(), store.getEndpoint(),
-                                          httpContext,store.getDisplayName());
+                                          httpContext,store.getDisplayName(), store.isProxyEnabled());
                 logoutFromExternalStore(store, httpContext);
             }
             return deleted;
@@ -122,8 +122,8 @@ public class WSO2APIPublisher implements APIPublisher {
     }
 
     private boolean deleteWSO2Store(APIIdentifier apiId, String externalPublisher, String storeEndpoint,
-                                    HttpContext httpContext,String displayName) throws APIManagementException {
-        HttpClient httpclient = getHttpClient(storeEndpoint);
+                    HttpContext httpContext,String displayName, boolean isProxyEnabled) throws APIManagementException {
+        HttpClient httpclient = getHttpClient(storeEndpoint, isProxyEnabled);
         if (storeEndpoint.contains("/store")) {
             storeEndpoint = getPublisherURLFromStoreURL(storeEndpoint) + APIConstants.APISTORE_DELETE_URL;
         } else if (!generateEndpoint(storeEndpoint)) {
@@ -177,7 +177,7 @@ public class WSO2APIPublisher implements APIPublisher {
         try {
             // create a post request to addAPI.
             String storeEndpoint = store.getEndpoint();
-            HttpClient httpclient = getHttpClient(storeEndpoint);
+            HttpClient httpclient = getHttpClient(storeEndpoint, store.isProxyEnabled());
             if (store.getEndpoint().contains("/store")) {
                 storeEndpoint = getPublisherURLFromStoreURL(storeEndpoint) + APIConstants.APISTORE_LOGIN_URL;
             } else if (!generateEndpoint(store.getEndpoint())) {
@@ -216,12 +216,17 @@ public class WSO2APIPublisher implements APIPublisher {
         }
     }
 
-    protected HttpClient getHttpClient(String storeEndpoint) throws APIManagementException {
+    protected HttpClient getHttpClient(String storeEndpoint, boolean isProxyEnabled) throws APIManagementException {
         try {
             URL storeURL = new URL(storeEndpoint);
             int externalStorePort = storeURL.getPort();
             String externalStoreProtocol = storeURL.getProtocol();
-            return APIUtil.getHttpClient(externalStorePort, externalStoreProtocol);
+            if (isProxyEnabled) {
+                String host = storeURL.getHost();
+                return APIUtil.getHttpClient(externalStorePort, externalStoreProtocol, host);
+            } else {
+                return APIUtil.getHttpClient(externalStorePort, externalStoreProtocol);
+            }
         } catch (MalformedURLException e) {
             throw new APIManagementException("Error while initializing HttpClient due to malformed URL", e);
         }
@@ -236,7 +241,7 @@ public class WSO2APIPublisher implements APIPublisher {
         try {
             // create a post request to addAPI.
             String storeEndpoint = store.getEndpoint();
-            HttpClient httpclient = getHttpClient(storeEndpoint);
+            HttpClient httpclient = getHttpClient(storeEndpoint, store.isProxyEnabled());
             if (store.getEndpoint().contains("/store")) {
                 storeEndpoint = getPublisherURLFromStoreURL(storeEndpoint) + APIConstants.APISTORE_LOGIN_URL;
             } else if (!generateEndpoint(store.getEndpoint())) {
@@ -275,10 +280,10 @@ public class WSO2APIPublisher implements APIPublisher {
         return input != null ? input : "";
     }
 
-    private boolean addAPIToStore(API api,String storeEndpoint,String externalPublisher,
-                                  HttpContext httpContext,String displayName) throws APIManagementException {
+    private boolean addAPIToStore(API api,String storeEndpoint,String externalPublisher, HttpContext httpContext,
+                                  String displayName, boolean isProxyEnabled) throws APIManagementException {
         boolean added;
-        HttpClient httpclient = getHttpClient(storeEndpoint);
+        HttpClient httpclient = getHttpClient(storeEndpoint, isProxyEnabled);
         if (storeEndpoint.contains("/store")) {
             storeEndpoint = getPublisherURLFromStoreURL(storeEndpoint) + APIConstants.APISTORE_ADD_URL;
         } else if (!generateEndpoint(storeEndpoint)) {
@@ -355,16 +360,17 @@ public class WSO2APIPublisher implements APIPublisher {
             httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
             boolean authenticated = authenticateAPIM(store, httpContext);
             if (authenticated) {
-                updated = updateWSO2Store(api, store.getUsername(), store.getEndpoint(), httpContext,store.getDisplayName());
+                updated = updateWSO2Store(api, store.getUsername(), store.getEndpoint(), httpContext,
+                        store.getDisplayName(), store.isProxyEnabled());
                 logoutFromExternalStore(store, httpContext);
             }
             return updated;
         }
     }
     private boolean updateWSO2Store(API api, String externalPublisher, String storeEndpoint,
-                                    HttpContext httpContext,String displayName) throws APIManagementException {
+                                    HttpContext httpContext,String displayName, boolean isProxyEnabled) throws APIManagementException {
         boolean updated;
-        HttpClient httpclient = getHttpClient(storeEndpoint);
+        HttpClient httpclient = getHttpClient(storeEndpoint, isProxyEnabled);
         if (storeEndpoint.contains("/store")) {
             storeEndpoint = getPublisherURLFromStoreURL(storeEndpoint) + APIConstants.APISTORE_ADD_URL;
         } else if (!generateEndpoint(storeEndpoint)) {
@@ -443,7 +449,8 @@ public class WSO2APIPublisher implements APIPublisher {
             httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
             boolean authenticated = authenticateAPIM(store, httpContext);
             if (authenticated) {
-                available = isAPIAvailableInWSO2Store(api, store.getUsername(), store.getEndpoint(), httpContext);
+                available = isAPIAvailableInWSO2Store(api, store.getUsername(), store.getEndpoint(), httpContext,
+                        store.isProxyEnabled());
                 logoutFromExternalStore(store, httpContext);
             }
             return available;
@@ -465,10 +472,10 @@ public class WSO2APIPublisher implements APIPublisher {
             boolean authenticated = authenticateAPIM(store, httpContext);
             if (authenticated) {  //First try to login to store
                 boolean added = addVersionedAPIToStore(api, store.getEndpoint(), version, httpContext,
-                                                       store.getDisplayName(), store.getUsername());
+                        store.getDisplayName(), store.getUsername(), store.isProxyEnabled());
                 if (added) {   //If API creation success,then try publishing the API
                     published = publishAPIToStore(api.getId(), store.getEndpoint(), store.getUsername(), httpContext,
-                                                  store.getDisplayName());
+                                                  store.getDisplayName(), store.isProxyEnabled());
                 }
                 logoutFromExternalStore(store, httpContext);
             }
@@ -478,9 +485,9 @@ public class WSO2APIPublisher implements APIPublisher {
     }
 
     private boolean isAPIAvailableInWSO2Store(API api, String externalPublisher, String storeEndpoint,
-                                              HttpContext httpContext) throws APIManagementException {
+                                      HttpContext httpContext, boolean isProxyEnabled) throws APIManagementException {
         boolean available = false;
-        HttpClient httpclient = getHttpClient(storeEndpoint);
+        HttpClient httpclient = getHttpClient(storeEndpoint, isProxyEnabled);
         if (storeEndpoint.contains("/store")) {
             storeEndpoint = getPublisherURLFromStoreURL(storeEndpoint) + APIConstants.APISTORE_LIST_URL;
         } else if (!generateEndpoint(storeEndpoint)) {
@@ -524,9 +531,9 @@ public class WSO2APIPublisher implements APIPublisher {
     }
 
     private boolean publishAPIToStore(APIIdentifier apiId,String storeEndpoint,String externalPublisher,
-                                      HttpContext httpContext,String displayName) throws APIManagementException {
+                  HttpContext httpContext,String displayName, boolean isProxyEnabled) throws APIManagementException {
         boolean published;
-        HttpClient httpclient = getHttpClient(storeEndpoint);
+        HttpClient httpclient = getHttpClient(storeEndpoint, isProxyEnabled);
         if (storeEndpoint.contains("/store")) {
             storeEndpoint = getPublisherURLFromStoreURL(storeEndpoint) + APIConstants.APISTORE_PUBLISH_URL;
         } else if (!generateEndpoint(storeEndpoint)) {
@@ -911,11 +918,11 @@ public class WSO2APIPublisher implements APIPublisher {
         return storeEndpoint.split("/store")[0] + "/publisher";
     }
 
-    private boolean addVersionedAPIToStore(API api, String storeEndpoint, String version,
-                                           HttpContext httpContext, String displayName, String externalPublisher)
+    private boolean addVersionedAPIToStore(API api, String storeEndpoint, String version, HttpContext httpContext,
+                                           String displayName, String externalPublisher, boolean isProxyEnabled)
             throws APIManagementException {
         boolean added;
-        HttpClient httpclient = getHttpClient(storeEndpoint);
+        HttpClient httpclient = getHttpClient(storeEndpoint, isProxyEnabled);
         if (storeEndpoint.contains("/store")) {
             storeEndpoint = getPublisherURLFromStoreURL(storeEndpoint) + APIConstants.APISTORE_COPY_URL;
         } else if (!generateEndpoint(storeEndpoint)) {

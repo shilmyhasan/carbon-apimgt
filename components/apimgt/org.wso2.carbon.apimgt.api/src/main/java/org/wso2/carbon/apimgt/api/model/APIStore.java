@@ -27,6 +27,7 @@ public class APIStore {
     private String password;
     private boolean published;
     private APIPublisher publisher;
+    private boolean isProxyEnabled;
 
     public void setType(String type) {
         this.type = type;
@@ -90,6 +91,10 @@ public class APIStore {
     public void setPublisher(APIPublisher publisher) {
         this.publisher = publisher;
     }
+
+    public boolean isProxyEnabled() { return isProxyEnabled; }
+
+    public void setProxyEnabled(boolean isProxyEnabled) { this.isProxyEnabled = isProxyEnabled; }
 
     @Override
     public boolean equals(Object o) {
