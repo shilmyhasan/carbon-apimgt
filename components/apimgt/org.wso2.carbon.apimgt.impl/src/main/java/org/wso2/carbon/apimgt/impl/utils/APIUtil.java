@@ -6913,7 +6913,7 @@ public final class APIUtil {
     public static String getSingleSearchCriteria(String criteria) throws APIManagementException {
         criteria = criteria.trim();
         String searchValue = criteria;
-        String searchKey = APIConstants.NAME_TYPE_PREFIX;
+        String searchKey = isContentSearchEnabled() ? APIConstants.CONTENT_SEARCH_TYPE_PREFIX : APIConstants.NAME_TYPE_PREFIX;
 
         if (criteria.contains(":")) {
             if (criteria.split(":").length > 1) {
@@ -7184,6 +7184,12 @@ public final class APIUtil {
             }
         }
         return Boolean.valueOf(multiGrpAppSharing);
+    }
+
+    public static boolean isContentSearchEnabled() {
+        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        return Boolean.parseBoolean(config.getFirstProperty("EnableContentSearch"));
     }
 
     /**
