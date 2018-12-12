@@ -568,6 +568,7 @@ public final class APIConstants {
     public static final String EXTERNAL_API_STORE_USERNAME = "Username";
     public static final String EXTERNAL_API_STORE_PASSWORD = "Password";
     public static final String EXTERNAL_API_STORE_PROXY_ENABLED = "ProxyEnabled";
+    public static final String IGNORE_HOSTNAME_VERIFICATION = "org.wso2.ignoreHostnameVerification";
 
     public static final String AUTH_MANAGER = "AuthManager.";
     public static final String AUTH_MANAGER_URL = AUTH_MANAGER + "ServerURL";

@@ -5940,7 +5940,7 @@ public final class APIUtil {
         boolean byPassProxy = false;
         SchemeRegistry registry = new SchemeRegistry();
         SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
-        String ignoreHostnameVerification = System.getProperty("org.wso2.ignoreHostnameVerification");
+        String ignoreHostnameVerification = System.getProperty(APIConstants.IGNORE_HOSTNAME_VERIFICATION);
         String sslValue = null;
 
         AxisConfiguration axis2Config = ServiceReferenceHolder.getContextService().getServerConfigContext()
@@ -5986,7 +5986,7 @@ public final class APIUtil {
                     }
                 }
             } catch (APIManagementException e) {
-                log.error(e);
+                log.error("Error while creating socket factory - " + e);
             }
         } else if (APIConstants.HTTP_PROTOCOL.equals(protocol)) {
             if (port >= 0) {
