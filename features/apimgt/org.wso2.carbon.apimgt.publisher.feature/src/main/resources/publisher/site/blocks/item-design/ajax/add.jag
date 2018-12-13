@@ -461,7 +461,7 @@ if(jagg.isCSRFTokenValid())
             } else {
                 var encryptedPasswordFromSession = session.get(request.getParameter("name", "UTF-8") + "-" +
                                                                               request.getParameter("version") + "-epPassword");
-                if (encryptedPasswordFromSession != null) {
+                if (encryptedPasswordFromSession) {
 
                     var byteArray = CryptoUtil.getDefaultCryptoUtil().base64DecodeAndDecrypt(encryptedPasswordFromSession);
                     var decodedPassword = "";
