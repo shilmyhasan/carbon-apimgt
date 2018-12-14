@@ -469,7 +469,7 @@ function showGatewayFailure(message) {
     }
     else {
 
-        jagg.message({content: responseText.message, type: "error"});
+        jagg.message({content: message, type: "error"});
     }
 }
 
