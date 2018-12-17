@@ -4007,6 +4007,14 @@ public final class APIUtil {
                 "APIManagement.LoadAPIContextsInServerStartup"));
     }
 
+    public static boolean updateNullThrottlingTierAtStartup() {
+        APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String isNullThrottlingTierUpdateEnabled = configuration
+                .getFirstProperty("StartupConfiguration.UpdateNullThrottlingTier");
+        return isNullThrottlingTierUpdateEnabled == null || Boolean.parseBoolean(isNullThrottlingTierUpdateEnabled);
+    }
+
     public static Set<APIStore> getExternalAPIStores(int tenantId) throws APIManagementException {
         SortedSet<APIStore> apistoreSet = new TreeSet<APIStore>(new APIStoreNameComparator());
         apistoreSet.addAll(getExternalStores(tenantId));
