@@ -378,6 +378,7 @@
     "API Gateways" : "API Gateways",
     "Micro Gateways" : "Micro Gateways",
     "Gateways" : "Gateways",
-    "DEFAULT" : "OAuth"
+    "DEFAULT" : "OAuth",
+    "Matched in Doc" : "Matched in Doc"
 
 }
