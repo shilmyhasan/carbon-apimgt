@@ -107,10 +107,6 @@ providerValUe = APIUtil.replaceEmailDomain(providerValUe);
 var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 var tenantDomain = MultitenantUtils.getTenantDomain(outputs.api.provider);
 
-/*if ("carbon.super" == tenantDomain) {
-    userName = userName + "@carbon.super";
-} */
-
     if(providerValUe.indexOf("@") > -1){
         providerValUe = providerValUe.replace("@","%40");
     }
@@ -289,7 +285,7 @@ function checkOnKeyPress(e) {
     }
 }
 </script>
-<div id="authorizations" class="col-md-12 col-lg-12">    
+<div id="authorizations" class="col-md-12 col-lg-12">
 <% if(subscriptions != null && subscriptions.length > 0) { %>
 <form class="form-horizontal">
       <div class="form-group">
