@@ -29,7 +29,6 @@ var log = new Log();
         var uriMatcher = new URIMatcher(callPath);
         var tenantVal,providerVal,apiNameVal,apiVersionVal;
         tenantVal = apiNameVal = apiVersionVal = "";
-        var log = new Log("tmkasun DEBUG");
 
         if (uriMatcher.match("/{tenantVal}/{apiNameVal}/{apiVersionVal}")) {
             tenantVal = uriMatcher.elements().tenantVal;
