@@ -216,6 +216,8 @@ public class APIStateChangeWSWorkflowExecutor extends WorkflowExecutor {
                 super.execute(workflowDTO);
                 // For any other states, act as simpleworkflow executor.
                 workflowDTO.setStatus(WorkflowStatus.APPROVED);
+                //Setting the updated time as this is not set in this flow
+                workflowDTO.setUpdatedTime(System.currentTimeMillis());
                 // calling super.complete() instead of complete() to act as the simpleworkflow executor
                 super.complete(workflowDTO);
             }
