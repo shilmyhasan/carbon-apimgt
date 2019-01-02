@@ -151,7 +151,7 @@ public class OIDCRelyingPartyObject extends ScriptableObject {
 
     }
 
-    public static String jsFunction_getJsonResponse(Context cx, Scriptable thisObj, Object[] args,
+    public static String jsFunction_getIdTokenResponse(Context cx, Scriptable thisObj, Object[] args,
                                          Function funObj) throws Exception {
 
         log.debug("Obtaining id_token");

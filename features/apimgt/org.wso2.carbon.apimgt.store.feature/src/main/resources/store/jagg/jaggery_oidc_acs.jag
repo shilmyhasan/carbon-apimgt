@@ -35,7 +35,7 @@
     }
 
     // obtain oidc token response to validate the signature and to obtain group ids
-    var oidcTokenReponse = oidcRelyingParty.getJsonResponse(authorizationCode);
+    var oidcTokenReponse = oidcRelyingParty.getIdTokenResponse(authorizationCode);
     // Check OIDC signature valid and set session as a authenticated if success
     var isSignatureValid = oidcRelyingParty.validateOIDCSignature(oidcTokenReponse, session.get("NONCE"), sessionId);
 
