@@ -16,6 +16,7 @@
 package org.wso2.carbon.apimgt.gateway.handlers.common;
 
 import org.apache.axis2.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
@@ -43,14 +44,15 @@ public class SynapsePropertiesHandler extends AbstractHandler {
                 .getAxis2MessageContext();
         String method = (String) axis2MsgContext.getProperty(Constants.Configuration.HTTP_METHOD);
         Map headers = (Map) axis2MsgContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        boolean isContentTypeNotSet = false;
+        boolean isContentTypeSet = false;
 
         if (headers != null) {
-            isContentTypeNotSet = headers.get("Content-Type") == null || headers.get("Content-Type").equals("");
+            String contentType = (String) headers.get(HttpHeaders.CONTENT_TYPE);
+            isContentTypeSet = StringUtils.isEmpty(contentType);
         }
 
-        if (isContentTypeNotSet && addDefaultContentType && (method.equals(Constants.Configuration.HTTP_METHOD_POST)
-                || method.equals(Constants.Configuration.HTTP_METHOD_PUT))) {
+        if (!isContentTypeSet && addDefaultContentType && (Constants.Configuration.HTTP_METHOD_POST.equals(method)
+                || Constants.Configuration.HTTP_METHOD_PUT.equals(method))) {
             // Need to set both the property and the header for this to work.
             // Simply setting the header will not work. It'll make synapse assume the ContentType property
             // to be default 'application/octet-stream'. Which causes a HTTP 415 response
