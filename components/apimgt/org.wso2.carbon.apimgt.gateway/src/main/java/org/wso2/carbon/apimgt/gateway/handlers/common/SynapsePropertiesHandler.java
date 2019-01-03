@@ -15,11 +15,20 @@
  */
 package org.wso2.carbon.apimgt.gateway.handlers.common;
 
+import org.apache.axis2.Constants;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
-public class SynapsePropertiesHandler extends AbstractHandler{
+import javax.ws.rs.core.MediaType;
+import java.util.Map;
+
+public class SynapsePropertiesHandler extends AbstractHandler {
+    private boolean addDefaultContentType = false;
 
     public boolean handleRequest(MessageContext messageContext) {
         String httpport = System.getProperty("http.nio.port");
@@ -27,13 +36,43 @@ public class SynapsePropertiesHandler extends AbstractHandler{
         messageContext.setProperty("http.nio.port", httpport);
         messageContext.setProperty("https.nio.port", httpsport);
         String mgtHttpsPort = System.getProperty(APIConstants.KEYMANAGER_PORT);
-        messageContext.setProperty("keyManager.port",mgtHttpsPort);
         String keyManagerHost = System.getProperty(APIConstants.KEYMANAGER_HOSTNAME);
-        messageContext.setProperty("keyManager.hostname",keyManagerHost);
+        messageContext.setProperty("keyManager.port", mgtHttpsPort);
+        messageContext.setProperty("keyManager.hostname", keyManagerHost);
+
+        org.apache.axis2.context.MessageContext axis2MsgContext = ((Axis2MessageContext) messageContext)
+                .getAxis2MessageContext();
+        String method = (String) axis2MsgContext.getProperty(Constants.Configuration.HTTP_METHOD);
+        Map headers = (Map) axis2MsgContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        boolean isContentTypeSet = false;
+
+        if (headers != null) {
+            String contentType = (String) headers.get(HttpHeaders.CONTENT_TYPE);
+            isContentTypeSet = StringUtils.isEmpty(contentType);
+        }
+
+        if (!isContentTypeSet && addDefaultContentType && (Constants.Configuration.HTTP_METHOD_POST.equals(method)
+                || Constants.Configuration.HTTP_METHOD_PUT.equals(method))) {
+            // Need to set both the property and the header for this to work.
+            // Simply setting the header will not work. It'll make synapse assume the ContentType property
+            // to be default 'application/octet-stream'. Which causes a HTTP 415 response
+            axis2MsgContext.setProperty(SynapseConstants.AXIS2_PROPERTY_CONTENT_TYPE,
+                    MediaType.APPLICATION_FORM_URLENCODED);
+            headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+        }
+
         return true;
     }
 
     public boolean handleResponse(MessageContext messageContext) {
         return true;
+    }
+
+    public boolean addDefaultContentType() {
+        return addDefaultContentType;
+    }
+
+    public void setAddDefaultContentType(boolean addDefaultContentType) {
+        this.addDefaultContentType = addDefaultContentType;
     }
 }
