@@ -106,7 +106,8 @@ public class JWTGenerator extends AbstractJWTGenerator {
                 return customClaims;
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("The custom claims are retrieved from AuthorizationGrantCache.");
+                    log.debug("Custom claims are not available in the AuthorizationGrantCache. Hence will be " +
+                            "retrieved from the user store.");
                 }
             }
             // If claims are not found in AuthorizationGrantCache, they will be retrieved from the userstore.
