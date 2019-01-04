@@ -20,16 +20,34 @@ import junit.framework.TestCase;
 import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationServiceImpl;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.apimgt.keymgt.token.JWTGenerator;
+import org.wso2.carbon.caching.impl.Util;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.util.KeyStoreManager;
+import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCache;
+import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.user.core.util.UserCoreUtil;
+
+import java.security.cert.X509Certificate;
 //import org.wso2.carbon.apimgt.impl.utils.TokenGenUtil;
 
-
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({PrivilegedCarbonContext.class, Util.class, CarbonContext.class, OAuthServerConfiguration.class,
+        AuthorizationGrantCache.class, APIUtil.class, KeyStoreManager.class, UserCoreUtil.class})
 public class TokenGenTest extends TestCase {
     private static final Log log = LogFactory.getLog(TokenGenTest.class);
 
@@ -40,6 +58,32 @@ public class TokenGenTest extends TestCase {
         config.load(dbConfigPath);
         ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(
                 new APIManagerConfigurationServiceImpl(config));
+        System.setProperty("carbon.home", "");
+        PowerMockito.mockStatic(Util.class);
+        PowerMockito.mockStatic(CarbonContext.class);
+        PowerMockito.mockStatic(PrivilegedCarbonContext.class);
+        PowerMockito.mockStatic(OAuthServerConfiguration.class);
+        PowerMockito.mockStatic(APIUtil.class);
+        PowerMockito.mockStatic(KeyStoreManager.class);
+        PowerMockito.mockStatic(UserCoreUtil.class);
+        PowerMockito.mockStatic(AuthorizationGrantCache.class);
+        OAuthServerConfiguration authServerConfiguration = Mockito.mock(OAuthServerConfiguration.class);
+        CarbonContext carbonContext = Mockito.mock(CarbonContext.class);
+        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
+        APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        X509Certificate publicCert = Mockito.mock(X509Certificate.class);
+        APIManagerConfigurationService apiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
+        KeyStoreManager keyStoreManager = Mockito.mock(KeyStoreManager.class);
+        PrivilegedCarbonContext privilegedCarbonContext = Mockito.mock(PrivilegedCarbonContext.class);
+        PowerMockito.when(OAuthServerConfiguration.getInstance()).thenReturn(authServerConfiguration);
+        PowerMockito.when(Util.getTenantDomain()).thenReturn("carbon.super");
+        Mockito.when(carbonContext.getTenantDomain()).thenReturn("carbon.super");
+        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
+        PowerMockito.when(CarbonContext.getThreadLocalCarbonContext()).thenReturn(carbonContext);
+        PowerMockito.when(KeyStoreManager.getInstance(-1234)).thenReturn(keyStoreManager);
+        Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        Mockito.when(keyStoreManager.getDefaultPrimaryCertificate()).thenReturn(publicCert);
+        PowerMockito.when(PrivilegedCarbonContext.getThreadLocalCarbonContext()).thenReturn(privilegedCarbonContext);
     }
 
     public void testAbstractJWTGenerator() throws Exception {
@@ -58,6 +102,9 @@ public class TokenGenTest extends TestCase {
         dto.setApplicationTier("UNLIMITED");
         dto.setEndUserName("malalgoda");
         dto.setUserType(APIConstants.ACCESS_TOKEN_USER_TYPE_APPLICATION);
+        PowerMockito.when(APIUtil.getUserNameWithTenantSuffix("malalgoda")).thenReturn("malalgoda@carbon.super");
+        PowerMockito.when(UserCoreUtil.removeDomainFromName("malalgoda@carbon.super")).thenReturn("malalgoda");
+
         //Here we will call generate token method with 4 argument.
         String token = jwtGen.generateToken(validationContext);
         System.out.println("Generated Token: " + token);
