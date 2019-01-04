@@ -48,7 +48,7 @@ public class SynapsePropertiesHandler extends AbstractHandler {
 
         if (headers != null) {
             String contentType = (String) headers.get(HttpHeaders.CONTENT_TYPE);
-            isContentTypeSet = StringUtils.isEmpty(contentType);
+            isContentTypeSet = !StringUtils.isEmpty(contentType);
         }
 
         if (!isContentTypeSet && addDefaultContentType && (Constants.Configuration.HTTP_METHOD_POST.equals(method)
