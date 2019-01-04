@@ -46,7 +46,7 @@ import java.security.cert.X509Certificate;
 //import org.wso2.carbon.apimgt.impl.utils.TokenGenUtil;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({PrivilegedCarbonContext.class, Util.class, CarbonContext.class, OAuthServerConfiguration.class,
+@PrepareForTest({PrivilegedCarbonContext.class, org.wso2.carbon.caching.impl.Util.class, CarbonContext.class, OAuthServerConfiguration.class,
         AuthorizationGrantCache.class, APIUtil.class, KeyStoreManager.class, UserCoreUtil.class})
 public class TokenGenTest extends TestCase {
     private static final Log log = LogFactory.getLog(TokenGenTest.class);
