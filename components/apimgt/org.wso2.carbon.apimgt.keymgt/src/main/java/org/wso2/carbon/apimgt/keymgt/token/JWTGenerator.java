@@ -124,7 +124,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
         return null;
     }
 
-    private static Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
+    public Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
 
         AuthorizationGrantCacheEntry cacheEntry = AuthorizationGrantCache.getInstance().getValueFromCacheByToken(cacheKey);
         if (cacheEntry == null) {
