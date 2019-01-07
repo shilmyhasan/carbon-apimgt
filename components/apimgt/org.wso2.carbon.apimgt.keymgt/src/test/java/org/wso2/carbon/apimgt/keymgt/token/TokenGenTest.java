@@ -20,28 +20,18 @@ import junit.framework.TestCase;
 import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationServiceImpl;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
-import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
-import org.wso2.carbon.apimgt.keymgt.token.JWTGenerator;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCache;
-import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheEntry;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheKey;
+
+import java.util.HashMap;
+import java.util.Map;
 //import org.wso2.carbon.apimgt.impl.utils.TokenGenUtil;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({AuthorizationGrantCache.class})
 public class TokenGenTest extends TestCase {
     private static final Log log = LogFactory.getLog(TokenGenTest.class);
 
@@ -52,16 +42,15 @@ public class TokenGenTest extends TestCase {
         config.load(dbConfigPath);
         ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(
                 new APIManagerConfigurationServiceImpl(config));
-        PowerMockito.mockStatic(AuthorizationGrantCache.class);
-        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
-        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
-        AuthorizationGrantCacheEntry entry = Mockito.mock(AuthorizationGrantCacheEntry.class);
-        PowerMockito.when(AuthorizationGrantCache.getInstance().getValueFromCacheByToken(Mockito.any(AuthorizationGrantCacheKey.class))).thenReturn(entry);
-
     }
 
     public void testAbstractJWTGenerator() throws Exception {
-        JWTGenerator jwtGen = new JWTGenerator();
+        JWTGenerator jwtGen = new JWTGenerator() {
+            @Override
+            protected Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
+                return new HashMap<String, String>();
+            }
+        };
         APIKeyValidationInfoDTO dto=new APIKeyValidationInfoDTO();
 
         TokenValidationContext validationContext = new TokenValidationContext();
@@ -115,7 +104,12 @@ public class TokenGenTest extends TestCase {
     }
     //    TODO: Have to convert to work with new JWT generation and signing
     public void testJWTGeneration() throws Exception {
-        JWTGenerator jwtGen = new JWTGenerator();
+        JWTGenerator jwtGen = new JWTGenerator() {
+            @Override
+            protected Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
+                return new HashMap<String, String>();
+            }
+        };
         APIKeyValidationInfoDTO dto=new APIKeyValidationInfoDTO();
         dto.setSubscriber("sastry");
         dto.setApplicationName("hubapp");
@@ -183,7 +177,6 @@ public class TokenGenTest extends TestCase {
         //String decodedToken = new String(Base64Utils.decode(token));
         //log.info(decodedToken);
         //assertNotNull(decodedToken);
-
-
     }
+
 }
