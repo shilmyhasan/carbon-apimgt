@@ -38,11 +38,10 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCache;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheEntry;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheKey;
-import org.wso2.carbon.utils.CarbonUtils;
 //import org.wso2.carbon.apimgt.impl.utils.TokenGenUtil;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CarbonUtils.class, AuthorizationGrantCache.class})
+@PrepareForTest({AuthorizationGrantCache.class})
 public class TokenGenTest extends TestCase {
     private static final Log log = LogFactory.getLog(TokenGenTest.class);
 
@@ -53,8 +52,6 @@ public class TokenGenTest extends TestCase {
         config.load(dbConfigPath);
         ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(
                 new APIManagerConfigurationServiceImpl(config));
-        System.setProperty("carbon.home", "");
-        PowerMockito.mockStatic(CarbonUtils.class);
         PowerMockito.mockStatic(AuthorizationGrantCache.class);
         AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
         PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
