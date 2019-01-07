@@ -47,7 +47,7 @@ public class TokenGenTest extends TestCase {
     public void testAbstractJWTGenerator() throws Exception {
         JWTGenerator jwtGen = new JWTGenerator() {
             @Override
-            protected Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
+            public Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
                 return new HashMap<String, String>();
             }
         };
@@ -106,7 +106,7 @@ public class TokenGenTest extends TestCase {
     public void testJWTGeneration() throws Exception {
         JWTGenerator jwtGen = new JWTGenerator() {
             @Override
-            protected Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
+            public Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
                 return new HashMap<String, String>();
             }
         };
