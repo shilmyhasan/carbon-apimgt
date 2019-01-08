@@ -590,7 +590,8 @@ public final class APIConstants {
     public static final String API_STORE_APIS_PER_PAGE = API_STORE + "APIsPerPage";
     public static final String API_STORE_FORUM_ENABLED = API_STORE + "isStoreForumEnabled";
     public static final String MULTI_TENANT_USER_ADMIN_SERVICE = "MultiTenantUserAdminService";
-
+    public static final String API_STORE_GROUP_EXTRACTOR_CLAIM_URI = API_STORE + "DefaultGroupExtractorClaimUri";
+    public static final String API_STORE_GROUP_EXTRACTOR_DEFAULT_CLAIM = "http://wso2.org/claims/organization";
 
     public static final String API_PUBLISHER = "APIPublisher.";
     public static final String SHOW_API_PUBLISHER_URL_FROM_STORE = API_PUBLISHER + "DisplayURL";

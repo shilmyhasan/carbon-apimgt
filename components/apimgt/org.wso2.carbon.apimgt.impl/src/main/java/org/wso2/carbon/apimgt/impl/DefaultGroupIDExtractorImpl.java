@@ -1,5 +1,6 @@
 package org.wso2.carbon.apimgt.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -7,6 +8,7 @@ import org.json.JSONObject;
 import org.wso2.carbon.apimgt.api.LoginPostExecutor;
 import org.wso2.carbon.apimgt.api.NewPostLoginExecutor;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreManager;
@@ -24,7 +26,7 @@ public class DefaultGroupIDExtractorImpl implements NewPostLoginExecutor {
         Boolean isSuperTenant;
         int tenantId = MultitenantConstants.SUPER_TENANT_ID;
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        String claim = "http://wso2.org/claims/organization";
+        String claim = APIUtil.getGroupIdExtractorClaim();
         String organization = null;
         try {
             obj = new JSONObject(loginResponse);
@@ -63,7 +65,7 @@ public class DefaultGroupIDExtractorImpl implements NewPostLoginExecutor {
         Boolean isSuperTenant;
         int tenantId = MultitenantConstants.SUPER_TENANT_ID;
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        String claim = "http://wso2.org/claims/organization";
+        String claim = APIUtil.getGroupIdExtractorClaim();
         String organization = null;
         String[] groupIdArray = null;
         try {

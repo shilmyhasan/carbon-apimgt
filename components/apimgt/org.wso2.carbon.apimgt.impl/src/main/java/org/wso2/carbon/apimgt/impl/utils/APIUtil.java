@@ -7542,4 +7542,20 @@ public final class APIUtil {
             return role;
         }
     }
+
+    /**
+     * Gets the configured claim for group extractor
+     * 
+     * @return claim for group extractor
+     */
+    public static String getGroupIdExtractorClaim() {
+
+        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String claim = config.getFirstProperty(APIConstants.API_STORE_GROUP_EXTRACTOR_CLAIM_URI);
+        if (StringUtils.isBlank(claim)) {
+            claim = APIConstants.API_STORE_GROUP_EXTRACTOR_DEFAULT_CLAIM;
+        }
+        return claim;
+    }
 }
