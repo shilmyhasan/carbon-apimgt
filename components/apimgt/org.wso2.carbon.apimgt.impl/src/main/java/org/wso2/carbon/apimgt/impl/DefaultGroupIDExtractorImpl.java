@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.wso2.carbon.apimgt.api.LoginPostExecutor;
 import org.wso2.carbon.apimgt.api.NewPostLoginExecutor;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreManager;
@@ -25,12 +26,7 @@ public class DefaultGroupIDExtractorImpl implements NewPostLoginExecutor {
         Boolean isSuperTenant;
         int tenantId = MultitenantConstants.SUPER_TENANT_ID;
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
-                getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String claim = config.getFirstProperty(APIConstants.API_STORE_GROUP_EXTRACTOR_CLAIM_URI);
-        if (StringUtils.isBlank(claim)) {
-            claim = "http://wso2.org/claims/organization";
-        }
+        String claim = APIUtil.getGroupIdExtractorClaim();
         String organization = null;
         try {
             obj = new JSONObject(loginResponse);
@@ -69,12 +65,7 @@ public class DefaultGroupIDExtractorImpl implements NewPostLoginExecutor {
         Boolean isSuperTenant;
         int tenantId = MultitenantConstants.SUPER_TENANT_ID;
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
-                getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String claim = config.getFirstProperty(APIConstants.API_STORE_GROUP_EXTRACTOR_CLAIM_URI);
-        if (StringUtils.isBlank(claim)) {
-            claim = "http://wso2.org/claims/organization";
-        }
+        String claim = APIUtil.getGroupIdExtractorClaim();
         String organization = null;
         String[] groupIdArray = null;
         try {
