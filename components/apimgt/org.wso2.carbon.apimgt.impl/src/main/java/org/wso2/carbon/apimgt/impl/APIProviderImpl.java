@@ -1196,6 +1196,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
 
+            String oldStatus = artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS);
+            String oldAccessControlRoles = registry.get(artifact.getPath()).getProperty(APIConstants.PUBLISHER_ROLES);
             GenericArtifact updateApiArtifact = APIUtil.createAPIArtifactContent(artifact, api);
             String artifactPath = GovernanceUtils.getArtifactPath(registry, updateApiArtifact.getId());
             org.wso2.carbon.registry.core.Tag[] oldTags = registry.getTags(artifactPath);
@@ -1240,9 +1242,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
             artifactManager.updateGenericArtifact(updateApiArtifact);
 
-            //update api status in document artifacts as well if there are any associated documents.
-            updateAPIStatusInDocumentArtifacts(api);
-
             //write API Status to a separate property. This is done to support querying APIs using custom query (SQL)
             //to gain performance
             String apiStatus = api.getStatus().toUpperCase();
@@ -1251,6 +1250,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String publisherAccessControlRoles = api.getAccessControlRoles();
             updateRegistryResources(artifactPath, publisherAccessControlRoles, api.getAccessControl(),
                     api.getAdditionalProperties());
+
+            //propagate api status change and access control roles change to document artifact
+            String newStatus = updateApiArtifact.getAttribute(APIConstants.API_OVERVIEW_STATUS);
+            if (!StringUtils.equals(oldStatus, newStatus) || !StringUtils.equals(oldAccessControlRoles, publisherAccessControlRoles)) {
+                APIUtil.notifyAPIStateChangeToAssociatedDocuments(artifact, registry);
+            }
 
             if (updatePermissions) {
                 APIUtil.clearResourcePermissions(artifactPath, api.getId(), ((UserRegistry) registry).getTenantId());
@@ -1295,6 +1300,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 } else {
                     APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(), visibleRoles,
                             docRootPath, registry);
+                }
+            } else {
+                //In order to support content search feature - we need to update resource permissions of document resources
+                //if their visibility is set to API level.
+                List<Documentation> docs = getAllDocumentation(api.getId());
+                for (Documentation doc : docs) {
+                    if ((APIConstants.DOC_API_BASED_VISIBILITY).equalsIgnoreCase(doc.getVisibility().name())) {
+                        String documentationPath = APIUtil.getAPIDocPath(api.getId()) + doc.getName();
+                        APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(),
+                                visibleRoles, documentationPath, registry);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -2516,11 +2532,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             APIUtil.setResourcePermissions(api.getId().getProviderName(),visibility, authorizedRoles,contentPath, registry);
-
-            //write inline content to new rxt field too
-            docArtifact.setAttribute(APIConstants.DOC_CONTENT, text);
-            artifactManager.updateGenericArtifact(docArtifact);
-
         } catch (RegistryException e) {
             String msg = "Failed to add the documentation content of : "
                     + documentationName + " of API :" + identifier.getApiName();
@@ -5826,24 +5837,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new APIManagementException(
                     "Registry Exception while trying to check the access control restriction of API " + identifier
                             .getApiName(), e);
-        }
-    }
-
-    private void updateAPIStatusInDocumentArtifacts(API api)
-            throws RegistryException, APIManagementException {
-
-        String apiPath = APIUtil.getAPIPath(api.getId());
-        Association[] docAssociations = registry.getAssociations(apiPath, APIConstants.DOCUMENTATION_ASSOCIATION);
-
-        GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry, APIConstants.DOCUMENTATION_KEY);
-
-        for (Association doc : docAssociations) {
-            String documentPath = doc.getDestinationPath();
-            Resource docResource = registry.get(documentPath);
-            GenericArtifact docArtifact = artifactManager.getGenericArtifact(docResource.getUUID());
-
-            docArtifact.setAttribute(APIConstants.DOC_ASSOCIATED_API_STATUS, api.getStatus());
-            artifactManager.updateGenericArtifact(docArtifact);
         }
     }
 
