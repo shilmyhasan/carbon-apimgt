@@ -707,6 +707,14 @@ public class APIMWSDLReader {
                 log.debug("Gateway endpoint for environment:" + environmentName + " is: "
                         + ((HTTPAddressImpl) exElement).getLocationURI());
             }
+        } else if (exElement instanceof UnknownExtensibilityElement) {
+            NodeList nodeList = ((UnknownExtensibilityElement) exElement).getElement().
+                    getElementsByTagNameNS("http://www.w3.org/2005/08/addressing", "Address");
+            if (nodeList.getLength() > 0) {
+                ((UnknownExtensibilityElement) exElement).getElement().
+                        getElementsByTagNameNS("http://www.w3.org/2005/08/addressing", "Address").item(0).
+                        setTextContent(APIUtil.getGatewayendpoint(transports) + context);
+            }
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("WSDL address element type is not supported for WSDL element type: " + exElement
