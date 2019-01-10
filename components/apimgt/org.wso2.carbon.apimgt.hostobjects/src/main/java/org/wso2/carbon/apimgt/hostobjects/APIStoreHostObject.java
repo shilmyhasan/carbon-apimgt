@@ -1098,7 +1098,6 @@ public class APIStoreHostObject extends ScriptableObject {
                             Documentation doc = entry.getKey();
                             API api = entry.getValue();
                             APIIdentifier apiIdentifier = api.getId();
-
                             NativeObject currentApi = new NativeObject();
 
                             currentApi.put("name", currentApi, apiIdentifier.getApiName());
