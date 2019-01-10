@@ -1251,7 +1251,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String apiStatus = api.getStatus().toUpperCase();
             saveAPIStatus(artifactPath, apiStatus);
             String[] visibleRoles = new String[0];
-            String publisherAccessControlRoles = null;
+            String publisherAccessControlRoles = api.getAccessControlRoles();
             updateRegistryResources(artifactPath, publisherAccessControlRoles, api.getAccessControl(),
                     api.getAdditionalProperties());
 
