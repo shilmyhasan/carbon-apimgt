@@ -1197,7 +1197,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             String oldStatus = artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS);
-            String oldAccessControlRoles = registry.get(artifact.getPath()).getProperty(APIConstants.PUBLISHER_ROLES);
+            Resource apiResource = registry.get(artifact.getPath());
+            String oldAccessControlRoles = api.getAccessControlRoles();
+            if (apiResource != null) {
+                oldAccessControlRoles = registry.get(artifact.getPath()).getProperty(APIConstants.PUBLISHER_ROLES);
+            }
             GenericArtifact updateApiArtifact = APIUtil.createAPIArtifactContent(artifact, api);
             String artifactPath = GovernanceUtils.getArtifactPath(registry, updateApiArtifact.getId());
             org.wso2.carbon.registry.core.Tag[] oldTags = registry.getTags(artifactPath);
@@ -1247,7 +1251,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String apiStatus = api.getStatus().toUpperCase();
             saveAPIStatus(artifactPath, apiStatus);
             String[] visibleRoles = new String[0];
-            String publisherAccessControlRoles = api.getAccessControlRoles();
+            String publisherAccessControlRoles = null;
             updateRegistryResources(artifactPath, publisherAccessControlRoles, api.getAccessControl(),
                     api.getAdditionalProperties());
 
@@ -1305,11 +1309,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 //In order to support content search feature - we need to update resource permissions of document resources
                 //if their visibility is set to API level.
                 List<Documentation> docs = getAllDocumentation(api.getId());
-                for (Documentation doc : docs) {
-                    if ((APIConstants.DOC_API_BASED_VISIBILITY).equalsIgnoreCase(doc.getVisibility().name())) {
-                        String documentationPath = APIUtil.getAPIDocPath(api.getId()) + doc.getName();
-                        APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(),
-                                visibleRoles, documentationPath, registry);
+                if (docs != null) {
+                    for (Documentation doc : docs) {
+                        if ((APIConstants.DOC_API_BASED_VISIBILITY).equalsIgnoreCase(doc.getVisibility().name())) {
+                            String documentationPath = APIUtil.getAPIDocPath(api.getId()) + doc.getName();
+                            APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(),
+                                    visibleRoles, documentationPath, registry);
+                        }
                     }
                 }
             }
