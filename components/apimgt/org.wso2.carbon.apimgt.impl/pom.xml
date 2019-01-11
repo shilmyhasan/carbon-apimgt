@@ -433,6 +433,7 @@
                             org.eclipse.equinox.http.helper,
                             com.google.gson,
                             org.apache.axis2.*; version="${imp.pkg.version.axis2}",
+                            org.apache.commons.codec.*; version="[1.4.0, 1.6.0)",
                             org.apache.commons.*,
                             org.apache.http.*,
                             org.apache.synapse.*,
