@@ -1447,6 +1447,42 @@ public class APIMgtDAOTest {
         Assert.assertTrue(result2.containsKey("/abc::GET::Any::Unlimited::abcd defgh fff"));
    }
 
+    @Test public void testGetProviderByNameVersionTenant() throws APIManagementException, SQLException {
+        final String apiProviderSuperTenant = "testUser1";
+        final String apiContextSuperTenant = "/sample/api";
+
+        final String apiProviderWSO2Tenant = "testUser1@wso2.test";
+        final String apiContextWSO2Tenant = "/t/wso2.test/sample/api";
+
+        final String apiName = "testAPI1";
+        final String apiVersion = "1.0.0";
+        insertAPIToAM(apiProviderSuperTenant, apiName, apiVersion,apiContextSuperTenant);
+        insertAPIToAM(apiProviderWSO2Tenant, apiName, apiVersion,apiContextWSO2Tenant);
+        try {
+            apiMgtDAO.getAPIProviderByNameAndVersion(apiName, apiVersion, "");
+            assertFalse("Should throw an exception when tenant value is blank string", true);
+        } catch (APIManagementException ex){
+            assertTrue(ex.getMessage().contains("cannot be null when fetching provider"));
+        }
+
+        try {
+            apiMgtDAO.getAPIProviderByNameAndVersion(apiName, apiVersion, null);
+            assertFalse("Should throw an exception when tenant value is null", true);
+        } catch (APIManagementException ex){
+            assertTrue(ex.getMessage().contains("cannot be null when fetching provider"));
+        }
+
+        String apiProviderSuperTenantResult = apiMgtDAO.getAPIProviderByNameAndVersion(apiName, apiVersion, APIConstants.SUPER_TENANT_DOMAIN);
+        Assert.assertEquals(apiProviderSuperTenant, apiProviderSuperTenantResult);
+
+        String apiProviderWSO2TenantResult = apiMgtDAO.getAPIProviderByNameAndVersion(apiName, apiVersion, "wso2.test");
+        Assert.assertEquals(apiProviderWSO2Tenant, apiProviderWSO2TenantResult);
+
+        deleteProviderTestAPI(apiName, apiProviderSuperTenant);
+        deleteProviderTestAPI(apiName, apiProviderWSO2Tenant);
+
+    }
+
     private void deleteSubscriber(int subscriberId) throws APIManagementException {
         Connection conn = null;
         ResultSet rs = null;
@@ -1528,6 +1564,55 @@ public class APIMgtDAOTest {
             String query = "DELETE FROM IDN_OAUTH_CONSUMER_APPS WHERE CONSUMER_KEY = ?";
             ps = conn.prepareStatement(query);
             ps.setString(1, clientId);
+            ps.executeUpdate();
+            conn.commit();
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+    }
+
+    private int insertAPIToAM(String apiProvider, String name ,String version, String context) throws SQLException {
+        Connection conn = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        int out;
+        final String apiCreatedBy1 = apiProvider;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+            final String query = "INSERT INTO AM_API "
+                    + "(API_PROVIDER, API_NAME, API_VERSION, CONTEXT, CONTEXT_TEMPLATE, CREATED_BY, CREATED_TIME) "
+                    + "VALUES(?, ?, ?, ?, '/sample', ?, ?)";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, apiProvider);
+            ps.setString(2, name);
+            ps.setString(3, version);
+            ps.setString(4, context);
+            ps.setString(5, apiCreatedBy1);
+            ps.setTimestamp(6, new Timestamp(new Date().getTime()), Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+            out = ps.executeUpdate();
+            conn.commit();
+
+            return out;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+    }
+
+
+    private void deleteProviderTestAPI(String apiName, String apiProvider) throws SQLException {
+        Connection conn = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            String query = "DELETE FROM AM_API WHERE API_NAME = ? AND API_PROVIDER = ?";
+            ps = conn.prepareStatement(query);
+            ps.setString(1, apiName);
+            ps.setString(2, apiProvider);
             ps.executeUpdate();
             conn.commit();
         } finally {
