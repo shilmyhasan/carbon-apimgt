@@ -6296,6 +6296,12 @@ public final class APIUtil {
         return null;
     }
 
+    public static String getAPIProviderFromAPINameVersionTenant(String apiName, String apiVersion, String tenant)
+            throws APIManagementException {
+        return ApiMgtDAO.getInstance().getAPIProviderByNameAndVersion(apiName, apiVersion, tenant);
+
+    }
+
     /**
      * Used to generate CORS Configuration object from CORS Configuration Json
      *
