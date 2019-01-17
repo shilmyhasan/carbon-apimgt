@@ -9,7 +9,7 @@
         var i, api, path;
         for(i = 0; i < length; i++) {
             api = apis[i];
-            path = jagg.getMappedUrl("/site/pages/item-info.jag") + "?name=" + api.name + "&version=" + api.version;
+            path = jagg.getMappedUrl("/site/pages/item-info.jag") + "?name=" + encodeURIComponent(api.name) + "&version=" + encodeURIComponent(api.version);
         %>
          <li><a><%=api.name%></a></li>
        <!-- <li>
