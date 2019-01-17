@@ -117,7 +117,7 @@ var swaggerAPI ;
 if (providerValUe.indexOf("/") > -1 || apiName.indexOf("/") > -1) {
     swaggerAPI = jagg.url("/api-docs" + "?tenant=" + encodeURIComponent(tenantDomain) + "&name=" + encodeURIComponent(apiName) + "&version=" + encodeURIComponent(version));
 } else {
-    swaggerAPI = jagg.url("/api-docs" + "/" + tenantDomain + "/" + apiName + "/" + version);
+    swaggerAPI = jagg.url("/api-docs" + "/" + encodeURIComponent(tenantDomain) + "/" + encodeURIComponent(apiName) + "/" + encodeURIComponent(version));
 }
 
 var api = outputs.api;%>

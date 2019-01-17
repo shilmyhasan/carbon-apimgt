@@ -1088,7 +1088,7 @@
         });
 
         $('#goToStore-btn').click(function(){
-            window.open('<%=storeUrl%>/apis/info?name=<%=api.name%>&version=<%=api.version%>&tenant=<%=tenantDomain%>', '_blank');
+            window.open('<%=storeUrl%>/apis/info?name=<%= encode.forHtml(api.name) %>&version=<%= encode.forHtml(api.version) %>&tenant=<%= encode.forHtml(String(tenantDomain)) %>', '_blank');
             location.href = '<%= jagg.url("/info?"+ apiUrlId ) %>';
         });
 
