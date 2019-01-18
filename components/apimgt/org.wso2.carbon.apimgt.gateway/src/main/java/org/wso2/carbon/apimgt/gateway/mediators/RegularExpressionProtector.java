@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.apimgt.gateway.mediators;
 
+import com.google.re2j.Pattern;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -41,7 +43,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * This mediator would protect the backend resources from the threat vulnerabilities by matching the
