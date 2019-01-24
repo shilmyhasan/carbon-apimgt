@@ -378,6 +378,9 @@
     "API Gateways" : "API Gateways",
     "Micro Gateways" : "Micro Gateways",
     "Gateways" : "Gateways",
-    "DEFAULT" : "OAuth"
+    "DEFAULT" : "OAuth",
+    "View Document" : "View Document",
+    "Document Name" : "Document Name",
+    "Document" : "Document"
 
 }

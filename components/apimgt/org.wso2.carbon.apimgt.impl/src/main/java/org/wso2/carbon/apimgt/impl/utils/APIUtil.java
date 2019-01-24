@@ -7566,4 +7566,27 @@ public final class APIUtil {
         }
         return claim;
     }
+
+    /**
+     * Notify document artifacts if an api state change occured. This change is required to re-trigger the document
+     * indexer so that the documnet indexes will be updated with the new associated api status.
+     * @param apiArtifact
+     * @param registry
+     * @throws RegistryException
+     * @throws APIManagementException
+     */
+    public static void notifyAPIStateChangeToAssociatedDocuments(GenericArtifact apiArtifact, Registry registry)
+            throws RegistryException, APIManagementException {
+        Association[] docAssociations = registry
+                .getAssociations(apiArtifact.getPath(), APIConstants.DOCUMENTATION_ASSOCIATION);
+        for (Association association : docAssociations) {
+            String documentResourcePath = association.getDestinationPath();
+            Resource docResource = registry.get(documentResourcePath);
+            //setting this indicator to a constant value - we only need to trigger an update on document artifact
+            String newStateChangeIndicatorStatus = "true";
+            docResource.setProperty(APIConstants.API_STATE_CHANGE_INDICATOR, newStateChangeIndicatorStatus);
+            registry.put(documentResourcePath, docResource);
+        }
+    }
+
 }

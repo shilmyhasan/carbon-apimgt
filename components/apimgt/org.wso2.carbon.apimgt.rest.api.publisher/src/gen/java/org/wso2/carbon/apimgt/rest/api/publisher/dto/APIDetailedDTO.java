@@ -262,9 +262,9 @@ public class APIDetailedDTO extends APIInfoDTO {
 
   
   /**
-   * Name of the Authorization header used for invoking the API. If it is not set, Authorization header name specified\nin tenant or system level will be used. \n
+   * Name of the Authorization header used for invoking the API. If it is not set, Authorization header name specified\nin tenant or system level will be used.\n
    **/
-  @ApiModelProperty(value = "Name of the Authorization header used for invoking the API. If it is not set, Authorization header name specified\nin tenant or system level will be used. \n")
+  @ApiModelProperty(value = "Name of the Authorization header used for invoking the API. If it is not set, Authorization header name specified\nin tenant or system level will be used.\n")
   @JsonProperty("authorizationHeader")
   public String getAuthorizationHeader() {
     return authorizationHeader;

@@ -85,8 +85,7 @@ public class APIDTO  {
   /**
   * gets and sets the lastUpdatedTime for APIDTO
   **/
-  @ApiModelProperty(value = "Last Updated Time of the API")
-  @JsonProperty("lastUpdatedTime")
+  @JsonIgnore
   public String getLastUpdatedTime(){
     return lastUpdatedTime;
   }
@@ -98,8 +97,7 @@ public class APIDTO  {
   * gets and sets the createdTime for a APIDTO
   **/
 
-  @ApiModelProperty(value = "Created Time of the API")
-  @JsonProperty("createdTime")
+  @JsonIgnore
   public String getCreatedTime(){
     return createdTime;
   }
@@ -375,7 +373,6 @@ public class APIDTO  {
     sb.append("  endpointURLs: ").append(endpointURLs).append("\n");
     sb.append("  businessInformation: ").append(businessInformation).append("\n");
     sb.append("  labels: ").append(labels).append("\n");
-    sb.append("  lastUpdatedTime: ").append(lastUpdatedTime).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
