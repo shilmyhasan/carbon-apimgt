@@ -99,6 +99,7 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
 
             //If groupId is provided, filter the applications by groupId
             if(StringUtils.isNotBlank(groupId)){
+                groupId = groupId.trim();
                 allMatchedApps = RestAPIStoreUtils.getFilteredApplicationsByGroupId(allMatchedApps, groupId);
             } else {
                 groupId = loggedInUserGroupId;
