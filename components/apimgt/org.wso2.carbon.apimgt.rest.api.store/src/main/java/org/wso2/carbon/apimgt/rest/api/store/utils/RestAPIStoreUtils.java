@@ -644,14 +644,13 @@ public class RestAPIStoreUtils {
         Application[] matchedApps = new Application[0];
         if (StringUtils.isNotBlank(groupId)) {
             List<Application> allMatchedAppsByGroupID = new ArrayList<Application>();
-
             for (Application application : applications) {
-
                 String applicationGroupID = application.getGroupId();
                 if (StringUtils.isNotBlank(applicationGroupID)) {
-                    String[] appGroupIds = applicationGroupID.trim().split(APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT);
-                    for(String appGroupId : appGroupIds){
-                        if(groupId.equals(appGroupId)){
+                    String[] appGroupIds = applicationGroupID.trim()
+                            .split(APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT);
+                    for (String appGroupId : appGroupIds) {
+                        if (groupId.equals(appGroupId)) {
                             allMatchedAppsByGroupID.add(application);
                         }
                     }
