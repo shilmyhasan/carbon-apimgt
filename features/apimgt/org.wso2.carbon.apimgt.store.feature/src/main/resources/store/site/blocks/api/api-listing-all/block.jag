@@ -11,7 +11,7 @@ jagg.block("api/api-listing-all", {
         };
     },
      getOutputs:function (inputs) {
-        var apis, docs, result, mod,error, response,message, list=[],tenantDomain,
+        var apis,result, mod,error, response,message, list=[],tenantDomain,
                 tag = request.getParameter("tag"), page = request.getParameter("page"),
                 query = request.getParameter("query")
                 apiStatus = request.getParameter("apiStatus");

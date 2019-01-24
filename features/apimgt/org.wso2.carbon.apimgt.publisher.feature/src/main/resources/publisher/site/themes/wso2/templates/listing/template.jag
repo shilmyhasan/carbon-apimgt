@@ -122,7 +122,7 @@
         <div class="page-content">
         <div class="row">
 		<%
-        var i, api,path,docPath,tooltip,mode=outputs.mode,apis = outputs.apis,docs = outputs.docs, length;
+        var i, api,path,docPath,tooltip,mode=outputs.mode,apis = outputs.apis, length;
         var reqUrl = request.getRequestURI();
         var docViewMappedUrl = jagg.getMappedUrl("/site/pages/doc-viewer.jag") + urlPrefix;
         var APIUtil = org.wso2.carbon.apimgt.impl.utils.APIUtil;

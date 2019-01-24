@@ -7582,12 +7582,9 @@ public final class APIUtil {
         for (Association association : docAssociations) {
             String documentResourcePath = association.getDestinationPath();
             Resource docResource = registry.get(documentResourcePath);
-            String oldStateChangeIndicatorStatus = docResource.getProperty(APIConstants.API_STATE_CHANGE_INDICATOR);
-            String newStateChangeIndicatorStatus = "false";
-            if (oldStateChangeIndicatorStatus != null) {
-                newStateChangeIndicatorStatus = String.valueOf(!Boolean.parseBoolean(oldStateChangeIndicatorStatus));
-            }
-            docResource.setProperty(APIConstants.API_STATE_CHANGE_INDICATOR, "false");
+            //setting this indicator to a constant value - we only need to trigger an update on document artifact
+            String newStateChangeIndicatorStatus = "true";
+            docResource.setProperty(APIConstants.API_STATE_CHANGE_INDICATOR, newStateChangeIndicatorStatus);
             registry.put(documentResourcePath, docResource);
         }
     }

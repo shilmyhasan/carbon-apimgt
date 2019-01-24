@@ -25,7 +25,7 @@ import java.util.Comparator;
 import java.util.Map;
 
 /**
- * Reorders
+ * Reorders unified search results
  */
 public class ContentSearchResultNameComparator implements Comparator{
 
