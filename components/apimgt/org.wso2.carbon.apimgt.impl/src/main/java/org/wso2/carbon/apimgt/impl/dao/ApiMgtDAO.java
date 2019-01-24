@@ -5492,6 +5492,12 @@ public class ApiMgtDAO {
                 application.setUUID(rs.getString("UUID"));
                 application.setTier(rs.getString("APPLICATION_TIER"));
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
+
+                if (multiGroupAppSharingEnabled) {
+                    if (StringUtils.isEmpty(application.getGroupId())) {
+                        application.setGroupId(getGroupId(applicationId));
+                    }
+                }
             }
         } catch (SQLException e) {
             handleException("Error while obtaining details of the Application : " + applicationId, e);
