@@ -379,6 +379,8 @@
     "Micro Gateways" : "Micro Gateways",
     "Gateways" : "Gateways",
     "DEFAULT" : "OAuth",
-    "Matched in Doc" : "Matched in Doc"
+    "View Document" : "View Document",
+    "Document Name" : "Document Name",
+    "Document" : "Document"
 
 }
