@@ -631,4 +631,33 @@ public class RestAPIStoreUtils {
         }
         return filteredScopes;
     }
+
+    /**
+     * To filter the authorized applications by groupID
+     *
+     * @param applications  authorized applications
+     * @param groupId   groupId query value
+     * @return  matched applications with groupId query
+     */
+    public static Application[] getFilteredApplicationsByGroupId(Application[] applications, String groupId) {
+
+        Application[] matchedApps = new Application[0];
+        if (StringUtils.isNotBlank(groupId)) {
+            List<Application> allMatchedAppsByGroupID = new ArrayList<Application>();
+            for (Application application : applications) {
+                String applicationGroupID = application.getGroupId();
+                if (StringUtils.isNotBlank(applicationGroupID)) {
+                    String[] appGroupIds = applicationGroupID.trim()
+                            .split(APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT);
+                    for (String appGroupId : appGroupIds) {
+                        if (groupId.equals(appGroupId)) {
+                            allMatchedAppsByGroupID.add(application);
+                        }
+                    }
+                }
+            }
+            matchedApps = allMatchedAppsByGroupID.toArray(new Application[allMatchedAppsByGroupID.size()]);
+        }
+        return matchedApps;
+    }
 }

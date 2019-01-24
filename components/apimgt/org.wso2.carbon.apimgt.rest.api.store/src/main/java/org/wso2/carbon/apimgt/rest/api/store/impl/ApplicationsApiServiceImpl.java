@@ -78,7 +78,7 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
 
         // currently groupId is taken from the user so that groupId coming as a query parameter is not honored.
         // As a improvement, we can check admin privileges of the user and honor groupId.
-        groupId = RestApiUtil.getLoggedInUserGroupId();
+        String loggedInUserGroupId = RestApiUtil.getLoggedInUserGroupId();
 
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
@@ -88,13 +88,21 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
             APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
             Application[] allMatchedApps = new Application[0];
             if (StringUtils.isBlank(query)) {
-                allMatchedApps = apiConsumer.getLightWeightApplications(new Subscriber(username), groupId);
+                allMatchedApps = apiConsumer.getLightWeightApplications(new Subscriber(username), loggedInUserGroupId);
             } else {
-                Application application = apiConsumer.getApplicationsByName(username, query, groupId);
+                Application application = apiConsumer.getApplicationsByName(username, query, loggedInUserGroupId);
                 if (application != null) {
                     allMatchedApps = new Application[1];
                     allMatchedApps[0] = application;
                 }
+            }
+
+            //If groupId is provided, filter the applications by groupId
+            if(StringUtils.isNotBlank(groupId)){
+                groupId = groupId.trim();
+                allMatchedApps = RestAPIStoreUtils.getFilteredApplicationsByGroupId(allMatchedApps, groupId);
+            } else {
+                groupId = loggedInUserGroupId;
             }
 
             //allMatchedApps are already sorted to application name
