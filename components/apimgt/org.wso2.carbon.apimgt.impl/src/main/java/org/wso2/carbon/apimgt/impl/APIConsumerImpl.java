@@ -2333,12 +2333,6 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     subscribedApi.getTier().setDisplayName(tier != null ? tier.getDisplayName() : subscribedApi
                             .getTier().getName());
                     // We do not need to add the modified object again.
-
-                    Set<APIKey> keys = getApplicationKeys(subscribedApi.getApplication().getId());
-
-                    for (APIKey key : keys) {
-                        subscribedApi.getApplication().addKey(key);
-                    }
                 }
             }
         } catch (APIManagementException e) {
@@ -2389,11 +2383,6 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                             .getTier().getName());
                     // We do not need to add the modified object again.
                     // subscribedAPIs.add(subscribedApi);
-                    Set<APIKey> keys = getApplicationKeys(subscribedApi.getApplication().getId());
-
-                    for (APIKey key : keys) {
-                        subscribedApi.getApplication().addKey(key);
-                    }
                 }
             }
         } catch (APIManagementException e) {
