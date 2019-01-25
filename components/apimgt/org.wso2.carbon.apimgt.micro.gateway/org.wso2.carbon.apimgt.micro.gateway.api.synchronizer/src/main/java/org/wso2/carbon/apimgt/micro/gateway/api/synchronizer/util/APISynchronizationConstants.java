@@ -31,7 +31,7 @@ public class APISynchronizationConstants {
     public static final String API_VIEW_PATH = "/api/am/publisher/{version}/apis";
     public static final String API_VIEW_MEDIATION_POLICY_PATH = "/policies/mediation";
     public static final String API_VIEW_GLOBAL_MEDIATION_POLICY_PATH = "/api/am/publisher/{version}/policies/mediation";
-    public static final String DEFAULT_API_UPDATE_SERVICE_URL = "https://localhost:9443/micro-gateway/v0.9/updated-apis";
+    public static final String DEFAULT_API_UPDATE_SERVICE_URL = "https://localhost:9443/micro-gateway/v0.10/updated-apis";
     public static final String API_NAME = "name";
     public static final String API_SEQUENCE = "sequence";
     public static final String API_VERSION_PARAM = "{version}";
