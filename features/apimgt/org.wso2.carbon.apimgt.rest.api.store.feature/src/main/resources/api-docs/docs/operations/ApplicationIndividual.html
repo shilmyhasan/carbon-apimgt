@@ -920,7 +920,8 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
    &quot;callbackUrl&quot;: &quot;&quot;,
    &quot;throttlingTier&quot;: &quot;Bronze&quot;,
    &quot;description&quot;: &quot;sample app description updated&quot;,
-   &quot;name&quot;: &quot;sampleapp&quot;
+   &quot;name&quot;: &quot;sampleapp&quot;,
+    &quot;groupId&quot;: &quot;org1&quot;
 }</code></div>
 
             <div class="pointer" data-toggle="collapse" data-target="#response-applicationsApplicationIdPut">
@@ -933,7 +934,7 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 Content-Type: application/json
 
 {
-   &quot;groupId&quot;: null,
+   &quot;groupId&quot;: &quot;org1&quot;,
    &quot;callbackUrl&quot;: &quot;&quot;,
    &quot;subscriber&quot;: &quot;admin&quot;,
    &quot;throttlingTier&quot;: &quot;Bronze&quot;,
@@ -1188,8 +1189,9 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
 {
   &quot;validityTime&quot;: &quot;3600&quot;,
   &quot;keyType&quot;: &quot;PRODUCTION&quot;,
-  &quot;accessAllowDomains&quot;: [&quot;ALL&quot;
-  ]
+  &quot;accessAllowDomains&quot;: [ &quot;ALL&quot; ],
+  &quot;scopes&quot;: [ &quot;am_application_scope&quot;, &quot;default&quot; ],
+  &quot;supportedGrantTypes&quot;: [ &quot;urn:ietf:params:oauth:grant-type:saml2-bearer&quot;, &quot;iwa:ntlm&quot;, &quot;refresh_token&quot;, &quot;client_credentials&quot;, &quot;password&quot; ]
 }</code></div>
 
             <div class="pointer" data-toggle="collapse" data-target="#response-applicationsGenerateKeysPost">
@@ -1468,7 +1470,8 @@ Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
     &quot;throttlingTier&quot;: &quot;Unlimited&quot;,
     &quot;description&quot;: &quot;sample app description&quot;,
     &quot;name&quot;: &quot;sampleapp&quot;,
-    &quot;callbackUrl&quot;: &quot;http://my.server.com/callback&quot;
+    &quot;callbackUrl&quot;: &quot;http://my.server.com/callback&quot;,
+    &quot;groupId&quot;: &quot;org1&quot;
 }</code></div>
 
             <div class="pointer" data-toggle="collapse" data-target="#response-applicationsPost">
@@ -1482,7 +1485,7 @@ Location: https://localhost:9443/api/am/store/v0.13/applications/c30f3a6e-ffa4-4
 Content-Type: application/json
 
 {
-   &quot;groupId&quot;: null,
+   &quot;groupId&quot;: &quot;org1&quot;,
    &quot;callbackUrl&quot;: &quot;http://my.server.com/callback&quot;,
    &quot;subscriber&quot;: &quot;admin&quot;,
    &quot;throttlingTier&quot;: &quot;Unlimited&quot;,

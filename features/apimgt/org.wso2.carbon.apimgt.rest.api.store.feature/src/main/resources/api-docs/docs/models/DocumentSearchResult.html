@@ -1,6 +1,6 @@
 <div class="main-content">
 
-        <h2>Application</h2>
+        <h2>DocumentSearchResult</h2>
             <table class="table table-hover">
                 <colgroup>
                     <col style="width: 10%;"/>
@@ -21,7 +21,7 @@
                 <tbody>
                     <tr>
                         <td class="parameter">
-                            <p>applicationId</p>
+                            <p>id</p>
                             <p class="param-required">
                                 
                                 optional
@@ -38,8 +38,8 @@
                         <td class="parameter">
                             <p>name</p>
                             <p class="param-required">
-                                required
                                 
+                                optional
                             </p>
                         </td>
                         <td class="parameter"><p class="marked"></p></td>
@@ -47,142 +47,157 @@
                                 <a href="#!/models#string">string</a>
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">CalculatorApp</p></td>
+                        <td class="parameter"> <p class="marked">TestAPI</p></td>
                     </tr>
                     <tr>
                         <td class="parameter">
-                            <p>subscriber</p>
+                            <p>type</p>
                             <p class="param-required">
                                 
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">If subscriber is not given user invoking the API will be taken as the subscriber. </p></td>
+                        <td class="parameter"><p class="marked"></p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">API</p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>docType</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked"></p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">HOWTO</p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>summary</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked"></p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">Summary of Calculator Documentation</p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>sourceType</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked"></p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">INLINE</p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>sourceUrl</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked"></p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked"></p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>otherTypeName</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked"></p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked"></p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>visibility</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked"></p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">API_LEVEL</p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>apiName</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked">The name of the associated API</p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">TestAPI</p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>apiVersion</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked">The version of the associated API</p></td>
+                        <td class="parameter">
+                                <a href="#!/models#string">string</a>
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">1.0.0</p></td>
+                    </tr>
+                    <tr>
+                        <td class="parameter">
+                            <p>apiProvider</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
                                 <a href="#!/models#string">string</a>
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
                         <td class="parameter"> <p class="marked">admin</p></td>
-                    </tr>
-                    <tr>
-                        <td class="parameter">
-                            <p>throttlingTier</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked"></p></td>
-                        <td class="parameter">
-                                <a href="#!/models#string">string</a>
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">Unlimited</p></td>
-                    </tr>
-                    <tr>
-                        <td class="parameter">
-                            <p>callbackUrl</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked"></p></td>
-                        <td class="parameter">
-                                <a href="#!/models#string">string</a>
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked"></p></td>
-                    </tr>
-                    <tr>
-                        <td class="parameter">
-                            <p>description</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked"></p></td>
-                        <td class="parameter">
-                                <a href="#!/models#string">string</a>
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">Sample calculator application</p></td>
-                    </tr>
-                    <tr>
-                        <td class="parameter">
-                            <p>tokenType</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked">Type of the access token generated for this application.  **OAUTH:** A UUID based access token which is issued by default. **JWT:** A self-contained, signed JWT based access token. **Note:** This can be only used in Microgateway environments. </p></td>
-                        <td class="parameter">
-                                <a href="#!/models#string">string</a>
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">OAUTH</p></td>
-                    </tr>
-                    <tr>
-                        <td class="parameter">
-                            <p>status</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked"></p></td>
-                        <td class="parameter">
-                                <a href="#!/models#string">string</a>
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">APPROVED</p></td>
-                    </tr>
-                    <tr>
-                        <td class="parameter">
-                            <p>groupId</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked"></p></td>
-                        <td class="parameter">
-                                <a href="#!/models#string">string</a>
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked"></p></td>
-                    </tr>
-                    <tr>
-                        <td class="parameter">
-                            <p>keys</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked"></p></td>
-                        <td class="parameter">
-                                <a href="#!/models#array">array</a>
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">[]</p></td>
-                    </tr>
-                    <tr>
-                        <td class="parameter">
-                            <p>attributes</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked"></p></td>
-                        <td class="parameter">
-                                <a href="#!/models#object">object</a>
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">&quot;External Reference ID, Billing Tier&quot;</p></td>
                     </tr>
                 </tbody>
             </table>
