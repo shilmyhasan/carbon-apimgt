@@ -161,7 +161,8 @@ function APIDesigner(){
                 var key = path + "_" + method;
                 var inSeqContent = soapRestMapping[key].content;
                 var outSeqContent = soapRestOutMapping[key].content;
-                event.data.render_soap_to_rest_resource($(this).parent().next().find('.resource_body'), inSeqContent, outSeqContent, key);
+                event.data.render_soap_to_rest_resource($(this).parent().next().find('.resource_body'), inSeqContent,
+                outSeqContent, key);
                 this.soap_resource_created = true;
             }
             $(this).parent().next().find('.resource_body').show();
