@@ -27,6 +27,7 @@ import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 /**
@@ -48,8 +49,11 @@ public class ResourceConfigContext extends ConfigContextDecorator {
             throw new APIManagementException("At least one resource is required");
         }
         if (APIUtil.isSequenceDefined(api.getFaultSequence())) {
-            String tenantDomain = MultitenantUtils.getTenantDomain
-                    (api.getId().getProviderName());
+            String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+            if (api.getId().getProviderName().contains("-AT-")) {
+                String provider = api.getId().getProviderName().replace("-AT-", "@");
+                tenantDomain = MultitenantUtils.getTenantDomain(provider);
+            }
             int tenantId;
             try {
                 tenantId = ServiceReferenceHolder.getInstance().getRealmService().

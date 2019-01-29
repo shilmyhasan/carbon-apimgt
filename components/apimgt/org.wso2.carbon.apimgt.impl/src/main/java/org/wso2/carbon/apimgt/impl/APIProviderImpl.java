@@ -3154,7 +3154,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 	public List<String> getCustomInSequences(APIIdentifier apiIdentifier) throws APIManagementException {
 
 		List<String> sequenceList = new ArrayList<String>();
+        boolean isTenantFlowStarted = false;
 		try {
+            String tenantDomain = null;
+            if (apiIdentifier.getProviderName().contains("-AT-")) {
+                String provider = apiIdentifier.getProviderName().replace("-AT-", "@");
+                tenantDomain = MultitenantUtils.getTenantDomain(provider);
+            }
+            PrivilegedCarbonContext.startTenantFlow();
+            isTenantFlowStarted = true;
+            if (!StringUtils.isEmpty(tenantDomain)) {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            } else {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
+                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+            }
 			UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService().getGovernanceSystemRegistry(tenantId);
 			if (registry.resourceExists(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION)) {
 	            org.wso2.carbon.registry.api.Collection inSeqCollection =
@@ -3187,7 +3201,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
 		} catch (Exception e) {
 			handleException("Issue is in getting custom InSequences from the Registry", e);
-		}
+		} finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
 		return sequenceList;
 	}
 
@@ -3200,7 +3218,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 	public List<String> getCustomOutSequences(APIIdentifier apiIdentifier) throws APIManagementException {
 
 		List<String> sequenceList = new ArrayList<String>();
+        boolean isTenantFlowStarted = false;
 		try {
+            String tenantDomain = null;
+            if (apiIdentifier.getProviderName().contains("-AT-")) {
+                String provider = apiIdentifier.getProviderName().replace("-AT-", "@");
+                tenantDomain = MultitenantUtils.getTenantDomain(provider);
+            }
+            PrivilegedCarbonContext.startTenantFlow();
+            isTenantFlowStarted = true;
+            if (!StringUtils.isEmpty(tenantDomain)) {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            } else {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
+                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+            }
 			UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
 			                                              .getGovernanceSystemRegistry(tenantId);
 			if (registry.resourceExists(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION)) {
@@ -3233,7 +3265,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
 		} catch (Exception e) {
 			handleException("Issue is in getting custom OutSequences from the Registry", e);
-		}
+		} finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
 		return sequenceList;
 	}
 
@@ -3366,7 +3402,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public List<String> getCustomFaultSequences(APIIdentifier apiIdentifier) throws APIManagementException {
 
         List<String> sequenceList = new ArrayList<String>();
+        boolean isTenantFlowStarted = false;
         try {
+            String tenantDomain = null;
+            if (apiIdentifier.getProviderName().contains("-AT-")) {
+                String provider = apiIdentifier.getProviderName().replace("-AT-", "@");
+                tenantDomain = MultitenantUtils.getTenantDomain(provider);
+            }
+            PrivilegedCarbonContext.startTenantFlow();
+            isTenantFlowStarted = true;
+            if (!StringUtils.isEmpty(tenantDomain)) {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            } else {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
+                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+            }
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
             if (registry.resourceExists(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION)) {
@@ -3412,6 +3462,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
         return sequenceList;
     }
@@ -3425,7 +3479,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     public List<String> getCustomApiInSequences(APIIdentifier apiIdentifier)  throws APIManagementException {
         List<String> sequenceList = new ArrayList<String>();
+        boolean isTenantFlowStarted = false;
         try {
+            String tenantDomain = null;
+            if (apiIdentifier.getProviderName().contains("-AT-")) {
+                String provider = apiIdentifier.getProviderName().replace("-AT-", "@");
+                tenantDomain = MultitenantUtils.getTenantDomain(provider);
+            }
+            PrivilegedCarbonContext.startTenantFlow();
+            isTenantFlowStarted = true;
+            if (!StringUtils.isEmpty(tenantDomain)) {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            } else {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
+                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+            }
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
             String customOutSeqFileLocation = APIUtil.getSequencePath(apiIdentifier,
@@ -3454,6 +3522,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
         return sequenceList;
     }
@@ -3467,7 +3539,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     public List<String> getCustomApiOutSequences(APIIdentifier apiIdentifier)  throws APIManagementException {
         List<String> sequenceList = new ArrayList<String>();
+        boolean isTenantFlowStarted = false;
         try {
+            String tenantDomain = null;
+            if (apiIdentifier.getProviderName().contains("-AT-")) {
+                String provider = apiIdentifier.getProviderName().replace("-AT-", "@");
+                tenantDomain = MultitenantUtils.getTenantDomain(provider);
+            }
+            PrivilegedCarbonContext.startTenantFlow();
+            isTenantFlowStarted = true;
+            if (!StringUtils.isEmpty(tenantDomain)) {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            } else {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
+                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+            }
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
             String customOutSeqFileLocation = APIUtil.getSequencePath(apiIdentifier,
@@ -3496,6 +3582,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
         return sequenceList;
     }
@@ -3508,7 +3598,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     public List<String> getCustomApiFaultSequences(APIIdentifier apiIdentifier)  throws APIManagementException {
         List<String> sequenceList = new ArrayList<String>();
+        boolean isTenantFlowStarted = false;
         try {
+            String tenantDomain = null;
+            if (apiIdentifier.getProviderName().contains("-AT-")) {
+                String provider = apiIdentifier.getProviderName().replace("-AT-", "@");
+                tenantDomain = MultitenantUtils.getTenantDomain(provider);
+            }
+            PrivilegedCarbonContext.startTenantFlow();
+            isTenantFlowStarted = true;
+            if (!StringUtils.isEmpty(tenantDomain)) {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            } else {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
+                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+            }
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
             String customOutSeqFileLocation = APIUtil.getSequencePath(apiIdentifier,
@@ -3537,6 +3641,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new APIManagementException(e.getMessage(), e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
         return sequenceList;
     }

@@ -54,10 +54,30 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.mozilla.javascript.*;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.apimgt.api.*;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.apimgt.api.model.*;
+import org.wso2.carbon.apimgt.api.model.API;
+import org.wso2.carbon.apimgt.api.model.APIIdentifier;
+import org.wso2.carbon.apimgt.api.model.APIKey;
+import org.wso2.carbon.apimgt.api.model.APIStatus;
+import org.wso2.carbon.apimgt.api.model.APIStore;
+import org.wso2.carbon.apimgt.api.model.CORSConfiguration;
+import org.wso2.carbon.apimgt.api.model.Documentation;
+import org.wso2.carbon.apimgt.api.model.DocumentationType;
+import org.wso2.carbon.apimgt.api.model.DuplicateAPIException;
+import org.wso2.carbon.apimgt.api.model.KeyManager;
+import org.wso2.carbon.apimgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.apimgt.api.model.ResourceFile;
+import org.wso2.carbon.apimgt.api.model.Scope;
+import org.wso2.carbon.apimgt.api.model.Subscriber;
+import org.wso2.carbon.apimgt.api.model.Tier;
+import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.api.model.policy.Policy;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.hostobjects.internal.HostObjectComponent;
@@ -677,20 +697,38 @@ public class APIProviderHostObject extends ScriptableObject {
         return saveAPI(apiProvider, api, null, false);
 
     }
-    
-    private static String uploadSequenceFile(APIProvider apiProvider, FileHostObject seqFile, String filePath) 
-                                                        throws APIManagementException, ScriptException {
+
+    private static String uploadSequenceFile(APIProvider apiProvider, FileHostObject seqFile, String filePath,
+            APIIdentifier apiIdentifier) throws APIManagementException, ScriptException {
         ResourceFile inSeq = new ResourceFile(seqFile.getInputStream(), seqFile.getJavaScriptFile().getContentType());
         String seqFileName;
+        boolean isTenantFlowStarted = false;
         try {
+            PrivilegedCarbonContext.startTenantFlow();
+            isTenantFlowStarted = true;
+            String tenantDomain = null;
+            if (apiIdentifier.getProviderName().contains("-AT-")) {
+                String provider = apiIdentifier.getProviderName().replace("-AT-", "@");
+                tenantDomain = MultitenantUtils.getTenantDomain(provider);
+            }
+            if (!StringUtils.isEmpty(tenantDomain)) {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            } else {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
+                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+            }
             OMElement seqElment = APIUtil.buildOMElement(seqFile.getInputStream());
-            seqFileName = seqElment.getAttributeValue(new QName("name"));            
+            seqFileName = seqElment.getAttributeValue(new QName("name"));
+            apiProvider.addResourceFile(filePath + seqFileName, inSeq);
         } catch (Exception e) {
             String errorMsg = "An Error has occurred while reading custom sequence file";
             log.error(errorMsg, e);
             throw new APIManagementException(errorMsg, e);
+        }  finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
-        apiProvider.addResourceFile(filePath + seqFileName, inSeq);
         return seqFileName;
     }
     
@@ -731,7 +769,7 @@ public class APIProviderHostObject extends ScriptableObject {
         if (apiData.get("seqFile", apiData) != null)  {
             FileHostObject seqFile = (FileHostObject) apiData.get("seqFile", apiData);
             String inSeqPath = APIUtil.getSequencePath(apiId, sequenceType);
-            inSeqFileName = uploadSequenceFile(apiProvider, seqFile, inSeqPath);
+            inSeqFileName = uploadSequenceFile(apiProvider, seqFile, inSeqPath, apiId);
         }
         return inSeqFileName;
         
