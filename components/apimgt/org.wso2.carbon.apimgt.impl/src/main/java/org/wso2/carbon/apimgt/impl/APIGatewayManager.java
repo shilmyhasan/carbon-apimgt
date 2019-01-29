@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -111,14 +112,14 @@ public class APIGatewayManager {
                         }
                     }
 					setSecureVaultProperty(api, tenantDomain, environment, operation);
-					undeployCustomSequences(api,tenantDomain, environment);
+					undeployCustomSequences(client, api,tenantDomain, environment);
 				} else {
 					if (debugEnabled) {
 						log.debug("API exists, updating existing API " + api.getId().getApiName() +
 						          " in environment " + environment.getName());
 					}
                     //Deploy the fault sequence first since it has to be available by the time the API is deployed.
-                    deployAPIFaultSequence(api, tenantDomain, environment);
+                    deployAPIFaultSequence(client, api, tenantDomain, environment);
 
                     operation ="update";
 
@@ -139,7 +140,7 @@ public class APIGatewayManager {
 					setSecureVaultProperty(api, tenantDomain, environment, operation);
 
                     //Update the custom sequences of the API
-					updateCustomSequences(api, tenantDomain, environment);
+					updateCustomSequences(client, api, tenantDomain, environment);
 				}
 			} else {
 				// If the Gateway type is 'production' and a production url has
@@ -159,7 +160,7 @@ public class APIGatewayManager {
 						          " in environment " + environment.getName());
 					}
                     //Deploy the fault sequence first since it has to be available by the time the API is deployed.
-                    deployAPIFaultSequence(api, tenantDomain, environment);
+                    deployAPIFaultSequence(client, api, tenantDomain, environment);
 
                     operation ="add";
 
@@ -180,7 +181,7 @@ public class APIGatewayManager {
 					setSecureVaultProperty(api, tenantDomain, environment, operation);
 
                     //Deploy the custom sequences of the API.
-					deployCustomSequences(api, tenantDomain, environment);
+					deployCustomSequences(client, api, tenantDomain, environment);
 				}
 			}
             } catch (AxisFault axisFault) {
@@ -231,7 +232,7 @@ public class APIGatewayManager {
                         }
                         String operation = "delete";
                         client.deleteApi(tenantDomain, api.getId());
-                        undeployCustomSequences(api, tenantDomain, environment);
+                        undeployCustomSequences(client, api, tenantDomain, environment);
                         setSecureVaultProperty(api, tenantDomain, environment, operation);
                     }
 
@@ -365,7 +366,8 @@ public class APIGatewayManager {
 	 * @throws APIManagementException
 	 * @throws AxisFault
 	 */
-    private void deployCustomSequences(API api, String tenantDomain, Environment environment)
+    private void deployCustomSequences(APIGatewayAdminClient client, API api, String tenantDomain, Environment
+            environment)
             throws APIManagementException, AxisFault {
 
         if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOutSequence())) {
@@ -380,11 +382,11 @@ public class APIGatewayManager {
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
                 if (APIUtil.isSequenceDefined(api.getInSequence())) {
-                    deployInSequence(api, tenantId, tenantDomain, environment);
+                    deployInSequence(client, api, tenantId, tenantDomain, environment);
                 }
 
                 if (APIUtil.isSequenceDefined(api.getOutSequence())) {
-                	deployOutSequence(api, tenantId, tenantDomain, environment);
+                	deployOutSequence(client, api, tenantId, tenantDomain, environment);
                 }
 
             } catch (Exception e) {
@@ -399,7 +401,9 @@ public class APIGatewayManager {
 
     }
 
-    private void deployInSequence(API api, int tenantId, String tenantDomain, Environment environment)
+    private void deployInSequence(APIGatewayAdminClient sequenceAdminServiceClient, API api, int tenantId, String
+            tenantDomain, Environment
+            environment)
             throws APIManagementException, AxisFault {
 
         String inSequenceName = api.getInSequence();
@@ -410,12 +414,12 @@ public class APIGatewayManager {
             if (inSequence.getAttribute(new QName("name")) != null) {
                 inSequence.getAttribute(new QName("name")).setAttributeValue(inSeqExt);
             }
-            APIGatewayAdminClient sequenceAdminServiceClient = new APIGatewayAdminClient(api.getId(), environment);
             sequenceAdminServiceClient.addSequence(inSequence, tenantDomain);
         }
     }
 
-    private void deployOutSequence(API api, int tenantId, String tenantDomain, Environment environment)
+    private void deployOutSequence(APIGatewayAdminClient client, API api, int tenantId, String tenantDomain,
+            Environment environment)
             throws APIManagementException, AxisFault {
 
         String outSequenceName = api.getOutSequence();
@@ -426,7 +430,6 @@ public class APIGatewayManager {
             if (outSequence.getAttribute(new QName("name")) != null)    {
                 outSequence.getAttribute(new QName("name")).setAttributeValue(outSeqExt);
             }
-            APIGatewayAdminClient client = new APIGatewayAdminClient(api.getId(), environment);
             client.addSequence(outSequence, tenantDomain);
         }
     }
@@ -439,7 +442,8 @@ public class APIGatewayManager {
 	 * @param environment
 	 * @throws APIManagementException
 	 */
-    private void undeployCustomSequences(API api, String tenantDomain, Environment environment) {
+    private void undeployCustomSequences(APIGatewayAdminClient client, API api, String tenantDomain, Environment
+            environment) {
 
         if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOutSequence())) {
             try {
@@ -451,7 +455,6 @@ public class APIGatewayManager {
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
                             (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
                 }
-                APIGatewayAdminClient client = new APIGatewayAdminClient(api.getId(), environment);
 
                 if (APIUtil.isSequenceDefined(api.getInSequence())) {
                     String inSequence = APIUtil.getSequenceExtensionName(api) + APIConstants.API_CUSTOM_SEQ_IN_EXT;
@@ -483,7 +486,8 @@ public class APIGatewayManager {
 	 * @param environment
 	 * @throws APIManagementException
 	 */
-	private void updateCustomSequences(API api, String tenantDomain, Environment environment)
+	private void updateCustomSequences(APIGatewayAdminClient client, API api, String tenantDomain, Environment
+            environment)
 	                                                                                         throws APIManagementException {
 
         //If sequences have been added, updated or removed.
@@ -501,7 +505,6 @@ public class APIGatewayManager {
                 }
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-                APIGatewayAdminClient client = new APIGatewayAdminClient(api.getId(), environment);
 
                 //If an inSequence has been added, updated or removed.
                 if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOldInSequence())) {
@@ -514,7 +517,7 @@ public class APIGatewayManager {
                     //If an inSequence has been added or updated.
                     if(APIUtil.isSequenceDefined(api.getInSequence())){
                         //Deploy the inSequence
-                        deployInSequence(api, tenantId, tenantDomain, environment);
+                        deployInSequence(client, api, tenantId, tenantDomain, environment);
                     }
                 }
 
@@ -530,7 +533,7 @@ public class APIGatewayManager {
                     //If an outSequence has been added or updated.
                     if (APIUtil.isSequenceDefined(api.getOutSequence())){
                         //Deploy outSequence
-                        deployOutSequence(api, tenantId, tenantDomain, environment);
+                        deployOutSequence(client, api, tenantId, tenantDomain, environment);
                     }
                 }
             } catch (Exception e) {
@@ -545,56 +548,64 @@ public class APIGatewayManager {
 
     }
 
-    private void deployAPIFaultSequence(API api, String tenantDomain, Environment environment)
+    private void deployAPIFaultSequence(APIGatewayAdminClient client, API api, String tenantDomain, Environment
+            environment)
             throws APIManagementException {
 
         String faultSequenceName = api.getFaultSequence();
         String faultSeqExt = APIUtil.getSequenceExtensionName(api) + APIConstants.API_CUSTOM_SEQ_FAULT_EXT;
+        boolean isTenantFlowStarted = false;
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            isTenantFlowStarted = true;
+            if (!StringUtils.isEmpty(tenantDomain)) {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            } else {
+                PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+                tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+            }
 
-        //If a fault sequence has be defined.
-        if (APIUtil.isSequenceDefined(faultSequenceName)) {
-            try {
-                PrivilegedCarbonContext.startTenantFlow();
-                if (tenantDomain != null && !"".equals(tenantDomain)) {
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-                } else {
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
-                            (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
-                }
+
+            //If a fault sequence has be defined.
+            if (APIUtil.isSequenceDefined(faultSequenceName)) {
                 int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-
-                APIGatewayAdminClient client = new APIGatewayAdminClient(api.getId(), environment);
-
                 //If the sequence already exists
                 if (client.isExistingSequence(faultSeqExt, tenantDomain)) {
                     //Delete the sequence. We need to redeploy afterwards since the sequence may have been updated.
                     client.deleteSequence(faultSeqExt, tenantDomain);
                 }
                 //Get the fault sequence xml
-                OMElement faultSequence = APIUtil.getCustomSequence(faultSequenceName, tenantId, 
-                                                            APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT, api.getId());
+                OMElement faultSequence = APIUtil.getCustomSequence(faultSequenceName, tenantId,
+                        APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT, api.getId());
 
                 if (faultSequence != null) {
-                    if (APIUtil.isPerAPISequence(faultSequenceName, tenantId, api.getId(), 
-                                                 APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT)) {
-                        if (faultSequence.getAttribute(new QName("name")) != null)    {
+                    if (APIUtil.isPerAPISequence(faultSequenceName, tenantId, api.getId(),
+                            APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT)) {
+                        if (faultSequence.getAttribute(new QName("name")) != null) {
                             faultSequence.getAttribute(new QName("name")).setAttributeValue(faultSeqExt);
                         }
                     } else {
                         //If the previous sequence was a per API fault sequence delete it
-                        if (client.isExistingSequence(faultSeqExt, tenantDomain)) {
-                            client.deleteSequence(faultSeqExt, tenantDomain);
+                        if (client.isExistingSequence(faultSequenceName, tenantDomain)) {
+                            client.deleteSequence(faultSequenceName, tenantDomain);
                         }
                     }
 
                     //Deploy the fault sequence
                     client.addSequence(faultSequence, tenantDomain);
                 }
-            } catch (Exception e) {
-                String msg = "Error in updating the fault sequence at the Gateway";
-                log.error(msg, e);
-                throw new APIManagementException(msg, e);
-            } finally {
+            } else {
+                if (client.isExistingSequence(faultSeqExt, tenantDomain)) {
+                    client.deleteSequence(faultSeqExt, tenantDomain);
+                }
+            }
+        } catch (AxisFault e) {
+            String msg = "Error while updating the fault sequence at the Gateway";
+            log.error(msg, e);
+            throw new APIManagementException(msg, e);
+        } finally {
+            if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
