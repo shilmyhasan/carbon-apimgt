@@ -3414,8 +3414,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (!StringUtils.isEmpty(tenantDomain)) {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             } else {
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
-                        (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
             }
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
