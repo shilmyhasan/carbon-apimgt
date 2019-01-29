@@ -115,6 +115,7 @@ public final class APIConstants {
     public static final String API_TENANT_CONF_DISPLAY_MULTIPLE_VERSIONS = "DisplayMultipleVersions";
     public static final String API_TENANT_CONF_DISPLAY_ALL_APIS = "DisplayAllAPIs";
 
+    public static final String API_WEBSOCKET_GATEWAY_ENDPOINT = "GatewayWSEndpoint";
 
     public static final String API_CATEGORY_FREE = "Free";
 

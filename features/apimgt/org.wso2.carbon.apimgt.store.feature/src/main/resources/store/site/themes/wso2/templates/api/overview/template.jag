@@ -74,7 +74,7 @@
 	                    if(environmenturls[urltype] != ""){
                             if (api.type.toUpperCase() == "WS") {
                                 var url = environmenturls[urltype];
-                                if(url.match("^ws:")) {
+                                if(url.match("^ws:")  || url.match("^wss:")) {
                                     var gatewayUrl = url;
                                 } else {
                                     var cut = url.match(":(.*):");
