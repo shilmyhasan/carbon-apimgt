@@ -2153,16 +2153,16 @@ public class APIStoreHostObject extends ScriptableObject {
         Map<String, Environment> environments = config.getApiGatewayEnvironments();
         JSONObject json = new JSONObject();
 
+        // Set URL for a given default env
         for (Environment environment : environments.values()) {
             if (APIConstants.GATEWAY_ENV_TYPE_HYBRID.equals(environment.getType())) {
-                json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION,
-                        APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX,
-                        APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                return json;
+                if (environment.isDefault()) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
+                }
             } else {
                 String environmentType = APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())
-                        ? "production" : "sandbox";
+                        ? APIConstants.GATEWAY_ENV_TYPE_PRODUCTION : APIConstants.GATEWAY_ENV_TYPE_SANDBOX;
                 if (environment.isDefault()) {
                     json.put(environmentType,
                             APIStoreHostObject.getHttpsEnvironmentUrl(environment));
@@ -2170,22 +2170,18 @@ public class APIStoreHostObject extends ScriptableObject {
             }
         }
 
-        if (json.get("production") == null) {
+        // If no default envs are specified, set URL from each of the configured env types at random
+        if (json.isEmpty()) {
             for (Environment environment : environments.values()) {
                 if (APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())) {
                     json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION,
                             APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                    break;
-                }
-            }
-        }
-
-        if (json.get("sandbox") == null) {
-            for (Environment environment : environments.values()) {
-                if (APIConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environment.getType())) {
+                } else if (APIConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environment.getType())) {
                     json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX,
                             APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                    break;
+                } else {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
                 }
             }
         }
