@@ -2719,6 +2719,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         appLogObject.put(APIConstants.AuditLogConstants.NAME, application.getName());
         appLogObject.put(APIConstants.AuditLogConstants.TIER, application.getTier());
         appLogObject.put(APIConstants.AuditLogConstants.CALLBACK, application.getCallbackUrl());
+        appLogObject.put(APIConstants.AuditLogConstants.GROUPS, application.getGroupId());
+        appLogObject.put(APIConstants.AuditLogConstants.OWNER, application.getSubscriber().getName());
 
         APIUtil.logAuditMessage(APIConstants.AuditLogConstants.APPLICATION, appLogObject.toString(),
                 APIConstants.AuditLogConstants.CREATED, this.username);
@@ -2811,6 +2813,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         appLogObject.put(APIConstants.AuditLogConstants.TIER, application.getTier());
         appLogObject.put(APIConstants.AuditLogConstants.STATUS, existingApp != null ? existingApp.getStatus() : "");
         appLogObject.put(APIConstants.AuditLogConstants.CALLBACK, application.getCallbackUrl());
+        appLogObject.put(APIConstants.AuditLogConstants.GROUPS, application.getGroupId());
+        appLogObject.put(APIConstants.AuditLogConstants.OWNER, application.getSubscriber().getName());
 
         APIUtil.logAuditMessage(APIConstants.AuditLogConstants.APPLICATION, appLogObject.toString(),
                 APIConstants.AuditLogConstants.UPDATED, this.username);
@@ -2954,6 +2958,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             appLogObject.put(APIConstants.AuditLogConstants.NAME, application.getName());
             appLogObject.put(APIConstants.AuditLogConstants.TIER, application.getTier());
             appLogObject.put(APIConstants.AuditLogConstants.CALLBACK, application.getCallbackUrl());
+            appLogObject.put(APIConstants.AuditLogConstants.GROUPS, application.getGroupId());
+            appLogObject.put(APIConstants.AuditLogConstants.OWNER, application.getSubscriber().getName());
 
             APIUtil.logAuditMessage(APIConstants.AuditLogConstants.APPLICATION, appLogObject.toString(),
                     APIConstants.AuditLogConstants.DELETED, this.username);
