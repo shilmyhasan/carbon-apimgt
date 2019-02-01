@@ -70,6 +70,7 @@ import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.UserRegistrationConfigDTO;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.ApplicationUtils;
 import org.wso2.carbon.apimgt.impl.utils.SelfSignUpUtil;
 import org.wso2.carbon.apimgt.impl.workflow.UserSignUpWorkflowExecutor;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowConstants;
@@ -2152,52 +2153,36 @@ public class APIStoreHostObject extends ScriptableObject {
         Map<String, Environment> environments = config.getApiGatewayEnvironments();
         JSONObject json = new JSONObject();
 
-        String productionUrl = null;
-        String sandboxUrl = null;
-        String hybridUrl = null;
-
         // Set URL for a given default env
         for (Environment environment : environments.values()) {
-            String envUrl = APIStoreHostObject.getHttpsEnvironmentUrl(environment);
-            if (APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())) {
-                productionUrl = envUrl;
+            if (APIConstants.GATEWAY_ENV_TYPE_HYBRID.equals(environment.getType())) {
                 if (environment.isDefault()) {
-                    json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION, productionUrl);
-                }
-            } else if (APIConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environment.getType())) {
-                sandboxUrl = envUrl;
-                if (environment.isDefault()) {
-                    json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX, sandboxUrl);
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
                 }
             } else {
-                hybridUrl = envUrl;
+                String environmentType = APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())
+                        ? APIConstants.GATEWAY_ENV_TYPE_PRODUCTION : APIConstants.GATEWAY_ENV_TYPE_SANDBOX;
                 if (environment.isDefault()) {
-                    json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID, hybridUrl);
+                    json.put(environmentType,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
                 }
             }
         }
 
-        if (productionUrl == null) {
-            if (hybridUrl != null) {
-                json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION, hybridUrl);
-            } else {
-                json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION, sandboxUrl);
-            }
-        } else {
-            if (json.get(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION) == null) {
-                json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION, productionUrl);
-            }
-        }
-
-        if (sandboxUrl == null) {
-            if (hybridUrl != null) {
-                json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX, hybridUrl);
-            } else {
-                json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX, productionUrl);
-            }
-        } else {
-            if (json.get(APIConstants.GATEWAY_ENV_TYPE_SANDBOX) == null) {
-                json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX, sandboxUrl);
+        // If no default envs are specified, set URL from each of the configured env types at random
+        if (json.isEmpty()) {
+            for (Environment environment : environments.values()) {
+                if (APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
+                } else if (APIConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environment.getType())) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
+                } else {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID,
+                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
+                }
             }
         }
 
