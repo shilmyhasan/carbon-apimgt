@@ -2153,40 +2153,52 @@ public class APIStoreHostObject extends ScriptableObject {
         Map<String, Environment> environments = config.getApiGatewayEnvironments();
         JSONObject json = new JSONObject();
 
+        String productionUrl = "";
+        String sandboxUrl = "";
+        String hybridUrl = "";
+
+        // Set URL for a given default env
         for (Environment environment : environments.values()) {
-            if (APIConstants.GATEWAY_ENV_TYPE_HYBRID.equals(environment.getType())) {
-                json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION,
-                        APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX,
-                        APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                return json;
+            String environmentUrl = APIStoreHostObject.getHttpsEnvironmentUrl(environment);
+            String environmentType = environment.getType();
+            boolean isDefault = environment.isDefault();
+
+            if (APIConstants.GATEWAY_ENV_TYPE_HYBRID.equals(environmentType)) {
+                if (isDefault) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID, environmentUrl);
+                } else {
+                    hybridUrl = environmentUrl;
+                }
+            } else if (APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environmentType)) {
+                if (isDefault) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION, environmentUrl);
+                } else {
+                    productionUrl = environmentUrl;
+                }
+            } else if (APIConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environmentType)) {
+                if (isDefault) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX, environmentUrl);
+                } else {
+                    sandboxUrl = environmentUrl;
+                }
             } else {
-                String environmentType = APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())
-                        ? "production" : "sandbox";
-                if (environment.isDefault()) {
-                    json.put(environmentType,
-                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                }
+                log.warn("Invalid gateway environment type : " + environmentType +
+                        " has been configured in api-manager.xml");
             }
         }
 
-        if (json.get("production") == null) {
-            for (Environment environment : environments.values()) {
-                if (APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())) {
-                    json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION,
-                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                    break;
-                }
+        // If no default envs are specified, set URL from each of the configured env types at random
+        if (json.isEmpty()) {
+            if (!productionUrl.isEmpty()) {
+                json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION, productionUrl);
             }
-        }
 
-        if (json.get("sandbox") == null) {
-            for (Environment environment : environments.values()) {
-                if (APIConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environment.getType())) {
-                    json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX,
-                            APIStoreHostObject.getHttpsEnvironmentUrl(environment));
-                    break;
-                }
+            if (!sandboxUrl.isEmpty()) {
+                json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX, sandboxUrl);
+            }
+
+            if (!hybridUrl.isEmpty()) {
+                json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID, hybridUrl);
             }
         }
 
@@ -5349,27 +5361,42 @@ public class APIStoreHostObject extends ScriptableObject {
                 List<String> environmenturls = new ArrayList<String>();
                 environmenturls.addAll(Arrays.asList((environment.getApiGatewayEndpoint().split(","))));
                 List<String> transports = new ArrayList<String>();
-                transports.addAll(Arrays.asList((api.getTransports().split(","))));
+                if (environment.getWebsocketGatewayEndpoint() == null) {
 
-                String httpGatewayUrl;
-                if ("WS".equals(api.getType())) {
-                    List<String> wsTransports = new ArrayList<String>();
-                    wsTransports.add("ws");
-                    wsTransports.add("http");
-                    wsTransports.add("https");
-                    httpGatewayUrl = filterUrlsByTransport(environmenturls, wsTransports, "ws");
-                    if (httpGatewayUrl == null || httpGatewayUrl.isEmpty()) {
-                        httpGatewayUrl = filterUrlsByTransport(environmenturls, wsTransports, "http");
+                    transports.addAll(Arrays.asList((api.getTransports().split(","))));
+
+                    String httpGatewayUrl;
+                    if ("WS".equals(api.getType())) {
+                        List<String> wsTransports = new ArrayList<String>();
+                        wsTransports.add("ws");
+                        wsTransports.add("http");
+                        wsTransports.add("https");
+                        httpGatewayUrl = filterUrlsByTransport(environmenturls, wsTransports, "ws");
+                        if (httpGatewayUrl == null || httpGatewayUrl.isEmpty()) {
+                            httpGatewayUrl = filterUrlsByTransport(environmenturls, wsTransports, "http");
+                        }
+                        if (httpGatewayUrl == null || httpGatewayUrl.isEmpty()) {
+                            httpGatewayUrl = filterUrlsByTransport(environmenturls, wsTransports, "https");
+                        }
+                    } else {
+                        httpGatewayUrl = filterUrlsByTransport(environmenturls, transports, "http");
                     }
-                    if (httpGatewayUrl == null || httpGatewayUrl.isEmpty()) {
-                        httpGatewayUrl = filterUrlsByTransport(environmenturls, wsTransports, "https");
-                    }
+
+                    jsonObject.put("http", httpGatewayUrl);
+                    jsonObject.put("https", filterUrlsByTransport(environmenturls, transports, "https"));
                 } else {
-                    httpGatewayUrl = filterUrlsByTransport(environmenturls, transports, "http");
+                    environmenturls.addAll(Arrays.asList((environment.getWebsocketGatewayEndpoint().split(","))));
+                    if("WS".equals(api.getType())) {
+                        transports.add("ws");
+                        transports.add("wss");
+                        jsonObject.put("ws", filterUrlsByTransport(environmenturls, transports, "ws"));
+                        jsonObject.put("wss", filterUrlsByTransport(environmenturls, transports, "wss"));
+                    } else {
+                        transports.addAll(Arrays.asList((api.getTransports().split(","))));
+                        jsonObject.put("http", filterUrlsByTransport(environmenturls, transports, "http"));
+                        jsonObject.put("https", filterUrlsByTransport(environmenturls, transports, "https"));
+                    }
                 }
-
-                jsonObject.put("http", httpGatewayUrl);
-                jsonObject.put("https", filterUrlsByTransport(environmenturls, transports, "https"));
                 jsonObject.put("showInConsole", environment.isShowInConsole());
                 if (APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environment.getType())) {
                     productionEnvironmentObject.put(environment.getName(), jsonObject);

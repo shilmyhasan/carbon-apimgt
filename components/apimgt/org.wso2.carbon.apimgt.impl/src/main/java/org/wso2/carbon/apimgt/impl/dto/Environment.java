@@ -32,6 +32,8 @@ public class Environment implements Serializable {
     
     private String password;
 
+    private String websocketGatewayEndpoint;
+
     private String apiGatewayEndpoint;
 
     private String description;
@@ -110,6 +112,14 @@ public class Environment implements Serializable {
 
     public void setApiGatewayEndpoint(String apiGatewayEndpoint) {
         this.apiGatewayEndpoint = apiGatewayEndpoint;
+    }
+
+    public String getWebsocketGatewayEndpoint() {
+        return websocketGatewayEndpoint;
+    }
+
+    public void setWebsocketGatewayEndpoint(String websocketGatewayEndpoint) {
+        this.websocketGatewayEndpoint = websocketGatewayEndpoint;
     }
 
     @Override
