@@ -225,7 +225,7 @@ public class APIManagerConfiguration {
                                     APIConstants.API_GATEWAY_ENDPOINT)).getText()));
                     if(environmentElem
                             .getFirstChildWithName(new QName(APIConstants.API_WEBSOCKET_GATEWAY_ENDPOINT)) != null) {
-                    environment.setWebsocketGatewayEndpoint(APIUtil.replaceSystemProperty(environmentElem
+                        environment.setWebsocketGatewayEndpoint(APIUtil.replaceSystemProperty(environmentElem
                             .getFirstChildWithName(new QName(APIConstants.API_WEBSOCKET_GATEWAY_ENDPOINT)).getText()));
                     }
                     OMElement description =
