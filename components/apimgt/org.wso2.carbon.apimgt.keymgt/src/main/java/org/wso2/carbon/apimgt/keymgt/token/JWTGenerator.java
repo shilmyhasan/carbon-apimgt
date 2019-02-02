@@ -103,15 +103,15 @@ public class JWTGenerator extends AbstractJWTGenerator {
             Map<String, String> customClaims = getClaimsFromCache(cacheKey);
             if (isNotEmpty(customClaims)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("The custom claims are retrieved from AuthorizationGrantCache for user : " +
-                            validationContext.getValidationInfoDTO().getEndUserName());
+                    log.debug("The custom claims are retrieved from AuthorizationGrantCache for user : "
+                            + validationContext.getValidationInfoDTO().getEndUserName());
                 }
                 return customClaims;
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Custom claims are not available in the AuthorizationGrantCache. Hence will be " +
-                            "retrieved from the user store for user : " +
-                            validationContext.getValidationInfoDTO().getEndUserName());
+                    log.debug("Custom claims are not available in the AuthorizationGrantCache. Hence will be "
+                            + "retrieved from the user store for user : " + validationContext.getValidationInfoDTO()
+                            .getEndUserName());
                 }
             }
             // If claims are not found in AuthorizationGrantCache, they will be retrieved from the userstore.
@@ -153,9 +153,8 @@ public class JWTGenerator extends AbstractJWTGenerator {
 
     private static Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
 
-        AuthorizationGrantCacheEntry cacheEntry = AuthorizationGrantCache.getInstance().getValueFromCacheByToken(cacheKey);
-
-
+        AuthorizationGrantCacheEntry cacheEntry = AuthorizationGrantCache.getInstance()
+                .getValueFromCacheByToken(cacheKey);
         if (cacheEntry == null) {
             return new HashMap<String, String>();
         }
