@@ -24,36 +24,33 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.core.util.KeyStoreManager;
+import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCache;
 import org.wso2.carbon.user.api.RealmConfiguration;
-import org.wso2.carbon.user.core.tenant.TenantManager;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.user.core.tenant.TenantManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.FileInputStream;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.MessageDigest;
-import java.security.PrivateKey;
-import java.security.Signature;
+import java.security.*;
 import java.util.HashMap;
 import java.util.Map;
 
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ServiceReferenceHolder.class, MultitenantUtils.class, APIUtil.class, KeyStoreManager.class,
-        MessageDigest.class})
+        MessageDigest.class, AuthorizationGrantCache.class})
 public class JWTGeneratorTestCase {
 
     private void mockAPIMConfiguration(Map<String, String> configMap) {
@@ -210,6 +207,10 @@ public class JWTGeneratorTestCase {
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
 
+        PowerMockito.mockStatic(AuthorizationGrantCache.class);
+        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
+        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
+
         String dialectUri = "dialect_uri";
         Map<String, String> configMap = new HashMap<String, String>();
         configMap.put(APIConstants.CONSUMER_DIALECT_URI, dialectUri);
@@ -260,6 +261,9 @@ public class JWTGeneratorTestCase {
                 .thenReturn(apiManagerConfigurationService);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        PowerMockito.mockStatic(AuthorizationGrantCache.class);
+        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
+        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
 
         String dialectUri = "dialect_uri";
         Map<String, String> configMap = new HashMap<String, String>();
@@ -302,6 +306,10 @@ public class JWTGeneratorTestCase {
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+
+        PowerMockito.mockStatic(AuthorizationGrantCache.class);
+        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
+        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
 
         String dialectUri = "dialect_uri";
         Map<String, String> configMap = new HashMap<String, String>();
@@ -354,6 +362,10 @@ public class JWTGeneratorTestCase {
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
 
+        PowerMockito.mockStatic(AuthorizationGrantCache.class);
+        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
+        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
+
         String dialectUri = "dialect_uri";
         Map<String, String> configMap = new HashMap<String, String>();
         configMap.put(APIConstants.CONSUMER_DIALECT_URI, dialectUri);
@@ -404,6 +416,9 @@ public class JWTGeneratorTestCase {
                 .thenReturn(apiManagerConfigurationService);
         APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        PowerMockito.mockStatic(AuthorizationGrantCache.class);
+        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
+        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
 
         String dialectUri = "dialect_uri";
         Map<String, String> configMap = new HashMap<String, String>();
@@ -438,6 +453,9 @@ public class JWTGeneratorTestCase {
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
 
+        PowerMockito.mockStatic(AuthorizationGrantCache.class);
+        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
+        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
         APIManagerConfigurationService apiManagerConfigurationService = Mockito
                 .mock(APIManagerConfigurationService.class);
         RealmService realmService = Mockito.mock(org.wso2.carbon.user.core.service.RealmService.class);
@@ -510,6 +528,10 @@ public class JWTGeneratorTestCase {
         TenantManager tenantManager = Mockito.mock(TenantManager.class);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+
+        PowerMockito.mockStatic(AuthorizationGrantCache.class);
+        AuthorizationGrantCache authorizationGrantCache = Mockito.mock(AuthorizationGrantCache.class);
+        PowerMockito.when(AuthorizationGrantCache.getInstance()).thenReturn(authorizationGrantCache);
 
         APIManagerConfigurationService apiManagerConfigurationService = Mockito
                 .mock(APIManagerConfigurationService.class);
