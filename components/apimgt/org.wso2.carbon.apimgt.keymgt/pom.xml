@@ -127,6 +127,16 @@
 			<!-- must match aspectj compiler version -->
 			<version>1.8.7</version>
 		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -173,6 +183,10 @@
                                 <name>IdentityConfigurationPath</name>
                                 <value>${basedir}/src/test/resources/identity.xml</value>
                             </property>
+							<property>
+								<name>WSO2CarbonJksFilePath</name>
+								<value>${basedir}/src/test/resources/wso2carbon.jks</value>
+							</property>
                         </systemProperties>
 				</configuration>
 			</plugin>
