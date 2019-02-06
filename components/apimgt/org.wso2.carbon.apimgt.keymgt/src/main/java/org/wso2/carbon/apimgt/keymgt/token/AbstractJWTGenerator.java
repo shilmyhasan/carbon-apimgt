@@ -100,7 +100,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
         if (claimsRetrieverImplClass != null) {
             try {
-                claimsRetriever = (ClaimsRetriever) APIUtil.getClassForName(claimsRetrieverImplClass).newInstance();
+                claimsRetriever = getClaimsRetrieverInstance(claimsRetrieverImplClass);
                 claimsRetriever.init();
             } catch (ClassNotFoundException e) {
                 log.error("Cannot find class: " + claimsRetrieverImplClass, e);
@@ -486,5 +486,16 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                       "returned", e);
         }
         return null;
+    }
+
+    /**
+     * Gets the class for the given class name
+     *
+     * @param className Name of the class
+     * @return Class
+     */
+    protected ClaimsRetriever getClaimsRetrieverInstance(String className) throws IllegalAccessException,
+            InstantiationException, ClassNotFoundException {
+        return (ClaimsRetriever) APIUtil.getClassForName(className).newInstance();
     }
 }

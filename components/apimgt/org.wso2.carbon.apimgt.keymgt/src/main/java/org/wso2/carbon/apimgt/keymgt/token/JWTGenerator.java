@@ -27,12 +27,18 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.keymgt.MethodStats;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
+import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCache;
+import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheEntry;
+import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheKey;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.util.UserCoreUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.*;
+
+import static org.apache.commons.collections.MapUtils.isNotEmpty;
 
 @MethodStats
 public class JWTGenerator extends AbstractJWTGenerator {
@@ -90,6 +96,25 @@ public class JWTGenerator extends AbstractJWTGenerator {
             throws APIManagementException {
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
+
+            String accessToken = validationContext.getAccessToken();
+            AuthorizationGrantCacheKey cacheKey = new AuthorizationGrantCacheKey(accessToken);
+
+            Map<String, String> customClaims = getClaimsFromCache(cacheKey);
+            if (isNotEmpty(customClaims)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("The custom claims are retrieved from AuthorizationGrantCache for user : "
+                            + validationContext.getValidationInfoDTO().getEndUserName());
+                }
+                return customClaims;
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Custom claims are not available in the AuthorizationGrantCache. Hence will be "
+                            + "retrieved from the user store for user : " + validationContext.getValidationInfoDTO()
+                            .getEndUserName());
+                }
+            }
+            // If claims are not found in AuthorizationGrantCache, they will be retrieved from the userstore.
             String userName = validationContext.getValidationInfoDTO().getEndUserName();
 
             try {
@@ -117,4 +142,20 @@ public class JWTGenerator extends AbstractJWTGenerator {
         }
         return null;
     }
+
+    private static Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
+
+        AuthorizationGrantCacheEntry cacheEntry = AuthorizationGrantCache.getInstance()
+                .getValueFromCacheByToken(cacheKey);
+        if (cacheEntry == null) {
+            return new HashMap<String, String>();
+        }
+        Map<ClaimMapping, String> userAttributes = cacheEntry.getUserAttributes();
+        Map<String, String> userClaims = new HashMap<String, String>();
+        for (Map.Entry<ClaimMapping, String> entry : userAttributes.entrySet()) {
+            userClaims.put(entry.getKey().getRemoteClaim().getClaimUri(), entry.getValue());
+        }
+        return userClaims;
+    }
+
 }
