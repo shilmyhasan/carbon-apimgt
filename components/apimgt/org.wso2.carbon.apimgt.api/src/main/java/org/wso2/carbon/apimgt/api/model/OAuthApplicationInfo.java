@@ -42,6 +42,7 @@ public class OAuthApplicationInfo {
     private String jsonAppAttribute;
 
     private String tokenType;
+    private Application mappedApplication;
 
 
 
@@ -189,4 +190,11 @@ public class OAuthApplicationInfo {
         this.tokenType = tokenType;
     }
 
+    public void setMappedApplication(Application mappedApplication) {
+        this.mappedApplication = mappedApplication;
+    }
+
+    public Application getMappedApplication() {
+        return mappedApplication;
+    }
 }

@@ -3635,6 +3635,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     tokenScope, jsonString, application.getTokenType());
 
             oauthAppRequest.getOAuthApplicationInfo().addParameter(ApplicationConstants.APP_KEY_TYPE, tokenType);
+            oauthAppRequest.getOAuthApplicationInfo().setMappedApplication(application);
 
             String consumerKey = apiMgtDAO.getConsumerKeyForApplicationKeyType(applicationName, userId, tokenType,
                     groupingId);
