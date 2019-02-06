@@ -178,7 +178,6 @@ public class RestApiPublisherUtils {
      */
     public static String validateUserRoles(List<String> inputRoles) throws APIManagementException {
         String userName = RestApiUtil.getLoggedInUsername();
-        String[] tenantRoleList = APIUtil.getRoleNames(userName);
         boolean isMatched = false;
         String[] userRoleList = null;
 
@@ -189,19 +188,15 @@ public class RestApiPublisherUtils {
 
         }
         if (inputRoles != null && !inputRoles.isEmpty()) {
-            if (tenantRoleList != null || userRoleList != null) {
-                for (String inputRole : inputRoles) {
-                    if (!isMatched && userRoleList != null && APIUtil.compareRoleList(userRoleList, inputRole)) {
-                        isMatched = true;
-                    }
-                    if (tenantRoleList != null && !APIUtil.compareRoleList(tenantRoleList, inputRole)) {
-                        return "Invalid user roles found in accessControlRole list";
-                    }
+            for (String inputRole : inputRoles) {
+                if (!isMatched && APIUtil.compareRoleList(userRoleList, inputRole)) {
+                    isMatched = true;
                 }
-                return isMatched ? "" : "This user does not have at least one role specified in API access control.";
-            } else {
-                return "Invalid user roles found";
+                if (!APIUtil.isRoleNameExist(userName, inputRole)) {
+                    return "Invalid user roles found in accessControlRole list";
+                }
             }
+            return isMatched ? "" : "This user does not have at least one role specified in API access control.";
         }
         return "";
     }
