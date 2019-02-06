@@ -31,6 +31,8 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public class API implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private APIIdentifier id;
 
     // uuid of registry artifact

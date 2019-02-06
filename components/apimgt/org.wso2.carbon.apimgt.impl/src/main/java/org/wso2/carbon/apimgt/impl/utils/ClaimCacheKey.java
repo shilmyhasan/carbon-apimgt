@@ -24,6 +24,8 @@ import java.io.Serializable;
 public class ClaimCacheKey implements Serializable {
     //TODO refactor caching implementation
 
+    private static final long serialVersionUID = 1L;
+
     private String cacheKeyString;
 
     public ClaimCacheKey(String cacheKeyString) {
