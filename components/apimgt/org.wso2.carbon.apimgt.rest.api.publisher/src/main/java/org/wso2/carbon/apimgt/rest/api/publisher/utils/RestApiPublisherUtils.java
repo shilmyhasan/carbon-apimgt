@@ -197,7 +197,6 @@ public class RestApiPublisherUtils {
                 }
             }
             return isMatched ? "" : "This user does not have at least one role specified in API access control.";
-
         }
         return "";
     }
