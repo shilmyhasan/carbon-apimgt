@@ -1564,6 +1564,9 @@
         <slf4j.wso2.version>1.5.10.wso2v1</slf4j.wso2.version>
         <ballerina.lang.version>0.970.0</ballerina.lang.version>
         <re2j.version>1.2</re2j.version>
+
+        <mvn.site.plugin.version>3.7.1</mvn.site.plugin.version>
+        <mvn.project.reports.plugin.version>3.0.0</mvn.project.reports.plugin.version>
     </properties>
 </project>
 
