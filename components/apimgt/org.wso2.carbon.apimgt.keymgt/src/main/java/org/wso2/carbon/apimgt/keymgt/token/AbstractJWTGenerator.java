@@ -66,6 +66,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
     private static final String SHA256_WITH_RSA = "SHA256withRSA";
 
+    private static final String BASE64 = "base64";
+
+    private static final String BASE64URL = "base64url";
+
     private static final String NONE = "NONE";
 
     private static volatile long ttl = -1L;
@@ -73,6 +77,8 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     private ClaimsRetriever claimsRetriever;
 
     private String dialectURI = ClaimsRetriever.DEFAULT_DIALECT_URI;
+
+    private String x5tEncoding = BASE64;
 
     private String signatureAlgorithm = SHA256_WITH_RSA;
 
@@ -95,6 +101,12 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             signatureAlgorithm = SHA256_WITH_RSA;
         }
 
+        //Check if the system property for x5tEncoding in base64 has been provided
+        String overrideEncoding = System.getProperty("x5tEncoding");
+        if (overrideEncoding != null && overrideEncoding.equalsIgnoreCase(BASE64URL)) {
+            x5tEncoding = BASE64URL;
+        }
+
         String claimsRetrieverImplClass =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
                         getAPIManagerConfiguration().getFirstProperty(APIConstants.CLAIMS_RETRIEVER_CLASS);
@@ -115,13 +127,9 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         }
     }
 
-    public String getDialectURI() {
-        return dialectURI;
-    }
+    public String getDialectURI() { return dialectURI; }
 
-    public ClaimsRetriever getClaimsRetriever() {
-        return claimsRetriever;
-    }
+    public ClaimsRetriever getClaimsRetriever() { return claimsRetriever;}
 
     public abstract Map<String, String> populateStandardClaims(TokenValidationContext validationContext)
             throws APIManagementException;
@@ -129,6 +137,9 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     public abstract Map<String, String> populateCustomClaims(TokenValidationContext validationContext) throws APIManagementException;
 
     public String encode(byte[] stringToBeEncoded) throws APIManagementException {
+        if (x5tEncoding.equals(BASE64URL)) {
+            return java.util.Base64.getUrlEncoder().encodeToString(stringToBeEncoded);
+        }
         return Base64Utils.encode(stringToBeEncoded);
     }
 
@@ -387,9 +398,15 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 digestValue.update(der);
                 byte[] digestInBytes = digestValue.digest();
                 String publicCertThumbprint = hexify(digestInBytes);
-                Base64 base64 = new Base64(true);
-                String base64UrlEncodedThumbPrint = base64.encodeToString(
-                        publicCertThumbprint.getBytes(Charsets.UTF_8)).trim();
+                String base64UrlEncodedThumbPrint;
+                if (x5tEncoding.equals(BASE64URL)) {
+                    base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
+                            .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+                } else {
+                    Base64 base64 = new Base64(true);
+                    base64UrlEncodedThumbPrint = base64.encodeToString(publicCertThumbprint.getBytes(Charsets.UTF_8)).trim();
+                }
+
                 StringBuilder jwtHeader = new StringBuilder();
                 //Sample header
                 //{"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10"}
