@@ -127,9 +127,13 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         }
     }
 
-    public String getDialectURI() { return dialectURI; }
+    public String getDialectURI() {
+        return dialectURI;
+    }
 
-    public ClaimsRetriever getClaimsRetriever() { return claimsRetriever;}
+    public ClaimsRetriever getClaimsRetriever() {
+        return claimsRetriever;
+    }
 
     public abstract Map<String, String> populateStandardClaims(TokenValidationContext validationContext)
             throws APIManagementException;
