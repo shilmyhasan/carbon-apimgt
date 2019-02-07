@@ -2110,6 +2110,75 @@ public class APIStoreHostObject extends ScriptableObject {
         return myn;
     }
 
+    public static JSONObject jsFunction_getHTTPSGatewayEndpointURLsWithType(Context cx, Scriptable thisObj,
+                                                                            Object[] args, Function funObj)
+            throws ScriptException, APIManagementException {
+
+        APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        Map<String, Environment> environments = config.getApiGatewayEnvironments();
+        JSONObject json = new JSONObject();
+
+        String productionUrl = "";
+        String sandboxUrl = "";
+        String hybridUrl = "";
+
+        // Set URL for a given default env
+        for (Environment environment : environments.values()) {
+            String environmentUrl = APIStoreHostObject.getHttpsEnvironmentUrl(environment);
+            String environmentType = environment.getType();
+            boolean isDefault = environment.isDefault();
+
+            if (APIConstants.GATEWAY_ENV_TYPE_HYBRID.equals(environmentType)) {
+                if (isDefault) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID, environmentUrl);
+                } else {
+                    hybridUrl = environmentUrl;
+                }
+            } else if (APIConstants.GATEWAY_ENV_TYPE_PRODUCTION.equals(environmentType)) {
+                if (isDefault) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION, environmentUrl);
+                } else {
+                    productionUrl = environmentUrl;
+                }
+            } else if (APIConstants.GATEWAY_ENV_TYPE_SANDBOX.equals(environmentType)) {
+                if (isDefault) {
+                    json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX, environmentUrl);
+                } else {
+                    sandboxUrl = environmentUrl;
+                }
+            } else {
+                log.warn("Invalid gateway environment type : " + environmentType +
+                        " has been configured in api-manager.xml");
+            }
+        }
+
+        // If no default envs are specified, set URL from each of the configured env types at random
+        if (json.isEmpty()) {
+            if (!productionUrl.isEmpty()) {
+                json.put(APIConstants.GATEWAY_ENV_TYPE_PRODUCTION, productionUrl);
+            }
+
+            if (!sandboxUrl.isEmpty()) {
+                json.put(APIConstants.GATEWAY_ENV_TYPE_SANDBOX, sandboxUrl);
+            }
+
+            if (!hybridUrl.isEmpty()) {
+                json.put(APIConstants.GATEWAY_ENV_TYPE_HYBRID, hybridUrl);
+            }
+        }
+
+        return json;
+    }
+
+    private static String getHttpsEnvironmentUrl(Environment environment) {
+        for (String url : environment.getApiGatewayEndpoint().split(",")) {
+            if (url.startsWith("https:")) {
+                return url;
+            }
+        }
+        return "";
+    }
+
     private static String filterUrlsByTransport(List<String> urlsList, List<String> transportList, String transportName) {
         String endpointUrl = "";
         if (transportList.contains(transportName)) {
