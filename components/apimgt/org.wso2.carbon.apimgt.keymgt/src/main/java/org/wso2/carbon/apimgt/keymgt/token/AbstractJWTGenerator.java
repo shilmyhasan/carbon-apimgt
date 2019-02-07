@@ -408,7 +408,8 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                             .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
                 } else {
                     Base64 base64 = new Base64(true);
-                    base64UrlEncodedThumbPrint = base64.encodeToString(publicCertThumbprint.getBytes(Charsets.UTF_8)).trim();
+                    base64UrlEncodedThumbPrint = base64.encodeToString(publicCertThumbprint.getBytes(Charsets.UTF_8))
+                            .trim();
                 }
 
                 StringBuilder jwtHeader = new StringBuilder();
