@@ -93,6 +93,12 @@ public class APIDefinitionFromSwagger20 extends APIDefinition {
                     for (Object o1 : path.keySet()) {
                         String httpVerb = (String) o1;
 
+                        if (APIConstants.PARAMETERS.equals(httpVerb.toLowerCase())
+                                || httpVerb.startsWith("x-")
+                                || httpVerb.startsWith("X-")) {
+                            continue;
+                        }
+
                         //Only continue for supported operations
                         if (APIConstants.SUPPORTED_METHODS.contains(httpVerb.toLowerCase())) {
                             JSONObject operation = (JSONObject) path.get(httpVerb);
