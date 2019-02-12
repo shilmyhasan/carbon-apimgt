@@ -4036,7 +4036,7 @@ public final class APIUtil {
 
     public static boolean isAllowDisplayMultipleVersions() throws APIManagementException {
         String displayMultiVersions = "false";
-        Boolean isDisplayMultipleVersions = false;
+        Boolean isDisplayMultipleVersionsProperty = false;
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
         if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
             try {
@@ -4046,8 +4046,8 @@ public final class APIUtil {
                     JSONParser parser = new JSONParser();
                     JSONObject apiTenantConfig = (JSONObject) parser.parse(content);
                     if (apiTenantConfig != null) {
-                        isDisplayMultipleVersions = apiTenantConfig.containsKey(APIConstants.API_TENANT_CONF_DISPLAY_MULTIPLE_VERSIONS);
-                        if (isDisplayMultipleVersions) {
+                        isDisplayMultipleVersionsProperty = apiTenantConfig.containsKey(APIConstants.API_TENANT_CONF_DISPLAY_MULTIPLE_VERSIONS);
+                        if (isDisplayMultipleVersionsProperty) {
                             Object value = apiTenantConfig.get(APIConstants.API_TENANT_CONF_DISPLAY_MULTIPLE_VERSIONS);
                             if (value != null) {
                                 displayMultiVersions = value.toString();
@@ -4063,7 +4063,7 @@ public final class APIUtil {
                 handleException("ParseException thrown when parsing the tenant-config.json content", e);
             }
         }
-        if (!isDisplayMultipleVersions) {
+        if (!isDisplayMultipleVersionsProperty) {
             APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
                     getAPIManagerConfigurationService().getAPIManagerConfiguration();
             displayMultiVersions = config.getFirstProperty(APIConstants.API_STORE_DISPLAY_MULTIPLE_VERSIONS);
