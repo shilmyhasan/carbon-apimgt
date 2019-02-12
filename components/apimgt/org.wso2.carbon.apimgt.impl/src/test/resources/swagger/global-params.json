@@ -1,0 +1,34 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Testing global parameters and x-*",
+    "version": "1.0.0",
+    "title": "global params"
+  },
+  "paths": {
+    "/pet": {
+      "parameters": [
+        {
+          "name": "code",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "description": "Unique Code",
+          "pattern": "^[A-Z]{4,5}$"
+        }
+      ],
+      "x-man": "mutant",
+      "post": {
+        "tags": [
+          "pet"
+        ],
+        "summary": "Add a new pet to the store",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    }
+  }
+}
