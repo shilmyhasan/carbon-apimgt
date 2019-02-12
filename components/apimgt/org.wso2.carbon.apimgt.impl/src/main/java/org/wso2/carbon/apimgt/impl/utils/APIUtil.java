@@ -4069,7 +4069,7 @@ public final class APIUtil {
             displayMultiVersions = config.getFirstProperty(APIConstants.API_STORE_DISPLAY_MULTIPLE_VERSIONS);
             if (displayMultiVersions == null) {
                 log.warn("The configurations related to show multiple versions of API in APIStore " +
-                        "are missing in api-manager.xml.");
+                        "are not available in api-manager.xml.");
                 return false;
             }
         }
