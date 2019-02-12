@@ -4034,15 +4034,44 @@ public final class APIUtil {
         return Boolean.parseBoolean(displayAllAPIs);
     }
 
-    public static boolean isAllowDisplayMultipleVersions() {
-        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
-                getAPIManagerConfigurationService().getAPIManagerConfiguration();
-
-        String displayMultiVersions = config.getFirstProperty(APIConstants.API_STORE_DISPLAY_MULTIPLE_VERSIONS);
-        if (displayMultiVersions == null) {
-            log.warn("The configurations related to show multiple versions of API in APIStore " +
-                    "are missing in api-manager.xml.");
-            return false;
+    public static boolean isAllowDisplayMultipleVersions() throws APIManagementException {
+        String displayMultiVersions = "false";
+        Boolean isDisplayMultipleVersionsProperty = false;
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            try {
+                String content = new APIMRegistryServiceImpl().getConfigRegistryResourceContent(tenantDomain,
+                        APIConstants.API_TENANT_CONF_LOCATION);
+                if (content != null) {
+                    JSONParser parser = new JSONParser();
+                    JSONObject apiTenantConfig = (JSONObject) parser.parse(content);
+                    if (apiTenantConfig != null) {
+                        isDisplayMultipleVersionsProperty = apiTenantConfig.containsKey(APIConstants.API_TENANT_CONF_DISPLAY_MULTIPLE_VERSIONS);
+                        if (isDisplayMultipleVersionsProperty) {
+                            Object value = apiTenantConfig.get(APIConstants.API_TENANT_CONF_DISPLAY_MULTIPLE_VERSIONS);
+                            if (value != null) {
+                                displayMultiVersions = value.toString();
+                            }
+                        }
+                    }
+                }
+            } catch (UserStoreException e) {
+                handleException("UserStoreException thrown when tenant-config.json", e);
+            } catch (RegistryException e) {
+                handleException("RegistryException thrown when getting tenant-config.json", e);
+            } catch (ParseException e) {
+                handleException("ParseException thrown when parsing the tenant-config.json content", e);
+            }
+        }
+        if (!isDisplayMultipleVersionsProperty) {
+            APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
+            displayMultiVersions = config.getFirstProperty(APIConstants.API_STORE_DISPLAY_MULTIPLE_VERSIONS);
+            if (displayMultiVersions == null) {
+                log.warn("The configurations related to show multiple versions of API in APIStore " +
+                        "are not available in api-manager.xml.");
+                return false;
+            }
         }
         return Boolean.parseBoolean(displayMultiVersions);
     }
