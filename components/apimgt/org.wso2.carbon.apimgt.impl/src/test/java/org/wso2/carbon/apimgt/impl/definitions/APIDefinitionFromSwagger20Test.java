@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.apimgt.impl.definitions;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,10 @@ import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.api.Resource;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -115,6 +120,22 @@ public class APIDefinitionFromSwagger20Test {
         } catch (APIManagementException e) {
             Assert.assertTrue(e.getMessage().contains("Error while retrieving Swagger v2.0 updated time for"));
         }
+    }
+
+    @Test
+    public void testProcessingGlobalSwaggerParams() throws Exception {
+        APIDefinitionFromSwagger20 apiDefinitionFromSwagger20 = new APIDefinitionFromSwagger20();
+
+        API api = Mockito.mock(API.class);
+
+        String filePath = "src" + File.separator + "test" + File.separator + "resources" + File
+                .separator + "swagger" + File.separator + "global-params.json";
+        File file = Paths.get(filePath).toFile();
+        String swaggerJson = IOUtils.toString(new FileInputStream(file));
+
+        Set<URITemplate> uriTemplates = apiDefinitionFromSwagger20.getURITemplates(api, swaggerJson);
+
+        Assert.assertTrue(uriTemplates.size() > 0);
     }
 
     protected URITemplate getUriTemplate(String httpVerb, String authType, String uriTemplateString) {
