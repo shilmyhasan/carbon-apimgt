@@ -4294,7 +4294,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return filterMultipleVersionedAPIs(searchResults);
     }
 
-    private Map<String, Object> filterMultipleVersionedAPIs(Map<String, Object> searchResults) {
+    private Map<String, Object> filterMultipleVersionedAPIs(Map<String, Object> searchResults) throws APIManagementException {
         ArrayList<Object> apiSet = (ArrayList<Object>) searchResults.get("apis");
 
         //filter store results if displayMultipleVersions is set to false
@@ -4364,5 +4364,4 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
         return searchResults;
     }
-
 }
