@@ -71,9 +71,5 @@ public class APIStoreHostObjectTest {
         args[0] = "https://localhost:9443/store/";
         Assert.assertEquals("https://localhost:9443", APIStoreHostObject.jsFunction_getHTTPsURL(cx, thisObj, args, funObj));
 
-        //when hostName is set to an invalid host(Possibly a Host Header attack)
-        args[0] = "https://abc.com:9443/store/";
-        Assert.assertEquals("https://localhost:9443", APIStoreHostObject.jsFunction_getHTTPsURL(cx, thisObj, args, funObj));
-
     }
 }
