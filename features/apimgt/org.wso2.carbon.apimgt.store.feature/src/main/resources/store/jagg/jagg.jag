@@ -414,7 +414,6 @@ var jagg = jagg || (function () {
     };
 
     var getAbsoluteUrl = function (path) {
-    var log = new Log();
     var host = "";
 
     if (isReverseProxyEnabled()) {
@@ -426,8 +425,7 @@ var jagg = jagg || (function () {
          // security fix for HOST Header Attack
         if (site.reverseProxy.enabled != "auto") {
             return validateHostName(match, host) + url(path);
-        }
-        else {
+        } else {
             return host;
        	}
     }
