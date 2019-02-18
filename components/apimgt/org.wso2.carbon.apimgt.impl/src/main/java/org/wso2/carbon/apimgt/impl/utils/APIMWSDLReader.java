@@ -623,6 +623,8 @@ public class APIMWSDLReader {
                             log.debug("Address URI for the port:" + port.getName() + " is " + addressURI.toString());
                         }
                     } catch (MalformedURLException e) {
+                        log.debug("Error occurred while getting the wsdl address location [" +
+                                getAddressUrl(extensibilityElement)  + "]");
                         endpointTransport = determineURLTransport("https", api.getTransports());
                         // This string to URL conversion done in order to identify URL transport eg - http or https.
                         // Here if there is a conversion failure , consider "https" as default protocol
