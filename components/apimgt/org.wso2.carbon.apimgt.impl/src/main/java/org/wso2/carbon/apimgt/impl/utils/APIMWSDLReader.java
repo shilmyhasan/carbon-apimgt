@@ -624,6 +624,8 @@ public class APIMWSDLReader {
                         }
                     } catch (MalformedURLException e) {
                         endpointTransport = determineURLTransport("https", api.getTransports());
+                        // This string to URL conversion done in order to identify URL transport eg - http or https.
+                        // Here if there is a conversion failure , consider "https" as default protocol
                     }
                     setAddressUrl(extensibilityElement, endpointTransport, api.getContext(), environmentName,
                             environmentType);
