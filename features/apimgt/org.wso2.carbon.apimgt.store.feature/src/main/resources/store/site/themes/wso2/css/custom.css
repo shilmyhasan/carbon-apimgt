@@ -608,7 +608,6 @@ a.remove_rating:hover{
 .scope-selection-form div.btn-group.scope_select{
     height: auto;
 }
-}
 /* fix for mobile browsers */
 header.header .dropdown-backdrop{
   display: none;
