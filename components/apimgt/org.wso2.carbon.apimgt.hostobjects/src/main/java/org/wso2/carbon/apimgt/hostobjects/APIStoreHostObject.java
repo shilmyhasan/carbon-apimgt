@@ -1024,12 +1024,12 @@ public class APIStoreHostObject extends ScriptableObject {
             }
 
             // The following condition is used to support API category in store
-            if(null != state){
-                if(state == APIConstants.PUBLISHED && displayAPIsWithMultipleStatus) {
+            if (null != state) {
+                if (state.equals(APIConstants.PUBLISHED) && displayAPIsWithMultipleStatus) {
                     statusList = new String[]{APIConstants.PUBLISHED, APIConstants.DEPRECATED};
-                }else if(state == APIConstants.PUBLISHED ){
+                } else if (state.equals(APIConstants.PUBLISHED)) {
                     statusList = new String[]{APIConstants.PUBLISHED};
-                }else if(state == APIConstants.PROTOTYPED){
+                } else if (state.equals(APIConstants.PROTOTYPED)) {
                     statusList = new String[]{APIConstants.PROTOTYPED};
                 }
             }
@@ -1519,11 +1519,11 @@ public class APIStoreHostObject extends ScriptableObject {
 
             // The following condition is used to support API category in store
             if (null != state) {
-                if (state == APIConstants.PUBLISHED && displayAPIsWithMultipleStatus) {
+                if (state.equals(APIConstants.PUBLISHED) && displayAPIsWithMultipleStatus) {
                     statusList = new String[]{APIConstants.PUBLISHED, APIConstants.DEPRECATED};
-                } else if (state == APIConstants.PUBLISHED) {
+                } else if (state.equals(APIConstants.PUBLISHED)) {
                     statusList = new String[]{APIConstants.PUBLISHED};
-                } else if (state == APIConstants.PROTOTYPED) {
+                } else if (state.equals(APIConstants.PROTOTYPED)) {
                     statusList = new String[]{APIConstants.PROTOTYPED};
                 }
             }
