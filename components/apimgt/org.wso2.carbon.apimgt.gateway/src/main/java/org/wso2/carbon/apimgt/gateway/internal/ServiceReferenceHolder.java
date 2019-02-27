@@ -36,6 +36,7 @@ public class ServiceReferenceHolder {
     public ThrottleDataHolder getThrottleDataHolder() {
         return throttleDataHolder;
     }
+    private ConfigurationContext axis2ConfigurationContext;
 
     public void setThrottleDataHolder(ThrottleDataHolder throttleDataHolder) {
         this.throttleDataHolder = throttleDataHolder;
@@ -80,4 +81,13 @@ public class ServiceReferenceHolder {
     public void setThrottleProperties(ThrottleProperties throttleProperties) {
         this.throttleProperties = throttleProperties;
     }
+
+    public void setAxis2ConfigurationContext(ConfigurationContext axis2ConfigurationContext) {
+        this.axis2ConfigurationContext = axis2ConfigurationContext;
+    }
+
+    public ConfigurationContext getAxis2ConfigurationContext() {
+        return axis2ConfigurationContext;
+    }
+
 }

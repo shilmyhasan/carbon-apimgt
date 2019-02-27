@@ -66,13 +66,10 @@ public class APIKeyValidatorClient {
         }
 
         try {
-            ConfigurationContext ctx = ConfigurationContextFactory.createConfigurationContextFromFileSystem(null, null);
+            ConfigurationContext ctx = ServiceReferenceHolder.getInstance().getAxis2ConfigurationContext();
             keyValidationServiceStub = new APIKeyValidationServiceStub(ctx, serviceURL + "APIKeyValidationService");
             ServiceClient client = keyValidationServiceStub._getServiceClient();
             Options options = client.getOptions();
-            options.setTimeOutInMilliSeconds(TIMEOUT_IN_MILLIS);
-            options.setProperty(HTTPConstants.SO_TIMEOUT, TIMEOUT_IN_MILLIS);
-            options.setProperty(HTTPConstants.CONNECTION_TIMEOUT, TIMEOUT_IN_MILLIS);
             options.setCallTransportCleanup(true);
             options.setManageSession(true);
 
