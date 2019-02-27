@@ -24,6 +24,7 @@ import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.StackObjectPool;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 
 public class ThriftKeyValidatorClientPool {
 
@@ -37,9 +38,9 @@ public class ThriftKeyValidatorClientPool {
 
     private ThriftKeyValidatorClientPool() {
         String maxIdleClients = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getFirstProperty
-                ("APIKeyValidator.ConnectionPool.MaxIdle");
+                (APIConstants.API_KEY_VALIDATOR_CONNECTION_MAXIDLE);
         String initIdleCapacity = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getFirstProperty
-                ("APIKeyValidator.ConnectionPool.InitIdleCapacity");
+                (APIConstants.API_KEY_VALIDATOR_CONNECTION_IDLE_CAPACITY);
         if (StringUtils.isNotEmpty(maxIdleClients)) {
             maxIdle = Integer.parseInt(maxIdleClients);
         } else {
