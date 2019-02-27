@@ -278,6 +278,16 @@ function getLocation(href) {
     }
 }
 
+function isWhiteListedHost(host) {
+    var whiteListedHostNames = site.whiteListedHostNames;
+    for (var i = 0; i < whiteListedHostNames.length; i++) {
+        if(host.equals(whiteListedHostNames[i])) {
+            return true;
+        }
+    }
+    return false;
+};
+
 function validateHostName(match, host) {
     var log = new Log();
     var CarbonUtils = Packages.org.wso2.carbon.utils.CarbonUtils;
@@ -306,16 +316,6 @@ function validateHostName(match, host) {
     } else {
         return host;
     }
-};
-
-var isWhiteListedHost = function (host) {
-    var whiteListedHostNames = site.whiteListedHostNames;
-    for (var i = 0; i < whiteListedHostNames.length; i++) {
-        if(host.equals(whiteListedHostNames[i])) {
-            return true;
-        }
-    }
-    return false;
 };
 
 var isReverseProxyEnabled = function() {
