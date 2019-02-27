@@ -51,7 +51,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
             throws APIManagementException {
 
         //generating expiring timestamp
-        long currentTime = System.currentTimeMillis() ;
+        long currentTime = System.currentTimeMillis();
         long expireIn = currentTime + getTTL() * 1000;
 
         String dialect;
@@ -106,7 +106,6 @@ public class JWTGenerator extends AbstractJWTGenerator {
                     log.debug("The custom claims are retrieved from AuthorizationGrantCache for user : "
                             + validationContext.getValidationInfoDTO().getEndUserName());
                 }
-                return customClaims;
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("Custom claims are not available in the AuthorizationGrantCache. Hence will be "
@@ -135,9 +134,14 @@ public class JWTGenerator extends AbstractJWTGenerator {
                     String username = split[0].substring(0, split[0].length() - 1);
 
                     if (manager.isExistingUser(username)) {
-                        return claimsRetriever.getClaims(tenantAwareUserName);
+                        customClaims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
+                        return customClaims;
                     } else {
-                        log.warn("User " + tenantAwareUserName + " cannot be found by user store manager");
+                        if (!customClaims.isEmpty()) {
+                            return customClaims;
+                        } else {
+                            log.warn("User " + tenantAwareUserName + " cannot be found by user store manager");
+                        }
                     }
                 } else {
                     log.error("Tenant cannot be found for username: " + tenantAwareUserName);
