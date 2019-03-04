@@ -44,7 +44,6 @@ public class ApplicationDTO  {
   
   private String owner = null;
   
-  
   private List<ApplicationKeyDTO> keys = new ArrayList<ApplicationKeyDTO>();
 
   private String lastUpdatedTime = null;
@@ -183,7 +182,6 @@ public class ApplicationDTO  {
     this.owner = owner;
   }
 
-  
   /**
    **/
   @ApiModelProperty(value = "")

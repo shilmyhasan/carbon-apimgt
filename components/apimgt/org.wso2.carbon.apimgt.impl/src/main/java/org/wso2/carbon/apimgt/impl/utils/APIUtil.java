@@ -7123,7 +7123,7 @@ public final class APIUtil {
      *
      * @param response  login response String.
      * @param groupingExtractorClass    extractor class.
-     * @return
+     * @return  group ids
      * @throws APIManagementException Throws is an error occured when stractoing group Ids
      */
     public static String[] getGroupIdsFromExtractor(String response, String groupingExtractorClass)
