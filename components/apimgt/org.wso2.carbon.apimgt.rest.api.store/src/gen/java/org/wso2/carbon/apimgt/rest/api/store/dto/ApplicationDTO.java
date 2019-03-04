@@ -42,6 +42,9 @@ public class ApplicationDTO  {
   private String groupId = null;
   
   
+  private String owner = null;
+  
+  
   private List<ApplicationKeyDTO> keys = new ArrayList<ApplicationKeyDTO>();
 
   private String lastUpdatedTime = null;
@@ -71,7 +74,7 @@ public class ApplicationDTO  {
     this.createdTime=createdTime;
   }
 
-  
+
   /**
    **/
   @ApiModelProperty(value = "")
@@ -172,6 +175,18 @@ public class ApplicationDTO  {
   /**
    **/
   @ApiModelProperty(value = "")
+  @JsonProperty("owner")
+  public String getOwner() {
+    return owner;
+  }
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
   @JsonProperty("keys")
   public List<ApplicationKeyDTO> getKeys() {
     return keys;
@@ -195,6 +210,7 @@ public class ApplicationDTO  {
     sb.append("  description: ").append(description).append("\n");
     sb.append("  status: ").append(status).append("\n");
     sb.append("  groupId: ").append(groupId).append("\n");
+    sb.append("  owner: ").append(owner).append("\n");
     sb.append("  keys: ").append(keys).append("\n");
     sb.append("}\n");
     return sb.toString();
