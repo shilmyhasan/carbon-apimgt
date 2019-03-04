@@ -131,6 +131,7 @@ public class ApplicationMappingUtil {
         applicationInfoDTO.setName(application.getName());
         applicationInfoDTO.setGroupId(application.getGroupId());
         applicationInfoDTO.setSubscriber(application.getSubscriber().getName());
+        applicationInfoDTO.setOwner(application.getOwner());
         return applicationInfoDTO;
     }
 }
