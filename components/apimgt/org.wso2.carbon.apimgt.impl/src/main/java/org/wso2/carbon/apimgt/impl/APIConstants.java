@@ -337,6 +337,9 @@ public final class APIConstants {
     public static final String PROTOTYPED = "PROTOTYPED";
     public static final String VERB_INFO_DTO = "VERB_INFO";
 
+    public static final String SUPER_TENANT_DOMAIN = "carbon.super";
+    public static final String TENANT_PREFIX = "/t/";
+
     //Overview constants for CORS configuration
     public static final String API_OVERVIEW_CORS_CONFIGURATION = "overview_corsConfiguration";
     //Registry lifecycle related info

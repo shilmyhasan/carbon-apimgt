@@ -1,15 +1,24 @@
 <%
 include("/jagg/jagg.jag");
 var store = jagg.module("manager").getAPIStoreObj();
-var tenantDomain=request.getParameter("tenant");
+var tenantDomain =request.getParameter("tenant");
 var resourceUrl = request.getParameter("resourceUrl");
+var apiName = request.getParameter("apiName");
+var apiVersion = request.getParameter("apiVersion");
+var isWSDLDownload = request.getParameter("isWSDLDownload");
+
+if (isWSDLDownload == "true" && apiName != null && apiVersion != null) {
+    var APIUtil = org.wso2.carbon.apimgt.impl.utils.APIUtil;
+    var provider = String(APIUtil.getAPIProviderFromAPINameVersionTenant(apiName, apiVersion, tenantDomain));
+    resourceUrl = resourceUrl + "/" + provider + "--" + apiName + apiVersion + ".wsdl";
+}
 
 var object = store.getDocument(tenantDomain,resourceUrl);
-if(object == null){
+if (object == null) {
     response.status = 500;
-   }else{
-   response.contentType = "application/force-download";
-   response.addHeader("Content-Disposition","attachment; filename = \""+object.name+"\"");
-   print(object.Data);
-    }
+   } else {
+       response.contentType = "application/force-download";
+       response.addHeader("Content-Disposition","attachment; filename = \""+object.name+"\"");
+       print(object.Data);
+   }
 %>

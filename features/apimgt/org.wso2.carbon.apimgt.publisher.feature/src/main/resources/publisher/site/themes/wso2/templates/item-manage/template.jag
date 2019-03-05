@@ -885,7 +885,7 @@
                         });
                         $('#publish-success').modal('show');
                         $('#goToStore-btn').click(function(){
-                            window.open('<%=storeUrl%>/apis/info?name=<%=api.name%>&version=<%=api.version%>&provider=<%=api.provider%>&tenant=<%=tenantDomain%>', '_blank');
+                            window.open('<%=storeUrl%>/apis/info?name=<%=api.name%>&version=<%=api.version%>&tenant=<%=tenantDomain%>', '_blank');
                             location.href = '<%= jagg.url("/info?"+ apiUrlId ) %>';
                         });
                     } else {
