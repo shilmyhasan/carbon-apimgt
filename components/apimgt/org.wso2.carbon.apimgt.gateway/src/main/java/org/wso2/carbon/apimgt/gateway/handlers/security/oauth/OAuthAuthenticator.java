@@ -78,7 +78,9 @@ public class OAuthAuthenticator implements Authenticator {
     }
 
     public void destroy() {
-        this.keyValidator.cleanup();
+        if (this.keyValidator != null) {
+            this.keyValidator.cleanup();
+        }
     }
 
     @MethodStats
