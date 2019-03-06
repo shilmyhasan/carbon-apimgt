@@ -170,10 +170,10 @@ var log = new Log();
         } else {
             for (var path in jsonObj.paths) {
                 for (var method in jsonObj.paths[path]) {
-                    if(jsonObj.paths[path][method]["security"] != undefined) {
+                var securityObj = jsonObj.paths[path][method]["security"];
+                    if(securityObj != undefined) {
                         var isDefaultExist = false;
                         var defaultSecurity = {"default" : []};
-                        var securityObj = jsonObj.paths[path][method]["security"];
                         for (var i=0; i < securityObj.length; i++) {
                            if ((Object.keys(securityObj[i])[0]) === "default") {
                                isDefaultExist = true;
@@ -181,7 +181,7 @@ var log = new Log();
                            }
                         }
                         if (!isDefaultExist) {
-                            jsonObj.paths[path][method]["security"].push(defaultSecurity);
+                            securityObj.push(defaultSecurity);
                         }
                     }
                 }
