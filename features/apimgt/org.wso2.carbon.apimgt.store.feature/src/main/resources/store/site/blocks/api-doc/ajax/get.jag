@@ -173,13 +173,14 @@ var log = new Log();
                     if(jsonObj.paths[path][method]["security"] != undefined) {
                         var isDefaultExist = false;
                         var defaultSecurity = {"default" : []};
-                        for (var i=0; i<jsonObj.paths[path][method]["security"].length; i++) {
-                           if ((Object.keys(jsonObj.paths[path][method]["security"][i])[0]) === "default") {
+                        var securityObj = jsonObj.paths[path][method]["security"];
+                        for (var i=0; i < securityObj.length; i++) {
+                           if ((Object.keys(securityObj[i])[0]) === "default") {
                                isDefaultExist = true;
                                break;
                            }
                         }
-                        if (isDefaultExist != true) {
+                        if (!isDefaultExist) {
                             jsonObj.paths[path][method]["security"].push(defaultSecurity);
                         }
                     }
