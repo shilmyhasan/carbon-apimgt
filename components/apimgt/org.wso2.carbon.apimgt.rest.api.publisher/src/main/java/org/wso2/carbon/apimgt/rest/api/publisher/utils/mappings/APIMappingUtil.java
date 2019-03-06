@@ -454,6 +454,7 @@ public class APIMappingUtil {
             apiTiers.add(new Tier(tier));
         }
         model.addAvailableTiers(apiTiers);
+        model.setApiLevelPolicy(dto.getApiLevelPolicy());
 
         String transports = StringUtils.join(dto.getTransport(), ',');
         model.setTransports(transports);
@@ -461,11 +462,6 @@ public class APIMappingUtil {
         if (dto.getVisibleRoles() != null) {
             String visibleRoles = StringUtils.join(dto.getVisibleRoles(), ',');
             model.setVisibleRoles(visibleRoles);
-        }
-
-        if (dto.getVisibleTenants() != null) {
-            String visibleTenants = StringUtils.join(dto.getVisibleTenants(), ',');
-            model.setVisibleTenants(visibleTenants);
         }
 
         List<String> accessControlRoles = dto.getAccessControlRoles();

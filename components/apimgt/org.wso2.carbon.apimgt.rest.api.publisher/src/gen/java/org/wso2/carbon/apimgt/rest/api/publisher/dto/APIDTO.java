@@ -76,6 +76,9 @@ public class APIDTO  {
   private List<String> tiers = new ArrayList<String>();
   
   
+  private String apiLevelPolicy = null;
+  
+  
   private APIMaxTpsDTO maxTps = null;
   
   
@@ -89,9 +92,6 @@ public class APIDTO  {
   
   
   private List<String> visibleRoles = new ArrayList<String>();
-
-  
-  private List<String> visibleTenants = new ArrayList<String>();
   
   @NotNull
   private String endpointConfig = null;
@@ -348,6 +348,19 @@ public class APIDTO  {
 
   
   /**
+   * The policy selected for the particular API
+   **/
+  @ApiModelProperty(value = "The policy selected for the particular API")
+  @JsonProperty("apiLevelPolicy")
+  public String getApiLevelPolicy() {
+    return apiLevelPolicy;
+  }
+  public void setApiLevelPolicy(String apiLevelPolicy) {
+    this.apiLevelPolicy = apiLevelPolicy;
+  }
+
+  
+  /**
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("maxTps")
@@ -394,17 +407,6 @@ public class APIDTO  {
   }
   public void setVisibleRoles(List<String> visibleRoles) {
     this.visibleRoles = visibleRoles;
-  }
-
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("visibleTenants")
-  public List<String> getVisibleTenants() {
-    return visibleTenants;
-  }
-  public void setVisibleTenants(List<String> visibleTenants) {
-    this.visibleTenants = visibleTenants;
   }
 
   
@@ -482,6 +484,7 @@ public class APIDTO  {
   }
 
   
+  /**
    * Is the API is restricted to certain set of publishers or creators or is it visible to all the\npublishers and creators. If the accessControl restriction is none, this API can be modified by all the\npublishers and creators, if not it can only be viewable/modifiable by certain set of publishers and creators,\n based on the restriction. Accepts one of the following. NONE or RESTRICTED.\n
    **/
   @ApiModelProperty(value = "Is the API is restricted to certain set of publishers or creators or is it visible to all the\npublishers and creators. If the accessControl restriction is none, this API can be modified by all the\npublishers and creators, if not it can only be viewable/modifiable by certain set of publishers and creators,\n based on the restriction. Accepts one of the following. NONE or RESTRICTED.\n")
@@ -505,6 +508,8 @@ public class APIDTO  {
   public void setAccessControlRoles(List<String> accessControlRoles) {
     this.accessControlRoles = accessControlRoles;
   }
+
+  
   /**
    **/
   @ApiModelProperty(value = "")
@@ -552,11 +557,11 @@ public class APIDTO  {
     sb.append("  transport: ").append(transport).append("\n");
     sb.append("  tags: ").append(tags).append("\n");
     sb.append("  tiers: ").append(tiers).append("\n");
+    sb.append("  apiLevelPolicy: ").append(apiLevelPolicy).append("\n");
     sb.append("  maxTps: ").append(maxTps).append("\n");
     sb.append("  thumbnailUri: ").append(thumbnailUri).append("\n");
     sb.append("  visibility: ").append(visibility).append("\n");
     sb.append("  visibleRoles: ").append(visibleRoles).append("\n");
-    sb.append("  visibleTenants: ").append(visibleTenants).append("\n");
     sb.append("  endpointConfig: ").append(endpointConfig).append("\n");
     sb.append("  endpointSecurity: ").append(endpointSecurity).append("\n");
     sb.append("  gatewayEnvironments: ").append(gatewayEnvironments).append("\n");
