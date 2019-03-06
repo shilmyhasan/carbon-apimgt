@@ -170,7 +170,7 @@ var log = new Log();
         } else {
             for (var path in jsonObj.paths) {
                 for (var method in jsonObj.paths[path]) {
-                var securityObj = jsonObj.paths[path][method]["security"];
+                    var securityObj = jsonObj.paths[path][method]["security"];
                     if(securityObj != undefined) {
                         var isDefaultExist = false;
                         var defaultSecurity = {"default" : []};
