@@ -90,13 +90,6 @@ public class APIDTO  {
   
   private List<String> visibleRoles = new ArrayList<String>();
 
-  public enum AccessControlEnum {
-    NONE,  RESTRICTED
-  };
-
-  private AccessControlEnum accessControl = null;
-
-  private List<String> accessControlRoles = new ArrayList<String>();
   
   private List<String> visibleTenants = new ArrayList<String>();
   
@@ -120,6 +113,15 @@ public class APIDTO  {
   
   
   private List<String> subscriptionAvailableTenants = new ArrayList<String>();
+  
+  public enum AccessControlEnum {
+     NONE,  RESTRICTED, 
+  };
+  
+  private AccessControlEnum accessControl = null;
+  
+  
+  private List<String> accessControlRoles = new ArrayList<String>();
   
   
   private APIBusinessInformationDTO businessInformation = null;
@@ -294,8 +296,9 @@ public class APIDTO  {
 
   
   /**
+   * The transport to be set. Accepted values are HTTP, WS
    **/
-  @ApiModelProperty(required = true, value = "")
+  @ApiModelProperty(required = true, value = "The transport to be set. Accepted values are HTTP, WS")
   @JsonProperty("type")
   public TypeEnum getType() {
     return type;
@@ -369,8 +372,9 @@ public class APIDTO  {
 
   
   /**
+   * The visibility level of the API. Accepts one of the following. PUBLIC, PRIVATE, RESTRICTED OR CONTROLLED.
    **/
-  @ApiModelProperty(required = true, value = "")
+  @ApiModelProperty(required = true, value = "The visibility level of the API. Accepts one of the following. PUBLIC, PRIVATE, RESTRICTED OR CONTROLLED.")
   @JsonProperty("visibility")
   public VisibilityEnum getVisibility() {
     return visibility;
@@ -390,29 +394,6 @@ public class APIDTO  {
   }
   public void setVisibleRoles(List<String> visibleRoles) {
     this.visibleRoles = visibleRoles;
-  }
-
-  /**
-   * Publisher access control related parameters getters and setters.
-   *
-   */
-  @ApiModelProperty(value = "AccessControl")
-  @JsonProperty("accessControl")
-  public AccessControlEnum getAccessControl() {
-    return accessControl;
-  }
-
-  public void setAccessControl(AccessControlEnum accessControl) {
-    this.accessControl = accessControl;
-  }
-
-  @ApiModelProperty(value = "The user roles that are able to access the API in publisher")
-  @JsonProperty("accessControlRoles")
-  public List<String> getAccessControlRoles() {
-    return accessControlRoles;
-  }
-  public void setAccessControlRoles(List<String> accessControlRoles) {
-    this.accessControlRoles = accessControlRoles;
   }
 
   /**
@@ -477,8 +458,9 @@ public class APIDTO  {
 
   
   /**
+   * The subscription availability. Accepts one of the following. current_tenant, all_tenants or specific_tenants.
    **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "The subscription availability. Accepts one of the following. current_tenant, all_tenants or specific_tenants.")
   @JsonProperty("subscriptionAvailability")
   public SubscriptionAvailabilityEnum getSubscriptionAvailability() {
     return subscriptionAvailability;
@@ -500,6 +482,29 @@ public class APIDTO  {
   }
 
   
+   * Is the API is restricted to certain set of publishers or creators or is it visible to all the\npublishers and creators. If the accessControl restriction is none, this API can be modified by all the\npublishers and creators, if not it can only be viewable/modifiable by certain set of publishers and creators,\n based on the restriction. Accepts one of the following. NONE or RESTRICTED.\n
+   **/
+  @ApiModelProperty(value = "Is the API is restricted to certain set of publishers or creators or is it visible to all the\npublishers and creators. If the accessControl restriction is none, this API can be modified by all the\npublishers and creators, if not it can only be viewable/modifiable by certain set of publishers and creators,\n based on the restriction. Accepts one of the following. NONE or RESTRICTED.\n")
+  @JsonProperty("accessControl")
+  public AccessControlEnum getAccessControl() {
+    return accessControl;
+  }
+  public void setAccessControl(AccessControlEnum accessControl) {
+    this.accessControl = accessControl;
+  }
+
+  
+  /**
+   * The user roles that are able to view/modify as API publisher or creator.
+   **/
+  @ApiModelProperty(value = "The user roles that are able to view/modify as API publisher or creator.")
+  @JsonProperty("accessControlRoles")
+  public List<String> getAccessControlRoles() {
+    return accessControlRoles;
+  }
+  public void setAccessControlRoles(List<String> accessControlRoles) {
+    this.accessControlRoles = accessControlRoles;
+  }
   /**
    **/
   @ApiModelProperty(value = "")
@@ -558,6 +563,8 @@ public class APIDTO  {
     sb.append("  sequences: ").append(sequences).append("\n");
     sb.append("  subscriptionAvailability: ").append(subscriptionAvailability).append("\n");
     sb.append("  subscriptionAvailableTenants: ").append(subscriptionAvailableTenants).append("\n");
+    sb.append("  accessControl: ").append(accessControl).append("\n");
+    sb.append("  accessControlRoles: ").append(accessControlRoles).append("\n");
     sb.append("  businessInformation: ").append(businessInformation).append("\n");
     sb.append("  corsConfiguration: ").append(corsConfiguration).append("\n");
     sb.append("}\n");
