@@ -165,10 +165,28 @@ var log = new Log();
      
         default_implicit.authorizationUrl = urlArr[0] + "/authorize";
 
-            if(jsonObj["securityDefinitions"] == undefined){
-                jsonObj["securityDefinitions"] = {};
+        if (jsonObj["securityDefinitions"] == undefined) {
+            jsonObj["securityDefinitions"] = {};
+        } else {
+            for (var path in jsonObj.paths) {
+                for (var method in jsonObj.paths[path]) {
+                    if(jsonObj.paths[path][method]["security"] != undefined) {
+                        var isDefaultExist = false;
+                        var defaultSecurity = {"default" : []};
+                        for (var i=0; i<jsonObj.paths[path][method]["security"].length; i++) {
+                           if ((Object.keys(jsonObj.paths[path][method]["security"][i])[0])==="default") {
+                               isDefaultExist = true;
+                               break;
+                           }
+                        }
+                        if (isDefaultExist != true) {
+                            jsonObj.paths[path][method]["security"].push(defaultSecurity);
+                        }
+                    }
+                }
             }
-            jsonObj["securityDefinitions"]["default"] = default_implicit;
+        }
+        jsonObj["securityDefinitions"]["default"] = default_implicit;
 
         jsonObj.basePath = api.context;
 
