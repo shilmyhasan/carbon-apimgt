@@ -192,7 +192,6 @@ paths:
           schema:
             $ref: '#/definitions/API'
         - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/Authorization'
       tags:
         -  API (Individual)
       responses:
@@ -212,10 +211,6 @@ paths:
               description: |
                 The content type of the body.
               type: string
-            Authorization:
-              description: |
-                The brearer token.
-              type: string 
             ETag:
               description: |
                 Entity Tag of the response resource. Used by caches, or in conditional requests (Will be supported in future).
@@ -3156,15 +3151,6 @@ parameters:
     required: true
     type : string
 
-# The HTTP Authorization header
-  Authorization:
-    name: Authorization
-    in: header
-    description: |
-      Holds the bearer token for apis that require authentication.
-    required: true
-    type : string
-
 # The HTTP If-None-Match header
 # Used to avoid retrieving data that are already cached
   If-None-Match:
@@ -3386,6 +3372,10 @@ definitions:
         items:
           type: string
         example: ["Unlimited"]
+      apiLevelPolicy:
+        description: The policy selected for the particular API
+        type: string
+        example: "Unlimited"
       maxTps:
         properties:
           production:
