@@ -174,7 +174,7 @@ var log = new Log();
                         var isDefaultExist = false;
                         var defaultSecurity = {"default" : []};
                         for (var i=0; i<jsonObj.paths[path][method]["security"].length; i++) {
-                           if ((Object.keys(jsonObj.paths[path][method]["security"][i])[0])==="default") {
+                           if ((Object.keys(jsonObj.paths[path][method]["security"][i])[0]) === "default") {
                                isDefaultExist = true;
                                break;
                            }
