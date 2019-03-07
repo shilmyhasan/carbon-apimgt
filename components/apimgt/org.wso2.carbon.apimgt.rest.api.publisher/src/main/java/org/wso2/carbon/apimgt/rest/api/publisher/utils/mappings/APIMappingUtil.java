@@ -297,6 +297,7 @@ public class APIMappingUtil {
         apiCorsConfigurationDTO.setAccessControlAllowCredentials(corsConfiguration.isAccessControlAllowCredentials());
         dto.setCorsConfiguration(apiCorsConfigurationDTO);
         dto.setWsdlUri(model.getWsdlUrl());
+        dto.setApiLevelPolicy(model.getApiLevelPolicy());
         setEndpointSecurityFromModelToApiDTO(model, dto);
         setMaxTpsFromModelToApiDTO(model, dto);
 
