@@ -93,6 +93,9 @@ public class APIDTO  {
   
   private List<String> visibleRoles = new ArrayList<String>();
   
+  
+  private List<String> visibleTenants = new ArrayList<String>();
+  
   @NotNull
   private String endpointConfig = null;
   
@@ -412,6 +415,18 @@ public class APIDTO  {
   
   /**
    **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("visibleTenants")
+  public List<String> getVisibleTenants() {
+    return visibleTenants;
+  }
+  public void setVisibleTenants(List<String> visibleTenants) {
+    this.visibleTenants = visibleTenants;
+  }
+
+  
+  /**
+   **/
   @ApiModelProperty(required = true, value = "")
   @JsonProperty("endpointConfig")
   public String getEndpointConfig() {
@@ -562,6 +577,7 @@ public class APIDTO  {
     sb.append("  thumbnailUri: ").append(thumbnailUri).append("\n");
     sb.append("  visibility: ").append(visibility).append("\n");
     sb.append("  visibleRoles: ").append(visibleRoles).append("\n");
+    sb.append("  visibleTenants: ").append(visibleTenants).append("\n");
     sb.append("  endpointConfig: ").append(endpointConfig).append("\n");
     sb.append("  endpointSecurity: ").append(endpointSecurity).append("\n");
     sb.append("  gatewayEnvironments: ").append(gatewayEnvironments).append("\n");

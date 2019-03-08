@@ -465,6 +465,11 @@ public class APIMappingUtil {
             model.setVisibleRoles(visibleRoles);
         }
 
+        if (dto.getVisibleTenants() != null) {
+            String visibleTenants = StringUtils.join(dto.getVisibleTenants(), ',');
+            model.setVisibleTenants(visibleTenants);
+        }
+
         List<String> accessControlRoles = dto.getAccessControlRoles();
         if (accessControlRoles == null || accessControlRoles.isEmpty()) {
             model.setAccessControl(APIConstants.NO_ACCESS_CONTROL);
