@@ -54,7 +54,7 @@ include("/jagg/jagg.jag");
 
             if (result.error) {
                 print({
-                    error:result.error,
+                    error: true,
                     message:msg.error.authError(action, username)
                 });
 
@@ -87,7 +87,7 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error:result.error,
+                error: true,
                 message:msg.error.authError(action, username)
             };
         } else {

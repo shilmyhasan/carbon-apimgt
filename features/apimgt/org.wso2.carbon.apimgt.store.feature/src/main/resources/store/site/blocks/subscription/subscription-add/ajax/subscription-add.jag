@@ -98,7 +98,7 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error:result.error,
+                error: true,
                 message:result.message
             };
         } else {
@@ -137,7 +137,7 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error:result.error,
+                error: true,
                 message:msg.error.authError(action, username)
             };
         } else {
@@ -168,11 +168,11 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error:result.error,
+                error:true,
                 message:msg.error.authError(action, username)
             };
             /*print({
-                error:result.error,
+                error: true,
                 message:msg.error.authError(action, username)
             });
             response.status = 500;
@@ -242,7 +242,7 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error: result.error,
+                error: true,
                 message: msg.error.authError(action, username)
             };
         } else {
@@ -312,7 +312,7 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error:result.error,
+                error:true,
                 message:msg.error.authError(action, username)
             };
         } else {
@@ -376,7 +376,7 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error:result.error,
+                error:true,
                 message:result.message
             };
         } else {
@@ -411,7 +411,7 @@ include("/jagg/jagg.jag");
         result = consumerSecret;
         if (result.error) {
            obj = {
-               error:result.error,
+               error:true,
                message:result.message
            };
         } else {
@@ -456,7 +456,7 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error:result.error,
+                error: true,
                 message:msg.error.authError(action, username)
             };
         } else {
@@ -490,7 +490,7 @@ include("/jagg/jagg.jag");
 
         if (result.error) {
             obj = {
-                error:result.error,
+                error: true,
                 message:msg.error.authError(action, username)
             };
         } else {

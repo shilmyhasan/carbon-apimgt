@@ -38,7 +38,7 @@ log = new Log();
 
         if (result.error == "true") {
             obj = {
-                error:result.error,
+                error: true,
                 message:msg.error.backendError(action)
             };
         } else {
@@ -56,7 +56,7 @@ log = new Log();
         result = mod.getFirstAccessTime(subscriber);
         if (result.error == "true") {
             obj = {
-                error:result.error,
+                error: true,
                 message:msg.error.backendError(action)
             };
         } else {
