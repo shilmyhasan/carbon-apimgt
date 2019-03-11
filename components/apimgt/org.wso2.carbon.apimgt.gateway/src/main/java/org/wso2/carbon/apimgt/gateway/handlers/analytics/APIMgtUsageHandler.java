@@ -108,6 +108,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
             Map headers =
                     (Map) (axis2MsgContext).getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
             String userAgent = (String) headers.get(APIConstants.USER_AGENT);
+            mc.setProperty(APIMgtGatewayConstants.CLIENT_USER_AGENT, userAgent);
             String context = (String) mc.getProperty(RESTConstants.REST_API_CONTEXT);
             String apiVersion = (String) mc.getProperty(RESTConstants.SYNAPSE_REST_API);
             String fullRequestPath = (String) mc.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
@@ -133,6 +134,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
             String keyType = (String) mc.getProperty(APIConstants.API_KEY_TYPE);
             String correlationID = Utils.getAndSetCorrelationID(mc);
             String clientIp = DataPublisherUtil.getClientIp(axis2MsgContext);
+            mc.setProperty(APIMgtGatewayConstants.CLIENT_IP, clientIp);
             RequestPublisherDTO requestPublisherDTO = new RequestPublisherDTO();
             requestPublisherDTO.setConsumerKey(consumerKey);
             requestPublisherDTO.setContext(context);
