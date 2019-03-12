@@ -10,7 +10,7 @@ var isWSDLDownload = request.getParameter("isWSDLDownload");
 if (isWSDLDownload == "true" && apiName != null && apiVersion != null) {
     var APIUtil = org.wso2.carbon.apimgt.impl.utils.APIUtil;
     var provider = String(APIUtil.getAPIProviderFromAPINameVersionTenant(apiName, apiVersion, tenantDomain));
-    resourceUrl = resourceUrl + "/" + provider + "--" + apiName + apiVersion + ".wsdl";
+    resourceUrl = resourceUrl + "/" + APIUtil.createWsdlFileName(provider, apiName, apiVersion);
 }
 
 var object = store.getDocument(tenantDomain,resourceUrl);
