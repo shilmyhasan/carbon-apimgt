@@ -22,6 +22,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.runtime.resource.*;
 import org.apache.velocity.runtime.resource.loader.ResourceLoader;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -36,6 +37,7 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -47,6 +49,11 @@ import static org.junit.Assert.*;
 @PrepareForTest({APIConfigContext.class, ServiceReferenceHolder.class, ResourceFactory.class})
 public class APITemplateBuilderImplTest {
     private API sampleAPI = createSampleAPI();
+
+    @Before
+    public void setup() {
+        System.setProperty("carbon.home", "CARBON_HOME");
+    }
 
     @Test
     public void getConfigStringForTemplateWhenVElocityLogPathIsNull() throws Exception {
