@@ -54,7 +54,11 @@ jagg.block("listing", {
             if (result.response != null) {
                 apis = result.response.apis;
                 length = result.response.totalLength;
-                error = result.error;
+                if (result.error === "false") {
+                    error = result.error;
+                } else {
+                    error = true;
+                }
                 message = result.message;
                 mode = "listing";
             }
