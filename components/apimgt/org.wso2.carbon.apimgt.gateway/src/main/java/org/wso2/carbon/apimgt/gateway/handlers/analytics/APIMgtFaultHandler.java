@@ -35,7 +35,6 @@ public class APIMgtFaultHandler extends APIMgtCommonExecutionPublisher {
     }
 
     public boolean mediate(MessageContext messageContext) {
-        super.mediate(messageContext);
         if (publisher == null) {
             initDataPublisher();
         }
