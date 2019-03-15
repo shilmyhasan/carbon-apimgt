@@ -30,6 +30,9 @@ if (resourceUrl.indexOf("/apimgt/applicationdata/wsdls") != -1) {
     if (provider != null && provider.indexOf("@") > -1) {
         provider = String(APIUtil.replaceEmailDomain(provider));
     }
+    if (provider != null && provider.indexOf("/") > -1) {
+        provider = provider.split("/")[1];
+    }
     resourceUrl = resourceUrl + "/" + APIUtil.createWsdlFileName(provider, apiName, apiVersion);
 }
 
