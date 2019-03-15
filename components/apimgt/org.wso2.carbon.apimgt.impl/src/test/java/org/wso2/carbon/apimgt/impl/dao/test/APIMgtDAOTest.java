@@ -48,6 +48,7 @@ import org.wso2.carbon.apimgt.api.model.policy.QueryParameterCondition;
 import org.wso2.carbon.apimgt.api.model.policy.QuotaPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationServiceImpl;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
@@ -68,6 +69,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -407,6 +409,34 @@ public class APIMgtDAOTest extends TestCase {
         assertTrue(applicationId > 0);
         assertNull(apiMgtDAO.getApplicationByName("testApplication2", null, null));
 
+    }
+
+    public void testGetProviderByNameVersionTenant() throws APIManagementException, SQLException {
+        final String apiProviderSuperTenant = "testUser1";
+        final String apiProviderWSO2Tenant = "testUser1@wso2.test";
+
+        final String apiName = "testAPI1";
+        final String apiVersion = "1.0.0";
+        try {
+            apiMgtDAO.getAPIProviderByNameAndVersion(apiName, apiVersion, "");
+            assertFalse("Should throw an exception when tenant value is blank string", true);
+        } catch (APIManagementException ex) {
+            assertTrue(ex.getMessage().contains("cannot be null when fetching provider"));
+        }
+
+        try {
+            apiMgtDAO.getAPIProviderByNameAndVersion(apiName, apiVersion, null);
+            assertFalse("Should throw an exception when tenant value is null", true);
+        } catch (APIManagementException ex) {
+            assertTrue(ex.getMessage().contains("cannot be null when fetching provider"));
+        }
+
+        String apiProviderSuperTenantResult = apiMgtDAO
+                .getAPIProviderByNameAndVersion(apiName, apiVersion, APIConstants.SUPER_TENANT_DOMAIN);
+        assertEquals(apiProviderSuperTenant, apiProviderSuperTenantResult);
+
+        String apiProviderWSO2TenantResult = apiMgtDAO.getAPIProviderByNameAndVersion(apiName, apiVersion, "wso2.test");
+        assertEquals(apiProviderWSO2Tenant, apiProviderWSO2TenantResult);
     }
 
     public void testKeyForwardCompatibility() throws Exception {

@@ -2520,6 +2520,13 @@ public class SQLConstants {
             "AND CON_APP.CONSUMER_KEY=AKM.CONSUMER_KEY " +
             "AND AKM.APPLICATION_ID = APP.APPLICATION_ID";
 
+    public static final String GET_API_PROVIDER_WITH_NAME_VERSION_FOR_SUPER_TENANT =
+            "SELECT API.API_PROVIDER FROM AM_API API WHERE API.API_NAME = ? AND API.API_VERSION = ? AND "
+                    + "CONTEXT NOT LIKE '%" + APIConstants.TENANT_PREFIX + "%' ";
+
+    public static final String GET_API_PROVIDER_WITH_NAME_VERSION_FOR_GIVEN_TENANT =
+            "SELECT API.API_PROVIDER FROM AM_API API WHERE API.API_NAME = ? AND API.API_VERSION = ? AND API.CONTEXT LIKE ? ";
+
     /** Throttle related constants**/
 
     public static class ThrottleSQLConstants{

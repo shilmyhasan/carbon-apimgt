@@ -337,6 +337,9 @@ public final class APIConstants {
     public static final String PROTOTYPED = "PROTOTYPED";
     public static final String VERB_INFO_DTO = "VERB_INFO";
 
+    public static final String SUPER_TENANT_DOMAIN = "carbon.super";
+    public static final String TENANT_PREFIX = "/t/";
+
     //Overview constants for CORS configuration
     public static final String API_OVERVIEW_CORS_CONFIGURATION = "overview_corsConfiguration";
     //Registry lifecycle related info
@@ -1032,6 +1035,7 @@ public final class APIConstants {
     public static final long MAX_FILE_SIZE = 1024L;
 
     public static final String REGISTRY_RESOURCE_PREFIX = "/registry/resource";
+    public static final String REGISTRY_RESOURCE_URL_PREFIX = "/registry/resource/_system/governance/apimgt/applicationdata/provider/";
 
     public enum RegistryResourceTypesForUI {
         TAG_THUMBNAIL

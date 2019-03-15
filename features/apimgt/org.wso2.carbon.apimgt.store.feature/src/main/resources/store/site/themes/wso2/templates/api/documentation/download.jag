@@ -1,15 +1,44 @@
 <%
 include("/jagg/jagg.jag");
 var store = jagg.module("manager").getAPIStoreObj();
-var tenantDomain=request.getParameter("tenant");
+var tenantDomain =request.getParameter("tenant");
 var resourceUrl = request.getParameter("resourceUrl");
+var apiName = request.getParameter("apiName");
+var apiVersion = request.getParameter("apiVersion");
+var APIUtil = org.wso2.carbon.apimgt.impl.utils.APIUtil;
+
+if (resourceUrl.indexOf("/documentation/files") != -1) {
+    var resourceUrlCopy = resourceUrl;
+    var resourceUrlArray = resourceUrl.split("/");
+    if (resourceUrlArray.length >= 3) {
+        var name = resourceUrlArray[1];
+        var version = resourceUrlArray[2];
+        var providerNameForFileDownload = String(APIUtil.getAPIProviderFromAPINameVersionTenant(name, version, tenantDomain));
+        if (providerNameForFileDownload != null && providerNameForFileDownload.indexOf("@") > -1) {
+           providerNameForFileDownload = String(APIUtil.replaceEmailDomain(providerNameForFileDownload));
+        }
+        if (tenantDomain != org.wso2.carbon.apimgt.impl.APIConstants.SUPER_TENANT_DOMAIN) {
+            resourceUrl = org.wso2.carbon.apimgt.impl.APIConstants.TENANT_PREFIX + tenantDomain + org.wso2.carbon.apimgt.impl.APIConstants.REGISTRY_RESOURCE_URL_PREFIX + providerNameForFileDownload + resourceUrlCopy;
+        } else {
+            resourceUrl = org.wso2.carbon.apimgt.impl.APIConstants.REGISTRY_RESOURCE_URL_PREFIX + providerNameForFileDownload + resourceUrlCopy;
+        }
+    }
+}
+
+if (resourceUrl.indexOf("/apimgt/applicationdata/wsdls") != -1) {
+    var provider = String(APIUtil.getAPIProviderFromAPINameVersionTenant(apiName, apiVersion, tenantDomain));
+    if (provider != null && provider.indexOf("@") > -1) {
+        provider = String(APIUtil.replaceEmailDomain(provider));
+    }
+    resourceUrl = resourceUrl + "/" + APIUtil.createWsdlFileName(provider, apiName, apiVersion);
+}
 
 var object = store.getDocument(tenantDomain,resourceUrl);
-if(object == null){
+if (object == null) {
     response.status = 500;
-   }else{
-   response.contentType = "application/force-download";
-   response.addHeader("Content-Disposition","attachment; filename = \""+object.name+"\"");
-   print(object.Data);
-    }
+   } else {
+       response.contentType = "application/force-download";
+       response.addHeader("Content-Disposition","attachment; filename = \""+object.name+"\"");
+       print(object.Data);
+   }
 %>

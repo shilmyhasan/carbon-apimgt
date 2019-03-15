@@ -74,9 +74,14 @@
                     }
                     }%>
     <%}%>
-    <% if(api.wsdl && api.wsdl != ""){ %>     
+    <% if(api.wsdl && api.wsdl != ""){ %>
+    <%
+        var wsdlResourceUrl = api.wsdl;
+        var index = wsdlResourceUrl.lastIndexOf("/");
+        var modifiedResourceUrl = wsdlResourceUrl.substring(0, index);
+     %>
     <p>
-        <a title="<%=i18n.localize("Download WSDL")%>" href="<%=jagg.getAbsoluteUrl(jagg.getThemeFile("templates/api/documentation/download.jag?tenant=" + tenantDomain + "&resourceUrl=" + api.wsdl))%>" target="_blank"><h4><%=i18n.localize("Download WSDL")%></h4></a>
+        <a title="<%=i18n.localize("Download WSDL")%>" href="<%=jagg.getAbsoluteUrl(jagg.getThemeFile("templates/api/documentation/download.jag?tenant=" + tenantDomain + "&apiName=" + api.name + "&apiVersion=" + api.version + "&resourceUrl=" + modifiedResourceUrl))%>" target="_blank"><h4><%=i18n.localize("Download WSDL")%></h4></a>
     </p>
     <% } %>
     <% if(api.wadl && api.wadl != ""){ %>
