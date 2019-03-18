@@ -712,19 +712,8 @@ if(jagg.isCSRFTokenValid())
             mod = jagg.module("api");
             var scope = request.getParameter("scope");
             var roleName = request.getParameter("roleName");
-            var result = mod.isScopeExist(scope, jagg.getUser().username, roleName);
-            if (result.error === "false") {
-                obj = {
-                    error:false,
-                    data:{"isScopeExist": result.isScopeExist, "isRoleExist" : result.isRoleExist}
-                };
-            } else {
-                obj = {
-                    error:true,
-                    message:result.error.message.split(":")[1]
-                }
-            }
-            print(obj);
+            var data = mod.isScopeExist(scope, jagg.getUser().username, roleName);
+            print(data);
         }else if (request.getMethod() == 'POST' && action === "validateAPIUpdate"){
             mod = jagg.module("api");
             var apiData = {};
