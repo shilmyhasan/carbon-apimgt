@@ -188,6 +188,7 @@ var loadTokens = function () {
         applicationId:application_id
         }, function (result) {
             if (result.error == false) {
+                var token = "";
                 if (selected_type == "production") {
                     for (var i = 0; i < result.apikeys.length; i++) {
                         token = result.apikeys[i].PRODUCTION_KEY;
