@@ -35,7 +35,7 @@
                 <td class="col-sm-3"><%=i18n.localize("Visibility on Store")%></td>
                 <td id="inUrl">
                     <%if(api.visibility == "restricted"){%>
-                        <%=i18n.localize("Restricted by roles, only visible to ") + api.roles +"."%><%}
+                        <%=i18n.localize("Restricted by roles, only visible to ") + encode.forHtml(api.roles) +"."%><%}
                     else{%><%=i18n.localize(api.visibility,api.visibility)%><%}%>
                 </td>
             </tr>
@@ -143,7 +143,7 @@
             </tr>
             <tr>
                 <td><%=i18n.localize("Tier Availability")%></td>
-                <td id="tierAvb"><%=api.availableTiersDisplayNames%></td>
+                <td id="tierAvb"><%=encode.forHtml(api.availableTiersDisplayNames)%></td>
             </tr>
             <tr>
                 <td><%=i18n.localize("Default API Version")%></td>
@@ -159,7 +159,7 @@
             <% if(api.tags!=''){%>
             <tr>
                 <td><%=i18n.localize("Tags")%></td>
-                <td id="tags"><%=api.tags%></td>
+                <td id="tags"><%=encode.forHtml(api.tags)%></td>
             </tr>
              <%
             }if(api.bizOwner!=''){%>

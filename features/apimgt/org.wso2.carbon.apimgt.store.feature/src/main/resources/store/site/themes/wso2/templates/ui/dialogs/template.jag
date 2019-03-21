@@ -7,7 +7,7 @@ i18n.init(request,localeResourcesBasePath);
 <script type="text/javascript">
         var isSecure = <%=outputs.isSecure%>;
         var showLogin = <%=session.get("showLogin")%>;
-        var redirectToHTTPS = '<%=session.get("redirectToHTTPS")%>';
+        var redirectToHTTPS = '<%=encode.forJavaScript(session.get("redirectToHTTPS"))%>';
 
     </script>
  <%     var mod,httpUrl,httpsUrl;
