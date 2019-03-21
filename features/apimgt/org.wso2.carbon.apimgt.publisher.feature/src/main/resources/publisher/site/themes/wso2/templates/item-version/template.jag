@@ -42,7 +42,7 @@
 						
 						<div id="copy-api">
 							<input type="hidden" id="overviewAPIVersion"
-								value="<%=api.version%>" /> <input type="hidden" id="overviewAPIName" value="<%=api.name%>" />
+								value="<%=encode.forHtmlAttribute(api.version)%>" /> <input type="hidden" id="overviewAPIName" value="<%=encode.forHtmlAttribute(api.name)%>" />
 
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="new-version"><%=i18n.localize("New Version")%>:<span class="requiredAstrix">*</span>
