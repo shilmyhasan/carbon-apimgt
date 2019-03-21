@@ -188,17 +188,18 @@ var loadTokens = function () {
         applicationId:application_id
         }, function (result) {
             if (result.error == false) {
+                var token = "";
                 if (selected_type == "production") {
-                    for (var key : result.apikeys) {
-                        token = key.PRODUCTION_KEY;
+                    for (var i = 0; i < result.apikeys.length; i++) {
+                        token = result.apikeys[i].PRODUCTION_KEY;
                         if (typeof token != 'undefined' && token){
                             break;
                         }
                     }
                     $("#access_token").val(token);
                 } else if (selected_type == "sandbox") {
-                    for (var key : result.apikeys) {
-                        token = key.SANDBOX_KEY;
+                    for (var i = 0; i < result.apikeys.length; i++) {
+                        token = result.apikeys[i].SANDBOX_KEY;
                         if (typeof token != 'undefined' && token){
                             break;
                         }
