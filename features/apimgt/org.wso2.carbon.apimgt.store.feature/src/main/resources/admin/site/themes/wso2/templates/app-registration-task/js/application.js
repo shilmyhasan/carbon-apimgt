@@ -34,9 +34,9 @@ $(document).ready(function(){
                     btn.next().show();
                     btn.next().next().html(json.msg);
                     btn.hide();
-                    if (1 != length && 1 == (length % itemsPerPage)){
-                        var previousPage = currentPage-1;
-                        window.location = '/admin/site/pages/index.jag?page='+previousPage+'&task=appRegistration';
+                    if (1 != length && 1 == (length % itemsPerPage)) {
+                        var previousPage = currentPage - 1;
+                        window.location = '/admin/site/pages/index.jag?page=' + previousPage + '&task=appRegistration';
                     } else {
                         window.location.reload();
                     }
