@@ -86,7 +86,7 @@ var getApplicationByName = function (username, applicationName, groupId) {
 };
 
 /**
- * This method will accept username, application id and application id and sends a request to host object and gets the response.
+ * This method will accept username, application id and sends a request to host object and gets the response.
  * @param {string} username - subscriber name
  * @param {string} applicationId - application id
  * @param {string} group id.

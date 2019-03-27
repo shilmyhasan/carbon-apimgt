@@ -3801,7 +3801,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This method helps to get an APIM application by given name.
+     * This method helps to get an APIM application by given id.
      *
      * @param cx      will be used to store information about the executing of the script.
      *                This is a object of org.mozilla.javascript.Context package.
