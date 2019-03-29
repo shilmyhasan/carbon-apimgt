@@ -237,6 +237,7 @@ public class ApisApiServiceImpl extends ApisApiService {
                                 MultitenantUtils.getTenantDomain(username) + "'";
                         RestApiUtil.handleBadRequest(errorMessage, log);
                     } else {
+                        //When tenant domain contains upper case characters, this will convert those to lowercase
                         provider = MultitenantUtils.getTenantAwareUsername(provider) + "@" +
                                 MultitenantUtils.getTenantDomain(provider);
                     }
