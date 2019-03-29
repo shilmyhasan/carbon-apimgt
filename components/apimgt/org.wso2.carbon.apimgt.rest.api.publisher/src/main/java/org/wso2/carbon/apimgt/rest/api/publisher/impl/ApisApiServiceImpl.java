@@ -236,6 +236,10 @@ public class ApisApiServiceImpl extends ApisApiService {
                                 + "' is not compatible with admin's('" + username + "') tenant domain '" +
                                 MultitenantUtils.getTenantDomain(username) + "'";
                         RestApiUtil.handleBadRequest(errorMessage, log);
+                    } else {
+                        //When tenant domain contains upper case characters, this will convert those to lowercase
+                        provider = MultitenantUtils.getTenantAwareUsername(provider) + "@" +
+                                MultitenantUtils.getTenantDomain(provider);
                     }
                 }
             } else {
