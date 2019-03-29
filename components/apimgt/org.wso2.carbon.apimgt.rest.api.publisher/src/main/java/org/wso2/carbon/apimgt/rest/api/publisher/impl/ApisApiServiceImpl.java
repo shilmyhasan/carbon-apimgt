@@ -236,6 +236,9 @@ public class ApisApiServiceImpl extends ApisApiService {
                                 + "' is not compatible with admin's('" + username + "') tenant domain '" +
                                 MultitenantUtils.getTenantDomain(username) + "'";
                         RestApiUtil.handleBadRequest(errorMessage, log);
+                    } else {
+                        provider = MultitenantUtils.getTenantAwareUsername(provider) + "@" +
+                                MultitenantUtils.getTenantDomain(provider);
                     }
                 }
             } else {
