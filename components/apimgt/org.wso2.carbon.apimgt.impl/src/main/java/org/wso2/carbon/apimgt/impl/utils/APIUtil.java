@@ -233,6 +233,8 @@ public final class APIUtil {
     private static final int ENTITY_EXPANSION_LIMIT = 0;
 
     private static final String DESCRIPTION = "Allows [1] request(s) per minute.";
+    private static final String STARTUP_CONFIGURATIONS = "StartupConfiguration.";
+    private static final String UPDATE_NULL_THROTTLING_TIER = STARTUP_CONFIGURATIONS + "UpdateNullThrottlingTier";
 
     private static final int DEFAULT_TENANT_IDLE_MINS = 30;
     private static long tenantIdleTimeMillis;
@@ -3999,8 +4001,7 @@ public final class APIUtil {
     public static boolean updateNullThrottlingTierAtStartup() {
         APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String isNullThrottlingTierUpdateEnabled = configuration
-                .getFirstProperty("StartupConfiguration.UpdateNullThrottlingTier");
+        String isNullThrottlingTierUpdateEnabled = configuration.getFirstProperty(UPDATE_NULL_THROTTLING_TIER);
         return isNullThrottlingTierUpdateEnabled == null || Boolean.parseBoolean(isNullThrottlingTierUpdateEnabled);
     }
 
