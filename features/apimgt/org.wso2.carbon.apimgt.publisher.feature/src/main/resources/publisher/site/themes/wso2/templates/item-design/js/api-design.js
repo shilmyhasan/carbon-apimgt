@@ -586,6 +586,7 @@ APIDesigner.prototype.transform = function(api_doc){
         delete path.parameters;
         for(var verbkey in path){
             var verb = path[verbkey];
+            verb.path1 = pathkey;
             if (pathkey.indexOf(".") != -1){
                 var str1 = "['";
                 var str2 = "']";
