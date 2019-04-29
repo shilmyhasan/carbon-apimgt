@@ -23,7 +23,6 @@ function triggerSubscribe() {
     jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag?name=" + api.name + "&appId=" + applicationId, {
         action:"addAPISubscriptionByAppId",
         appId:applicationId,
-        name:api.name,
         version:api.version,
         provider:api.provider,
         tier:tier,
