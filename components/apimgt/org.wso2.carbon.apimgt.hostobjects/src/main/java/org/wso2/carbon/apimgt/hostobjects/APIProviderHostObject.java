@@ -1125,10 +1125,6 @@ public class APIProviderHostObject extends ScriptableObject {
         name = (name != null ? name.trim() : null);
         version = (version != null ? version.trim() : null);
         APIIdentifier apiId = new APIIdentifier(provider, name, version);
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        if (apiProvider.getAPI(apiId) == null) {
-            return null;
-        }
 
         boolean isTenantFlowStarted = false;
         String apiJSON = null;
@@ -1139,6 +1135,12 @@ public class APIProviderHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
+
+            APIProvider apiProvider = getAPIProvider(thisObj);
+            if (apiProvider.getAPI(apiId) == null) {
+                return null;
+            }
+
             RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
             int tenantId;
             UserRegistry registry;
