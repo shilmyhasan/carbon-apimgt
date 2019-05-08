@@ -60,6 +60,7 @@ import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRe
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
+import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.IdentityException;
@@ -70,6 +71,8 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.util.UserCoreUtil;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -79,6 +82,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -174,7 +178,7 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
             String[] allowedGrantTypes = null;
             String jsonPayload = oauthApplicationInfo.getJsonString();
             if(jsonPayload != null){
-                
+
                 String grantTypesString = null;
                 JSONObject jsonObj = new JSONObject(jsonPayload);
                 if(jsonObj != null && jsonObj.has("grant_types")){
@@ -186,12 +190,12 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                   //set allowed grant types if grant types are not provided
                     allowedGrantTypes = oAuthAdminService.getAllowedGrantTypes();
                 }
-                
+
             } else {
                 //set allowed grant types if grant types are not provided
                 allowedGrantTypes = oAuthAdminService.getAllowedGrantTypes();
             }
-            
+
             // CallbackURL is needed for authorization_code and implicit grant types. If CallbackURL is empty,
             // simply remove those grant types from the list
             StringBuilder grantTypeString = new StringBuilder();
@@ -398,6 +402,12 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                     log.debug("Name of the OAuthApplication is set to : " + applicationName);
                 }
 
+                if (userId != null && !userId.isEmpty()) {
+                    oAuthConsumerAppDTO.setUsername(userName);
+                    log.debug("Username of the OAuthApplication is set to : " + userName);
+                }
+
+
                 if (grantTypes != null && grantTypes.length > 0) {
                     StringBuilder builder = new StringBuilder();
                     for (String grantType : grantTypes) {
@@ -430,6 +440,152 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                 return oAuthApplicationInfo;
             }
 
+        } catch (IdentityApplicationManagementException e) {
+            APIUtil.handleException("Error occurred while creating ServiceProvider for app " + applicationName, e);
+        } catch (Exception e) {
+            APIUtil.handleException("Error occurred while creating OAuthApp " + applicationName, e);
+        } finally {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(baseUser);
+        }
+        return null;
+    }
+
+    /**
+     * Update an OAuth application with the given user
+     *
+     * @param userId
+     * @param applicationName
+     * @param callbackUrl
+     * @return
+     * @throws APIKeyMgtException
+     * @throws APIManagementException
+     * @throws IdentityException
+     */
+    public OAuthApplicationInfo updateOAuthApplicationOwner(String userId, String ownerId, String applicationName,
+            String callbackUrl, String consumerKey, String[] grantTypes)
+            throws APIKeyMgtException, APIManagementException, IdentityException {
+        if (userId == null || userId.isEmpty()) {
+            return null;
+        }
+        String tenantDomain = MultitenantUtils.getTenantDomain(userId);
+        String baseUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String userName = MultitenantUtils.getTenantAwareUsername(userId);
+        String ownerName = MultitenantUtils.getTenantAwareUsername(ownerId);
+        String userNameForSP = userName;
+        String authorizationCodeGrantType = "authorization_code";
+        String implicitGrantType = "implicit";
+        PrivilegedCarbonContext.startTenantFlow();
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+        // Acting as the provided user. When creating Service Provider/OAuth App,
+        // username is fetched from CarbonContext
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(userName);
+        try {
+            // Replace domain separator by "_" if user is coming from a secondary userstore.
+            String domain = UserCoreUtil.extractDomainFromName(userNameForSP);
+            if (domain != null && !domain.isEmpty() && !UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals(domain)) {
+                userNameForSP = userNameForSP.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
+            }
+            if (applicationName != null && !applicationName.isEmpty()) {
+                // Append the username before Application name to make application name unique across two users.
+                String displayName;
+                if (applicationName.endsWith("_" + APIConstants.API_KEY_TYPE_PRODUCTION) || applicationName.endsWith("_"
+                        + APIConstants.API_KEY_TYPE_SANDBOX)) {
+                    displayName = applicationName.substring(0, applicationName.lastIndexOf("_"));
+                } else {
+                    displayName = applicationName;
+                }
+                // Get ServiceProvider Name by consumer Key.
+                ApplicationManagementService appMgtService = ApplicationManagementService.getInstance();
+                String appName = appMgtService.getServiceProviderNameByClientId(consumerKey, "oauth2", tenantDomain);
+                ServiceProvider serviceProvider =
+                        appMgtService.getApplicationExcludingFileBasedSPs(appName, tenantDomain);
+                if (serviceProvider != null) {
+                    serviceProvider.setApplicationName(applicationName);
+                    serviceProvider.setDescription("Service Provider for application " + applicationName);
+                    ServiceProviderProperty[] serviceProviderPropertiesArray = serviceProvider.getSpProperties();
+                    ArrayList<ServiceProviderProperty> serviceProviderProperties = new ArrayList<>();
+                    if (serviceProviderPropertiesArray != null) {
+                        serviceProviderProperties = new ArrayList<>(Arrays.asList(serviceProviderPropertiesArray));
+                    }
+                    boolean displayNameExist = false;
+                    //check displayName property and modify if found
+                    for (ServiceProviderProperty serviceProviderProperty : serviceProviderProperties) {
+                        if (APIConstants.APP_DISPLAY_NAME.equals(serviceProviderProperty.getName())) {
+                            serviceProviderProperty.setValue(displayName);
+                            displayNameExist = true;
+                            break;
+                        }
+                    }
+                    //if displayName not found add new property
+                    if (!displayNameExist) {
+                        ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
+                        serviceProviderProperty.setName(APIConstants.APP_DISPLAY_NAME);
+                        serviceProviderProperty.setValue(displayName);
+                        serviceProviderProperties.add(serviceProviderProperty);
+                    }
+                    serviceProvider.setSpProperties(serviceProviderProperties.toArray(new ServiceProviderProperty[0]));
+                    serviceProvider.setApplicationName(applicationName);
+                    serviceProvider.setOwner(User.getUserFromUserName(userName));
+                    serviceProvider.setDescription("Service Provider for application " + applicationName);
+                    appMgtService.updateApplication(serviceProvider, tenantDomain, ownerName);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Service Provider Name Updated to : " + applicationName);
+                    }
+                }
+            }
+            OAuthAdminService oAuthAdminService = new OAuthAdminService();
+            OAuthConsumerAppDTO oAuthConsumerAppDTO = oAuthAdminService.getOAuthApplicationData(consumerKey);
+            if (oAuthConsumerAppDTO != null) {
+                if (callbackUrl != null && !callbackUrl.isEmpty()) {
+                    oAuthConsumerAppDTO.setCallbackUrl(callbackUrl);
+                    if (log.isDebugEnabled()) {
+                        log.debug("CallbackURL is set to : " + callbackUrl);
+                    }
+                }
+                oAuthConsumerAppDTO.setOauthConsumerKey(consumerKey);
+                if (applicationName != null && !applicationName.isEmpty()) {
+                    oAuthConsumerAppDTO.setApplicationName(applicationName);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Name of the OAuthApplication is set to : " + applicationName);
+                    }
+                }
+                if (userId != null && !userId.isEmpty()) {
+                    oAuthConsumerAppDTO.setUsername(userName);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Username of the OAuthApplication is set to : " + userName);
+                    }
+                }
+                if (grantTypes != null && grantTypes.length > 0) {
+                    StringBuilder builder = new StringBuilder();
+                    for (String grantType : grantTypes) {
+                        builder.append(grantType + " ");
+                    }
+                    builder.deleteCharAt(builder.length() - 1);
+                    oAuthConsumerAppDTO.setGrantTypes(builder.toString());
+                } else {
+                    //update the grant type with respect to callback url
+                    String[] allowedGrantTypes = oAuthAdminService.getAllowedGrantTypes();
+                    StringBuilder grantTypeString = new StringBuilder();
+
+                    for (String grantType : allowedGrantTypes) {
+                        if (callbackUrl == null || callbackUrl.isEmpty()) {
+                            if (authorizationCodeGrantType.equals(grantType) || implicitGrantType.equals(grantType)) {
+                                continue;
+                            }
+                        }
+                        grantTypeString.append(grantType).append(" ");
+                    }
+                    oAuthConsumerAppDTO.setGrantTypes(grantTypeString.toString().trim());
+                }
+                oAuthAdminService.updateConsumerApplication(oAuthConsumerAppDTO);
+                if (log.isDebugEnabled()) {
+                    log.debug("Updated the OAuthApplication...");
+                }
+                oAuthConsumerAppDTO = oAuthAdminService.getOAuthApplicationData(consumerKey);
+                OAuthApplicationInfo oAuthApplicationInfo = createOAuthAppInfoFromDTO(oAuthConsumerAppDTO);
+                return oAuthApplicationInfo;
+            }
         } catch (IdentityApplicationManagementException e) {
             APIUtil.handleException("Error occurred while creating ServiceProvider for app " + applicationName, e);
         } catch (Exception e) {

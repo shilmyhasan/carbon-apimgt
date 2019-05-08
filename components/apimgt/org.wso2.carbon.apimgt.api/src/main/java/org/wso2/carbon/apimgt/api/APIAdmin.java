@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.apimgt.api;
 
+import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.Label;
 
 import java.util.List;
@@ -57,4 +58,33 @@ public interface APIAdmin  {
      * @throws APIManagementException if failed to update label
      */
     Label updateLabel(Label label) throws APIManagementException;
+
+    /**
+     * Get the applications of the given tenantId with pagination.
+     *
+     * @param tenantId             tenant Id
+     * @param start                content to start
+     * @param offset               content to limit number of pages
+     * @param searchOwner          content to search applications based on owners
+     * @param searchApplication    content to search applications based on application
+     * @param sortColumn           content to sort column
+     * @param sortOrder            content to sort in a order
+     * @throws APIManagementException if failed to get applications
+     */
+    List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int start , int offset, String searchOwner,
+            String searchApplication, String sortColumn,
+            String sortOrder)
+            throws APIManagementException;
+
+    /**
+     * Get count of the applications for the tenantId.
+     *
+     * @param tenantId             content to get application count based on tenant_id
+     * @param searchOwner          content to search applications based on owners
+     * @param searchApplication    content to search applications based on application
+     * @throws APIManagementException if failed to get application
+     */
+
+    public int getApplicationsCount(int tenantId, String searchOwner, String searchApplication)
+            throws APIManagementException;
 }

@@ -126,4 +126,9 @@ public class FakeKeyManagerForTest implements KeyManager {
     public Map<String, Set<Scope>> getScopesForAPIS(String apiIdsString) throws APIManagementException {
         return null;
     }
+
+    @Override public OAuthApplicationInfo updateApplicationOwner(OAuthAppRequest oAuthAppRequest, String owner)
+            throws APIManagementException {
+        return null;
+    }
 }
