@@ -20,9 +20,10 @@ function triggerSubscribe() {
         + '<span class="spinner"><i class="fw fw-loader5" title="button-loader"></i></span>'
     ).attr('disabled', 'disabled');
 
-    jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag?name=" + api.name + "&appId=" + applicationId, {
+    jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag?applicationName=" + applicationName + "&applicationId=" + applicationId, {
         action:"addAPISubscriptionByAppId",
         appId:applicationId,
+				name:api.name,
         version:api.version,
         provider:api.provider,
         tier:tier,
@@ -198,7 +199,7 @@ $('input.rate_save').on('change', function () {
         } else {
             jagg.message({content:result.message,type:"error"});
         }
-    }, "json");  
+    }, "json");
 });
 
 $('.remove_rating').on("click",function(){
@@ -217,7 +218,7 @@ $('.remove_rating').on("click",function(){
         } else {
             jagg.message({content:result.message,type:"error"});
         }
-    }, "json");    
+    }, "json");
 });
 
 $('.rating-tooltip-manual').rating({
