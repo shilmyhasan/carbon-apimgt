@@ -16,7 +16,7 @@ function triggerSubscribe() {
     var tier = $("#tiers-list").val();
     var subscribeButtonIconHtml = '<span class="icon fw-stack"><i class="fw fw-subscribe fw-stack-1x"></i><i class="fw fw-circle-outline fw-stack-2x"></i></span>';
     $("#subscribe-button").html(
-        subscribeButtonIconHtml + i18n.t('Subscribing...') 
+        subscribeButtonIconHtml + i18n.t('Subscribing...')
         + '<span class="spinner"><i class="fw fw-loader5" title="button-loader"></i></span>'
     ).attr('disabled', 'disabled');
 
@@ -44,7 +44,7 @@ function triggerSubscribe() {
                 var jsonPayload = result.status.workflowResponse.jsonPayload;
                 if(jsonPayload != null && jsonPayload != ""){
                    var jsonObj = JSON.parse(jsonPayload);
-                   var additionalParameters = jsonObj.additionalParameters; 
+                   var additionalParameters = jsonObj.additionalParameters;
                        //add another condition to prevent unnecessary redirection
 		   if (jsonObj.redirectUrl != null) {
 		      if(jsonObj.redirectConfirmationMsg == null){
@@ -98,7 +98,7 @@ function triggerSubscribe() {
                             }
                           }, "json");;
                        });
-                         $('#messageModal').modal(); 
+                         $('#messageModal').modal();
                      }
                   }
                }else {
@@ -124,7 +124,7 @@ function triggerSubscribe() {
                    $('#messageModal').modal();
                 }
               }
-        
+
        } else {
           jagg.message({content:result.message,type:"error"});
         //$('#messageModal').html($('#confirmation-data').html());
