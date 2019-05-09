@@ -1644,16 +1644,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String apiName = api.getId().getApiName();
         Set<String> versions = getAPIVersions(provider, apiName);
         APIVersionComparator comparator = new APIVersionComparator();
-        //SortedVersions list is iterated in descending order to assure that the latest version's subscription details get copied.
-        SortedSet<String> sortedVersions = new TreeSet<>(new APIVersionStringComparator());
-        sortedVersions.addAll(versions);
-        List<String> sortedVersionsList = new ArrayList<>(sortedVersions);
-        for (int i = sortedVersionsList.size() - 1; i >= 0; i--) {
-            API otherApi = getAPI(new APIIdentifier(provider, apiName, sortedVersionsList.get(i)));
-            if (comparator.compare(otherApi, api) < 0 && !(APIConstants.RETIRED.equals(otherApi.getStatus()))) {
-                apiMgtDAO.makeKeysForwardCompatible(provider, apiName, sortedVersionsList.get(i),
-                                                    api.getId().getVersion(), api.getContext());
+        List<API> sortedAPIs = new ArrayList<API>();
+        for (String version : versions) {
+            API otherApi = getAPI(new APIIdentifier(provider, apiName, version));
+            if (comparator.compare(otherApi, api) < 0 && !otherApi.getStatus().equals(APIStatus.RETIRED)) {
+                sortedAPIs.add(otherApi);
             }
+        }
+
+        // Get the subscriptions from the latest api version first
+        Collections.sort(sortedAPIs, comparator);
+        for (int i = sortedAPIs.size() - 1; i >= 0; i--) {
+            String oldVersion = sortedAPIs.get(i).getId().getVersion();
+            apiMgtDAO.makeKeysForwardCompatible(provider, apiName, oldVersion, api.getId().getVersion(),
+                    api.getContext());
         }
     }
 
