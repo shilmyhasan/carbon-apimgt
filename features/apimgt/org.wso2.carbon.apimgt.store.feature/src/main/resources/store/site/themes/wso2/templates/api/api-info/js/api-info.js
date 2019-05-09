@@ -16,13 +16,14 @@ function triggerSubscribe() {
     var tier = $("#tiers-list").val();
     var subscribeButtonIconHtml = '<span class="icon fw-stack"><i class="fw fw-subscribe fw-stack-1x"></i><i class="fw fw-circle-outline fw-stack-2x"></i></span>';
     $("#subscribe-button").html(
-        subscribeButtonIconHtml + i18n.t('Subscribing...') 
+        subscribeButtonIconHtml + i18n.t('Subscribing...')
         + '<span class="spinner"><i class="fw fw-loader5" title="button-loader"></i></span>'
     ).attr('disabled', 'disabled');
 
-    jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag?name=" + api.name + "&appId=" + applicationId, {
+    jagg.post("/site/blocks/subscription/subscription-add/ajax/subscription-add.jag?applicationName=" + applicationName + "&applicationId=" + applicationId, {
         action:"addAPISubscriptionByAppId",
         appId:applicationId,
+        name:api.name,
         version:api.version,
         provider:api.provider,
         tier:tier,
@@ -43,7 +44,7 @@ function triggerSubscribe() {
                 var jsonPayload = result.status.workflowResponse.jsonPayload;
                 if(jsonPayload != null && jsonPayload != ""){
                    var jsonObj = JSON.parse(jsonPayload);
-                   var additionalParameters = jsonObj.additionalParameters; 
+                   var additionalParameters = jsonObj.additionalParameters;
                        //add another condition to prevent unnecessary redirection
 		   if (jsonObj.redirectUrl != null) {
 		      if(jsonObj.redirectConfirmationMsg == null){
@@ -97,7 +98,7 @@ function triggerSubscribe() {
                             }
                           }, "json");;
                        });
-                         $('#messageModal').modal(); 
+                         $('#messageModal').modal();
                      }
                   }
                }else {
@@ -123,7 +124,7 @@ function triggerSubscribe() {
                    $('#messageModal').modal();
                 }
               }
-        
+
        } else {
           jagg.message({content:result.message,type:"error"});
         //$('#messageModal').html($('#confirmation-data').html());
@@ -198,7 +199,7 @@ $('input.rate_save').on('change', function () {
         } else {
             jagg.message({content:result.message,type:"error"});
         }
-    }, "json");  
+    }, "json");
 });
 
 $('.remove_rating').on("click",function(){
@@ -217,7 +218,7 @@ $('.remove_rating').on("click",function(){
         } else {
             jagg.message({content:result.message,type:"error"});
         }
-    }, "json");    
+    }, "json");
 });
 
 $('.rating-tooltip-manual').rating({
