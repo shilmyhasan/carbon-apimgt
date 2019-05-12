@@ -3674,6 +3674,7 @@ public class ApiMgtDAO {
      * @throws APIManagementException if failed to get applications for given subscriber
      */
     public boolean isApplicationOwnedBySubscriber(String appName, String username) throws APIManagementException {
+
         if (username == null) {
             return false;
         }
@@ -4194,20 +4195,20 @@ public class ApiMgtDAO {
 
     /**
      * Returns applications within a tenant domain with pagination
-     * @param tenantId   The tenantId.
-     * @param start      The start index.
-     * @param offset     The offset.
-     * @param searchOwner     The search string.
-     * @param searchApplication     The search string.
-     * @param sortOrder  The sort order.
-     * @param sortColumn The sort column.
+     *
+     * @param tenantId          The tenantId.
+     * @param start             The start index.
+     * @param offset            The offset.
+     * @param searchOwner       The search string.
+     * @param searchApplication The search string.
+     * @param sortOrder         The sort order.
+     * @param sortColumn        The sort column.
      * @return Application[] The array of applications.
      * @throws APIManagementException
      */
-    public List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int start, int offset,
-            String searchOwner, String searchApplication,
-            String sortColumn, String sortOrder)
-            throws APIManagementException {
+    public List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int start, int offset, String
+            searchOwner, String searchApplication, String sortColumn, String sortOrder) throws APIManagementException {
+
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -4249,8 +4250,18 @@ public class ApiMgtDAO {
         return applicationList;
     }
 
-    public int getApplicationsCount(int tenantId, String searchOwner, String searchApplication) throws
-            APIManagementException {
+    /**
+     * Get count of the applications for the tenantId
+     *
+     * @param tenantId
+     * @param searchOwner
+     * @param searchApplication
+     * @return
+     * @throws APIManagementException
+     */
+    public int getApplicationsCount(int tenantId, String searchOwner, String searchApplication)
+            throws APIManagementException {
+
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet resultSet = null;
@@ -12517,7 +12528,7 @@ public class ApiMgtDAO {
     }
 
     /**
-     * Retrieves the Application which is corresponding to the given UUID String
+     * Retrieves the given Application corresponding to the given subscriber
      *
      * @param subscriberId subscriberId of the Application
      * @param applicationName name of the Application

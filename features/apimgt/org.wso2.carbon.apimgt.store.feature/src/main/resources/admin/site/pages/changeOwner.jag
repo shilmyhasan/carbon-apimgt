@@ -4,8 +4,8 @@ include("header.jag");
 var site = require("/site/conf/site.json");
 
 var i18n = require("i18n");
-var localeResourcesBasePath="/site/conf/locales/jaggery/";
-i18n.init(request,localeResourcesBasePath);
+var localeResourcesBasePath = "/site/conf/locales/jaggery/";
+i18n.init(request, localeResourcesBasePath);
 
 (function () {
     var user = jagg.getUser();
@@ -20,24 +20,24 @@ i18n.init(request,localeResourcesBasePath);
     }
 
     jagg.render({
-        "name":"page/base",
-        "inputs":{
-            "title":"Change Owner Of The Applications",
-            "header":{
-                "name":"menu/primary"
+        "name": "page/base",
+        "inputs": {
+            "title": "Change Owner Of The Applications",
+            "header": {
+                "name": "menu/primary"
             },
-            "body":[
+            "body": [
                 {
-                    "name":"layout/extended",
-                    "inputs":{
-                        "middle":{
-                            "name":"application-owner/change-owner"
+                    "name": "layout/extended",
+                    "inputs": {
+                        "middle": {
+                            "name": "application-owner/change-owner"
                         }
                     }
                 }
-            ],"footer":[
+            ], "footer": [
                 {
-                    "name":"footer"
+                    "name": "footer"
                 }
             ]
         }

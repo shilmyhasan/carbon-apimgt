@@ -1,9 +1,9 @@
 <%
 jagg.module("application-owner", {
-    changeOwner:function () {
+    changeOwner: function () {
         return jagg.require(jagg.getModulesDir() + "application-owner/change-owner.jag").changeOwner.apply(this, arguments);
     },
-    getApplicationsByTenantIdWithPagination:function () {
+    getApplicationsByTenantIdWithPagination: function () {
         return jagg.require(jagg.getModulesDir() + "application-owner/get-applications.jag").getApplicationsByTenantIdWithPagination.apply(this, arguments);
     }
 });

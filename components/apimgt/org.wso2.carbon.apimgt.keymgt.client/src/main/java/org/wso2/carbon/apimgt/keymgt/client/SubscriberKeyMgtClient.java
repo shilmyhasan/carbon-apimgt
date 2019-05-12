@@ -118,7 +118,7 @@ public class SubscriberKeyMgtClient {
             String callbackUrl, String consumerKey, String[] grantTypes)
             throws RemoteException, APIKeyMgtSubscriberServiceAPIManagementException,
             APIKeyMgtSubscriberServiceAPIKeyMgtException, APIKeyMgtSubscriberServiceIdentityException {
-        return subscriberServiceStub.updateOAuthApplicationOwner(userId, owner, applicationName, callbackUrl,
-                consumerKey, grantTypes);
+        return subscriberServiceStub
+                .updateOAuthApplicationOwner(userId, owner, applicationName, callbackUrl, consumerKey, grantTypes);
     }
 }

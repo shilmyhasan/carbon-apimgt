@@ -2919,12 +2919,12 @@ public abstract class AbstractAPIManager implements APIManager {
     /**
      * Returns the corresponding application given the subscriberId and application name.
      *
-     * @param subscriberId subscriberId of the Application
+     * @param subscriberId    subscriberId of the Application
      * @param applicationName name of the Application
      * @throws APIManagementException
      */
-    public Application getApplicationBySubscriberIdAndName(int subscriberId, String applicationName) throws
-            APIManagementException {
+    public Application getApplicationBySubscriberIdAndName(int subscriberId, String applicationName)
+            throws APIManagementException {
         Application application = apiMgtDAO.getApplicationBySubscriberIdAndName(subscriberId, applicationName);
         if (application != null) {
             Set<APIKey> keys = getApplicationKeys(application.getId());

@@ -86,11 +86,10 @@ public class APIAdminImpl implements APIAdmin {
      * @param sortOrder            content to sort in a order
      * @throws APIManagementException if failed to get application
      */
-    public List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int start , int offset
-            , String searchOwner, String searchApplication, String sortColumn, String sortOrder)
-            throws APIManagementException {
-        return apiMgtDAO.getApplicationsByTenantIdWithPagination(tenantId, start, offset,
-                searchOwner, searchApplication, sortColumn, sortOrder);
+    public List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int start , int offset, String
+            searchOwner, String searchApplication, String sortColumn, String sortOrder) throws APIManagementException {
+        return apiMgtDAO.getApplicationsByTenantIdWithPagination(tenantId, start, offset, searchOwner,
+                searchApplication, sortColumn, sortOrder);
     }
 
     /**
@@ -102,8 +101,8 @@ public class APIAdminImpl implements APIAdmin {
      * @throws APIManagementException if failed to get application
      */
 
-    public int getApplicationsCount(int tenantId, String searchOwner, String searchApplication)
-            throws APIManagementException {
+    public int getApplicationsCount(int tenantId, String searchOwner, String searchApplication) throws
+            APIManagementException {
         return apiMgtDAO.getApplicationsCount(tenantId, searchOwner, searchApplication);
     }
 }

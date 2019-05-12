@@ -13,7 +13,7 @@ var changeOwner = function (action, newApplicationOwner, oldApplicationOwner, ap
         var subscriber = apiConsumer.getSubscriber(oldApplicationOwner);
         var subscriberDetails = JSON.parse(gson.toJson(subscriber));
         var subscriberId = subscriberDetails.id;
-        var application = apiConsumer.getApplicationBySubscriberIdAndName(subscriberId, applicationName );
+        var application = apiConsumer.getApplicationBySubscriberIdAndName(subscriberId, applicationName);
         if (application) {
             var changeOwner = apiConsumer.updateApplicationOwner(newApplicationOwner, application);
             return {

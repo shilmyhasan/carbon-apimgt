@@ -3750,8 +3750,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
      * @return is valid
      * @throws APIManagementException
      */
-    public boolean isSubscriberValid(String userId)
-            throws APIManagementException {
+    public boolean isSubscriberValid(String userId) throws APIManagementException {
         boolean isSubscribeValid = false;
         if (apiMgtDAO.getSubscriber(userId) != null) {
             isSubscribeValid = true;
