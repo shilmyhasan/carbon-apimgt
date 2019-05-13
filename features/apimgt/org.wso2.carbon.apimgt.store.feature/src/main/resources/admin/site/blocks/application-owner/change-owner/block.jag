@@ -1,0 +1,9 @@
+<%
+include("/jagg/jagg.jag");
+
+jagg.block("application-owner/change-owner", {
+    initializer:function (data) {
+    },
+});
+%>
+

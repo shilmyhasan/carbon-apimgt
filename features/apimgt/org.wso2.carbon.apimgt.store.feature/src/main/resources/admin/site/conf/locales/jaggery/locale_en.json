@@ -276,5 +276,10 @@
     "Type an Email and press Enter":"Type an email address and press Enter",
     "Label contains spaces": "Label contains spaces",
     "Label": "Label",
-    "Label contains one or more illegal characters": "Label contains one or more illegal characters "
+    "Label contains one or more illegal characters": "Label contains one or more illegal characters ",
+    "Generate" : "Generate",
+    "Applications" : "Applications",
+    "Application Name" : "Application Name",
+    "Owner" : "Owner",
+    "Change Application Owner" : "Change Application Owner"
 }
