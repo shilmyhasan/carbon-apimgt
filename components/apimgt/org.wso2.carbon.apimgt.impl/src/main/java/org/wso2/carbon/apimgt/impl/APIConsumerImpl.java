@@ -2718,10 +2718,18 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 workflowDTO.setApiVersion(identifier.getVersion());
                 workflowDTO.setApiProvider(identifier.getProviderName());
                 workflowDTO.setTierName(identifier.getTier());
+                //workflowDTO.setTierPlan(identifier.getTierPlan());
                 workflowDTO.setApplicationName(apiMgtDAO.getApplicationNameFromId(applicationId));
                 workflowDTO.setApplicationId(applicationId);
                 workflowDTO.setSubscriber(userId);
-                workflowResponse = addSubscriptionWFExecutor.execute(workflowDTO);
+
+                //TODO include monetization check
+                if(identifier.getTierPlan().equals("COMMERCIAL"))
+                {
+                    workflowResponse = addSubscriptionWFExecutor.monetizeSubscription(workflowDTO);
+                }else {
+                    workflowResponse = addSubscriptionWFExecutor.execute(workflowDTO);
+                }
             } catch (WorkflowException e) {
                 //If the workflow execution fails, roll back transaction by removing the subscription entry.
                 apiMgtDAO.removeSubscriptionById(subscriptionId);
@@ -2885,6 +2893,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             workflowDTO.setWorkflowType(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION);
             workflowDTO.setCreatedTime(System.currentTimeMillis());
             workflowDTO.setExternalWorkflowReference(removeSubscriptionWFExecutor.generateUUID());
+
+            removeSubscriptionWFExecutor.deleteMonetizedSubscription(workflowDTO);
             removeSubscriptionWFExecutor.execute(workflowDTO);
 
             JSONObject subsLogObject = new JSONObject();
