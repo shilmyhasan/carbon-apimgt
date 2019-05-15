@@ -65,6 +65,15 @@ public abstract class WorkflowExecutor implements Serializable {
         return new GeneralWorkflowResponse();
     }
 
+
+    public WorkflowResponse monetizeSubscription(WorkflowDTO workflowDTO) throws WorkflowException {
+        return new GeneralWorkflowResponse();
+    }
+
+    public  WorkflowResponse deleteMonetizedSubscription(WorkflowDTO workflowDTO) throws WorkflowException {
+        return new GeneralWorkflowResponse();
+    }
+
     /**
      * Implements the workflow completion logic.
      *
