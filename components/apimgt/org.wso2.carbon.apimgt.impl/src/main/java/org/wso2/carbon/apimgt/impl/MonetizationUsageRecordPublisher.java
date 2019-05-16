@@ -14,6 +14,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.Monetization;
+import org.wso2.carbon.apimgt.api.model.Usage;
 import org.wso2.carbon.apimgt.impl.caching.MonetizationConstants;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -160,8 +161,8 @@ public class MonetizationUsageRecordPublisher extends TimerTask implements Monet
                             usageRecordParams.put("action", "increment");
                             RequestOptions usageRequestOptions = RequestOptions.builder().setStripeAccount(ConnectId).
                                     setIdempotencyKey(subscriptionItem.getId()+lastUpdatedTimeStamp.toString()).build();
-                            UsageRecord.createOnSubscriptionItem(subscriptionItem.getId(), usageRecordParams,
-                                    usageRequestOptions);
+                            UsageRecord usageRecord = UsageRecord.createOnSubscriptionItem(
+                                    subscriptionItem.getId(), usageRecordParams, usageRequestOptions);
                         }
                     }
                 }
