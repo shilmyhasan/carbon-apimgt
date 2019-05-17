@@ -116,14 +116,18 @@ public class ThrottleDataPublisher {
             String appId, MessageContext messageContext,
             AuthenticationContext authenticationContext) {
         try {
-            DataProcessAndPublishingAgent agent = dataPublisherPool.get();
-            agent.setDataReference(applicationLevelThrottleKey, applicationLevelTier,
-                    apiLevelThrottleKey, apiLevelTier,
-                    subscriptionLevelThrottleKey, subscriptionLevelTier,
-                    resourceLevelThrottleKey, resourceLevelTier,
-                    authorizedUser, apiContext, apiVersion, appTenant, apiTenant, appId, messageContext,
-                    authenticationContext);
-            executor.execute(agent);
+            if (dataPublisherPool != null) {
+                DataProcessAndPublishingAgent agent = dataPublisherPool.get();
+                agent.setDataReference(applicationLevelThrottleKey, applicationLevelTier,
+                        apiLevelThrottleKey, apiLevelTier,
+                        subscriptionLevelThrottleKey, subscriptionLevelTier,
+                        resourceLevelThrottleKey, resourceLevelTier,
+                        authorizedUser, apiContext, apiVersion, appTenant, apiTenant, appId, messageContext,
+                        authenticationContext);
+                executor.execute(agent);
+            } else {
+                log.debug("Throttle data publisher pool is not initialized.");
+            }
         } catch (Exception e) {
             log.error("Error while publishing throttling events to global policy server", e);
         }
