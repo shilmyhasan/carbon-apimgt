@@ -432,7 +432,7 @@ APIDesigner.prototype.init_controllers = function(){
     });
 
     this.container.delegate(".delete_parameter", "click", function (event) {
-        //var elementToDelete =  $(this).parent().parent();
+        $("#messageModal div.modal-footer").html("");
         var deleteData = $(this).attr("data-path");
         var i = $(this).attr("data-index");
 
