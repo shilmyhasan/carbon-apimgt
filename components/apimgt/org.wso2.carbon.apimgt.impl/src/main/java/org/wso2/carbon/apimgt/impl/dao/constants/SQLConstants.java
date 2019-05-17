@@ -403,6 +403,48 @@ public class SQLConstants {
                     "UPDATED_TIME) " +
             " VALUES (?,?,?,?,?,?,?)";
 
+    public static final String ADD_STRIPE_CUSTOMER_SQL =
+            " INSERT" +
+                    " INTO AM_STRIPE_CUSTOMERS (SUBSCRIBER_ID , TENANT_ID, CUSTOMER_ID)" +
+                    " VALUES (?,?,?)";
+
+    public static final String ADD_STRIPE_SHARED_CUSTOMER_SQL =
+            " INSERT" +
+                    " INTO AM_STRIPE_SHARED_CUSTOMERS (APPLICATION_ID,  API_PROVIDER, " +
+                    " TENANT_ID, SHARED_CUSTOMER_ID, PARENT_CUSTOMER_ID)" +
+                    " VALUES (?,?,?,?,?)";
+
+    public static final String ADD_STRIPE_SUBSCRIPTION_SQL =
+            " INSERT" +
+                    " INTO AM_STRIPE_SUBSCRIPTION (SUBSCRIBED_API_ID, SUBSCRIBED_APPLICATION_ID, " +
+                    " TENANT_ID, SHARED_CUSTOMER_ID, SUBSCRIPTION_ID)" +
+                    " VALUES (?,?,?,?,?)";
+
+    public static final  String GET_STRIPE_CUSTOMER_SQL=
+            " SELECT " +
+            " ID, CUSTOMER_ID" +
+            " FROM AM_STRIPE_CUSTOMERS" +
+            " WHERE " +
+            " SUBSCRIBER_ID=? AND TENANT_ID=?";
+
+    public static final  String GET_STRIPE_SHARED_CUSTOMER_SQL=
+            " SELECT " +
+                    " ID, SHARED_CUSTOMER_ID" +
+                    " FROM AM_STRIPE_SHARED_CUSTOMERS" +
+                    " WHERE " +
+                    " APPLICATION_ID=? AND API_PROVIDER=? AND TENANT_ID=?";
+
+
+    public static final  String GET_STRIPE_SUBSCRIPTION_SQL=
+            " SELECT " +
+                    " ID, SUBSCRIPTION_ID" +
+                    " FROM AM_STRIPE_SUBSCRIPTION" +
+                    " WHERE " +
+                    " SUBSCRIBED_APPLICATION_ID=? AND SUBSCRIBED_API_ID=? AND TENANT_ID=?";
+
+    public static final String DELETE_STRIPE_SUBSCRIPTION_SQL =
+            "DELETE FROM AM_STRIPE_SUBSCRIPTION WHERE ID=?";
+
     public static final String UPDATE_SUBSCRIBER_SQL =
             " UPDATE AM_SUBSCRIBER " +
             " SET" +

@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openxmlformats.schemas.drawingml.x2006.main.STAdjAngle;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.BlockConditionAlreadyExistsException;
 import org.wso2.carbon.apimgt.api.SubscriptionAlreadyExistingException;
@@ -46,6 +47,8 @@ import org.wso2.carbon.apimgt.api.model.LifeCycleEvent;
 import org.wso2.carbon.apimgt.api.model.OAuthAppRequest;
 import org.wso2.carbon.apimgt.api.model.OAuthApplicationInfo;
 import org.wso2.carbon.apimgt.api.model.Scope;
+import org.wso2.carbon.apimgt.api.model.StripeCustomer;
+import org.wso2.carbon.apimgt.api.model.StripeSharedCustomer;
 import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
 import org.wso2.carbon.apimgt.api.model.Subscriber;
 import org.wso2.carbon.apimgt.api.model.Tier;
@@ -67,6 +70,7 @@ import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.StripeSubscription;
 import org.wso2.carbon.apimgt.impl.ThrottlePolicyConstants;
 import org.wso2.carbon.apimgt.impl.dao.constants.SQLConstants;
 import org.wso2.carbon.apimgt.impl.dto.APIInfoDTO;
@@ -660,6 +664,115 @@ public class ApiMgtDAO {
         return isAnyContentAware;
     }
 
+    public int addStripeCustomer(int subscriberId, int tenantId, String customerId) throws APIManagementException {
+        Connection conn = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        int id=0;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            String query = SQLConstants.ADD_STRIPE_CUSTOMER_SQL;
+            ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+            ps.setInt(1, subscriberId);
+            ps.setInt(2, tenantId);
+            ps.setString(3, customerId);
+            id = ps.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Error while rolling back the failed operation", e1);
+                }
+            }
+            handleException("Error in adding new Stripe Customer: " + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return id;
+    }
+
+    public int addStripeSharedCustomer(StripeSharedCustomer sharedCustomer) throws APIManagementException {
+        Connection conn = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        int id=0;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            String query = SQLConstants.ADD_STRIPE_SHARED_CUSTOMER_SQL;
+            ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+            ps.setInt(1, sharedCustomer.getApplicationId());
+            ps.setString(2, sharedCustomer.getApiProvider());
+            ps.setInt(3, sharedCustomer.getTenantId());
+            ps.setString(4, sharedCustomer.getSharedCustomerId());
+            ps.setInt(5, sharedCustomer.getParentCustomerId());
+            id = ps.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Error while rolling back the failed operation", e1);
+                }
+            }
+            handleException("Error in adding new Stripe Customer: " + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return id;
+    }
+
+    public void addStripeSubscription(APIIdentifier identifier, int applicationId, int tenandId,
+                                      int sharedCustomerId, String subscriptionId) throws APIManagementException {
+        Connection conn = null;
+        ResultSet rs = null;
+        PreparedStatement ps = null;
+        int apiId;
+
+
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+            apiId = getAPIID(identifier, conn);
+
+            String query = SQLConstants.ADD_STRIPE_SUBSCRIPTION_SQL;
+            ps = conn.prepareStatement(query);
+
+            ps.setInt(1, apiId);
+            ps.setInt(2, applicationId);
+            ps.setInt(3, tenandId);
+            ps.setInt(4, sharedCustomerId);
+            ps.setString(5, subscriptionId);
+            ps.executeUpdate();
+
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Error while rolling back the failed operation", e1);
+                }
+            }
+            handleException("Error in adding new Stripe subscription: " + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+    }
+
     public void addSubscriber(Subscriber subscriber, String groupingId) throws APIManagementException {
         Connection conn = null;
         ResultSet rs = null;
@@ -1147,10 +1260,11 @@ public class ApiMgtDAO {
         return null;
     }
 
+
     /**
      * This method used tot get Subscriber from subscriberId.
      *
-     * @param subscriberName id
+     * @param subscriberName
      * @return Subscriber
      * @throws APIManagementException if failed to get Subscriber from subscriber id
      */
@@ -1190,6 +1304,136 @@ public class ApiMgtDAO {
         }
         return subscriber;
     }
+
+    public StripeCustomer getStripeCustomer(int subscriberId , int tenantId) throws APIManagementException{
+        Connection conn = null;
+        StripeCustomer customer = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        String customerId = null;
+        StripeCustomer strCustomer = new StripeCustomer();
+
+        String sqlQuery = SQLConstants.GET_STRIPE_CUSTOMER_SQL;
+        /*if (forceCaseInsensitiveComparisons) {
+            sqlQuery = SQLConstants.GET_TENANT_SUBSCRIBER_CASE_INSENSITIVE_SQL;
+        }*/
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setInt(1, subscriberId);
+            ps.setInt(2, tenantId);
+            result = ps.executeQuery();
+
+            if (result.next()) {
+                strCustomer.setId(result.getInt("ID"));
+                strCustomer.setCustomerId(result.getString("CUSTOMER_ID"));
+            }
+        } catch (SQLException e) {
+            handleException("Failed to get Stripe Customer :" , e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, result);
+        }
+        return strCustomer;
+    }
+
+    public StripeSharedCustomer getStripeSharedCustomer(int applicationId, String apiProvider,
+                                          int tenantId) throws APIManagementException{
+        Connection conn = null;
+        StripeCustomer customer = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        StripeSharedCustomer sharedCustomer = new StripeSharedCustomer();
+
+        String sqlQuery = SQLConstants.GET_STRIPE_SHARED_CUSTOMER_SQL;
+        /*if (forceCaseInsensitiveComparisons) {
+            sqlQuery = SQLConstants.GET_TENANT_SUBSCRIBER_CASE_INSENSITIVE_SQL;
+        }*/
+        try {
+
+            conn = APIMgtDBUtil.getConnection();
+
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setInt(1, applicationId);
+            ps.setString(2, apiProvider);
+            ps.setInt(3, tenantId);
+            result = ps.executeQuery();
+
+            if (result.next()) {
+                sharedCustomer.setId(result.getInt("ID"));
+                sharedCustomer.setSharedCustomerId(result.getString("SHARED_CUSTOMER_ID"));
+            }
+        } catch (SQLException e) {
+            handleException("Failed to get Shared customer : ", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, result);
+        }
+        return sharedCustomer;
+    }
+
+    public void removeStripeSubscription(int id) throws APIManagementException{
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        String subscriptionId = null;
+        StripeSubscription strSubscription = new StripeSubscription();
+
+        String sqlQuery = SQLConstants.DELETE_STRIPE_SUBSCRIPTION_SQL;
+        /*if (forceCaseInsensitiveComparisons) {
+            sqlQuery = SQLConstants.GET_TENANT_SUBSCRIBER_CASE_INSENSITIVE_SQL;
+        }*/
+        try {
+
+            conn = APIMgtDBUtil.getConnection();
+
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            handleException("Failed to remove Subscribtion: " , e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, result);
+        }
+    }
+
+    public StripeSubscription getStripeSubscription(String apiName, String apiVersion ,String apiProvider, int applicationId,
+                                                    String tenantDomain ) throws APIManagementException{
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        String subscriptionId = null;
+        StripeSubscription strSubscription = new StripeSubscription();
+
+        String sqlQuery = SQLConstants.GET_STRIPE_SUBSCRIPTION_SQL;
+        /*if (forceCaseInsensitiveComparisons) {
+            sqlQuery = SQLConstants.GET_TENANT_SUBSCRIBER_CASE_INSENSITIVE_SQL;
+        }*/
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+        APIIdentifier identifier = new APIIdentifier(apiProvider,apiName, apiVersion);
+        try {
+
+            conn = APIMgtDBUtil.getConnection();
+            int apiId = getAPIID(identifier, conn);
+
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setInt(1, applicationId);
+            ps.setInt(2, apiId);
+            ps.setInt(3, tenantId);
+            result = ps.executeQuery();
+
+            if (result.next()) {
+                strSubscription.setId(result.getInt("ID"));
+                strSubscription.setSubscriptionId(result.getString("SUBSCRIPTION_ID"));
+            }
+        } catch (SQLException e) {
+            handleException("Failed to get Subscribtion: " , e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, result);
+        }
+        return strSubscription;
+    }
+
 
     public Set<APIIdentifier> getAPIByConsumerKey(String accessToken) throws APIManagementException {
         Connection connection = null;

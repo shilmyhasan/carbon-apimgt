@@ -35,6 +35,10 @@ public class APIIdentifier implements Serializable{
     private final String apiName;
     private final String version;
     private String tier;
+
+    //written lines
+    private String tierPlan;
+
     private String applicationId;
 
     public String getApplicationId() {
@@ -52,6 +56,10 @@ public class APIIdentifier implements Serializable{
     public void setTier(String tier) {
         this.tier = tier;
     }
+
+    public String getTierPlan() { return tierPlan; }
+
+    public void setTierPlan(String tierPlan) { this.tierPlan = tierPlan; }
 
     public APIIdentifier(String providerName, String apiName, String version) {
         this.providerName = providerName;

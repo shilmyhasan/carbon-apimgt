@@ -2684,12 +2684,13 @@ public class APIStoreHostObject extends ScriptableObject {
         if (args.length > 6 && args[6] != null) {
             groupId = (String) args[6];
         }
+        String tierPlan = "free";
+
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
 
         APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
                 .getAPIManagerConfiguration();
         boolean isGlobalThrottlingEnabled = APIUtil.isAdvanceThrottlingEnabled();
-
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(providerName));
@@ -2711,6 +2712,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     Tier policy = iterator.next();
                     if (policy.getName() != null && (policy.getName()).equals(tier)) {
                         isPolicyAllowed = true;
+                        tierPlan = policy.getTierPlan();
                     }
                     allowedPolicyList.add(policy.getName());
                 }
@@ -2725,7 +2727,6 @@ public class APIStoreHostObject extends ScriptableObject {
                 }*/
             } else {
                 Set<Tier> tiers = api.getAvailableTiers();
-
                 Iterator<Tier> iterator = tiers.iterator();
                 boolean isTierAllowed = false;
                 List<String> allowedTierList = new ArrayList<String>();
@@ -2733,6 +2734,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     Tier t = iterator.next();
                     if (t.getName() != null && (t.getName()).equals(tier)) {
                         isTierAllowed = true;
+                        tierPlan = t.getTierPlan();
                     }
                     allowedTierList.add(t.getName());
                 }
@@ -2774,6 +2776,10 @@ public class APIStoreHostObject extends ScriptableObject {
                 throw new APIManagementException("Subscription is not allowed for " + userDomain);
             }
             apiIdentifier.setTier(tier);
+
+            // written lines
+            apiIdentifier.setTierPlan(tierPlan);
+
             addSubscriptionResponse = apiConsumer.addSubscription(apiIdentifier, userId, applicationId, groupId);
         } catch (APIManagementException e) {
 

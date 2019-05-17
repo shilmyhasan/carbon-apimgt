@@ -36,6 +36,8 @@ public class SubscriptionWorkflowDTO extends WorkflowDTO{
 
     private String tierName;
 
+    private String tierPlan;
+
     public String getApiName() {
         return apiName;
     }
@@ -99,4 +101,8 @@ public class SubscriptionWorkflowDTO extends WorkflowDTO{
     public void setApplicationId(int applicationId) {
         this.applicationId = applicationId;
     }
+
+    public String getTierPlan() { return tierPlan; }
+
+    public void setTierPlan(String tierPlan) { this.tierPlan = tierPlan; }
 }
