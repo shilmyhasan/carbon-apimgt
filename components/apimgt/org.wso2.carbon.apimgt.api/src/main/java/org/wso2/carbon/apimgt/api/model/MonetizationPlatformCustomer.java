@@ -1,6 +1,6 @@
 package org.wso2.carbon.apimgt.api.model;
 
-public class StripeCustomer {
+public class MonetizationPlatformCustomer {
 
     public int getId() {
 

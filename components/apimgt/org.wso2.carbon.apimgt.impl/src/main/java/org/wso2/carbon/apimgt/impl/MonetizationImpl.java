@@ -18,6 +18,7 @@ import org.wso2.carbon.apimgt.impl.caching.MonetizationConstants;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+//import org.wso2.carbon.apimgt.rest.api.admin.dto.PublishStatusDTO;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
@@ -32,21 +33,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.apimgt.impl.utils.APIUtil.handleException;
 
 public class MonetizationImpl implements Monetization {
 
-    private static final Log log = LogFactory.getLog(MonetizationUsageRecordPublisher.class);
+    private static final Log log = LogFactory.getLog(MonetizationImpl.class);
     private static int publishIntervalInHours = 24 ;
     private static Long hoursToMilliseconds = 60*60*1000L;
     Boolean retry = true;
 
     @Override
-    public Response publishMonetizationUsageRecord() throws APIManagementException {
-        String apiName = null;
+    public Response publishMonetizationUsageRecord() {
+     /*   String apiName = null;
         String apiVersion = null;
         String tenantDomain = null;
         int applicationId;
@@ -54,12 +54,13 @@ public class MonetizationImpl implements Monetization {
         Long requestCount = 0L;
         boolean transactionCommitted = false;
         String ConnectId = "acct_1EQF7PCxKhMnrBL5";
-        String lastUpdatedTimeStamp;
+        String lastPublishedTimeStamp;
         Long currentTimestamp;
         int flag = 0;
         int counter = 0;
 
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
+        PublishStatusDTO publishStatusDTO = new PublishStatusDTO();
         Timestamp current = new Timestamp(System.currentTimeMillis());
         currentTimestamp = getLocalTimestamp(current.toString());
 
@@ -70,23 +71,25 @@ public class MonetizationImpl implements Monetization {
             Registry registry = ServiceReferenceHolder.getInstance().getRegistryService().getConfigSystemRegistry();
             Resource resource = registry.get(MonetizationConstants.UsagePublisher.LAST_PUBSLISHH_TIME_REG_LOCATION);
             if(resource.getContent()!= null) {
-                lastUpdatedTimeStamp = RegistryUtils.decodeBytes((byte[]) resource.getContent());
+                lastPublishedTimeStamp = RegistryUtils.decodeBytes((byte[]) resource.getContent());
             } else{
                 //TODO find a proper way to get the lastupdated time
                 Timestamp lastupdated = new Timestamp(System.currentTimeMillis() -
                         (publishIntervalInHours*hoursToMilliseconds));
-                lastUpdatedTimeStamp = lastupdated.toString();
+                lastPublishedTimeStamp = lastupdated.toString();
             }
             PrivilegedCarbonContext.endTenantFlow();
         }catch(RegistryException ex){
-            String msg = "Error while obtaining registry objects";
+            String msg = "Could not derive last published time , Error while obtaining registry objects";
+            publishStatusDTO.setStatus("Unsuccessfull");
+            publishStatusDTO.setMessage(msg);
             log.error(msg, ex);
-            throw new APIManagementException(msg, ex);
+            return Response.serverError().entity(publishStatusDTO).build();
         }
 
         StringBuilder query = new StringBuilder(
                 "from " + MonetizationConstants.UsagePublisher.USAGE_RECORD_AGGREGATION
-                        + " within " + lastUpdatedTimeStamp
+                        + " within " + lastPublishedTimeStamp
                         + "L, " + currentTimestamp + "L per '" + MonetizationConstants.UsagePublisher.GRANULARITY
                         + "' select "
                         + MonetizationConstants.API_NAME + ", "
@@ -124,35 +127,51 @@ public class MonetizationImpl implements Monetization {
                                 apiProvider, applicationId, tenantDomain);
 
                         Stripe.apiKey=getPlatformAccountStripeKey(tenantDomain);
-
                         if(subscription.getSubscriptionId() != null) {
-                            flag++;
+
                             RequestOptions subRequestOptions = RequestOptions.builder().
                                     setStripeAccount(ConnectId).build();
                             Subscription sub = Subscription.retrieve(subscription.getSubscriptionId(),
                                     subRequestOptions);
                             subscriptionItem = sub.getItems().getData().get(0);
-                            Map<String, Object> usageRecordParams = new HashMap<String, Object>();
-                            usageRecordParams.put("quantity", requestCount);
-                            usageRecordParams.put("timestamp", getLocalTimestamp(current.toString()) / 1000);
-                            usageRecordParams.put("action", "increment");
-                            RequestOptions usageRequestOptions = RequestOptions.builder().setStripeAccount(ConnectId).
-                                    setIdempotencyKey(subscriptionItem.getId()+lastUpdatedTimeStamp.toString()).build();
-                            UsageRecord usageRecord = UsageRecord.createOnSubscriptionItem(
-                                    subscriptionItem.getId(), usageRecordParams, usageRequestOptions);
-                            if(usageRecord.getId() != null){
-                                counter++;
+
+                            //check whether the billing plan is Usage Based.
+                            if (subscriptionItem.getPlan().getUsageType().equals("metered")) {
+                                flag++;
+                                Map<String, Object> usageRecordParams = new HashMap<String, Object>();
+                                usageRecordParams.put("quantity", requestCount);
+                                usageRecordParams.put("timestamp", getLocalTimestamp(current.toString()) / 1000);
+                                usageRecordParams.put("action", "increment");
+                                RequestOptions usageRequestOptions = RequestOptions.builder().
+                                        setStripeAccount(ConnectId).setIdempotencyKey(subscriptionItem.getId() +
+                                        lastPublishedTimeStamp.toString()).build();
+                                UsageRecord usageRecord = UsageRecord.createOnSubscriptionItem(
+                                        subscriptionItem.getId(), usageRecordParams, usageRequestOptions);
+                                if (usageRecord.getId() != null) {
+                                    counter++;
+                                    if (log.isDebugEnabled()) {
+                                        String msg = "Usage for "+ apiName+ " by Application with ID " + applicationId +
+                                           "is successfully published to Stripe";
+                                        log.info(msg);
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
         } catch (APIManagementException ex) {
-            String msg = "Error in publishing usage data to Stripe";
-            throw new APIManagementException(ex.getMessage());
+            String msg = ex.getLocalizedMessage();
+            publishStatusDTO.setStatus("Unsuccessfull");
+            publishStatusDTO.setMessage(msg);
+            log.error(msg);
+            return Response.serverError().entity(publishStatusDTO).build();
         } catch (StripeException ex) {
-            log.error("STRIPE ERROR : " + ex.getMessage());
-            throw new APIManagementException(ex.getMessage());
+            String msg = "STRIPE ERROR : " + ex.getMessage();
+            publishStatusDTO.setStatus("Unsuccessfull");
+            publishStatusDTO.setMessage(msg);
+            log.error(msg);
+            return Response.serverError().entity(publishStatusDTO).build();
         }
 
         if(flag == counter){
@@ -166,13 +185,18 @@ public class MonetizationImpl implements Monetization {
                 registry.put(MonetizationConstants.UsagePublisher.LAST_PUBSLISHH_TIME_REG_LOCATION, resource);
                 PrivilegedCarbonContext.endTenantFlow();
             }catch(RegistryException ex){
-                String msg= "Registry Objects could not be found";
-                handleException(msg,ex);
+                String msg= "Could not update last published time , Registry Objects could not be found";
+                log.error(msg,ex);
             }
+            publishStatusDTO.setStatus("Successfull");
+            publishStatusDTO.setMessage("All the records are published successfully");
+            return Response.ok().entity(publishStatusDTO).build();
         } else if(counter > 0 && counter < flag){
-
-        }
-        return null;
+            publishStatusDTO.setStatus("Partially Successfull");
+            publishStatusDTO.setMessage("Some of the records were not published sucessfully");
+            return Response.ok().entity(publishStatusDTO).build();
+        }*/
+        return Response.ok().entity("log").build();
     }
 
     public String getPlatformAccountStripeKey(String tenantDomain) throws APIManagementException{

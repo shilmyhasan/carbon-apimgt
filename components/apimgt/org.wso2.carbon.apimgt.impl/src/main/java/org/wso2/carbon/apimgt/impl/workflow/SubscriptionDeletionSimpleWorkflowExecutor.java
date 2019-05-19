@@ -26,7 +26,7 @@ import org.pdfbox.pdmodel.graphics.predictor.Sub;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.WorkflowResponse;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
-import org.wso2.carbon.apimgt.impl.StripeSubscription;
+import org.wso2.carbon.apimgt.api.model.MonetizedSubscription;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dto.SubscriptionWorkflowDTO;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
@@ -67,29 +67,36 @@ public class SubscriptionDeletionSimpleWorkflowExecutor extends WorkflowExecutor
     public  WorkflowResponse deleteMonetizedSubscription(WorkflowDTO workflowDTO) throws WorkflowException {
 
         SubscriptionWorkflowDTO subWorkflowDTO;
-        StripeSubscription stripeSubscription;
+        MonetizedSubscription monetizedSubscription;
         Stripe.apiKey = "sk_test_1Y8cd8EgnY1KYtBcs1vObHUF00020Je2H4";
         String ConnectId="acct_1EQF7PCxKhMnrBL5";
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
         subWorkflowDTO = (SubscriptionWorkflowDTO) workflowDTO;
 
+        //TODO get the connect ID from API
         RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(ConnectId).build();
         try {
-            stripeSubscription = apiMgtDAO.getStripeSubscription(subWorkflowDTO.getApiName(),
+            monetizedSubscription = apiMgtDAO.getMonetizedSubscription(subWorkflowDTO.getApiName(),
                     subWorkflowDTO.getApiVersion(), subWorkflowDTO.getApiProvider(), subWorkflowDTO.getApplicationId(),
                     subWorkflowDTO.getTenantDomain());
         }catch (APIManagementException ex){
-            throw new WorkflowException(""+ex);
+            throw new WorkflowException("Could not complete subscription deletion workflow",ex);
         }
 
-        if(stripeSubscription.getSubscriptionId() != null){
+        if(monetizedSubscription.getSubscriptionId() != null){
             try {
-                Subscription subscription = Subscription.retrieve(stripeSubscription.getSubscriptionId(), requestOptions);
+                Subscription subscription = Subscription.retrieve(monetizedSubscription.getSubscriptionId(),
+                        requestOptions);
                 Map<String, Object> params = new HashMap<>();
                 params.put("invoice_now", true);
                 subscription = subscription.cancel(params,requestOptions);
                 if(subscription.getStatus().equals("canceled")) {
-                    apiMgtDAO.removeStripeSubscription(stripeSubscription.getId());
+                    apiMgtDAO.removeMonetizedSubscription(monetizedSubscription.getId());
+                }
+                if(log.isDebugEnabled()){
+                    String msg = "Monetized Subscriprion for API : "+subWorkflowDTO.getApiName()+" by Application : "
+                            +subWorkflowDTO.getApplicationName()+ " is removed successfully ";
+                    log.debug(msg);
                 }
             }catch (StripeException ex)
             {

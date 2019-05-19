@@ -1,6 +1,6 @@
-package org.wso2.carbon.apimgt.impl;
+package org.wso2.carbon.apimgt.api.model;
 
-public class StripeSubscription {
+public class MonetizedSubscription {
 
     public int getId() {
 

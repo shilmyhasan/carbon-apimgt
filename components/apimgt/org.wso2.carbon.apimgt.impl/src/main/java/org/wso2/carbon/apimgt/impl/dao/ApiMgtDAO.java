@@ -44,11 +44,12 @@ import org.wso2.carbon.apimgt.api.model.Comment;
 import org.wso2.carbon.apimgt.api.model.KeyManager;
 import org.wso2.carbon.apimgt.api.model.Label;
 import org.wso2.carbon.apimgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.apimgt.api.model.MonetizationPlatformCustomer;
+import org.wso2.carbon.apimgt.api.model.MonetizationSharedCustomer;
+import org.wso2.carbon.apimgt.api.model.MonetizedSubscription;
 import org.wso2.carbon.apimgt.api.model.OAuthAppRequest;
 import org.wso2.carbon.apimgt.api.model.OAuthApplicationInfo;
 import org.wso2.carbon.apimgt.api.model.Scope;
-import org.wso2.carbon.apimgt.api.model.StripeCustomer;
-import org.wso2.carbon.apimgt.api.model.StripeSharedCustomer;
 import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
 import org.wso2.carbon.apimgt.api.model.Subscriber;
 import org.wso2.carbon.apimgt.api.model.Tier;
@@ -70,7 +71,6 @@ import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
-import org.wso2.carbon.apimgt.impl.StripeSubscription;
 import org.wso2.carbon.apimgt.impl.ThrottlePolicyConstants;
 import org.wso2.carbon.apimgt.impl.dao.constants.SQLConstants;
 import org.wso2.carbon.apimgt.impl.dto.APIInfoDTO;
@@ -664,7 +664,7 @@ public class ApiMgtDAO {
         return isAnyContentAware;
     }
 
-    public int addStripeCustomer(int subscriberId, int tenantId, String customerId) throws APIManagementException {
+    public int addMonetizationPlatformCustomer(int subscriberId, int tenantId, String customerId) throws APIManagementException {
         Connection conn = null;
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -674,7 +674,7 @@ public class ApiMgtDAO {
             conn = APIMgtDBUtil.getConnection();
             conn.setAutoCommit(false);
 
-            String query = SQLConstants.ADD_STRIPE_CUSTOMER_SQL;
+            String query = SQLConstants.ADD_MS_PLATFORM_CUSTOMER_SQL;
             ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             ps.setInt(1, subscriberId);
@@ -698,7 +698,7 @@ public class ApiMgtDAO {
         return id;
     }
 
-    public int addStripeSharedCustomer(StripeSharedCustomer sharedCustomer) throws APIManagementException {
+    public int addMSSharedCustomer(MonetizationSharedCustomer sharedCustomer) throws APIManagementException {
         Connection conn = null;
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -708,7 +708,7 @@ public class ApiMgtDAO {
             conn = APIMgtDBUtil.getConnection();
             conn.setAutoCommit(false);
 
-            String query = SQLConstants.ADD_STRIPE_SHARED_CUSTOMER_SQL;
+            String query = SQLConstants.ADD_MS_SHARED_CUSTOMER_SQL;
             ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             ps.setInt(1, sharedCustomer.getApplicationId());
@@ -734,7 +734,7 @@ public class ApiMgtDAO {
         return id;
     }
 
-    public void addStripeSubscription(APIIdentifier identifier, int applicationId, int tenandId,
+    public void addMSSubscription(APIIdentifier identifier, int applicationId, int tenandId,
                                       int sharedCustomerId, String subscriptionId) throws APIManagementException {
         Connection conn = null;
         ResultSet rs = null;
@@ -748,7 +748,7 @@ public class ApiMgtDAO {
             conn.setAutoCommit(false);
             apiId = getAPIID(identifier, conn);
 
-            String query = SQLConstants.ADD_STRIPE_SUBSCRIPTION_SQL;
+            String query = SQLConstants.ADD_MS_SUBSCRIPTION_SQL;
             ps = conn.prepareStatement(query);
 
             ps.setInt(1, apiId);
@@ -1305,15 +1305,14 @@ public class ApiMgtDAO {
         return subscriber;
     }
 
-    public StripeCustomer getStripeCustomer(int subscriberId , int tenantId) throws APIManagementException{
+    public MonetizationPlatformCustomer getPlatformCustomer(int subscriberId , int tenantId) throws APIManagementException{
         Connection conn = null;
-        StripeCustomer customer = null;
         PreparedStatement ps = null;
         ResultSet result = null;
         String customerId = null;
-        StripeCustomer strCustomer = new StripeCustomer();
+        MonetizationPlatformCustomer monetizationPlatformCustomer = new MonetizationPlatformCustomer();
 
-        String sqlQuery = SQLConstants.GET_STRIPE_CUSTOMER_SQL;
+        String sqlQuery = SQLConstants.GET_MS_PLATFORM_CUSTOMER_SQL;
         /*if (forceCaseInsensitiveComparisons) {
             sqlQuery = SQLConstants.GET_TENANT_SUBSCRIBER_CASE_INSENSITIVE_SQL;
         }*/
@@ -1326,33 +1325,27 @@ public class ApiMgtDAO {
             result = ps.executeQuery();
 
             if (result.next()) {
-                strCustomer.setId(result.getInt("ID"));
-                strCustomer.setCustomerId(result.getString("CUSTOMER_ID"));
+                monetizationPlatformCustomer.setId(result.getInt("ID"));
+                monetizationPlatformCustomer.setCustomerId(result.getString("CUSTOMER_ID"));
             }
         } catch (SQLException e) {
-            handleException("Failed to get Stripe Customer :" , e);
+            handleException("Failed to get Monetization Platform Customer :" , e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, result);
         }
-        return strCustomer;
+        return monetizationPlatformCustomer;
     }
 
-    public StripeSharedCustomer getStripeSharedCustomer(int applicationId, String apiProvider,
-                                          int tenantId) throws APIManagementException{
+    public MonetizationSharedCustomer getSharedCustomer(int applicationId, String apiProvider,
+                                                        int tenantId) throws APIManagementException{
         Connection conn = null;
-        StripeCustomer customer = null;
         PreparedStatement ps = null;
         ResultSet result = null;
-        StripeSharedCustomer sharedCustomer = new StripeSharedCustomer();
+        MonetizationSharedCustomer monetizationSharedCustomer = new MonetizationSharedCustomer();
 
-        String sqlQuery = SQLConstants.GET_STRIPE_SHARED_CUSTOMER_SQL;
-        /*if (forceCaseInsensitiveComparisons) {
-            sqlQuery = SQLConstants.GET_TENANT_SUBSCRIBER_CASE_INSENSITIVE_SQL;
-        }*/
+        String sqlQuery = SQLConstants.GET_MS_SHARED_CUSTOMER_SQL;
         try {
-
             conn = APIMgtDBUtil.getConnection();
-
             ps = conn.prepareStatement(sqlQuery);
             ps.setInt(1, applicationId);
             ps.setString(2, apiProvider);
@@ -1360,57 +1353,46 @@ public class ApiMgtDAO {
             result = ps.executeQuery();
 
             if (result.next()) {
-                sharedCustomer.setId(result.getInt("ID"));
-                sharedCustomer.setSharedCustomerId(result.getString("SHARED_CUSTOMER_ID"));
+                monetizationSharedCustomer.setId(result.getInt("ID"));
+                monetizationSharedCustomer.setSharedCustomerId(result.getString("SHARED_CUSTOMER_ID"));
             }
         } catch (SQLException e) {
-            handleException("Failed to get Shared customer : ", e);
+            handleException("Failed to get Monetization Shared customer : ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, result);
         }
-        return sharedCustomer;
+        return monetizationSharedCustomer;
     }
 
-    public void removeStripeSubscription(int id) throws APIManagementException{
+    public void removeMonetizedSubscription(int id) throws APIManagementException{
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet result = null;
-        String subscriptionId = null;
-        StripeSubscription strSubscription = new StripeSubscription();
 
-        String sqlQuery = SQLConstants.DELETE_STRIPE_SUBSCRIPTION_SQL;
-        /*if (forceCaseInsensitiveComparisons) {
-            sqlQuery = SQLConstants.GET_TENANT_SUBSCRIBER_CASE_INSENSITIVE_SQL;
-        }*/
+        String sqlQuery = SQLConstants.DELETE_MS_SUBSCRIPTION_SQL;
         try {
-
             conn = APIMgtDBUtil.getConnection();
-
             ps = conn.prepareStatement(sqlQuery);
             ps.setInt(1, id);
             ps.executeUpdate();
-
         } catch (SQLException e) {
-            handleException("Failed to remove Subscribtion: " , e);
+            handleException("Failed to remove Monetization Subscription: " , e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, result);
         }
     }
 
-    public StripeSubscription getStripeSubscription(String apiName, String apiVersion ,String apiProvider, int applicationId,
-                                                    String tenantDomain ) throws APIManagementException{
+    public MonetizedSubscription getMonetizedSubscription(String apiName, String apiVersion , String apiProvider, int applicationId,
+                                                                    String tenantDomain ) throws APIManagementException{
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet result = null;
         String subscriptionId = null;
-        StripeSubscription strSubscription = new StripeSubscription();
-
-        String sqlQuery = SQLConstants.GET_STRIPE_SUBSCRIPTION_SQL;
-        /*if (forceCaseInsensitiveComparisons) {
-            sqlQuery = SQLConstants.GET_TENANT_SUBSCRIBER_CASE_INSENSITIVE_SQL;
-        }*/
+        MonetizedSubscription monetizedSubscription = new MonetizedSubscription();
         int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
         APIIdentifier identifier = new APIIdentifier(apiProvider,apiName, apiVersion);
+
+        String sqlQuery = SQLConstants.GET_MS_SUBSCRIPTION_SQL;
         try {
 
             conn = APIMgtDBUtil.getConnection();
@@ -1423,15 +1405,15 @@ public class ApiMgtDAO {
             result = ps.executeQuery();
 
             if (result.next()) {
-                strSubscription.setId(result.getInt("ID"));
-                strSubscription.setSubscriptionId(result.getString("SUBSCRIPTION_ID"));
+                monetizedSubscription.setId(result.getInt("ID"));
+                monetizedSubscription.setSubscriptionId(result.getString("SUBSCRIPTION_ID"));
             }
         } catch (SQLException e) {
             handleException("Failed to get Subscribtion: " , e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, result);
         }
-        return strSubscription;
+        return monetizedSubscription;
     }
 
 

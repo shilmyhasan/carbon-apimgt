@@ -1,0 +1,3 @@
+2019-05-19 23:18:17,097 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2019-05-19 23:18:17,097 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2019-05-19 23:18:17,098 - ResourceManager : found repository/resources/policy_templates/throttle_policy_template_app.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
