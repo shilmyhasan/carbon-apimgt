@@ -2,20 +2,28 @@ package org.wso2.carbon.apimgt.impl.caching;
 
 public final class MonetizationConstants {
 
-    public static final String customer = "customer";
-    public static final String plan = "plan";
-
     public static final String API_NAME = "apiName";
     public static final String API_VERSION = "apiVersion";
     public static final String APPLICATION_ID = "applicationId";
     public static final String API_PROVIDER_TENANT_DOMAIN = "apiCreatorTenantDomain";
     public static final String API_PROVIDER = "apiCreator";
-    public static final String TIMESTAMP_PATTERN="yyyy-MM-dd HH:mm:ss";
+    public static final String TIMESTAMP_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String QUANTITY = "quantity";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String MONETIZATION_INFO = "MonetizationInfo";
 
-    public static class StripeCustomer{
-        public static final String description = "description";
-        public static final String email = "email";
-        public static final String source = "source";
+
+    public static class Stripe{
+        public static final String PLATFORM_ACCOUNT_STRIPE_KEY = "PlatformAccountStripeKey";
+        public static final String CUSTOMER = "customer";
+        public static final String PLAN = "plan";
+        public static final String METERED_PLAN = "metered";
+        public static final String CUSTOMER_DESCRIPTION = "description";
+        public static final String CUSTOMER_EMAIL = "email";
+        public static final String CUSTOMER_SOURCE = "source";
+        public static final String ITEMS = "items";
+        public static final String ACTION = "action";
+        public static final String INCREMENT = "increment";
     }
 
     public static class UsagePublisher{

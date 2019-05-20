@@ -107,7 +107,7 @@ public class SubscriptionCreationSimpleWorkflowExecutor extends WorkflowExecutor
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
         subWorkFlowDTO = (SubscriptionWorkflowDTO) workflowDTO;
 
-        Stripe.apiKey = getPlatformAccountStripeKey(subWorkFlowDTO.getTenantId());
+        Stripe.apiKey = getPlatformAccountKey(subWorkFlowDTO.getTenantId());
         RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(ConnectId).build();
 
         try {
@@ -144,7 +144,7 @@ public class SubscriptionCreationSimpleWorkflowExecutor extends WorkflowExecutor
      * @return the stripe key of the platform/tenant
      * @throws WorkflowException
      */
-    public String getPlatformAccountStripeKey(int tenantId) throws WorkflowException{
+    private String getPlatformAccountKey(int tenantId) throws WorkflowException{
         String stripePlatformAccountKey = null;
         try{
             Registry configRegistry = ServiceReferenceHolder.getInstance().getRegistryService().getConfigSystemRegistry(
@@ -159,8 +159,9 @@ public class SubscriptionCreationSimpleWorkflowExecutor extends WorkflowExecutor
                 }
                 //get the stripe key of patform account from tenant conf file
                 JSONObject tenantConfig = (JSONObject) new JSONParser().parse(content);
-                JSONObject monetizationInfo = (JSONObject) tenantConfig.get("MonetizationInfo");
-                stripePlatformAccountKey = monetizationInfo.get("PlatformAccountStripeKey").toString();
+                JSONObject monetizationInfo = (JSONObject) tenantConfig.get(MonetizationConstants.MONETIZATION_INFO);
+                stripePlatformAccountKey = monetizationInfo.get(
+                        MonetizationConstants.Stripe.PLATFORM_ACCOUNT_STRIPE_KEY).toString();
 
                 if (StringUtils.isBlank(stripePlatformAccountKey)) {
                     throw new WorkflowException("stripePlatformAccountKey is empty!!!");
@@ -192,7 +193,7 @@ public class SubscriptionCreationSimpleWorkflowExecutor extends WorkflowExecutor
         Token token = new Token();
         try {
             Map<String, Object> params = new HashMap<String, Object>();
-            params.put("customer", platformCustomer.getCustomerId());
+            params.put(MonetizationConstants.Stripe.CUSTOMER, platformCustomer.getCustomerId());
             token = Token.create(params, requestOptions);
         }catch (StripeException ex){
             String errorMsg = "Error when creating a stripe token for"+platformCustomer.getSubscriberName();
@@ -202,12 +203,12 @@ public class SubscriptionCreationSimpleWorkflowExecutor extends WorkflowExecutor
 
         Map<String, Object> sharedCustomerParams = new HashMap<>();
         if(!email.equals("")) {
-            sharedCustomerParams.put(MonetizationConstants.StripeCustomer.email,email);
+            sharedCustomerParams.put(MonetizationConstants.Stripe.CUSTOMER_EMAIL, email);
         }
         try {
-            sharedCustomerParams.put(MonetizationConstants.StripeCustomer.description, "Shared Customer for "
+            sharedCustomerParams.put(MonetizationConstants.Stripe.CUSTOMER_DESCRIPTION, "Shared Customer for "
                     + subWorkFlowDTO.getApplicationName() + " / " + subWorkFlowDTO.getSubscriber());
-            sharedCustomerParams.put(MonetizationConstants.StripeCustomer.source, token.getId());
+            sharedCustomerParams.put(MonetizationConstants.Stripe.CUSTOMER_SOURCE, token.getId());
             stripeCustomer = Customer.create(sharedCustomerParams, requestOptions);
             try {
                 monetizationSharedCustomer.setApplicationId(subWorkFlowDTO.getApplicationId());
@@ -260,15 +261,12 @@ public class SubscriptionCreationSimpleWorkflowExecutor extends WorkflowExecutor
 
         try {
             Map<String, Object> item = new HashMap<String, Object>();
-            item.put(MonetizationConstants.plan, planId);
+            item.put(MonetizationConstants.Stripe.PLAN, planId);
             Map<String, Object> items = new HashMap<String, Object>();
             items.put("0", item);
             Map<String, Object> subParams = new HashMap<String, Object>();
-            subParams.put(MonetizationConstants.customer, sharedCustomer.getSharedCustomerId());
-            subParams.put("items", items);
-            List<String> expandList = new LinkedList<String>();
-            expandList.add("latest_invoice.payment_intent");
-
+            subParams.put(MonetizationConstants.Stripe.CUSTOMER, sharedCustomer.getSharedCustomerId());
+            subParams.put(MonetizationConstants.Stripe.ITEMS, items);
             try {
                 //create a subscritpion in stripe under the API Providers Connected Account
                 subscription = Subscription.create(subParams, requestOptions);
@@ -315,11 +313,11 @@ public class SubscriptionCreationSimpleWorkflowExecutor extends WorkflowExecutor
         try {
             Map<String, Object> customerParams = new HashMap<String, Object>();
             if (!subscriber.getEmail().equals("")) {
-                customerParams.put(MonetizationConstants.StripeCustomer.email, subscriber.getEmail());
+                customerParams.put(MonetizationConstants.Stripe.CUSTOMER_EMAIL, subscriber.getEmail());
             }
-            customerParams.put(MonetizationConstants.StripeCustomer.description, "Customer for "
+            customerParams.put(MonetizationConstants.Stripe.CUSTOMER_DESCRIPTION, "Customer for "
                     + subscriber.getName());
-            customerParams.put(MonetizationConstants.StripeCustomer.source, "tok_visa");
+            customerParams.put(MonetizationConstants.Stripe.CUSTOMER_SOURCE, "tok_visa");
             customer = Customer.create(customerParams);
             monetizationPlatformCustomer.setCustomerId(customer.getId());
             try {

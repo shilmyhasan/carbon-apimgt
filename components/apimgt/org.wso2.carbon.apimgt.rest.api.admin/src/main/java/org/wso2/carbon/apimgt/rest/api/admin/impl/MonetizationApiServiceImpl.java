@@ -22,6 +22,7 @@ public class MonetizationApiServiceImpl extends MonetizationApiService {
     public Response monetizationPublishUsagePost(){
         /*MonetizationImpl monetizationImpl = new MonetizationImpl();
         Response response = monetizationImpl.publishMonetizationUsageRecord();*/
-        return Response.ok().entity("").build();
+        PublishStatusDTO publishStatusDTO = new PublishStatusDTO();
+        return Response.ok().entity(publishStatusDTO).build();
     }
 }
