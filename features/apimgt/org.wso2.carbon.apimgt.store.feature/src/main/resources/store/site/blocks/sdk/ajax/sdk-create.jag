@@ -4,7 +4,7 @@ include("/jagg/jagg.jag");
     var site = require("/site/conf/site.json");
     var ssoEnabled = site.ssoConfiguration.enabled;
     response.contentType = "application/json; charset=UTF-8";
-    var mod, obj, result, username , apiName, apiVersion,
+    var mod, obj, result, username , apiName, apiVersion, tenant, provider,
             msg = require("/site/conf/ui-messages.jag"),
             action = request.getParameter("action"),
             user = jagg.getUser();
@@ -55,8 +55,12 @@ include("/jagg/jagg.jag");
             apiVersion = null;
         }
 
+        tenant = jagg.getTenantDomain();
+        if (tenant === null) {
+            //If no tenant name provided in the query params, We assume that user is in super tenant
+            tenant = org.wso2.carbon.apimgt.impl.APIConstants.SUPER_TENANT_DOMAIN;
+        }
 
-        tenant = String(jagg.getTenantDomain());
         var APIUtil = org.wso2.carbon.apimgt.impl.utils.APIUtil;
         // If can't find the provider , "null" String will be returned
         provider = String(APIUtil.getAPIProviderFromAPINameVersionTenant(apiName, apiVersion, tenant));
