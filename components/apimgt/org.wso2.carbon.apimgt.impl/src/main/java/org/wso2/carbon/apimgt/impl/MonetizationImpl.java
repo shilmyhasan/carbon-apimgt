@@ -24,7 +24,6 @@ import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
-import org.wso2.carbon.user.api.UserStoreException;
 
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
@@ -81,7 +80,7 @@ public class MonetizationImpl implements Monetization {
         }catch(RegistryException ex){
             String msg = "Could not derive last published time , Error while obtaining registry objects";
             log.error(msg, ex);
-
+            return Response.serverError().entity("Error while obtaining registry objects").build();
         }
 
         StringBuilder query = new StringBuilder(
@@ -163,10 +162,11 @@ public class MonetizationImpl implements Monetization {
         } catch (APIManagementException ex) {
             String msg = "Unable to Publish usage Record";
             log.error(msg);
-
+            return Response.serverError().entity("Unable to Publish usage Record").build();
         } catch (StripeException ex) {
             String msg = "Unable to Publish usage Record";
             log.error(msg);
+            return Response.serverError().entity("Unable to Publish usage Record").build();
         }
 
         if(flag == counter){
@@ -182,11 +182,13 @@ public class MonetizationImpl implements Monetization {
             }catch(RegistryException ex){
                 String msg= "Could not update last published time , Registry Objects could not be found";
                 log.error(msg,ex);
+                return Response.serverError().entity("Registry Objects could not be found").build();
             }
+            return Response.ok().entity("SuccessFull").build();
         } else if(counter > 0 && counter < flag){
-
+            return Response.ok().entity("Partially Successfull").build();
         }
-        return Response.ok().entity("log").build();
+        return null;
     }
 
   /*  public String getPlatformAccountStripeKey(String tenantDomain) throws APIManagementException{

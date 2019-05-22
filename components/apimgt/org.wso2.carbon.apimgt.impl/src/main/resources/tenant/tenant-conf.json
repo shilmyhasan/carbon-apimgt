@@ -71,7 +71,12 @@
       {
         "Name": "apim:label_read",
         "Roles": "admin"
+      },
+      {
+        "Name" : "apim:monetization_usage_publish",
+        "Roles": "admin"
       }
+
     ]
   },
   "NotificationsEnabled":"false",
