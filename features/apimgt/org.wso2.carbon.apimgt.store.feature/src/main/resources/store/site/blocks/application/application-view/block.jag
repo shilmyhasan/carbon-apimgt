@@ -20,6 +20,7 @@ jagg.block("application/application-view", {
             application = result.application;
 
             var result2 = jagg.module("subscription").getAllSubscriptionsOfApplicationById(username, applicationId, 0, 10);
+	        var scopeList = jagg.module("subscription").getAllScopesOfApplicationSubscription(username, applicationId);
 
             var log = new Log();
 
@@ -29,7 +30,7 @@ jagg.block("application/application-view", {
                 for(i=0;i < result2.applications.length;i++){
                     if(result2.applications[i].name == applicationName){
                         oauthapp = result2.applications[i];
-                        scopes = oauthapp.scopes;
+                        scopes = scopeList.result.scopes;
                     }
                 }
             }

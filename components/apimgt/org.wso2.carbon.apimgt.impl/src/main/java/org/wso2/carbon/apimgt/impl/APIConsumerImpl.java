@@ -2332,7 +2332,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
     public Integer getSubscriptionCount(Subscriber subscriber,String applicationName,String groupingId)
             throws APIManagementException {
-        return apiMgtDAO.getSubscriptionCount(subscriber,applicationName,groupingId);
+        return apiMgtDAO.getSubscriptionCount(subscriber,applicationName, groupingId);
     }
 
     public Integer getSubscriptionCountByApplicationId(Subscriber subscriber, int applicationId, String groupingId)
@@ -3662,6 +3662,11 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     	return true;
     }
 
+    public Set<Scope> getScopesForApplicationSubscription(Subscriber subscriber, int applicationId)
+            throws APIManagementException {
+        return apiMgtDAO.getScopesForApplicationSubscription(subscriber, applicationId);
+    }
+
 	@Override
 	public Set<API> searchAPI(String searchTerm, String searchType, String tenantDomain)
 	                                                                                    throws APIManagementException {
@@ -3674,8 +3679,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 	}
 
 	public String getScopesByToken(String accessToken) throws APIManagementException {
-		return null;
-	}
+        return null;
+    }
 
 	public Set<Scope> getScopesByScopeKeys(String scopeKeys, int tenantId)
 			throws APIManagementException {

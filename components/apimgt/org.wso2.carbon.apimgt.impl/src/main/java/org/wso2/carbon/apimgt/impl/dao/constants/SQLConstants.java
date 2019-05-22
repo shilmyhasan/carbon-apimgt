@@ -691,6 +691,22 @@ public class SQLConstants {
                     "   AND APP.APPLICATION_ID= ? " +
                     "   AND SUBS.SUBS_CREATE_STATE = '" + APIConstants.SubscriptionCreatedStatus.SUBSCRIBE + "'";
 
+    public static final String GET_SUBSCRIBED_API_IDs_BY_APP_ID_SQL =
+            " SELECT " +
+            "   API.API_ID " +
+            " FROM " +
+            "   AM_SUBSCRIBER SUB," +
+            "   AM_APPLICATION APP, " +
+            "   AM_SUBSCRIPTION SUBS, " +
+            "   AM_API API " +
+            " WHERE " +
+            "   SUB.TENANT_ID = ? " +
+            "   AND SUB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID " +
+            "   AND APP.APPLICATION_ID=SUBS.APPLICATION_ID " +
+            "   AND API.API_ID=SUBS.API_ID" +
+            "   AND APP.APPLICATION_ID= ? " +
+            "   AND SUBS.SUBS_CREATE_STATE = '" + APIConstants.SubscriptionCreatedStatus.SUBSCRIBE + "'";
+
     public static final String GET_SUBSCRIBED_APIS_OF_SUBSCRIBER_SQL =
             " SELECT " +
             "   SUBS.SUBSCRIPTION_ID AS SUBS_ID, " +

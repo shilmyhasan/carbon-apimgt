@@ -758,6 +758,17 @@ public interface APIConsumer extends APIManager {
 	 */
 	Set<Scope> getScopesBySubscribedAPIs(List<APIIdentifier> identifiers) throws APIManagementException;
 
+    /**
+     * Returns a set of scopes associated with a list of API identifiers.
+     *
+     * @param subscriber    subscriber of the application
+     * @param applicationId applicationId of the application
+     * @return set of scopes.
+     * @throws APIManagementException
+     */
+    Set<Scope> getScopesForApplicationSubscription(Subscriber subscriber, int applicationId)
+            throws APIManagementException;
+
 	/**
 	 * Returns the scopes of an access token as a string
 	 *

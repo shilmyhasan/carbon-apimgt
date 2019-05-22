@@ -68,6 +68,29 @@ var getAllSubscriptionsOfApplicationById = function (username, selectedAppId, st
     }
 };
 
+var getAllScopesOfApplicationSubscription = function (username, selectedAppId)  {
+    var result,
+    log = new Log(),
+    store = jagg.module("manager").getAPIStoreObj();
+    try {
+	    result = store.getAllScopesOfApplication(username , selectedAppId);
+        log.info(result.result);
+        if (log.isDebugEnabled()) {
+            log.debug("getAllScopesOfApplicationSubscription : " + stringify(result));
+        }
+        return {
+            error:false,
+            result:result
+        };
+    } catch (e) {
+        log.error(e);
+        return {
+            error:true,
+            result:e
+        };
+    }
+};
+
 var getAPISubscriptions = function (api, username) {
     var subscriptions,
             log = new Log(),
