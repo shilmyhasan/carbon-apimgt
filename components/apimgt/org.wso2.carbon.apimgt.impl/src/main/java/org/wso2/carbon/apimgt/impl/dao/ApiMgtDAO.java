@@ -8207,7 +8207,6 @@ public class ApiMgtDAO {
             throws APIManagementException {
 
         Connection connection = null;
-        ResultSet resultSet = null;
         PreparedStatement ps = null;
         HashMap<String, Scope> scopeHashMap = new HashMap<>();
         ResultSet result = null;
@@ -8225,7 +8224,7 @@ public class ApiMgtDAO {
             try (PreparedStatement statement = conn.prepareStatement(sqlQuery)) {
                 statement.setInt(1, tenantId);
                 statement.setInt(2, applicationId);
-                try (resultSet = statement.executeQuery()) {
+                try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
                         Scope scope;
                         String scopeKey = resultSet.getString(1);
