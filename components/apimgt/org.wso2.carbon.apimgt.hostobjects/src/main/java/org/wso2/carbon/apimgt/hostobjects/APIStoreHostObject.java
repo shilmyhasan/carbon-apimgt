@@ -3275,46 +3275,6 @@ public class APIStoreHostObject extends ScriptableObject {
 
         return result;
     }
-
-    public static NativeObject jsFunction_getAllScopesOfApplication(Context cx, Scriptable thisObj,
-                                                                    Object[] args, Function funObj)
-            throws ScriptException, APIManagementException, ApplicationNotFoundException {
-        return getAllScopesForApplicationSubscription(cx, thisObj, args, funObj, true);
-    }
-
-    public static NativeObject getAllScopesForApplicationSubscription(Context cx, Scriptable thisObj, Object[] args,
-                                                                      Function funObj, boolean isFirstOnly)
-            throws ScriptException, APIManagementException, ApplicationNotFoundException {
-
-        NativeObject result = new NativeObject();
-        String username = args[0].toString();
-        int appId = Integer.parseInt(args[1].toString());
-        Set<Scope> scopeSet = new LinkedHashSet<Scope>();
-        NativeArray scopesArray = new NativeArray(0);
-
-        boolean isTenantFlowStarted = false;
-        String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(username));
-        if (tenantDomain != null &&
-                !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-            isTenantFlowStarted = true;
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-        }
-
-        Subscriber subscriber = new Subscriber(username);
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        scopeSet = apiConsumer.getScopesForApplicationSubscription(subscriber, appId);
-        for (Scope scope : scopeSet) {
-            NativeObject scopeObj = new NativeObject();
-            scopeObj.put("scopeKey", scopeObj, scope.getKey());
-            scopeObj.put("scopeName", scopeObj, scope.getName());
-            scopesArray.put(scopesArray.getIds().length, scopesArray, scopeObj);
-        }
-
-        result.put("scopes", result, scopesArray);
-        return result;
-    }
-
     public static NativeObject jsFunction_getAllSubscriptionsOfApplication(Context cx,
                                                                            Scriptable thisObj, Object[] args, Function funObj)
             throws ScriptException, APIManagementException, ApplicationNotFoundException {

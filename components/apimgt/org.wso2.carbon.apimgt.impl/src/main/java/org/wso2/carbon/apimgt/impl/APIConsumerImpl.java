@@ -3679,9 +3679,23 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     	return true;
     }
 
-    public Set<Scope> getScopesForApplicationSubscription(Subscriber subscriber, int applicationId)
+    public JSONArray getScopesForApplicationSubscription(String username, int applicationId)
             throws APIManagementException {
-        return apiMgtDAO.getScopesForApplicationSubscription(subscriber, applicationId);
+        Set<Scope> scopeSet = new LinkedHashSet<Scope>();
+        JSONObject scopeList = new JSONObject();
+        JSONArray scopeArray = new JSONArray();
+
+        Subscriber subscriber = new Subscriber(username);
+        scopeSet = apiMgtDAO.getScopesForApplicationSubscription(subscriber, applicationId);
+
+        for (Scope scope : scopeSet) {
+            JSONObject scopeObj = new JSONObject();
+            scopeObj.put("scopeKey", scope.getKey());
+            scopeObj.put("scopeName", scope.getName());
+
+            scopeArray.add(scopeObj);
+        }
+        return scopeArray;
     }
 
 	@Override
