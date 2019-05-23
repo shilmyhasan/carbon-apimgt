@@ -3275,7 +3275,6 @@ public class APIStoreHostObject extends ScriptableObject {
 
         return result;
     }
-
     public static NativeObject jsFunction_getAllSubscriptionsOfApplication(Context cx,
                                                                            Scriptable thisObj, Object[] args, Function funObj)
             throws ScriptException, APIManagementException, ApplicationNotFoundException {
