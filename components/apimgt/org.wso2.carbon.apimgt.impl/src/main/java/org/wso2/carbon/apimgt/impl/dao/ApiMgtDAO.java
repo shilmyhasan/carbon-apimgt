@@ -8222,29 +8222,27 @@ public class ApiMgtDAO {
                 sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_ORACLE_SQL + sqlQueryforGetSubscribedApis +
                         SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
             }
-
             try (PreparedStatement statement = conn.prepareStatement(sqlQuery)) {
                 statement.setInt(1, tenantId);
                 statement.setInt(2, applicationId);
-                resultSet = statement.executeQuery();
-                while (resultSet.next()) {
-                    Scope scope;
-                    String scopeKey = resultSet.getString(1);
-                    if (scopeHashMap.containsKey(scopeKey)) {
-                        // scope already exists append roles.
-                        scope = scopeHashMap.get(scopeKey);
-                        scope.setRoles(scope.getRoles().concat("," + resultSet.getString(4)).trim());
-                    } else {
-                        scope = new Scope();
-                        scope.setKey(scopeKey);
-                        scope.setName(resultSet.getString(2));
-                        scope.setDescription(resultSet.getString(3));
-                        scope.setRoles(resultSet.getString(4).trim());
+                try (resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        Scope scope;
+                        String scopeKey = resultSet.getString(1);
+                        if (scopeHashMap.containsKey(scopeKey)) {
+                            // scope already exists append roles.
+                            scope = scopeHashMap.get(scopeKey);
+                            scope.setRoles(scope.getRoles().concat("," + resultSet.getString(4)).trim());
+                        } else {
+                            scope = new Scope();
+                            scope.setKey(scopeKey);
+                            scope.setName(resultSet.getString(2));
+                            scope.setDescription(resultSet.getString(3));
+                            scope.setRoles(resultSet.getString(4).trim());
+                        }
+                        scopeHashMap.put(scopeKey, scope);
                     }
-                    scopeHashMap.put(scopeKey, scope);
                 }
-            } catch (SQLException e) {
-                handleException("Failed to retrieve scopes ", e);
             }
         } catch (SQLException e) {
             handleException("Failed to retrieve scopes ", e);
