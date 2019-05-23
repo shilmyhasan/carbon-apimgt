@@ -74,7 +74,6 @@ var getAllScopesOfApplicationSubscription = function (username, selectedAppId)  
     store = jagg.module("manager"). getAPIConsumerObj();
     try {
 	    result = store.getScopesForApplicationSubscription(username , selectedAppId);
-        log.info(result.result);
         if (log.isDebugEnabled()) {
             log.debug("getAllScopesOfApplicationSubscription : " + stringify(result));
         }
