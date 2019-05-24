@@ -169,7 +169,7 @@ public class APIKeyValidator {
             initializeGatewayResourceCache(getTenantDomain());
             APIManagerConfiguration config = getApiManagerConfiguration();
             String gatewayTokenCacheExpiry = config.getFirstProperty(APIConstants.GATEWAY_RESOURCE_CACHE_TIMEOUT);
-            if(gatewayTokenCacheExpiry != null) {
+            if (gatewayTokenCacheExpiry != null) {
                 return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants.RESOURCE_CACHE_NAME,
                         Long.parseLong(gatewayTokenCacheExpiry), Long.parseLong(gatewayTokenCacheExpiry));
             } else {
@@ -829,11 +829,8 @@ public class APIKeyValidator {
 
     private class CacheExpirationConfig {
         private boolean gatewayKeyCacheInit = false;
-
         private boolean gatewayTokenCacheInit = false;
-
         private boolean resourceCacheInit = false;
-
         private boolean invalidTokenCacheInit = false;
     }
 }
