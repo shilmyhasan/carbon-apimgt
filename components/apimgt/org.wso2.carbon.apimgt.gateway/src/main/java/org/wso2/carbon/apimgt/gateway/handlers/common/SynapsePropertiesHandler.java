@@ -50,6 +50,7 @@ public class SynapsePropertiesHandler extends AbstractHandler{
                 httpMethod.equals(Constants.Configuration.HTTP_METHOD_PUT))) {
             ((Axis2MessageContext) messageContext).getAxis2MessageContext().
                     setProperty("ContentType", "application/x-www-form-urlencoded");
+                    headers.put("Content-Type", "application/x-www-form-urlencoded");
         }
 
         return true;
