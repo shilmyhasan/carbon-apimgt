@@ -177,6 +177,13 @@ public class GatewayUtilsTestCase {
     }
 
     @Test
+    public void testGetJWTClaimsWhenJWTIsNULL() {
+        AuthenticationContext authenticationContext = new AuthenticationContext();
+        authenticationContext.setCallerToken(null);
+        Assert.assertNull(GatewayUtils.getJWTClaims(authenticationContext));
+    }
+
+    @Test
     public void testIsClusteringEnabled() {
         ConfigurationContext configurationContext = Mockito.mock(ConfigurationContext.class);
         AxisConfiguration axisConfiguration = Mockito.mock(AxisConfiguration.class);

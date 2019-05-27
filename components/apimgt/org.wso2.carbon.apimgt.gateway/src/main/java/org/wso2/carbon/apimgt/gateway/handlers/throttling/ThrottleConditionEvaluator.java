@@ -22,6 +22,7 @@ package org.wso2.carbon.apimgt.gateway.handlers.throttling;
 
 
 import org.apache.axis2.context.MessageContext;
+import org.apache.commons.lang.StringUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.apimgt.api.dto.ConditionDTO;
 import org.wso2.carbon.apimgt.api.dto.ConditionGroupDTO;
@@ -172,7 +173,9 @@ public class ThrottleConditionEvaluator {
 
     private boolean isJWTClaimPresent(AuthenticationContext authenticationContext, ConditionDTO condition) {
         Map assertions = GatewayUtils.getJWTClaims(authenticationContext);
-
+        if (assertions == null) {
+            return false;
+        }
         Object value = assertions.get(condition.getConditionName());
         if (value == null) {
             return false;
@@ -187,13 +190,11 @@ public class ThrottleConditionEvaluator {
     private boolean isQueryParamPresent(MessageContext messageContext, ConditionDTO condition) {
 
         Map<String, String> queryParamMap = GatewayUtils.getQueryParams(messageContext);
-
-        String value = queryParamMap.get(condition.getConditionName());
-
-        if (value == null) {
-            return false;
+        if (queryParamMap != null) {
+            String value = queryParamMap.get(condition.getConditionName());
+            return value != null && value.matches(condition.getConditionValue());
         }
-        return value.matches(condition.getConditionValue());
+        return false;
     }
 
     private boolean isMatchingIP(MessageContext messageContext, ConditionDTO condition) {
@@ -207,7 +208,7 @@ public class ThrottleConditionEvaluator {
         long endIp = APIUtil.ipToLong(condition.getConditionValue());
 
         String currentIpString = GatewayUtils.getIp(messageContext);
-        if (!currentIpString.isEmpty()) {
+        if (StringUtils.isNotEmpty(currentIpString)) {
             long currentIp = APIUtil.ipToLong(currentIpString);
 
             return startIp <= currentIp && endIp >= currentIp;

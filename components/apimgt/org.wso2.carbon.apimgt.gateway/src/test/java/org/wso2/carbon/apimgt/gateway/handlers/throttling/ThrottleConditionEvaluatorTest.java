@@ -393,4 +393,28 @@ public class ThrottleConditionEvaluatorTest {
                 (messageContext, authenticationContext, conditionGroupDTOS);
         Assert.assertNull(matchingConditionGroups.get(0));
     }
+
+    @Test
+    public void testApplicabilityOfNotMatchingHeaderConditionWhenJWTIsNull() {
+
+        ConditionGroupDTO conditionGroupDTO = new ConditionGroupDTO();
+        conditionGroupDTO.setConditionGroupId("JWTClaimsConditionGroup");
+        ConditionDTO invertedCondition = new ConditionDTO();
+        invertedCondition.setConditionType("JWTClaims");
+        invertedCondition.setConditionName("http://wso2.org/claims/subscriber");
+        invertedCondition.setConditionValue("admin");
+        invertedCondition.isInverted(true);
+
+        ConditionDTO[] conditionDTOS = {invertedCondition};
+        conditionGroupDTO.setConditions(conditionDTOS);
+        ConditionGroupDTO[] conditionGroupDTOS = {conditionGroupDTO};
+
+        AuthenticationContext authenticationContext = new AuthenticationContext();
+        authenticationContext.setCallerToken(null);
+
+        MessageContext messageContext = TestUtils.getMessageContext(apiContext, apiVersion);
+        List<ConditionGroupDTO> matchingConditionGroups = throttleConditionEvaluator.getApplicableConditions
+                (messageContext, authenticationContext, conditionGroupDTOS);
+        Assert.assertNotNull(matchingConditionGroups.get(0));
+    }
 }

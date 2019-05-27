@@ -36,7 +36,6 @@ import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationContext;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.threatprotection.utils.ThreatProtectorConstants;
-import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.registry.RegistryServiceHolder;
 import org.wso2.carbon.registry.core.Resource;
@@ -44,17 +43,17 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayInputStream;
 
 public class GatewayUtils {
 
@@ -139,17 +138,20 @@ public class GatewayUtils {
     }
 
     public static Map getJWTClaims(AuthenticationContext authContext){
-        String[] jwtTokenArray = authContext.getCallerToken().split(Pattern.quote("."));
-        // decoding JWT
-        try {
-            byte[] jwtByteArray = Base64.decodeBase64(jwtTokenArray[1].getBytes("UTF-8"));
-            String jwtAssertion = new String(jwtByteArray, "UTF-8");
-            JSONParser parser = new JSONParser();
-            return  (Map) parser.parse(jwtAssertion);
-        } catch (UnsupportedEncodingException e) {
-            log.error("Error while decoding jwt header", e);
-        } catch (ParseException e) {
-            log.error("Error while parsing jwt header", e);
+        String callerToken = authContext.getCallerToken();
+        if (StringUtils.isNotEmpty(callerToken)) {
+            String[] jwtTokenArray = callerToken.split(Pattern.quote("."));
+            // decoding JWT
+            try {
+                byte[] jwtByteArray = Base64.decodeBase64(jwtTokenArray[1].getBytes("UTF-8"));
+                String jwtAssertion = new String(jwtByteArray, "UTF-8");
+                JSONParser parser = new JSONParser();
+                return (Map) parser.parse(jwtAssertion);
+            } catch (UnsupportedEncodingException e) {
+                log.error("Error while decoding jwt header", e);
+            } catch (ParseException e) {
+                log.error("Error while parsing jwt header", e);
+            }
         }
         return null;
     }
