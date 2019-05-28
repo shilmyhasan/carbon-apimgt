@@ -16,7 +16,12 @@
 
 package org.wso2.carbon.apimgt.rest.api.publisher.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import io.swagger.models.Swagger;
+import io.swagger.parser.SwaggerParser;
+import io.swagger.parser.util.SwaggerDeserializationResult;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -1610,6 +1615,7 @@ public class ApisApiServiceImpl extends ApisApiService {
     public Response apisApiIdSwaggerPut(String apiId, String apiDefinition, String contentType, String ifMatch,
                                         String ifUnmodifiedSince) {
         try {
+            validateAPIDefinition(apiDefinition);
             APIDefinition apiDefinitionFromOpenAPISpec = new APIDefinitionFromOpenAPISpec();
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
@@ -1678,5 +1684,35 @@ public class ApisApiServiceImpl extends ApisApiService {
     private boolean isAuthorizationFailure(Exception e) {
         String errorMessage = e.getMessage();
         return errorMessage != null && errorMessage.contains(APIConstants.UN_AUTHORIZED_ERROR_MESSAGE);
+    }
+
+    private void validateAPIDefinition(String apiDefinition) {
+        try {
+            JsonNode swagger = new ObjectMapper().readTree(apiDefinition);
+            if (swagger.get(APIConstants.SWAGGER) != null) {
+                // logic to validate swagger 2.0
+                SwaggerDeserializationResult swaggerDefinition = new SwaggerParser().readWithInfo(apiDefinition);
+                if (!swagger.get(APIConstants.SWAGGER).asText().equals(APIConstants.SWAGGER_V2)) {
+                    RestApiUtil.handleBadRequest("Unsupported swagger version provided. Please add with swagger " +
+                            "version " + APIConstants.SWAGGER_V2, log);
+                } else if(!swaggerDefinition.getMessages().isEmpty()) {
+                    RestApiUtil.handleBadRequest("Swagger contains invalid parameters. Please add valid swagger " +
+                            "definition", log);
+                }
+            } else if (swagger.get(APIConstants.OPEN_API) != null) {
+                // logic to validate open api 3.0
+                if (!swagger.get(APIConstants.OPEN_API).asText().equals(APIConstants.OPEN_API_V3)) {
+                    RestApiUtil.handleBadRequest("Unsupported OpenAPI version provided. Please add with OpenAPI " +
+                            "version " + APIConstants.OPEN_API_V3, log);
+                } else if(swagger.get(APIConstants.SWAGGER_INFO) == null ||
+                        swagger.get(APIConstants.SWAGGER_PATHS) == null) {
+                    RestApiUtil.handleBadRequest("Required property 'info' or 'paths' are not provided", log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported swagger definition provided.", log);
+            }
+        } catch (IOException e) {
+            RestApiUtil.handleBadRequest("Invalid swagger definition provided.", log);
+        }
     }
 }
