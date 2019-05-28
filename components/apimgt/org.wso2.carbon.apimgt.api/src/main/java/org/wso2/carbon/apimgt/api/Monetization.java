@@ -9,4 +9,6 @@ public interface Monetization {
      * @return Response returns the HTTP response for Rest API Implementation
      */
     public Response publishMonetizationUsageRecord();
+
+    public boolean publishMonetizationUsageRecords() throws APIManagementException;
 }

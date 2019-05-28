@@ -27,16 +27,30 @@ public class MonetizationApiServiceImpl extends MonetizationApiService {
     public Response monetizationPublishUsagePost(){
         PublishStatusDTO publishStatusDTO;
         MonetizationImpl monetizationImpl = new MonetizationImpl();
-        Response response = monetizationImpl.publishMonetizationUsageRecord();
-        if(response.getStatus() == 200 )
-        {
-            String status = "Successfull";
-            String msg = "All Usage Records Published Successfully";
+        try {
+            Boolean result = monetizationImpl.publishMonetizationUsageRecords();
+            if(result == true){
+                String status = "Successfull";
+                String msg = "All Usage Records Published Successfully";
+                publishStatusDTO = MonetizationAPIMappinUtil.fromStatusToDTO(status, msg);
+                return Response.ok().entity(publishStatusDTO).build();
+            }
+        }catch (APIManagementException ex){
+            String status = " UnSuccessfull";
+            String msg = "Internal Server Error";
+            RestApiUtil.handleInternalServerError(msg,ex,log);
             publishStatusDTO = MonetizationAPIMappinUtil.fromStatusToDTO(status, msg);
-            return Response.ok().entity(publishStatusDTO).build();
-        }else if(response.getStatus() == 200 && response.getEntity().equals("Partially Successfull")) {
+            return Response.serverError().entity(publishStatusDTO).build();
+        }
+
+        /*if(response.getStatus() == 200 && response.getEntity().equals("Partially Successfull")) {
             String status = " Partially Successfull";
             String msg = "All Usage Records were not Published Successfully";
+            publishStatusDTO = MonetizationAPIMappinUtil.fromStatusToDTO(status, msg);
+            return Response.ok().entity(publishStatusDTO).build();
+        } else if(response.getStatus() == 200 ) {
+            String status = "Successfull";
+            String msg = "All Usage Records Published Successfully";
             publishStatusDTO = MonetizationAPIMappinUtil.fromStatusToDTO(status, msg);
             return Response.ok().entity(publishStatusDTO).build();
         } else  if(response.getStatus() == 403){
@@ -49,7 +63,7 @@ public class MonetizationApiServiceImpl extends MonetizationApiService {
             String msg = response.getEntity().toString();
             publishStatusDTO = MonetizationAPIMappinUtil.fromStatusToDTO(status, msg);
             return Response.serverError().entity(publishStatusDTO).build();
-        }
+        }*/
         return null;
     }
 }

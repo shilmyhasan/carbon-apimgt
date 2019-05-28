@@ -94,6 +94,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.ConstraintViolation;
+import javax.ws.rs.core.Response;
 
 public class RestApiUtil {
 
@@ -759,8 +760,9 @@ public class RestApiUtil {
      * @param msg error message
      * @param log Log instance
      * @throws InternalServerErrorException
+     * @return
      */
-    public static void handleInternalServerError(String msg, Log log)
+    public static Response handleInternalServerError(String msg, Log log)
             throws InternalServerErrorException {
         InternalServerErrorException internalServerErrorException = buildInternalServerErrorException();
         log.error(msg);

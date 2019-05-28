@@ -58,12 +58,20 @@ public class SettingsMappingUtil {
         return settingsDTO;
     }
 
+<<<<<<< Updated upstream
     private List<String> GetMonetizationProperties() throws APIManagementException{
         List<String> properties = new ArrayList<>();
         APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
                 .getAPIManagerConfiguration();
         properties=configuration.getProperty("Monetization.Properties.Property");
         return properties;
+=======
+    private List<String> GetMonetizationProperties() throws APIManagementException {
+        APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                .getAPIManagerConfiguration();
+        List<String> monetizationProperties = configuration.getProperty("Monetization.Properties.Property");
+        return monetizationProperties;
+>>>>>>> Stashed changes
     }
 
     private List<String> GetScopeList() throws APIManagementException {
