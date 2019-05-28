@@ -1,66 +1,36 @@
 package org.wso2.carbon.apimgt.rest.api.publisher.v1.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleStateAvailableTransitionBeanListDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleStateCheckItemBeanListDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleStateInputBeanListDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleStatePermissionBeansDTO;
-import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleStateValidationBeansDTO;
+import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleStateAvailableTransitionsDTO;
+import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleStateCheckItemsDTO;
+import javax.validation.constraints.*;
+
 
 import io.swagger.annotations.*;
-import com.fasterxml.jackson.annotation.*;
+import java.util.Objects;
 
-import javax.validation.constraints.NotNull;
-
-
+import javax.xml.bind.annotation.*;
 
 
 
-@ApiModel(description = "")
-public class LifecycleStateDTO  {
+public class LifecycleStateDTO   {
   
-  
-  
-  private String lcName = null;
-  
-  
-  private String state = null;
-  
-  
-  private String lifecyelId = null;
-  
-  
-  private List<LifecycleStateCheckItemBeanListDTO> checkItemBeanList = new ArrayList<LifecycleStateCheckItemBeanListDTO>();
-  
-  
-  private List<LifecycleStateInputBeanListDTO> inputBeanList = new ArrayList<LifecycleStateInputBeanListDTO>();
-  
-  
-  private List<LifecycleStateValidationBeansDTO> customCodeBeanList = new ArrayList<LifecycleStateValidationBeansDTO>();
-  
-  
-  private List<LifecycleStateAvailableTransitionBeanListDTO> availableTransitionBeanList = new ArrayList<LifecycleStateAvailableTransitionBeanListDTO>();
-  
-  
-  private List<LifecycleStatePermissionBeansDTO> permissionBeanList = new ArrayList<LifecycleStatePermissionBeansDTO>();
+    private String state = null;
+    private List<LifecycleStateCheckItemsDTO> checkItems = new ArrayList<>();
+    private List<LifecycleStateAvailableTransitionsDTO> availableTransitions = new ArrayList<>();
 
-  
   /**
    **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("lcName")
-  public String getLcName() {
-    return lcName;
-  }
-  public void setLcName(String lcName) {
-    this.lcName = lcName;
+  public LifecycleStateDTO state(String state) {
+    this.state = state;
+    return this;
   }
 
   
-  /**
-   **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(example = "Created", value = "")
   @JsonProperty("state")
   public String getState() {
     return state;
@@ -69,94 +39,81 @@ public class LifecycleStateDTO  {
     this.state = state;
   }
 
-  
   /**
    **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("lifecyelId")
-  public String getLifecyelId() {
-    return lifecyelId;
-  }
-  public void setLifecyelId(String lifecyelId) {
-    this.lifecyelId = lifecyelId;
+  public LifecycleStateDTO checkItems(List<LifecycleStateCheckItemsDTO> checkItems) {
+    this.checkItems = checkItems;
+    return this;
   }
 
   
+  @ApiModelProperty(value = "")
+  @JsonProperty("checkItems")
+  public List<LifecycleStateCheckItemsDTO> getCheckItems() {
+    return checkItems;
+  }
+  public void setCheckItems(List<LifecycleStateCheckItemsDTO> checkItems) {
+    this.checkItems = checkItems;
+  }
+
   /**
    **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("checkItemBeanList")
-  public List<LifecycleStateCheckItemBeanListDTO> getCheckItemBeanList() {
-    return checkItemBeanList;
-  }
-  public void setCheckItemBeanList(List<LifecycleStateCheckItemBeanListDTO> checkItemBeanList) {
-    this.checkItemBeanList = checkItemBeanList;
+  public LifecycleStateDTO availableTransitions(List<LifecycleStateAvailableTransitionsDTO> availableTransitions) {
+    this.availableTransitions = availableTransitions;
+    return this;
   }
 
   
-  /**
-   **/
   @ApiModelProperty(value = "")
-  @JsonProperty("inputBeanList")
-  public List<LifecycleStateInputBeanListDTO> getInputBeanList() {
-    return inputBeanList;
+  @JsonProperty("availableTransitions")
+  public List<LifecycleStateAvailableTransitionsDTO> getAvailableTransitions() {
+    return availableTransitions;
   }
-  public void setInputBeanList(List<LifecycleStateInputBeanListDTO> inputBeanList) {
-    this.inputBeanList = inputBeanList;
+  public void setAvailableTransitions(List<LifecycleStateAvailableTransitionsDTO> availableTransitions) {
+    this.availableTransitions = availableTransitions;
   }
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("customCodeBeanList")
-  public List<LifecycleStateValidationBeansDTO> getCustomCodeBeanList() {
-    return customCodeBeanList;
-  }
-  public void setCustomCodeBeanList(List<LifecycleStateValidationBeansDTO> customCodeBeanList) {
-    this.customCodeBeanList = customCodeBeanList;
-  }
-
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("availableTransitionBeanList")
-  public List<LifecycleStateAvailableTransitionBeanListDTO> getAvailableTransitionBeanList() {
-    return availableTransitionBeanList;
-  }
-  public void setAvailableTransitionBeanList(List<LifecycleStateAvailableTransitionBeanListDTO> availableTransitionBeanList) {
-    this.availableTransitionBeanList = availableTransitionBeanList;
-  }
-
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("permissionBeanList")
-  public List<LifecycleStatePermissionBeansDTO> getPermissionBeanList() {
-    return permissionBeanList;
-  }
-  public void setPermissionBeanList(List<LifecycleStatePermissionBeansDTO> permissionBeanList) {
-    this.permissionBeanList = permissionBeanList;
-  }
-
-  
 
   @Override
-  public String toString()  {
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    LifecycleStateDTO lifecycleState = (LifecycleStateDTO) o;
+    return Objects.equals(state, lifecycleState.state) &&
+        Objects.equals(checkItems, lifecycleState.checkItems) &&
+        Objects.equals(availableTransitions, lifecycleState.availableTransitions);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(state, checkItems, availableTransitions);
+  }
+
+  @Override
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class LifecycleStateDTO {\n");
     
-    sb.append("  lcName: ").append(lcName).append("\n");
-    sb.append("  state: ").append(state).append("\n");
-    sb.append("  lifecyelId: ").append(lifecyelId).append("\n");
-    sb.append("  checkItemBeanList: ").append(checkItemBeanList).append("\n");
-    sb.append("  inputBeanList: ").append(inputBeanList).append("\n");
-    sb.append("  customCodeBeanList: ").append(customCodeBeanList).append("\n");
-    sb.append("  availableTransitionBeanList: ").append(availableTransitionBeanList).append("\n");
-    sb.append("  permissionBeanList: ").append(permissionBeanList).append("\n");
-    sb.append("}\n");
+    sb.append("    state: ").append(toIndentedString(state)).append("\n");
+    sb.append("    checkItems: ").append(toIndentedString(checkItems)).append("\n");
+    sb.append("    availableTransitions: ").append(toIndentedString(availableTransitions)).append("\n");
+    sb.append("}");
     return sb.toString();
   }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
+

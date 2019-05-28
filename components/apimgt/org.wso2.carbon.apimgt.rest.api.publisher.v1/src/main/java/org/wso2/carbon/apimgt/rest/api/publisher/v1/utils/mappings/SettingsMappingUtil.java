@@ -24,9 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.Scope;
-import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.definitions.APIDefinitionUsingOASParser;
-import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.SettingsDTO;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
@@ -49,29 +47,12 @@ public class SettingsMappingUtil {
             settingsDTO.setEnvironment(null);
             settingsDTO.setScopes(GetScopeList());
             settingsDTO.setTokenUrl(APIUtil.getTokenUrl());
-            settingsDTO.setMonetizationProperties(GetMonetizationProperties());
         } else {
             //todo: set the environment
             settingsDTO.setEnvironment(null);
             settingsDTO.setScopes(GetScopeList());
         }
         return settingsDTO;
-    }
-
-<<<<<<< Updated upstream
-    private List<String> GetMonetizationProperties() throws APIManagementException{
-        List<String> properties = new ArrayList<>();
-        APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
-                .getAPIManagerConfiguration();
-        properties=configuration.getProperty("Monetization.Properties.Property");
-        return properties;
-=======
-    private List<String> GetMonetizationProperties() throws APIManagementException {
-        APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
-                .getAPIManagerConfiguration();
-        List<String> monetizationProperties = configuration.getProperty("Monetization.Properties.Property");
-        return monetizationProperties;
->>>>>>> Stashed changes
     }
 
     private List<String> GetScopeList() throws APIManagementException {

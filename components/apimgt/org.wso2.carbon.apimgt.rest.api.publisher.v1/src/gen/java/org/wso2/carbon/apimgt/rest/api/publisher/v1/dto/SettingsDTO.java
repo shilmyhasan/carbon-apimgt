@@ -1,37 +1,34 @@
 package org.wso2.carbon.apimgt.rest.api.publisher.v1.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.EnvironmentDTO;
+import javax.validation.constraints.*;
+
 
 import io.swagger.annotations.*;
-import com.fasterxml.jackson.annotation.*;
+import java.util.Objects;
 
-import javax.validation.constraints.NotNull;
-
-
+import javax.xml.bind.annotation.*;
 
 
 
-@ApiModel(description = "")
-public class SettingsDTO  {
+public class SettingsDTO   {
   
-  
-  
-  private String tokenUrl = null;
-  
-  
-  private List<EnvironmentDTO> environment = new ArrayList<EnvironmentDTO>();
-  
-  
-  private List<String> scopes = new ArrayList<String>();
-  
-  
-  private List<String> monetizationProperties = new ArrayList<String>();
+    private String tokenUrl = null;
+    private List<EnvironmentDTO> environment = new ArrayList<>();
+    private List<String> scopes = new ArrayList<>();
 
-  
   /**
    **/
+  public SettingsDTO tokenUrl(String tokenUrl) {
+    this.tokenUrl = tokenUrl;
+    return this;
+  }
+
+  
   @ApiModelProperty(value = "")
   @JsonProperty("tokenUrl")
   public String getTokenUrl() {
@@ -41,9 +38,14 @@ public class SettingsDTO  {
     this.tokenUrl = tokenUrl;
   }
 
-  
   /**
    **/
+  public SettingsDTO environment(List<EnvironmentDTO> environment) {
+    this.environment = environment;
+    return this;
+  }
+
+  
   @ApiModelProperty(value = "")
   @JsonProperty("environment")
   public List<EnvironmentDTO> getEnvironment() {
@@ -53,9 +55,14 @@ public class SettingsDTO  {
     this.environment = environment;
   }
 
-  
   /**
    **/
+  public SettingsDTO scopes(List<String> scopes) {
+    this.scopes = scopes;
+    return this;
+  }
+
+  
   @ApiModelProperty(value = "")
   @JsonProperty("scopes")
   public List<String> getScopes() {
@@ -66,28 +73,46 @@ public class SettingsDTO  {
   }
 
 
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("monetizationProperties")
-  public List<String> getMonetizationProperties() {
-    return monetizationProperties;
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    SettingsDTO settings = (SettingsDTO) o;
+    return Objects.equals(tokenUrl, settings.tokenUrl) &&
+        Objects.equals(environment, settings.environment) &&
+        Objects.equals(scopes, settings.scopes);
   }
-  public void setMonetizationProperties(List<String> monetizationProperties) {
-    this.monetizationProperties = monetizationProperties;
-  }
-
 
   @Override
-  public String toString()  {
+  public int hashCode() {
+    return Objects.hash(tokenUrl, environment, scopes);
+  }
+
+  @Override
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class SettingsDTO {\n");
     
-    sb.append("  tokenUrl: ").append(tokenUrl).append("\n");
-    sb.append("  environment: ").append(environment).append("\n");
-    sb.append("  scopes: ").append(scopes).append("\n");
-    sb.append("  monetizationProperties: ").append(monetizationProperties).append("\n");
-    sb.append("}\n");
+    sb.append("    tokenUrl: ").append(toIndentedString(tokenUrl)).append("\n");
+    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
+    sb.append("}");
     return sb.toString();
   }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
+

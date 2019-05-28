@@ -1,45 +1,39 @@
 package org.wso2.carbon.apimgt.rest.api.store.v1.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.apimgt.rest.api.store.v1.dto.PaginationDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.RatingDTO;
+import javax.validation.constraints.*;
+
 
 import io.swagger.annotations.*;
-import com.fasterxml.jackson.annotation.*;
+import java.util.Objects;
 
-import javax.validation.constraints.NotNull;
-
-
+import javax.xml.bind.annotation.*;
 
 
 
-@ApiModel(description = "")
-public class RatingListDTO  {
+public class RatingListDTO   {
   
-  
-  
-  private String avgRating = null;
-  
-  
-  private String userRating = null;
-  
-  
-  private Integer count = null;
-  
-  
-  private String next = null;
-  
-  
-  private String previous = null;
-  
-  
-  private List<RatingDTO> list = new ArrayList<RatingDTO>();
+    private String avgRating = null;
+    private String userRating = null;
+    private Integer count = null;
+    private List<RatingDTO> list = new ArrayList<>();
+    private PaginationDTO pagination = null;
 
-  
   /**
-   * Average Rating of the API\n
+   * Average Rating of the API 
    **/
-  @ApiModelProperty(value = "Average Rating of the API\n")
+  public RatingListDTO avgRating(String avgRating) {
+    this.avgRating = avgRating;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "Average Rating of the API ")
   @JsonProperty("avgRating")
   public String getAvgRating() {
     return avgRating;
@@ -48,11 +42,16 @@ public class RatingListDTO  {
     this.avgRating = avgRating;
   }
 
-  
   /**
-   * Rating given by the user\n
+   * Rating given by the user 
    **/
-  @ApiModelProperty(value = "Rating given by the user\n")
+  public RatingListDTO userRating(String userRating) {
+    this.userRating = userRating;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "Rating given by the user ")
   @JsonProperty("userRating")
   public String getUserRating() {
     return userRating;
@@ -61,11 +60,16 @@ public class RatingListDTO  {
     this.userRating = userRating;
   }
 
-  
   /**
-   * Number of Subscriber Ratings returned.\n
+   * Number of Subscriber Ratings returned. 
    **/
-  @ApiModelProperty(value = "Number of Subscriber Ratings returned.\n")
+  public RatingListDTO count(Integer count) {
+    this.count = count;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "1", value = "Number of Subscriber Ratings returned. ")
   @JsonProperty("count")
   public Integer getCount() {
     return count;
@@ -74,35 +78,14 @@ public class RatingListDTO  {
     this.count = count;
   }
 
-  
   /**
-   * Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n
    **/
-  @ApiModelProperty(value = "Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n")
-  @JsonProperty("next")
-  public String getNext() {
-    return next;
-  }
-  public void setNext(String next) {
-    this.next = next;
+  public RatingListDTO list(List<RatingDTO> list) {
+    this.list = list;
+    return this;
   }
 
   
-  /**
-   * Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n
-   **/
-  @ApiModelProperty(value = "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n")
-  @JsonProperty("previous")
-  public String getPrevious() {
-    return previous;
-  }
-  public void setPrevious(String previous) {
-    this.previous = previous;
-  }
-
-  
-  /**
-   **/
   @ApiModelProperty(value = "")
   @JsonProperty("list")
   public List<RatingDTO> getList() {
@@ -112,20 +95,68 @@ public class RatingListDTO  {
     this.list = list;
   }
 
+  /**
+   **/
+  public RatingListDTO pagination(PaginationDTO pagination) {
+    this.pagination = pagination;
+    return this;
+  }
+
   
+  @ApiModelProperty(value = "")
+  @JsonProperty("pagination")
+  public PaginationDTO getPagination() {
+    return pagination;
+  }
+  public void setPagination(PaginationDTO pagination) {
+    this.pagination = pagination;
+  }
+
 
   @Override
-  public String toString()  {
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    RatingListDTO ratingList = (RatingListDTO) o;
+    return Objects.equals(avgRating, ratingList.avgRating) &&
+        Objects.equals(userRating, ratingList.userRating) &&
+        Objects.equals(count, ratingList.count) &&
+        Objects.equals(list, ratingList.list) &&
+        Objects.equals(pagination, ratingList.pagination);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(avgRating, userRating, count, list, pagination);
+  }
+
+  @Override
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class RatingListDTO {\n");
     
-    sb.append("  avgRating: ").append(avgRating).append("\n");
-    sb.append("  userRating: ").append(userRating).append("\n");
-    sb.append("  count: ").append(count).append("\n");
-    sb.append("  next: ").append(next).append("\n");
-    sb.append("  previous: ").append(previous).append("\n");
-    sb.append("  list: ").append(list).append("\n");
-    sb.append("}\n");
+    sb.append("    avgRating: ").append(toIndentedString(avgRating)).append("\n");
+    sb.append("    userRating: ").append(toIndentedString(userRating)).append("\n");
+    sb.append("    count: ").append(toIndentedString(count)).append("\n");
+    sb.append("    list: ").append(toIndentedString(list)).append("\n");
+    sb.append("    pagination: ").append(toIndentedString(pagination)).append("\n");
+    sb.append("}");
     return sb.toString();
   }
+
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }
+

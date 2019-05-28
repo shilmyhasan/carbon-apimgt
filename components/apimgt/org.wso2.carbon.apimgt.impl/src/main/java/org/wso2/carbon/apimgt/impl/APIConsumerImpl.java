@@ -18,10 +18,11 @@
 
 package org.wso2.carbon.apimgt.impl;
 
+import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -33,8 +34,6 @@ import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceNotFoundException;
-import org.wso2.carbon.apimgt.api.LoginPostExecutor;
-import org.wso2.carbon.apimgt.api.NewPostLoginExecutor;
 import org.wso2.carbon.apimgt.api.WorkflowResponse;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
@@ -99,11 +98,7 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.user.mgt.stub.UserAdminStub;
-import org.wso2.carbon.user.mgt.stub.UserAdminUserAdminException;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -116,7 +111,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -163,6 +157,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     public static final String API_NAME = "apiName";
     public static final String API_VERSION = "apiVersion";
     public static final String API_PROVIDER = "apiProvider";
+    private static final String PRESERVED_CASE_SENSITIVE_VARIABLE = "preservedCaseSensitive";
 
     /* Map to Store APIs against Tag */
     private ConcurrentMap<String, Set<API>> taggedAPIs = new ConcurrentHashMap<String, Set<API>>();
@@ -3654,6 +3649,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                                                                   Set<Scope> reqScopeSet) {
         String[] userRoles = null;
         org.wso2.carbon.user.api.UserStoreManager userStoreManager = null;
+        String preservedCaseSensitiveValue = System.getProperty(PRESERVED_CASE_SENSITIVE_VARIABLE);
+        boolean preservedCaseSensitive = JavaUtils.isTrueExplicitly(preservedCaseSensitiveValue);
 
         List<Scope> authorizedScopes = new ArrayList<Scope>();
         try {
@@ -3670,7 +3667,14 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
         List<String> userRoleList;
         if (userRoles != null) {
-            userRoleList = new ArrayList<String>(Arrays.asList(userRoles));
+            if (preservedCaseSensitive) {
+                userRoleList = Arrays.asList(userRoles);
+            } else {
+                userRoleList = new ArrayList<String>();
+                for (String userRole : userRoles) {
+                    userRoleList.add(userRole.toLowerCase());
+                }
+            }
         } else {
             userRoleList = Collections.emptyList();
         }
@@ -3682,8 +3686,14 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
             //If the scope has been defined in the context of the App and if roles have been defined for the scope
             if (roles != null && roles.length() != 0) {
-                List<String> roleList =
-                        new ArrayList<String>(Arrays.asList(roles.replaceAll(" ", EMPTY_STRING).split(",")));
+                List<String> roleList = new ArrayList<String>();
+                for (String scopeRole : roles.split(",")) {
+                    if (preservedCaseSensitive) {
+                        roleList.add(scopeRole.trim());
+                    } else {
+                        roleList.add(scopeRole.trim().toLowerCase());
+                    }
+                }
                 //Check if user has at least one of the roles associated with the scope
                 roleList.retainAll(userRoleList);
                 if (!roleList.isEmpty()) {
@@ -4919,15 +4929,11 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
         JSONArray applicationAttributes = null;
         JSONObject applicationConfig = APIUtil.getAppAttributeKeysFromRegistry(tenantId);
-        try {
-            if (applicationConfig != null) {
-                applicationAttributes = (JSONArray) applicationConfig.get(APIConstants.ApplicationAttributes.ATTRIBUTES);
-            } else {
-                APIManagerConfiguration configuration = getAPIManagerConfiguration();
-                applicationAttributes = configuration.getApplicationAttributes();
-            }
-        } catch (NullPointerException e){
-            handleException("Error in reading configuration " + e.getMessage(), e);
+        if (applicationConfig != null) {
+            applicationAttributes = (JSONArray) applicationConfig.get(APIConstants.ApplicationAttributes.ATTRIBUTES);
+        } else {
+            APIManagerConfiguration configuration = getAPIManagerConfiguration();
+            applicationAttributes = configuration.getApplicationAttributes();
         }
         return applicationAttributes;
     }
@@ -4991,6 +4997,13 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         Map<String, Object> searchResults = super
                 .searchPaginatedAPIsByContent(registry, tenantId, searchQuery, start, end, limitAttributes);
         return filterMultipleVersionedAPIs(searchResults);
+    }
+
+
+    @Override
+    public String getOpenAPIDefinition(APIIdentifier apiId) throws APIManagementException {
+        String definition = super.getOpenAPIDefinition(apiId);
+        return APIUtil.removeXMediationScriptsFromSwagger(definition);
     }
 
     private Map<String, Object> filterMultipleVersionedAPIs(Map<String, Object> searchResults) {
