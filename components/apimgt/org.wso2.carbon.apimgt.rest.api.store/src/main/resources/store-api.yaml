@@ -2174,6 +2174,9 @@ definitions:
       groupId:
         type: string
         example: ""
+      owner:
+        type: string
+        example: ""
       keys:
         type: array
         items:
@@ -2205,6 +2208,9 @@ definitions:
         type: string
         example: APPROVED
       groupId:
+        type: string
+        example: ""
+      owner:
         type: string
         example: ""
 

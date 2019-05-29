@@ -16,10 +16,12 @@
 package org.wso2.carbon.apimgt.gateway.handlers.common;
 
 import org.apache.axis2.Constants;
+import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import javax.ws.rs.core.MediaType;
 
 import java.util.Map;
 
@@ -50,6 +52,7 @@ public class SynapsePropertiesHandler extends AbstractHandler{
                 httpMethod.equals(Constants.Configuration.HTTP_METHOD_PUT))) {
             ((Axis2MessageContext) messageContext).getAxis2MessageContext().
                     setProperty("ContentType", "application/x-www-form-urlencoded");
+                    headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
         }
 
         return true;
