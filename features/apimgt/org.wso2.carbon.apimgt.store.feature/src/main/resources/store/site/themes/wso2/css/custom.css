@@ -587,7 +587,7 @@ a.remove_rating:hover{
 .global-server-container {
     display: none;
 }
-/* fix for mobile browsers */
+/* fix for mobile browsers https://github.com/wso2/product-apim/issues/4328 */
 header.header .dropdown-backdrop{
   display: none;
 }
