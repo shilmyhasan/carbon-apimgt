@@ -1692,7 +1692,7 @@ public class ApisApiServiceImpl extends ApisApiService {
             if (swagger.get(APIConstants.SWAGGER) != null) {
                 // logic to validate swagger 2.0
                 SwaggerDeserializationResult swaggerDefinition = new SwaggerParser().readWithInfo(apiDefinition);
-                if (!swagger.get(APIConstants.SWAGGER).asText().equals(APIConstants.SWAGGER_V2)) {
+                if (!(APIConstants.SWAGGER_V2.equals(swagger.get(APIConstants.SWAGGER).asText()))) {
                     RestApiUtil.handleBadRequest("Unsupported swagger version provided. Please add with swagger " +
                             "version " + APIConstants.SWAGGER_V2, log);
                 } else if(!swaggerDefinition.getMessages().isEmpty()) {
@@ -1700,8 +1700,8 @@ public class ApisApiServiceImpl extends ApisApiService {
                             "definition", log);
                 }
             } else if (swagger.get(APIConstants.OPEN_API) != null) {
-                // logic to validate open api 3.0
-                if (!swagger.get(APIConstants.OPEN_API).asText().equals(APIConstants.OPEN_API_V3)) {
+                // logic to validate open api 3.0.x
+                if (!swagger.get(APIConstants.OPEN_API).asText().matches(APIConstants.OPEN_API_VERSION_REGEX)) {
                     RestApiUtil.handleBadRequest("Unsupported OpenAPI version provided. Please add with OpenAPI " +
                             "version " + APIConstants.OPEN_API_V3, log);
                 } else if(swagger.get(APIConstants.SWAGGER_INFO) == null ||
