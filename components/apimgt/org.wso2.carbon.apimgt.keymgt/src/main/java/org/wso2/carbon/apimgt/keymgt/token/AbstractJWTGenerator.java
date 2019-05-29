@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.keymgt.token;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -387,7 +388,16 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 digestValue.update(der);
                 byte[] digestInBytes = digestValue.digest();
                 Base64  base64 = new Base64(true);
-                String base64UrlEncodedThumbPrint = base64.encodeToString(digestInBytes).trim();
+                //fix for REPSOLPROD-123
+                String base64UrlEncodedThumbPrint = "";
+                String publicCertThumbprint = "";
+                if (Boolean.parseBoolean(System.getProperty(APIConstants.ENABLE_THUMBPRINT_HEXIFY))) {
+                    publicCertThumbprint = hexify(digestInBytes);
+                    base64UrlEncodedThumbPrint = base64.encodeToString(
+                            publicCertThumbprint.getBytes(Charsets.UTF_8)).trim();
+                } else {
+                    base64UrlEncodedThumbPrint = base64.encodeToString(digestInBytes).trim();
+                }
                 StringBuilder jwtHeader = new StringBuilder();
                 //Sample header
                 //{"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10"}
