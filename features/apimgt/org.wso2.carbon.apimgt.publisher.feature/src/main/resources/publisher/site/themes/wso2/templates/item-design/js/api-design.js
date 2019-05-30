@@ -587,7 +587,7 @@ APIDesigner.prototype.init_controllers = function(){
                             for(var method in pathObj){
                                 if(pathObj.hasOwnProperty(method)){
                                     var methodObj = pathObj[method];
-                                    
+
                                     //If the scope is added to the resource, remove it.
                                     if(methodObj['x-scope'] && methodObj['x-scope'] === scopeKeyToDelete){
                                         methodObj['x-scope'] = "";
@@ -1328,12 +1328,34 @@ $(document).ready(function(){
                     var data = jsyaml.load(jsonFile.result);
                 }
                 if((m = json.exec(jsonFile.file_name)) !== null){
-                    var data = JSON.parse(jsonFile.result); //swagger file content
+                    try {
+                        var data = JSON.parse(jsonFile.result); //swagger file content
+                    } catch (err) {
+                        jagg.message({
+                            content:i18n.t("API swagger definition is invalid JSON. Please re-import valid swagger definition"),
+                            type: "error"
+                        });
+                        $('#import_swagger').buttonLoader('stop');
+                    }
                 }
-                var designer = APIDesigner();
-                designer.load_api_document(data);
-                $('#import_swagger').buttonLoader('stop');
-                $("#swaggerUpload").modal('hide');
+
+                jagg.post("/site/blocks/item-design/ajax/add.jag", {
+                    action: "validateSwagger",
+                    swaggerDefinition: jsonFile.result
+                }, function (result) {
+                    if (result.error) {
+                        jagg.message({
+                            content: i18n.t("API swagger definition is invalid. Please re-import valid swagger definition"),
+                            type: "error"
+                        });
+                        $('#import_swagger').buttonLoader('stop');
+                    } else {
+                        var designer = APIDesigner();
+                        designer.load_api_document(data);
+                        $('#import_swagger').buttonLoader('stop');
+                        $("#swaggerUpload").modal('hide');
+                    }
+                }, "json");
             } catch (err){
                 $('#swagger_file_help').show();
                 $('#import_swagger').buttonLoader('stop');
@@ -1515,15 +1537,15 @@ $(document).ready(function(){
             output.src = URL.createObjectURL(this.files[0]);
         }
     });
-    
+
     if($("#wsdl").val()) {
 		var wsdlInputVal = $("#wsdl").val();
 		if(wsdlInputVal.endsWith(".zip")) {
 		   $("#fileUploadSection").show();
 		   $("#wsdlurlInputSection").hide();
-		   
+
 		} else {
-		   $("#fileUploadSection").hide();	
+		   $("#fileUploadSection").hide();
 		}
     }
 });
