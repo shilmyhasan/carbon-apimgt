@@ -1328,15 +1328,7 @@ $(document).ready(function(){
                     var data = jsyaml.load(jsonFile.result);
                 }
                 if((m = json.exec(jsonFile.file_name)) !== null){
-                    try {
-                        var data = JSON.parse(jsonFile.result); //swagger file content
-                    } catch (err) {
-                        jagg.message({
-                            content:i18n.t("API swagger definition is invalid JSON. Please re-import valid swagger definition"),
-                            type: "error"
-                        });
-                        $('#import_swagger').buttonLoader('stop');
-                    }
+                    var data = JSON.parse(jsonFile.result); //swagger file content
                 }
 
                 jagg.post("/site/blocks/item-design/ajax/add.jag", {
@@ -1357,6 +1349,10 @@ $(document).ready(function(){
                     }
                 }, "json");
             } catch (err){
+                jagg.message({
+                    content:i18n.t("API swagger definition is invalid JSON. Please re-import valid swagger definition"),
+                    type: "error"
+                });
                 $('#swagger_file_help').show();
                 $('#import_swagger').buttonLoader('stop');
                 $('#fileErrorMsgClose').on('click', function (e) {
