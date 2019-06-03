@@ -1445,6 +1445,7 @@ public class APIMgtDAOTest {
         apiMgtDAO.convertNullThrottlingTiers();
         HashMap<String, String> result2 = apiMgtDAO.getURITemplatesPerAPIAsString(apiId);
         Assert.assertTrue(result2.containsKey("/abc::GET::Any::Unlimited::abcd defgh fff"));
+        apiMgtDAO.deleteAPI(apiId);
    }
 
     @Test public void testGetProviderByNameVersionTenant() throws APIManagementException, SQLException {
