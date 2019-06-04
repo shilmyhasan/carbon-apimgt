@@ -2117,7 +2117,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (registry.resourceExists(resourcePath + APIConstants.API_DOC_2_0_RESOURCE_NAME)) {
                 String apiDefinition = definitionFromSwagger20.getAPIDefinition(api.getId(), registry);
                 LinkedHashMap map = new ObjectMapper().readValue(apiDefinition, LinkedHashMap.class);
-                JSONObject infoObject = (JSONObject)map.get("info");
+                Map infoObject = map;
                 infoObject.remove("version");
                 infoObject.put("version", newAPI.getId().getVersion());
                 String json = new ObjectMapper().writeValueAsString(map);
