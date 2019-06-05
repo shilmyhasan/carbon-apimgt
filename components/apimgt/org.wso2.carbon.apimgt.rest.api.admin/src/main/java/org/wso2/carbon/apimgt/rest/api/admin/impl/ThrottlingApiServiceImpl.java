@@ -671,10 +671,6 @@ public class ThrottlingApiServiceImpl extends ThrottlingApiService {
                     RestApiUtil.handleResourceAlreadyExistsError(
                             "Custom rule with name " + globalPolicy.getPolicyName() + " already exists", log);
                 }
-                if (apiProvider.isGlobalPolicyKeyTemplateExists(globalPolicy)) {
-                    RestApiUtil.handleResourceAlreadyExistsError(
-                            "Custom rule with key template " + globalPolicy.getKeyTemplate() + " already exists", log);
-                }
             } catch (PolicyNotFoundException ignore) {
             }
             //Add the policy
