@@ -125,8 +125,6 @@
              only be created when this element is uncommented. When the specified
              time duration gets elapsed ,tag cache will get re-generated. -->
         <!--TagCacheDuration>120000</TagCacheDuration-->
-        <!-- Expiry time for resource cache-->
-        <!-- GatewayResourceCacheExpiry>3600</GatewayResourceCacheExpiry -->
     </CacheConfigurations>
 
     <!--
