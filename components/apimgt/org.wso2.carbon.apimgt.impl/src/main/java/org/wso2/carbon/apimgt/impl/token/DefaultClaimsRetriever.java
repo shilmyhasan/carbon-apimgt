@@ -18,6 +18,8 @@
 package org.wso2.carbon.apimgt.impl.token;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -45,6 +47,8 @@ import java.util.concurrent.TimeUnit;
  * api-manager.xml -> JWTConfiguration -> ClaimsRetrieverImplClass
  */
 public class DefaultClaimsRetriever implements ClaimsRetriever {
+
+    private static final Log log = LogFactory.getLog(DefaultClaimsRetriever.class);
     //TODO refactor caching implementation
 
     private String dialectURI = DEFAULT_DIALECT_URI;
@@ -80,6 +84,12 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
     }
 
     public SortedMap<String, String> getClaims(String endUserName) throws APIManagementException {
+        String strEnabledJWTClaimCache = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                .getAPIManagerConfiguration().getFirstProperty(APIConstants.ENABLED_JWT_CLAIM_CACHE);
+        boolean enabledJWTClaimCache = true;
+        if (strEnabledJWTClaimCache != null) {
+            enabledJWTClaimCache = Boolean.valueOf(strEnabledJWTClaimCache);
+        }
         SortedMap<String, String> claimValues;
         try {
             if (endUserName != null) {
@@ -88,10 +98,20 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
                 //check in local cache
                 String key = endUserName + ':' + tenantId;
                 ClaimCacheKey cacheKey = new ClaimCacheKey(key);
-                Object result = getClaimsLocalCache().get(cacheKey);
+                Object result = null;
+                if (enabledJWTClaimCache) {
+                    result = getClaimsLocalCache().get(cacheKey);
+                }
                 if (result != null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Claims are retrieved from JWT claim cache for user: " + endUserName);
+                    }
                     return ((UserClaims) result).getClaimValues();
                 } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Custom claims are not available in JWT claim cache. Hence will be retrieved from "
+                                + "user store for user: " + endUserName);
+                    }
                     ClaimManager claimManager = ServiceReferenceHolder.getInstance().getRealmService().
                             getTenantUserRealm(tenantId).getClaimManager();
                     //Claim[] claims = claimManager.getAllClaims(dialectURI);
@@ -102,8 +122,14 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
 
                     claimValues = new TreeMap(userStoreManager.getUserClaimValues(tenantAwareUserName, claimURIs,null));
                     UserClaims userClaims = new UserClaims(claimValues);
-                    //add to cache
-                    getClaimsLocalCache().put(cacheKey, userClaims);
+                    //add to cache when JWT claim cache is enabled
+                    if (enabledJWTClaimCache) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Will add claims retrieved from user store for user: " + endUserName +
+                                    " to JWT claim cache");
+                        }
+                        getClaimsLocalCache().put(cacheKey, userClaims);
+                    }
                     return claimValues;
                 }
             }
