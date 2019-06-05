@@ -1408,6 +1408,9 @@ public final class APIConstants {
     public static final String USER = "user";
     public static final String IS_SUPER_TENANT = "isSuperTenant";
 
+    public static final String ENABLE_THUMBPRINT_HEXIFY = "enableThumbprintHexify";
+
+
     /**
      * Constants for correlation logging
      * */
