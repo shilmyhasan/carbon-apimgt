@@ -388,7 +388,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 digestValue.update(der);
                 byte[] digestInBytes = digestValue.digest();
                 Base64  base64 = new Base64(true);
-                //fix for REPSOLPROD-123
+                //fix for carbon-apimgt-5535
                 String base64UrlEncodedThumbPrint = "";
                 String publicCertThumbprint = "";
                 if (Boolean.parseBoolean(System.getProperty(APIConstants.ENABLE_THUMBPRINT_HEXIFY))) {
