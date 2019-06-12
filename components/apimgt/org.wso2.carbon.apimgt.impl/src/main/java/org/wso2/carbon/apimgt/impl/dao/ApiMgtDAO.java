@@ -5564,7 +5564,7 @@ public class ApiMgtDAO {
                 subscriber.setId(rs.getInt("SUBSCRIBER_ID"));
 
                 if (multiGroupAppSharingEnabled) {
-                    if (application.getGroupId().isEmpty()) {
+                    if (StringUtils.isEmpty(application.getGroupId())) {
                         application.setGroupId(getGroupId(application.getId()));
                     }
                 }
