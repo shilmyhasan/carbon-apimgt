@@ -21,8 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.HttpClient;
 import org.json.simple.JSONArray;
@@ -83,6 +81,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -93,7 +93,7 @@ import javax.xml.transform.stream.StreamResult;
  * Class for synchronizing APIs upon initial server startup
  */
 public class APISynchronizer implements OnPremiseGatewayInitListener {
-    private static final Log log = LogFactory.getLog(APISynchronizer.class);
+    private static final Logger log = LoggerFactory.getLogger(APISynchronizer.class);
     private String apiViewUrl = APISynchronizationConstants.EMPTY_STRING;
     private String mediationPolicyAdminUrl = APISynchronizationConstants.EMPTY_STRING;
     private String mediationPolicyUrl = APISynchronizationConstants.EMPTY_STRING;
