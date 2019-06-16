@@ -1,26 +1,26 @@
 /*
-*  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.apimgt.impl.workflow;
 
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.WorkflowResponse;
-import org.wso2.carbon.apimgt.impl.APIManagerAnalyticsConfiguration;
+import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -55,6 +55,7 @@ public abstract class WorkflowExecutor implements Serializable {
      * @throws WorkflowException - Thrown when the workflow execution was not fully performed.
      */
     public WorkflowResponse execute(WorkflowDTO workflowDTO) throws WorkflowException {
+
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
         try {
             apiMgtDAO.addWorkflowEntry(workflowDTO);
@@ -66,6 +67,28 @@ public abstract class WorkflowExecutor implements Serializable {
     }
 
     /**
+     * Implements monetization logic in workflow.
+     *
+     * @param workflowDTO - The WorkflowDTO which contains workflow contextual information related to the workflow.
+     * @throws WorkflowException - Thrown when the workflow execution was not fully performed.
+     */
+    public WorkflowResponse monetizeSubscription(WorkflowDTO workflowDTO, API api) throws WorkflowException {
+
+        return new GeneralWorkflowResponse();
+    }
+
+    /**
+     * Implements monetization deletion logic in workflow.
+     *
+     * @param workflowDTO - The WorkflowDTO which contains workflow contextual information related to the workflow.
+     * @throws WorkflowException - Thrown when the workflow execution was not fully performed.
+     */
+    public WorkflowResponse deleteMonetizedSubscription(WorkflowDTO workflowDTO, API api) throws WorkflowException {
+
+        return new GeneralWorkflowResponse();
+    }
+
+    /**
      * Implements the workflow completion logic.
      *
      * @param workflowDTO - The WorkflowDTO which contains workflow contextual information related to the workflow.
@@ -73,8 +96,8 @@ public abstract class WorkflowExecutor implements Serializable {
      */
     public WorkflowResponse complete(WorkflowDTO workflowDTO) throws WorkflowException {
 
-       ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
-       try {
+        ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
+        try {
             apiMgtDAO.updateWorkflowStatus(workflowDTO);
             publishEvents(workflowDTO);
         } catch (APIManagementException e) {
@@ -98,6 +121,7 @@ public abstract class WorkflowExecutor implements Serializable {
      * @return UUID
      */
     public String generateUUID() {
+
         return UUIDGenerator.generateUUID();
     }
 
@@ -108,6 +132,7 @@ public abstract class WorkflowExecutor implements Serializable {
      * @throws WorkflowException
      */
     public void persistWorkflow(WorkflowDTO workflowDTO) throws WorkflowException {
+
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
         try {
             apiMgtDAO.addWorkflowEntry(workflowDTO);
@@ -117,10 +142,12 @@ public abstract class WorkflowExecutor implements Serializable {
     }
 
     public String getCallbackURL() {
+
         return callbackURL;
     }
 
     public void setCallbackURL(String callbackURL) {
+
         this.callbackURL = callbackURL;
     }
 
@@ -130,6 +157,7 @@ public abstract class WorkflowExecutor implements Serializable {
      * @param workflowDTO workflow DTO
      */
     public void publishEvents(WorkflowDTO workflowDTO) {
+
         boolean enabled = APIUtil.isAnalyticsEnabled();
         if (enabled) {
             APIMgtWorkflowDataPublisher publisher = ServiceReferenceHolder.getInstance()
@@ -144,7 +172,9 @@ public abstract class WorkflowExecutor implements Serializable {
      * @param workflowExtRef workflow external reference to match with workflow server process
      * @throws WorkflowException
      */
-    public void cleanUpPendingTask(String workflowExtRef) throws WorkflowException {}
+    public void cleanUpPendingTask(String workflowExtRef) throws WorkflowException {
+
+    }
 
 }
 

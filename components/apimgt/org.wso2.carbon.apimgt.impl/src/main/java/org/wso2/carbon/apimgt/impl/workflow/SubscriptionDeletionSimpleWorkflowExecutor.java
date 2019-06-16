@@ -20,24 +20,24 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.WorkflowResponse;
+import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dto.SubscriptionWorkflowDTO;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
-import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
  * Simple workflow executor for subscription delete action
  */
 public class SubscriptionDeletionSimpleWorkflowExecutor extends WorkflowExecutor {
+
     private static final Log log = LogFactory.getLog(SubscriptionDeletionSimpleWorkflowExecutor.class);
 
     @Override
     public String getWorkflowType() {
+
         return WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION;
     }
 
@@ -50,14 +50,29 @@ public class SubscriptionDeletionSimpleWorkflowExecutor extends WorkflowExecutor
 
     @Override
     public WorkflowResponse execute(WorkflowDTO workflowDTO) throws WorkflowException {
+
         workflowDTO.setStatus(WorkflowStatus.APPROVED);
         complete(workflowDTO);
         super.publishEvents(workflowDTO);
         return new GeneralWorkflowResponse();
     }
 
+    /**
+     * This method is responsible for deleting the monetized subscription and returns the execute method.
+     *
+     * @param workflowDTO The WorkflowDTO which contains workflow contextual information related to the workflow
+     * @return workflow response to the caller by returning the execute() method
+     * @throws WorkflowException
+     */
+    @Override
+    public WorkflowResponse deleteMonetizedSubscription(WorkflowDTO workflowDTO, API api) throws WorkflowException {
+        // implemetation is not provided in this version
+        return execute(workflowDTO);
+    }
+
     @Override
     public WorkflowResponse complete(WorkflowDTO workflowDTO) throws WorkflowException {
+
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
         SubscriptionWorkflowDTO subWorkflowDTO = (SubscriptionWorkflowDTO) workflowDTO;
         String errorMsg = null;
