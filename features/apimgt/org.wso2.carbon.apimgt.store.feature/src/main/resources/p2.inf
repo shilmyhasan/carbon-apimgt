@@ -1,7 +1,6 @@
-metaRequirements.0.namespace = org.eclipse.equinox.p2.iu
-metaRequirements.0.name = org.wso2.carbon.extensions.touchpoint
 instructions.configure = \
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/web-ui-apps/);\
-org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/web-ui-apps/store/);\
-org.wso2.carbon.extensions.touchpoint.copy(source:${installFolder}/../lib/features/org.wso2.carbon.apimgt.store_${feature.version}/store/,target:${installFolder}/../../deployment/web-ui-apps/store/,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.apimgt.store_${feature.version}/store/,target:${installFolder}/../../deployment/server/jaggeryapps/api-store,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.apimgt.store_${feature.version}/apistore/,target:${installFolder}/../../modules/apistore,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.apimgt.store_${feature.version}/customTheme/,target:${installFolder}/../../deployment/server/jaggeryapps/api-store,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.apimgt.store_${feature.version}/admin/,target:${installFolder}/../../deployment/server/jaggeryapps/admin,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.apimgt.store_${feature.version}/store-new/,target:${installFolder}/../../deployment/server/jaggeryapps/store-new,overwrite:true);\

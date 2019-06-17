@@ -1,20 +1,14 @@
----
-# Use Ubuntu Trusty with sudo instead of new default Trusty because of higher resources availability
-sudo: required
-dist: trusty
 language: java
-
-install:
-  - . $HOME/.nvm/nvm.sh
-  - nvm install 8.9.0
-  - nvm use 8.9.0
+sudo: true
+# Can't update to xenial distribution (ubuntu 16.04) bause of the Java JDK restriction (Not supporting )
+dist: trusty
 
 # Using -q Quiet output which only show errors, to overcome TravisCI log limit issue
-script: travis_wait 100 mvn clean install -q -B -V
+script: mvn clean install -Dmaven.test.skip -q -B -V | grep -v DEBUG; exit "${PIPESTATUS[0]}";
 
 cache:
   directories:
+  - $HOME/.m2_1
   - $HOME/.m2
-  - features/apimgt/org.wso2.carbon.apimgt.admin.feature/src/main/resources/admin/node_modules
-  - features/apimgt/org.wso2.carbon.apimgt.publisher.feature/src/main/resources/publisher/node_modules
-  - features/apimgt/org.wso2.carbon.apimgt.store.feature/src/main/resources/store/node_modules
+  - features/apimgt/org.wso2.carbon.apimgt.publisher.feature/src/main/resources/publisher-new/node_modules
+  - features/apimgt/org.wso2.carbon.apimgt.store.feature/src/main/resources/store-new/node_modules

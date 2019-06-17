@@ -1,96 +1,62 @@
 package org.wso2.carbon.apimgt.rest.api.admin.dto;
 
+import org.wso2.carbon.apimgt.rest.api.admin.dto.ThrottleConditionDTO;
 
-import com.google.gson.annotations.SerializedName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import java.util.Objects;
+import io.swagger.annotations.*;
+import com.fasterxml.jackson.annotation.*;
 
-/**
- * HeaderConditionDTO
- */
-public class HeaderConditionDTO   {
-  @SerializedName("headerName")
+import javax.validation.constraints.NotNull;
+
+
+
+
+
+@ApiModel(description = "")
+public class HeaderConditionDTO extends ThrottleConditionDTO {
+  
+  
+  
   private String headerName = null;
-
-  @SerializedName("headerValue")
+  
+  
   private String headerValue = null;
 
-  public HeaderConditionDTO headerName(String headerName) {
-    this.headerName = headerName;
-    return this;
-  }
-
-   /**
-   * Get headerName
-   * @return headerName
-  **/
-  @ApiModelProperty(required = true, value = "")
+  
+  /**
+   * Name of the header
+   **/
+  @ApiModelProperty(value = "Name of the header")
+  @JsonProperty("headerName")
   public String getHeaderName() {
     return headerName;
   }
-
   public void setHeaderName(String headerName) {
     this.headerName = headerName;
   }
 
-  public HeaderConditionDTO headerValue(String headerValue) {
-    this.headerValue = headerValue;
-    return this;
-  }
-
-   /**
-   * Get headerValue
-   * @return headerValue
-  **/
-  @ApiModelProperty(required = true, value = "")
+  
+  /**
+   * Value of the header
+   **/
+  @ApiModelProperty(value = "Value of the header")
+  @JsonProperty("headerValue")
   public String getHeaderValue() {
     return headerValue;
   }
-
   public void setHeaderValue(String headerValue) {
     this.headerValue = headerValue;
   }
 
+  
 
   @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    HeaderConditionDTO headerCondition = (HeaderConditionDTO) o;
-    return Objects.equals(this.headerName, headerCondition.headerName) &&
-        Objects.equals(this.headerValue, headerCondition.headerValue);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(headerName, headerValue);
-  }
-
-  @Override
-  public String toString() {
+  public String toString()  {
     StringBuilder sb = new StringBuilder();
     sb.append("class HeaderConditionDTO {\n");
-    
-    sb.append("    headerName: ").append(toIndentedString(headerName)).append("\n");
-    sb.append("    headerValue: ").append(toIndentedString(headerValue)).append("\n");
-    sb.append("}");
+    sb.append("  " + super.toString()).append("\n");
+    sb.append("  headerName: ").append(headerName).append("\n");
+    sb.append("  headerValue: ").append(headerValue).append("\n");
+    sb.append("}\n");
     return sb.toString();
   }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
-

@@ -1,73 +1,45 @@
 package org.wso2.carbon.apimgt.rest.api.admin.dto;
 
+import org.wso2.carbon.apimgt.rest.api.admin.dto.ThrottleLimitDTO;
 
-import com.google.gson.annotations.SerializedName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import java.util.Objects;
+import io.swagger.annotations.*;
+import com.fasterxml.jackson.annotation.*;
 
-/**
- * RequestCountLimitDTO
- */
-public class RequestCountLimitDTO   {
-  @SerializedName("requestCount")
-  private Integer requestCount = 0;
+import javax.validation.constraints.NotNull;
 
-  public RequestCountLimitDTO requestCount(Integer requestCount) {
-    this.requestCount = requestCount;
-    return this;
-  }
 
-   /**
-   * Get requestCount
-   * @return requestCount
-  **/
-  @ApiModelProperty(required = true, value = "")
-  public Integer getRequestCount() {
+
+
+
+@ApiModel(description = "")
+public class RequestCountLimitDTO extends ThrottleLimitDTO {
+  
+  
+  
+  private Long requestCount = null;
+
+  
+  /**
+   * Maximum number of requests allowed
+   **/
+  @ApiModelProperty(value = "Maximum number of requests allowed")
+  @JsonProperty("requestCount")
+  public Long getRequestCount() {
     return requestCount;
   }
-
-  public void setRequestCount(Integer requestCount) {
+  public void setRequestCount(Long requestCount) {
     this.requestCount = requestCount;
   }
 
+  
 
   @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    RequestCountLimitDTO requestCountLimit = (RequestCountLimitDTO) o;
-    return Objects.equals(this.requestCount, requestCountLimit.requestCount);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(requestCount);
-  }
-
-  @Override
-  public String toString() {
+  public String toString()  {
     StringBuilder sb = new StringBuilder();
     sb.append("class RequestCountLimitDTO {\n");
-    
-    sb.append("    requestCount: ").append(toIndentedString(requestCount)).append("\n");
-    sb.append("}");
+    sb.append("  " + super.toString()).append("\n");
+    sb.append("  requestCount: ").append(requestCount).append("\n");
+    sb.append("}\n");
     return sb.toString();
   }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
-
