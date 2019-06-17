@@ -1563,5 +1563,6 @@ public final class APIConstants {
         public static final String JOB_NAME = "USAGE_PUBLISHER";
         public static final String FROM_TIME_CONFIGURATION_PROPERTY =
                 "Monetization.UsagePubliser.PublishTimeDurationInDays";
+        public static final String GRANULARITY_PROERTY_LOCATION = "Monetization.UsagePubliser.Granularity";
     }
 }
