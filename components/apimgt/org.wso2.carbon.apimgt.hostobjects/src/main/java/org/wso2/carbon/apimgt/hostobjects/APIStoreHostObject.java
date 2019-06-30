@@ -4540,7 +4540,6 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             username = signupConfig.getAdminUserName();
             String password = signupConfig.getAdminPassword();
-
             String host = null;
             host = new URL(url).getHost();
             if (!authAdminStub.login(username, password, host)) {
@@ -4564,7 +4563,7 @@ public class APIStoreHostObject extends ScriptableObject {
             for (LocalClaimDTO dto : localClaimDTOS) {
                 boolean isSupported = false;
                 boolean isRequired = false;
-                String displayName = "";
+                String displayName = StringUtils.EMPTY;
                 int displayOrder = 0;
                 for (ClaimPropertyDTO dto2 : dto.getClaimProperties()) {
                     if ("SupportedByDefault".equalsIgnoreCase(dto2.getPropertyName())) {
