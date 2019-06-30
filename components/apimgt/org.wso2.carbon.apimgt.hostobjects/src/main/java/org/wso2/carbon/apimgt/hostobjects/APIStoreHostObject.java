@@ -4511,7 +4511,8 @@ public class APIStoreHostObject extends ScriptableObject {
         UserFieldDTO[] userFields = null;
         APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
         String url = config.getFirstProperty(APIConstants.AUTH_MANAGER_URL);
-        String username = "";
+        String username = StringUtils.EMPTY;
+        boolean isTenantFlowStarted = false;
 
         try {
             if (url == null) {
@@ -4522,8 +4523,6 @@ public class APIStoreHostObject extends ScriptableObject {
             ServiceClient client = authAdminStub._getServiceClient();
             Options options = client.getOptions();
             options.setManageSession(true);
-
-            boolean isTenantFlowStarted = false;
 
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
@@ -4602,6 +4601,10 @@ public class APIStoreHostObject extends ScriptableObject {
             handleException("Error while checking the ability to login for user " + username, e);
         } catch (ClaimMetadataManagementServiceClaimMetadataException e) {
             handleException("Error while retrieving user registration fields for tenant " + tenantDomain, e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
         return userFields;
     }
