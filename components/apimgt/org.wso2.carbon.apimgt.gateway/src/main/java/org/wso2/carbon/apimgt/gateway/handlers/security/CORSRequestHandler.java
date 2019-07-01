@@ -58,6 +58,7 @@ public class CORSRequestHandler extends AbstractHandler implements ManagedLifecy
     private Set<String> allowedOrigins;
     private boolean initializeHeaderValues;
     private String allowedMethods;
+    private List<String> allowedMethodList;
     private boolean allowCredentialsEnabled;
 
     public void init(SynapseEnvironment synapseEnvironment) {
@@ -93,6 +94,9 @@ public class CORSRequestHandler extends AbstractHandler implements ManagedLifecy
         }
         if (allowedMethods == null) {
             allowedMethods = APIUtil.getAllowedMethods();
+            if (allowedMethods != null) {
+                allowedMethodList = Arrays.asList(allowedMethods.split(","));
+            }
         }
 
         initializeHeaderValues = true;
@@ -287,15 +291,17 @@ public class CORSRequestHandler extends AbstractHandler implements ManagedLifecy
         }
 
         messageContext.setProperty(APIConstants.CORSHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, allowedOrigin);
-        String allowedMethods = "";
-        StringBuffer allowedMethodsBuffer = new StringBuffer();
+        String allowedMethods;
+        StringBuffer allowedMethodsBuffer = new StringBuffer(20);
         if (selectedResource != null) {
             String[] methods = selectedResource.getMethods();
             for (String method : methods) {
-                allowedMethodsBuffer.append(method).append(',');
+                if (this.allowedMethodList.contains(method)) {
+                    allowedMethodsBuffer.append(method).append(',');
+                }
             }
             allowedMethods = allowedMethodsBuffer.toString();
-            if (methods.length != 0) {
+            if (allowedMethods.endsWith(",")) {
                 allowedMethods = allowedMethods.substring(0, allowedMethods.length() - 1);
             }
         } else {
@@ -370,5 +376,8 @@ public class CORSRequestHandler extends AbstractHandler implements ManagedLifecy
 
     public void setAllowedMethods(String allowedMethods) {
         this.allowedMethods = allowedMethods;
+        if (allowedMethods != null) {
+            allowedMethodList = Arrays.asList(allowedMethods.split(","));
+        }
     }
 }
