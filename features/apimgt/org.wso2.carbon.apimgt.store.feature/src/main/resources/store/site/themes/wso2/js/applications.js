@@ -454,6 +454,12 @@ GrantTypes.prototype.getMap = function(selected){
             this.element.html(template(this.app));
             this.element.find(".selectpicker").selectpicker({dropupAuto:false});
             this.element.find(".curl_command").codeHighlight();
+
+            if (this.app.grants[4].key == "client_credentials" && this.app.grants[4].selected == false) {
+                $(this.element.find('.regenerate')).attr("disabled", true);
+            } else {
+                $(this.element.find('.regenerate')).attr("disabled", false);
+            }
         }
     };
 
