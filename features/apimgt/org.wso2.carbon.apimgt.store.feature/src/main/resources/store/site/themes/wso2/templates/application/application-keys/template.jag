@@ -175,11 +175,7 @@
                       <div class="input-group-addon"><%=i18n.localize("Seconds")%></div>
                     </div>
             </div>
-            {{#if ClientCredentials}}
-                <button class=" btn btn-primary regenerate" data-load-text="<%= i18n.localize("Generating") %>"><%=i18n.localize("Re-generate")%></button>
-            {{else}}
-                <button disabled="disabled" class=" btn btn-primary regenerate" data-load-text="<%= i18n.localize("Generating") %>"><%=i18n.localize("Re-generate")%></button>
-            {{/if}}
+            <button class=" btn btn-primary regenerate" data-load-text="<%= i18n.localize("Generating") %>"><%=i18n.localize("Re-generate")%></button>
 		</form>		  	
 	  </div>
 	</div>

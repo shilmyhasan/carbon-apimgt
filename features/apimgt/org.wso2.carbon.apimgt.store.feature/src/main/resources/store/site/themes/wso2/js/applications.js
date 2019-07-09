@@ -370,7 +370,6 @@ GrantTypes.prototype.getMap = function(selected){
                     this.app.Key = result.data.key.accessToken;
                     this.app.ValidityTime = result.data.key.validityTime;
                     this.app.KeyScope = result.data.key.tokenScope.join();
-                    this.app.grants = this.grants.getMap(selectedGrants.split(",").join(" "));
                     var i;
                     for (i = 0; i < this.app.grants.length; ++i) {
                         if(this.app.grants[i].key == "client_credentials" && this.app.grants[i].selected == true){
@@ -454,6 +453,15 @@ GrantTypes.prototype.getMap = function(selected){
             this.element.html(template(this.app));
             this.element.find(".selectpicker").selectpicker({dropupAuto:false});
             this.element.find(".curl_command").codeHighlight();
+
+            var isClientCredentialsSelected = this.app.grants.filter(function (item) {
+                    return (item.key === "client_credentials" && item.selected === true)
+                }).length !== 0;
+            if (isClientCredentialsSelected) {
+                $(this.element.find('.regenerate')).attr("disabled", false);
+            } else {
+                $(this.element.find('.regenerate')).attr("disabled", true);
+            }
         }
     };
 
