@@ -21,7 +21,6 @@ package org.wso2.carbon.apimgt.impl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -42,12 +41,10 @@ import org.wso2.carbon.apimgt.impl.workflow.*;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
-import org.wso2.carbon.governance.api.generic.GenericArtifactFilter;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.core.*;
-import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.pagination.PaginationContext;
@@ -65,9 +62,22 @@ import org.wso2.carbon.registry.common.TermData;
 import javax.cache.Caching;
 
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class provides the core API store functionality. It is implemented in a very
@@ -98,6 +108,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     private final Object tagCacheMutex = new Object();
     private final Object tagWithAPICacheMutex = new Object();
     private APIMRegistryService apimRegistryService;
+    private final String invalidAppNameRegex = "[~!#$;%^*+={}\\|\\\\<>\\\"\\'\\/,]";
 
     public APIConsumerImpl() throws APIManagementException {
         super();
@@ -2400,6 +2411,12 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                                                             "cannot contain leading or trailing white spaces");
         }
 
+        Pattern pattern = Pattern.compile(invalidAppNameRegex);
+        Matcher matcher = pattern.matcher(application.getName());
+        if (matcher.find()) {
+            handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
+        }
+
         if (APIUtil.isApplicationExist(userId, application.getName(), application.getGroupId())) {
             handleResourceAlreadyExistsException(
                     "A duplicate application already exists by the name - " + application.getName());
@@ -2490,6 +2507,12 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         if (application.getName() != null && (application.getName().length() != application.getName().trim().length())) {
             handleApplicationNameContainSpacesException("Application name " +
                     "cannot contain leading or trailing white spaces");
+        }
+
+        Pattern pattern = Pattern.compile(invalidAppNameRegex);
+        Matcher matcher = pattern.matcher(application.getName());
+        if (matcher.find()) {
+            handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
         }
 
         apiMgtDAO.updateApplication(application);
