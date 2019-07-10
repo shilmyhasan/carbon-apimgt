@@ -5,7 +5,7 @@
 
     var ssoRelyingParty = new security.OIDCRelyingParty(site.oidcConfiguration.issuer);
     var sessionId = session.getId();
-    var isAuthenticated = ssoRelyingParty.isSessionAuthenticated(sessionId);
+    var isAuthenticated = jagg.getUser() != null;
     var i18n = require("i18n");
     var localeResourcesBasePath="/site/conf/locales/jaggery/";
     i18n.init(request,localeResourcesBasePath);
