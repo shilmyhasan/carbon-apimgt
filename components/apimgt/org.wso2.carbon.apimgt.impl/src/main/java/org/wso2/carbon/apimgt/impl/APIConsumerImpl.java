@@ -111,6 +111,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     private final Object tagCacheMutex = new Object();
     private final Object tagWithAPICacheMutex = new Object();
     private APIMRegistryService apimRegistryService;
+    private final String invalidAppNameRegex = "[~!#$;%^*+={}\\|\\\\<>\\\"\\'\\/,]";
 
     public APIConsumerImpl() throws APIManagementException {
         super();
@@ -2413,8 +2414,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                                                             "cannot contain leading or trailing white spaces");
         }
 
-        String regex = "[~!#$;%^*+={}\\|\\\\<>\\\"\\'\\/,]";
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(invalidAppNameRegex);
         Matcher matcher = pattern.matcher(application.getName());
         if (matcher.find()) {
             handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
@@ -2512,8 +2512,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     "cannot contain leading or trailing white spaces");
         }
 
-        String regex = "[~!#$;%^*+={}\\|\\\\<>\\\"\\'\\/,]";
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(invalidAppNameRegex);
         Matcher matcher = pattern.matcher(application.getName());
         if (matcher.find()) {
             handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");

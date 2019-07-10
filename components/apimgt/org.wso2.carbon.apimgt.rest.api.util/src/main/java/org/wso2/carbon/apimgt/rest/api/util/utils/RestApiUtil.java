@@ -33,8 +33,6 @@ import org.wso2.carbon.apimgt.api.APIMgtResourceAlreadyExistsException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceNotFoundException;
 import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.ApplicationNameWhiteSpaceValidationException;
-import org.wso2.carbon.apimgt.api.ApplicationNameWithInvalidCharactersException;
-import org.wso2.carbon.apimgt.api.PolicyNotFoundException;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.DuplicateAPIException;
@@ -458,8 +456,7 @@ public class RestApiUtil {
      */
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public static boolean isDueToApplicationNameWithInvalidCharacters(Throwable e) {
-        Throwable rootCause = getPossibleErrorCause(e);
-        return rootCause instanceof ApplicationNameWithInvalidCharactersException;
+        return rootCauseMessageMatches(e, "Application name contains invalid characters");
     }
 
     /**
