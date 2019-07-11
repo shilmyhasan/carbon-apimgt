@@ -213,6 +213,7 @@ $(document).ready(function(){
 var show_environments = function(){
     var type = $(".keytype option:selected").val();
     $("#environment_name").children('option').hide();
+    $("#environment_name").children().hide();
     $("#environment_name").children("option[class='" + type + "']").show();
     $("#environment_name").children("option[class='hybrid']").show();
     var options = $("#environment_name").children("option[class='hybrid'], option[class='" + type + "']");

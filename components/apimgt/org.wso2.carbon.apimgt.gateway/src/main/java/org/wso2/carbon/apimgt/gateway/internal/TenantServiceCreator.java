@@ -57,6 +57,7 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
     private String faultSequenceName = "fault";
     private String mainSequenceName = "main";
     private String corsSequenceName = "_cors_request_handler_";
+    private String threatFaultSequenceName = "_threat_fault_";
     private String synapseConfigRootPath = CarbonBaseUtils.getCarbonHome() + "/repository/resources/apim-synapse-config/";
 
     public void createdConfigurationContext(ConfigurationContext configurationContext) {
@@ -110,6 +111,16 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
             //sequence synapse configurations by using resource artifacts
             if (!authFailureHandlerSequenceNameFile.exists()) {
                 createTenantSynapseConfigHierarchy(synapseConfigDir, tenantDomain);
+            }
+            String threatFaultConfigLocation = synapseConfigsDir.getAbsolutePath() + File.separator +
+                    manger.getTracker().getCurrentConfigurationName() + File.separator +
+                    MultiXMLConfigurationBuilder.SEQUENCES_DIR + File.separator + threatFaultSequenceName + ".xml";
+            File threatFaultXml = new File(threatFaultConfigLocation);
+            if (!threatFaultXml.exists()) {
+                FileUtils.copyFile(new File(synapseConfigRootPath + threatFaultSequenceName + ".xml"),
+                        new File(synapseConfigDir.getAbsolutePath() + File.separator +
+                                MultiXMLConfigurationBuilder.SEQUENCES_DIR + File.separator +
+                                threatFaultSequenceName + ".xml"));
             }
         } catch (RemoteException e) {
             log.error("Failed to create Tenant's synapse sequences.", e);
@@ -190,6 +201,9 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
                 FileUtils.copyFile(new File(synapseConfigRootPath + corsSequenceName + ".xml"),
                                    new File(synapseConfigDir.getAbsolutePath() + File.separator + "sequences"
                                             + File.separator + corsSequenceName + ".xml"));
+                FileUtils.copyFile(new File(synapseConfigRootPath + threatFaultSequenceName + ".xml"),
+                        new File(synapseConfigDir.getAbsolutePath() + File.separator + "sequences"
+                                + File.separator + threatFaultSequenceName + ".xml"));
             } catch (IOException e) {
                 log.error("Error while copying API manager specific synapse sequences" + e);
             }
