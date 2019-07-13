@@ -22726,7 +22726,7 @@ SwaggerUi.partials.signature = (function () {
     var type = model.definition && model.definition.type ? model.definition.type : 'object';
     name = name || model.name;
 
-   if (config.modelsToIgnore.indexOf($ref) > -1) {
+    if (config.modelsToIgnore.indexOf($ref) > -1) {
       type = 'loop';
       config.loopTo = modelType;
     } else {
