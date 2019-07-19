@@ -425,6 +425,7 @@ public class APIMappingUtil {
         model.setContext(context);
         model.setDescription(dto.getDescription());
         model.setEndpointConfig(dto.getEndpointConfig());
+        model.setImplementation(dto.getEndpointImplementationType().toString());
         model.setWsdlUrl(dto.getWsdlUri());
         model.setType(dto.getType().toString());
         model.setThumbnailUrl(dto.getThumbnailUri());

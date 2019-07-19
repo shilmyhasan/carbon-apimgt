@@ -82,6 +82,12 @@ public class APIDetailedDTO extends APIInfoDTO {
   
   private String endpointConfig = null;
   
+  public enum EndpointImplementationTypeEnum {
+     INLINE,  ENDPOINT, 
+  };
+  
+  private EndpointImplementationTypeEnum endpointImplementationType = EndpointImplementationTypeEnum.ENDPOINT;
+  
   
   private APIEndpointSecurityDTO endpointSecurity = null;
   
@@ -262,9 +268,9 @@ public class APIDetailedDTO extends APIInfoDTO {
 
   
   /**
-   * Name of the Authorization header used for invoking the API. If it is not set, Authorization header name specified\nin tenant or system level will be used.\n
+   * Name of the Authorization header used for invoking the API. If it is not set, Authorization header name specified\nin tenant or system level will be used. \n
    **/
-  @ApiModelProperty(value = "Name of the Authorization header used for invoking the API. If it is not set, Authorization header name specified\nin tenant or system level will be used.\n")
+  @ApiModelProperty(value = "Name of the Authorization header used for invoking the API. If it is not set, Authorization header name specified\nin tenant or system level will be used. \n")
   @JsonProperty("authorizationHeader")
   public String getAuthorizationHeader() {
     return authorizationHeader;
@@ -333,6 +339,18 @@ public class APIDetailedDTO extends APIInfoDTO {
   }
   public void setEndpointConfig(String endpointConfig) {
     this.endpointConfig = endpointConfig;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("endpointImplementationType")
+  public EndpointImplementationTypeEnum getEndpointImplementationType() {
+    return endpointImplementationType;
+  }
+  public void setEndpointImplementationType(EndpointImplementationTypeEnum endpointImplementationType) {
+    this.endpointImplementationType = endpointImplementationType;
   }
 
   
@@ -497,6 +515,7 @@ public class APIDetailedDTO extends APIInfoDTO {
     sb.append("  visibleRoles: ").append(visibleRoles).append("\n");
     sb.append("  visibleTenants: ").append(visibleTenants).append("\n");
     sb.append("  endpointConfig: ").append(endpointConfig).append("\n");
+    sb.append("  endpointImplementationType: ").append(endpointImplementationType).append("\n");
     sb.append("  endpointSecurity: ").append(endpointSecurity).append("\n");
     sb.append("  gatewayEnvironments: ").append(gatewayEnvironments).append("\n");
     sb.append("  labels: ").append(labels).append("\n");
