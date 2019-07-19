@@ -4739,7 +4739,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 // checking if policy already exist
                 Policy policyIfExists = getGlobalPolicy(globalPolicy.getPolicyName());
                 if (policyIfExists != null) {
-                    throw new APIManagementException("Policy Name Already Exist");
+                    throw new APIManagementException("Policy Name Already Exists");
                 }
 
                 String policyFile = PolicyConstants.POLICY_LEVEL_GLOBAL + "_" + globalPolicy.getPolicyName();
