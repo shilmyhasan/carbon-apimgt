@@ -42,10 +42,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * ScopeIssuerTest contains tests for case insensitive scope validation
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ApiMgtDAO.class, APIKeyMgtDataHolder.class, Caching.class, AbstractUserStoreManager.class})
 public class ScopeIssuerTest {
 
+    /**
+     * Test case insensitive scope validation
+     *
+     * @throws Exception
+     */
     @Test
     public void testGetScopesOfRolesWithSpacesAndCases() throws Exception {
         ApiMgtDAO apiMgtDAO = Mockito.mock(ApiMgtDAO.class);
