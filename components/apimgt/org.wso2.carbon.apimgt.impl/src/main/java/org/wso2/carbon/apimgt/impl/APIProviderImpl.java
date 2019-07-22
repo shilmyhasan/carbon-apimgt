@@ -4736,9 +4736,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     throw new APIManagementException("Invalid Execution Plan");
                 }
 
-                // checking if keytemplate already exist
-                if (apiMgtDAO.isKeyTemplatesExist(globalPolicy)) {
-                    throw new APIManagementException("Key Template Already Exist");
+                // checking if policy already exist
+                Policy policyIfExists = getGlobalPolicy(globalPolicy.getPolicyName());
+                if (policyIfExists != null) {
+                    throw new APIManagementException("Policy Name Already Exists");
                 }
 
                 String policyFile = PolicyConstants.POLICY_LEVEL_GLOBAL + "_" + globalPolicy.getPolicyName();
@@ -4871,10 +4872,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 // validating custom execution plan
                 if (!deploymentManager.validateExecutionPlan(policyString)) {
                     throw new APIManagementException("Invalid Execution Plan");
-                }
-                // checking if keytemplate already exist for another policy
-                if (apiMgtDAO.isKeyTemplatesExist(globalPolicy)) {
-                    throw new APIManagementException("Key Template Already Exist");
                 }
 
                 // getting key templates before updating database
