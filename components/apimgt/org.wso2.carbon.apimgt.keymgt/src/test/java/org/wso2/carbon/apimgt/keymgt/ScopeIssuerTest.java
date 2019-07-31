@@ -1,20 +1,21 @@
 /*
- *Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *WSO2 Inc. licenses this file to you under the Apache License,
- *Version 2.0 (the "License"); you may not use this file except
- *in compliance with the License.
- *You may obtain a copy of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *Unless required by applicable law or agreed to in writing,
- *software distributed under the License is distributed on an
- *"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *KIND, either express or implied.  See the License for the
- *specific language governing permissions and limitations
- *under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.apimgt.keymgt;
 
 import org.junit.Assert;
@@ -63,9 +64,11 @@ public class ScopeIssuerTest {
         AbstractUserStoreManager abstractUserStoreManager = Mockito.mock(AbstractUserStoreManager.class);
         CacheManager cacheManager = Mockito.mock(CacheManager.class);
         Cache cache = Mockito.mock(Cache.class);
+
 //        mock ApiMgtDAO
         PowerMockito.mockStatic(ApiMgtDAO.class);
         Mockito.when(ApiMgtDAO.getInstance()).thenReturn(apiMgtDAO);
+
         /* mock APIKeyMgtDataHolder to get realm service, tenant manager, tenant id, tenant user realm and
         user store manager fo user realm */
         PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
@@ -74,16 +77,19 @@ public class ScopeIssuerTest {
         Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt())).thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
+
 //        mock AbstractUserStoreManager to return user roles
         String[] roles = { "CaseRole", "space role" };
         PowerMockito.whenNew(AbstractUserStoreManager.class).withAnyArguments().thenReturn(abstractUserStoreManager);
         Mockito.when(abstractUserStoreManager.getRoleListOfUser("ADMIN.USER.STORE.DOMAIN/caseuser"))
                 .thenReturn(roles);
+
 //        mock Caching to set restAPIScopes for tenant domain
         PowerMockito.mockStatic(Caching.class);
         Mockito.when(Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER)).thenReturn(cacheManager);
         Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
         Mockito.when(cache.get(Mockito.anyString())).thenReturn(new HashMap<String, String>());
+
 //        create access token request DTO with user details
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -94,12 +100,14 @@ public class ScopeIssuerTest {
         authenticatedUser.setUserName("caseuser");
         authenticatedUser.setUserStoreDomain("admin.user.store.domain");
         tokReqMsgCtx.setAuthorizedUser(authenticatedUser);
+
 //        set application scopes
         Map<String, String> appScopes = new HashMap<String, String>();
         appScopes.put("caseScope1", "caserole");
         appScopes.put("caseScope2", "CaseRole");
         appScopes.put("spaceScope", "space role");
         Mockito.when(apiMgtDAO.getScopeRolesOfApplication("clientId")).thenReturn(appScopes);
+        
 //        create scopeIssuer instance with empty whitelist/scopeSkipList
         ScopesIssuer.loadInstance(new ArrayList<String>());
         ScopesIssuer scopesIssuer = ScopesIssuer.getInstance();
@@ -107,6 +115,7 @@ public class ScopeIssuerTest {
         boolean setScopes = scopesIssuer.setScopes(tokReqMsgCtx);
         Assert.assertTrue(setScopes);
         Assert.assertEquals(3, tokReqMsgCtx.getScope().length);
+
 //        test scopes for case sensitive
         System.setProperty("preservedCaseSensitive", "true");
         setScopes = scopesIssuer.setScopes(tokReqMsgCtx);
