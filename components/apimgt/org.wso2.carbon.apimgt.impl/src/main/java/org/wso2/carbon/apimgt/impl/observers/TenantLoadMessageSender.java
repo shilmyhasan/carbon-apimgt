@@ -130,11 +130,14 @@ public class TenantLoadMessageSender extends AbstractAxis2ConfigurationContextOb
         // do nothing
     }
 
+    public void terminatedConfigurationContext(ConfigurationContext configContext) {
+        // do nothing
+    }
+
     /**
      * Check if the tenant load notifier is enabled
      *
-     * @return true if the java system property 'enableTenantLoadNotification'
-     * is set to true, else false
+     * @return true if the java system property 'enableTenantLoadNotification' is set to true, else false
      */
     public boolean isEnabled() {
         return Boolean.parseBoolean((System.getProperty(APIConstants.ENABLE_TENANT_LOAD_NOTIFICATION)));
