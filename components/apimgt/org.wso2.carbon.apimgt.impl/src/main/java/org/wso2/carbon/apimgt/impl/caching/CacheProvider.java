@@ -94,8 +94,8 @@ public class CacheProvider {
      */
     public static long getDefaultCacheTimeout() {
         if (ServerConfiguration.getInstance().getFirstProperty(APIConstants.DEFAULT_CACHE_TIMEOUT) != null) {
-            return Long.valueOf(ServerConfiguration.getInstance().getFirstProperty(APIConstants.DEFAULT_CACHE_TIMEOUT))
-                    * 60;
+            return Long.valueOf(ServerConfiguration.getInstance().
+                    getFirstProperty(APIConstants.DEFAULT_CACHE_TIMEOUT)) * 60;
         }
         return APIConstants.DEFAULT_TIMEOUT;
     }
@@ -106,11 +106,13 @@ public class CacheProvider {
     public static Cache createGatewayKeyCache() {
         String apimGWCacheExpiry = getApiManagerConfiguration().getFirstProperty(APIConstants.TOKEN_CACHE_EXPIRY);
         if (apimGWCacheExpiry != null) {
-            return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants.GATEWAY_KEY_CACHE_NAME, Long.parseLong(apimGWCacheExpiry), Long.parseLong(apimGWCacheExpiry));
+            return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants.GATEWAY_KEY_CACHE_NAME,
+                    Long.parseLong(apimGWCacheExpiry), Long.parseLong(apimGWCacheExpiry));
         } else {
             long defaultCacheTimeout =
                     getDefaultCacheTimeout();
-            return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants.GATEWAY_KEY_CACHE_NAME, defaultCacheTimeout, defaultCacheTimeout);
+            return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants.GATEWAY_KEY_CACHE_NAME,
+                    defaultCacheTimeout, defaultCacheTimeout);
         }
     }
 

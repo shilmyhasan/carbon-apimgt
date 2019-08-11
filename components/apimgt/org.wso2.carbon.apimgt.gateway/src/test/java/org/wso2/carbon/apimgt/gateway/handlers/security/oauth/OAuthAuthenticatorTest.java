@@ -305,10 +305,9 @@ public class OAuthAuthenticatorTest {
             public String getResourceAuthenticationScheme(MessageContext synCtx) throws APISecurityException {
                 if (authScheme.equalsIgnoreCase("noMatchedAuthScheme")) {
                     return "noMatchedAuthScheme";
-                } else if(authScheme.equalsIgnoreCase("Application")) {
+                } else if (authScheme.equalsIgnoreCase("Application")) {
                     return "Application";
-                }
-                else {
+                } else {
                     return "None";
                 }
             }

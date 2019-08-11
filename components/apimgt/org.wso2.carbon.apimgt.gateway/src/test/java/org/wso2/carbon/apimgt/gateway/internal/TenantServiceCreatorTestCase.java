@@ -74,9 +74,12 @@ public class TenantServiceCreatorTestCase {
         ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
         final APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
-        APIManagerConfigurationService apiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).thenReturn(apiManagerConfigurationService);
-        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        APIManagerConfigurationService apiManagerConfigurationService =
+                Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService);
+        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).
+                thenReturn(apiManagerConfiguration);
         CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
         PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
 

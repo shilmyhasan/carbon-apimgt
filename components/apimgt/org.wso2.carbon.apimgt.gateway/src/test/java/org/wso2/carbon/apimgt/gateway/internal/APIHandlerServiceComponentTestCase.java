@@ -48,6 +48,7 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 import javax.cache.Cache;
+
 /**
  * Test class for APIHandlerServiceComponent
  */
@@ -135,14 +136,17 @@ public class APIHandlerServiceComponentTestCase {
         final APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         PowerMockito.when(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()).
                 thenReturn(serviceReferenceHolder);
-        APIManagerConfigurationService apiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
+        APIManagerConfigurationService apiManagerConfigurationService =
+                Mockito.mock(APIManagerConfigurationService.class);
         PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
                 thenReturn(apiManagerConfigurationService);
-        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).
+                thenReturn(apiManagerConfiguration);
         PowerMockito.mockStatic(ServerConfiguration.class);
         ServerConfiguration serverConfiguration = Mockito.mock(ServerConfiguration.class);
         PowerMockito.when(ServerConfiguration.getInstance()).thenReturn(serverConfiguration);
-        PowerMockito.doNothing().when(serverConfiguration).overrideConfigurationProperty("Cache.ForceLocalCache", "true");
+        PowerMockito.doNothing().when(serverConfiguration).
+                overrideConfigurationProperty("Cache.ForceLocalCache", "true");
         CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
         PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
         Mockito.when(CacheProvider.createGatewayKeyCache()).thenReturn(cache);

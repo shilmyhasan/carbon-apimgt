@@ -46,6 +46,7 @@ public class APIAuthenticationServiceTest {
     public void setup() {
         System.setProperty("carbon.home", "");
     }
+
     @Test
     public void invalidateKeys() throws Exception {
         CacheManager cacheManager = Mockito.mock(CacheManager.class);
@@ -68,9 +69,12 @@ public class APIAuthenticationServiceTest {
         final APIManagerConfiguration apiManagerConfiguration1 = Mockito.mock(APIManagerConfiguration.class);
         PowerMockito.when(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()).
                 thenReturn(serviceReferenceHolder1);
-        APIManagerConfigurationService apiManagerConfigurationService1 = Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(serviceReferenceHolder1.getAPIManagerConfigurationService()).thenReturn(apiManagerConfigurationService1);
-        PowerMockito.when(apiManagerConfigurationService1.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration1);
+        APIManagerConfigurationService apiManagerConfigurationService1 =
+                Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(serviceReferenceHolder1.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService1);
+        PowerMockito.when(apiManagerConfigurationService1.getAPIManagerConfiguration()).
+                thenReturn(apiManagerConfiguration1);
         PowerMockito.mockStatic(CacheProvider.class);
         CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
         PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
@@ -101,51 +105,59 @@ public class APIAuthenticationServiceTest {
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.mockStatic(APIManagerConfigurationService.class);
         PowerMockito.mockStatic(CacheProvider.class);
-        ServiceReferenceHolder serviceReferenceHolder=Mockito.mock(ServiceReferenceHolder.class);
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
         final APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
-        APIManagerConfigurationService apiManagerConfigurationService=Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).thenReturn(apiManagerConfigurationService);
-        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
-        CacheProvider cacheProvider =Mockito.mock(CacheProvider.class);
-        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long)900);
+        APIManagerConfigurationService apiManagerConfigurationService =
+                Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService);
+        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).
+                thenReturn(apiManagerConfiguration);
+        CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
+        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
 
         Mockito.when(CacheProvider.getGatewayKeyCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getResourceCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getGatewayTokenCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getInvalidTokenCache()).thenReturn(cache);
-        apiAuthenticationService.invalidateResourceCache("/api1","1.0.0","/*","GET");
+        apiAuthenticationService.invalidateResourceCache("/api1", "1.0.0", "/*",
+                "GET");
     }
-    
+
     @Test
     public void invalidateResourceCacheForPolicy() throws Exception {
         CacheManager cacheManager = Mockito.mock(CacheManager.class);
         Cache cache = Mockito.mock(Cache.class);
-        
+
         Mockito.when(cacheManager.getCache(APIConstants.RESOURCE_CACHE_NAME)).thenReturn(cache);
         APIAuthenticationService apiAuthenticationService = new ApiAuthenticationServiceWrapper(cacheManager);
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.mockStatic(APIManagerConfigurationService.class);
         PowerMockito.mockStatic(CacheProvider.class);
-        ServiceReferenceHolder serviceReferenceHolder=Mockito.mock(ServiceReferenceHolder.class);
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
         final APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
-        APIManagerConfigurationService apiManagerConfigurationService=Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).thenReturn(apiManagerConfigurationService);
-        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
-        CacheProvider cacheProvider =Mockito.mock(CacheProvider.class);
-        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long)900);
+        APIManagerConfigurationService apiManagerConfigurationService =
+                Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService);
+        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).
+                thenReturn(apiManagerConfiguration);
+        CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
+        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
 
         Mockito.when(CacheProvider.getGatewayKeyCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getResourceCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getGatewayTokenCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getInvalidTokenCache()).thenReturn(cache);
-		apiAuthenticationService.invalidateResourceCache(
-				APIConstants.POLICY_CACHE_CONTEXT + "/t/" + MultitenantConstants.SUPER_TENANT_DOMAIN_NAME + "/", null, null,
-				null);
-		Mockito.verify(cache, Mockito.times(1)).removeAll();
-	  }
-    
+        apiAuthenticationService.invalidateResourceCache(
+                APIConstants.POLICY_CACHE_CONTEXT + "/t/" + MultitenantConstants.SUPER_TENANT_DOMAIN_NAME +
+                        "/", null, null,
+                null);
+        Mockito.verify(cache, Mockito.times(1)).removeAll();
+    }
+
     @Test
     public void invalidateResourceCacheInTenant() throws Exception {
         CacheManager cacheManager = Mockito.mock(CacheManager.class);
@@ -155,20 +167,23 @@ public class APIAuthenticationServiceTest {
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.mockStatic(APIManagerConfigurationService.class);
         PowerMockito.mockStatic(CacheProvider.class);
-        ServiceReferenceHolder serviceReferenceHolder=Mockito.mock(ServiceReferenceHolder.class);
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
         final APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
-        APIManagerConfigurationService apiManagerConfigurationService=Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).thenReturn(apiManagerConfigurationService);
-        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
-        CacheProvider cacheProvider =Mockito.mock(CacheProvider.class);
-        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long)900);
+        APIManagerConfigurationService apiManagerConfigurationService =
+                Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService);
+        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).
+                thenReturn(apiManagerConfiguration);
+        CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
+        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
 
         Mockito.when(CacheProvider.getGatewayKeyCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getResourceCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getGatewayTokenCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getInvalidTokenCache()).thenReturn(cache);
-        apiAuthenticationService.invalidateResourceCache("/t/wso2.com/api1","1.0.0","/*","GET");
+        apiAuthenticationService.invalidateResourceCache("/t/wso2.com/api1", "1.0.0", "/*", "GET");
     }
 
     @Test
@@ -176,8 +191,8 @@ public class APIAuthenticationServiceTest {
         CacheManager cacheManager = Mockito.mock(CacheManager.class);
         Cache cache = Mockito.mock(Cache.class);
         List<Cache.Entry> cacheEntryList = new ArrayList<>();
-        cacheEntryList.add(new CacheEntry("",""));
-        cacheEntryList.add(new CacheEntry("abcde-efgh",""));
+        cacheEntryList.add(new CacheEntry("", ""));
+        cacheEntryList.add(new CacheEntry("abcde-efgh", ""));
         Mockito.when(cache.iterator()).thenReturn(cacheEntryList.iterator());
         Mockito.when(cacheManager.getCache(APIConstants.KEY_CACHE_NAME)).thenReturn(cache);
         APIAuthenticationService apiAuthenticationService = new ApiAuthenticationServiceWrapper(cacheManager);
@@ -189,9 +204,9 @@ public class APIAuthenticationServiceTest {
         CacheManager cacheManager = Mockito.mock(CacheManager.class);
         Cache cache = Mockito.mock(Cache.class);
         List<Cache.Entry> cacheEntryList = new ArrayList<>();
-        Cache.Entry superTenantEntry= new CacheEntry("cdefg-hijk","carbon.super");
-        Cache.Entry tenantEntry = new CacheEntry("abcde-efgh","wso2.com");
-        Cache.Entry tenantEntry2 = new CacheEntry("abcde-efghi","wso2.com");
+        Cache.Entry superTenantEntry = new CacheEntry("cdefg-hijk", "carbon.super");
+        Cache.Entry tenantEntry = new CacheEntry("abcde-efgh", "wso2.com");
+        Cache.Entry tenantEntry2 = new CacheEntry("abcde-efghi", "wso2.com");
         cacheEntryList.add(superTenantEntry);
         cacheEntryList.add(tenantEntry);
         cacheEntryList.add(tenantEntry2);
@@ -204,14 +219,16 @@ public class APIAuthenticationServiceTest {
         PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.mockStatic(APIManagerConfigurationService.class);
         PowerMockito.mockStatic(CacheProvider.class);
-        ServiceReferenceHolder serviceReferenceHolder=Mockito.mock(ServiceReferenceHolder.class);
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
         final APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
-        APIManagerConfigurationService apiManagerConfigurationService=Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).thenReturn(apiManagerConfigurationService);
-        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
-        CacheProvider cacheProvider =Mockito.mock(CacheProvider.class);
-        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long)900);
+        APIManagerConfigurationService apiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService);
+        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).
+                thenReturn(apiManagerConfiguration);
+        CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
+        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
 
         Mockito.when(CacheProvider.getGatewayKeyCache()).thenReturn(cache);
         Mockito.when(CacheProvider.getResourceCache()).thenReturn(cache);
@@ -220,7 +237,7 @@ public class APIAuthenticationServiceTest {
 
         Mockito.when(cacheManager.getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME)).thenReturn(cache);
         APIAuthenticationService apiAuthenticationService = new ApiAuthenticationServiceWrapper(cacheManager);
-        String[] tokens = new String[]{"abcde-efgh","cdefg-hijk","abcde-efghi"};
+        String[] tokens = new String[]{"abcde-efgh", "cdefg-hijk", "abcde-efghi"};
         apiAuthenticationService.invalidateCachedTokens(tokens);
     }
 }
