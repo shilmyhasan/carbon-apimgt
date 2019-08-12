@@ -698,14 +698,14 @@ public class APIKeyValidatorTestCase {
         PowerMockito.mockStatic(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
         PowerMockito.mockStatic(APIManagerConfigurationService.class);
         PowerMockito.mockStatic(CacheProvider.class);
-        org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder serviceReferenceHolder1 = Mockito.mock(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
-        final APIManagerConfiguration apiManagerConfiguration1 = Mockito.mock(APIManagerConfiguration.class);
-        PowerMockito.when(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder1);
+        org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder MockServiceReferenceHolder = Mockito.mock(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
+        final APIManagerConfiguration MockApiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        PowerMockito.when(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()).thenReturn(MockServiceReferenceHolder);
 
-        APIManagerConfigurationService apiManagerConfigurationService1 = Mockito.mock(APIManagerConfigurationService.class);
+        APIManagerConfigurationService MockApiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
 
-        PowerMockito.when(serviceReferenceHolder1.getAPIManagerConfigurationService()).thenReturn(apiManagerConfigurationService1);
-        PowerMockito.when(apiManagerConfigurationService1.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration1);
+        PowerMockito.when(MockServiceReferenceHolder.getAPIManagerConfigurationService()).thenReturn(MockApiManagerConfigurationService);
+        PowerMockito.when(MockApiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(MockApiManagerConfiguration);
 
 
         PowerMockito.when(CacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);

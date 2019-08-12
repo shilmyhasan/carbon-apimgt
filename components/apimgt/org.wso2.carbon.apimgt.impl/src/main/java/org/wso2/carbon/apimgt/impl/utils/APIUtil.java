@@ -7168,10 +7168,10 @@ public final class APIUtil {
     /**
      * Get the Cache object using cacheManagerName & cacheName
      * @param cacheManagerName - Name of the Cache Manager
-     * @param cacheName - Name of the Cache
+     * @param cacheName        - Name of the Cache
      * @return existing cache
      */
-    public static Cache getCache(final String cacheManagerName, final String cacheName){
+    public static Cache getCache(final String cacheManagerName, final String cacheName) {
         return Caching.getCacheManager(cacheManagerName).getCache(cacheName);
     }
 

@@ -129,9 +129,9 @@ public class WebsocketUtil {
 		return CacheProvider.getGatewayKeyCache();
 	}
 
-    protected static Cache getGatewayTokenCache() {
-        return CacheProvider.getGatewayTokenCache();
-    }
+	protected static Cache getGatewayTokenCache() {
+		return CacheProvider.getGatewayTokenCache();
+	}
 
 	public static boolean isGatewayTokenCacheEnabled() {
 		return gatewayTokenCacheEnabled;

@@ -117,17 +117,17 @@ public class OAuthAuthenticatorTest {
         Cache cache = Mockito.mock(Cache.class);
         PowerMockito.mockStatic(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
         PowerMockito.mockStatic(APIManagerConfigurationService.class);
-        org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder serviceReferenceHolder1 =
+        org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder MockServiceReferenceHolder =
                 Mockito.mock(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
-        final APIManagerConfiguration apiManagerConfiguration1 = Mockito.mock(APIManagerConfiguration.class);
+        final APIManagerConfiguration MockApiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
         PowerMockito.when(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()).
-                thenReturn(serviceReferenceHolder1);
-        APIManagerConfigurationService apiManagerConfigurationService1 =
+                thenReturn(MockServiceReferenceHolder);
+        APIManagerConfigurationService MockApiManagerConfigurationService =
                 Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(serviceReferenceHolder1.getAPIManagerConfigurationService()).
-                thenReturn(apiManagerConfigurationService1);
-        PowerMockito.when(apiManagerConfigurationService1.getAPIManagerConfiguration()).
-                thenReturn(apiManagerConfiguration1);
+        PowerMockito.when(MockServiceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(MockApiManagerConfigurationService);
+        PowerMockito.when(MockApiManagerConfigurationService.getAPIManagerConfiguration()).
+                thenReturn(MockApiManagerConfiguration);
         PowerMockito.mockStatic(CacheProvider.class);
         CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
         PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
