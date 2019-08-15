@@ -26,6 +26,7 @@ import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.caching.impl.Util;
 
 import javax.cache.Cache;
+import javax.cache.Caching;
 
 /**
  * Class for initiating and returning caches. Creating cache take place when super tenant loading and tenant loading
@@ -164,5 +165,19 @@ public class CacheProvider {
             return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants
                     .GATEWAY_INVALID_TOKEN_CACHE_NAME, defaultCacheTimeout, defaultCacheTimeout);
         }
+    }
+
+    /**
+     * remove caches
+     */
+    public static void removeAllCaches() {
+        Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.getGatewayKeyCache().
+                getName());
+        Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.getResourceCache().
+                getName());
+        Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.getGatewayTokenCache().
+                getName());
+        Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).removeCache(CacheProvider.getInvalidTokenCache().
+                getName());
     }
 }

@@ -117,6 +117,7 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
         } catch (Exception e) {
             log.error("Failed to create Tenant's synapse sequences.", e);
         }
+        CacheProvider.removeAllCaches();
         CacheProvider.createGatewayKeyCache();
         CacheProvider.createResourceCache();
         CacheProvider.createGatewayTokenCache();
