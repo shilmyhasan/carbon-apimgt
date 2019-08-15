@@ -15,6 +15,7 @@
  */
 
 package org.wso2.carbon.apimgt.keymgt.handlers;
+
 import org.apache.axiom.om.OMElement;
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,6 +27,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.application.common.cache.BaseCache;
+import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.core.util.IdentityConfigParser;
@@ -35,6 +37,7 @@ import org.wso2.carbon.identity.oauth.internal.OAuthComponentServiceHolder;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
 import org.wso2.carbon.identity.oauth2.internal.OAuth2ServiceComponentHolder;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
+import org.wso2.carbon.identity.oauth2.token.handlers.grant.PasswordGrantHandler;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.user.api.Claim;
 import org.wso2.carbon.user.core.UserRealm;
@@ -42,14 +45,17 @@ import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.util.UserCoreUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
 import javax.xml.namespace.QName;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({OAuthServerConfiguration.class, IdentityConfigParser.class, MultitenantUtils.class, OAuth2ServiceComponentHolder.class,
-        IdentityTenantUtil.class, OAuthComponentServiceHolder.class, OAuth2Util.class, APIKeyMgtDataHolder.class, UserCoreUtil.class})
+@PrepareForTest({OAuthServerConfiguration.class, IdentityConfigParser.class, MultitenantUtils.class,
+        OAuth2ServiceComponentHolder.class, IdentityTenantUtil.class, OAuthComponentServiceHolder.class,
+        OAuth2Util.class, APIKeyMgtDataHolder.class, UserCoreUtil.class, LocalAndOutboundAuthenticationConfig.class,
+        ServiceProvider.class})
 public class ExtendedPasswordGrantHandlerTest {
 
     @Test
@@ -67,7 +73,7 @@ public class ExtendedPasswordGrantHandlerTest {
         extendedPasswordGrantHandler.init();
 
         //set loginConfig
-        Mockito.when(omElement.getFirstChildWithName((QName)Mockito.anyObject())).thenReturn(omElement);
+        Mockito.when(omElement.getFirstChildWithName((QName) Mockito.anyObject())).thenReturn(omElement);
         extendedPasswordGrantHandler.init();
     }
 
@@ -127,6 +133,15 @@ public class ExtendedPasswordGrantHandlerTest {
         OAuth2Util auth2Util = Mockito.mock(OAuth2Util.class);
         AuthenticatedUser authenticatedUser = Mockito.mock(AuthenticatedUser.class);
         Mockito.when(auth2Util.getUserFromUserName(Mockito.anyString())).thenReturn(authenticatedUser);
+        PowerMockito.mockStatic(LocalAndOutboundAuthenticationConfig.class);
+        LocalAndOutboundAuthenticationConfig localAndOutboundAuthenticationConfig =
+                Mockito.mock(LocalAndOutboundAuthenticationConfig.class);
+        Mockito.when(serviceProvider.getLocalAndOutBoundAuthenticationConfig()).
+                thenReturn(localAndOutboundAuthenticationConfig);
+        Mockito.when(localAndOutboundAuthenticationConfig.isUseUserstoreDomainInLocalSubjectIdentifier()).
+                thenReturn(true);
+        Mockito.when(localAndOutboundAuthenticationConfig.isUseTenantDomainInLocalSubjectIdentifier()).
+                thenReturn(true);
         Mockito.doNothing().when(authenticatedUser).setAuthenticatedSubjectIdentifier(Mockito.anyString());
         Mockito.doNothing().when(tokenReqMessageContext).setAuthorizedUser(authenticatedUser);
         String[] scopes = {"api_view", "api_update"};
@@ -173,8 +188,8 @@ public class ExtendedPasswordGrantHandlerTest {
         extendedPasswordGrantHandler.validateGrant(tokenReqMessageContext);
 
         //isSeconderyUserName - true
-        Map<String,Map<String,String>> loginConfiguration1 = new ConcurrentHashMap<String, Map<String,String>>();
-        Map<String,String> login1 = new HashMap<String, String>();
+        Map<String, Map<String, String>> loginConfiguration1 = new ConcurrentHashMap<String, Map<String, String>>();
+        Map<String, String> login1 = new HashMap<String, String>();
         login1.put("primary", "true");
         loginConfiguration1.put("EmailLogin", login1);
         Field loginConfigField = ExtendedPasswordGrantHandler.class.getDeclaredField("loginConfiguration");

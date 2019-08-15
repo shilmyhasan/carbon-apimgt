@@ -41,16 +41,23 @@ import org.wso2.carbon.apimgt.gateway.throttling.util.KeyTemplateRetriever;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
+import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
+
+import javax.cache.Cache;
 
 /**
  * Test class for APIHandlerServiceComponent
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({APIKeyValidatorClientPool.class, ThriftKeyValidatorClientPool.class, ServiceReferenceHolder.class,
-        APIManagerConfiguration.class, APIHandlerServiceComponent.class})
+        APIManagerConfiguration.class, APIHandlerServiceComponent.class,
+        org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class, ServerConfiguration.class,
+        Cache.class, APIManagerConfigurationService.class,
+        CacheProvider.class})
 public class APIHandlerServiceComponentTestCase {
     private APIHandlerServiceComponent apiHandlerServiceComponent;
     private APIKeyValidatorClientPool apiKeyValidatorClientPool;
@@ -119,6 +126,34 @@ public class APIHandlerServiceComponentTestCase {
         PowerMockito.whenNew(KeyTemplateRetriever.class).withAnyArguments().thenReturn(keyTemplateRetriever);
         PowerMockito.doNothing().when(blockingConditionRetriever).startWebServiceThrottleDataRetriever();
         PowerMockito.doNothing().when(keyTemplateRetriever).startKeyTemplateDataRetriever();
+        PowerMockito.mockStatic(Cache.class);
+        Cache cache = Mockito.mock(Cache.class);
+        PowerMockito.mockStatic(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
+        PowerMockito.mockStatic(APIManagerConfigurationService.class);
+        PowerMockito.mockStatic(CacheProvider.class);
+        org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder serviceReferenceHolder =
+                Mockito.mock(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
+        final APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        PowerMockito.when(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()).
+                thenReturn(serviceReferenceHolder);
+        APIManagerConfigurationService apiManagerConfigurationService =
+                Mockito.mock(APIManagerConfigurationService.class);
+        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).
+                thenReturn(apiManagerConfigurationService);
+        PowerMockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).
+                thenReturn(apiManagerConfiguration);
+        PowerMockito.mockStatic(ServerConfiguration.class);
+        ServerConfiguration serverConfiguration = Mockito.mock(ServerConfiguration.class);
+        PowerMockito.when(ServerConfiguration.getInstance()).thenReturn(serverConfiguration);
+        PowerMockito.doNothing().when(serverConfiguration).
+                overrideConfigurationProperty("Cache.ForceLocalCache", "true");
+        CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
+        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
+        Mockito.when(CacheProvider.createGatewayKeyCache()).thenReturn(cache);
+        Mockito.when(CacheProvider.createResourceCache()).thenReturn(cache);
+        Mockito.when(CacheProvider.createGatewayTokenCache()).thenReturn(cache);
+        Mockito.when(CacheProvider.createInvalidTokenCache()).thenReturn(cache);
+
         apiHandlerServiceComponent.activate(context);
         //test deactivate
         Mockito.doNothing().when(apiKeyValidatorClientPool).cleanup();
