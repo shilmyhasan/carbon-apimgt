@@ -22,33 +22,23 @@ import org.apache.synapse.MessageContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.gateway.TestUtils;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APIKeyValidator;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
-import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
-import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.metrics.manager.Timer;
 
 import javax.cache.Cache;
-import javax.cache.Caching;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Caching.class,
-        APIKeyValidator.class, org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class,
-        Cache.class, APIManagerConfigurationService.class, CacheProvider.class, Cache.class})
+
 public class OAuthAuthenticatorTest {
 
     private Timer timer;
@@ -113,33 +103,8 @@ public class OAuthAuthenticatorTest {
 
         org.apache.synapse.MessageContext messageContextNew = TestUtils.getMessageContextWithOutAuthContext
                 ("testAPI1", "1.2.0");
-        PowerMockito.mockStatic(Cache.class);
-        Cache cache = Mockito.mock(Cache.class);
-        PowerMockito.mockStatic(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
-        PowerMockito.mockStatic(APIManagerConfigurationService.class);
-        org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder MockServiceReferenceHolder =
-                Mockito.mock(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class);
-        final APIManagerConfiguration MockApiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
-        PowerMockito.when(org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()).
-                thenReturn(MockServiceReferenceHolder);
-        APIManagerConfigurationService MockApiManagerConfigurationService =
-                Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(MockServiceReferenceHolder.getAPIManagerConfigurationService()).
-                thenReturn(MockApiManagerConfigurationService);
-        PowerMockito.when(MockApiManagerConfigurationService.getAPIManagerConfiguration()).
-                thenReturn(MockApiManagerConfiguration);
-        PowerMockito.mockStatic(CacheProvider.class);
-        CacheProvider cacheProvider = Mockito.mock(CacheProvider.class);
-        PowerMockito.when(cacheProvider.getDefaultCacheTimeout()).thenReturn((long) 900);
-
-        Mockito.when(CacheProvider.getGatewayKeyCache()).thenReturn(cache);
-        Mockito.when(CacheProvider.getResourceCache()).thenReturn(cache);
-        Mockito.when(CacheProvider.getGatewayTokenCache()).thenReturn(cache);
         OAuthAuthenticator oauthAuthenticatorApplicationAuth = new OauthAuthenticatorWrapper(apiManagerConfiguration,
                 timer, createAPIKeyValidator(true, "Application"));
-        Mockito.when((String) cache.get("123456789")).thenReturn("cachekey");
-        APIKeyValidationInfoDTO apiKeyValidationInfoDTO = Mockito.mock(APIKeyValidationInfoDTO.class);
-        Mockito.when((APIKeyValidationInfoDTO) cache.get("/")).thenReturn(apiKeyValidationInfoDTO);
         Assert.assertEquals(oauthAuthenticatorApplicationAuth.authenticate(messageContextNew), true);
 
 
@@ -254,6 +219,11 @@ public class OAuthAuthenticatorTest {
             }
 
             @Override
+            protected long getDefaultCacheTimeout() {
+                return 900L;
+            }
+
+            @Override
             protected Cache getCacheFromCacheManager(String cacheName) {
                 if (isWithEmptyCache) {
                     return Mockito.mock(Cache.class);
@@ -305,9 +275,10 @@ public class OAuthAuthenticatorTest {
             public String getResourceAuthenticationScheme(MessageContext synCtx) throws APISecurityException {
                 if (authScheme.equalsIgnoreCase("noMatchedAuthScheme")) {
                     return "noMatchedAuthScheme";
-                } else if (authScheme.equalsIgnoreCase("Application")) {
+                } else if(authScheme.equalsIgnoreCase("Application")) {
                     return "Application";
-                } else {
+                }
+                else {
                     return "None";
                 }
             }

@@ -22,13 +22,15 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
-import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.cache.Cache;
+import javax.cache.CacheConfiguration;
+import javax.cache.Caching;
+import java.util.concurrent.TimeUnit;
 
 public class WebsocketUtil {
 	private static Logger log = LoggerFactory.getLogger(WebsocketUtil.class);
@@ -38,6 +40,7 @@ public class WebsocketUtil {
 
 	static {
 		initParams();
+		getGatewayKeyCache();
 	}
 
 	/**
@@ -45,6 +48,7 @@ public class WebsocketUtil {
 	 *
 	 */
 	protected static void initParams() {
+		try {
 			APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
 			String cacheEnabled = config.getFirstProperty(APIConstants.GATEWAY_TOKEN_CACHE_ENABLED);
 			if (cacheEnabled != null) {
@@ -54,6 +58,12 @@ public class WebsocketUtil {
 			if (value != null) {
 				removeOAuthHeadersFromOutMessage = Boolean.parseBoolean(value);
 			}
+		} catch (NullPointerException e) {
+			log.error(
+					"Did not found valid API Validation Information cache configuration. "
+					+ e.getMessage(), e);
+		}
+
 	}
 
 	public static boolean isRemoveOAuthHeadersFromOutMessage() {
@@ -88,6 +98,7 @@ public class WebsocketUtil {
 				return info;
 			}
 		}
+
 		return null;
 	}
 
@@ -123,14 +134,46 @@ public class WebsocketUtil {
 				PrivilegedCarbonContext.endTenantFlow();
 			}
 		}
+
 	}
 
 	protected static Cache getGatewayKeyCache() {
-		return CacheProvider.getGatewayKeyCache();
+		String apimGWCacheExpiry =
+				ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().
+						getFirstProperty(APIConstants.TOKEN_CACHE_EXPIRY);
+		if (!isGatewayKeyCacheInitialized && apimGWCacheExpiry != null) {
+			isGatewayKeyCacheInitialized = true;
+			return Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER)
+			              .createCacheBuilder(APIConstants.GATEWAY_KEY_CACHE_NAME).
+					              setExpiry(CacheConfiguration.ExpiryType.MODIFIED,
+					                        new CacheConfiguration.Duration(TimeUnit.SECONDS,
+					                                                        Long.parseLong(
+							                                                        apimGWCacheExpiry)))
+			              .
+					              setExpiry(CacheConfiguration.ExpiryType.ACCESSED,
+					                        new CacheConfiguration.Duration(TimeUnit.SECONDS,
+					                                                        Long.parseLong(
+							                                                        apimGWCacheExpiry)))
+			              .setStoreByValue(false).build();
+		} else {
+			return Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER)
+			              .getCache(APIConstants.GATEWAY_KEY_CACHE_NAME);
+		}
 	}
 
 	protected static Cache getGatewayTokenCache() {
-		return CacheProvider.getGatewayTokenCache();
+		Cache cache = null;
+		try {
+			javax.cache.CacheManager manager =
+					Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER);
+			cache = manager.getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME);
+		} catch (NullPointerException e) {
+			log.error(
+					"Did not found valid API Validation Information cache configuration. " +
+					e.getMessage(), e);
+		}
+		return cache;
+
 	}
 
 	public static boolean isGatewayTokenCacheEnabled() {
