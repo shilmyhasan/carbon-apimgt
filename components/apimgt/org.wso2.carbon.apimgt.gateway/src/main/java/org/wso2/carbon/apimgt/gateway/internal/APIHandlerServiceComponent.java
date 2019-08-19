@@ -36,7 +36,6 @@ import org.wso2.carbon.apimgt.gateway.throttling.util.KeyTemplateRetriever;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
-import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -68,7 +67,6 @@ public class APIHandlerServiceComponent {
             log.debug("API handlers component activated");
         }
         try {
-            // This need to fix properly
             ConfigurationContext ctx = ConfigurationContextFactory.createConfigurationContextFromFileSystem
                     (getClientRepoLocation(), getAxis2ClientXmlLocation());
             ServiceReferenceHolder.getInstance().setAxis2ConfigurationContext(ctx);
@@ -124,12 +122,6 @@ public class APIHandlerServiceComponent {
         } catch (APIManagementException | AxisFault e) {
             log.error("Error while initializing the API Gateway (APIHandlerServiceComponent) component", e);
         }
-        // Create caches for the super tenant
-        ServerConfiguration.getInstance().overrideConfigurationProperty("Cache.ForceLocalCache", "true");
-        CacheProvider.createGatewayKeyCache();
-        CacheProvider.createResourceCache();
-        CacheProvider.createGatewayTokenCache();
-        CacheProvider.createInvalidTokenCache();
     }
 
     protected void deactivate(ComponentContext context) {

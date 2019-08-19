@@ -19,7 +19,6 @@ package org.wso2.carbon.apimgt.gateway.handlers.security.service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.impl.APIConstants;
-import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
@@ -37,9 +36,10 @@ public class APIAuthenticationService extends AbstractServiceBusAdmin {
     private static final Log log = LogFactory.getLog(APIAuthenticationService.class);
 
     public void invalidateKeys(APIKeyMapping[] mappings) {
+
         //Previously we were clearing API key manager side cache. But actually this service deployed at gateway side.
         //Hence we will get cache from gateway cache
-        Cache gatewayCache = CacheProvider.getGatewayKeyCache();
+        Cache gatewayCache =  getCacheManager().getCache(APIConstants.GATEWAY_KEY_CACHE_NAME);
         for (APIKeyMapping mapping : mappings) {
             //According to new cache design we will use cache key to clear cache if its available in mapping
             //Later we construct key using attributes. Now cache key will pass as key
@@ -54,6 +54,7 @@ public class APIAuthenticationService extends AbstractServiceBusAdmin {
         Cache cache = getCacheManager().getCache(APIConstants.KEY_CACHE_NAME);
         String cacheKey = consumerKey + ':' + authorizedUser;
         cache.remove(cacheKey);
+
     }
 
 	public void invalidateResourceCache(String apiContext, String apiVersion, String resourceURLContext,
@@ -71,7 +72,7 @@ public class APIAuthenticationService extends AbstractServiceBusAdmin {
 				isTenantFlowStarted = startTenantFlow(tenantDomain);
 			}
 
-			Cache cache = CacheProvider.getResourceCache();
+			Cache cache = getCacheManager().getCache(APIConstants.RESOURCE_CACHE_NAME);
 			if (apiContext.contains(APIConstants.POLICY_CACHE_CONTEXT)) {
 				if (log.isDebugEnabled()) {
 					log.debug("Cleaning cache for policy update for tenant " + tenantDomain);
@@ -94,6 +95,7 @@ public class APIAuthenticationService extends AbstractServiceBusAdmin {
 				endTenantFlow();
 			}
 		}
+
 	}
 
     protected void endTenantFlow() {
@@ -142,7 +144,8 @@ public class APIAuthenticationService extends AbstractServiceBusAdmin {
             return;
         }
 
-        Cache gatewayCache = CacheProvider.getGatewayTokenCache();
+        Cache gatewayCache = getCacheManager().
+                getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME);
 
         Map<String, String> cachedObjects = new HashMap<String, String>();
         for(String accessToken : accessTokens){
@@ -189,7 +192,11 @@ public class APIAuthenticationService extends AbstractServiceBusAdmin {
                 tenantMap.put(tenantDomain, tokensOfDomain);
             }
         }
-        CacheProvider.getGatewayTokenCache().removeAll(cachedObjects.keySet());
+
+        //Remove all tokens from the super tenant cache.
+        getCacheManager().
+                getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME).removeAll(cachedObjects.keySet());
+
         //For each each tenant
         for(String tenantDomain : tenantMap.keySet()){
             try{
@@ -198,7 +205,10 @@ public class APIAuthenticationService extends AbstractServiceBusAdmin {
                     log.debug("About to delete " + tenantMap.get(tenantDomain).size() + " tokens from tenant " +
                                 tenantDomain + "'s cache");
                 }
-                Cache tenantGatewayCache = CacheProvider.getGatewayTokenCache();
+
+                Cache tenantGatewayCache = getCacheManager().
+                        getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME);
+
                 //Remove all cached tokens from the tenant's cache
                 //Note: Best solution would have been to use the removeAll method of the cache. But it currently throws
                 //an NPE if at least one key in the list doesn't exist in the cache.
