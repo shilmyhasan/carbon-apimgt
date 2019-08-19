@@ -662,7 +662,7 @@ APIDesigner.prototype.init_controllers = function(){
 				}
                 if (result.isRoleExist == false) {
                     jagg.message({
-                        content : "Role '" + encodeURIComponent($("#scopeRoles").val()) + "' Does not exist.",
+                        content : "Role '" + $("#scopeRoles").val() + "' Does not exist.",
                         type : "error"
                     });
                     return;
