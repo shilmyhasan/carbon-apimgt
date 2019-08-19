@@ -559,12 +559,12 @@ APIDesigner.prototype.init_controllers = function(){
 				}
                 if (result.isRoleExist == false) {
                     jagg.message({
-                        content : "Role '" + encodeURIComponent($("#scopeRoles").val()) + "' Does not exist.",
+                        content : "Role '" + $("#scopeRoles").val() + "' Does not exist.",
                         type : "error"
                     });
                     return;
                 }
-
+			
 				API_DESIGNER.api_doc['x-wso2-security'].apim['x-wso2-scopes'].push(scope);
 				$("#define_scope_modal").modal('hide');
 				API_DESIGNER.render_scopes();
