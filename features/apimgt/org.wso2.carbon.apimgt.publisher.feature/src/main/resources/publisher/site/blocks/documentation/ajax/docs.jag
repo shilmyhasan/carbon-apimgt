@@ -1,7 +1,5 @@
 <%
 include("/jagg/jagg.jag");
-var encode = require('encode');
-encode = new encode.Encode();
 
 if(jagg.isCSRFTokenValid())
 (function () {
@@ -54,7 +52,7 @@ if(jagg.isCSRFTokenValid())
             if (result.error === true) {
                 obj = {
                     error:true,
-                    message:encode.forHtml(result.message)
+                    message:result.message
                 };
                 response.status = 500;
             } else {
