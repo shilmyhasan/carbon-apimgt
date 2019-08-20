@@ -26,13 +26,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.base.CarbonBaseUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
+import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 
+import javax.cache.Caching;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -128,6 +131,13 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
         } catch (Exception e) {
             log.error("Failed to create Tenant's synapse sequences.", e);
         }
+
+        //Create caches for tenants
+        CacheProvider.removeAllCaches();
+        CacheProvider.createGatewayKeyCache();
+        CacheProvider.createResourceCache();
+        CacheProvider.createGatewayTokenCache();
+        CacheProvider.createInvalidTokenCache();
     }
 
     /**

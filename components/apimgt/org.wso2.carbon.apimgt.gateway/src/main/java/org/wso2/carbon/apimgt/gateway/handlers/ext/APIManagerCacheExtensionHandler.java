@@ -9,9 +9,9 @@ import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import javax.cache.Caching;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -66,21 +66,16 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
             //Remove token from tenant cache.
             removeTokenFromTenantTokenCache(revokedToken, cachedTenantDomain);
             putInvalidTokenIntoTenantInvalidTokenCache(revokedToken, cachedTenantDomain);
-
         }
 
         if (renewedToken != null) {
-
             //Find the actual tenant domain on which the access token was cached. It is stored as a reference in
             //the super tenant cache.
             String cachedTenantDomain = getCachedTenantDomain(renewedToken);
-
             //Remove the super tenant cache entry.
             removeCacheEntryFromGatewayCache(renewedToken);
-
             //Remove token from tenant cache.
             removeTokenFromTenantTokenCache(renewedToken, cachedTenantDomain);
-
         }
     }
 
@@ -118,7 +113,6 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
     private void putInvalidTokenIntoTenantInvalidTokenCache(String accessToken, String cachedTenantDomain) {
         //If the token was cached in the tenant cache
         if (cachedTenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(cachedTenantDomain)) {
-
             if (log.isDebugEnabled()) {
                 log.debug("Going to put cache entry " + accessToken + " from " + cachedTenantDomain + " domain");
             }
@@ -154,18 +148,15 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
     }
 
     protected void removeCacheEntryFromGatewayCache(String key) {
-		Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME)
-				.remove(key);		
+        CacheProvider.getGatewayTokenCache().remove(key);
     }
 
     protected void putInvalidTokenEntryIntoInvalidTokenCache(String cachedToken, String tenantDomain) {
-        Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).getCache(APIConstants
-                .GATEWAY_INVALID_TOKEN_CACHE_NAME).put(cachedToken, tenantDomain);
+        CacheProvider.getInvalidTokenCache().put(cachedToken, tenantDomain);
     }
 
     protected String getCachedTenantDomain(String token) {
-		return (String) Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER)
-				.getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME).get(token);
+        return (String) CacheProvider.getGatewayTokenCache().get(token);
     }
 
 }
