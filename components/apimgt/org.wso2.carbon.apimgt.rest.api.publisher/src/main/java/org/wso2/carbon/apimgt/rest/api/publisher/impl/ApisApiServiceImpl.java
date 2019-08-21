@@ -210,8 +210,24 @@ public class ApisApiServiceImpl extends ApisApiService {
                         + " already exists.", log);
             }
 
+            //Check if the user has admin permission before applying a different provider than the current user
+            String provider = body.getProvider();
+            if (!StringUtils.isBlank(provider) && !provider.equals(username)) {
+                if (!APIUtil.hasPermission(username, APIConstants.Permissions.APIM_ADMIN)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("User " + username + " does not have admin permission ("
+                                + APIConstants.Permissions.APIM_ADMIN + ") hence provider (" +
+                                provider + ") overridden with current user (" + username + ")");
+                    }
+                    provider = username;
+                }
+            } else {
+                //Set username in case provider is null or empty
+                provider = username;
+            }
+
             //Get all existing versions of  api been adding
-            List<String> apiVersions = apiProvider.getApiVersionsMatchingApiName(body.getName(), body.getProvider());
+            List<String> apiVersions = apiProvider.getApiVersionsMatchingApiName(body.getName(), provider);
             if (apiVersions.size() > 0) {
                 //If any previous version exists
                 for (String version : apiVersions) {
@@ -234,22 +250,6 @@ public class ApisApiServiceImpl extends ApisApiService {
                     RestApiUtil.handleBadRequest("Error occurred while adding the API. A duplicate API context " +
                                     "already exists for " + body.getContext(), log);
                 }
-            }
-
-            //Check if the user has admin permission before applying a different provider than the current user
-            String provider = body.getProvider();
-            if (!StringUtils.isBlank(provider) && !provider.equals(username)) {
-                if (!APIUtil.hasPermission(username, APIConstants.Permissions.APIM_ADMIN)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("User " + username + " does not have admin permission ("
-                                + APIConstants.Permissions.APIM_ADMIN + ") hence provider (" +
-                                provider + ") overridden with current user (" + username + ")");
-                    }
-                    provider = username;
-                }
-            } else {
-                //Set username in case provider is null or empty
-                provider = username;
             }
 
             List<String> tiersFromDTO = body.getTiers();
