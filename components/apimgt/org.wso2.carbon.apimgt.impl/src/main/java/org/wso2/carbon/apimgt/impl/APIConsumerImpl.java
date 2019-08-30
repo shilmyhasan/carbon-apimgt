@@ -4736,4 +4736,9 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
         return searchResults;
     }
+
+    public Map<String, OAuthApplicationInfo> getOAuthApplications(int applicationId) throws APIManagementException {
+        return apiMgtDAO.getOAuthApplications(applicationId);
+    }
+
 }
