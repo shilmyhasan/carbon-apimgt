@@ -2116,12 +2116,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                                                          api.getId().getProviderName());
             if (registry.resourceExists(resourcePath + APIConstants.API_DOC_2_0_RESOURCE_NAME)) {
                 String apiDefinition = definitionFromSwagger20.getAPIDefinition(api.getId(), registry);
-                LinkedHashMap map = new ObjectMapper().readValue(apiDefinition, LinkedHashMap.class);
-                Map infoObject = (Map) map.get("info");
+                LinkedHashMap apiDefinitionMap = new ObjectMapper().readValue(apiDefinition, LinkedHashMap.class);
+                Map infoObject = (Map) apiDefinitionMap.get("info");
                 infoObject.remove("version");
                 infoObject.put("version", newAPI.getId().getVersion());
-                String json = new ObjectMapper().writeValueAsString(map);
-                definitionFromSwagger20.saveAPIDefinition(newAPI, json, registry);
+                String apiDefinitionMapTojson = new ObjectMapper().writeValueAsString(apiDefinitionMap);
+                definitionFromSwagger20.saveAPIDefinition(newAPI, apiDefinitionMapTojson, registry);
             }
 
             // copy wsdl in case of a SOAP API
