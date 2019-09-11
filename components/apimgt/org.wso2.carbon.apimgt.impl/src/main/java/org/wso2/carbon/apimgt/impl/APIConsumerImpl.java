@@ -1931,6 +1931,50 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return result;
     }
 
+    public Map<String,Object> searchPaginatedAPIs(Registry registry, String searchQuery, int start, int end,
+            boolean limitAttributes) throws APIManagementException {
+        Map<String, Object> result = super.searchPaginatedAPIs(registry, searchQuery, start, end, limitAttributes);
+        Set<API> apiSet = (Set<API>) result.get("apis");
+
+        //Check the configuration to allow showing multiple versions of an API true/false
+        SortedSet<API> apiVersionsSortedSet = new TreeSet<API>(new APIVersionComparator());
+        Map<String, API> latestPublishedAPIs = new HashMap<String, API>();
+        SortedSet<API> multiVersionedAPIs = new TreeSet<API>(new APINameComparator());
+        Comparator<API> versionComparator = new APIVersionComparator();
+        Boolean displayMultipleVersions = APIUtil.isAllowDisplayMultipleVersions();
+        String key;
+        if (!displayMultipleVersions) {
+            for (API api : apiSet) {
+                key = api.getId().getProviderName() + COLON_CHAR + api.getId().getApiName();
+                API existingAPI = latestPublishedAPIs.get(key);
+                // If we have already seen an API with the same name and provider, make sure
+                // this one has a higher version number else ignore the api
+                if (existingAPI != null) {
+                    // If we have already seen an API with the same name, make sure
+                    // this one has a higher version number
+                    if (versionComparator.compare(api, existingAPI) > 0) {
+                        latestPublishedAPIs.put(key, api);
+                    }
+                } else {
+                    // We haven't seen this API before
+                    latestPublishedAPIs.put(key, api);
+                }
+            }
+        } else { //If allow showing multiple versions of an API
+            multiVersionedAPIs.addAll(apiSet);
+        }
+
+        if (!displayMultipleVersions) {
+            apiVersionsSortedSet.addAll(latestPublishedAPIs.values());
+            result.put("apis", apiVersionsSortedSet);
+        } else {
+            apiVersionsSortedSet.addAll(multiVersionedAPIs);
+            result.put("apis", apiVersionsSortedSet);
+        }
+
+        return result;
+    }
+
 
     private  GenericArtifact[] searchAPIsByOwner(GenericArtifactManager artifactManager, final String searchValue) throws GovernanceException {
         Map<String, List<String>> listMap = new HashMap<String, List<String>>();
