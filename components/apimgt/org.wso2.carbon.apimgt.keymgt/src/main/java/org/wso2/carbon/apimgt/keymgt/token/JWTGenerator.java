@@ -126,7 +126,6 @@ public class JWTGenerator extends AbstractJWTGenerator {
                     log.debug("The custom claims are retrieved from AuthorizationGrantCache for user : "
                             + validationContext.getValidationInfoDTO().getEndUserName());
                 }
-                return customClaims;
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("Custom claims are not available in the AuthorizationGrantCache. Hence will be "
