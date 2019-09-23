@@ -409,7 +409,7 @@ public class APIGatewayManager {
                 "\t</script>\n" +
                 "\t<property xmlns:ns=\"http://org.apache.synapse/xsd\" name=\"queryparams\"" +
                 " expression=\"$ctx:queryparams\"/>\n\t" +
-                "<property name=\"urlVal\" value=\"ws://echo.websocket.org:80\"/> \n" +
+                "<property name=\"urlVal\" value=\""+ url + "\"/>\n" +
                 "\t<property name=\"fullUrl\" expression=\"fn:concat(get-property('urlVal'), " +
                 "get-property('queryparams'))\" type=\"STRING\"/>\n" +
                 "\t<header name=\"To\" expression=\"$ctx:fullUrl\"/>\n" +
