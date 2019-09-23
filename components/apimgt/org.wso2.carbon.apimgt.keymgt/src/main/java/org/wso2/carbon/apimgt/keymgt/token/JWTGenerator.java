@@ -54,7 +54,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
             throws APIManagementException {
 
         //generating expiring timestamp
-        long currentTime = System.currentTimeMillis() ;
+        long currentTime = System.currentTimeMillis();
         long expireIn = currentTime + getTTL() * 1000;
 
         String dialect;
@@ -147,9 +147,14 @@ public class JWTGenerator extends AbstractJWTGenerator {
                     String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(userName);
 
                     if (manager.isExistingUser(tenantAwareUserName)) {
-                        return claimsRetriever.getClaims(userName);
+                        customClaims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
+                        return customClaims;
                     } else {
-                        log.warn("User " + userName + " cannot be found by user store manager");
+                        if (!customClaims.isEmpty()) {
+                            return customClaims;
+                        } else {
+                            log.warn("User " + tenantAwareUserName + " cannot be found by user store manager");
+                        }
                     }
                 } else {
                     log.error("Tenant cannot be found for username: " + userName);
