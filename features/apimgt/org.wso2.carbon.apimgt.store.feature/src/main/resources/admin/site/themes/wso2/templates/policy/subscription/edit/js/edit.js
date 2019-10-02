@@ -69,7 +69,6 @@ function validateInput(text, element, errorMsg){
 }
 
 function validateRolesInput(text, element, requiredMsg, invalidRoleMsg){
-    console.log("validating roles....");
     var elementId = element.attr('id');
     text = text.trim();
     if(text == ""){
