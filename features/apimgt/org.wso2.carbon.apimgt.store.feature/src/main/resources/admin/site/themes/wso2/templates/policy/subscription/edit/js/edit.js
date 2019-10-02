@@ -59,11 +59,7 @@ function validateInput(text, element, errorMsg){
     if(text == ""){
         element.css("border", "1px solid red");
         $('#label'+elementId).remove();
-        if (elementId == "roles") {
-            element.after('<label class="error" id="label'+elementId+'" >' + errorMsg + '</label>');
-        } else {
-                element.parent().append('<label class="error" id="label'+elementId+'" >' + errorMsg + '</label>');
-        }
+        element.parent().append('<label class="error" id="label'+elementId+'" >' + errorMsg + '</label>');
         return false;
     }else{
         $('#label'+elementId).remove();
@@ -72,9 +68,31 @@ function validateInput(text, element, errorMsg){
     }
 }
 
+function validateRolesInput(text, element, requiredMsg, invalidRoleMsg){
+    console.log("validating roles....");
+    var elementId = element.attr('id');
+    text = text.trim();
+    if(text == ""){
+        element.css("border", "1px solid red");
+        $('#label'+elementId).remove();
+        element.after('<label class="error" id="label'+elementId+'" >' + requiredMsg + '</label>');
+        return false;
+    }else{
+        if (!validateRoles(text)) {
+            element.css("border", "1px solid red");
+            $('#label'+elementId).remove();
+            element.after('<label class="error" id="label'+elementId+'" >' + invalidRoleMsg + '</label>');
+            return false;
+        }
+        $('#label'+elementId).remove();
+        element.css("border", "1px solid #cccccc");
+        return true;
+    }
+}
+
 function validateInputCharactors(text, element, errorMsg){
     var elementId = element.attr('id');
-    var illegalChars = /([~!&@#;%^*+={}\|\\<>\"\',])/;     
+    var illegalChars = /([~!&@#;%^*+={}\|\\<>\"\',])/;
     text = text.trim();
     if(illegalChars.test(text)){
         element.css("border", "1px solid red");
@@ -161,9 +179,9 @@ function htmlEscape(str) {
 }
 
 function populateCustomerAttributes(attributesList){
-    var attributeArray = attributesList.customAttributes;    
+    var attributeArray = attributesList.customAttributes;
     var tBody = $('#custom-attribute-tbody');
-        
+
     if(attributeArray != null){
         $.each(attributeArray, function( index, value ) {
             ++ attributeCount;
@@ -175,7 +193,7 @@ function populateCustomerAttributes(attributesList){
 }
 
 function addCustomAttribute(element, count){
-    
+
     var elementId = element.attr('id');
     element.parent().append(
         '<tr id="attribute'+count+'">'+
@@ -189,7 +207,7 @@ function addCustomAttribute(element, count){
 }
 
 function addCustomAttributeInitially(element, count, name, value){
-    
+
     var elementId = element.attr('id');
     element.parent().append(
         '<tr id="attribute'+count+'">'+
@@ -200,9 +218,9 @@ function addCustomAttributeInitially(element, count, name, value){
             '<span class="fw-stack"> <i class="fw fw-delete fw-stack-1x"></i> <i class="fw fw-circle-outline fw-stack-2x"></i></span></td></a></td>'+
         '</tr>'
         );
-    
+
     $('#attributeName'+count).val(name);
-    $('#attributeValue'+count).val(value);    
+    $('#attributeValue'+count).val(value);
 }
 
 $(document).ready(function(){
@@ -236,6 +254,7 @@ function validateInputs() {
     var errorHasSpacesMsg = $('#errorMessageSpaces').val();
     var invalidErrorMsg = $('#errorMessageInvalid').val();
     var illegalChars = $('#errorMessageIllegalChar').val();
+    var invalidRoleMsg = $('#invalidRoleMsg').val();
     var policyName = $('#policyName');
     var policyNameTxt = policyName.val();
 
@@ -281,8 +300,8 @@ function validateInputs() {
         return false;
     }
 
-    if (!validateInput(roleList, roles, requiredMsg)) {
-            return false;
+    if (!validateRolesInput(roleList, roles, requiredMsg, invalidRoleMsg)) {
+        return false;
     }
 
     var isInvalidAttribute = false;
@@ -318,4 +337,17 @@ function validateForSpaces(text, element, errorMsg){
         element.css("border", "1px solid #cccccc");
         return true;
     }
+}
+
+function validateRoles(roles){
+    var valid = false;
+    jagg.syncPost("/site/blocks/policy/subscription/edit/ajax/subscription-policy-edit.jag", { action:"validateRoles",
+        roles:roles },
+        function (result) {
+            if (!result.error) {
+                valid = result.response;
+            }
+            return valid;
+        });
+    return valid;
 }
