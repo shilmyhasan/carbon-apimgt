@@ -59,7 +59,11 @@ function validateInput(text, element, errorMsg){
     if(text == ""){
         element.css("border", "1px solid red");
         $('#label'+elementId).remove();
-        element.parent().append('<label class="error" id="label'+elementId+'" >' + errorMsg + '</label>');
+        if (elementId == "roles") {
+            element.after('<label class="error" id="label'+elementId+'" >' + errorMsg + '</label>');
+        } else {
+                element.parent().append('<label class="error" id="label'+elementId+'" >' + errorMsg + '</label>');
+        }
         return false;
     }else{
         $('#label'+elementId).remove();
@@ -244,6 +248,8 @@ function validateInputs() {
     var defaultBandwidthTxt = defaultBandwidth.val();
     var rateLimitCount = $('#rateLimitCount');
     var rateLimitCountTxt = rateLimitCount.val();
+    var roles = $('#roles');
+    var roleList = roles.val();
 
 
     if (!validateInput(policyNameTxt, policyName, requiredMsg)) {
@@ -273,6 +279,10 @@ function validateInputs() {
     }
     if (!validateNullableNumbersInput(rateLimitCountTxt, rateLimitCount, invalidErrorMsg)) {
         return false;
+    }
+
+    if (!validateInput(roleList, roles, requiredMsg)) {
+            return false;
     }
 
     var isInvalidAttribute = false;
