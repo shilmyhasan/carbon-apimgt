@@ -275,6 +275,7 @@
     "Allowed keys" : "Allowed keys",
     "Type an Email and press Enter":"Type an Email and press Enter",
     "API State Approval" : "API State Change",
-    "Suspended" : "Suspended"
+    "Suspended" : "Suspended",
+    "Invalid role name" : "Invalid role name"
 
 }
