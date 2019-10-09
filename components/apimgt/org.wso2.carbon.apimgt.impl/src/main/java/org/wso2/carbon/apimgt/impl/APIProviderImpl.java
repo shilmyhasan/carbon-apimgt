@@ -1619,10 +1619,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String apiName = api.getId().getApiName();
         Set<String> versions = getAPIVersions(provider, apiName);
         APIVersionComparator comparator = new APIVersionComparator();
-        for (String version : versions) {
-            API otherApi = getAPI(new APIIdentifier(provider, apiName, version));
+        //SortedVersions list is iterated in descending order to assure that the latest version's subscription details get
+        //copied.
+        List<String> sortedVersions = new ArrayList<>(versions);
+        for (int i = sortedVersions.size() - 1; i >= 0; i--) {
+            API otherApi = getAPI(new APIIdentifier(provider, apiName, sortedVersions.get(i)));
             if (comparator.compare(otherApi, api) < 0 && !(APIConstants.RETIRED.equals(otherApi.getStatus()))) {
-                apiMgtDAO.makeKeysForwardCompatible(provider, apiName, version,
+                apiMgtDAO.makeKeysForwardCompatible(provider, apiName, sortedVersions.get(i),
                                                     api.getId().getVersion(), api.getContext());
             }
         }
