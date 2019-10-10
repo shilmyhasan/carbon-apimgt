@@ -100,6 +100,7 @@ import org.wso2.carbon.apimgt.impl.utils.APINameComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIStoreNameComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
+import org.wso2.carbon.apimgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.apimgt.impl.utils.StatUpdateClusterMessage;
 import org.wso2.carbon.apimgt.impl.workflow.APIStateWorkflowDTO;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowConstants;
@@ -1619,10 +1620,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String apiName = api.getId().getApiName();
         Set<String> versions = getAPIVersions(provider, apiName);
         APIVersionComparator comparator = new APIVersionComparator();
-        for (String version : versions) {
-            API otherApi = getAPI(new APIIdentifier(provider, apiName, version));
+        //SortedVersions list is iterated in descending order to assure that the latest version's subscription details get copied.
+        SortedSet<String> sortedVersions = new TreeSet<>(new APIVersionStringComparator());
+        sortedVersions.addAll(versions);
+        List<String> sortedVersionsList = new ArrayList<>(sortedVersions);
+        for (int i = sortedVersionsList.size() - 1; i >= 0; i--) {
+            API otherApi = getAPI(new APIIdentifier(provider, apiName, sortedVersionsList.get(i)));
             if (comparator.compare(otherApi, api) < 0 && !(APIConstants.RETIRED.equals(otherApi.getStatus()))) {
-                apiMgtDAO.makeKeysForwardCompatible(provider, apiName, version,
+                apiMgtDAO.makeKeysForwardCompatible(provider, apiName, sortedVersionsList.get(i),
                                                     api.getId().getVersion(), api.getContext());
             }
         }
