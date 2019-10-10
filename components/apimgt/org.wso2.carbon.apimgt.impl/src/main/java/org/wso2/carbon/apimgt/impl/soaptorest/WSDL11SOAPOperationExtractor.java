@@ -22,8 +22,11 @@ import com.google.gson.GsonBuilder;
 import io.swagger.models.ModelImpl;
 import io.swagger.models.Xml;
 import io.swagger.models.properties.ArrayProperty;
+import io.swagger.models.properties.BinaryProperty;
 import io.swagger.models.properties.BooleanProperty;
 import io.swagger.models.properties.DateProperty;
+import io.swagger.models.properties.DateTimeProperty;
+import io.swagger.models.properties.DecimalProperty;
 import io.swagger.models.properties.DoubleProperty;
 import io.swagger.models.properties.FloatProperty;
 import io.swagger.models.properties.IntegerProperty;
@@ -505,10 +508,18 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
             return new BooleanProperty();
         case "int":
             return new IntegerProperty();
-        case "nonNegativeInteger":
+        case "unsignedInt":
             return new IntegerProperty();
+        case "unsignedShort":
+            return new IntegerProperty();
+        case "unsignedByte":
+            return new IntegerProperty();
+        case "nonNegativeInteger":
+            return new DecimalProperty();
         case "integer":
             return new IntegerProperty();
+        case "nonPositiveInteger":
+            return new DecimalProperty();
         case "positiveInteger":
             return new IntegerProperty();
         case "double":
@@ -517,8 +528,64 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
             return new FloatProperty();
         case "long":
             return new LongProperty();
+        case "unsignedLong":
+            return new DecimalProperty();
+        case "short":
+            return new IntegerProperty();
+        case "decimal":
+            return new DecimalProperty();
+        case "byte":
+            return new StringProperty("byte");
         case "date":
             return new DateProperty();
+        case "dateTime":
+            return new DateTimeProperty();
+        case "anyURI":
+            return new StringProperty();
+        case "anySimpleType":
+            return new StringProperty();
+        case "NOTATION":
+            return new StringProperty();
+        case "QName":
+            return new StringProperty();
+        case "binary":
+            return new BinaryProperty();
+        case "base64Binary":
+            return new BinaryProperty();
+        case "hexBinary":
+            return new StringProperty();
+        case "time":
+            return new StringProperty();
+        case "duration":
+            return new StringProperty();
+        case "gYearMonth":
+            return new StringProperty();
+        case "gYear":
+            return new StringProperty();
+        case "gDay":
+            return new StringProperty();
+        case "gMonth":
+            return new StringProperty();
+        case "gMonthDay":
+            return new StringProperty();
+        case "NCName":
+            return new StringProperty();
+        case "ID":
+            return new StringProperty();
+        case "normalizedString":
+            return new StringProperty();
+        case "token":
+            return new StringProperty();
+        case "language":
+            return new StringProperty();
+        case "NMToken":
+            return new StringProperty();
+        case "Name":
+            return new StringProperty();
+        case "IDREF":
+            return new StringProperty();
+        case "ENTITY":
+            return new StringProperty();
         default:
             return new RefProperty();
         }
