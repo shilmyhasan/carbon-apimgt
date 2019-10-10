@@ -298,7 +298,7 @@ GrantTypes.prototype.getMap = function(selected){
 	        selectedGrants = selected;
             var scopes = "";
 
-            if(this.element.find("select.scope_select").val() != null) {
+            if (this.element.find("select.scope_select").val() != null) {
                 scopes = this.element.find("select.scope_select").val().join(" ");
             }
 
