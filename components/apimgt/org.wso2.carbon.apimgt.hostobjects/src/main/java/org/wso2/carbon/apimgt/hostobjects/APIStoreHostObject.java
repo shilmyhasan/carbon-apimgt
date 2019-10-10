@@ -4511,7 +4511,8 @@ public class APIStoreHostObject extends ScriptableObject {
         UserFieldDTO[] userFields = null;
         APIManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
         String url = config.getFirstProperty(APIConstants.AUTH_MANAGER_URL);
-        String username = "";
+        String username = StringUtils.EMPTY;
+        boolean isTenantFlowStarted = false;
 
         try {
             if (url == null) {
@@ -4522,8 +4523,6 @@ public class APIStoreHostObject extends ScriptableObject {
             ServiceClient client = authAdminStub._getServiceClient();
             Options options = client.getOptions();
             options.setManageSession(true);
-
-            boolean isTenantFlowStarted = false;
 
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
@@ -4540,7 +4539,6 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             username = signupConfig.getAdminUserName();
             String password = signupConfig.getAdminPassword();
-
             String host = null;
             host = new URL(url).getHost();
             if (!authAdminStub.login(username, password, host)) {
@@ -4564,7 +4562,7 @@ public class APIStoreHostObject extends ScriptableObject {
             for (LocalClaimDTO dto : localClaimDTOS) {
                 boolean isSupported = false;
                 boolean isRequired = false;
-                String displayName = "";
+                String displayName = StringUtils.EMPTY;
                 int displayOrder = 0;
                 for (ClaimPropertyDTO dto2 : dto.getClaimProperties()) {
                     if ("SupportedByDefault".equalsIgnoreCase(dto2.getPropertyName())) {
@@ -4603,6 +4601,10 @@ public class APIStoreHostObject extends ScriptableObject {
             handleException("Error while checking the ability to login for user " + username, e);
         } catch (ClaimMetadataManagementServiceClaimMetadataException e) {
             handleException("Error while retrieving user registration fields for tenant " + tenantDomain, e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
         return userFields;
     }
