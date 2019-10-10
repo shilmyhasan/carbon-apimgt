@@ -230,12 +230,23 @@ public class ApisApiServiceImpl extends ApisApiService {
                 } else {
                     if (!MultitenantUtils.getTenantDomain(username).equals(MultitenantUtils
                             .getTenantDomain(provider))) {
-                        String errorMessage = "Error while adding new API : " + body.getProvider() + "-" +
-                                body.getName() + "-" + body.getVersion() + ". The tenant " +
-                                "domain '" + MultitenantUtils.getTenantDomain(provider) + "' of provider '" + provider
-                                + "' is not compatible with admin's('" + username + "') tenant domain '" +
-                                MultitenantUtils.getTenantDomain(username) + "'";
-                        RestApiUtil.handleBadRequest(errorMessage, log);
+                        StringBuilder errorMessage = new StringBuilder("Error while adding new API : ");
+                        errorMessage.append(body.getProvider());
+                        errorMessage.append("-");
+                        errorMessage.append(body.getName());
+                        errorMessage.append("-");
+                        errorMessage.append(body.getVersion());
+                        errorMessage.append(". The tenant domain '");
+                        errorMessage.append(MultitenantUtils.getTenantDomain(provider));
+                        errorMessage.append("' of provider '");
+                        errorMessage.append(provider);
+                        errorMessage.append("' is not compatible with admin's('");
+                        errorMessage.append(username);
+                        errorMessage.append("') tenant domain '");
+                        errorMessage.append(MultitenantUtils.getTenantDomain(username));
+                        errorMessage.append("'");
+
+                        RestApiUtil.handleBadRequest(errorMessage.toString(), log);
                     } else {
                         //When tenant domain contains upper case characters, this will convert those to lowercase
                         provider = MultitenantUtils.getTenantAwareUsername(provider) + "@" +
