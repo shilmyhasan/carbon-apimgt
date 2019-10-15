@@ -4099,4 +4099,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return addSubscription(identifier, userId, applicationId);
     }
 
+    public Map<String, OAuthApplicationInfo> getOAuthApplications(int applicationId) throws APIManagementException {
+        return apiMgtDAO.getOAuthApplications(applicationId);
+    }
+
 }

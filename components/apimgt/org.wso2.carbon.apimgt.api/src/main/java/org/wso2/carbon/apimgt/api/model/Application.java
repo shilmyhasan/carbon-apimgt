@@ -231,4 +231,8 @@ public class Application {
     public void setOwner(String owner) {
         this.owner = owner;
     }
+
+    public void clearOAuthApps() {
+        oauthApps.clear();
+    }
 }
