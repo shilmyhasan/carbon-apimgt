@@ -1,7 +1,10 @@
 package org.wso2.carbon.apimgt.rest.api.publisher.dto;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIBusinessInformationDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.dto.APICorsConfigurationDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.dto.APIEndpointSecurityDTO;
@@ -132,7 +135,8 @@ public class APIDTO  {
   
   private APICorsConfigurationDTO corsConfiguration = null;
 
-  
+  private Map<String, String> additionalProperties = new HashMap<>();
+
   /**
    * UUID of the api registry artifact\n
    **/
@@ -548,7 +552,17 @@ public class APIDTO  {
     this.corsConfiguration = corsConfiguration;
   }
 
-  
+  /**
+   * Custom properties for the API
+   **/
+  @ApiModelProperty(value = "Custom properties for the API")
+  @JsonProperty("additionalProperties")
+  public Map<String, String> getAdditionalProperties() {
+    return additionalProperties;
+  }
+  public void setAdditionalProperties(Map<String, String> additionalProperties) {
+    this.additionalProperties = additionalProperties;
+  }
 
   @Override
   public String toString()  {

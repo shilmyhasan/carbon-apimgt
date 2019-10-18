@@ -182,6 +182,13 @@ public class ApisApiServiceImpl extends ApisApiService {
                     RestApiUtil.handleBadRequest(errorMessage, log);
                 }
             }
+            if (body.getAdditionalProperties() != null) {
+                String errorMessage = RestApiPublisherUtils
+                        .validateAdditionalProperties(body.getAdditionalProperties());
+                if (!errorMessage.isEmpty()) {
+                    RestApiUtil.handleBadRequest(errorMessage, log);
+                }
+            }
             if (body.getContext().endsWith("/")) {
                 RestApiUtil.handleBadRequest("Context cannot end with '/' character", log);
             }
@@ -829,6 +836,13 @@ public class ApisApiServiceImpl extends ApisApiService {
             }
             if (body.getAccessControlRoles() != null) {
                 String errorMessage = RestApiPublisherUtils.validateUserRoles(body.getAccessControlRoles());
+                if (!errorMessage.isEmpty()) {
+                    RestApiUtil.handleBadRequest(errorMessage, log);
+                }
+            }
+            if (body.getAdditionalProperties() != null) {
+                String errorMessage = RestApiPublisherUtils
+                        .validateAdditionalProperties(body.getAdditionalProperties());
                 if (!errorMessage.isEmpty()) {
                     RestApiUtil.handleBadRequest(errorMessage, log);
                 }

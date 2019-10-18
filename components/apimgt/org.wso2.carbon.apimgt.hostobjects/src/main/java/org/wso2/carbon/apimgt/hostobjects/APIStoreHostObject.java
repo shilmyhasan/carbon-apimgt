@@ -1030,7 +1030,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 String[] searchCriterias = inputSearchQuery.split(" ");
                 for (int i = 0; i < searchCriterias.length; i++) {
                     if (searchCriterias[i].contains(":") && searchCriterias[i].split(":").length > 1) {
-                        if (APIConstants.DOCUMENTATION_SEARCH_TYPE_PREFIX.equalsIgnoreCase(searchCriterias[i].split(":")[0]) ||
+                        if (APIConstants.DOCUMENTATION_SEARCH_TYPE_PREFIX_WITH_EQUALS.equalsIgnoreCase(searchCriterias[i].split(":")[0]) ||
                             APIConstants.SUBCONTEXT_SEARCH_TYPE_PREFIX.equalsIgnoreCase(searchCriterias[i].split(":")[0])) {
                             throw new APIManagementException("Invalid query. AND based search is not supported for "
                                                              + "doc and subcontext prefixes");
@@ -1051,7 +1051,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
         // Append LC state query criteria if the search is not doc or subcontext
         // based
-        if (!APIConstants.DOCUMENTATION_SEARCH_TYPE_PREFIX2.startsWith(newSearchQuery) &&
+        if (!APIConstants.DOCUMENTATION_SEARCH_TYPE_PREFIX_WITH_EQUALS.startsWith(newSearchQuery) &&
             !APIConstants.SUBCONTEXT_SEARCH_TYPE_PREFIX.startsWith(newSearchQuery)) {
             boolean displayAPIsWithMultipleStatus = APIUtil.isAllowDisplayAPIsWithMultipleStatus();
 
@@ -2086,6 +2086,7 @@ public class APIStoreHostObject extends ScriptableObject {
                         row.put("isDefaultVersion", row,api.isDefaultVersion());
                         row.put("transports", row,api.getTransports());
                         row.put("type", row, api.getType());
+                        row.put("additionalProperties", row, api.getAdditionalProperties().toJSONString());
                         myn.put(0, myn, row);
 
                     } else {

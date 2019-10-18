@@ -19,6 +19,7 @@
 package org.wso2.carbon.apimgt.rest.api.store.utils.mappings;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.simple.JSONObject;
 import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.API;
@@ -129,6 +130,15 @@ public class APIMappingUtil {
 
         if (!StringUtils.isBlank(model.getThumbnailUrl())) {
             dto.setThumbnailUrl(getThumbnailUri(model.getUUID()));
+        }
+        if (model.getAdditionalProperties() != null) {
+            JSONObject additionalProperties = model.getAdditionalProperties();
+            Map<String, String> additionalPropertiesMap = new HashMap<>();
+            for (Object propertyKey : additionalProperties.keySet()) {
+                String key = (String) propertyKey;
+                additionalPropertiesMap.put(key, (String) additionalProperties.get(key));
+            }
+            dto.setAdditionalProperties(additionalPropertiesMap);
         }
         dto.setWsdlUri(model.getWsdlUrl());
         return dto;

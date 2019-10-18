@@ -150,22 +150,7 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1186,7 +1171,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String[] visibleRoles = new String[0];
             String publisherAccessControlRoles = api.getAccessControlRoles();
 
-            updateAPIRolesRestrictions(artifactPath, publisherAccessControlRoles, api.getAccessControl());
+            updateRegistryResources(artifactPath, publisherAccessControlRoles, api.getAccessControl(),
+                    api.getAdditionalProperties());
 
             if (updatePermissions) {
                 clearResourcePermissions(artifactPath, api.getId());
@@ -2035,8 +2021,22 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 rolesSet = roles.split(",");
             }
             // Adding publisher access control permissions to new version.
-            Resource apiTargetArtifact = registry.get(targetPath);
+            Resource apiTargetArtifact = null;
+            if (registry.resourceExists(targetPath)) {
+                apiTargetArtifact = registry.get(targetPath);
+            }
             if (apiTargetArtifact != null) {
+                // Copying all the properties.
+                Properties properties = apiSourceArtifact.getProperties();
+                if (properties != null) {
+                    Enumeration propertyNames = properties.propertyNames();
+                    while (propertyNames.hasMoreElements()) {
+                        String propertyName = (String) propertyNames.nextElement();
+                        if (propertyName.startsWith(APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX)) {
+                            apiTargetArtifact.setProperty(propertyName, apiSourceArtifact.getProperty(propertyName));
+                        }
+                    }
+                }
                 apiTargetArtifact.setProperty(APIConstants.PUBLISHER_ROLES,
                         apiSourceArtifact.getProperty(APIConstants.PUBLISHER_ROLES));
                 apiTargetArtifact.setProperty(APIConstants.DISPLAY_PUBLISHER_ROLES,
@@ -2604,7 +2604,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(), visibleRoles,
                     artifactPath, registry);
 
-            updateAPIRolesRestrictions(artifactPath, publisherAccessControlRoles, api.getAccessControl());
+            updateRegistryResources(artifactPath, publisherAccessControlRoles, api.getAccessControl(),
+                    api.getAdditionalProperties());
             registry.commitTransaction();
             transactionCommitted = true;
 
@@ -5610,19 +5611,24 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * To add API roles restrictions whenever the publisher access control is modified.
+     * To add API roles restrictions and add additional properties.
      *
      * @param artifactPath                Path of the API artifact.
      * @param publisherAccessControlRoles Role specified for the publisher access control.
      * @param publisherAccessControl      Publisher Access Control restriction.
+     * @param additionalProperties        Additional properties that is related with an API.
      * @throws RegistryException Registry Exception.
      */
-    protected void updateAPIRolesRestrictions(String artifactPath, String publisherAccessControlRoles,
-                                              String publisherAccessControl) throws RegistryException {
+    private void updateRegistryResources(String artifactPath, String publisherAccessControlRoles,
+                                         String publisherAccessControl, Map<String, String> additionalProperties)
+            throws RegistryException {
         publisherAccessControlRoles = (publisherAccessControlRoles == null || publisherAccessControlRoles.trim()
                 .isEmpty()) ? APIConstants.NULL_USER_ROLE_LIST : publisherAccessControlRoles;
         if (publisherAccessControlRoles.equalsIgnoreCase(APIConstants.NULL_USER_ROLE_LIST)) {
             publisherAccessControl = APIConstants.NO_ACCESS_CONTROL;
+        }
+        if (!registry.resourceExists(artifactPath)) {
+            return;
         }
 
         // Replace spaces
@@ -5630,6 +5636,19 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         Resource apiResource = registry.get(artifactPath);
         if (apiResource != null) {
+            if (additionalProperties != null) {
+                // Removing all the properties, before updating new properties.
+                Properties properties = apiResource.getProperties();
+                if (properties != null) {
+                    Enumeration propertyNames = properties.propertyNames();
+                    while (propertyNames.hasMoreElements()) {
+                        String propertyName = (String) propertyNames.nextElement();
+                        if (propertyName.startsWith(APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX)) {
+                            apiResource.removeProperty(propertyName);
+                        }
+                    }
+                }
+            }
             // We are changing to lowercase, as registry search only supports lower-case characters.
             apiResource.setProperty(APIConstants.PUBLISHER_ROLES, publisherAccessControlRoles.toLowerCase());
 
@@ -5638,6 +5657,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             apiResource.setProperty(APIConstants.DISPLAY_PUBLISHER_ROLES, publisherAccessControlRoles);
             apiResource.setProperty(APIConstants.ACCESS_CONTROL, publisherAccessControl);
             apiResource.removeProperty(APIConstants.CUSTOM_API_INDEXER_PROPERTY);
+
+            if (additionalProperties != null && additionalProperties.size() != 0) {
+                for (Map.Entry<String, String> entry : additionalProperties.entrySet()) {
+                    apiResource.setProperty(
+                            (APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX + entry.getKey()),
+                            entry.getValue());
+                }
+            }
             registry.put(artifactPath, apiResource);
         }
     }
