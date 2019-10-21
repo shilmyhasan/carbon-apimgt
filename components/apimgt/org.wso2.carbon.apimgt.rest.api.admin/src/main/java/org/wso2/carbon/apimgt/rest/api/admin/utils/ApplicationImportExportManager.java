@@ -31,7 +31,6 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-import org.json.simple.JSONObject;
 import org.wso2.carbon.apimgt.api.model.ApplicationConstants;
 
 import java.util.ArrayList;
@@ -42,8 +41,6 @@ import java.util.Set;
 public class ApplicationImportExportManager {
     private static final Log log = LogFactory.getLog(ApplicationImportExportManager.class);
     private APIConsumer apiConsumer;
-    public static final String JSON_CLIENT_ID = "client_id";
-    public static final String JSON_CLIENT_SECRET = "client_secret";
 
     ApplicationImportExportManager(APIConsumer apiConsumer) {
         this.apiConsumer = apiConsumer;
@@ -63,11 +60,10 @@ public class ApplicationImportExportManager {
         String groupId = apiConsumer.getGroupId(appId);
         application = apiConsumer.getApplicationById(appId);
 
-
-
         if (application != null) {
             application.setGroupId(groupId);
             application.setOwner(application.getSubscriber().getName());
+
             Map<String, OAuthApplicationInfo> keyMap = apiConsumer.getOAuthApplications(application.getId());
             for (Map.Entry<String, OAuthApplicationInfo> entry : keyMap.entrySet()) {
                 application.addOAuthApp(entry.getKey(), entry.getValue());
@@ -157,8 +153,6 @@ public class ApplicationImportExportManager {
                     if (isTierAvailable(tier, api) && api.getStatus() != null && api.getStatus()
                             .equals(APIStatus.PUBLISHED)) {
                         apiId.setTier(tier.getName());
-
-
                         // add subscription if update flag is not specified
                         // it will throw an error if subscriber already exists
                         if (update == null || !update) {
@@ -233,7 +227,7 @@ public class ApplicationImportExportManager {
         String jsonParams = jsonParamObj.toString();
         String tokenScopes = apiKey.getTokenScope();
         apiConsumer.requestApprovalForApplicationRegistration(
-                username, application.getName(), apiKey.getType(), apiKey.getCallbackUrl(),
+                application.getSubscriber().getName(), application.getName(), apiKey.getType(), apiKey.getCallbackUrl(),
                 accessAllowDomainsArray, Long.toString(apiKey.getValidityPeriod()), tokenScopes, application.getGroupId(),
                 jsonParams);
     }

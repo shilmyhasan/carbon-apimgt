@@ -86,10 +86,6 @@ public class ExportApiServiceImpl extends ExportApiService {
                 log.error(errorMsg);
                 return Response.status(Response.Status.NOT_FOUND).entity(errorMsg).build();
             }
-//            else if (Boolean.getBoolean(RestApiConstants.MIGRATION_MODE)) { // migration flow
-//                String appTenant = MultitenantUtils.getTenantDomain(applicationDetails.getSubscriber().getName());
-//                RestApiUtil.handleMigrationSpecificPermissionViolations(appTenant, username);
-//            }
             else if (!MultitenantUtils.getTenantDomain(applicationDetails.getSubscriber().getName()).equals
                     (MultitenantUtils.getTenantDomain(username))) {  // normal non-migration flow
                 String errorMsg = "Cross Tenant Exports are not allowed";
@@ -133,12 +129,6 @@ public class ExportApiServiceImpl extends ExportApiService {
                 .header("Content-Disposition", "attachment; filename=\"" + exportedFileName + "\"");
         return responseBuilder.build();
     }
-
-
-//    @Override
-//    public Response exportApplicationsGet(String appName, String appOwner) {
-//        return null;
-//    }
 
     @Override
     public String exportApplicationsGetGetLastUpdatedTime(String appName, String appOwner) {

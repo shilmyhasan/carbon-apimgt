@@ -151,12 +151,14 @@ public class ImportApiServiceImplTestCase {
         PowerMockito.mockStatic(APIUtil.class);
         PowerMockito.when(APIUtil.isApplicationExist(USER, "sampleApp", null))
                 .thenReturn(false);
-
         Mockito.when(apiConsumer.searchPaginatedAPIs("name=*sampleAPI*&version=*1.0.0*",
                 "carbon.super", 0, Integer.MAX_VALUE, false)).thenReturn(matchedAPIs);
         Mockito.when(apiConsumer.getApplicationById(1)).thenReturn(new Application(1));
+        PowerMockito.when(APIUtil.replaceEmailDomainBack(USER)).thenReturn(USER);
+        PowerMockito.when(APIUtil.getSingleSearchCriteria("sampleAPI")).thenReturn("*sampleAPI*");
+        PowerMockito.when(APIUtil.getSingleSearchCriteria("version:1.0.0")).thenReturn("*&version=*1.0.0*");
         Response response = importApiService.importApplicationsPost(fis, fileInfo, true,
-                false, "admin");
+                false, "admin", true, false);
         Assert.assertEquals(response.getStatus(), 207);
     }
 
@@ -179,9 +181,10 @@ public class ImportApiServiceImplTestCase {
         Mockito.when(apiConsumer.getSubscriber("admin")).thenReturn(subscriber);
         Mockito.when(apiConsumer.addApplication(Mockito.any(Application.class), Mockito.anyString()))
                 .thenThrow(APIManagementException.class);
-        PowerMockito.when(APIUtil.replaceEmailDomainBack(USER)).thenReturn(USER);
-        PowerMockito.when(APIUtil.getSingleSearchCriteria("sampleAPI")).thenReturn("*sampleAPI*");
-        PowerMockito.when(APIUtil.getSingleSearchCriteria("version:1.0.0")).thenReturn("*&version=*1.0.0*");
+        PowerMockito.mockStatic(APIUtil.class);
+        PowerMockito.when(APIUtil.isApplicationExist(USER, "sampleApp", null))
+                .thenReturn(true);
+
         Response response = importApiService.importApplicationsPost(fis, null, false,
                 false, "admin", true, false);
 
