@@ -154,6 +154,9 @@ public final class APIConstants {
     public static final String GOVERNANCE_COMPONENT_REGISTRY_LOCATION = "/repository/components/org.wso2.carbon" +
             ".governance";
 
+    public static final String JSON_CLIENT_ID = "client_id";
+    public static final String JSON_CLIENT_SECRET = "client_secret";
+
     // registry location for wsdl files
     public static final String API_WSDL_RESOURCE_LOCATION = API_APPLICATION_DATA_LOCATION + "/wsdls/";
     public static final String API_WSDL_RESOURCE = API_APPLICATION_DATA_LOCATION+"/wsdls";

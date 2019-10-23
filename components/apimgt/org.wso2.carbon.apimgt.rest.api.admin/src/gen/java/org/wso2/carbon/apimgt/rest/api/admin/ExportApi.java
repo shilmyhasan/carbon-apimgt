@@ -24,31 +24,32 @@ import javax.ws.rs.*;
 @io.swagger.annotations.Api(value = "/export", description = "the export API")
 public class ExportApi  {
 
-   private final ExportApiService delegate = ExportApiServiceFactory.getExportApi();
+ private final ExportApiService delegate = ExportApiServiceFactory.getExportApi();
 
-    @GET
-    @Path("/applications")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json", "application/zip" })
-    @io.swagger.annotations.ApiOperation(value = "Export an Application", notes = "This operation can be used to export the details of a particular Application as a zip file.\n", response = File.class)
-    @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nExport Successful.\n"),
-        
-        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error\n"),
-        
-        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nRequested Application does not exist.\n"),
-        
-        @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable.\nThe requested media type is not supported\n") })
+ @GET
+ @Path("/applications")
+ @Consumes({ "application/json" })
+ @Produces({ "application/json", "application/zip" })
+ @io.swagger.annotations.ApiOperation(value = "Export an Application", notes = "This operation can be used to export the details of a particular Application as a zip file.\n", response = File.class)
+ @io.swagger.annotations.ApiResponses(value = {
+         @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nExport Successful.\n"),
 
-    public Response exportApplicationsGet(@ApiParam(value = "Application Name\n",required=true) @QueryParam("appName")  String appName,
-    @ApiParam(value = "Owner of the Application\n",required=true) @QueryParam("appOwner")  String appOwner)
-    {
-    return delegate.exportApplicationsGet(appName,appOwner);
-    }
+         @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error\n"),
 
-    public String exportApplicationsGetGetLastUpdatedTime(String appName,String appOwner)
-    {
-        return delegate.exportApplicationsGetGetLastUpdatedTime(appName,appOwner);
-    }
+         @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nRequested Application does not exist.\n"),
+
+         @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable.\nThe requested media type is not supported\n") })
+
+ public Response exportApplicationsGet(@ApiParam(value = "Application Name\n",required=true) @QueryParam("appName")  String appName,
+                                       @ApiParam(value = "Owner of the Application\n",required=true) @QueryParam("appOwner")  String appOwner,
+                                       @ApiParam(value = "Export application keys\n") @QueryParam("withKeys")  Boolean withKeys)
+ {
+  return delegate.exportApplicationsGet(appName,appOwner,withKeys);
+ }
+
+ public String exportApplicationsGetGetLastUpdatedTime(String appName,String appOwner)
+ {
+  return delegate.exportApplicationsGetGetLastUpdatedTime(appName,appOwner);
+ }
 }
 

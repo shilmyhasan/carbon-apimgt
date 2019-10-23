@@ -1935,7 +1935,7 @@ public class ApiMgtDAO {
     }
 
 
-    private Map<String, OAuthApplicationInfo> getOAuthApplications(int applicationId) throws APIManagementException {
+    public Map<String, OAuthApplicationInfo> getOAuthApplications(int applicationId) throws APIManagementException {
         Map<String, OAuthApplicationInfo> map = new HashMap<String, OAuthApplicationInfo>();
         OAuthApplicationInfo prodApp = getClientOfApplication(applicationId, "PRODUCTION");
         if (prodApp != null) {

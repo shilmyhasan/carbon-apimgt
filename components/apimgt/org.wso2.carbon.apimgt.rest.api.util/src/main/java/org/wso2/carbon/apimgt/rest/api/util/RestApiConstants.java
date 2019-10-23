@@ -165,4 +165,5 @@ public final class RestApiConstants {
     public static final String CERTS_BASE_PATH = "/certificates";
     public static final String CERTS_GET_PAGINATED_URL =
             CERTS_BASE_PATH + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + QUERY_PARAM;
+
 }

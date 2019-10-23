@@ -689,4 +689,14 @@ public interface APIConsumer extends APIManager {
     String getWSDLDocument(String username, String tenantDomain, String resourceUrl, Map environmentDetails,
             Map apiDetails) throws APIManagementException;
 
+
+    /**
+     * Returns OAuth Applications of each environment
+     *
+     * @param applicationId           id of the required application
+     * @return Map of environment and the corresponding OAuth Application Informations
+     * @throws APIManagementException
+     */
+    Map<String, OAuthApplicationInfo> getOAuthApplications(int applicationId)  throws APIManagementException;
+
 }
