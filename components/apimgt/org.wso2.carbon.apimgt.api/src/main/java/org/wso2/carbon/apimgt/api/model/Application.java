@@ -235,4 +235,8 @@ public class Application {
     public void clearOAuthApps() {
         oauthApps.clear();
     }
+
+    public void updateSubscriber(Subscriber subscriber) {
+        this.subscriber = subscriber;
+    }
 }
