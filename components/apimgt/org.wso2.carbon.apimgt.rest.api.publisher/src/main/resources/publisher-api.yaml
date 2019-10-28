@@ -3450,6 +3450,9 @@ definitions:
         items:
           type: string
         example: ["tenant1","tenant2"]
+      additionalProperties:
+        type: object
+        description: Map of custom properties of API
       accessControl:
         type: string
         description: |

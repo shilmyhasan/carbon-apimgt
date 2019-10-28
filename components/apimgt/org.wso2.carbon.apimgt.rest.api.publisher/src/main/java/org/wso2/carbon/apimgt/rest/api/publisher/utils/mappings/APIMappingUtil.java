@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.rest.api.publisher.utils.mappings;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
@@ -50,12 +51,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class APIMappingUtil {
 
@@ -268,6 +264,16 @@ public class APIMappingUtil {
             dto.setVisibleRoles(Arrays.asList(model.getVisibleTenants().split(",")));
         }
 
+        if (model.getAdditionalProperties() != null) {
+            JSONObject additionalProperties = model.getAdditionalProperties();
+            Map<String, String> additionalPropertiesMap = new HashMap<>();
+            for (Object propertyKey : additionalProperties.keySet()) {
+                String key = (String) propertyKey;
+                additionalPropertiesMap.put(key, (String) additionalProperties.get(key));
+            }
+            dto.setAdditionalProperties(additionalPropertiesMap);
+        }
+
         dto.setAccessControl(APIConstants.API_RESTRICTED_VISIBILITY.equals(model.getAccessControl()) ?
                 APIDTO.AccessControlEnum.RESTRICTED :
                 APIDTO.AccessControlEnum.NONE);
@@ -477,6 +483,13 @@ public class APIMappingUtil {
         } else {
             model.setAccessControlRoles(StringUtils.join(accessControlRoles, ',').toLowerCase());
             model.setAccessControl(APIConstants.API_RESTRICTED_VISIBILITY);
+        }
+
+        Map<String, String> additionalProperties = dto.getAdditionalProperties();
+        if (additionalProperties != null) {
+            for (Map.Entry<String, String> entry : additionalProperties.entrySet()) {
+                model.addProperty(entry.getKey(), entry.getValue());
+            }
         }
 
         APIBusinessInformationDTO apiBusinessInformationDTO = dto.getBusinessInformation();

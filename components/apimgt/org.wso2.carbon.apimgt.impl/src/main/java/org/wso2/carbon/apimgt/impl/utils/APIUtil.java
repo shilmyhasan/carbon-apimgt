@@ -187,21 +187,23 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedSet;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
+import java.util.LinkedHashSet;
+import java.util.Properties;
 import java.util.TreeSet;
+import java.util.SortedSet;
+import java.util.Iterator;
+import java.util.Enumeration;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import javax.cache.Cache;
 import javax.cache.CacheConfiguration;
@@ -292,8 +294,7 @@ public final class APIUtil {
             api = new API(apiIdentifier);
             // set rating
             String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
-
-
+            api = setResourceProperties(api, registry, artifactPath);
             api.setRating(getAverageRating(apiId));
             //set description
             api.setDescription(artifact.getAttribute(APIConstants.API_OVERVIEW_DESCRIPTION));
@@ -480,27 +481,7 @@ public final class APIUtil {
             api.setUUID(artifact.getId());
             // set rating
             String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
-            Resource apiResource = registry.get(artifactPath);
-            api.setAccessControl(apiResource.getProperty(APIConstants.ACCESS_CONTROL));
-
-            String accessControlRoles = null;
-
-            String displayPublisherRoles = apiResource.getProperty(APIConstants.DISPLAY_PUBLISHER_ROLES);
-            if (displayPublisherRoles == null) {
-
-                String publisherRoles = apiResource.getProperty(APIConstants.PUBLISHER_ROLES);
-
-                if (publisherRoles != null) {
-                    accessControlRoles = APIConstants.NULL_USER_ROLE_LIST.equals(
-                            apiResource.getProperty(APIConstants.PUBLISHER_ROLES)) ?
-                            null : apiResource.getProperty(APIConstants.PUBLISHER_ROLES);
-                }
-            } else {
-                accessControlRoles = APIConstants.NULL_USER_ROLE_LIST.equals(displayPublisherRoles) ?
-                        null : displayPublisherRoles;
-            }
-
-            api.setAccessControlRoles(accessControlRoles);
+            api = setResourceProperties(api, registry, artifactPath);
             api.setRating(getAverageRating(apiId));
             //set description
             api.setDescription(artifact.getAttribute(APIConstants.API_OVERVIEW_DESCRIPTION));
@@ -7316,5 +7297,38 @@ public final class APIUtil {
         Throwable rootCause = ExceptionUtils.getRootCause(e);
         rootCause = rootCause == null ? e : rootCause;
         return rootCause;
+    }
+
+    /**
+     * To set the resource properties to the API.
+     *
+     * @param api          API that need to set the resource properties.
+     * @param registry     Registry to get the resource from.
+     * @param artifactPath Path of the API artifact.
+     * @return Updated API.
+     * @throws RegistryException Registry Exception.
+     */
+    private static API setResourceProperties(API api, Registry registry, String artifactPath) throws RegistryException {
+        Resource apiResource = registry.get(artifactPath);
+        Properties properties = apiResource.getProperties();
+        if (properties != null) {
+            Enumeration propertyNames = properties.propertyNames();
+            while (propertyNames.hasMoreElements()) {
+                String propertyName = (String) propertyNames.nextElement();
+                if (log.isDebugEnabled()) {
+                    log.debug("API '" + api.getId().toString() + "' " + "has the property " + propertyName);
+                }
+                if (propertyName.startsWith(APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX)) {
+                    api.addProperty(propertyName.substring(APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX.length()),
+                            apiResource.getProperty(propertyName));
+                }
+            }
+        }
+        api.setAccessControl(apiResource.getProperty(APIConstants.ACCESS_CONTROL));
+        api.setAccessControlRoles(
+                APIConstants.NULL_USER_ROLE_LIST.equals(apiResource.getProperty(APIConstants.PUBLISHER_ROLES)) ?
+                        null :
+                        apiResource.getProperty(APIConstants.PUBLISHER_ROLES));
+        return api;
     }
 }

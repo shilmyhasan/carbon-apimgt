@@ -25,6 +25,7 @@ import org.apache.axis2.clustering.ClusteringAgent;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -2244,7 +2245,10 @@ public class APIProviderImplTest {
         oldApi.setContext("/test");        
         oldApi.setEnvironments(environments);
         api.setUriTemplates(uriTemplates);
-        
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("test", "new_test");
+        api.setAdditionalProperties(jsonObject);
+        api.addProperty("secured", "false");
 
         List<Documentation> documentationList = getDocumentationList();
         
@@ -2329,6 +2333,10 @@ public class APIProviderImplTest {
         apiProvider.updateAPI(api);
         Assert.assertEquals(1, api.getEnvironments().size());
         Assert.assertEquals(true, api.getEnvironments().contains("SANDBOX"));
+        Assert.assertEquals("Additional properties that are set are not retrieved new_test", "new_test",
+                api.getAdditionalProperties().get("test"));
+        Assert.assertEquals("Additional properties that are set are not retrieved new_test", "false",
+                api.getAdditionalProperties().get("secured"));
     }
     
     @Test(expected = APIManagementException.class)
