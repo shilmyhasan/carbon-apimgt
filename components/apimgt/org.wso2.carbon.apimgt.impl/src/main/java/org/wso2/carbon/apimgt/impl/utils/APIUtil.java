@@ -6472,8 +6472,8 @@ public final class APIUtil {
         */
         if (apiMgtDAO.isPolicyExist(PolicyConstants.POLICY_LEVEL_APP, tenantId,
                 APIConstants.DEFAULT_APP_POLICY_UNLIMITED)) {
-            log.debug("Default Throttling Policies are not written into the database again, as they were added " +
-                    "once at initial server startup");
+            log.debug("Default Throttling Policy : " + APIConstants.DEFAULT_APP_POLICY_UNLIMITED +
+                    ", is not written into the database again as it is added once at initial server startup");
             return;
         }
 
@@ -6570,8 +6570,8 @@ public final class APIUtil {
         */
         if (apiMgtDAO.isPolicyExist(PolicyConstants.POLICY_LEVEL_APP, tenantId,
                 APIConstants.DEFAULT_APP_POLICY_UNLIMITED)) {
-            log.debug("Default Throttling Policies are not written into the database again, as they were added once, " +
-                    "at initial tenant loading");
+            log.debug("Default Throttling Policy : " + APIConstants.DEFAULT_APP_POLICY_UNLIMITED +
+                    ", is not written into the database again as it is added once at initial tenant loading");
             return;
         }
 
