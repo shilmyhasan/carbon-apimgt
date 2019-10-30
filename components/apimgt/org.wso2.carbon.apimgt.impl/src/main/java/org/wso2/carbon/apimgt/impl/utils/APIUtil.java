@@ -1428,7 +1428,7 @@ public final class APIUtil {
             // isWSDL2Document(api.getWsdlUrl()) method only understands http or file system urls.
             // Hence if this is a registry url, should not go in to the following if block
             if (!api.getWsdlUrl().matches(wsdRegistryPath) && (api.getWsdlUrl().startsWith("http:") || api.getWsdlUrl
-                    ().startsWith("https:") || api.getWsdlUrl().startsWith("file:"))) {
+                    ().startsWith("https:") || api.getWsdlUrl().startsWith("file:") || api.getWsdlUrl().startsWith("/t"))) {
                 if (isWSDL2Document(api.getWsdlUrl())) {
                     wsdlContentEle = wsdlReader.readAndCleanWsdl2(api);
                     wsdlResource.setContent(wsdlContentEle.toString());
@@ -4959,7 +4959,7 @@ public final class APIUtil {
 
     /**
      * This method will check the validity of given url. WSDL url should be
-     * contain http, https or file system patch
+     * contain http, https, "/t" (for tenant APIs) or file system path
      * otherwise we will mark it as invalid wsdl url. How ever here we do not
      * validate wsdl content.
      *
@@ -4969,7 +4969,7 @@ public final class APIUtil {
     public static boolean isValidWSDLURL(String wsdlURL, boolean required) {
         if (wsdlURL != null && !"".equals(wsdlURL)) {
             if (wsdlURL.startsWith("http:") || wsdlURL.startsWith("https:") ||
-                    wsdlURL.startsWith("file:") || wsdlURL.startsWith("/registry")) {
+                    wsdlURL.startsWith("file:") || wsdlURL.startsWith("/registry") || wsdlURL.startsWith("/t")) {
                 return true;
             }
         } else if (!required) {
