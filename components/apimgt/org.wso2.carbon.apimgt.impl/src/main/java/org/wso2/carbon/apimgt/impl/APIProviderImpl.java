@@ -5572,7 +5572,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         rolesQuery.append(APIConstants.NULL_USER_ROLE_LIST);
         String[] userRoles = APIUtil.getListOfRoles(userNameWithoutChange);
         String skipRolesByRegex = APIUtil.getSkipRolesByRegex();
-        if (skipRolesByRegex != null) {
+        if (StringUtils.isNotEmpty(skipRolesByRegex)) {
             List<String> filteredUserRoles = new ArrayList<>(Arrays.asList(userRoles));
             String[] regexList = skipRolesByRegex.split(",");
             for (int i = 0; i < regexList.length; i++) {
