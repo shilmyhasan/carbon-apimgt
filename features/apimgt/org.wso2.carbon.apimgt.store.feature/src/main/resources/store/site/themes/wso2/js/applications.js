@@ -324,6 +324,7 @@ GrantTypes.prototype.getMap = function(selected){
             }, $.proxy(function (result) {
                 this.element.find('.update_grants').buttonLoader('stop');
                 if (!result.error) {
+		    this.app.grants = this.grants.getMap(selected.replace(/,/g, ' '));
                 } else {
                     //@todo: param_string
                     jagg.message({content:result.message,type:"error"});
