@@ -985,7 +985,7 @@ public final class APIUtil {
             try {
                 cacheTimeout = Integer.parseInt(artifact.getAttribute(APIConstants.API_OVERVIEW_CACHE_TIMEOUT));
             } catch (NumberFormatException e) {
-                //ignore
+                log.warn(" Could not derive Cache Timeout , Default is used : " + e);
             }
             api.setCacheTimeout(cacheTimeout);
             boolean isGlobalThrottlingEnabled = APIUtil.isAdvanceThrottlingEnabled();
