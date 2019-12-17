@@ -134,6 +134,10 @@ public class Application {
         oauthApps.put(keyType, oAuthApplication);
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }
