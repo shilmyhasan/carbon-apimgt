@@ -1,4 +1,4 @@
-APIUtil<% jagg.template("menu/left", function(inputs, outputs, jagg) { %>
+<% jagg.template("menu/left", function(inputs, outputs, jagg) { %>
 <%  var tenant= encode.forUriComponent(request.getParameter("tenant"));
     var urlPrefix;
     var urlPostfix;
