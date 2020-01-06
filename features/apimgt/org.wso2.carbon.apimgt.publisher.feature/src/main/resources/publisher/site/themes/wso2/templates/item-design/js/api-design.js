@@ -522,6 +522,7 @@ APIDesigner.prototype.init_controllers = function(){
         var i = $(this).attr("data-index");
 
         var regex = /\.(?!(?:\w+\|?)+'])/;
+        //this regex pattern will skip the split if dot is found inside a square bracket
         var deleteDataArray = deleteData.split(regex);
         var operations = deleteDataArray[2].replace(/]|[[]|'/g, '');
         var operation = deleteDataArray[3];
