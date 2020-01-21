@@ -66,6 +66,8 @@
         ssoRelyingParty.setProperty("nameIdPolicy", site.ssoConfiguration.nameIdPolicy);
 
         // if it is IDP initiated SSO, we should just do a HTTP GET to IDP with SP ID and relay state optionally
+        // This block is required to log in the user in the api list page of the store.
+        // (When logging in through IDP initiated SSO)
         if (site.ssoConfiguration.idpInit == "true") {
             var relayState = ssoRelyingParty.getUUID();
             ssoRelyingParty.setRelayStateProperty(relayState, requestURI);

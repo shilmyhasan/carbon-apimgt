@@ -19,7 +19,7 @@
         "timestampSkewInSeconds":"300",
         "keyStoreName" :"",
         "signRequests" : "true",
-	    "assertionEncryptionEnabled" : "false",
+        "assertionEncryptionEnabled" : "false",
         "idpInit" : "true",
         "idpInitSSOURL" : "https://localhost:9443/samlsso?spEntityID=API_PUBLISHER",
         "externalLogoutPage" : "https://localhost:9443/samlsso?slo=true"
