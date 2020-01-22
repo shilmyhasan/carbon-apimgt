@@ -9,10 +9,13 @@ jagg.setCSRFToken();
 //commented below if condition because anonymous user
 //should be able to view the available apis without
 //seeing IS login page.SSO will work when click the login link.
-/*var ssoEnabled = site.ssoConfiguration.enabled;
-if (ssoEnabled === 'true') {
+
+//In idp init sso scenario this snippet is needed, therefore this was uncommented with an additional condition.
+var ssoEnabled = site.ssoConfiguration.enabled;
+var idpInit = site.ssoConfiguration.idpInit;
+if (ssoEnabled === 'true' && idpInit === 'true') {
     jagg.includeBlock("sso/filter", {});
-}*/
+}
 
 var getRedirectPathForNonAuthenticatedUser = function () {
    var requestedPage = request.getRequestURI();
