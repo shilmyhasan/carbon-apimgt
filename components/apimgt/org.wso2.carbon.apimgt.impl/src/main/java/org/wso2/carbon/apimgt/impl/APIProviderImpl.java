@@ -250,13 +250,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             Association[] associations = registry.getAssociations(providerPath, APIConstants.PROVIDER_ASSOCIATION);
             for (Association association : associations) {
                 String apiPath = association.getDestinationPath();
-                Resource resource = registry.get(apiPath);
-                String apiArtifactId = resource.getUUID();
-                if (apiArtifactId != null) {
-                    GenericArtifact apiArtifact = artifactManager.getGenericArtifact(apiArtifactId);
-                    apiSortedList.add(getAPI(apiArtifact));
-                } else {
-                    throw new GovernanceException("artifact id is null of " + apiPath);
+                if (registry.resourceExists(apiPath)) {
+                    Resource resource = registry.get(apiPath);
+                    String apiArtifactId = resource.getUUID();
+                    if (apiArtifactId != null) {
+                        GenericArtifact apiArtifact = artifactManager.getGenericArtifact(apiArtifactId);
+                        apiSortedList.add(getAPI(apiArtifact));
+                    } else {
+                        throw new GovernanceException("artifact id is null of " + apiPath);
+                    }
                 }
             }
 
