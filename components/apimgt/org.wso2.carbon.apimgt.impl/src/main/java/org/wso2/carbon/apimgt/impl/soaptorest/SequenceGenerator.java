@@ -297,7 +297,8 @@ public class SequenceGenerator {
                         Element element = doc.createElementNS(namespace,
                                 SOAPToRESTConstants.SequenceGen.NAMESPACE_PREFIX
                                         + SOAPToRESTConstants.SequenceGen.NAMESPACE_SEPARATOR + parameterTreeNode);
-                        if (doc.getElementsByTagName(element.getTagName()).getLength() > 0) {
+                        if (doc.getElementsByTagName(element.getTagName()).getLength() > 0
+                                && rootElement != doc.getElementsByTagName(element.getTagName()).item(0)) {
                             prevElement = (Element) doc.getElementsByTagName(element.getTagName()).item(0);
                         } else {
                             if (elemPos == length - 1) {
