@@ -48,7 +48,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
         TracingSpan span = null;
 
-        // reset HTTP_METHOD properties to rest api values before send them to analytics.
+        // reset HTTP_METHOD, to rest api values before send them to analytics.
         // (only for graphQL APIs)
         if (mc.getProperty(APIConstants.API_TYPE) != null &&
                 APIConstants.GRAPHQL_API.equals(mc.getProperty(APIConstants.API_TYPE).toString())) {
