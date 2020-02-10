@@ -18,12 +18,18 @@
 
 package org.wso2.carbon.apimgt.keymgt;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.issuers.AbstractScopesIssuer;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
+import org.wso2.carbon.identity.core.util.IdentityConfigParser;
+import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
+import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 
+import javax.xml.namespace.QName;
 import java.util.*;
 
 /**
@@ -36,16 +42,27 @@ public class ScopesIssuer {
     private List<String> scopeSkipList = new ArrayList<String>();
     private static Map<String, AbstractScopesIssuer> scopesIssuers;
     private static final String DEFAULT_SCOPE_NAME = "default";
+    private static final String CONFIG_ELEM_OAUTH = "OAuth";
     /**
      * Singleton of ScopeIssuer.*
      */
     private static ScopesIssuer scopesIssuer;
-    
-    private ScopesIssuer() {
+
+    public ScopesIssuer() {
     }
 
-    public static void loadInstance(List<String> whitelist) {
-        scopesIssuer = new ScopesIssuer();
+    public static void loadInstance(List<String> whitelist) throws IllegalAccessException, InstantiationException,
+            ClassNotFoundException {
+        IdentityConfigParser configParser = IdentityConfigParser.getInstance();
+        OMElement oauthElem = configParser.getConfigElement(CONFIG_ELEM_OAUTH);
+        //Get the configured scope validators
+        String scopeIssuerClass = oauthElem.getFirstChildWithName(
+                new QName(IdentityCoreConstants.IDENTITY_DEFAULT_NAMESPACE, "ScopeIssuer")).getText();
+        if (scopeIssuerClass != null) {
+            scopesIssuer = (ScopesIssuer) APIUtil.getClassForName(scopeIssuerClass).newInstance();
+        } else {
+            scopesIssuer = new ScopesIssuer();
+        }
         if (whitelist != null && !whitelist.isEmpty()) {
             scopesIssuer.scopeSkipList.addAll(whitelist);
         }
