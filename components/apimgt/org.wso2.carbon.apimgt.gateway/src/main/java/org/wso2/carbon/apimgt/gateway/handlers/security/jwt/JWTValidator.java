@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
+import org.wso2.carbon.apimgt.gateway.dto.JWTTokenPayloadInfo;
 import org.wso2.carbon.apimgt.gateway.handlers.WebsocketUtil;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APIKeyValidator;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
@@ -96,13 +97,22 @@ public class JWTValidator {
 
         String cacheKey = GatewayUtils.getAccessTokenCacheKey(tokenSignature, apiContext, apiVersion, matchingResource, httpMethod);
         String tenantDomain = GatewayUtils.getTenantDomain();
-
+        JWTTokenPayloadInfo payloadInfo = null;
         // Validate from cache
         if (isGatewayTokenCacheEnabled) {
             String cacheToken = (String) getGatewayTokenCache().get(tokenSignature);
             if (cacheToken != null) {
                 log.debug("Token retrieved from the token cache.");
-                isVerified = true;
+                if (getGatewayKeyCache().get(cacheKey) != null) {
+                    // Token is found in the key cache
+                    payloadInfo = (JWTTokenPayloadInfo) getGatewayKeyCache().get(cacheKey);
+                    String rawPayload = payloadInfo.getRawPayload();
+                    if (!rawPayload.equals(splitToken[1])) {
+                        isVerified = false;
+                    } else {
+                        isVerified = true;
+                    }
+                }
             } else if (getInvalidTokenCache().get(tokenSignature) != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Token retrieved from the invalid token cache. Token: " + GatewayUtils
@@ -187,9 +197,9 @@ public class JWTValidator {
         // If token signature is verified
         if (isVerified) {
             log.debug("Token signature is verified.");
-            if (isGatewayTokenCacheEnabled && getGatewayKeyCache().get(cacheKey) != null) {
+            if (isGatewayTokenCacheEnabled && payloadInfo != null) {
                 // Token is found in the key cache
-                payload = (JSONObject) getGatewayKeyCache().get(cacheKey);
+                payload = payloadInfo.getPayload();
                 checkTokenExpiration(tokenSignature, payload, tenantDomain);
             } else {
                 // Retrieve payload from token
@@ -211,7 +221,10 @@ public class JWTValidator {
                 validateScopes(synCtx, openAPI, payload);
 
                 if (isGatewayTokenCacheEnabled) {
-                    getGatewayKeyCache().put(cacheKey, payload);
+                    JWTTokenPayloadInfo jwtTokenPayloadInfo = new JWTTokenPayloadInfo();
+                    jwtTokenPayloadInfo.setPayload(payload);
+                    jwtTokenPayloadInfo.setRawPayload(splitToken[1]);
+                    getGatewayKeyCache().put(cacheKey, jwtTokenPayloadInfo);
                 }
             }
 
@@ -301,13 +314,24 @@ public class JWTValidator {
 
         String tokenSignature = splitToken[2];
         String tenantDomain = GatewayUtils.getTenantDomain();
+        JWTTokenPayloadInfo payloadInfo = null;
+        String cacheKey = WebsocketUtil.getAccessTokenCacheKey(tokenSignature, apiContext);
 
         // Validate from cache
         if (isGatewayTokenCacheEnabled) {
             String cacheToken = (String) getGatewayTokenCache().get(tokenSignature);
             if (cacheToken != null) {
                 log.debug("Token retrieved from the token cache.");
-                isVerified = true;
+                if (getGatewayKeyCache().get(cacheKey) != null) {
+                    // Token is found in the key cache
+                    payloadInfo = (JWTTokenPayloadInfo) getGatewayKeyCache().get(cacheKey);
+                    String rawPayload = payloadInfo.getRawPayload();
+                    if (!rawPayload.equals(splitToken[1])) {
+                        isVerified = false;
+                    } else {
+                        isVerified = true;
+                    }
+                }
             } else if (getInvalidTokenCache().get(tokenSignature) != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Token retrieved from the invalid token cache. Token: " + GatewayUtils
@@ -383,14 +407,13 @@ public class JWTValidator {
             }
         }
 
-        String cacheKey = WebsocketUtil.getAccessTokenCacheKey(tokenSignature, apiContext);
 
         // If token signature is verified
         if (isVerified) {
             log.debug("Token signature is verified.");
-            if (isGatewayTokenCacheEnabled && getGatewayKeyCache().get(cacheKey) != null) {
+            if (isGatewayTokenCacheEnabled && payloadInfo != null) {
                 // Token is found in the key cache
-                payload = (JSONObject) getGatewayKeyCache().get(cacheKey);
+                payload = payloadInfo.getPayload();
                 checkTokenExpiration(tokenSignature, payload, tenantDomain);
             } else {
                 // Retrieve payload from token
@@ -411,7 +434,10 @@ public class JWTValidator {
                 checkTokenExpiration(tokenSignature, payload, tenantDomain);
 
                 if (isGatewayTokenCacheEnabled) {
-                    getGatewayKeyCache().put(cacheKey, payload);
+                    JWTTokenPayloadInfo jwtTokenPayloadInfo = new JWTTokenPayloadInfo();
+                    jwtTokenPayloadInfo.setPayload(payload);
+                    jwtTokenPayloadInfo.setRawPayload(splitToken[1]);
+                    getGatewayKeyCache().put(cacheKey, jwtTokenPayloadInfo);
                 }
             }
 
