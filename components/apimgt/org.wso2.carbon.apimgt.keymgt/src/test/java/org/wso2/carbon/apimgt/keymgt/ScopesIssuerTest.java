@@ -9,6 +9,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.keymgt.issuers.AbstractScopesIssuer;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
+import org.wso2.carbon.identity.core.util.IdentityConfigParser;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 
@@ -17,15 +18,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest( {APIKeyMgtDataHolder.class})
+@PrepareForTest( {APIKeyMgtDataHolder.class, IdentityConfigParser.class})
 public class ScopesIssuerTest {
+
     @Test
     public void setScopes() throws Exception {
         PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
+        PowerMockito.mockStatic(IdentityConfigParser.class);
         AbstractScopesIssuer mockIssuer = Mockito.mock(AbstractScopesIssuer.class);
         Map<String, AbstractScopesIssuer> scopesIssuerMap = new HashMap<String, AbstractScopesIssuer>();
         scopesIssuerMap.put("wso2", mockIssuer);
         BDDMockito.given(APIKeyMgtDataHolder.getScopesIssuers()).willReturn(scopesIssuerMap);
+        BDDMockito.given(IdentityConfigParser.getInstance()).willReturn(null);
         ScopesIssuer.loadInstance(Collections.<String>emptyList());
         ScopesIssuer scopesIssuer = ScopesIssuer.getInstance();
         OAuthTokenReqMessageContext tokReqMsgCtx = new OAuthTokenReqMessageContext(new OAuth2AccessTokenReqDTO());
@@ -35,10 +39,12 @@ public class ScopesIssuerTest {
     @Test
     public void setDefaultScopes() throws Exception {
         PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
+        PowerMockito.mockStatic(IdentityConfigParser.class);
         AbstractScopesIssuer mockIssuer = Mockito.mock(AbstractScopesIssuer.class);
         Map<String, AbstractScopesIssuer> scopesIssuerMap = new HashMap<String, AbstractScopesIssuer>();
         scopesIssuerMap.put("wso2", mockIssuer);
         BDDMockito.given(APIKeyMgtDataHolder.getScopesIssuers()).willReturn(scopesIssuerMap);
+        BDDMockito.given(IdentityConfigParser.getInstance()).willReturn(null);
         ScopesIssuer.loadInstance(Collections.<String>emptyList());
         ScopesIssuer scopesIssuer = ScopesIssuer.getInstance();
         OAuthTokenReqMessageContext tokReqMsgCtx = new OAuthTokenReqMessageContext(new OAuth2AccessTokenReqDTO());
@@ -47,8 +53,10 @@ public class ScopesIssuerTest {
     @Test
     public void testNoScopeIssuers() throws Exception {
         PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
+        PowerMockito.mockStatic(IdentityConfigParser.class);
         Map<String, AbstractScopesIssuer> scopesIssuerMap = new HashMap<String, AbstractScopesIssuer>();
         BDDMockito.given(APIKeyMgtDataHolder.getScopesIssuers()).willReturn(scopesIssuerMap);
+        BDDMockito.given(IdentityConfigParser.getInstance()).willReturn(null);
         ScopesIssuer.loadInstance(Collections.<String>emptyList());
         ScopesIssuer scopesIssuer = ScopesIssuer.getInstance();
         OAuthTokenReqMessageContext tokReqMsgCtx = new OAuthTokenReqMessageContext(new OAuth2AccessTokenReqDTO());
@@ -57,15 +65,16 @@ public class ScopesIssuerTest {
     @Test
     public void testNoScopeAssigned() throws Exception {
         PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
+        PowerMockito.mockStatic(IdentityConfigParser.class);
         AbstractScopesIssuer mockIssuer = Mockito.mock(AbstractScopesIssuer.class);
         Map<String, AbstractScopesIssuer> scopesIssuerMap = new HashMap<String, AbstractScopesIssuer>();
         scopesIssuerMap.put("default", mockIssuer);
         BDDMockito.given(APIKeyMgtDataHolder.getScopesIssuers()).willReturn(scopesIssuerMap);
+        BDDMockito.given(IdentityConfigParser.getInstance()).willReturn(null);
         ScopesIssuer.loadInstance(Collections.<String>emptyList());
         ScopesIssuer scopesIssuer = ScopesIssuer.getInstance();
         OAuthTokenReqMessageContext tokReqMsgCtx = new OAuthTokenReqMessageContext(new OAuth2AccessTokenReqDTO());
         tokReqMsgCtx.setScope(new String[] {"wso2:a"});
         scopesIssuer.setScopes(tokReqMsgCtx);
     }
-
 }

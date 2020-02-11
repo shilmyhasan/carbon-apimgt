@@ -26,7 +26,6 @@ import org.wso2.carbon.apimgt.keymgt.issuers.AbstractScopesIssuer;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.identity.core.util.IdentityConfigParser;
 import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
-import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 
 import javax.xml.namespace.QName;
@@ -54,15 +53,21 @@ public class ScopesIssuer {
     public static void loadInstance(List<String> whitelist) throws IllegalAccessException, InstantiationException,
             ClassNotFoundException {
         IdentityConfigParser configParser = IdentityConfigParser.getInstance();
-        OMElement oauthElem = configParser.getConfigElement(CONFIG_ELEM_OAUTH);
-        //Get the configured scope validators
-        String scopeIssuerClass = oauthElem.getFirstChildWithName(
-                new QName(IdentityCoreConstants.IDENTITY_DEFAULT_NAMESPACE, "ScopeIssuer")).getText();
-        if (scopeIssuerClass != null) {
-            scopesIssuer = (ScopesIssuer) APIUtil.getClassForName(scopeIssuerClass).newInstance();
+        if(configParser != null) {
+            OMElement oauthElem = configParser.getConfigElement(CONFIG_ELEM_OAUTH);
+            //Get the configured scope issuer
+            OMElement elementScopeIssuer = oauthElem.getFirstChildWithName(
+                new QName(IdentityCoreConstants.IDENTITY_DEFAULT_NAMESPACE, "ScopeIssuer"));
+            if (elementScopeIssuer != null) {
+                String scopeIssuerClass = elementScopeIssuer.getText();
+                scopesIssuer = (ScopesIssuer) APIUtil.getClassForName(scopeIssuerClass).newInstance();
+            } else {
+                scopesIssuer = new ScopesIssuer();
+            }
         } else {
             scopesIssuer = new ScopesIssuer();
         }
+
         if (whitelist != null && !whitelist.isEmpty()) {
             scopesIssuer.scopeSkipList.addAll(whitelist);
         }
