@@ -18,17 +18,15 @@
 
 package org.wso2.carbon.apimgt.keymgt;
 
-import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.issuers.AbstractScopesIssuer;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
-import org.wso2.carbon.identity.core.util.IdentityConfigParser;
-import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 
-import javax.xml.namespace.QName;
 import java.util.*;
 
 /**
@@ -41,7 +39,7 @@ public class ScopesIssuer {
     private List<String> scopeSkipList = new ArrayList<String>();
     private static Map<String, AbstractScopesIssuer> scopesIssuers;
     private static final String DEFAULT_SCOPE_NAME = "default";
-    private static final String CONFIG_ELEM_OAUTH = "OAuth";
+    private static final String CONFIG_ELEM_SCOPE_ISSUER = "OAuthConfigurations.ScopeIssuer";
     /**
      * Singleton of ScopeIssuer.*
      */
@@ -52,14 +50,11 @@ public class ScopesIssuer {
 
     public static void loadInstance(List<String> whitelist) throws IllegalAccessException, InstantiationException,
             ClassNotFoundException {
-        IdentityConfigParser configParser = IdentityConfigParser.getInstance();
-        if(configParser != null) {
-            OMElement oauthElem = configParser.getConfigElement(CONFIG_ELEM_OAUTH);
-            //Get the configured scope issuer
-            OMElement elementScopeIssuer = oauthElem.getFirstChildWithName(
-                new QName(IdentityCoreConstants.IDENTITY_DEFAULT_NAMESPACE, "ScopeIssuer"));
-            if (elementScopeIssuer != null) {
-                String scopeIssuerClass = elementScopeIssuer.getText();
+        APIManagerConfiguration configParser = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                .getAPIManagerConfiguration();
+        if (configParser != null) {
+            String scopeIssuerClass = configParser.getFirstProperty(CONFIG_ELEM_SCOPE_ISSUER);
+            if (scopeIssuerClass != null) {
                 scopesIssuer = (ScopesIssuer) APIUtil.getClassForName(scopeIssuerClass).newInstance();
             } else {
                 scopesIssuer = new ScopesIssuer();
