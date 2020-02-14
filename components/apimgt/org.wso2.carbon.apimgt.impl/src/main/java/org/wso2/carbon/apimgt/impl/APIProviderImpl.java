@@ -414,6 +414,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     * Returns full list of subscriptions of an API
+     *
+     * @param apiName    Name of the API
+     * @param apiVersion Version of the API
+     * @param provider Name of API creator
+     * @return All subscriptions of a given API
+     * @throws APIManagementException if failed to get Subscribers
+     */
+    public List<SubscribedAPI> getSubscriptionsOfAPI(String apiName, String apiVersion, String provider)
+            throws APIManagementException {
+        return apiMgtDAO.getSubscriptionsOfAPI(apiName, apiVersion, provider);
+    }
+
+    /**
      * Returns full list of Subscribers of an API
      *
      * @param identifier APIIdentifier

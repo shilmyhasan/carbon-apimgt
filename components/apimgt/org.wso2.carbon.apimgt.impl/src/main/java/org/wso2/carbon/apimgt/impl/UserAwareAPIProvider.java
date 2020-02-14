@@ -284,6 +284,12 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
+    public void updateSubscription(APIIdentifier apiId, String subStatus, int appId) throws APIManagementException {
+        checkPublishPermission();
+        apiMgtDAO.updateSubscription(apiId, subStatus, appId);
+    }
+
+    @Override
     public List<LifeCycleEvent> getLifeCycleEvents(APIIdentifier apiId) throws APIManagementException {
         checkAccessControlPermission(apiId);
         return super.getLifeCycleEvents(apiId);

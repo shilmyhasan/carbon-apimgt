@@ -3151,6 +3151,55 @@ public class ApiMgtDAO {
         }
     }
 
+    /**
+     * @param apiName    Name of the API
+     * @param apiVersion Version of the API
+     * @param provider Name of API creator
+     * @return All subscriptions of a given API
+     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     */
+    public List<SubscribedAPI> getSubscriptionsOfAPI(String apiName, String apiVersion, String provider)
+            throws APIManagementException {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        List<SubscribedAPI> subscriptions = new ArrayList<>();
+
+        try {
+            String sqlQuery = SQLConstants.GET_SUBSCRIPTIONS_OF_API_SQL;
+            connection = APIMgtDBUtil.getConnection();
+
+            ps = connection.prepareStatement(sqlQuery);
+            ps.setString(1, apiName);
+            ps.setString(2, apiVersion);
+            ps.setString(3, provider);
+            result = ps.executeQuery();
+
+            while (result.next()) {
+                APIIdentifier apiId = new APIIdentifier(result.getString("API_PROVIDER"), apiName, apiVersion);
+                Subscriber subscriber = new Subscriber(result.getString("USER_ID"));
+                SubscribedAPI subscription = new SubscribedAPI(subscriber, apiId);
+                subscription.setUUID(result.getString("SUB_UUID"));
+                subscription.setSubStatus(result.getString("SUB_STATUS"));
+                subscription.setSubCreatedStatus(result.getString("SUBS_CREATE_STATE"));
+                subscription.setTier(new Tier(result.getString("SUB_TIER_ID")));
+                subscription.setCreatedTime(result.getString("SUB_CREATED_TIME"));
+
+                Application application = new Application(result.getInt("APPLICATION_ID"));
+                application.setName(result.getString("APPNAME"));
+                subscription.setApplication(application);
+
+                subscriptions.add(subscription);
+            }
+        } catch (SQLException e) {
+            handleException("Error occurred while reading subscriptions of API: " + apiName + ':' + apiVersion, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, result);
+        }
+        return subscriptions;
+    }
+
+
 
     private void updateOAuthConsumerApp(String appName, String callbackUrl)
             throws IdentityOAuthAdminException, APIManagementException {
