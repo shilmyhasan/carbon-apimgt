@@ -48,14 +48,21 @@ public class ScopesIssuer {
     public ScopesIssuer() {
     }
 
-    public static void loadInstance(List<String> whitelist) throws IllegalAccessException, InstantiationException,
-            ClassNotFoundException {
+    public static void loadInstance(List<String> whitelist) throws APIKeyMgtException{
         APIManagerConfiguration configParser = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
                 .getAPIManagerConfiguration();
         if (configParser != null) {
             String scopeIssuerClass = configParser.getFirstProperty(CONFIG_ELEM_SCOPE_ISSUER);
             if (scopeIssuerClass != null) {
-                scopesIssuer = (ScopesIssuer) APIUtil.getClassForName(scopeIssuerClass).newInstance();
+                try {
+                    scopesIssuer = (ScopesIssuer) APIUtil.getClassForName(scopeIssuerClass).newInstance();
+                } catch (ClassNotFoundException ex) {
+                    throw new APIKeyMgtException("Class " + scopeIssuerClass + " could not be found", ex);
+                } catch (InstantiationException ex) {
+                    throw new APIKeyMgtException("Class " + scopeIssuerClass + " could not be instantiated", ex);
+                } catch (IllegalAccessException ex) {
+                    throw new APIKeyMgtException("Class " + scopeIssuerClass + " could not be accessed", ex);
+                }
             } else {
                 scopesIssuer = new ScopesIssuer();
             }
