@@ -24,6 +24,7 @@ import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.identity.oauth.callback.OAuthCallback;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 import org.wso2.carbon.user.core.service.RealmService;
 
@@ -45,9 +46,19 @@ public abstract class AbstractScopesIssuer {
      *
      * @param tokReqMsgCtx      token message context
      * @param whiteListedScopes scopes to be white listed
-     * @return returns authorized scopes list
+     * @return authorized scopes list
      */
     public abstract List<String> getScopes(OAuthTokenReqMessageContext tokReqMsgCtx, List<String> whiteListedScopes);
+
+    /**
+     * This method is used to retrieve authorized scopes with respect to an authorization callback.
+     *
+     * @param scopeValidationCallback Authorization callback to validate scopes
+     * @param whiteListedScopes       scopes to be white listed
+     * @return authorized scopes list
+     */
+    public abstract List<String> getScopes(OAuthCallback scopeValidationCallback, List<String> whiteListedScopes)
+            throws APIManagementException;
 
     /**
      * This method is used to get the prefix of the scope issuer.
