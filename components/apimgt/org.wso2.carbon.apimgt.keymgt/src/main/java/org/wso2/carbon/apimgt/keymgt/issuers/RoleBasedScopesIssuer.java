@@ -21,8 +21,6 @@ import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opensaml.saml2.core.Assertion;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.keymgt.handlers.ResourceConstants;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
@@ -208,59 +206,6 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             log.error("Error when getting the tenant's UserStoreManager or when getting roles of user ", e);
         }
         return userRoles;
-    }
-
-    /**
-     * This method is used to check if the application scope list empty.
-     *
-     * @param appScopes Application scopes list
-     * @param clientId  Client ID of the application
-     * @return if the scopes list is empty
-     */
-    private Boolean isAppScopesEmpty(Map<String, String> appScopes, String clientId) {
-
-        if (appScopes.isEmpty()) {
-            if (log.isDebugEnabled()) {
-                log.debug("No scopes defined for the Application " + clientId);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * This method is used to get the application scopes including the scopes defined for the APIs subscribed to the
-     * application and the API-M REST API scopes set of the current tenant.
-     *
-     * @param consumerKey       Consumer Key of the application
-     * @param authenticatedUser Authenticated User
-     * @return Application Scope List
-     */
-    private Map<String, String> getAppScopes(String consumerKey, AuthenticatedUser authenticatedUser) {
-
-        //Get all the scopes and roles against the scopes defined for the APIs subscribed to the application.
-        Map<String, String> appScopes = null;
-        String tenantDomain = authenticatedUser.getTenantDomain();
-        try {
-            appScopes = getApiMgtDAOInstance().getScopeRolesOfApplication(consumerKey);
-            //Add API Manager rest API scopes set. This list should be loaded at server start up and keep
-            //in memory and add it to each and every request coming.
-            Map<String, String> restAPIScopesOfCurrentTenant =
-                    (Map) getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER)
-                            .getCache(APIConstants.REST_API_SCOPE_CACHE).get(tenantDomain);
-            if (restAPIScopesOfCurrentTenant != null) {
-                appScopes.putAll(restAPIScopesOfCurrentTenant);
-            } else {
-                restAPIScopesOfCurrentTenant = getRESTAPIScopesFromConfig(getTenantRESTAPIScopesConfig(tenantDomain));
-                //call load tenant config for rest API then put cache
-                appScopes.putAll(restAPIScopesOfCurrentTenant);
-                getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).getCache(APIConstants.REST_API_SCOPE_CACHE)
-                        .put(tenantDomain, restAPIScopesOfCurrentTenant);
-            }
-        } catch (APIManagementException e) {
-            log.error("Error while getting scopes of application " + e.getMessage(), e);
-        }
-        return appScopes;
     }
 
     /**
