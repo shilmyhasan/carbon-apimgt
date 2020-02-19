@@ -103,12 +103,11 @@ public class ScopesIssuer {
                 authorizedAllScopes.addAll(authorizedScopes);
                 isAllAuthorized = true;
             }
-
         }
 
         if (isAllAuthorized) {
             scopeValidationCallback
-                    .setRequestedScope(authorizedAllScopes.toArray(new String[authorizedAllScopes.size()]));
+                    .setApprovedScope(authorizedAllScopes.toArray(new String[authorizedAllScopes.size()]));
             return true;
         }
         return false;
