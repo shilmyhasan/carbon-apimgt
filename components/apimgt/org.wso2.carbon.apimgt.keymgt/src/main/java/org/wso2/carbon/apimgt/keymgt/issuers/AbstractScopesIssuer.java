@@ -57,8 +57,7 @@ public abstract class AbstractScopesIssuer {
      * @param whiteListedScopes       scopes to be white listed
      * @return authorized scopes list
      */
-    public abstract List<String> getScopes(OAuthCallback scopeValidationCallback, List<String> whiteListedScopes)
-            throws APIManagementException;
+    public abstract List<String> getScopes(OAuthCallback scopeValidationCallback, List<String> whiteListedScopes);
 
     /**
      * This method is used to get the prefix of the scope issuer.
