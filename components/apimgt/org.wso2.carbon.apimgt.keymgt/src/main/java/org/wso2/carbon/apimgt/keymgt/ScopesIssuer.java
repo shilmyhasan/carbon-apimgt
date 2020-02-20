@@ -174,7 +174,9 @@ public class ScopesIssuer {
 
         Map<String, List<String>> scopeSets = new HashMap<>();
         // initializing scope sets with respect to prefixes
-        scopesIssuers.keySet().forEach((String prefix) -> scopeSets.put(prefix, new ArrayList<>()));
+        for (String prefix : scopesIssuers.keySet()) {
+            scopeSets.put(prefix, new ArrayList<String>());
+        }
         for (String scope : requestedScopes) {
             boolean scopeAssigned = false;
             for (String prefix : scopesIssuers.keySet()) {
