@@ -52,6 +52,7 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
 
     @Override
     public String getPrefix() {
+
         return ISSUER_PREFIX;
     }
 
@@ -65,18 +66,21 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
     @Override
     public List<String> getScopes(OAuthCallback scopeValidationCallback, List<String> whiteListedScopes) {
 
+        List<String> authorizedScopes = null;
         String[] requestedScopes = scopeValidationCallback.getRequestedScope();
         String clientId = scopeValidationCallback.getClient();
         AuthenticatedUser authenticatedUser = scopeValidationCallback.getResourceOwner();
 
         Map<String, String> appScopes = getAppScopes(clientId, authenticatedUser);
-        //If no scopes can be found in the context of the application
-        if (isAppScopesEmpty(appScopes, clientId)) {
-            return getAllowedScopes(whiteListedScopes, Arrays.asList(requestedScopes));
+        if (appScopes != null) {
+            //If no scopes can be found in the context of the application
+            if (isAppScopesEmpty(appScopes, clientId)) {
+                return getAllowedScopes(whiteListedScopes, Arrays.asList(requestedScopes));
+            }
+            String[] userRoles = getUserRoles(authenticatedUser);
+            authorizedScopes = getAuthorizedScopes(userRoles, requestedScopes, appScopes, whiteListedScopes);
         }
-
-        String[] userRoles = getUserRoles(authenticatedUser);
-        return getAuthorizedScopes(userRoles, requestedScopes, appScopes, whiteListedScopes);
+        return authorizedScopes;
     }
 
     /**
@@ -89,29 +93,33 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
     @Override
     public List<String> getScopes(OAuthTokenReqMessageContext tokReqMsgCtx, List<String> whiteListedScopes) {
 
+        List<String> authorizedScopes = null;
         String[] requestedScopes = tokReqMsgCtx.getScope();
         String clientId = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getClientId();
         AuthenticatedUser authenticatedUser = tokReqMsgCtx.getAuthorizedUser();
 
         Map<String, String> appScopes = getAppScopes(clientId, authenticatedUser);
-        //If no scopes can be found in the context of the application
-        if (isAppScopesEmpty(appScopes, clientId)) {
-            return getAllowedScopes(whiteListedScopes, Arrays.asList(requestedScopes));
-        }
+        if (appScopes != null) {
+            //If no scopes can be found in the context of the application
+            if (isAppScopesEmpty(appScopes, clientId)) {
+                return getAllowedScopes(whiteListedScopes, Arrays.asList(requestedScopes));
+            }
 
-        String grantType = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getGrantType();
-        String[] userRoles;
+            String grantType = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getGrantType();
+            String[] userRoles;
 
-        // If GrantType is SAML20_BEARER and CHECK_ROLES_FROM_SAML_ASSERTION is true,
-        // use user roles from assertion otherwise use roles from userstore.
-        String isSAML2Enabled = System.getProperty(ResourceConstants.CHECK_ROLES_FROM_SAML_ASSERTION);
-        if (GrantType.SAML20_BEARER.toString().equals(grantType) && Boolean.parseBoolean(isSAML2Enabled)) {
-            Assertion assertion = (Assertion) tokReqMsgCtx.getProperty(ResourceConstants.SAML2_ASSERTION);
-            userRoles = getRolesFromAssertion(assertion);
-        } else {
-            userRoles = getUserRoles(authenticatedUser);
+            // If GrantType is SAML20_BEARER and CHECK_ROLES_FROM_SAML_ASSERTION is true,
+            // use user roles from assertion otherwise use roles from userstore.
+            String isSAML2Enabled = System.getProperty(ResourceConstants.CHECK_ROLES_FROM_SAML_ASSERTION);
+            if (GrantType.SAML20_BEARER.toString().equals(grantType) && Boolean.parseBoolean(isSAML2Enabled)) {
+                Assertion assertion = (Assertion) tokReqMsgCtx.getProperty(ResourceConstants.SAML2_ASSERTION);
+                userRoles = getRolesFromAssertion(assertion);
+            } else {
+                userRoles = getUserRoles(authenticatedUser);
+            }
+            authorizedScopes = getAuthorizedScopes(userRoles, requestedScopes, appScopes, whiteListedScopes);
         }
-        return getAuthorizedScopes(userRoles, requestedScopes, appScopes, whiteListedScopes);
+        return authorizedScopes;
     }
 
     /**
@@ -201,6 +209,7 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             UserStoreManager userStoreManager = realmService.getTenantUserRealm(tenantId).getUserStoreManager();
             String endUsernameWithDomain = addDomainToName(username, userStoreDomain);
             userRoles = userStoreManager.getRoleListOfUser(endUsernameWithDomain);
+
         } catch (UserStoreException e) {
             //Log and return since we do not want to stop issuing the token in case of scope validation failures.
             log.error("Error when getting the tenant's UserStoreManager or when getting roles of user ", e);
@@ -216,6 +225,7 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
      * @return String
      */
     protected String addDomainToName(String username, String domainName) {
+
         return UserCoreUtil.addDomainToName(username, domainName);
     }
 
@@ -226,6 +236,7 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
      * @return String[]
      */
     protected String[] getRolesFromAssertion(Assertion assertion) {
+
         return APIKeyMgtUtil.getRolesFromAssertion(assertion);
     }
 

@@ -59,15 +59,19 @@ public class PermissionBasedScopeIssuer extends AbstractScopesIssuer {
     @Override
     public List<String> getScopes(OAuthTokenReqMessageContext tokReqMsgCtx, List<String> whiteListedScopes) {
 
+        List<String> authorizedScopes = null;
         List<String> requestedScopes = Arrays.asList(tokReqMsgCtx.getScope());
         String clientId = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getClientId();
         AuthenticatedUser authenticatedUser = tokReqMsgCtx.getAuthorizedUser();
         Map<String, String> appScopes = getAppScopes(clientId, authenticatedUser);
-        //If no scopes can be found in the context of the application
-        if (isAppScopesEmpty(appScopes, clientId)) {
-            return getAllowedScopes(whiteListedScopes, requestedScopes);
+        if (appScopes != null) {
+            //If no scopes can be found in the context of the application
+            if (isAppScopesEmpty(appScopes, clientId)) {
+                return getAllowedScopes(whiteListedScopes, requestedScopes);
+            }
+            authorizedScopes = getAuthorizedScopes(authenticatedUser, requestedScopes, appScopes, whiteListedScopes);
         }
-        return getAuthorizedScopes(authenticatedUser, requestedScopes, appScopes, whiteListedScopes);
+        return authorizedScopes;
     }
 
     /**
@@ -80,15 +84,19 @@ public class PermissionBasedScopeIssuer extends AbstractScopesIssuer {
     @Override
     public List<String> getScopes(OAuthCallback scopeValidationCallback, List<String> whiteListedScopes) {
 
+        List<String> authroizedScopes = null;
         List<String> requestedScopes = Arrays.asList(scopeValidationCallback.getRequestedScope());
         String clientId = scopeValidationCallback.getClient();
         AuthenticatedUser authenticatedUser = scopeValidationCallback.getResourceOwner();
         Map<String, String> appScopes = getAppScopes(clientId, authenticatedUser);
-        //If no scopes can be found in the context of the application
-        if (isAppScopesEmpty(appScopes, clientId)) {
-            return getAllowedScopes(whiteListedScopes, requestedScopes);
+        if (appScopes != null) {
+            //If no scopes can be found in the context of the application
+            if (isAppScopesEmpty(appScopes, clientId)) {
+                return getAllowedScopes(whiteListedScopes, requestedScopes);
+            }
+            authroizedScopes = getAuthorizedScopes(authenticatedUser, requestedScopes, appScopes, whiteListedScopes);
         }
-        return getAuthorizedScopes(authenticatedUser, requestedScopes, appScopes, whiteListedScopes);
+        return authroizedScopes;
     }
 
     /**
