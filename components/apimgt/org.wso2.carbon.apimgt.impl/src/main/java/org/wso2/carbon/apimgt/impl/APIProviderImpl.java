@@ -1090,6 +1090,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     contextCache.put(api.getContext(), Boolean.TRUE);
                 }
 
+            List<Documentation> docsList = getAllDocumentation(api.getId());
+            Iterator it = docsList.iterator();
+            int i = 0;
+            while (it.hasNext()) {
+                Object docsObject = it.next();
+                Documentation docs = (Documentation) docsObject;
+                updateDocVisibility(api.getId(), api.getVisibility(),docs);
+                i++;
+            }
 
         } else {
             // We don't allow API status updates via this method.
@@ -2541,6 +2550,52 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
     }
 
+    /**
+     * Updates a visibility of the documentation
+     *
+     * @param apiId         APIIdentifier
+     * @param visibility String
+     * @throws APIManagementException if failed to update visibility
+     */
+    private void updateDocVisibility(APIIdentifier apiId, String visibility, Documentation documentation) throws APIManagementException {
+
+        String apiPath = APIUtil.getAPIPath(apiId);
+        API api = getAPI(apiPath);
+
+        try {
+            GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry,APIConstants.DOCUMENTATION_KEY);
+            if (artifactManager == null) {
+                String errorMessage = "Artifact manager is null when updating documentation of API " +
+                        apiId.getApiName();
+                log.error(errorMessage);
+                throw new APIManagementException(errorMessage);
+            }
+
+            GenericArtifact artifact = artifactManager.getGenericArtifact(documentation.getId());
+            String[] authorizedRoles = new String[0];
+            String visibleRolesList = api.getVisibleRoles();
+            if (visibleRolesList != null) {
+                authorizedRoles = visibleRolesList.split(",");
+            }
+
+            GenericArtifact updateApiArtifact = APIUtil.createDocArtifactContent(artifact, apiId, documentation);
+            artifactManager.updateGenericArtifact(updateApiArtifact);
+            clearResourcePermissions(artifact.getPath(), apiId);
+
+            APIUtil.setResourcePermissions(api.getId().getProviderName(), visibility, authorizedRoles,
+                    artifact.getPath(), registry);
+
+            String docFilePath = artifact.getAttribute(APIConstants.DOC_FILE_PATH);
+            if (docFilePath != null && !"".equals(docFilePath)) {
+                int startIndex = docFilePath.indexOf("governance") + "governance".length();
+                String filePath = docFilePath.substring(startIndex, docFilePath.length());
+                APIUtil.setResourcePermissions(api.getId().getProviderName(), visibility, authorizedRoles, filePath,
+                        registry);
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to update documentation", e);
+        }
+    }
     /**
      * Copies current Documentation into another version of the same API.
      *
