@@ -171,8 +171,14 @@ class APIDefinition extends React.Component {
         if (isGraphql) {
             this.setState({ graphQL: schemaContent });
         } else {
+            let parsedContent = {};
+            let formattedContent = schemaContent;
+            if (contentType === 'json') {
+                parsedContent = JSON.parse(schemaContent);
+                formattedContent = JSON.stringify(parsedContent, null, 1);
+            }
             this.setState({
-                swagger: schemaContent,
+                swagger: formattedContent,
                 convertTo: this.getConvertToFormat(contentType),
                 format: contentType,
             });
