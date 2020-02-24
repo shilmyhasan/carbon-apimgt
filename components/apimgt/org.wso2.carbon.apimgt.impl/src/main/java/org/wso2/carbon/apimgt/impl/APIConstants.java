@@ -1153,6 +1153,8 @@ public final class APIConstants {
     public static final String API_STORE_REST_API_GROUP_EXTRACTOR_IMPLEMENTATION = API_STORE + "RESTApiGroupingExtractor";
     public static final String API_CUSTOM_SEQUENCES_FOLDER_LOCATION =
             "repository" + File.separator + "resources" + File.separator + "customsequences";
+    public static final String WORKFLOW_EXTENSION_LOCATION =
+            "repository" + File.separator + "resources" + File.separator + "default-workflow-extensions.xml";
     public static final String API_CUSTOM_SEQUENCE_TYPE_IN = "in";
     public static final String API_CUSTOM_SEQUENCE_TYPE_OUT = "out";
     public static final String API_CUSTOM_SEQUENCE_TYPE_FAULT = "fault";
@@ -1260,6 +1262,7 @@ public final class APIConstants {
     public static final String SWAGGER_RESPONSE_200 = "200";
     public static final String SWAGGER_SECURITY_DEFINITIONS = "securityDefinitions";
     public static final String SWAGGER_APIM_DEFAULT_SECURITY = "default";
+    public static final String SWAGGER_APIM_RESTAPI_SECURITY = "OAuth2Security";
     public static final String OPEN_API_V3 = "3.0.x";
     public static final String OPEN_API = "openapi";
     public static final String OPEN_API_VERSION_REGEX = "3\\.0\\.\\d{1,}";
@@ -1899,6 +1902,7 @@ public final class APIConstants {
     public static final int AWS_DEFAULT_CONNECTION_TIMEOUT = 50000;
     public static final String AMZN_ACCESS_KEY = "amznAccessKey";
     public static final String AMZN_SECRET_KEY = "amznSecretKey";
+    public static final String AMZN_REGION = "amznRegion";
     public static final String NO_ENTITY_BODY = "NO_ENTITY_BODY";
 
     public static final String JWT_AUTHENTICATION_CONFIG = "JWTAuthentication";
