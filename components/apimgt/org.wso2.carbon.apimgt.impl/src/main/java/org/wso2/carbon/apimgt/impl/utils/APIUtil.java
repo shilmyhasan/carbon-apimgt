@@ -1200,6 +1200,8 @@ public final class APIUtil {
             if (!"".equals(tiers)) {
                 tiers = tiers.substring(0, tiers.length() - 2);
                 artifact.setAttribute(APIConstants.API_OVERVIEW_TIER, tiers);
+            } else {
+                artifact.setAttribute(APIConstants.API_OVERVIEW_TIER, tiers);
             }
 
             if (APIConstants.PUBLISHED.equals(apiStatus)) {
@@ -1238,11 +1240,6 @@ public final class APIUtil {
                         api.getMonetizationProperties().toJSONString());
             }
 
-            String apiSecurity = artifact.getAttribute(APIConstants.API_OVERVIEW_API_SECURITY);
-            if (apiSecurity != null && !apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) &&
-                    !apiSecurity.contains(APIConstants.API_SECURITY_API_KEY)) {
-                artifact.setAttribute(APIConstants.API_OVERVIEW_TIER, "");
-            }
         } catch (GovernanceException e) {
             String msg = "Failed to create API for : " + api.getId().getApiName();
             log.error(msg, e);
@@ -1293,6 +1290,8 @@ public final class APIUtil {
             if (!"".equals(policies)) {
                 policies = policies.substring(0, policies.length() - 2);
                 artifact.setAttribute(APIConstants.API_OVERVIEW_TIER, policies);
+            } else {
+                artifact.setAttribute(APIConstants.API_OVERVIEW_TIER, policies);
             }
 
             artifact.setAttribute(APIConstants.API_OVERVIEW_ENVIRONMENTS, writeEnvironmentsToArtifact(apiProduct));
@@ -1325,12 +1324,6 @@ public final class APIUtil {
             // This is to support the pluggable version strategy.
             artifact.setAttribute(APIConstants.API_OVERVIEW_CONTEXT_TEMPLATE, apiProduct.getContextTemplate());
             artifact.setAttribute(APIConstants.API_OVERVIEW_VERSION_TYPE, "context");
-
-            String apiSecurity = artifact.getAttribute(APIConstants.API_OVERVIEW_API_SECURITY);
-            if (apiSecurity != null && !apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) &&
-                    !apiSecurity.contains(APIConstants.API_SECURITY_API_KEY)) {
-                artifact.setAttribute(APIConstants.API_OVERVIEW_TIER, "");
-            }
 
             //set monetization status (i.e - enabled or disabled)
             artifact.setAttribute(APIConstants.Monetization.API_MONETIZATION_STATUS, Boolean.toString(apiProduct.getMonetizationStatus()));
