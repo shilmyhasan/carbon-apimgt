@@ -210,6 +210,7 @@ function AddParameter(props) {
                             size='small'
                             variant='outlined'
                             aria-label='add'
+                            color='primary'
                             onClick={addNewParameter}
                         >
                             Add
