@@ -31,9 +31,6 @@ import IconButton from '@material-ui/core/IconButton';
 import ClearIcon from '@material-ui/icons/Clear';
 import Tooltip from '@material-ui/core/Tooltip';
 import { capitalizeFirstLetter } from 'AppData/stringFormatter';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormGroup from '@material-ui/core/FormGroup';
 
 const useStyles = makeStyles(() => ({
     formControl: {
@@ -302,27 +299,39 @@ function AddParameter(props) {
                     <FormHelperText id='my-helper-text'>Select the data type</FormHelperText>
                 </FormControl>
             </Grid>
+
             <Grid item xs={2} md={2}>
-                <FormControl component='fieldset' className={classes.formControl}>
-                    <FormGroup>
-                        <FormControlLabel
-                            control={(
-                                <Checkbox
-                                    checked={newParameter.required}
-                                    onChange={
-                                        ({
-                                            target: { name, value },
-                                        }) => newParameterDispatcher({ type: name, value: !value })
-                                    }
-                                    value={newParameter.required}
-                                    inputProps={{
-                                        name: 'required',
-                                    }}
-                                />
-                            )}
-                            label='Required'
-                        />
-                    </FormGroup>
+                <FormControl margin='dense' variant='outlined' className={classes.formControl}>
+                    <InputLabel ref={inputLabel} htmlFor='requred' error={isParameterExist}>
+                        Required
+                    </InputLabel>
+
+                    <Select
+                        value={newParameter.required ? 'Yes' : 'No'}
+                        onChange={
+                            ({
+                                target: { name, value },
+                            }) => newParameterDispatcher({ type: name, value: (value === 'Yes') })
+                        }
+                        labelWidth={labelWidth}
+                        inputProps={{
+                            name: 'required',
+                            id: 'required',
+                        }}
+                        MenuProps={{
+                            getContentAnchorEl: null,
+                            anchorOrigin: {
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            },
+                        }}
+                        error={isParameterExist}
+                    >
+                        return (
+                        <MenuItem value='Yes' dense>Yes</MenuItem>
+                        <MenuItem value='No' dense>No</MenuItem>
+                        );
+                    </Select>
                     <FormHelperText>Check whether the parameter is required.</FormHelperText>
                 </FormControl>
             </Grid>
