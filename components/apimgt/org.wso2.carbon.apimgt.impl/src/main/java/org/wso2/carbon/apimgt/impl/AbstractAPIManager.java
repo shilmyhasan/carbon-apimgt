@@ -503,7 +503,7 @@ public abstract class AbstractAPIManager implements APIManager {
             String msg = "Failed to get API";
             log.error(msg, e);
             throw new APIManagementException(msg, e);
-        }finally {
+        } finally {
             if (tenantFlowStarted) {
                 endTenantFlow();
             }
