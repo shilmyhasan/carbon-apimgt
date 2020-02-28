@@ -132,7 +132,7 @@ function AddParameter(props) {
                             required: newParameter.required,
                             in: newParameter.in,
                             schema: {
-                                type: newParameter.schema.type,
+                                type: newParameter.type,
                             },
                         },
                     },
@@ -299,7 +299,6 @@ function AddParameter(props) {
                     <FormHelperText id='my-helper-text'>Select the data type</FormHelperText>
                 </FormControl>
             </Grid>
-
             <Grid item xs={2} md={2}>
                 <FormControl margin='dense' variant='outlined' className={classes.formControl}>
                     <InputLabel ref={inputLabel} htmlFor='requred' error={isParameterExist}>
