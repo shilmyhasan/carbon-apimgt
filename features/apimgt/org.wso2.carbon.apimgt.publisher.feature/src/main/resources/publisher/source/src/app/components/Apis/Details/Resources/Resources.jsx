@@ -121,6 +121,13 @@ export default function Resources(props) {
                 if (!updatedOperation.parameters) {
                     updatedOperation.parameters = [value];
                 } else {
+                    if (value.in === 'body') {
+                        updatedOperation.parameters = updatedOperation.parameters
+                            .filter(parameter => parameter.in !== 'formData' && parameter.in !== 'body');
+                    } else if (value.in === 'formData') {
+                        updatedOperation.parameters = updatedOperation.parameters
+                            .filter(parameter => parameter.in !== 'body');
+                    }
                     updatedOperation.parameters.push(value);
                 }
                 break;
@@ -129,7 +136,7 @@ export default function Resources(props) {
                 break;
             case 'deleteParameter':
                 updatedOperation.parameters = updatedOperation.parameters.filter((parameter) => {
-                    return parameter.in !== value.in && parameter.name !== value.name;
+                    return !(parameter.in === value.in && parameter.name === value.name);
                 });
                 break;
             case 'throttlingPolicy':

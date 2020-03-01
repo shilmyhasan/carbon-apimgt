@@ -108,7 +108,10 @@ export default function EditParameter(props) {
                 <Typography variant='h6'>
                     Edit{' '}
                     <Typography display='inline' variant='subtitle1'>
-                        {capitalizeFirstLetter(parameter.in)} : {parameter.name}
+                        {capitalizeFirstLetter(parameter.in)}
+                        {' '}
+                        :
+                        {parameter.name}
                     </Typography>
                 </Typography>
             </DialogTitle>
