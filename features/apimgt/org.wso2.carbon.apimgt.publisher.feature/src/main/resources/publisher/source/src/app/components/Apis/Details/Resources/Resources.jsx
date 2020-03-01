@@ -121,6 +121,13 @@ export default function Resources(props) {
                 if (!updatedOperation.parameters) {
                     updatedOperation.parameters = [value];
                 } else {
+                    if (value.in === 'body') {
+                        updatedOperation.parameters = updatedOperation.parameters
+                            .filter(parameter => parameter.in !== 'formData' && parameter.in !== 'body');
+                    } else if (value.in === 'formData') {
+                        updatedOperation.parameters = updatedOperation.parameters
+                            .filter(parameter => parameter.in !== 'body');
+                    }
                     updatedOperation.parameters.push(value);
                 }
                 break;

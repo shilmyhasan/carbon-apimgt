@@ -31,10 +31,20 @@ import IconButton from '@material-ui/core/IconButton';
 import ClearIcon from '@material-ui/icons/Clear';
 import Tooltip from '@material-ui/core/Tooltip';
 import { capitalizeFirstLetter } from 'AppData/stringFormatter';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormGroup from '@material-ui/core/FormGroup';
 
 const useStyles = makeStyles(() => ({
     formControl: {
         minWidth: 120,
+    },
+    parameterContainer: {
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    checkBox: {
+        color: '#7c7c7c',
     },
 }));
 
@@ -202,13 +212,12 @@ function AddParameter(props) {
         }
     }
     return (
-        <Grid container direction='row' spacing={1} justify='center' alignItems='center' alignContent='space-between'>
+        <Grid container direction='row' spacing={1} className={classes.parameterContainer}>
             <Grid item xs={2} md={2}>
                 <FormControl margin='dense' variant='outlined' className={classes.formControl}>
                     <InputLabel ref={inputLabel} htmlFor='param-in' error={isParameterExist}>
                         Parameter Type
                     </InputLabel>
-
                     <Select
                         value={newParameter.in}
                         onChange={({ target: { name, value } }) => newParameterDispatcher({ type: name, value })}
@@ -270,7 +279,6 @@ function AddParameter(props) {
                     <InputLabel ref={inputLabel} htmlFor='data-type' error={isParameterExist}>
                         Data Type
                     </InputLabel>
-
                     <Select
                         value={newParameter.schema !== undefined ? newParameter.schema.type : newParameter.type}
                         onChange={({ target: { name, value } }) => newParameterDispatcher({ type: name, value })}
@@ -300,38 +308,28 @@ function AddParameter(props) {
                 </FormControl>
             </Grid>
             <Grid item xs={2} md={2}>
-                <FormControl margin='dense' variant='outlined' className={classes.formControl}>
-                    <InputLabel ref={inputLabel} htmlFor='requred' error={isParameterExist}>
-                        Required
-                    </InputLabel>
-
-                    <Select
-                        value={newParameter.required ? 'Yes' : 'No'}
-                        onChange={
-                            ({
-                                target: { name, value },
-                            }) => newParameterDispatcher({ type: name, value: (value === 'Yes') })
-                        }
-                        labelWidth={labelWidth}
-                        inputProps={{
-                            name: 'required',
-                            id: 'required',
-                        }}
-                        MenuProps={{
-                            getContentAnchorEl: null,
-                            anchorOrigin: {
-                                vertical: 'bottom',
-                                horizontal: 'left',
-                            },
-                        }}
-                        error={isParameterExist}
-                    >
-                        return (
-                        <MenuItem value='Yes' dense>Yes</MenuItem>
-                        <MenuItem value='No' dense>No</MenuItem>
-                        );
-                    </Select>
-                    <FormHelperText>Check whether the parameter is required.</FormHelperText>
+                <FormControl component='fieldset' className={classes.formControl}>
+                    <FormGroup>
+                        <FormControlLabel
+                            className={classes.checkBox}
+                            control={(
+                                <Checkbox
+                                    checked={newParameter.required}
+                                    onChange={
+                                        (event) => {
+                                            const { checked, name } = event.target;
+                                            newParameterDispatcher({ type: name, value: checked });
+                                        }
+                                    }
+                                    inputProps={{
+                                        name: 'required',
+                                    }}
+                                />
+                            )}
+                            label='Required'
+                        />
+                    </FormGroup>
+                    <FormHelperText>Select if the parameter is required</FormHelperText>
                 </FormControl>
             </Grid>
             <Grid item xs={2} md={2}>
