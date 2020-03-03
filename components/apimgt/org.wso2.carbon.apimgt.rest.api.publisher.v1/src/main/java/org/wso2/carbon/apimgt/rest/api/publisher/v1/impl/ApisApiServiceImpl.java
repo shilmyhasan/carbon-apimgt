@@ -2000,10 +2000,6 @@ public class ApisApiServiceImpl implements ApisApiService {
             //Constructing mediation resource path
             String mediationResourcePath = apiResourcePath + RegistryConstants.PATH_SEPARATOR +
                     type + RegistryConstants.PATH_SEPARATOR;
-            if (apiProvider.checkIfResourceExists(mediationResourcePath)) {
-                RestApiUtil.handleConflict("Mediation policy already " +
-                        "exists in the given resource path, cannot create a new.", log);
-            }
 
             if (fileInputStream != null) {
                 String fileContentType = URLConnection.guessContentTypeFromName(fileName);
@@ -2031,6 +2027,8 @@ public class ApisApiServiceImpl implements ApisApiService {
                 }
             } else if (inlineContent != null) {
                 //todo
+            } else {
+                throw new APIManagementException("Both fileInputStream and inlineContent are unavailable");
             }
 
             if (StringUtils.isNotBlank(mediationPolicyUrl)) {
