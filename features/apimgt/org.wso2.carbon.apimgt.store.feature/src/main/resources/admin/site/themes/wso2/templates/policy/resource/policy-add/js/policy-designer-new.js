@@ -473,7 +473,7 @@ var addPolicyToBackend = function () {
                     var ipConditionType = $("#ip-condition-type-" + executionFlowId + " option:selected").val();
                     if (ipConditionType == 'specificIp') {
                         var specificIp = $('#specific-ip-address-input-' + executionFlowId).val();
-                        if(!validateIPAddress(specificIp, $('#specific-ip-address-input-' + executionFlowId))) {
+                        if (!validateIPAddress(specificIp, $('#specific-ip-address-input-' + executionFlowId))) {
                             return false;
                         }
                         apiPolicyNew.executionFlows[i].conditions[j].enabled = true;
@@ -483,10 +483,10 @@ var addPolicyToBackend = function () {
                         var startIp = $('#ip-range-start-address-input-' + executionFlowId).val();
                         var endIp = $('#ip-range-end-address-input-' + executionFlowId).val();
 
-                        if(!validateIPAddress(startIp, $('#ip-range-start-address-input-' + executionFlowId))) {
+                        if (!validateIPAddress(startIp, $('#ip-range-start-address-input-' + executionFlowId))) {
                             return false;
                         }
-                        if(!validateIPAddress(endIp, $('#ip-range-end-address-input-' + executionFlowId))) {
+                        if (!validateIPAddress(endIp, $('#ip-range-end-address-input-' + executionFlowId))) {
                             return false;
                         }
                         apiPolicyNew.executionFlows[i].conditions[j].enabled = true;
@@ -644,18 +644,18 @@ function validateInput(text, element, errorMsg){
     }
 }
 
-function validateIPAddress(text, element){
+function validateIPAddress(text, element) {
     var elementId = element.attr('id');
     text = text.trim();
     var ipAddressChars = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     var result = ipAddressChars.test(text);
-    if(result == false){
+    if (result == false) {
         element.css("border", "1px solid red");
-        $('#label'+elementId).remove();
+        $('#label' + elementId).remove();
         element.parent().append('<label class="error" id="label'+elementId+'" >' + 'Invalid IP Address' + '</label>');
         return false;
-    }else{
-        $('#label'+elementId).remove();
+    } else {
+        $('#label' + elementId).remove();
         element.css("border", "1px solid #cccccc");
         return true;
     }
