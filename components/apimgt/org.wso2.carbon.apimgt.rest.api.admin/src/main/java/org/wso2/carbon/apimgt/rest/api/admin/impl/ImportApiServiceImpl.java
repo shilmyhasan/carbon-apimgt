@@ -27,6 +27,7 @@ import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.Application;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.rest.api.admin.ImportApiService;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.APIInfoListDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.ApplicationInfoDTO;
@@ -90,6 +91,12 @@ public class ImportApiServiceImpl extends ImportApiService {
                 return Response.status(Response.Status.FORBIDDEN).entity(errorMsg).build();
             }
             importExportManager.validateOwner(ownerId, applicationDetails.getGroupId());
+
+            // set tokenType of the application to DEFAULT if it is null
+            if (StringUtils.isEmpty(applicationDetails.getTokenType())) {
+                applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
+            }
+
             int appId = consumer.addApplication(applicationDetails, ownerId);
             List<APIIdentifier> skippedAPIs = new ArrayList<>();
             if (skipSubscriptions == null || !skipSubscriptions) {
