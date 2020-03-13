@@ -2098,8 +2098,7 @@ public class APIProviderImplTest {
     }
     
     @Test
-    public void testUpdateAPI_InCreatedState() throws RegistryException, UserStoreException, APIManagementException, 
-                                                                FaultGatewaysException {
+    public void testUpdateAPI_InCreatedState() throws Exception {
         APIIdentifier identifier = new APIIdentifier("admin-AT-carbon.super", "API1", "1.0.0");
         Set<String> environments = new HashSet<String>();
         
@@ -2195,6 +2194,28 @@ public class APIProviderImplTest {
         }).when(artifactManager).updateGenericArtifact(artifact);
         
         Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
+        Mockito.when(APIUtil.getAPI(artifact)).thenReturn(api);
+        Documentation documentation = documentationList.get(1);
+        Mockito.when(APIUtil.getAPIDocPath(api.getId())).thenReturn(documentation.getFilePath());
+
+        APIProviderImplWrapper apiProviderImplWrapper = new APIProviderImplWrapper(apimgtDAO, null);
+        Resource docResource = Mockito.mock(Resource.class);
+        Mockito.when(docResource.getUUID()).thenReturn(documentation.getId());
+
+        Mockito.when(apiProviderImplWrapper.registry.get(documentation.getFilePath())).thenReturn(docResource);
+        GenericArtifact docArtifact = Mockito.mock(GenericArtifact.class);
+        Mockito.when(artifactManager.getGenericArtifact(documentation.getId())).thenReturn(docArtifact);
+        Mockito.when(APIUtil.getDocumentation(docArtifact)).thenReturn(documentation);
+
+        String artifactPath = "artifact/path";
+        Mockito.when(docArtifact.getPath()).thenReturn(artifactPath);
+
+        RegistryAuthorizationManager registryAuthorizationManager = Mockito.mock(RegistryAuthorizationManager.class);
+        PowerMockito.whenNew(RegistryAuthorizationManager.class).withAnyArguments().thenReturn(registryAuthorizationManager);
+
+        String[] roles = {"admin", "subscriber"};
+        APIUtil.setResourcePermissions("admin", "Public", roles, artifactPath);
+        Mockito.when(docArtifact.getAttribute(APIConstants.DOC_FILE_PATH)).thenReturn("docFilePath");
         
         apiProvider.updateAPI(api);
         Assert.assertEquals(0, api.getEnvironments().size());
@@ -2258,10 +2279,6 @@ public class APIProviderImplTest {
         Mockito.when(APIUtil.createAPIArtifactContent(artifact, oldApi)).thenReturn(artifact);
         apiProvider.addAPI(oldApi);
         
-        RegistryAuthorizationManager registryAuthorizationManager = Mockito.mock(RegistryAuthorizationManager.class);
-        PowerMockito.whenNew(RegistryAuthorizationManager.class).withAnyArguments()
-                .thenReturn(registryAuthorizationManager);
-        
         //mock has permission
         Resource apiSourceArtifact = Mockito.mock(Resource.class);
         Mockito.when(apiSourceArtifact.getUUID()).thenReturn("12640983654");
@@ -2309,6 +2326,29 @@ public class APIProviderImplTest {
                 return null;
             }
         }).when(artifactManager).updateGenericArtifact(artifact);
+
+        Mockito.when(APIUtil.getAPI(artifact)).thenReturn(api);
+        Documentation documentation = documentationList.get(1);
+
+        Mockito.when(APIUtil.getAPIDocPath(api.getId())).thenReturn(documentation.getFilePath());
+        APIProviderImplWrapper apiProviderImplWrapper = new APIProviderImplWrapper(apimgtDAO, null);
+        Resource docResource = Mockito.mock(Resource.class);
+        Mockito.when(docResource.getUUID()).thenReturn(documentation.getId());
+
+        Mockito.when(apiProviderImplWrapper.registry.get(documentation.getFilePath())).thenReturn(docResource);
+        GenericArtifact docArtifact = Mockito.mock(GenericArtifact.class);
+        Mockito.when(artifactManager.getGenericArtifact(documentation.getId())).thenReturn(docArtifact);
+
+        Mockito.when(APIUtil.getDocumentation(docArtifact)).thenReturn(documentation);
+        String artifactPath = "artifact/path";
+        Mockito.when(docArtifact.getPath()).thenReturn(artifactPath);
+
+        RegistryAuthorizationManager registryAuthorizationManager = Mockito.mock(RegistryAuthorizationManager.class);
+        PowerMockito.whenNew(RegistryAuthorizationManager.class).withAnyArguments().thenReturn(registryAuthorizationManager);
+
+        String[] roles = {"admin", "subscriber"};
+        APIUtil.setResourcePermissions("admin", "Public", roles, artifactPath);
+        Mockito.when(docArtifact.getAttribute(APIConstants.DOC_FILE_PATH)).thenReturn("docFilePath");
         
         //Mocking API already not published and published
         Mockito.when(gatewayManager.isAPIPublished(Matchers.any(API.class), Matchers.anyString())).thenReturn(true);
@@ -2428,8 +2468,7 @@ public class APIProviderImplTest {
     }
     
     @Test(expected = FaultGatewaysException.class)
-    public void testUpdateAPI_WithFailedGWs() throws RegistryException, UserStoreException, APIManagementException, 
-                                                                FaultGatewaysException {
+    public void testUpdateAPI_WithFailedGWs() throws Exception {
         APIIdentifier identifier = new APIIdentifier("admin-AT-carbon.super", "API1", "1.0.0");
         Set<String> environments = new HashSet<String>();
         Set<URITemplate> uriTemplates = new HashSet<URITemplate>();
@@ -4287,10 +4326,14 @@ public class APIProviderImplTest {
         Documentation doc1 = new Documentation(DocumentationType.HOWTO, "How To");
         doc1.setVisibility(DocumentVisibility.API_LEVEL);
         doc1.setSourceType(DocumentSourceType.INLINE);
-        
+        doc1.setId("678ghk");
+        doc1.setFilePath("/registry/resource/_system/governance/apimgt/applicationdata/provider/"
+                + "files/provider/fileName");
+
         Documentation doc2 = new Documentation(DocumentationType.SUPPORT_FORUM, "Support Docs");
         doc2.setVisibility(DocumentVisibility.API_LEVEL);
         doc2.setSourceType(DocumentSourceType.FILE);
+        doc2.setId("678ghk");
         doc2.setFilePath("/registry/resource/_system/governance/apimgt/applicationdata/provider/"
                 + "files/provider/fileName");
         
