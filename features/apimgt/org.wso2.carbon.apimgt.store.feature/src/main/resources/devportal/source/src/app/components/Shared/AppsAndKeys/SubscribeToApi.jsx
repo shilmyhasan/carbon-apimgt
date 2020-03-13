@@ -222,8 +222,11 @@ const subscribeToApi = (props) => {
                                                     policy.monetizationAttributes.pricePerRequest ? (
                                                         <Typography>
                                                             {policy.monetizationAttributes.pricePerRequest}{' '}
-                                                            {policy.monetizationAttributes.currencyType} {' per '}
-                                                            {policy.monetizationAttributes.billingCycle}
+                                                            {policy.monetizationAttributes.currencyType}
+                                                            <FormattedMessage
+                                                                id='Shared.AppsAndKeys.SubscribeToApi.per.request'
+                                                                defaultMessage=' per request'
+                                                            />
                                                         </Typography>
                                                     ) : (
                                                         <Typography>
