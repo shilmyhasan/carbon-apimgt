@@ -39,7 +39,7 @@ import ViewKeys from './ViewKeys';
 import WaitingForApproval from './WaitingForApproval';
 import { ScopeValidation, resourceMethods, resourcePaths } from '../ScopeValidation';
 
-const styles = (theme) => ({
+const styles = theme => ({
     root: {
         padding: theme.spacing.unit * 3,
     },
@@ -129,7 +129,6 @@ class TokenManager extends React.Component {
         this.loadApplication();
     }
 
-
     /**
      * get supported grant types from the settings api
      */
@@ -141,7 +140,7 @@ class TokenManager extends React.Component {
                 const { keyRequest } = this.state;
                 const newKeyRequest = { ...keyRequest };
                 newKeyRequest.serverSupportedGrantTypes = response.obj.grantTypes;
-                newKeyRequest.supportedGrantTypes = response.obj.grantTypes.filter((item) => item !== 'authorization_code'
+                newKeyRequest.supportedGrantTypes = response.obj.grantTypes.filter(item => item !== 'authorization_code'
                     && item !== 'implicit');
                 this.setState({ keyRequest: newKeyRequest });
             })
@@ -163,7 +162,7 @@ class TokenManager extends React.Component {
         this.getserverSupportedGrantTypes();
         if (this.appId) {
             this.application
-                .then((application) => application.getKeys())
+                .then(application => application.getKeys())
                 .then((keys) => {
                     const { keyType } = this.props;
                     const { keyRequest } = this.state;
@@ -379,7 +378,7 @@ class TokenManager extends React.Component {
         const key = keys.get(keyType);
         if (keys.size > 0 && key && key.keyState === 'APPROVED' && !key.consumerKey) {
             return (
-                <>
+                <React.Fragment>
                     <Typography className={classes.cleanUpInfoText} variant='subtitle1'>
                         <FormattedMessage
                             id='Shared.AppsAndKeys.TokenManager.cleanup.text'
@@ -398,7 +397,7 @@ class TokenManager extends React.Component {
                             id='Shared.AppsAndKeys.TokenManager.cleanup'
                         />
                     </Button>
-                </>
+                </React.Fragment>
             );
         }
         if (key && (key.keyState === this.keyStates.CREATED || key.keyState === this.keyStates.REJECTED)) {
@@ -466,7 +465,7 @@ class TokenManager extends React.Component {
                             resourceMethod={resourceMethods.POST}
                         >
                             {!isUserOwner ? (
-                                <>
+                                <React.Fragment>
                                     <Button
                                         variant='contained'
                                         color='primary'
@@ -486,7 +485,7 @@ class TokenManager extends React.Component {
                                             id='Shared.AppsAndKeys.TokenManager.key.and.user.owner'
                                         />
                                     </Typography>
-                                </>
+                                </React.Fragment>
                             ) : (
                                 <Button
                                     variant='contained'
@@ -494,7 +493,7 @@ class TokenManager extends React.Component {
                                     className={classes.button}
                                     onClick={keys.size > 0 && keys.get(keyType) ? this.updateKeys : this.generateKeys}
                                     noFound={notFound}
-                                    disabled={!generateEnabled || isLoading}
+                                    disabled={isLoading}
                                 >
                                     {keys.size > 0 && keys.get(keyType) ? 'Update' : 'Generate Keys'}
                                     {isLoading && <CircularProgress size={20} />}
@@ -530,7 +529,7 @@ class TokenManager extends React.Component {
                                     resourceMethod={resourceMethods.POST}
                                 >
                                     {!isUserOwner ? (
-                                        <>
+                                        <React.Fragment>
                                             <Button
                                                 variant='contained'
                                                 color='primary'
@@ -563,7 +562,7 @@ class TokenManager extends React.Component {
                                                     id='Shared.AppsAndKeys.TokenManager.key.provide.user.owner'
                                                 />
                                             </Typography>
-                                        </>
+                                        </React.Fragment>
                                     ) : (
                                         <Button
                                             variant='contained'
