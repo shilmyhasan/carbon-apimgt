@@ -8078,10 +8078,7 @@ public class ApiMgtDAO {
                     scope.setKey(resultSet.getString(2));
                     scope.setName(resultSet.getString(3));
                     scope.setDescription(resultSet.getString(4));
-                    String roles = resultSet.getString(5);
-                    if (StringUtils.isNotEmpty(roles)) {
-                        scope.setRoles(scope.getRoles().concat("," + roles.trim()));
-                    }
+                    scope.setRoles(resultSet.getString(5).trim());
                 }
                 scopeHashMap.put(scopeId, scope);
             }
