@@ -13270,11 +13270,11 @@ public class ApiMgtDAO {
     /**
      * Get Subscribed APIs for an App.
      *
-     * @param applicationName id of the application name
+     * @param applicationId id of the application name
      * @return APISubscriptionInfoDTO[]
      * @throws APIManagementException if failed to get Subscribed APIs
      */
-    public APISubscriptionInfoDTO[] getSubscribedAPIsForAnApp(String userId, String applicationName) throws
+    public APISubscriptionInfoDTO[] getSubscribedAPIsForAnApp(String userId, int applicationId) throws
             APIManagementException {
         List<APISubscriptionInfoDTO> apiSubscriptionInfoDTOS = new ArrayList<APISubscriptionInfoDTO>();
         Connection conn = null;
@@ -13294,7 +13294,7 @@ public class ApiMgtDAO {
             conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(sqlQuery);
             ps.setInt(1, tenantId);
-            ps.setString(2, applicationName);
+            ps.setInt(2, applicationId);
             rs = ps.executeQuery();
             while (rs.next()) {
                 APISubscriptionInfoDTO infoDTO = new APISubscriptionInfoDTO();
