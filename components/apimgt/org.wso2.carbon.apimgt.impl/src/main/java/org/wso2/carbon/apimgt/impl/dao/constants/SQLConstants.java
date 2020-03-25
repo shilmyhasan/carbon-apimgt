@@ -153,7 +153,6 @@ public class SQLConstants {
                     "   AND SP.SUB_STATUS = '"+ APIConstants.SubscriptionStatus.UNBLOCKED +"'" + 
                     "   AND SP.SUBS_CREATE_STATE = '" + APIConstants.SubscriptionCreatedStatus.SUBSCRIBE + "'" +
                     "   AND APP.APPLICATION_ID = ?";
-//                    "   AND APP.NAME = ?";
 
     public static final String GET_SUBSCRIBED_APIS_OF_USER_BY_APP_CASE_INSENSITIVE_SQL =
             " SELECT " +
@@ -175,7 +174,6 @@ public class SQLConstants {
                     "   AND SP.SUB_STATUS = '"+ APIConstants.SubscriptionStatus.UNBLOCKED +"'" + 
                     "   AND SP.SUBS_CREATE_STATE = '" + APIConstants.SubscriptionCreatedStatus.SUBSCRIBE + "'" +
                     "   AND APP.APPLICATION_ID = ?";
-//                    "   AND APP.NAME = ?";
 
     public static final String GET_SUBSCRIBED_USERS_FOR_API_SQL =
             " SELECT " +

@@ -64,7 +64,6 @@ public class APIMTokenIssuerUtil {
 
         String tenantDomain = tokReqMsgCtx.getAuthorizedUser().getTenantDomain();
         String userName = tokReqMsgCtx.getAuthorizedUser().toFullQualifiedUsername();
-//        String applicationName = application.getName();
         int applicationId = application.getId();
 
         String appOwner = application.getOwner();

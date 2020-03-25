@@ -13274,7 +13274,6 @@ public class ApiMgtDAO {
      * @return APISubscriptionInfoDTO[]
      * @throws APIManagementException if failed to get Subscribed APIs
      */
-//    public APISubscriptionInfoDTO[] getSubscribedAPIsForAnApp(String userId, String applicationName) throws
     public APISubscriptionInfoDTO[] getSubscribedAPIsForAnApp(String userId, int applicationId) throws
             APIManagementException {
         List<APISubscriptionInfoDTO> apiSubscriptionInfoDTOS = new ArrayList<APISubscriptionInfoDTO>();

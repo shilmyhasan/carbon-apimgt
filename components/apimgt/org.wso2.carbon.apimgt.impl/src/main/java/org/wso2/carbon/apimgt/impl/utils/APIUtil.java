@@ -9440,7 +9440,6 @@ public final class APIUtil {
     public static JwtTokenInfoDTO getJwtTokenInfoDTO(Application application, String userName, String tenantDomain)
             throws APIManagementException {
 
-//        String applicationName = application.getName();
         int applicationId = application.getId();
 
         String appOwner = application.getOwner();
