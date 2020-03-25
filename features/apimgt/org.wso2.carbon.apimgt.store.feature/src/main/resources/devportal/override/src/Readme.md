@@ -16,6 +16,32 @@ override
                     │   └── Documentation.jsx
                     └── Overview.jsx
 ```
+### Adding new files to the override folder¶
+
+override
+└── src
+    ├── Readme.txt
+    └── app
+        └── components
+            └── Apis
+                └── Details
+                    ├── Documents
+                    │   └── Documentation.jsx
+                    └── Overview.jsx
+                    └── NewFile.jsx
+                    
+
+If we try to import the NewFile.jsx from Overview.jsx as follows it will give a compilation error.
+
+```sh
+import NewFile from './NewFile.jsx';
+```
+
+The correct way is to add the AppOverride prefix to the import and provide the full path relative to the override folder.
+
+```sh
+import NewFile from 'AppOverride/src/app/components/Apis/Details/NewFile.jsx';
+```
 
 ### Development
 
