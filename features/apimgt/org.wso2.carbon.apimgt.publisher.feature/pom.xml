@@ -275,9 +275,8 @@
                     <include>publisher/jaggery.conf</include>
                     <include>publisher/source/**</include>
                     <include>publisher/override/**</include>
-                    <include>publisher/.eslintignore</include>
-                    <include>publisher/.eslintrc.js</include>
-                    <include>publisher/.npmrc</include>
+                    <include>publisher/eslintignore</include>
+                    <include>publisher/eslintrc.js</include>
                     <include>publisher/babel.config.js</include>
                     <include>publisher/jest.config.js</include>
                     <include>publisher/jsconfig.json</include>

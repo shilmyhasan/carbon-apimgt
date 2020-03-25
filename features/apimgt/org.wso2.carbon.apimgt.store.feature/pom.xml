@@ -309,9 +309,6 @@
                     <include>devportal/jaggery.conf</include>
                     <include>devportal/source/**</include>
                     <include>devportal/override/**</include>
-                    <include>devportal/.eslintignore</include>
-                    <include>devportal/.eslintrc.js</include>
-                    <include>devportal/.npmrc</include>
                     <include>devportal/babel.config.js</include>
                     <include>devportal/jest.config.js</include>
                     <include>devportal/jsconfig.json</include>
