@@ -100,6 +100,8 @@ if (process.env.NODE_ENV === 'development') {
         options: {
             failOnError: true,
             quiet: true,
+            ignorePath: 'eslintignore',
+            configFile: 'eslintrc.js',
         },
     };
     config.module.rules.push(esLintLoader);
