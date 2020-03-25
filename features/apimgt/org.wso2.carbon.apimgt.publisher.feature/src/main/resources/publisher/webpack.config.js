@@ -47,7 +47,14 @@ const config = {
             {
                 test: /\.(js|jsx)$/,
                 exclude: [/node_modules\/(?!(@hapi)\/).*/, /coverage/],
-                loader: 'babel-loader',
+                use: [
+                    {
+                        loader: 'babel-loader',
+                    },
+                    {
+                        loader: path.resolve('loader.js'),
+                    },
+                ],
             },
             {
                 test: /\.css$/,
@@ -93,6 +100,8 @@ if (process.env.NODE_ENV === 'development') {
         options: {
             failOnError: true,
             quiet: true,
+            ignorePath: 'eslintignore',
+            configFile: 'eslintrc.js',
         },
     };
     config.module.rules.push(esLintLoader);
