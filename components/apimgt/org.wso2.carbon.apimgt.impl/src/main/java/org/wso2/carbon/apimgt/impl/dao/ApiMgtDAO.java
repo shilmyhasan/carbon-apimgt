@@ -8078,7 +8078,10 @@ public class ApiMgtDAO {
                     scope.setKey(resultSet.getString(2));
                     scope.setName(resultSet.getString(3));
                     scope.setDescription(resultSet.getString(4));
-                    scope.setRoles(resultSet.getString(5).trim());
+                    String roles = resultSet.getString(5);
+                    if (StringUtils.isNotEmpty(roles)) {
+                        scope.setRoles(roles.trim());
+                    }
                 }
                 scopeHashMap.put(scopeId, scope);
             }
@@ -8247,7 +8250,7 @@ public class ApiMgtDAO {
                             scope.setDescription(resultSet.getString(3));
                             String roles = resultSet.getString(4);
                             if (StringUtils.isNotEmpty(roles)) {
-                                scope.setRoles(scope.getRoles().concat("," + roles.trim()));
+                                scope.setRoles(roles.trim());
                             }
                         }
                         scopeHashMap.put(scopeKey, scope);
@@ -8291,7 +8294,7 @@ public class ApiMgtDAO {
                     scope.setDescription(resultSet.getString(4));
                     String roles = resultSet.getString(5);
                     if (StringUtils.isNotEmpty(roles)) {
-                        scope.setRoles(scope.getRoles().concat("," + roles.trim()));
+                        scope.setRoles(roles.trim());
                     }
                 }
                 scopeHashMap.put(scopeId, scope);
@@ -8351,7 +8354,7 @@ public class ApiMgtDAO {
                     scope.setDescription(resultSet.getString(4));
                     String roles = resultSet.getString(6);
                     if (StringUtils.isNotEmpty(roles)) {
-                        scope.setRoles(scope.getRoles().concat("," + roles.trim()));
+                        scope.setRoles(roles.trim());
                     }
                 }
                 scopeHashMap.put(scopeId, scope);
