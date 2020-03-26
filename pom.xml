@@ -17,13 +17,6 @@
         <version>1.2</version>
     </parent>
 
-    <scm>
-        <url>https://github.com/wso2/carbon-apimgt.git</url>
-        <developerConnection>scm:git:https://github.com/wso2/carbon-apimgt.git</developerConnection>
-        <connection>scm:git:https://github.com/wso2/carbon-apimgt.git</connection>
-        <tag>v6.6.163</tag>
-    </scm>
-
     <modules>
         <module>service-stubs/apimgt</module>
         <module>service-stubs/oidc-authenticator</module>
@@ -1607,7 +1600,6 @@
     </dependencyManagement>
 
     <properties>
-        <project.scm.id>scm-server</project.scm.id>
 
         <!-- File encoding of build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
