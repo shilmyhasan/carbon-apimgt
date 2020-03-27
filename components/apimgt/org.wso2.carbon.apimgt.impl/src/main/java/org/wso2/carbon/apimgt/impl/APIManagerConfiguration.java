@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.APIPublisher;
 import org.wso2.carbon.apimgt.api.model.APIStore;
+import org.wso2.carbon.apimgt.impl.config.InMemorySubscriptionValidationHandlerConfig;
+import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowProperties;
@@ -80,6 +82,7 @@ public class APIManagerConfiguration {
 
     private boolean initialized;
     private ThrottleProperties throttleProperties = new ThrottleProperties();
+    private KeyValidationHandlerConfig keyValidationHandlerConfig = null;
     private WorkflowProperties workflowProperties = new WorkflowProperties();
     private Map<String, Environment> apiGatewayEnvironments = new HashMap<String, Environment>();
     private Set<APIStore> externalAPIStores = new HashSet<APIStore>();
@@ -319,6 +322,9 @@ public class APIManagerConfiguration {
                 setThrottleProperties(serverConfig);
             } else if (APIConstants.WorkflowConfigConstants.WORKFLOW.equals(localName)){
                 setWorkflowProperties(serverConfig);
+            } else if (APIConstants.ApiKeyValidator.KEY_VALIDATION_HANDLER.equals(localName)) {
+                log.info("KeyValidationHandler");
+                setKeyValidationHandlerProperties(element);
             }
             readChildElements(element, nameStack);
             nameStack.pop();
@@ -404,6 +410,10 @@ public class APIManagerConfiguration {
             }
         }
         return null;
+    }
+
+    public KeyValidationHandlerConfig getKeyValidationHandlerConfig() {
+        return keyValidationHandlerConfig;
     }
 
     /**
@@ -512,6 +522,16 @@ public class APIManagerConfiguration {
 
         }
     }
+
+    /**
+     * Load Configuration related to KeyValidationHandler.
+     * @param node - Element with KeyValidationHandler config.
+     */
+    private void setKeyValidationHandlerProperties(OMElement node) {
+        this.keyValidationHandlerConfig = new InMemorySubscriptionValidationHandlerConfig();
+        this.keyValidationHandlerConfig.loadFromNode(node);
+    }
+
     /**
      * set the Advance Throttle Properties into Configuration
      *

@@ -511,6 +511,16 @@ public final class APIConstants {
     public static final String API_KEY_MANGER_VALIDATIONHANDLER_CLASS_NAME = API_KEY_VALIDATOR
             + "KeyValidationHandlerClassName";
 
+
+    public static class ApiKeyValidator{
+        public static final String KEY_VALIDATION_HANDLER = "KeyValidationHandler";
+        public static final String KEY_VALIDATOR_HANDLER = "KeyValidationHandlerImpl";
+        public static final String IN_MEM_SUBSCRIPTION_STORE = "InMemorySubscriptionStore";
+        public static final String IN_MEM_SUBSCRIPTION_STORE_IMPL = "InMemorySubscriptionStoreImpl";
+        public static final String CONFIGURATION_ELEMENT = "Configuration";
+
+    }
+
     public static final String USER_DEFAULT_PROFILE = "default";
     public static final String USER_PROFILE_MGT_SERVICE = "UserProfileMgtService";
 

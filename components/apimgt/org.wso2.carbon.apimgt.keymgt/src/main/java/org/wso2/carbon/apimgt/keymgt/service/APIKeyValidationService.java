@@ -30,27 +30,21 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
-import org.wso2.carbon.apimgt.impl.dao.constants.SQLConstants;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
-import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.handlers.KeyValidationHandler;
 import org.wso2.carbon.apimgt.keymgt.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigLoadable;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.metrics.manager.MetricManager;
 import org.wso2.carbon.metrics.manager.Timer;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -64,12 +58,28 @@ public class APIKeyValidationService extends AbstractAdmin {
         try {
             if (keyValidationHandler == null) {
 
+                APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+
+                String keyValidationClassName =
+                        configuration.getFirstProperty(APIConstants.API_KEY_MANGER_VALIDATIONHANDLER_CLASS_NAME);
+
+                if(keyValidationClassName == null) {
+                    KeyValidationHandlerConfig handlerConfig =
+                            configuration.getKeyValidationHandlerConfig();
+                    keyValidationClassName = handlerConfig.getImplementingClass();
+                }
+
                 KeyValidationHandler validationHandler = (KeyValidationHandler) APIUtil.getClassForName
-                        (ServiceReferenceHolder.getInstance().
-                                getAPIManagerConfigurationService().getAPIManagerConfiguration().
-                                getFirstProperty(APIConstants.API_KEY_MANGER_VALIDATIONHANDLER_CLASS_NAME).trim()).newInstance();
+                        (keyValidationClassName.trim()).newInstance();
+
+                if(validationHandler != null && validationHandler instanceof KeyValidatorConfigLoadable) {
+                    KeyValidatorConfigLoadable configLoadable = (KeyValidatorConfigLoadable) validationHandler;
+                    configLoadable.initialise(configuration.getKeyValidationHandlerConfig());
+                }
                 log.info("Initialised KeyValidationHandler instance successfully");
                 if (keyValidationHandler == null) {
+
                     synchronized (this) {
                         keyValidationHandler = validationHandler;
                     }
