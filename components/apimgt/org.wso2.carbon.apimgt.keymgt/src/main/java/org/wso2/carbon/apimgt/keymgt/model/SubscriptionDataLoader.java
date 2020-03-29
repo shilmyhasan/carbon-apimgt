@@ -19,21 +19,51 @@
 package org.wso2.carbon.apimgt.keymgt.model;
 
 import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.impl.config.SubscriptionDataLoaderConfig;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
 
 import java.util.List;
 
+/**
+ * This interface abstracts Data Loading operations. Interface will be consumed by
+ * {@link InMemorySubscriptionStore} while populating in memory storage. The entries can be
+ * fetched directly by the Database or by calling a service.
+ */
 public interface SubscriptionDataLoader {
 
+    /**
+     * Loads all Subscriptions from underlying Storage.
+     * @return A list of all {@link Subscription} objects at the time of calling.
+     * @throws APIManagementException
+     */
     public List<Subscription> loadAllSubscriptions() throws APIManagementException;
 
+    /**
+     * Load all Applications from the Database belonging to all Tenants
+     * @return A list of all {@link Application}s.
+     * @throws APIManagementException
+     */
     public List<Application> loadAllApplications() throws APIManagementException;
 
+    /**
+     * Load all Key Mappings (Mapping between the Consumer Key and Application) from the Database
+     * owned by all tenants
+     * @return A list of {@link ApplicationKeyMapping}s
+     * @throws APIManagementException
+     */
     public List<ApplicationKeyMapping> loadAllKeyMappings() throws APIManagementException;
 
+    /**
+     * Load all {@link API} objects owned by all Tenants.
+     * @return
+     * @throws APIManagementException
+     */
     public List<API> loadAllApis() throws APIManagementException;
 
+    /**
+     *
+     * @return
+     * @throws APIManagementException
+     */
     public List<Policy> loadAllPolicies() throws APIManagementException;
 
 }

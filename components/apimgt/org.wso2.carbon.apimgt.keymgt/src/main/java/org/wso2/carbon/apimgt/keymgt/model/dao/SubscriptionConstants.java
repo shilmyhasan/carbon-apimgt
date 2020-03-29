@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.dao;
 
-import org.apache.derby.impl.io.CPStorageFactory;
-
 public class SubscriptionConstants {
 
     public static final String APPLICATION_LOAD_SQL =
@@ -80,7 +78,5 @@ public class SubscriptionConstants {
                     "   STATE" +
                     " FROM " +
                     "   AM_APPLICATION_KEY_MAPPING";
-
-//    public static final String
 
 }

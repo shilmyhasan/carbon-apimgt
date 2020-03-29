@@ -63,26 +63,13 @@ public class SubscriptionLoadingDao {
         ArrayList<Subscription> subscriptions = null;
         try {
             conn = APIMgtDBUtil.getConnection();
-//            conn.setAutoCommit(false);
 
             String query = SubscriptionConstants.SUBSCRIPTION_LOAD_SQL;
-/*
-            "SELECT " +
-                    "   SUB.SUBSCRIPTION_ID AS SUB_ID," +
-                    "   SUB.TIER_ID AS TIER," +
-                    "   SUB.API_ID AS API_ID," +
-                    "   SUB.APPLICATION_ID AS APP_ID," +
-                    "   SUB.SUB_STATUS AS STATUS," +
-                    "   SUB.SUBS_CREATE_STATE AS WF_STATUS" +
-                    " FROM " +
-                    "   AM_SUBSCRIPTION AS SUB";
-            */
             ps = conn.prepareStatement(query);
             resultSet = ps.executeQuery();
-//            conn.commit();
             subscriptions = new ArrayList<Subscription>();
 
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 Subscription subscription = new Subscription();
                 subscription.setSubscriptionId(resultSet.getInt("SUB_ID"));
                 subscription.setTierName(resultSet.getString("TIER"));
@@ -112,26 +99,11 @@ public class SubscriptionLoadingDao {
 
             String query = SubscriptionConstants.APPLICATION_LOAD_SQL;
 
-            /*
-            *                     "   APP.APPLICATION_ID AS APP_ID," +
-                    "   APP.NAME AS NAME," +
-                    "   APP.APPLICATION_TIER AS TIER," +
-                    "   APP.APPLICATION_STATUS AS STATUS," +
-                    "   SUB.SUBSCRIBER_ID AS SUB_ID," +
-                    "   SUB.TENANT_ID AS TENANT_ID," +
-                    "   SUB.USER_ID AS SUB_NAME" +
-                    " FROM " +
-                    "   AM_APPLICATION AS APP," +
-                    "   AM_SUBSCRIBER AS SUB" +
-                    " WHERE " +
-                    "   APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID ";
-            * */
-
             ps = conn.prepareStatement(query);
             resultSet = ps.executeQuery();
             applications = new ArrayList<Application>();
 
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 Application application = new Application();
                 application.setAppId(resultSet.getInt("APP_ID"));
                 application.setAppName(resultSet.getString("NAME"));
@@ -168,7 +140,7 @@ public class SubscriptionLoadingDao {
             resultSet = ps.executeQuery();
             keyMappings = new ArrayList<ApplicationKeyMapping>();
 
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 ApplicationKeyMapping keyMapping = new ApplicationKeyMapping();
                 keyMapping.setApplicationId(resultSet.getInt("APPLICATION_ID"));
                 keyMapping.setConsumerKey(resultSet.getString("CONSUMER_KEY"));
@@ -197,23 +169,11 @@ public class SubscriptionLoadingDao {
             conn = APIMgtDBUtil.getConnection();
 
             String query = SubscriptionConstants.API_LOAD_SQL;
-
             ps = conn.prepareStatement(query);
             resultSet = ps.executeQuery();
             apis = new ArrayList<API>();
 
-            /*
-            * "SELECT " +
-                    " API_ID," +
-                    " API_PROVIDER," +
-                    " API_NAME," +
-                    " API_VERSION," +
-                    " CONTEXT " +
-                    " FROM "+
-                    "   API";
-            * */
-
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 API api = new API();
                 api.setApiId(resultSet.getInt("API_ID"));
                 api.setApiProvider(resultSet.getString("API_PROVIDER"));
@@ -249,7 +209,7 @@ public class SubscriptionLoadingDao {
             resultSet = ps.executeQuery();
             policies = new ArrayList<Policy>();
 
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 Policy policy = new Policy();
                 policy.setPolicyId(resultSet.getInt("POLICY_ID"));
                 policy.setTierName(resultSet.getString("NAME"));
@@ -268,7 +228,6 @@ public class SubscriptionLoadingDao {
 
         return policies;
     }
-
 
 
 }

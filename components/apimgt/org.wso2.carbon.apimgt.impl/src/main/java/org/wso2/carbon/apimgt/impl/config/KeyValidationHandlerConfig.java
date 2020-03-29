@@ -25,27 +25,6 @@ import javax.xml.namespace.QName;
 public class KeyValidationHandlerConfig implements LoadableConfig{
 
     public static final String KEY_VALIDATOR_IMPL = "KeyValidationHandlerImpl";
-    /*
-    *
-    *         <KeyValidationHandler>
-           <KeyValidationHandlerImpl>org.wso2.carbon.apimgt.keymgt.handlers.InMemorySubscriptionValidationHandler</KeyValidationHandlerImpl>
-           <Configuration>
-              <InMemorySubscriptionStore>
-                 <InMemorySubscriptionStoreImpl>org.wso2.carbon.apimgt.keymgt.model.impl.MapBasedInMemorySubscriptionStore</InMemorySubscriptionStoreImpl>
-                 <Configuration>
-                    <SubscriptionDataLoader>
-                       <SubscriptionDataLoaderImpl>org.wso2.carbon.apimgt.keymgt.model.impl.DbDataLoader</SubscriptionDataLoaderImpl>
-                       <ApiLoadingFrequency>120</ApiLoadingFrequency>
-                       <ApplicationLoadingFrequency>120</ApplicationLoadingFrequency>
-                       <SubscriptionLoadingFrequency>60</SubscriptionLoadingFrequency>
-                       <KeyMappingLoadingFrequency>300</KeyMappingLoadingFrequency>
-                       <PolicyLoadingFrequency>300</PolicyLoadingFrequency>
-                    </SubscriptionDataLoader>
-                 </Configuration>
-              </InMemorySubscriptionStore>
-           </Configuration>
-        </KeyValidationHandler>
-    * */
 
     protected String implementingClass;
 

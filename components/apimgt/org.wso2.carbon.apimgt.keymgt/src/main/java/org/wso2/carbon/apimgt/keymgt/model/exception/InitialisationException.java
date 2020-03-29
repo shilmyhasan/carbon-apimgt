@@ -16,13 +16,26 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.keymgt.model;
+package org.wso2.carbon.apimgt.keymgt.model.exception;
 
-import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
+/**
+ * Thrown when an error occurs during initialising
+ * {@link org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig}
+ */
+public class InitialisationException extends Exception {
+    public InitialisationException() {
+        super();
+    }
 
-import java.lang.reflect.InvocationTargetException;
+    public InitialisationException(String message) {
+        super(message);
+    }
 
-public interface KeyValidatorConfigLoadable {
+    public InitialisationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    void initialise(KeyValidationHandlerConfig config) throws IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException;
+    public InitialisationException(Throwable cause) {
+        super(cause);
+    }
 }

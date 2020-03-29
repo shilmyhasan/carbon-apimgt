@@ -19,9 +19,6 @@
 package org.wso2.carbon.apimgt.impl.config;
 
 import org.apache.axiom.om.OMElement;
-import org.wso2.carbon.apimgt.impl.APIConstants;
-
-import javax.xml.namespace.QName;
 
 public class DbLoaderConfig extends SubscriptionDataLoaderConfig{
 

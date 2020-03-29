@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
-public class Application {
+import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
+
+public class Application implements CachableEntity<Integer> {
 
     private int appId;
     private String appName;
@@ -91,5 +93,9 @@ public class Application {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public Integer getCacheKey() {
+        return getAppId();
     }
 }

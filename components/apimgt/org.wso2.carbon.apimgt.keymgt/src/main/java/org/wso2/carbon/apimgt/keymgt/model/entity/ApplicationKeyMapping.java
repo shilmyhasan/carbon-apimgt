@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
-public class ApplicationKeyMapping {
+import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
+
+public class ApplicationKeyMapping implements CachableEntity<String> {
 
     private String consumerKey;
     private String keyType;
@@ -55,5 +57,10 @@ public class ApplicationKeyMapping {
 
     public void setApplicationId(int applicationId) {
         this.applicationId = applicationId;
+    }
+
+    @Override
+    public String getCacheKey() {
+        return getConsumerKey();
     }
 }

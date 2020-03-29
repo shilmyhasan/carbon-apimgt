@@ -21,15 +21,46 @@ package org.wso2.carbon.apimgt.keymgt.model;
 import org.wso2.carbon.apimgt.impl.config.InMemorySubscriptionStoreConfig;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
 
+/**
+ * A Facade for obtaining Subscription related Data.
+ */
 public interface InMemorySubscriptionStore {
 
+    /**
+     * Gets an {@link Application} by Id
+     * @param appId Id of the Application
+     * @return {@link Application} with the appId
+     */
     Application getApplicationById(int appId);
 
+    /**
+     * Gets the {@link ApplicationKeyMapping} entry by consumerKey
+     * @param consumerKey Consumer Key of the Application
+     * @return {@link ApplicationKeyMapping} entry
+     */
     ApplicationKeyMapping getKeyMappingByConsumerKey(String consumerKey);
 
-    API findApiByContextAndVersion(String context, String version);
+    /**
+     * Get API by Context and Version
+     * @param context Context of the API
+     * @param version Version of the API
+     * @return {@link API} entry represented by Context and Version.
+     */
+    API getApiByContextAndVersion(String context, String version);
 
-    Subscription findSubscriptionByApiAndApplication(Application application, API api);
+    /**
+     * Gets Subscription by API and by Application
+     * @param application Application associated with the Subscription
+     * @param api API for which subscription is created
+     * @return {@link Subscription}
+     */
+    Subscription getSubscriptionByApiAndApplication(Application application, API api);
 
+    /**
+     * Gets Policy by the name and Tenant Id
+     * @param policyName Name of the Policy
+     * @param tenantId TenantId of the policy owner
+     * @return {@link Policy}
+     */
     Policy getPolicyByName(String policyName, int tenantId);
 }

@@ -18,5 +18,21 @@
 
 package org.wso2.carbon.apimgt.keymgt.model;
 
-public interface MapPopulator {
+import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
+import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
+
+import java.lang.reflect.InvocationTargetException;
+
+/**
+ * Interface to be extended if need to initialise a class by supplying a
+ * {@link KeyValidationHandlerConfig}.
+ */
+public interface KeyValidatorConfigInitializable {
+
+    /**
+     * Initialises the instance using and instance of {@link KeyValidationHandlerConfig}
+     * @param config Subclass of {@link KeyValidationHandlerConfig}
+     * @throws InitialisationException when an error occurs while instantiation.
+     */
+    void initialise(KeyValidationHandlerConfig config) throws InitialisationException;
 }

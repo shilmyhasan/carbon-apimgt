@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
-public class Policy {
+import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
+
+public class Policy implements CachableEntity<String> {
     private int policyId;
     private int count;
     private String unitTime;
@@ -72,5 +74,10 @@ public class Policy {
 
     public void setTierName(String tierName) {
         this.tierName = tierName;
+    }
+
+    @Override
+    public String getCacheKey() {
+        return getTierName()+"."+getTenantId();
     }
 }

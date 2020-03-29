@@ -26,29 +26,6 @@ public class SubscriptionDataLoaderConfig extends KeyValidationHandlerConfig{
 
     public static final String SUBSCRIPTION_DATA_LOADER_IMPL = "SubscriptionDataLoaderImpl";
 
-    /*
-*
-*         <KeyValidationHandler>
-       <KeyValidationHandlerImpl>org.wso2.carbon.apimgt.keymgt.handlers.InMemorySubscriptionValidationHandler</KeyValidationHandlerImpl>
-       <Configuration>
-          <InMemorySubscriptionStore>
-             <InMemorySubscriptionStoreImpl>org.wso2.carbon.apimgt.keymgt.model.impl.MapBasedInMemorySubscriptionStore</InMemorySubscriptionStoreImpl>
-             <Configuration>
-                <SubscriptionDataLoader>
-                   <SubscriptionDataLoaderImpl>org.wso2.carbon.apimgt.keymgt.model.impl.DbDataLoader</SubscriptionDataLoaderImpl>
-                   <ApiLoadingFrequency>120</ApiLoadingFrequency>
-                   <ApplicationLoadingFrequency>120</ApplicationLoadingFrequency>
-                   <SubscriptionLoadingFrequency>60</SubscriptionLoadingFrequency>
-                   <KeyMappingLoadingFrequency>300</KeyMappingLoadingFrequency>
-                   <PolicyLoadingFrequency>300</PolicyLoadingFrequency>
-                </SubscriptionDataLoader>
-             </Configuration>
-          </InMemorySubscriptionStore>
-       </Configuration>
-    </KeyValidationHandler>
-*
-* */
-
     @Override
     public void loadFromNode(OMElement node) {
         OMElement implNode = node.getFirstChildWithName(new QName(SUBSCRIPTION_DATA_LOADER_IMPL));

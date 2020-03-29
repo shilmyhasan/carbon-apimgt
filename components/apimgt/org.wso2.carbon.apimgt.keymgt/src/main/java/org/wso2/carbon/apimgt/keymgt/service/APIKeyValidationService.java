@@ -38,13 +38,15 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.handlers.KeyValidationHandler;
 import org.wso2.carbon.apimgt.keymgt.internal.ServiceReferenceHolder;
-import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigLoadable;
+import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
+import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.metrics.manager.MetricManager;
 import org.wso2.carbon.metrics.manager.Timer;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -64,7 +66,7 @@ public class APIKeyValidationService extends AbstractAdmin {
                 String keyValidationClassName =
                         configuration.getFirstProperty(APIConstants.API_KEY_MANGER_VALIDATIONHANDLER_CLASS_NAME);
 
-                if(keyValidationClassName == null) {
+                if (keyValidationClassName == null) {
                     KeyValidationHandlerConfig handlerConfig =
                             configuration.getKeyValidationHandlerConfig();
                     keyValidationClassName = handlerConfig.getImplementingClass();
@@ -73,13 +75,12 @@ public class APIKeyValidationService extends AbstractAdmin {
                 KeyValidationHandler validationHandler = (KeyValidationHandler) APIUtil.getClassForName
                         (keyValidationClassName.trim()).newInstance();
 
-                if(validationHandler != null && validationHandler instanceof KeyValidatorConfigLoadable) {
-                    KeyValidatorConfigLoadable configLoadable = (KeyValidatorConfigLoadable) validationHandler;
+                if (validationHandler != null && validationHandler instanceof KeyValidatorConfigInitializable) {
+                    KeyValidatorConfigInitializable configLoadable = (KeyValidatorConfigInitializable) validationHandler;
                     configLoadable.initialise(configuration.getKeyValidationHandlerConfig());
                 }
                 log.info("Initialised KeyValidationHandler instance successfully");
                 if (keyValidationHandler == null) {
-
                     synchronized (this) {
                         keyValidationHandler = validationHandler;
                     }
@@ -91,6 +92,8 @@ public class APIKeyValidationService extends AbstractAdmin {
             log.error("Error while accessing class" + e.toString());
         } catch (ClassNotFoundException e) {
             log.error("Error while creating keyManager instance" + e.toString());
+        } catch (InitialisationException e) {
+            log.error("Error while instantiating KeyValidationHandler ");
         }
     }
 

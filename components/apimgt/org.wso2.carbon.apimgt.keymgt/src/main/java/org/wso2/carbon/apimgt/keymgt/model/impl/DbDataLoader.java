@@ -21,16 +21,18 @@ package org.wso2.carbon.apimgt.keymgt.model.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.impl.config.DbLoaderConfig;
 import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
-import org.wso2.carbon.apimgt.impl.config.SubscriptionDataLoaderConfig;
 import org.wso2.carbon.apimgt.keymgt.model.*;
 import org.wso2.carbon.apimgt.keymgt.model.dao.SubscriptionLoadingDao;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
 
 import java.util.List;
 
-public class DbDataLoader  implements SubscriptionDataLoader,KeyValidatorConfigLoadable {
+/**
+ * A Subscription Data Loader that loads data from DB
+ */
+public class DbDataLoader implements SubscriptionDataLoader, KeyValidatorConfigInitializable {
 
     private static final Log log = LogFactory.getLog(DbDataLoader.class);
 
@@ -61,7 +63,7 @@ public class DbDataLoader  implements SubscriptionDataLoader,KeyValidatorConfigL
     }
 
     @Override
-    public void initialise(KeyValidationHandlerConfig config) {
+    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
 
     }
 }

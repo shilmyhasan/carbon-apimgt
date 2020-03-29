@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
-public class Subscription {
+import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
+
+public class Subscription implements CachableEntity<String> {
 
     private int subscriptionId = -1;
     private String tierName;
@@ -82,5 +84,9 @@ public class Subscription {
 
     public void setCreatedTime(long createdTime) {
         this.createdTime = createdTime;
+    }
+
+    public String getCacheKey() {
+        return getAppId() + "." + getApiId();
     }
 }

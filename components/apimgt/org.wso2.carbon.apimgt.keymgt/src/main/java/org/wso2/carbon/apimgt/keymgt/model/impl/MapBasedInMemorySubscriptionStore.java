@@ -22,87 +22,124 @@ package org.wso2.carbon.apimgt.keymgt.model.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.impl.config.InMemorySubscriptionStoreConfig;
 import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.impl.config.MapBasedSubscriptionStoreConfig;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
-import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigLoadable;
+import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataLoader;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
-public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionStore, KeyValidatorConfigLoadable {
+/**
+ * In memory store which keeps data needed to validate subscriptions as Maps. This uses
+ * {@link SubscriptionDataLoader} to load related information.
+ */
+public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionStore, KeyValidatorConfigInitializable {
 
+    public static final int LOADING_POOL_SIZE = 6;
     private static final Log log = LogFactory.getLog(MapBasedInMemorySubscriptionStore.class);
     private Map<String, ApplicationKeyMapping> applicationKeyMappingMap;
     private Map<Integer, Application> applicationMap;
-    private Map<String, API> apiMap = new ConcurrentHashMap<String, API>();
+    private Map<String, API> apiMap;
     private Map<String, Policy> policyMap;
     private Map<String, Subscription> subscriptionMap;
-    private SubscriptionDataLoader dataLoader = new DbDataLoader();
-    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(6);
+    private SubscriptionDataLoader dataLoader;
+    private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(LOADING_POOL_SIZE);
     private MapBasedSubscriptionStoreConfig mapBasedSubscriptionStoreConfig;
 
-    public MapBasedInMemorySubscriptionStore(){
-        try {
+    public MapBasedInMemorySubscriptionStore() {
+        this.applicationKeyMappingMap = new ConcurrentHashMap<String, ApplicationKeyMapping>();
+        this.applicationMap = new ConcurrentHashMap<Integer, Application>();
+        this.apiMap = new ConcurrentHashMap<String, API>();
+        this.policyMap = new ConcurrentHashMap<String, Policy>();
+        this.subscriptionMap = new ConcurrentHashMap<String, Subscription>();
+    }
 
-            Runnable apiLoadingTask = new PeriodicPopulateTask<String,API>(apiMap, () -> {
-                try {
-                    log.info("Started running Periodic Task for Loading APIs...");
-                    List<API> apis = dataLoader.loadAllApis();
-                    Map<String, API> internalMap = new HashMap<String, API>();
-                    for (API api : apis) {
-                        internalMap.put(api.getContext()+"."+api.getApiVersion(),api);
-                        log.info("Adding API : "+api.getContext() + " , Version : "+ api.getApiVersion());
+    private void initialiseLoadingTasks() {
+
+        Runnable apiTask = new PeriodicPopulateTask<String, API>(apiMap,
+                () -> {
+                    try {
+                        log.debug("Calling loadAllApis...");
+                        return dataLoader.loadAllApis();
+                    } catch (APIManagementException e) {
+                        log.error("Exception while loading APIs");
                     }
-                    return internalMap;
-                } catch (APIManagementException e) {
-                    log.error("Exception while loading APIs");
-                }
-                return null;
-            });
+                    return null;
+                });
 
-            executorService.scheduleAtFixedRate(apiLoadingTask,100,60, TimeUnit.SECONDS);
-            List<Subscription> subscriptionList =  dataLoader.loadAllSubscriptions();
-            subscriptionMap = new HashMap<String, Subscription>();
-            for (Subscription subscription : subscriptionList) {
-                subscriptionMap.put(Integer.toString(subscription.getAppId()) + "." + Integer.toString(subscription.getApiId()),subscription);
-                log.info("Adding Subscription : "+subscription.getSubscriptionId() + ", Tier : "+ subscription.getTierName());
-            }
+        executorService.scheduleAtFixedRate(apiTask, 0,
+                mapBasedSubscriptionStoreConfig.getApiLoadingFrequency(), TimeUnit.SECONDS);
 
-            List<Application> applicationList = dataLoader.loadAllApplications();
-            applicationMap = new HashMap<Integer, Application>();
-            for (Application application : applicationList) {
-                applicationMap.put(application.getAppId(),application);
-                log.info("Adding Application : "+application.getAppName() + ", Tier : "+ application.getAppTier());
-            }
 
-            List<ApplicationKeyMapping> keyMappings = dataLoader.loadAllKeyMappings();
-            applicationKeyMappingMap = new HashMap<String, ApplicationKeyMapping>();
-            for (ApplicationKeyMapping keyMapping : keyMappings) {
-                applicationKeyMappingMap.put(keyMapping.getConsumerKey(),keyMapping);
-                log.info("Adding KeyMappingEntry : App Id "+keyMapping.getApplicationId() + " " +
-                        "Consumer Key : "+keyMapping.getConsumerKey());
-            }
+        Runnable subscriptionLoadingTask = new PeriodicPopulateTask<String, Subscription>(subscriptionMap,
+                () -> {
+                    try {
+                        log.debug("Calling loadAllSubscriptions...");
+                        return dataLoader.loadAllSubscriptions();
+                    } catch (APIManagementException e) {
+                        log.error("Exception while loading Subscriptions");
+                    }
+                    return null;
+                });
 
-            List<Policy> policies = dataLoader.loadAllPolicies();
-            policyMap = new HashMap<String, Policy>();
-            for (Policy policy : policies) {
-                policyMap.put(policy.getTierName()+"."+Integer.toString(policy.getTenantId()),
-                        policy);
-                log.info("Adding Policy : "+policy.getTierName() + " , TID : "+ policy.getTenantId());
-            }
+        executorService.scheduleAtFixedRate(subscriptionLoadingTask, 0,
+                mapBasedSubscriptionStoreConfig.getSubLoadingFrequency(), TimeUnit.SECONDS);
 
-        } catch (APIManagementException e) {
-            log.error("Error occurred while fetching Subscriptions");
-        }
+
+        Runnable applicationLoadingTask = new PeriodicPopulateTask<Integer, Application>(applicationMap,
+                () -> {
+                    try {
+                        log.debug("Calling loadAllApplications...");
+                        return dataLoader.loadAllApplications();
+                    } catch (APIManagementException e) {
+                        log.error("Exception while loading Applications");
+                    }
+                    return null;
+                });
+
+        executorService.scheduleAtFixedRate(applicationLoadingTask, 0,
+                this.mapBasedSubscriptionStoreConfig.getAppLoadingFrequency(), TimeUnit.SECONDS);
+
+        Runnable keyMappingsTask =
+                new PeriodicPopulateTask<String, ApplicationKeyMapping>(applicationKeyMappingMap,
+                        () -> {
+                            try {
+                                log.debug("Calling loadAllKeyMappings...");
+                                return dataLoader.loadAllKeyMappings();
+                            } catch (APIManagementException e) {
+                                log.error("Exception while loading ApplicationKeyMapping");
+                            }
+                            return null;
+                        });
+
+        executorService.scheduleAtFixedRate(keyMappingsTask, 0,
+                this.mapBasedSubscriptionStoreConfig.getKeyMappingLoadingFrequency(), TimeUnit.SECONDS);
+
+
+        Runnable policyLoadingTask =
+                new PeriodicPopulateTask<String, Policy>(policyMap,
+                        () -> {
+                            try {
+                                log.debug("Calling loadAllPolicies...");
+                                return dataLoader.loadAllPolicies();
+                            } catch (APIManagementException e) {
+                                log.error("Exception while loading Policies");
+                            }
+                            return null;
+                        });
+
+        executorService.scheduleAtFixedRate(policyLoadingTask, 0,
+                this.mapBasedSubscriptionStoreConfig.getPolicyLoadingFrequency(), TimeUnit.SECONDS);
+
     }
 
     public Application finApplicationbyConsumerKey(String consumerKey) {
@@ -127,60 +164,73 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
     }
 
     @Override
-    public API findApiByContextAndVersion(String context, String version) {
-        String apiKey = context +"."+version;
-        return apiMap.get(apiKey);
+    public API getApiByContextAndVersion(String context, String version) {
+        API api = new API();
+        api.setContext(context);
+        api.setApiVersion(version);
+        return apiMap.get(api.getCacheKey());
     }
 
     @Override
-    public Subscription findSubscriptionByApiAndApplication(Application application, API api) {
-        String subKey =
-                Integer.toString(application.getAppId()) + "." + Integer.toString(api.getApiId());
-        subscriptionMap.get(subKey);
+    public Subscription getSubscriptionByApiAndApplication(Application application, API api) {
+        Subscription subKey = new Subscription();
+        subKey.setApiId(application.getAppId());
+        subKey.setApiId(api.getApiId());
+        subscriptionMap.get(subKey.getCacheKey());
         return subscriptionMap.get(subKey);
     }
 
     @Override
     public Policy getPolicyByName(String policyName, int tenantId) {
-        String policyKey = policyName+"."+tenantId;
-        return policyMap.get(policyKey);
+        Policy policy = new Policy();
+        policy.setTierName(policyName);
+        policy.setTenantId(tenantId);
+        return policyMap.get(policy.getCacheKey());
     }
 
     @Override
-    public void initialise(KeyValidationHandlerConfig config) throws IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
         this.mapBasedSubscriptionStoreConfig =
                 (MapBasedSubscriptionStoreConfig) config;
         String subscriptionDataLoader =
                 mapBasedSubscriptionStoreConfig.getSubscriptionDataLoaderConfig().getImplementingClass();
 
-        if(subscriptionDataLoader != null){
-            this.dataLoader =
-                    (SubscriptionDataLoader) APIUtil.getClassForName(subscriptionDataLoader.trim()).getDeclaredConstructor().newInstance();
+        if (subscriptionDataLoader != null) {
+            try {
+                this.dataLoader =
+                        (SubscriptionDataLoader) APIUtil.getClassForName(subscriptionDataLoader.trim()).getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
+                throw new InitialisationException(e);
+            }
         }
+
+        this.initialiseLoadingTasks();
     }
 
-    private static class PeriodicPopulateTask<K,V> implements Runnable {
+    private class PeriodicPopulateTask<K, V extends CachableEntity<K>> implements Runnable {
 
-        private Map<K,V> entityMap;
-        private Supplier<Map<K,V>> supplier;
+        private Map<K, V> entityMap;
+        private Supplier<List<V>> supplier;
 
-        PeriodicPopulateTask(Map<K,V> entityMap, Supplier<Map<K,V>> supplier){
+        PeriodicPopulateTask(Map<K, V> entityMap, Supplier<List<V>> supplier) {
             this.entityMap = entityMap;
             this.supplier = supplier;
         }
 
         public void run() {
-            Map<K,V> map = supplier.get();
-            // entityMap.clear() and putALl could have been used, but would render some elements
-            // null for a longer period. Hence followed this approach.
-            if(map != null) {
-                for (Map.Entry<K, V> entry : map.entrySet()) {
-                    entityMap.put(entry.getKey(),entry.getValue());
-                    if(log.isDebugEnabled()) {
-                        log.debug(String.format("Adding entry Key : %s Value : %s",entry.getKey()
-                                ,entry.getValue()));
+
+            List<V> list = supplier.get();
+
+            if (list != null) {
+                for (V v : list) {
+                    entityMap.put(v.getCacheKey(), v);
+                    if (log.isDebugEnabled()) {
+                        log.debug(String.format("Adding entry Key : %s Value : %s", v.getCacheKey()
+                                , v));
                     }
                 }
+
             }
         }
     }

@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
-public class API {
+import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
+
+public class API implements CachableEntity<String> {
 
     private int apiId;
     private String apiProvider;
@@ -73,5 +75,9 @@ public class API {
 
     public void setApiVersion(String apiVersion) {
         this.apiVersion = apiVersion;
+    }
+
+    public String getCacheKey() {
+        return context + "." + apiVersion;
     }
 }
