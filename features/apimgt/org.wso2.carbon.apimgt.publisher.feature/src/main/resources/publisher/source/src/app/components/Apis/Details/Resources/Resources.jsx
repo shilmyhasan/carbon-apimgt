@@ -38,6 +38,7 @@ import APIRateLimiting from './components/APIRateLimiting';
 import { extractPathParameters, isSelectAll, mapAPIOperations } from './operationUtils';
 import OperationsSelector from './components/OperationsSelector';
 import SaveOperations from './components/SaveOperations';
+import SwaggerParser from 'swagger-parser';
 
 /**
  * This component handles the Resource page in API details though it's written in a sharable way
@@ -63,6 +64,7 @@ export default function Resources(props) {
     const [markedOperations, setSelectedOperation] = useState({});
     const [openAPISpec, setOpenAPISpec] = useState({});
     const [apiThrottlingPolicy, setApiThrottlingPolicy] = useState(api.apiThrottlingPolicy);
+    const [resolvedSpec, setResolvedSpec] = useState({ spec: {}, errors: [] });
 
     /**
      *
@@ -229,13 +231,28 @@ export default function Resources(props) {
      * @returns
      */
     function resolveAndUpdateSpec(rawSpec) {
-        return Swagger.resolve({ spec: rawSpec, allowMetaPatches: false }).then(({ spec, errors }) => {
-            const value = spec;
-            delete value.$$normalized;
-            operationsDispatcher({ action: 'init', data: value.paths });
-            setOpenAPISpec(value);
-            setSpecErrors(errors);
+         /*
+         * Deep copying the spec.
+         * Otherwise it will resolved to the original parameter passed (rawSpec) to the validate method.
+         * We will not alter the provided spec.
+         */
+        const specCopy = cloneDeep(rawSpec);
+
+          /*
+        * Used SwaggerParser.validate() because we can get the errors as well.
+        */
+        SwaggerParser.validate(specCopy, (err, result) => {
+            setResolvedSpec(() => {
+                const errors = err ? [err] : [];
+                return {
+                    spec: result,
+                    errors,
+                };
+            });
         });
+
+        operationsDispatcher({ action: 'init', data: rawSpec.paths });
+        setOpenAPISpec(rawSpec);
     }
 
     /**
