@@ -229,7 +229,6 @@ export default function Resources(props) {
      * @returns
      */
     function resolveAndUpdateSpec(rawSpec) {
-      
         operationsDispatcher({ action: 'init', data: rawSpec.paths });
         setOpenAPISpec(rawSpec);
     }
