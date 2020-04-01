@@ -20,16 +20,19 @@ package org.wso2.carbon.apimgt.rest.api.admin.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.APIManager;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowExecutor;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.apimgt.rest.api.admin.WorkflowsApiService;
+import org.wso2.carbon.apimgt.rest.api.admin.dto.ErrorDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
 
@@ -54,7 +57,8 @@ public class WorkflowsApiServiceImpl extends WorkflowsApiService {
     public Response workflowsUpdateWorkflowStatusPost(String workflowReferenceId, WorkflowDTO body) {
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
         boolean isTenantFlowStarted = false;
-
+        String username = RestApiUtil.getLoggedInUsername();
+        String tenantDomainOfUser = MultitenantUtils.getTenantDomain(username);
         try {
             if (workflowReferenceId == null) {
                 RestApiUtil.handleBadRequest("workflowReferenceId is empty", log);
@@ -67,6 +71,9 @@ public class WorkflowsApiServiceImpl extends WorkflowsApiService {
             }
 
             String tenantDomain = workflowDTO.getTenantDomain();
+            if (!tenantDomain.equals(tenantDomainOfUser)) {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
             if (tenantDomain != null && !SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
