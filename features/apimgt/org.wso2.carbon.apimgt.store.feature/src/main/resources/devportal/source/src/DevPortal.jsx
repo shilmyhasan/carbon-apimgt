@@ -231,7 +231,7 @@ class DevPortal extends React.Component {
     }
 
     /**
-     * Add two numbers.
+     * Generate page title from theme config.
      * @param {object} theme object.
      * @returns {JSX} link dom tag.
      */

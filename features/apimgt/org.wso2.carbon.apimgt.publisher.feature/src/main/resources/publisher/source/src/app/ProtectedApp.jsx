@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import { Helmet } from 'react-helmet';
 // import MaterialDesignCustomTheme from 'AppComponents/Shared/CustomTheme';
 import ResourceNotFound from 'AppComponents/Base/Errors/ResourceNotFound';
 import Api from 'AppData/api';
@@ -98,6 +99,22 @@ export default class Protected extends Component {
     }
 
     /**
+     * Generate page title from theme config.
+     * @param {object} theme object.
+     * @returns {JSX} link dom tag.
+     */
+    getTitle(localTheme) {
+        const {
+            custom: {
+                title: {
+                    prefix, sufix,
+                },
+            },
+        } = localTheme;
+        return (prefix + sufix);
+    }
+
+    /**
      * Handle iframe message
      * @param {event} e Event
      */
@@ -139,6 +156,9 @@ export default class Protected extends Component {
         return (
             <MuiThemeProvider theme={theme}>
                 <AppErrorBoundary>
+                    <Helmet>
+                        <title>{this.getTitle(theme)}</title>
+                    </Helmet>
                     <Base header={header}>
                         <iframe
                             title='iframeOP'

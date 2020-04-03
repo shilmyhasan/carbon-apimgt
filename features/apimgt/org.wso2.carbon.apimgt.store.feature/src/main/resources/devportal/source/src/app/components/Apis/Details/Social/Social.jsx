@@ -172,7 +172,7 @@ function Social() {
                     <>
                         <div className={classes.divider} />
                         <a
-                            href={`mailto:?Subject=${apiName}&body=Link+:+${apiUrl}"`} 
+                            href={`mailto:?Subject=${apiName}&body=Link+:+${apiUrl}"`}
                             className={classes.codeIcon}
                             target='_blank'
                             rel='noopener noreferrer'

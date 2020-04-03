@@ -52,6 +52,7 @@
         "react-dom": "^16.10.2",
         "react-draft-wysiwyg": "^1.13.2",
         "react-dropzone": "^v10.1.7",
+        "react-helmet": "^5.2.1",
         "react-intl": "v3.1.6",
         "react-markdown": "^4.0.8",
         "react-modal": "^2.2.2",
