@@ -114,8 +114,8 @@ const AppThemes = {
             },
             warningColor: '#ffc439',
             title: {
-                prefix: '[Devportal]',
-                sufix: '- WSO2 APIM',
+                prefix: '[Publisher]',
+                sufix: 'WSO2 APIM',
             },
         },
     },

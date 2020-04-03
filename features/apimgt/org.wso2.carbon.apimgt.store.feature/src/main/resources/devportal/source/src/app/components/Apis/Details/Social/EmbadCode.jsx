@@ -90,8 +90,8 @@ function EmbadCode(props) {
                 <div style={modalStyle} className={classes.paper}>
                     <h2 id='simple-modal-title'>
                         <FormattedMessage
-                            id='Apis.Details.Social.EmbadCode'
-                            defaultMessage='Embad'
+                            id='Apis.Details.Social.EmbedCode.embed'
+                            defaultMessage='Embed'
                         />
                     </h2>
                     <div className={classes.code}>
@@ -102,11 +102,11 @@ function EmbadCode(props) {
                             codeCopied
                                 ? intl.formatMessage({
                                     defaultMessage: 'Copied',
-                                    id: 'Apis.Details.Environments.copied',
+                                    id: 'Apis.Details.Social.EmbedCode.copied',
                                 })
                                 : intl.formatMessage({
                                     defaultMessage: 'Copy to clipboard',
-                                    id: 'Apis.Details.Environments.copy.to.clipboard',
+                                    id: 'Apis.Details.Social.EmbedCode.copy.to.clipboard',
                                 })
                         }
                         placement='right'
