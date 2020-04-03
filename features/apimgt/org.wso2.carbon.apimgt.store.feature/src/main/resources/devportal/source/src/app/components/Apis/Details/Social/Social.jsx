@@ -171,7 +171,12 @@ function Social() {
                 {showEmail && (
                     <>
                         <div className={classes.divider} />
-                        <a href={`mailto:?Subject=${apiName}&body=Link+:+${apiUrl}"`} className={classes.codeIcon}>
+                        <a
+                            href={`mailto:?Subject=${apiName}&body=Link+:+${apiUrl}"`} 
+                            className={classes.codeIcon}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                        >
                             <MailOutlineIcon />
                         </a>
                     </>
