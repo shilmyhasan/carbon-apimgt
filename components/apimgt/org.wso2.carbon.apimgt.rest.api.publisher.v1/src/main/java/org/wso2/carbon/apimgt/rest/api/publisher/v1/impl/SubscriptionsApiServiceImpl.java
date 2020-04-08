@@ -26,6 +26,7 @@ import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.MonetizationException;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
+import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.Monetization;
 import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
 import org.wso2.carbon.apimgt.impl.APIConstants;
@@ -66,6 +67,34 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
 
             if (currentSubscription == null) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_SUBSCRIPTION, subscriptionId, log);
+            }
+
+            Application subscribedApp = currentSubscription.getApplication();
+            String applicationTokenType = "OAUTH";
+            if (subscribedApp != null) {
+                applicationTokenType = subscribedApp.getTokenType();
+            }
+
+            //in case of a JWT type application add a subscription blocking condition as well.
+            if (APIConstants.APPLICATION_TOKEN_TYPE_JWT.equals(applicationTokenType)) {
+                APIIdentifier apiId = currentSubscription.getApiId();
+                String apiContext = apiProvider.getAPIContext(apiId);
+                String appId = subscribedApp.getOwner() + "-" + subscribedApp.getName();
+                String substatus = currentSubscription.getSubStatus();
+
+                //delete existing block conditions
+                deleteSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
+                deleteSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_SANDBOX);
+
+                if (APIConstants.SubscriptionStatus.BLOCKED.equals(substatus)) {
+                    /*In case all subscriptions blocked, add block conditions for both sandbox and production
+                    key types*/
+                    addSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
+                    addSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_SANDBOX);
+                } else {
+                    /*In case production only blocked add a blocking condition only for production type*/
+                    addSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
+                }
             }
 
             SubscribedAPI subscribedAPI = new SubscribedAPI(subscriptionId);
@@ -198,6 +227,23 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_SUBSCRIPTION, subscriptionId, log);
             }
 
+            Application subscribedApp = currentSubscription.getApplication();
+            String applicationTokenType = "OAUTH";
+            if (subscribedApp != null) {
+                applicationTokenType = subscribedApp.getTokenType();
+            }
+
+            //in case of a JWT type application remove the subscription blocking conditions if exist
+            if (APIConstants.APPLICATION_TOKEN_TYPE_JWT.equals(applicationTokenType)) {
+                APIIdentifier apiId = currentSubscription.getApiId();
+                String apiContext = apiProvider.getAPIContext(apiId);
+                String appId = subscribedApp.getOwner() + "-" + subscribedApp.getName();
+
+                //delete existing block conditions
+                deleteSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
+                deleteSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_SANDBOX);
+            }
+
             SubscribedAPI subscribedAPI = new SubscribedAPI(subscriptionId);
             subscribedAPI.setSubStatus(APIConstants.SubscriptionStatus.UNBLOCKED);
             apiProvider.updateSubscription(subscribedAPI);
@@ -212,5 +258,21 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
         }
 
         return null;
+    }
+
+    private String addSubscriptionBlockCondition(String apiContext, String appId, String keyType)
+            throws APIManagementException {
+        String conditionValue = apiContext + ":" + appId + ":" + keyType;
+        String username = RestApiUtil.getLoggedInUsername();
+        APIProvider apiProvider = RestApiUtil.getProvider(username);
+        return apiProvider.addBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION, conditionValue);
+    }
+
+    private void deleteSubscriptionBlockCondition(String apiContext, String appId, String keyType)
+            throws APIManagementException {
+        String conditionValue = apiContext + ":" + appId + ":" + keyType;
+        String username = RestApiUtil.getLoggedInUsername();
+        APIProvider apiProvider = RestApiUtil.getProvider(username);
+        apiProvider.deleteSubscriptionBlockCondition(conditionValue);
     }
 }

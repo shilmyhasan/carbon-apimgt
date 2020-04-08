@@ -21,6 +21,7 @@ package org.wso2.carbon.throttle.service.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.ClassPathResource;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.throttle.service.dto.BlockConditionsDTO;
 import org.wso2.carbon.throttle.service.dto.RevokedJWTDTO;
 import org.wso2.carbon.throttle.service.dto.RevokedJWTListDTO;
@@ -105,6 +106,7 @@ public final class BlockConditionDBUtil {
         List ip = new ArrayList();
         List user = new ArrayList();
         List custom = new ArrayList();
+        List subscription = new ArrayList();
         String sqlQuery = "select * from AM_BLOCK_CONDITIONS";
         try {
             conn = BlockConditionDBUtil.getConnection();
@@ -126,6 +128,8 @@ public final class BlockConditionDBUtil {
                         user.add(value);
                     } else if ("CUSTOM".equals(type)) {
                         custom.add(value);
+                    } else if (APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION.equals(type)) {
+                        subscription.add(value);
                     }
                 }
             }
@@ -140,6 +144,7 @@ public final class BlockConditionDBUtil {
         blockConditionsDTO.setIp(ip);
         blockConditionsDTO.setUser(user);
         blockConditionsDTO.setCustom(custom);
+        blockConditionsDTO.setSubscription(subscription);
         return blockConditionsDTO;
     }
 

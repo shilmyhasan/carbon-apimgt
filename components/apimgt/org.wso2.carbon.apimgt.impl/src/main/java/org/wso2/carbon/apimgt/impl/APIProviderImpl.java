@@ -5987,6 +5987,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         publishBlockingEvent(blockingConditionType, blockingConditionValue, "delete");
     }
 
+    public void deleteSubscriptionBlockCondition(String conditionValue)
+            throws APIManagementException {
+        boolean status = apiMgtDAO.deleteSubscriptionBlockCondition(conditionValue, tenantDomain);
+
+        if (status) {
+            publishBlockingEvent(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION, conditionValue, "false");
+        }
+    }
+
     @Override
     public APIPolicy getAPIPolicy(String username, String policyName) throws APIManagementException {
         return apiMgtDAO.getAPIPolicy(policyName, APIUtil.getTenantId(username));
@@ -6077,7 +6086,22 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         ThrottleProperties throttleProperties = getAPIManagerConfiguration().getThrottleProperties();
 
         if (throttleProperties.getDataPublisher() != null && throttleProperties.getDataPublisher().isEnabled()) {
-            eventAdapterService.publish(APIConstants.BLOCKING_EVENT_PUBLISHER, Collections.EMPTY_MAP, blockingMessage);
+
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            boolean isTenantFlowStarted = false;
+            try {
+                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().
+                            setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+                }
+                eventAdapterService.publish(APIConstants.BLOCKING_EVENT_PUBLISHER, Collections.EMPTY_MAP, blockingMessage);
+            } finally {
+                if (isTenantFlowStarted) {
+                    PrivilegedCarbonContext.endTenantFlow();
+                }
+            }
         }
     }
 
@@ -7684,5 +7708,16 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public String getGraphqlSchema(APIIdentifier apiId) throws APIManagementException {
         return getGraphqlSchemaDefinition(apiId);
+    }
+
+    /**
+     * This method is used to get the context of API identified by the given APIIdentifier
+     *
+     * @param apiId api identifier
+     * @return apiContext
+     * @throws APIManagementException if failed to fetch the context for apiID
+     */
+    public String getAPIContext(APIIdentifier apiId) throws APIManagementException {
+        return apiMgtDAO.getAPIContext(apiId);
     }
 }

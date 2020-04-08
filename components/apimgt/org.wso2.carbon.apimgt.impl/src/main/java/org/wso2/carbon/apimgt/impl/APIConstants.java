@@ -1408,6 +1408,7 @@ public final class APIConstants {
     public static final String BLOCKING_CONDITIONS_API = "API";
     public static final String BLOCKING_CONDITIONS_USER = "USER";
     public static final String BLOCKING_CONDITIONS_IP = "IP";
+    public static final String BLOCKING_CONDITIONS_SUBSCRIPTION = "SUBSCRIPTION";
 
     public static final String REVOKED_TOKEN_KEY = "revokedToken";
     public static final String REVOKED_TOKEN_EXPIRY_TIME = "expiryTime";
@@ -1812,4 +1813,5 @@ public final class APIConstants {
             JWT_AUTHENTICATION_CONFIG + ".EnableSubscriptionValidationViaKeyManager";
 
 
+    public static final String APPLICATION_TOKEN_TYPE_JWT = "JWT";
 }

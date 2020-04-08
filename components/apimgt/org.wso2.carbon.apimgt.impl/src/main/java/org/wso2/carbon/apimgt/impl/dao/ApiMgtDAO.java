@@ -12293,6 +12293,45 @@ public class ApiMgtDAO {
                 }
             } else if (APIConstants.BLOCKING_CONDITIONS_IP.equals(conditionType)) {
                 valid = true;
+            } else if (APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION.equals(conditionType)) {
+                /* ATM this condition type will be used internally to handle subscription blockings for JWT type access
+                   tokens.
+                */
+                String[] conditionsArray = conditionValue.split(":");
+                if (conditionsArray.length > 0) {
+                    String apiContext = conditionsArray[0];
+                    String applicationIdentifier = conditionsArray[1];
+
+                    String[] app = applicationIdentifier.split("-");
+                    String appOwner = app[0];
+                    String appName = app[1];
+
+                    //check whether the given api context exists in tenant
+                    String extractedTenantDomain = MultitenantUtils.getTenantDomainFromRequestURL(apiContext);
+                    if (extractedTenantDomain == null) {
+                        extractedTenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+                    }
+                    if (tenantDomain.equals(extractedTenantDomain) && isValidContext(apiContext)) {
+                        valid = true;
+                    } else {
+                        throw new APIManagementException(
+                                "Couldn't Save Subscription Block Condition Due to Invalid API Context "
+                                        + apiContext);
+                    }
+
+                    //check whether the given application is valid
+                    if ((MultitenantUtils.getTenantDomain(appOwner).equals(tenantDomain)) &&
+                            isValidApplication(appOwner, appName)) {
+                        valid = true;
+                    } else {
+                        throw new APIManagementException("Couldn't Save Subscription Block Condition Due to Invalid Application " +
+                                "name " + appName + " from Application " +
+                                "Owner " + appOwner);
+                    }
+                } else {
+                    throw new APIManagementException(
+                            "Invalid subscription block condition with insufficient data : " + conditionValue);
+                }
             }
             if (valid) {
                 connection = APIMgtDBUtil.getConnection();
@@ -12597,6 +12636,40 @@ public class ApiMgtDAO {
             handleException("Failed to delete Block condition with condition UUID " + uuid, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(deleteBlockConditionPreparedStatement, connection, null);
+        }
+        return status;
+    }
+
+    public boolean deleteSubscriptionBlockCondition(String conditionValue, String tenantDomain) throws APIManagementException{
+        Connection connection = null;
+        PreparedStatement deleteSubscriptionBlockConditionStatement = null;
+        boolean status = false;
+        try {
+            String sql = SQLConstants.DELETE_SUBSCRIPTION_BLOCK_CONDITION;
+            connection = APIMgtDBUtil.getConnection();
+            initialAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
+            deleteSubscriptionBlockConditionStatement = connection.prepareStatement(sql);
+            deleteSubscriptionBlockConditionStatement.setString(1, conditionValue);
+            deleteSubscriptionBlockConditionStatement.setString(2, tenantDomain);
+            int count = deleteSubscriptionBlockConditionStatement.executeUpdate();
+            if (count > 0) {
+                status = true;
+            }
+            connection.commit();
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    handleException("Failed to rollback deleting Subscription Block condition with condition value "
+                            + conditionValue + " of tenant " + tenantDomain, ex);
+                }
+            }
+            handleException("Failed to delete Subscription Block condition with condition value " + conditionValue
+                    + " of tenant " + tenantDomain, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(deleteSubscriptionBlockConditionStatement, connection, null);
         }
         return status;
     }

@@ -3080,6 +3080,9 @@ public class SQLConstants {
             + "FROM AM_API_URL_MAPPING API_UM, AM_API_PRODUCT_MAPPING PRO_UM, AM_API API "
             + "WHERE API_UM.URL_MAPPING_ID = PRO_UM.URL_MAPPING_ID AND API_UM.API_ID = API.API_ID AND PRO_UM.API_ID = ?";
 
+    public static final String DELETE_SUBSCRIPTION_BLOCK_CONDITION =
+            "DELETE FROM AM_BLOCK_CONDITIONS WHERE VALUE = ? AND DOMAIN = ? ";
+
     /** Throttle related constants**/
 
     public static class ThrottleSQLConstants{
