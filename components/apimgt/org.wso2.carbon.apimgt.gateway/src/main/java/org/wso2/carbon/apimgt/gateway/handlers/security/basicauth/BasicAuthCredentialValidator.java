@@ -262,8 +262,8 @@ public class BasicAuthCredentialValidator {
     }
 
     /**
-     * This method used to validate scopes which bind with internal roles
-     * @param resourceRoles allowed roles for the resource
+     * This method used to validate scopes which bind with internal roles.
+     * @param resourceRoles allowed roles for resource
      * @param userRoles roles of user
      * @return
      */
