@@ -12642,15 +12642,11 @@ public class ApiMgtDAO {
 
     public boolean deleteSubscriptionBlockCondition(String conditionValue, String tenantDomain)
             throws APIManagementException {
-        Connection connection = null;
-        PreparedStatement deleteSubscriptionBlockConditionStatement = null;
         boolean status = false;
-        try {
-            String sql = SQLConstants.DELETE_SUBSCRIPTION_BLOCK_CONDITION;
-            connection = APIMgtDBUtil.getConnection();
-            initialAutoCommit = connection.getAutoCommit();
+        try (Connection connection = APIMgtDBUtil.getConnection();
+                PreparedStatement deleteSubscriptionBlockConditionStatement = connection
+                        .prepareStatement(SQLConstants.DELETE_SUBSCRIPTION_BLOCK_CONDITION)) {
             connection.setAutoCommit(false);
-            deleteSubscriptionBlockConditionStatement = connection.prepareStatement(sql);
             deleteSubscriptionBlockConditionStatement.setString(1, conditionValue);
             deleteSubscriptionBlockConditionStatement.setString(2, tenantDomain);
             int count = deleteSubscriptionBlockConditionStatement.executeUpdate();
@@ -12659,18 +12655,8 @@ public class ApiMgtDAO {
             }
             connection.commit();
         } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    handleException("Failed to rollback deleting Subscription Block condition with condition value "
-                            + conditionValue + " of tenant " + tenantDomain, ex);
-                }
-            }
             handleException("Failed to delete Subscription Block condition with condition value " + conditionValue
                     + " of tenant " + tenantDomain, e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(deleteSubscriptionBlockConditionStatement, connection, null);
         }
         return status;
     }
