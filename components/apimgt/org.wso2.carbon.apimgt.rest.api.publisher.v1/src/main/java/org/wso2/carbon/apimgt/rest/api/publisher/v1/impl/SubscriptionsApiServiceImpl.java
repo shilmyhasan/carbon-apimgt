@@ -25,10 +25,7 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.MonetizationException;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.apimgt.api.model.APIIdentifier;
-import org.wso2.carbon.apimgt.api.model.Application;
-import org.wso2.carbon.apimgt.api.model.Monetization;
-import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
+import org.wso2.carbon.apimgt.api.model.*;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.SubscriptionsApiService;
@@ -77,8 +74,19 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
 
             //in case of a JWT type application add a subscription blocking condition as well.
             if (APIConstants.APPLICATION_TOKEN_TYPE_JWT.equals(applicationTokenType)) {
-                APIIdentifier apiId = currentSubscription.getApiId();
-                String apiContext = apiProvider.getAPIContext(apiId);
+                Identifier apiId = currentSubscription.getApiId();
+                if (apiId == null) {
+                    apiId = currentSubscription.getProductId();
+                }
+
+                String apiContext = "";
+                if (apiId instanceof APIIdentifier) {
+                    apiContext = apiProvider.getAPIContext((APIIdentifier) apiId);
+                } else if (apiId instanceof APIProductIdentifier) {
+                    APIProduct product = apiProvider.getAPIProduct((APIProductIdentifier) apiId);
+                    apiContext = product.getContext();
+                }
+
                 String appId = subscribedApp.getOwner() + "-" + subscribedApp.getName();
                 String substatus = currentSubscription.getSubStatus();
 
