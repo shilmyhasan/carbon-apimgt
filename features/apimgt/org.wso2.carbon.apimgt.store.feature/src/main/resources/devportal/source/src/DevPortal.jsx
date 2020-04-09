@@ -60,7 +60,7 @@ class DevPortal extends React.Component {
             tenantDomain: null,
             theme: null,
         };
-        this.SetTenantTheme = this.setTenantTheme.bind(this);
+        this.setTenantTheme = this.setTenantTheme.bind(this);
         this.setSettings = this.setSettings.bind(this);
     }
 
@@ -113,7 +113,6 @@ class DevPortal extends React.Component {
         this.setState({ settings });
     }
 
-
     /**
      * Load Theme file.
      *
@@ -140,15 +139,15 @@ class DevPortal extends React.Component {
         const { app: { context } } = Settings;
         return (
             settings && theme && (
-                <SettingsProvider value={{
+                <SettingsProvider value = {{
                     settings,
                     setSettings: this.setSettings,
                     tenantDomain,
                     setTenantDomain: this.setTenantDomain,
                 }}
                 >
-                    <MuiThemeProvider theme={createMuiTheme(theme)}>
-                        <BrowserRouter basename={context}>
+                    <MuiThemeProvider theme = {createMuiTheme(theme)}>
+                        <BrowserRouter basename = {context}>
                             <Switch>
                                 <Route path='/login' render={() => <Login appName='store' appLabel='STORE' />} />
                                 <Route path='/logout' component={Logout} />
