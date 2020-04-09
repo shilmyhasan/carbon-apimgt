@@ -80,28 +80,33 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
                 }
 
                 String apiContext = "";
+                String apiVersion = "";
                 if (apiId instanceof APIIdentifier) {
                     apiContext = apiProvider.getAPIContext((APIIdentifier) apiId);
+                    apiVersion = apiId.getVersion();
                 } else if (apiId instanceof APIProductIdentifier) {
                     APIProduct product = apiProvider.getAPIProduct((APIProductIdentifier) apiId);
                     apiContext = product.getContext();
+                    //until product versioning is supported, we will be adding default api product version to the
+                    // blacklist condition key
+                    apiVersion = APIConstants.API_PRODUCT_VERSION;
                 }
 
                 String appId = subscribedApp.getOwner() + "-" + subscribedApp.getName();
                 String substatus = currentSubscription.getSubStatus();
 
                 //delete existing block conditions
-                deleteSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
-                deleteSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_SANDBOX);
+                deleteSubscriptionBlockCondition(apiContext, apiVersion, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
+                deleteSubscriptionBlockCondition(apiContext, apiVersion, appId, APIConstants.API_KEY_TYPE_SANDBOX);
 
                 if (APIConstants.SubscriptionStatus.BLOCKED.equals(substatus)) {
                     /*In case all subscriptions blocked, add block conditions for both sandbox and production
                     key types*/
-                    addSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
-                    addSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_SANDBOX);
+                    addSubscriptionBlockCondition(apiContext, apiVersion, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
+                    addSubscriptionBlockCondition(apiContext, apiVersion, appId, APIConstants.API_KEY_TYPE_SANDBOX);
                 } else {
                     /*In case production only blocked add a blocking condition only for production type*/
-                    addSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
+                    addSubscriptionBlockCondition(apiContext, apiVersion, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
                 }
             }
 
@@ -243,13 +248,27 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
 
             //in case of a JWT type application remove the subscription blocking conditions if exist
             if (APIConstants.APPLICATION_TOKEN_TYPE_JWT.equals(applicationTokenType)) {
-                APIIdentifier apiId = currentSubscription.getApiId();
-                String apiContext = apiProvider.getAPIContext(apiId);
+                Identifier apiId = currentSubscription.getApiId();
+                if (apiId == null) {
+                    apiId = currentSubscription.getProductId();
+                }
+
+                String apiContext = "";
+                String apiVersion = "";
+                if (apiId instanceof APIIdentifier) {
+                    apiContext = apiProvider.getAPIContext((APIIdentifier) apiId);
+                    apiVersion = apiId.getVersion();
+                } else if (apiId instanceof  APIProductIdentifier) {
+                    APIProduct product = apiProvider.getAPIProduct((APIProductIdentifier) apiId);
+                    apiContext = product.getContext();
+                    apiVersion = APIConstants.API_PRODUCT_VERSION;
+                }
+
                 String appId = subscribedApp.getOwner() + "-" + subscribedApp.getName();
 
                 //delete existing block conditions
-                deleteSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
-                deleteSubscriptionBlockCondition(apiContext, appId, APIConstants.API_KEY_TYPE_SANDBOX);
+                deleteSubscriptionBlockCondition(apiContext, apiVersion, appId, APIConstants.API_KEY_TYPE_PRODUCTION);
+                deleteSubscriptionBlockCondition(apiContext, apiVersion, appId, APIConstants.API_KEY_TYPE_SANDBOX);
             }
 
             SubscribedAPI subscribedAPI = new SubscribedAPI(subscriptionId);
@@ -268,17 +287,17 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
         return null;
     }
 
-    private String addSubscriptionBlockCondition(String apiContext, String appId, String keyType)
+    private String addSubscriptionBlockCondition(String apiContext, String apiVersion, String appId, String keyType)
             throws APIManagementException {
-        String conditionValue = apiContext + ":" + appId + ":" + keyType;
+        String conditionValue = apiContext + ":" + apiVersion + ":" + appId + ":" + keyType;
         String username = RestApiUtil.getLoggedInUsername();
         APIProvider apiProvider = RestApiUtil.getProvider(username);
         return apiProvider.addBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION, conditionValue);
     }
 
-    private void deleteSubscriptionBlockCondition(String apiContext, String appId, String keyType)
+    private void deleteSubscriptionBlockCondition(String apiContext, String apiVersion, String appId, String keyType)
             throws APIManagementException {
-        String conditionValue = apiContext + ":" + appId + ":" + keyType;
+        String conditionValue = apiContext + ":" + apiVersion + ":" + appId + ":" + keyType;
         String username = RestApiUtil.getLoggedInUsername();
         APIProvider apiProvider = RestApiUtil.getProvider(username);
         apiProvider.deleteSubscriptionBlockCondition(conditionValue);

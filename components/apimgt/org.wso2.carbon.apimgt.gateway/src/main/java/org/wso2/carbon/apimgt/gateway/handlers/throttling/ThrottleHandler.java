@@ -210,7 +210,7 @@ public class ThrottleHandler extends AbstractHandler implements ManagedLifecycle
                 ipLevelBlockingKey = apiTenantDomain + ":" + clientIp;
                 appLevelBlockingKey = authContext.getSubscriber() + ":" + authContext.getApplicationName();
                 subscriptionLevelBlockingKey =
-                        apiContext + ":" + authContext.getSubscriber() + "-" + authContext.getApplicationName()
+                        apiContext + ":" + apiVersion + ":" + authContext.getSubscriber() + "-" + authContext.getApplicationName()
                                 + ":" + authContext.getKeyType();
                 Timer timer = getTimer(MetricManager.name(
                         APIConstants.METRICS_PREFIX, this.getClass().getSimpleName(), BLOCKED_TEST));

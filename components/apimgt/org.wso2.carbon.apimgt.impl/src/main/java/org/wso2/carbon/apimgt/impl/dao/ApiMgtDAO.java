@@ -12300,7 +12300,7 @@ public class ApiMgtDAO {
                 String[] conditionsArray = conditionValue.split(":");
                 if (conditionsArray.length > 0) {
                     String apiContext = conditionsArray[0];
-                    String applicationIdentifier = conditionsArray[1];
+                    String applicationIdentifier = conditionsArray[2];
 
                     String[] app = applicationIdentifier.split("-");
                     String appOwner = app[0];
