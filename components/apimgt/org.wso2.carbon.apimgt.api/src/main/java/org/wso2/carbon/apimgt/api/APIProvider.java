@@ -958,7 +958,7 @@ public interface APIProvider extends APIManager {
     /**
      * Deletes a subscription block condition when the condition key is given
      *
-     * @param conditionValue condition key ex: /api/1.0:admin-testApplication
+     * @param conditionValue condition key ex: /api/1.0:admin-testApplication:SANDBOX
      * @throws APIManagementException
      */
     void deleteSubscriptionBlockCondition(String conditionValue) throws APIManagementException;

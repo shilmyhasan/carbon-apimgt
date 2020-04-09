@@ -12324,9 +12324,9 @@ public class ApiMgtDAO {
                             isValidApplication(appOwner, appName)) {
                         valid = true;
                     } else {
-                        throw new APIManagementException("Couldn't Save Subscription Block Condition Due to Invalid Application " +
-                                "name " + appName + " from Application " +
-                                "Owner " + appOwner);
+                        throw new APIManagementException(
+                                "Couldn't Save Subscription Block Condition Due to Invalid Application " + "name "
+                                        + appName + " from Application " + "Owner " + appOwner);
                     }
                 } else {
                     throw new APIManagementException(
@@ -12640,7 +12640,8 @@ public class ApiMgtDAO {
         return status;
     }
 
-    public boolean deleteSubscriptionBlockCondition(String conditionValue, String tenantDomain) throws APIManagementException{
+    public boolean deleteSubscriptionBlockCondition(String conditionValue, String tenantDomain)
+            throws APIManagementException {
         Connection connection = null;
         PreparedStatement deleteSubscriptionBlockConditionStatement = null;
         boolean status = false;
