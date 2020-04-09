@@ -19,7 +19,6 @@
 package org.wso2.carbon.apimgt.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
@@ -7188,6 +7187,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 failedGateways.put("UNPUBLISHED", Collections.<String, String>emptyMap());
             }
         }
+
         //todo : check whether permissions need to be updated and pass it along
         updateApiProductArtifact(product, true, true);
         apiMgtDAO.updateAPIProduct(product, userNameWithoutChange);
