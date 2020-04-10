@@ -269,17 +269,16 @@ public class BasicAuthCredentialValidator {
      * @return
      */
     private boolean validateInternalUserRoles(String resourceRoles, String[] userRoles) {
-        String[] seperatedRoles = resourceRoles.split(",");
+        String[] separatedRoles = resourceRoles.split(",");
         if (resourceRoles.contains(CarbonConstants.DOMAIN_SEPARATOR)) {
-            for (String role : seperatedRoles) {
+            for (String role : separatedRoles) {
                 if (role.contains(CarbonConstants.DOMAIN_SEPARATOR)) {
                     int index = role.indexOf(CarbonConstants.DOMAIN_SEPARATOR);
                     if (index > 0) {
                         String domain = role.substring(0, index);
                         if (UserCoreConstants.INTERNAL_DOMAIN.equalsIgnoreCase(domain)) {
                             for (String userRole : userRoles) {
-                                if (UserCoreConstants.INTERNAL_DOMAIN.equalsIgnoreCase(domain) &&
-                                        role.equalsIgnoreCase(userRole)) {
+                                if (role.equalsIgnoreCase(userRole)) {
                                     return true;
                                 }
 
