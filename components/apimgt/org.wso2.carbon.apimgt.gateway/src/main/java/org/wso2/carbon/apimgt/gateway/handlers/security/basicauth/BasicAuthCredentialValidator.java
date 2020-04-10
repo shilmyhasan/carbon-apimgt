@@ -263,25 +263,27 @@ public class BasicAuthCredentialValidator {
 
     /**
      * This method used to validate scopes which bind with internal roles.
+     *
      * @param resourceRoles allowed roles for resource
-     * @param userRoles roles of user
+     * @param userRoles     roles of user
      * @return
      */
     private boolean validateInternalUserRoles(String resourceRoles, String[] userRoles) {
         String[] seperatedRoles = resourceRoles.split(",");
         if (resourceRoles.contains(CarbonConstants.DOMAIN_SEPARATOR)) {
             for (String role : seperatedRoles) {
-                int index = role.indexOf(CarbonConstants.DOMAIN_SEPARATOR);
-                if (index > 0) {
-                    String domain = role.substring(0, index);
-                    if (UserCoreConstants.INTERNAL_DOMAIN.equalsIgnoreCase(domain)) {
-                        for (String userRole : userRoles) {
-                            if (UserCoreConstants.INTERNAL_DOMAIN.equalsIgnoreCase(domain) &&
-                                    role.equalsIgnoreCase(userRole)) {
-                                return true;
+                if (role.contains(CarbonConstants.DOMAIN_SEPARATOR)) {
+                    int index = role.indexOf(CarbonConstants.DOMAIN_SEPARATOR);
+                    if (index > 0) {
+                        String domain = role.substring(0, index);
+                        if (UserCoreConstants.INTERNAL_DOMAIN.equalsIgnoreCase(domain)) {
+                            for (String userRole : userRoles) {
+                                if (UserCoreConstants.INTERNAL_DOMAIN.equalsIgnoreCase(domain) &&
+                                        role.equalsIgnoreCase(userRole)) {
+                                    return true;
+                                }
 
                             }
-
                         }
                     }
                 }
