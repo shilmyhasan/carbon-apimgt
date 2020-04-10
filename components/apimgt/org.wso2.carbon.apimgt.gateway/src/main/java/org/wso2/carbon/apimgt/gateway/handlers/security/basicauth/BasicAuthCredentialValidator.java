@@ -266,7 +266,7 @@ public class BasicAuthCredentialValidator {
      *
      * @param resourceRoles allowed roles for resource
      * @param userRoles     roles of user
-     * @return
+     * @return true if one of userRoles match with any internal role of resource scope
      */
     private boolean validateInternalUserRoles(String resourceRoles, String[] userRoles) {
         String[] separatedRoles = resourceRoles.split(",");
@@ -281,7 +281,6 @@ public class BasicAuthCredentialValidator {
                                 if (role.equalsIgnoreCase(userRole)) {
                                     return true;
                                 }
-
                             }
                         }
                     }
