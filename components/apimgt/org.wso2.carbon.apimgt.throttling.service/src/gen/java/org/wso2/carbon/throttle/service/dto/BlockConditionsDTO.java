@@ -29,6 +29,9 @@ public class BlockConditionsDTO  {
   private List<String> custom = new ArrayList<String>();
 
   
+  private List<String> subscription = new ArrayList<String>();
+
+  
   /**
    **/
   @ApiModelProperty(value = "")
@@ -89,6 +92,18 @@ public class BlockConditionsDTO  {
   }
 
   
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("subscription")
+  public List<String> getSubscription() {
+    return subscription;
+  }
+  public void setSubscription(List<String> subscription) {
+    this.subscription = subscription;
+  }
+
+  
 
   @Override
   public String toString()  {
@@ -100,6 +115,7 @@ public class BlockConditionsDTO  {
     sb.append("  ip: ").append(ip).append("\n");
     sb.append("  user: ").append(user).append("\n");
     sb.append("  custom: ").append(custom).append("\n");
+    sb.append("  subscription: ").append(subscription).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

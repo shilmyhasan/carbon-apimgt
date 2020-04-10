@@ -39,6 +39,7 @@ public class ThrottleDataHolder {
     private Map<String, String> blockedApplicationConditionsMap = new ConcurrentHashMap<String, String>();
     private Map<String, String> blockedUserConditionsMap = new ConcurrentHashMap<String, String>();
     private Map<String, String> blockedIpConditionsMap = new ConcurrentHashMap<String, String>();
+    private Map<String, String> blockedSubscriptionConditionsMap = new ConcurrentHashMap<String, String>();
     private Map<String, String> keyTemplateMap = new ConcurrentHashMap<String, String>();
     private boolean isBlockingConditionsPresent = false;
     private boolean isKeyTemplatesPresent = false;
@@ -135,6 +136,11 @@ public class ThrottleDataHolder {
         blockedIpConditionsMap.put(name, value);
     }
 
+    public void addSubscriptionBlockingCondition(String name, String value) {
+        isBlockingConditionsPresent = true;
+        blockedSubscriptionConditionsMap.put(name, value);
+    }
+
     public void addUserBlockingConditionsFromMap(Map<String, String> data) {
         if(data.size() > 0) {
             blockedUserConditionsMap.putAll(data);
@@ -159,6 +165,13 @@ public class ThrottleDataHolder {
     public void addApplicationBlockingConditionsFromMap(Map<String, String> data) {
         if(data.size() > 0) {
             blockedApplicationConditionsMap.putAll(data);
+            isBlockingConditionsPresent = true;
+        }
+    }
+
+    public void addSubscriptionBlockingConditionsFromMap(Map<String, String> data) {
+        if(data.size() > 0) {
+            blockedSubscriptionConditionsMap.putAll(data);
             isBlockingConditionsPresent = true;
         }
     }
@@ -200,6 +213,15 @@ public class ThrottleDataHolder {
         }
     }
 
+    public void removeSubscriptionBlockingCondition(String name) {
+        blockedSubscriptionConditionsMap.remove(name);
+        if(isAnyBlockedMapContainsData()) {
+            isBlockingConditionsPresent = true;
+        } else {
+            isBlockingConditionsPresent = false;
+        }
+    }
+
     public void addKeyTemplate(String key, String value) {
         keyTemplateMap.put(key, value);
         isKeyTemplatesPresent = true;
@@ -226,11 +248,12 @@ public class ThrottleDataHolder {
     }
 
     public boolean isRequestBlocked(String apiBlockingKey, String applicationBlockingKey, String userBlockingKey,
-                                    String ipBlockingKey) {
+                                    String ipBlockingKey, String subscriptionBlockingKey) {
         return (blockedAPIConditionsMap.containsKey(apiBlockingKey) ||
                 blockedApplicationConditionsMap.containsKey(applicationBlockingKey) ||
                 blockedUserConditionsMap.containsKey(userBlockingKey) ||
-                blockedIpConditionsMap.containsKey(ipBlockingKey));
+                blockedIpConditionsMap.containsKey(ipBlockingKey)) ||
+                blockedSubscriptionConditionsMap.containsKey(subscriptionBlockingKey);
     }
 
     /**
@@ -278,7 +301,8 @@ public class ThrottleDataHolder {
 
     private boolean isAnyBlockedMapContainsData() {
         if (blockedAPIConditionsMap.size() > 0 || blockedIpConditionsMap.size() > 0
-                || blockedApplicationConditionsMap.size() > 0 || blockedUserConditionsMap.size() > 0) {
+                || blockedApplicationConditionsMap.size() > 0 || blockedUserConditionsMap.size() > 0
+                || blockedSubscriptionConditionsMap.size() > 0) {
             return true;
         }
         return false;
