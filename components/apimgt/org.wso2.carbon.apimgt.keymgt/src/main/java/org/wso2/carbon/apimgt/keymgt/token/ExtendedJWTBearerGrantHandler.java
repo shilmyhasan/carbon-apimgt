@@ -89,7 +89,9 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
         if (roles != null) {
             for (int i = 0 ; i< roles.size(); i++) {
                 String updatedRoleClaimValue = getUpdatedRoleClaimValue(identityProvider, roles.get(i).toString());
-                updatedRoles.add(updatedRoleClaimValue);
+                if(updatedRoleClaimValue != null) {
+                    updatedRoles.add(updatedRoleClaimValue);
+                }
             }
         }
 
