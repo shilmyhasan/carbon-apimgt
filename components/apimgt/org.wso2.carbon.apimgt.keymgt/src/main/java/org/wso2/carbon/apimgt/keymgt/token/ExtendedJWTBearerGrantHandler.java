@@ -18,12 +18,15 @@
 
 package org.wso2.carbon.apimgt.keymgt.token;
 
-import com.nimbusds.jwt.JWTClaimsSet;
+
+import com.nimbusds.jwt.ReadOnlyJWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import net.minidev.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.wso2.carbon.apimgt.keymgt.ScopesIssuer;
 import org.wso2.carbon.apimgt.keymgt.handlers.ResourceConstants;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
@@ -44,6 +47,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -59,51 +63,38 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
     @Override public boolean validateScope(OAuthTokenReqMessageContext tokReqMsgCtx) {
 
         SignedJWT signedJWT = null;
-        JWTClaimsSet claimsSet = null;
-        String[] roles = null;
+        ReadOnlyJWTClaimsSet claimsSet = null;
+        JSONArray roles = null;
         try {
             signedJWT = getSignedJWT(tokReqMsgCtx);
         } catch (IdentityOAuth2Exception e) {
-            log.error("Couldn't retrieve signed JWT:", e);
+            log.error("Couldn't retrieve signed JWT", e);
         }
-
-        if (signedJWT == null) {
-            log.error("No Valid Assertion was found for " + JWTConstants.OAUTH_JWT_BEARER_GRANT_TYPE);
-        } else {
-            claimsSet = getClaimSet(signedJWT);
-        }
-
+        claimsSet = getClaimSet(signedJWT);
         String jwtIssuer = claimsSet != null ? claimsSet.getIssuer() : null;
         String tenantDomain = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getTenantDomain();
 
         try {
             identityProvider = IdentityProviderManager.getInstance().getIdPByName(jwtIssuer, tenantDomain);
         } catch (IdentityProviderManagementException e) {
-            log.error("Couldn't initiate identity provider instance:", e);
+            log.error("Couldn't initiate identity provider instance", e);
         }
 
-        try {
-            roles = claimsSet != null ?
-                    claimsSet.getStringArrayClaim(identityProvider.getClaimConfig().getRoleClaimURI()) :
-                    null;
-        } catch (ParseException e) {
-            log.error("Couldn't retrieve roles:", e);
-        }
+        String roleClaim = identityProvider.getClaimConfig().getRoleClaimURI();
+        roles = claimsSet != null ?
+                (JSONArray)claimsSet.getClaim(roleClaim) :
+                null;
 
-        List<String> updatedRoles = new ArrayList<>();
+        List<String> updatedRoles = new ArrayList<String>();
         if (roles != null) {
-            for (String role : roles) {
-                String updatedRoleClaimValue = getUpdatedRoleClaimValue(identityProvider, role);
-                if (updatedRoleClaimValue != null) {
-                    updatedRoles.add(updatedRoleClaimValue);
-                } else {
-                    updatedRoles.add(role);
-                }
+            for (int i = 0 ; i< roles.size(); i++) {
+                String updatedRoleClaimValue = getUpdatedRoleClaimValue(identityProvider, roles.get(i).toString());
+                updatedRoles.add(updatedRoleClaimValue);
             }
         }
+
         AuthenticatedUser user = tokReqMsgCtx.getAuthorizedUser();
         Map<ClaimMapping, String> userAttributes = user.getUserAttributes();
-        String roleClaim = identityProvider.getClaimConfig().getRoleClaimURI();
         userAttributes
                 .put(ClaimMapping.build(roleClaim, roleClaim, null, false),
                         updatedRoles.toString().replace(" ", ""));
@@ -114,7 +105,7 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
     }
 
     /**
-     * Check the retireved roles against the role mappings in the IDP and return the updated roles
+     * Check the retrieved roles against the role mappings in the IDP and return the updated roles
      * @param identityProvider used to retrieve the role mappings
      * @param currentRoleClaimValue current roles received through the token
      * @return updated roles
@@ -131,7 +122,7 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
         PermissionsAndRoleConfig permissionAndRoleConfig = identityProvider.getPermissionAndRoleConfig();
         if (permissionAndRoleConfig != null && ArrayUtils.isNotEmpty(permissionAndRoleConfig.getRoleMappings())) {
             String[] receivedRoles = currentRoleClaimValue.split(FrameworkUtils.getMultiAttributeSeparator());
-            List<String> updatedRoleClaimValues = new ArrayList<>();
+            List<String> updatedRoleClaimValues = new ArrayList<String>();
             loop:
             for (String receivedRole : receivedRoles) {
                 for (RoleMapping roleMapping : permissionAndRoleConfig.getRoleMappings()) {
@@ -140,19 +131,14 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
                         continue loop;
                     }
                 }
-                if (!OAuthServerConfiguration.getInstance().isReturnOnlyMappedLocalRoles()) {
-                    updatedRoleClaimValues.add(receivedRole);
-                }
+                updatedRoleClaimValues.add(receivedRole);
             }
             if (!updatedRoleClaimValues.isEmpty()) {
                 return StringUtils.join(updatedRoleClaimValues, FrameworkUtils.getMultiAttributeSeparator());
             }
             return null;
         }
-        if (!OAuthServerConfiguration.getInstance().isReturnOnlyMappedLocalRoles()) {
-            return currentRoleClaimValue;
-        }
-        return null;
+        return currentRoleClaimValue;
     }
 
     /**
@@ -160,8 +146,8 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
      * @param signedJWT JWT token
      * @return JWTClaimsSet Object
      */
-    private JWTClaimsSet getClaimSet(SignedJWT signedJWT) {
-        JWTClaimsSet claimsSet = null;
+    private ReadOnlyJWTClaimsSet getClaimSet(SignedJWT signedJWT) {
+        ReadOnlyJWTClaimsSet claimsSet = null;
         try {
             claimsSet = signedJWT.getJWTClaimsSet();
         } catch (ParseException e) {
@@ -187,7 +173,8 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
             }
         }
         if (StringUtils.isEmpty(assertion)) {
-            return null;
+            String errorMessage = "Error while retrieving assertion";
+            throw new IdentityOAuth2Exception(errorMessage);
         }
 
         try {
