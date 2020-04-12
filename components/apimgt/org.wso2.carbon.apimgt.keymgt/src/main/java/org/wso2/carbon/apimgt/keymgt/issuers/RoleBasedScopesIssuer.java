@@ -140,8 +140,12 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
                         && !(Boolean.parseBoolean(isValidateScopeRolesFromUserStore))) {
                     AuthenticatedUser user = tokReqMsgCtx.getAuthorizedUser();
                     Map<ClaimMapping, String> userAttributes = user.getUserAttributes();
-                    userRoles = getRolesFromUserAttribute(userAttributes,
-                            tokReqMsgCtx.getProperty(ResourceConstants.ROLE_CLAIM).toString());
+                    if (tokReqMsgCtx.getProperty(ResourceConstants.ROLE_CLAIM) != null) {
+                        userRoles = getRolesFromUserAttribute(userAttributes,
+                                tokReqMsgCtx.getProperty(ResourceConstants.ROLE_CLAIM).toString());
+                    } else {
+                        userRoles = new String[0];
+                    }
                 } else {
                     userRoles = userStoreManager.getRoleListOfUser(endUsernameWithDomain);
                 }
