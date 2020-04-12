@@ -36,10 +36,19 @@ import ApiKey from '../ApiKey';
 const styles = (theme) => ({
     root: {
         padding: theme.spacing(3),
+        '& span, & h5, & label, & input': {
+            color: theme.palette.getContrastText(theme.palette.background.paper),
+        },
+    },
+    dialog: {
+        '& span, & h2, & label': {
+            color: theme.palette.getContrastText(theme.palette.background.paper),
+        },
     },
     button: {
-        marginLeft: theme.spacing(5),
-        padding: '10px',
+        '& span': {
+            color: theme.palette.getContrastText(theme.palette.primary.main),
+        }
     },
     tokenSection: {
         marginTop: theme.spacing(2),
@@ -147,6 +156,7 @@ class ApiKeyManager extends React.Component {
                                     variant='contained'
                                     color='primary'
                                     onClick={this.handleClickOpen}
+                                    className={classes.button}
                                 >
                                     {'Generate Key'}
                                 </Button>
@@ -161,7 +171,7 @@ class ApiKeyManager extends React.Component {
                         </Grid>
                     </Grid>
                 </FormGroup>
-                <Dialog open={open} onClose={this.handleClose} aria-labelledby='form-dialog-title'>
+                <Dialog open={open} onClose={this.handleClose} aria-labelledby='form-dialog-title' className={classes.dialog}>
                     <DialogTitle id='responsive-dialog-title' className={classes.dialogTitle}>
                         {'Generate API Key'}
                     </DialogTitle>
@@ -178,7 +188,13 @@ class ApiKeyManager extends React.Component {
                     </DialogContent>
                     <DialogActions>
                         {!showToken && (
-                            <Button onClick={() => this.generateKeys(selectedApp, keyType)} disabled={!accessTokenRequest.timeout} color='primary'>
+                            <Button 
+                                onClick={() => this.generateKeys(selectedApp, keyType)} 
+                                disabled={!accessTokenRequest.timeout} 
+                                color='primary'
+                                variant='contained'
+                                className={classes.button}
+                                >
                                 <FormattedMessage
                                     id='Shared.AppsAndKeys.ViewKeys.consumer.generate.btn'
                                     defaultMessage='Generate'

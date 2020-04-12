@@ -4,10 +4,17 @@ import Grid from '@material-ui/core/Grid';
 import MenuItem from '@material-ui/core/MenuItem';
 import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = (theme) => ({
+    menuItem: {
+        color: theme.palette.getContrastText(theme.palette.background.paper),
+    },
+});
 
 const SelectAppPanel = (props) => {
     const {
-        subscriptions, handleChanges, selectedApplication, selectedKeyType,
+        subscriptions, handleChanges, selectedApplication, selectedKeyType, classes,
     } = props;
     return (
         <React.Fragment>
@@ -35,7 +42,7 @@ const SelectAppPanel = (props) => {
                             variant='outlined'
                         >
                             {subscriptions.map(sub => (
-                                <MenuItem value={sub.applicationInfo.applicationId} key={sub.applicationInfo.applicationId}>
+                                <MenuItem value={sub.applicationInfo.applicationId} key={sub.applicationInfo.applicationId} className={classes.menuItem}>
                                     {sub.applicationInfo.name}
                                 </MenuItem>
                             ))}
@@ -63,14 +70,14 @@ const SelectAppPanel = (props) => {
                             variant='outlined'
                         >
                             {(subscriptions != null && subscriptions.find(sub => sub.applicationId === selectedApplication).status === 'UNBLOCKED') &&
-                            <MenuItem value='PRODUCTION'>
+                            <MenuItem value='PRODUCTION' className={classes.menuItem}>
                                 <FormattedMessage
                                     id='Apis.Details.ApiConsole.SelectAppPanel.production'
                                     defaultMessage='PRODUCTION'
                                 />
                             </MenuItem>
                             }
-                            <MenuItem value='SANDBOX'>
+                            <MenuItem value='SANDBOX' className={classes.menuItem}>
                                 <FormattedMessage
                                     id='Apis.Details.ApiConsole.SelectAppPanel.sandbox'
                                     defaultMessage='SANDBOX'
@@ -85,4 +92,4 @@ const SelectAppPanel = (props) => {
     );
 };
 
-export default SelectAppPanel;
+export default withStyles(styles)(SelectAppPanel);

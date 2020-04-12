@@ -62,6 +62,9 @@ const styles = (theme) => ({
     paper: {
         margin: theme.spacing(1),
         padding: theme.spacing(1),
+        '& span, & h5, & label, & td, & li, & div, & input': {
+            color: theme.palette.getContrastText(theme.palette.background.paper),
+        },
     },
     grid: {
         marginTop: theme.spacing(4),
@@ -76,6 +79,7 @@ const styles = (theme) => ({
         marginLeft: theme.spacing(2),
         paddingTop: theme.spacing(2),
         paddingBottom: theme.spacing(2),
+        color: theme.palette.getContrastText(theme.palette.background.default),
     },
     usernameField: {
         width: '100%',
@@ -83,6 +87,12 @@ const styles = (theme) => ({
     passwordField: {
         width: '100%',
         marginLeft: theme.spacing(1),
+    },
+    menuItem: {
+        color: theme.palette.getContrastText(theme.palette.background.paper),
+    },
+    swaggerUIPaper: {
+        backgroundColor: theme.custom.apiDetailPages.swaggerUIBackground,
     },
 });
 /**
@@ -475,7 +485,7 @@ class ApiConsole extends React.Component {
                                                 variant='outlined'
                                             >
                                                 {environments && environments.length > 0 && (
-                                                    <MenuItem value='' disabled>
+                                                    <MenuItem value='' disabled className={classes.menuItem}>
                                                         <em>
                                                             <FormattedMessage
                                                                 id='api.gateways'
@@ -486,12 +496,12 @@ class ApiConsole extends React.Component {
                                                 )}
                                                 {environments && (
                                                     environments.map((env) => (
-                                                        <MenuItem value={env} key={env}>
+                                                        <MenuItem value={env} key={env} className={classes.menuItem}>
                                                             {env}
                                                         </MenuItem>
                                                     )))}
                                                 {labels && labels.length > 0 && (
-                                                    <MenuItem value='' disabled>
+                                                    <MenuItem value='' disabled className={classes.menuItem}>
                                                         <em>
                                                             <FormattedMessage
                                                                 id='micro.gateways'
@@ -502,7 +512,11 @@ class ApiConsole extends React.Component {
                                                 )}
                                                 {labels && (
                                                     labels.map((label) => (
-                                                        <MenuItem value={label} key={label}>
+                                                        <MenuItem
+                                                            value={label}
+                                                            key={label}
+                                                            className={classes.menuItem}
+                                                        >
                                                             {label}
                                                         </MenuItem>
                                                     ))
@@ -639,7 +653,7 @@ class ApiConsole extends React.Component {
                         </Grid>
                     </Grid>
                 </Paper>
-                <Paper className={classes.paper}>
+                <Paper className={classes.swaggerUIPaper}>
                     <SwaggerUI
                         api={this.state.api}
                         accessTokenProvider={this.accessTokenProvider}
