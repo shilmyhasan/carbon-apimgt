@@ -323,7 +323,6 @@ public class APIManagerConfiguration {
             } else if (APIConstants.WorkflowConfigConstants.WORKFLOW.equals(localName)){
                 setWorkflowProperties(serverConfig);
             } else if (APIConstants.ApiKeyValidator.KEY_VALIDATION_HANDLER.equals(localName)) {
-                log.info("KeyValidationHandler");
                 setKeyValidationHandlerProperties(element);
             }
             readChildElements(element, nameStack);
