@@ -20,14 +20,18 @@ package org.wso2.carbon.apimgt.keymgt.model.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
-import org.wso2.carbon.apimgt.keymgt.model.*;
+import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
+import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataLoader;
 import org.wso2.carbon.apimgt.keymgt.model.dao.SubscriptionLoadingDao;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.exception.DataLoadingException;
 import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A Subscription Data Loader that loads data from DB
@@ -38,32 +42,63 @@ public class DbDataLoader implements SubscriptionDataLoader, KeyValidatorConfigI
 
 
     @Override
-    public List<Subscription> loadAllSubscriptions() throws APIManagementException {
+    public List<Subscription> loadAllSubscriptions() throws DataLoadingException {
         return SubscriptionLoadingDao.getInstance().getAllSubscriptions();
     }
 
     @Override
-    public List<Application> loadAllApplications() throws APIManagementException {
+    public List<Application> loadAllApplications() throws DataLoadingException {
         return SubscriptionLoadingDao.getInstance().getAllApplications();
     }
 
     @Override
-    public List<ApplicationKeyMapping> loadAllKeyMappings() throws APIManagementException {
+    public List<ApplicationKeyMapping> loadAllKeyMappings() throws DataLoadingException {
         return SubscriptionLoadingDao.getInstance().getAllApplicationKeyMappings();
     }
 
     @Override
-    public List<API> loadAllApis() throws APIManagementException {
-        return SubscriptionLoadingDao.getInstance().getAllApis();
+    public List<Api> loadAllApis() throws DataLoadingException {
+        Map<Integer, Api> apiMap = SubscriptionLoadingDao.getInstance().getAllApis();
+        Map<String, Resource> resourceMap = SubscriptionLoadingDao.getInstance().getApiUrlMappings();
+        for (Resource resource : resourceMap.values()) {
+            Api api = apiMap.get(resource.getApiId());
+            if (api != null) {
+                api.addResource(resource);
+            } else {
+                log.error("Api not found for Id : " + resource.getApiId());
+            }
+        }
+        return Arrays.asList(apiMap.values().toArray(new Api[]{}));
     }
 
     @Override
-    public List<Policy> loadAllPolicies() throws APIManagementException {
-        return SubscriptionLoadingDao.getInstance().getAllPolicies();
+    public List<SubscriptionPolicy> loadAllSubscriptionPolicies() throws DataLoadingException {
+        return SubscriptionLoadingDao.getInstance().getAllSubscriptionPolicies();
+    }
+
+    @Override
+    public List<ApiPolicy> loadAllApiPolicies() throws DataLoadingException {
+        Map<Integer, ApiPolicy> apiPolicyMap =
+                SubscriptionLoadingDao.getInstance().getAllApiPolicies();
+        Map<Integer, Set<ApiPolicyConditionGroup>> conditionGroups =
+                SubscriptionLoadingDao.getInstance().getApiPolicyConditionGroups();
+
+        for (Map.Entry<Integer, Set<ApiPolicyConditionGroup>> conditionGroupEntry :
+                conditionGroups.entrySet()) {
+            ApiPolicy policy = apiPolicyMap.get(conditionGroupEntry.getKey());
+            policy.setConditionGroups(conditionGroupEntry.getValue());
+        }
+
+        return Arrays.asList(apiPolicyMap.values().toArray(new ApiPolicy[]{}));
+    }
+
+    @Override
+    public List<ApplicationPolicy> loadAllAppPolicies() throws DataLoadingException {
+        return SubscriptionLoadingDao.getInstance().getAllApplicationPolicies();
     }
 
     @Override
     public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
-
+        // Currently this class doesn't have any configs.
     }
 }

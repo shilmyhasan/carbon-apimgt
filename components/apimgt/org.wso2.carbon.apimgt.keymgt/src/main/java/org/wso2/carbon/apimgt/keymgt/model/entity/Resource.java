@@ -20,29 +20,31 @@ package org.wso2.carbon.apimgt.keymgt.model.entity;
 
 import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 
-public class API implements CachableEntity<String> {
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Resource implements CachableEntity<String> {
+
+    private String urlPattern;
 
     private int apiId;
-    private String apiProvider;
-    private String apiName;
-    private String apiVersion;
-    private String context;
-    private String apiTier;
 
-    public String getContext() {
-        return context;
+    private Map<String, Verb> httpVerbs;
+
+    public Resource() {
+        httpVerbs = new HashMap<>();
     }
 
-    public void setContext(String context) {
-        this.context = context;
+    public Resource(int apiId, String urlPattern) {
+        this();
+        this.apiId = apiId;
+        this.urlPattern = urlPattern;
     }
 
-    public String getApiTier() {
-        return apiTier;
-    }
-
-    public void setApiTier(String apiTier) {
-        this.apiTier = apiTier;
+    public List<Verb> getAllVerbs() {
+        return Arrays.asList(httpVerbs.values().toArray(new Verb[]{}));
     }
 
     public int getApiId() {
@@ -53,31 +55,24 @@ public class API implements CachableEntity<String> {
         this.apiId = apiId;
     }
 
-    public String getApiProvider() {
-        return apiProvider;
+    public String getUrlPattern() {
+        return urlPattern;
     }
 
-    public void setApiProvider(String apiProvider) {
-        this.apiProvider = apiProvider;
+    public void setUrlPattern(String urlPattern) {
+        this.urlPattern = urlPattern;
     }
 
-    public String getApiName() {
-        return apiName;
+    public void addVerb(Verb resourceVerb) {
+        httpVerbs.put(resourceVerb.getHttpVerb(), resourceVerb);
     }
 
-    public void setApiName(String apiName) {
-        this.apiName = apiName;
+    public Verb getVerb(String httpVerb) {
+        return httpVerbs.get(httpVerb);
     }
 
-    public String getApiVersion() {
-        return apiVersion;
-    }
-
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
-    }
-
+    @Override
     public String getCacheKey() {
-        return context + "." + apiVersion;
+        return urlPattern + "." + apiId;
     }
 }

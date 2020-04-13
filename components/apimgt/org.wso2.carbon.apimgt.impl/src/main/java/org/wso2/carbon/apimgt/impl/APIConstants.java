@@ -510,6 +510,7 @@ public final class APIConstants {
     public static final String OPEN_ID_SCOPE_NAME = "openid";
     public static final String API_KEY_MANGER_VALIDATIONHANDLER_CLASS_NAME = API_KEY_VALIDATOR
             + "KeyValidationHandlerClassName";
+    public static final String URL_TEMPLATE_LOADER = API_KEY_VALIDATOR + "UriTemplateLoader";
 
 
     public static class ApiKeyValidator{

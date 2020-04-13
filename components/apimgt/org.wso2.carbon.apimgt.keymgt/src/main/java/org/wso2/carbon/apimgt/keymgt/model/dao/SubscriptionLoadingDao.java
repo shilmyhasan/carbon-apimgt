@@ -21,12 +21,15 @@ package org.wso2.carbon.apimgt.keymgt.model.dao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.dto.ConditionGroupDTO;
+import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.exception.DataLoadingException;
 
+import java.io.InputStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.wso2.carbon.apimgt.impl.utils.APIUtil.handleException;
 
@@ -56,7 +59,7 @@ public class SubscriptionLoadingDao {
     }
 
 
-    public List<Subscription> getAllSubscriptions() throws APIManagementException {
+    public List<Subscription> getAllSubscriptions() throws DataLoadingException {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
@@ -89,7 +92,7 @@ public class SubscriptionLoadingDao {
         return subscriptions;
     }
 
-    public List<Application> getAllApplications() throws APIManagementException {
+    public List<Application> getAllApplications() throws DataLoadingException {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
@@ -125,7 +128,7 @@ public class SubscriptionLoadingDao {
         return applications;
     }
 
-    public List<ApplicationKeyMapping> getAllApplicationKeyMappings() throws APIManagementException {
+    public List<ApplicationKeyMapping> getAllApplicationKeyMappings() throws DataLoadingException {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
@@ -159,11 +162,11 @@ public class SubscriptionLoadingDao {
     }
 
 
-    public List<API> getAllApis() throws APIManagementException {
+    public Map<Integer, Api> getAllApis() throws DataLoadingException {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        ArrayList<API> apis = null;
+        Map<Integer, Api> apiMap = null;
         try {
 
             conn = APIMgtDBUtil.getConnection();
@@ -171,17 +174,17 @@ public class SubscriptionLoadingDao {
             String query = SubscriptionConstants.API_LOAD_SQL;
             ps = conn.prepareStatement(query);
             resultSet = ps.executeQuery();
-            apis = new ArrayList<API>();
+            apiMap = new HashMap<>();
 
             while (resultSet.next()) {
-                API api = new API();
+                Api api = new Api();
                 api.setApiId(resultSet.getInt("API_ID"));
                 api.setApiProvider(resultSet.getString("API_PROVIDER"));
                 api.setApiName(resultSet.getString("API_NAME"));
                 api.setApiTier(resultSet.getString("API_TIER"));
                 api.setApiVersion(resultSet.getString("API_VERSION"));
                 api.setContext(resultSet.getString("CONTEXT"));
-                apis.add(api);
+                apiMap.put(api.getApiId(),api);
             }
 
         } catch (SQLException e) {
@@ -190,38 +193,38 @@ public class SubscriptionLoadingDao {
             APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
 
-        return apis;
+        return apiMap;
     }
 
-
-    public List<Policy> getAllPolicies() throws APIManagementException {
+    public List<SubscriptionPolicy> getAllSubscriptionPolicies() throws DataLoadingException {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet resultSet = null;
-        ArrayList<Policy> policies = null;
+        ArrayList<SubscriptionPolicy> policies = null;
         try {
 
             conn = APIMgtDBUtil.getConnection();
 
-            String query = SubscriptionConstants.POLICY_LOAD_SQL;
+            String query = SubscriptionConstants.SUB_POLICY_LOAD_SQL;
 
             ps = conn.prepareStatement(query);
             resultSet = ps.executeQuery();
-            policies = new ArrayList<Policy>();
+            policies = new ArrayList<SubscriptionPolicy>();
 
             while (resultSet.next()) {
-                Policy policy = new Policy();
+                SubscriptionPolicy policy = new SubscriptionPolicy();
                 policy.setPolicyId(resultSet.getInt("POLICY_ID"));
                 policy.setTierName(resultSet.getString("NAME"));
-                policy.setCount(resultSet.getInt("RATE_LIMIT_COUNT"));
-                policy.setUnitTime(resultSet.getString("RATE_LIMIT_TIME_UNIT"));
+                policy.setQuotaType(resultSet.getString("QUOTA_TYPE"));
+                policy.setRateLimitCount(resultSet.getInt("RATE_LIMIT_COUNT"));
+                policy.setRateLimitTimeUnit(resultSet.getString("RATE_LIMIT_TIME_UNIT"));
                 policy.setTenantId(resultSet.getInt("TENANT_ID"));
                 policy.setStopOnQuotaReach(resultSet.getBoolean("STOP_ON_QUOTA_REACH"));
                 policies.add(policy);
             }
 
         } catch (SQLException e) {
-            handleException("Error in loading Applications : " + e.getMessage(), e);
+            handleException("Error in loading Subscriptions : " + e.getMessage(), e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
@@ -229,5 +232,162 @@ public class SubscriptionLoadingDao {
         return policies;
     }
 
+    public List<ApplicationPolicy> getAllApplicationPolicies() throws DataLoadingException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet resultSet = null;
+        ArrayList<ApplicationPolicy> policies = null;
+        try {
+
+            conn = APIMgtDBUtil.getConnection();
+
+            String query = SubscriptionConstants.APP_POLICY_LOAD_SQL;
+
+            ps = conn.prepareStatement(query);
+            resultSet = ps.executeQuery();
+            policies = new ArrayList<ApplicationPolicy>();
+
+            while (resultSet.next()) {
+                ApplicationPolicy policy = new ApplicationPolicy();
+                policy.setPolicyId(resultSet.getInt("POLICY_ID"));
+                policy.setTierName(resultSet.getString("NAME"));
+                policy.setQuotaType(resultSet.getString("QUOTA_TYPE"));
+                policy.setTenantId(resultSet.getInt("TENANT_ID"));
+                policies.add(policy);
+            }
+
+        } catch (SQLException e) {
+            handleException("Error in loading Subscriptions : " + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+
+        return policies;
+    }
+
+    public Map<Integer, Set<ApiPolicyConditionGroup>> getApiPolicyConditionGroups()  throws DataLoadingException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet resultSet = null;
+        Map<Integer,Set<ApiPolicyConditionGroup>> policyMap = null;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            String query = SubscriptionConstants.API_POLICY_CONDITION_LOAD_SQL;
+
+            ps = conn.prepareStatement(query);
+            resultSet = ps.executeQuery();
+            policyMap = new HashMap<Integer, Set<ApiPolicyConditionGroup>>();
+
+            while (resultSet.next()) {
+                ApiPolicyConditionGroup policyConditionGroup = new ApiPolicyConditionGroup();
+                policyConditionGroup.setConditionGroupId(resultSet.getInt("CONDITION_GROUP_ID"));
+                policyConditionGroup.setPolicyId(resultSet.getInt("POLICY_ID"));
+                policyConditionGroup.setQuotaType(resultSet.getString("QUOTA_TYPE"));
+                Set<ApiPolicyConditionGroup> conditionGroups =
+                        policyMap.get(policyConditionGroup.getPolicyId());
+                ConditionGroupDTO groupDTO =
+                        ApiMgtDAO.getInstance().createConditionGroupDTO(policyConditionGroup.getConditionGroupId());
+                policyConditionGroup.
+                        setConditionDTOS(new HashSet<>(Arrays.asList(groupDTO.getConditions())));
+                if(conditionGroups == null) {
+                    conditionGroups = new HashSet<>();
+                    conditionGroups.add(policyConditionGroup);
+                    policyMap.put(policyConditionGroup.getPolicyId(),conditionGroups);
+                } else {
+                    conditionGroups.add(policyConditionGroup);
+                }
+            }
+
+        } catch (SQLException e) {
+            handleException("Error in loading Subscriptions : " + e.getMessage(), e);
+        } catch (APIManagementException e) {
+            handleException("Error while creating ConditionGroups : " + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+        return policyMap;
+    }
+
+    public Map<String, Resource> getApiUrlMappings()  throws DataLoadingException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet resultSet = null;
+        Map<String,Resource> resourceMap = null;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            String query = SubscriptionConstants.API_URL_MAPPING_LOAD_SQL;
+
+            ps = conn.prepareStatement(query);
+            resultSet = ps.executeQuery();
+            resourceMap = new HashMap<String, Resource>();
+
+            while (resultSet.next()) {
+                String urlMapping = resultSet.getString("URL_PATTERN");
+                int apiId = resultSet.getInt("API_ID");
+                Resource resource = new Resource(apiId,urlMapping);
+                Resource cachedResource = resourceMap.get(resource.getCacheKey());
+                if(cachedResource == null){
+                    resourceMap.put(resource.getCacheKey(),resource);
+                    cachedResource = resource;
+                }
+                Verb verb = new Verb();
+                verb.setVerbId(resultSet.getInt("URL_MAPPING_ID"));
+                verb.setAuthType(resultSet.getString("AUTH_SCHEME"));
+                verb.setHttpVerb(resultSet.getString("HTTP_METHOD"));
+                verb.setThrottlingTier(resultSet.getString("THROTTLING_TIER"));
+
+                InputStream mediationScriptBlob = resultSet.getBinaryStream("MEDIATION_SCRIPT");
+                if (mediationScriptBlob != null) {
+                    verb.setScript(APIMgtDBUtil.getStringFromInputStream(mediationScriptBlob));
+                }
+                cachedResource.addVerb(verb);
+            }
+
+        } catch (SQLException e) {
+            handleException("Error in loading Subscriptions : " + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+        return resourceMap;
+    }
+
+    public Map<Integer,ApiPolicy> getAllApiPolicies() throws DataLoadingException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet resultSet = null;
+        Map<Integer,ApiPolicy> policyMap = null;
+        try {
+
+            conn = APIMgtDBUtil.getConnection();
+            String query = SubscriptionConstants.API_POLICY_LOAD_SQL;
+
+            ps = conn.prepareStatement(query);
+            resultSet = ps.executeQuery();
+            policyMap = new HashMap<Integer, ApiPolicy>();
+
+            while (resultSet.next()) {
+                ApiPolicy policy = new ApiPolicy();
+                policy.setPolicyId(resultSet.getInt("POLICY_ID"));
+                policy.setTierName(resultSet.getString("NAME"));
+                policy.setQuotaType(resultSet.getString("DEFAULT_QUOTA_TYPE"));
+                policy.setTenantId(resultSet.getInt("TENANT_ID"));
+                policyMap.put(policy.getPolicyId(),policy);
+            }
+
+        } catch (SQLException e) {
+            handleException("Error in loading Subscriptions : " + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+
+        return policyMap;
+    }
+
+    public static void handleException(String msg, Throwable t) throws DataLoadingException {
+        log.error(msg, t);
+        throw new DataLoadingException(msg, t);
+    }
 
 }

@@ -47,16 +47,26 @@ public class SubscriptionConstants {
                     " FROM " +
                     "   AM_SUBSCRIPTION AS SUB";
 
-    public static final String POLICY_LOAD_SQL =
+    public static final String SUB_POLICY_LOAD_SQL =
             "SELECT " +
                     "   POLICY_ID," +
                     "   NAME," +
                     "   RATE_LIMIT_COUNT," +
                     "   RATE_LIMIT_TIME_UNIT," +
+                    "   QUOTA_TYPE," +
                     "   STOP_ON_QUOTA_REACH, " +
                     "   TENANT_ID " +
                     "FROM " +
                     "   AM_POLICY_SUBSCRIPTION";
+
+    public static final String APP_POLICY_LOAD_SQL =
+            "SELECT " +
+                    "   POLICY_ID," +
+                    "   NAME," +
+                    "   QUOTA_TYPE," +
+                    "   TENANT_ID " +
+                    "FROM " +
+                    "   AM_POLICY_APPLICATION";
 
 
     public static final String API_LOAD_SQL =
@@ -69,6 +79,35 @@ public class SubscriptionConstants {
                     " CONTEXT " +
                     " FROM "+
                     "   AM_API";
+
+    public static final String API_URL_MAPPING_LOAD_SQL =
+            "SELECT " +
+                    " URL_MAPPING_ID," +
+                    " API_ID," +
+                    " HTTP_METHOD," +
+                    " AUTH_SCHEME," +
+                    " URL_PATTERN," +
+                    " THROTTLING_TIER, " +
+                    " MEDIATION_SCRIPT " +
+                    " FROM "+
+                    "   AM_API_URL_MAPPING";
+
+    public static final String API_POLICY_CONDITION_LOAD_SQL =
+            "SELECT " +
+                    "CONDITION_GROUP_ID," +
+                    "POLICY_ID," +
+                    "QUOTA_TYPE " +
+                    "   FROM " +
+                    "       AM_CONDITION_GROUP;";
+
+    public static final String API_POLICY_LOAD_SQL =
+            "SELECT " +
+                    "POLICY_ID," +
+                    "NAME," +
+                    "TENANT_ID," +
+                    "DEFAULT_QUOTA_TYPE" +
+                    " FROM " +
+                    "   AM_API_THROTTLE_POLICY";
 
     public static final String AM_KEY_MAPPING =
             "SELECT "+

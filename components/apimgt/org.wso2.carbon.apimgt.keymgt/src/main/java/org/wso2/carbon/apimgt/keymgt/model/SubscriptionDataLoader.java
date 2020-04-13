@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.model;
 
-import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.exception.DataLoadingException;
+import org.wso2.carbon.apimgt.keymgt.model.impl.DbDataLoader;
 
 import java.util.List;
 
@@ -32,38 +33,59 @@ public interface SubscriptionDataLoader {
 
     /**
      * Loads all Subscriptions from underlying Storage.
+     *
      * @return A list of all {@link Subscription} objects at the time of calling.
-     * @throws APIManagementException
+     * @throws DataLoadingException
      */
-    public List<Subscription> loadAllSubscriptions() throws APIManagementException;
+    public List<Subscription> loadAllSubscriptions() throws DataLoadingException;
 
     /**
      * Load all Applications from the Database belonging to all Tenants
+     *
      * @return A list of all {@link Application}s.
-     * @throws APIManagementException
+     * @throws DataLoadingException
      */
-    public List<Application> loadAllApplications() throws APIManagementException;
+    public List<Application> loadAllApplications() throws DataLoadingException;
 
     /**
      * Load all Key Mappings (Mapping between the Consumer Key and Application) from the Database
      * owned by all tenants
-     * @return A list of {@link ApplicationKeyMapping}s
-     * @throws APIManagementException
-     */
-    public List<ApplicationKeyMapping> loadAllKeyMappings() throws APIManagementException;
-
-    /**
-     * Load all {@link API} objects owned by all Tenants.
-     * @return
-     * @throws APIManagementException
-     */
-    public List<API> loadAllApis() throws APIManagementException;
-
-    /**
      *
-     * @return
-     * @throws APIManagementException
+     * @return A list of {@link ApplicationKeyMapping}s
+     * @throws DataLoadingException
      */
-    public List<Policy> loadAllPolicies() throws APIManagementException;
+    public List<ApplicationKeyMapping> loadAllKeyMappings() throws DataLoadingException;
+
+    /**
+     * Load all {@link Api} objects owned by all Tenants.
+     *
+     * @return A list of {@link Api}
+     * @throws DataLoadingException
+     */
+    public List<Api> loadAllApis() throws DataLoadingException;
+
+    /**
+     * Load All Subscription Throttling Policies.
+     *
+     * @return A list of Subscription Throttling Policies.
+     * @throws DataLoadingException
+     */
+    public List<SubscriptionPolicy> loadAllSubscriptionPolicies() throws DataLoadingException;
+
+    /**
+     * Loads All Api Throttling Policies.
+     *
+     * @return A list of Api  Throttling Policies.
+     * @throws DataLoadingException
+     */
+    public List<ApiPolicy> loadAllApiPolicies() throws DataLoadingException;
+
+    /**
+     * Loads All Application Throttling Policies.
+     *
+     * @return A list of Api Throttling Policies.
+     * @throws DataLoadingException
+     */
+    public List<ApplicationPolicy> loadAllAppPolicies() throws DataLoadingException;
 
 }

@@ -28,12 +28,14 @@ import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
+import org.wso2.carbon.apimgt.keymgt.internal.RegistrationHolder;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
 import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
 import org.wso2.carbon.apimgt.keymgt.model.impl.MapBasedInMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,12 +48,112 @@ import java.util.List;
 public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationHandler implements KeyValidatorConfigInitializable {
 
     private static final Log log = LogFactory.getLog(InMemorySubscriptionValidationHandler.class);
+    public static final String API_LEVEL_THROTTLING_KEY = "api_level_throttling_key";
     private InMemorySubscriptionStore inMemoryStore = null;
+
+    @Override
+    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
+        InMemorySubscriptionValidationHandlerConfig inMemoryConfig = (InMemorySubscriptionValidationHandlerConfig) config;
+        String subscriptionStoreClass =
+                inMemoryConfig.getSubscriptionStoreConfig().getImplementingClass();
+        try {
+            this.inMemoryStore = (MapBasedInMemorySubscriptionStore)
+                    APIUtil.getClassForName(subscriptionStoreClass.trim()).getDeclaredConstructor().newInstance();
+
+            RegistrationHolder.getInstance().registerInstance(InMemorySubscriptionStore.class.getName(),
+                    this.inMemoryStore);
+
+            if (this.inMemoryStore instanceof KeyValidatorConfigInitializable) {
+                ((KeyValidatorConfigInitializable) this.inMemoryStore).initialise(inMemoryConfig.getSubscriptionStoreConfig());
+
+            }
+        } catch (InitialisationException e) {
+            log.error("Error occurred while instantiating in MemoryStore", e);
+            throw new InitialisationException(e);
+        } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException |
+                IllegalAccessException | InvocationTargetException e) {
+            log.error("Error occurred while instantiating " + subscriptionStoreClass, e);
+            throw new InitialisationException(e);
+        }
+    }
 
     @Override
     public boolean validateSubscription(TokenValidationContext validationContext) throws APIKeyMgtException {
         log.debug("Inside validateSubscription");
 
+        boolean state = validateResourceAuthenticationScheme(validationContext);
+
+        if(!state){
+            return false;
+        }
+
+        APIKeyValidationInfoDTO dto = validationContext.getValidationInfoDTO();
+
+        ApplicationKeyMapping mapping =
+                inMemoryStore.getKeyMappingByConsumerKey(validationContext.getTokenInfo().getConsumerKey());
+
+        if (mapping == null) {
+            setForNonExistentSubscription(validationContext);
+            return false;
+        }
+
+        Application application =
+                inMemoryStore.getApplicationById(mapping.getApplicationId());
+
+        if (application == null) {
+            setForNonExistentSubscription(validationContext);
+            return false;
+        }
+
+        Api api = inMemoryStore.getApiByContextAndVersion(validationContext.getContext(),
+                validationContext.getVersion());
+
+        if (api == null) {
+            setForNonExistentSubscription(validationContext);
+            return false;
+        }
+
+        Subscription subscription = inMemoryStore.getSubscriptionByApiAndApplication(application,
+                api);
+
+        if (subscription == null) {
+            setForNonExistentSubscription(validationContext);
+            return false;
+        }
+
+        String subscriptionStatus = subscription.getSubscriptionState();
+        String keyType = mapping.getKeyType();
+
+        state = validateAndSetSubscriptionStatus(subscriptionStatus,keyType,dto);
+
+        if(!state){
+            return false;
+        }
+
+        dto.setTier(subscription.getTierName());
+        dto.setSubscriber(application.getSubName());
+        dto.setApplicationId(Integer.toString(application.getAppId()));
+        dto.setApiName(api.getApiName());
+        dto.setApiPublisher(api.getApiProvider());
+        dto.setApplicationName(application.getAppName());
+        dto.setApplicationTier(application.getAppTier());
+        dto.setType(keyType);
+
+        if (APIUtil.isAdvanceThrottlingEnabled()) {
+            state = validateAndSetAdvancedThrottlingTiers(validationContext.getMatchingResource(),
+                    validationContext.getHttpVerb(),
+                    dto, api, subscription, application);
+        }
+
+        if(!state){
+            setForNonExistentSubscription(validationContext);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateResourceAuthenticationScheme(TokenValidationContext validationContext){
 
         if (validationContext == null || validationContext.getValidationInfoDTO() == null) {
             return false;
@@ -81,44 +183,87 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
                 return false;
             }
         }
+        return true;
+    }
 
-        boolean state = false;
+    /**
+     * Method to set errors if the subscription is not existing.
+     *
+     * @param validationContext
+     */
+    private void setForNonExistentSubscription(TokenValidationContext validationContext) {
+        validationContext.getValidationInfoDTO().setAuthorized(false);
+        validationContext.getValidationInfoDTO().setValidationStatus(APIConstants.KeyValidationStatus.API_AUTH_RESOURCE_FORBIDDEN);
+    }
 
-        ApplicationKeyMapping mapping =
-                inMemoryStore.getKeyMappingByConsumerKey(validationContext.getTokenInfo().getConsumerKey());
+    /**
+     * When advanced Throttling is used, this method goes through the Throttling policies and
+     * populate validation Info Object with necessary values.
+     */
+    private boolean validateAndSetAdvancedThrottlingTiers(String matchingResource, String httpVerb,
+                                                          APIKeyValidationInfoDTO dto, Api api,
+                                                          Subscription subscription, Application application){
+        String apiTier = api.getApiTier();
+        if (apiTier == null) {
+            Resource resource = api.getResource(matchingResource);
+            if (resource != null) {
+                Verb resourceVerb = resource.getVerb(httpVerb);
+                apiTier = resourceVerb.getThrottlingTier();
+            }
+        }
 
-        if (mapping == null) {
-            setForNonExistentSubscription(validationContext);
+        String subscriberUserId = application.getSubName();
+
+        String subscriberTenant = MultitenantUtils.getTenantDomain(subscriberUserId);
+        SubscriptionPolicy subscriptionPolicy =
+                inMemoryStore.getSubscriptionPolicyByName(subscription.getTierName(),
+                        MultitenantConstants.SUPER_TENANT_ID);
+
+        ApplicationPolicy applicationPolicy =
+                inMemoryStore.getApplicationPolicyByName(application.getAppTier(), MultitenantConstants.SUPER_TENANT_ID);
+
+        ApiPolicy apiPolicy = inMemoryStore.getApiPolicyByName(apiTier, MultitenantConstants.SUPER_TENANT_ID);
+
+        // If any of the Policies are null, that means in memory store hasn't been updated in a
+        // while.
+        if(subscriptionPolicy == null || applicationPolicy == null || apiPolicy == null) {
+            log.error("Throttling policy not found in the in-memory Store");
             return false;
         }
 
-        Application application =
-                inMemoryStore.getApplicationById(mapping.getApplicationId());
+        // Checking if any of Subscription, Api or Application Throttling policies are
+        // ContentAware
+        boolean isContentAware =
+                subscriptionPolicy.isContentAware() || applicationPolicy.isContentAware() || apiPolicy.isContentAware();
 
-        if (application == null) {
-            setForNonExistentSubscription(validationContext);
-            return false;
+        dto.setContentAware(isContentAware);
+
+        int spikeArrest = subscriptionPolicy.getRateLimitCount();
+
+        String spikeArrestUnit = subscriptionPolicy.getRateLimitTimeUnit();
+
+        boolean stopOnQuotaReach = subscriptionPolicy.isStopOnQuotaReach();
+        List<String> list = new ArrayList<>();
+        list.add(API_LEVEL_THROTTLING_KEY);
+        dto.setSpikeArrestLimit(spikeArrest);
+        dto.setSpikeArrestUnit(spikeArrestUnit);
+        dto.setStopOnQuotaReach(stopOnQuotaReach);
+        dto.setSubscriberTenantDomain(subscriberTenant);
+        if (apiTier != null && apiTier.trim().length() > 0) {
+            dto.setApiTier(apiTier);
         }
 
-        API api = inMemoryStore.getApiByContextAndVersion(validationContext.getContext(),
-                validationContext.getVersion());
+        dto.setThrottlingDataList(list);
 
-        if (api == null) {
-            setForNonExistentSubscription(validationContext);
-            return false;
-        }
+        return true;
+    }
 
-        Subscription subscription = inMemoryStore.getSubscriptionByApiAndApplication(application,
-                api);
-
-        if (api == null) {
-            setForNonExistentSubscription(validationContext);
-            return false;
-        }
-
-        String subscriptionStatus = subscription.getSubscriptionState();
-        String keyType = mapping.getKeyType();
-
+    /**
+     * Validates Subscription status and set the relevant error values in
+     * {@link APIKeyValidationInfoDTO} object.
+     */
+    private boolean validateAndSetSubscriptionStatus(String subscriptionStatus, String keyType,
+                                                     APIKeyValidationInfoDTO dto) {
         if (APIConstants.SubscriptionStatus.BLOCKED.equals(subscriptionStatus)) {
             dto.setValidationStatus(APIConstants.KeyValidationStatus.API_BLOCKED);
             dto.setAuthorized(false);
@@ -136,90 +281,18 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
             return false;
         }
 
-        dto.setTier(subscription.getTierName());
-        dto.setSubscriber(application.getSubName());
-        dto.setApplicationId(Integer.toString(application.getAppId()));
-        dto.setApiName(api.getApiName());
-        dto.setApiPublisher(api.getApiProvider());
-        dto.setApplicationName(application.getAppName());
-        dto.setApplicationTier(application.getAppTier());
-        dto.setType(keyType);
-
-
-        if (APIUtil.isAdvanceThrottlingEnabled()) {
-            String apiTier = api.getApiTier();
-            String subscriberUserId = application.getSubName();
-            int apiId = api.getApiId();
-            int subscriberTenantId = APIUtil.getTenantId(subscriberUserId);
-            //TODO:Check if this works without the DB
-            int apiTenantId = APIUtil.getTenantId(api.getApiProvider());
-
-            String subscriberTenant = MultitenantUtils.getTenantDomain(subscriberUserId);
-            Policy subscriptionPolicy = inMemoryStore.getPolicyByName(subscription.getTierName(), apiTenantId);
-
-            //TODO isContentAware
-//            boolean isContentAware = isAnyPolicyContentAware(conn, apiTier, appTier, subTier, subscriberTenantId, apiTenantId, apiId);
-//            infoDTO.setContentAware(isContentAware);
-
-            //TODO this must implement as a part of throttling implementation.
-            int spikeArrest = subscriptionPolicy.getCount();
-            String apiLevelThrottlingKey = "api_level_throttling_key";
-
-            String spikeArrestUnit = subscriptionPolicy.getUnitTime();
-            ;
-
-            boolean stopOnQuotaReach = subscriptionPolicy.isStopOnQuotaReach();
-            List<String> list = new ArrayList<String>();
-            list.add(apiLevelThrottlingKey);
-            dto.setSpikeArrestLimit(spikeArrest);
-            dto.setSpikeArrestUnit(spikeArrestUnit);
-            dto.setStopOnQuotaReach(stopOnQuotaReach);
-            dto.setSubscriberTenantDomain(subscriberTenant);
-            if (apiTier != null && apiTier.trim().length() > 0) {
-                dto.setApiTier(apiTier);
-            }
-            //We also need to set throttling data list associated with given API. This need to have policy id and
-            // condition id list for all throttling tiers associated with this API.
-            dto.setThrottlingDataList(list);
-        }
-
         return true;
     }
 
-    /**
-     * Method to set errors if the subscription is not existing.
-     * @param validationContext
-     */
-    private void setForNonExistentSubscription(TokenValidationContext validationContext) {
-        validationContext.getValidationInfoDTO().setAuthorized(false);
-        validationContext.getValidationInfoDTO().setValidationStatus(APIConstants.KeyValidationStatus.API_AUTH_RESOURCE_FORBIDDEN);
-    }
 
-    @Override
-    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
-        InMemorySubscriptionValidationHandlerConfig inMemoryConfig = (InMemorySubscriptionValidationHandlerConfig) config;
-        String subscriptionStoreClass =
-                inMemoryConfig.getSubscriptionStoreConfig().getImplementingClass();
-        try {
-            this.inMemoryStore = (MapBasedInMemorySubscriptionStore)
-                    APIUtil.getClassForName(subscriptionStoreClass.trim()).getDeclaredConstructor().newInstance();
-
-            if (this.inMemoryStore instanceof KeyValidatorConfigInitializable) {
-                ((KeyValidatorConfigInitializable) this.inMemoryStore).initialise(inMemoryConfig.getSubscriptionStoreConfig());
-
-            }
-        } catch (InitialisationException e) {
-            log.error("Error occurred while instantiating in MemoryStore", e);
-            throw new InitialisationException(e);
-        } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException |
-                IllegalAccessException | InvocationTargetException e) {
-            log.error("Error occurred while instantiating " + subscriptionStoreClass, e);
-            throw new InitialisationException(e);
-        }
-    }
 
     @Override
     public boolean validateScopes(TokenValidationContext validationContext) throws APIKeyMgtException {
+        return true;
+    }
+
+    @Override
+    public boolean generateConsumerToken(TokenValidationContext validationContext) throws APIKeyMgtException {
         return true;
     }
 }

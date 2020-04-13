@@ -18,15 +18,14 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
+import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 
 public class Policy implements CachableEntity<String> {
     private int policyId;
-    private int count;
-    private String unitTime;
     private int tenantId;
     private String tierName;
-    private boolean stopOnQuotaReach;
+    private String quotaType;
 
     public int getPolicyId() {
         return policyId;
@@ -36,29 +35,18 @@ public class Policy implements CachableEntity<String> {
         this.policyId = policyId;
     }
 
-    public boolean isStopOnQuotaReach() {
-        return stopOnQuotaReach;
+    public String getQuotaType() {
+        return quotaType;
     }
 
-    public void setStopOnQuotaReach(boolean stopOnQuotaReach) {
-        this.stopOnQuotaReach = stopOnQuotaReach;
+    public void setQuotaType(String quotaType) {
+        this.quotaType = quotaType;
     }
 
-    public int getCount() {
-        return count;
+    public boolean isContentAware() {
+        return PolicyConstants.BANDWIDTH_TYPE.equals(quotaType);
     }
 
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public String getUnitTime() {
-        return unitTime;
-    }
-
-    public void setUnitTime(String unitTime) {
-        this.unitTime = unitTime;
-    }
 
     public int getTenantId() {
         return tenantId;
@@ -78,6 +66,6 @@ public class Policy implements CachableEntity<String> {
 
     @Override
     public String getCacheKey() {
-        return getTierName()+"."+getTenantId();
+        return getTierName() + "." + getTenantId();
     }
 }

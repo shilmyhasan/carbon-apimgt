@@ -37,9 +37,14 @@ import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.handlers.KeyValidationHandler;
+import org.wso2.carbon.apimgt.keymgt.internal.RegistrationHolder;
 import org.wso2.carbon.apimgt.keymgt.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
+import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataLoader;
+import org.wso2.carbon.apimgt.keymgt.model.UriTemplateLoader;
 import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
+import org.wso2.carbon.apimgt.keymgt.model.impl.MemoryBackedUriTemplateLoader;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
 import org.wso2.carbon.core.AbstractAdmin;
@@ -55,6 +60,7 @@ import java.util.*;
 public class APIKeyValidationService extends AbstractAdmin {
     private static final Log log = LogFactory.getLog(APIKeyValidationService.class);
     private static KeyValidationHandler keyValidationHandler;
+    private static UriTemplateLoader loader;
 
     public APIKeyValidationService() {
         try {
@@ -79,6 +85,16 @@ public class APIKeyValidationService extends AbstractAdmin {
                     KeyValidatorConfigInitializable configLoadable = (KeyValidatorConfigInitializable) validationHandler;
                     configLoadable.initialise(configuration.getKeyValidationHandlerConfig());
                 }
+
+                String urlTemplateLoader =
+                        configuration.getFirstProperty(APIConstants.URL_TEMPLATE_LOADER);
+
+                if(urlTemplateLoader != null) {
+                    loader =
+                            (UriTemplateLoader) APIUtil.getClassForName(urlTemplateLoader.trim()).getDeclaredConstructor().newInstance();
+                    log.debug("UriLoader " + loader.getClass().getName() + " instantiated.");
+                }
+
                 log.info("Initialised KeyValidationHandler instance successfully");
                 if (keyValidationHandler == null) {
                     synchronized (this) {
@@ -92,8 +108,8 @@ public class APIKeyValidationService extends AbstractAdmin {
             log.error("Error while accessing class" + e.toString());
         } catch (ClassNotFoundException e) {
             log.error("Error while creating keyManager instance" + e.toString());
-        } catch (InitialisationException e) {
-            log.error("Error while instantiating KeyValidationHandler ");
+        } catch (InitialisationException | NoSuchMethodException | InvocationTargetException e) {
+            log.error("Error while instantiating KeyValidationService " + e, e);
         }
     }
 
@@ -240,7 +256,13 @@ public class APIKeyValidationService extends AbstractAdmin {
         Timer timer6 = MetricManager.timer(org.wso2.carbon.metrics.manager.Level.INFO, MetricManager.name(
                 APIConstants.METRICS_PREFIX, this.getClass().getSimpleName(), "GET_URI_TEMPLATE"));
         Timer.Context timerContext6 = timer6.start();
-        ArrayList<URITemplate> templates = ApiMgtDAO.getInstance().getAllURITemplates(context, version);
+        ArrayList<URITemplate> templates;
+        if(loader == null) {
+            templates = ApiMgtDAO.getInstance().getAllURITemplates(context, version);
+        } else {
+            List<URITemplate> uriTemplates = loader.getAllURITemplates(context,version);
+            templates = new ArrayList<>(uriTemplates);
+        }
         timerContext6.stop();
         return templates;
     }

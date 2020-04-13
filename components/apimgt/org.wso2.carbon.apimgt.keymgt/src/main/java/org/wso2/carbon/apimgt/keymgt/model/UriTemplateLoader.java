@@ -18,20 +18,22 @@
 
 package org.wso2.carbon.apimgt.keymgt.model;
 
-import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
-import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
+import org.wso2.carbon.apimgt.api.model.URITemplate;
+
+import java.util.List;
 
 /**
- * Interface to be extended if need to initialise a class by supplying a
- * {@link KeyValidationHandlerConfig}.
+ * Abstraction for loading {@link URITemplate}. When making Subscription data memory resident,
+ * URITemplates too should be loaded from the in-memory store. Hence this abstraction is needed.
  */
-public interface KeyValidatorConfigInitializable {
+public interface UriTemplateLoader {
 
     /**
-     * Initialises the instance using and instance of {@link KeyValidationHandlerConfig}
+     * Returns the list of {@link URITemplate}s associated with an API
      *
-     * @param config Subclass of {@link KeyValidationHandlerConfig}
-     * @throws InitialisationException when an error occurs while instantiation.
+     * @param context context of the API
+     * @param version version of the API
+     * @return List of {@link URITemplate}s
      */
-    void initialise(KeyValidationHandlerConfig config) throws InitialisationException;
+    public List<URITemplate> getAllURITemplates(String context, String version);
 }

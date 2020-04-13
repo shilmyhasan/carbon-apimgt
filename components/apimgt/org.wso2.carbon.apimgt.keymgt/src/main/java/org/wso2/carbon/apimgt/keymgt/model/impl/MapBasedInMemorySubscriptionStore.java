@@ -25,6 +25,7 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.impl.config.MapBasedSubscriptionStoreConfig;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.keymgt.internal.RegistrationHolder;
 import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
@@ -46,26 +47,118 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
     public static final int LOADING_POOL_SIZE = 6;
     private static final Log log = LogFactory.getLog(MapBasedInMemorySubscriptionStore.class);
+
+    // Maps for keeping Subscription related details.
     private Map<String, ApplicationKeyMapping> applicationKeyMappingMap;
     private Map<Integer, Application> applicationMap;
-    private Map<String, API> apiMap;
+    private Map<String, Api> apiMap;
     private Map<String, Policy> policyMap;
+    private Map<String, ApiPolicy> apiPolicyMap;
+    private Map<String, SubscriptionPolicy> subPolicyMap;
+    private Map<String, ApplicationPolicy> appPolicyMap;
     private Map<String, Subscription> subscriptionMap;
+
+    // DataLoader responsible for loading Data from underlying storage.
     private SubscriptionDataLoader dataLoader;
     private ScheduledExecutorService executorService = Executors.newScheduledThreadPool(LOADING_POOL_SIZE);
     private MapBasedSubscriptionStoreConfig mapBasedSubscriptionStoreConfig;
 
     public MapBasedInMemorySubscriptionStore() {
-        this.applicationKeyMappingMap = new ConcurrentHashMap<String, ApplicationKeyMapping>();
-        this.applicationMap = new ConcurrentHashMap<Integer, Application>();
-        this.apiMap = new ConcurrentHashMap<String, API>();
-        this.policyMap = new ConcurrentHashMap<String, Policy>();
-        this.subscriptionMap = new ConcurrentHashMap<String, Subscription>();
+        this.applicationKeyMappingMap = new ConcurrentHashMap<>();
+        this.applicationMap = new ConcurrentHashMap<>();
+        this.apiMap = new ConcurrentHashMap<>();
+        this.policyMap = new ConcurrentHashMap<>();
+        this.subPolicyMap = new ConcurrentHashMap<>();
+        this.appPolicyMap = new ConcurrentHashMap<>();
+        this.apiPolicyMap = new ConcurrentHashMap<>();
+        this.subscriptionMap = new ConcurrentHashMap<>();
+
+    }
+
+    public Application finApplicationbyConsumerKey(String consumerKey) {
+        String applicationKeyMappingKey = consumerKey;
+        ApplicationKeyMapping mapping = applicationKeyMappingMap.get(applicationKeyMappingKey);
+
+        return mapping == null ? null :
+                applicationMap.get(mapping.getApplicationId());
+    }
+
+    @Override
+    public Application getApplicationById(int appId) {
+        return applicationMap.get(appId);
+    }
+
+    @Override
+    public ApplicationKeyMapping getKeyMappingByConsumerKey(String consumerKey) {
+        return applicationKeyMappingMap.get(consumerKey);
+    }
+
+    @Override
+    public Api getApiByContextAndVersion(String context, String version) {
+        Api api = new Api();
+        api.setContext(context);
+        api.setApiVersion(version);
+        return apiMap.get(api.getCacheKey());
+    }
+
+    @Override
+    public Subscription getSubscriptionByApiAndApplication(Application application, Api api) {
+        Subscription subKey = new Subscription();
+        subKey.setAppId(application.getAppId());
+        subKey.setApiId(api.getApiId());
+        return subscriptionMap.get(subKey.getCacheKey());
+    }
+
+    @Override
+    public Policy getPolicyByName(String policyName, int tenantId) {
+        Policy policy = new Policy();
+        policy.setTierName(policyName);
+        policy.setTenantId(tenantId);
+        return policyMap.get(policy.getCacheKey());
+    }
+
+
+    @Override
+    public SubscriptionPolicy getSubscriptionPolicyByName(String policyName, int tenantId) {
+        return getPolicy(policyName, tenantId, subPolicyMap);
+    }
+
+    @Override
+    public ApplicationPolicy getApplicationPolicyByName(String policyName, int tenantId) {
+        return getPolicy(policyName, tenantId, appPolicyMap);
+    }
+
+    @Override
+    public ApiPolicy getApiPolicyByName(String policyName, int tenantId) {
+        return getPolicy(policyName, tenantId, apiPolicyMap);
+    }
+
+    @Override
+    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
+        this.mapBasedSubscriptionStoreConfig =
+                (MapBasedSubscriptionStoreConfig) config;
+        String subscriptionDataLoader =
+                mapBasedSubscriptionStoreConfig.getSubscriptionDataLoaderConfig().getImplementingClass();
+
+        if (subscriptionDataLoader != null) {
+            try {
+                this.dataLoader =
+                        (SubscriptionDataLoader) APIUtil.getClassForName(subscriptionDataLoader.trim()).getDeclaredConstructor().newInstance();
+                RegistrationHolder.getInstance().registerInstance(SubscriptionDataLoader.class.getName(),
+                        this.dataLoader);
+            } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException |
+                    IllegalAccessException | InvocationTargetException e) {
+                log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
+                throw new InitialisationException(e);
+            }
+        }
+
+        this.initialiseLoadingTasks();
     }
 
     private void initialiseLoadingTasks() {
 
-        Runnable apiTask = new PeriodicPopulateTask<String, API>(apiMap,
+        Runnable apiTask = new PeriodicPopulateTask<String, Api>(apiMap,
                 () -> {
                     try {
                         log.debug("Calling loadAllApis...");
@@ -124,88 +217,62 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         executorService.scheduleAtFixedRate(keyMappingsTask, 0,
                 this.mapBasedSubscriptionStoreConfig.getKeyMappingLoadingFrequency(), TimeUnit.SECONDS);
 
-
-        Runnable policyLoadingTask =
-                new PeriodicPopulateTask<String, Policy>(policyMap,
+        Runnable subPolicyLoadingTask =
+                new PeriodicPopulateTask<String, SubscriptionPolicy>(subPolicyMap,
                         () -> {
                             try {
-                                log.debug("Calling loadAllPolicies...");
-                                return dataLoader.loadAllPolicies();
+                                log.debug("Calling loadAllSubscriptionPolicies...");
+                                return dataLoader.loadAllSubscriptionPolicies();
                             } catch (APIManagementException e) {
-                                log.error("Exception while loading Policies");
+                                log.error("Exception while loading Subscription Policies");
                             }
                             return null;
                         });
 
-        executorService.scheduleAtFixedRate(policyLoadingTask, 0,
+
+        executorService.scheduleAtFixedRate(subPolicyLoadingTask, 0,
+                this.mapBasedSubscriptionStoreConfig.getPolicyLoadingFrequency(), TimeUnit.SECONDS);
+
+        Runnable appPolicyLoadingTask =
+                new PeriodicPopulateTask<String, ApplicationPolicy>(appPolicyMap,
+                        () -> {
+                            try {
+                                log.debug("Calling loadAllAppPolicies...");
+                                return dataLoader.loadAllAppPolicies();
+                            } catch (APIManagementException e) {
+                                log.error("Exception while loading Application Policies");
+                            }
+                            return null;
+                        });
+
+
+        executorService.scheduleAtFixedRate(appPolicyLoadingTask, 0,
+                this.mapBasedSubscriptionStoreConfig.getPolicyLoadingFrequency(), TimeUnit.SECONDS);
+
+        Runnable apiPolicyLoadingTask =
+                new PeriodicPopulateTask<String, ApiPolicy>(apiPolicyMap,
+                        () -> {
+                            try {
+                                log.debug("Calling loadAllApiPolicies...");
+                                return dataLoader.loadAllApiPolicies();
+                            } catch (APIManagementException e) {
+                                log.error("Exception while loading Api Policies");
+                            }
+                            return null;
+                        });
+
+
+        executorService.scheduleAtFixedRate(apiPolicyLoadingTask, 0,
                 this.mapBasedSubscriptionStoreConfig.getPolicyLoadingFrequency(), TimeUnit.SECONDS);
 
     }
 
-    public Application finApplicationbyConsumerKey(String consumerKey) {
-        String applicationKeyMappingKey = consumerKey;
-        ApplicationKeyMapping mapping = applicationKeyMappingMap.get(applicationKeyMappingKey);
-
-        //TODO: Check whether key has been approved.
-        Application application = mapping == null ? null :
-                applicationMap.get(mapping.getApplicationId());
-
-        return application;
-    }
-
-    @Override
-    public Application getApplicationById(int appId) {
-        return applicationMap.get(appId);
-    }
-
-    @Override
-    public ApplicationKeyMapping getKeyMappingByConsumerKey(String consumerKey) {
-        return applicationKeyMappingMap.get(consumerKey);
-    }
-
-    @Override
-    public API getApiByContextAndVersion(String context, String version) {
-        API api = new API();
-        api.setContext(context);
-        api.setApiVersion(version);
-        return apiMap.get(api.getCacheKey());
-    }
-
-    @Override
-    public Subscription getSubscriptionByApiAndApplication(Application application, API api) {
-        Subscription subKey = new Subscription();
-        subKey.setApiId(application.getAppId());
-        subKey.setApiId(api.getApiId());
-        subscriptionMap.get(subKey.getCacheKey());
-        return subscriptionMap.get(subKey);
-    }
-
-    @Override
-    public Policy getPolicyByName(String policyName, int tenantId) {
+    private <T extends Policy> T getPolicy(String policyName, int tenantId,
+                                           Map<String, T> policyMap) {
         Policy policy = new Policy();
         policy.setTierName(policyName);
         policy.setTenantId(tenantId);
         return policyMap.get(policy.getCacheKey());
-    }
-
-    @Override
-    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
-        this.mapBasedSubscriptionStoreConfig =
-                (MapBasedSubscriptionStoreConfig) config;
-        String subscriptionDataLoader =
-                mapBasedSubscriptionStoreConfig.getSubscriptionDataLoaderConfig().getImplementingClass();
-
-        if (subscriptionDataLoader != null) {
-            try {
-                this.dataLoader =
-                        (SubscriptionDataLoader) APIUtil.getClassForName(subscriptionDataLoader.trim()).getDeclaredConstructor().newInstance();
-            } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
-                throw new InitialisationException(e);
-            }
-        }
-
-        this.initialiseLoadingTasks();
     }
 
     private class PeriodicPopulateTask<K, V extends CachableEntity<K>> implements Runnable {
@@ -231,6 +298,10 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                     }
                 }
 
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("List is null for " + supplier.getClass());
+                }
             }
         }
     }

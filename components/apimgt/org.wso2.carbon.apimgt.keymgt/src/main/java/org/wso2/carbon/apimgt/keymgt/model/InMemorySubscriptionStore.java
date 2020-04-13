@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.apimgt.keymgt.model;
 
-import org.wso2.carbon.apimgt.impl.config.InMemorySubscriptionStoreConfig;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
 
 /**
@@ -28,6 +27,7 @@ public interface InMemorySubscriptionStore {
 
     /**
      * Gets an {@link Application} by Id
+     *
      * @param appId Id of the Application
      * @return {@link Application} with the appId
      */
@@ -35,6 +35,7 @@ public interface InMemorySubscriptionStore {
 
     /**
      * Gets the {@link ApplicationKeyMapping} entry by consumerKey
+     *
      * @param consumerKey Consumer Key of the Application
      * @return {@link ApplicationKeyMapping} entry
      */
@@ -42,25 +43,55 @@ public interface InMemorySubscriptionStore {
 
     /**
      * Get API by Context and Version
+     *
      * @param context Context of the API
      * @param version Version of the API
-     * @return {@link API} entry represented by Context and Version.
+     * @return {@link Api} entry represented by Context and Version.
      */
-    API getApiByContextAndVersion(String context, String version);
+    Api getApiByContextAndVersion(String context, String version);
 
     /**
      * Gets Subscription by API and by Application
+     *
      * @param application Application associated with the Subscription
-     * @param api API for which subscription is created
+     * @param api         API for which subscription is created
      * @return {@link Subscription}
      */
-    Subscription getSubscriptionByApiAndApplication(Application application, API api);
+    Subscription getSubscriptionByApiAndApplication(Application application, Api api);
 
     /**
      * Gets Policy by the name and Tenant Id
+     *
      * @param policyName Name of the Policy
-     * @param tenantId TenantId of the policy owner
+     * @param tenantId   TenantId of the policy owner
      * @return {@link Policy}
      */
     Policy getPolicyByName(String policyName, int tenantId);
+
+    /**
+     * Gets Subscription Throttling Policy by the name and Tenant Id
+     *
+     * @param policyName Name of the Throttling Policy
+     * @param tenantId   Tenant ID in the Policy
+     * @return Subscription Throttling Policy
+     */
+    SubscriptionPolicy getSubscriptionPolicyByName(String policyName, int tenantId);
+
+    /**
+     * Gets Application Throttling Policy by the name and Tenant Id
+     *
+     * @param policyName Name of the Throttling Policy
+     * @param tenantId   Tenant ID in the Policy
+     * @return Application Throttling Policy
+     */
+    ApplicationPolicy getApplicationPolicyByName(String policyName, int tenantId);
+
+    /**
+     * Gets Api Throttling Policy by the name and Tenant Id
+     *
+     * @param policyName Name of the Throttling Policy
+     * @param tenantId   Tenant ID in the Policy
+     * @return Api Throttling Policy
+     */
+    ApiPolicy getApiPolicyByName(String policyName, int tenantId);
 }

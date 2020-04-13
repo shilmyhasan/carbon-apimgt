@@ -18,20 +18,17 @@
 
 package org.wso2.carbon.apimgt.keymgt.model;
 
-import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
-import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
-
 /**
- * Interface to be extended if need to initialise a class by supplying a
- * {@link KeyValidationHandlerConfig}.
+ * An interface to indicate that an entity provides a cacheKey
+ *
+ * @param <K> Type of the CacheKey
  */
-public interface KeyValidatorConfigInitializable {
+public interface CachableEntity<K> {
 
     /**
-     * Initialises the instance using and instance of {@link KeyValidationHandlerConfig}
+     * Gets the Cache Key of an entity.
      *
-     * @param config Subclass of {@link KeyValidationHandlerConfig}
-     * @throws InitialisationException when an error occurs while instantiation.
+     * @return K
      */
-    void initialise(KeyValidationHandlerConfig config) throws InitialisationException;
+    public K getCacheKey();
 }
