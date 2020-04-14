@@ -1416,7 +1416,6 @@
         <carbon.identity-inbound-auth-openid.version>5.2.5</carbon.identity-inbound-auth-openid.version>
         <carbon.identity-local-auth-basicauth.version>5.3.7</carbon.identity-local-auth-basicauth.version>
         <carbon.identity-outbound-auth-samlsso.version>5.1.12</carbon.identity-outbound-auth-samlsso.version>
-        <carbon.identity-oauth2-grant-jwt.version>1.0.10</carbon.identity-oauth2-grant-jwt.version>
 
         <carbon.governance.version>4.7.23</carbon.governance.version>
         <carbon.deployment.version>4.7.15</carbon.deployment.version>
