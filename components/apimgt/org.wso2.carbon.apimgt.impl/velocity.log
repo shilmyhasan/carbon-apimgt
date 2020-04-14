@@ -1,0 +1,1336 @@
+2020-04-14 15:58:08,964 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:08,964 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:08,964 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:08,964 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:08,965 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAPILevel_aroundBody2(ThrottlePolicyTemplateBuilder.java:98)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAPILevel(ThrottlePolicyTemplateBuilder.java:79)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForAPILevelPerUser(ThrottlingPolicyTemplateBuilderTest.java:56)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:08,966 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:08,966 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:08,968 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:08,970 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:08,971 - Do unicode file recognition:  false
+2020-04-14 15:58:08,971 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:08,978 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:08,979 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:08,980 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:08,981 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:08,982 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:08,982 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,000 - Created '20' parsers.
+2020-04-14 15:58:09,004 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,005 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,005 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,005 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,005 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,005 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,013 - Velocimacro : added #getKey(  ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml
+2020-04-14 15:58:09,014 - Velocimacro : added #getRule(  policy ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml
+2020-04-14 15:58:09,023 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,033 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,033 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,033 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,033 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,034 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,034 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,034 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,034 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,034 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAPILevel_aroundBody2(ThrottlePolicyTemplateBuilder.java:98)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAPILevel(ThrottlePolicyTemplateBuilder.java:79)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForAPILevelPerAPI(ThrottlingPolicyTemplateBuilderTest.java:61)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,034 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAPILevel_aroundBody2(ThrottlePolicyTemplateBuilder.java:98)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAPILevel(ThrottlePolicyTemplateBuilder.java:79)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForAPILevelPerAPI(ThrottlingPolicyTemplateBuilderTest.java:61)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,035 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,035 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,035 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,035 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,035 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,035 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,035 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,035 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,035 - Do unicode file recognition:  false
+2020-04-14 15:58:09,035 - Do unicode file recognition:  false
+2020-04-14 15:58:09,035 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,035 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,035 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,035 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,036 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,036 - Created '20' parsers.
+2020-04-14 15:58:09,036 - Created '20' parsers.
+2020-04-14 15:58:09,036 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,036 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,036 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,036 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,036 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,036 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,037 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,037 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,037 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,037 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,037 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,037 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,037 - Velocimacro : added #getKey(  ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml
+2020-04-14 15:58:09,037 - Velocimacro : added #getKey(  ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml
+2020-04-14 15:58:09,038 - Velocimacro : added #getRule(  policy ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml
+2020-04-14 15:58:09,038 - Velocimacro : added #getRule(  policy ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml
+2020-04-14 15:58:09,040 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,040 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_resource.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,043 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,043 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,043 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,044 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,044 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,044 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,044 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,044 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,044 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,044 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,044 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,044 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,044 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForGlobalLevel_aroundBody6(ThrottlePolicyTemplateBuilder.java:231)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForGlobalLevel(ThrottlePolicyTemplateBuilder.java:214)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForGlobalLevel(ThrottlingPolicyTemplateBuilderTest.java:66)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,044 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForGlobalLevel_aroundBody6(ThrottlePolicyTemplateBuilder.java:231)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForGlobalLevel(ThrottlePolicyTemplateBuilder.java:214)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForGlobalLevel(ThrottlingPolicyTemplateBuilderTest.java:66)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,044 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForGlobalLevel_aroundBody6(ThrottlePolicyTemplateBuilder.java:231)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForGlobalLevel(ThrottlePolicyTemplateBuilder.java:214)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForGlobalLevel(ThrottlingPolicyTemplateBuilderTest.java:66)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,045 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,045 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,045 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,045 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,045 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,045 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,045 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,045 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,045 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,045 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,045 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,045 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,045 - Do unicode file recognition:  false
+2020-04-14 15:58:09,045 - Do unicode file recognition:  false
+2020-04-14 15:58:09,045 - Do unicode file recognition:  false
+2020-04-14 15:58:09,045 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,045 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,045 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,045 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,045 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,045 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,046 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,048 - Created '20' parsers.
+2020-04-14 15:58:09,048 - Created '20' parsers.
+2020-04-14 15:58:09,048 - Created '20' parsers.
+2020-04-14 15:58:09,049 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,049 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,049 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,049 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,049 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,049 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,049 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,049 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,049 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,049 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,049 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,049 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,049 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,049 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,049 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,049 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,049 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,049 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,051 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_global.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,051 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_global.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,051 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_global.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,057 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,057 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,057 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,057 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,057 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,057 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,057 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,057 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,057 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,057 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,057 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,057 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,057 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,057 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,057 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,057 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,057 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAppLevel_aroundBody8(ThrottlePolicyTemplateBuilder.java:281)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAppLevel(ThrottlePolicyTemplateBuilder.java:264)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForAppLevel(ThrottlingPolicyTemplateBuilderTest.java:71)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,057 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAppLevel_aroundBody8(ThrottlePolicyTemplateBuilder.java:281)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAppLevel(ThrottlePolicyTemplateBuilder.java:264)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForAppLevel(ThrottlingPolicyTemplateBuilderTest.java:71)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,057 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAppLevel_aroundBody8(ThrottlePolicyTemplateBuilder.java:281)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAppLevel(ThrottlePolicyTemplateBuilder.java:264)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForAppLevel(ThrottlingPolicyTemplateBuilderTest.java:71)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,057 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAppLevel_aroundBody8(ThrottlePolicyTemplateBuilder.java:281)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForAppLevel(ThrottlePolicyTemplateBuilder.java:264)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForAppLevel(ThrottlingPolicyTemplateBuilderTest.java:71)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,059 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,059 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,059 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,059 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,059 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,059 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,059 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,059 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,059 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,059 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,059 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,059 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,059 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,059 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,059 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,059 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,059 - Do unicode file recognition:  false
+2020-04-14 15:58:09,059 - Do unicode file recognition:  false
+2020-04-14 15:58:09,059 - Do unicode file recognition:  false
+2020-04-14 15:58:09,059 - Do unicode file recognition:  false
+2020-04-14 15:58:09,059 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,059 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,059 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,059 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,059 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,059 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,059 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,059 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,060 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,061 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,061 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,061 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,061 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,061 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,061 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,061 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,061 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,062 - Created '20' parsers.
+2020-04-14 15:58:09,062 - Created '20' parsers.
+2020-04-14 15:58:09,062 - Created '20' parsers.
+2020-04-14 15:58:09,062 - Created '20' parsers.
+2020-04-14 15:58:09,062 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,062 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,062 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,062 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,062 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,062 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,062 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,062 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,062 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,062 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,062 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,062 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,062 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,062 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,062 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,062 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,062 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,062 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,062 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,062 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,062 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,062 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,062 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,062 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,063 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_app.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,063 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_app.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,063 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_app.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,063 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_app.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,067 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,067 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,067 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,067 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,067 - Log4JLogChute initialized using file 'velocity.log'
+2020-04-14 15:58:09,067 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,067 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,067 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,067 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,067 - Starting Apache Velocity v1.5 (compiled: 2007-02-22 08:52:29)
+2020-04-14 15:58:09,067 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,067 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,067 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,067 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,067 - Default Properties File: org/apache/velocity/runtime/defaults/velocity.properties
+2020-04-14 15:58:09,067 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,067 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,067 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,067 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,067 - Trying to use logger class org.apache.velocity.runtime.log.AvalonLogChute
+2020-04-14 15:58:09,067 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel_aroundBody10(ThrottlePolicyTemplateBuilder.java:325)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel(ThrottlePolicyTemplateBuilder.java:308)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForSubscriptionLevelperUser(ThrottlingPolicyTemplateBuilderTest.java:76)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,067 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel_aroundBody10(ThrottlePolicyTemplateBuilder.java:325)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel(ThrottlePolicyTemplateBuilder.java:308)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForSubscriptionLevelperUser(ThrottlingPolicyTemplateBuilderTest.java:76)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,067 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel_aroundBody10(ThrottlePolicyTemplateBuilder.java:325)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel(ThrottlePolicyTemplateBuilder.java:308)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForSubscriptionLevelperUser(ThrottlingPolicyTemplateBuilderTest.java:76)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,067 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel_aroundBody10(ThrottlePolicyTemplateBuilder.java:325)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel(ThrottlePolicyTemplateBuilder.java:308)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForSubscriptionLevelperUser(ThrottlingPolicyTemplateBuilderTest.java:76)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,067 - Couldn't find class org.apache.velocity.runtime.log.AvalonLogChute or necessary supporting classes in classpath.
+java.lang.NoClassDefFoundError: org/apache/log/format/Formatter
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.apache.velocity.util.ClassUtils.getClass(ClassUtils.java:63)
+	at org.apache.velocity.util.ClassUtils.getNewInstance(ClassUtils.java:95)
+	at org.apache.velocity.runtime.log.LogManager.createLogChute(LogManager.java:147)
+	at org.apache.velocity.runtime.log.LogManager.updateLog(LogManager.java:208)
+	at org.apache.velocity.runtime.RuntimeInstance.initializeLog(RuntimeInstance.java:728)
+	at org.apache.velocity.runtime.RuntimeInstance.init(RuntimeInstance.java:240)
+	at org.apache.velocity.app.VelocityEngine.init(VelocityEngine.java:116)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel_aroundBody10(ThrottlePolicyTemplateBuilder.java:325)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder.getThrottlePolicyForSubscriptionLevel(ThrottlePolicyTemplateBuilder.java:308)
+	at org.wso2.carbon.apimgt.impl.template.ThrottlingPolicyTemplateBuilderTest.testGetThrottlePolicyForSubscriptionLevelperUser(ThrottlingPolicyTemplateBuilderTest.java:76)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at junit.framework.TestCase.runTest(TestCase.java:154)
+	at junit.framework.TestCase.runBare(TestCase.java:127)
+	at junit.framework.TestResult$1.protect(TestResult.java:106)
+	at junit.framework.TestResult.runProtected(TestResult.java:124)
+	at junit.framework.TestResult.run(TestResult.java:109)
+	at junit.framework.TestCase.run(TestCase.java:118)
+	at junit.framework.TestSuite.runTest(TestSuite.java:208)
+	at junit.framework.TestSuite.run(TestSuite.java:203)
+	at org.junit.internal.runners.JUnit38ClassRunner.run(JUnit38ClassRunner.java:86)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+	at org.testng.junit.JUnit4TestRunner.start(JUnit4TestRunner.java:82)
+	at org.testng.junit.JUnit4TestRunner.run(JUnit4TestRunner.java:70)
+	at org.testng.TestRunner$1.run(TestRunner.java:667)
+	at org.testng.TestRunner.runJUnitWorkers(TestRunner.java:950)
+	at org.testng.TestRunner.privateRunJUnit(TestRunner.java:698)
+	at org.testng.TestRunner.run(TestRunner.java:599)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:380)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:375)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:340)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:289)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1226)
+	at org.testng.TestNG.runSuites(TestNG.java:1144)
+	at org.testng.TestNG.run(TestNG.java:1115)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:76)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:177)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:101)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:115)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:189)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:165)
+	at org.apache.maven.surefire.booter.ProviderFactory.invokeProvider(ProviderFactory.java:85)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:103)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:74)
+Caused by: java.lang.ClassNotFoundException: org.apache.log.format.Formatter
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:382)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:349)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 56 more
+2020-04-14 15:58:09,068 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Trying to use logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,068 - Using logger class org.apache.velocity.runtime.log.Log4JLogChute
+2020-04-14 15:58:09,069 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,069 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,069 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,069 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,069 - Default ResourceManager initializing. (class org.apache.velocity.runtime.resource.ResourceManagerImpl)
+2020-04-14 15:58:09,069 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,069 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,069 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,069 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,069 - ResourceLoader instantiated: org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,069 - Do unicode file recognition:  false
+2020-04-14 15:58:09,069 - Do unicode file recognition:  false
+2020-04-14 15:58:09,069 - Do unicode file recognition:  false
+2020-04-14 15:58:09,069 - Do unicode file recognition:  false
+2020-04-14 15:58:09,069 - Do unicode file recognition:  false
+2020-04-14 15:58:09,069 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,069 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,069 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,069 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,069 - FileResourceLoader : adding path '.'
+2020-04-14 15:58:09,069 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,069 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,069 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,069 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,069 - ResourceCache: initialized (class org.apache.velocity.runtime.resource.ResourceCacheImpl)
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Literal
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Macro
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,069 - Loaded System Directive: org.apache.velocity.runtime.directive.Parse
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Include
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,070 - Loaded System Directive: org.apache.velocity.runtime.directive.Foreach
+2020-04-14 15:58:09,070 - Created '20' parsers.
+2020-04-14 15:58:09,070 - Created '20' parsers.
+2020-04-14 15:58:09,070 - Created '20' parsers.
+2020-04-14 15:58:09,070 - Created '20' parsers.
+2020-04-14 15:58:09,070 - Created '20' parsers.
+2020-04-14 15:58:09,070 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,070 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,070 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,070 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,070 - Velocimacro : "velocimacro.library" is not set.  Trying default library: VM_global_library.vm
+2020-04-14 15:58:09,071 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,071 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,071 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,071 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,071 - Velocimacro : Default library not found.
+2020-04-14 15:58:09,071 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,071 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,071 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,071 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,071 - Velocimacro : allowInline = true : VMs can be defined inline in templates
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineToOverride = false : VMs defined inline may NOT replace previous VM definitions
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,071 - Velocimacro : allowInlineLocal = false : VMs defined inline will be global in scope if allowed.
+2020-04-14 15:58:09,071 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,071 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,071 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,071 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,071 - Velocimacro : autoload off : VM system will not automatically reload global library macros
+2020-04-14 15:58:09,072 - Velocimacro : added #getKey(  ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getKey(  ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getKey(  ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getKey(  ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getKey(  ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getRule(  policy ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getRule(  policy ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getRule(  policy ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getRule(  policy ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,072 - Velocimacro : added #getRule(  policy ) : source = src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml
+2020-04-14 15:58:09,073 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,073 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,073 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,073 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
+2020-04-14 15:58:09,073 - ResourceManager : found src/test/resources/repository/resources/policy_templates/throttle_policy_template_sub.xml with loader org.apache.velocity.runtime.resource.loader.FileResourceLoader
