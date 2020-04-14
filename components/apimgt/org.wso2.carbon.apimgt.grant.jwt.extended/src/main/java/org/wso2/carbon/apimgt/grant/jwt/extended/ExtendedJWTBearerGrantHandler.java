@@ -59,7 +59,8 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
     private static Log log = LogFactory.getLog(ExtendedJWTBearerGrantHandler.class);
     private IdentityProvider identityProvider = null;
 
-    @Override public boolean validateScope(OAuthTokenReqMessageContext tokReqMsgCtx) {
+    @Override
+    public boolean validateScope(OAuthTokenReqMessageContext tokReqMsgCtx) {
 
         SignedJWT signedJWT = null;
         JWTClaimsSet claimsSet = null;
