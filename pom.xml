@@ -258,9 +258,9 @@
 
     <repositories>
         <repository>
-            <id>wso2-nexus</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <id>wso2-support</id>
+            <name>WSO2 support</name>
+            <url> https://support-maven.wso2.org/nexus/content/repositories/releases</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
@@ -268,29 +268,41 @@
             </releases>
         </repository>
 
-        <repository>
-            <id>wso2.releases</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
+<!--        <repository>-->
+<!--            <id>wso2-nexus</id>-->
+<!--            <name>WSO2 internal Repository</name>-->
+<!--            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--                <updatePolicy>daily</updatePolicy>-->
+<!--                <checksumPolicy>ignore</checksumPolicy>-->
+<!--            </releases>-->
+<!--        </repository>-->
 
-        <repository>
-            <id>wso2.snapshots</id>
-            <name>Apache Snapshot Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
+
+<!--        <repository>-->
+<!--            <id>wso2.releases</id>-->
+<!--            <name>WSO2 internal Repository</name>-->
+<!--            <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--                <updatePolicy>daily</updatePolicy>-->
+<!--                <checksumPolicy>ignore</checksumPolicy>-->
+<!--            </releases>-->
+<!--        </repository>-->
+
+<!--        <repository>-->
+<!--            <id>wso2.snapshots</id>-->
+<!--            <name>Apache Snapshot Repository</name>-->
+<!--            <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--                <updatePolicy>daily</updatePolicy>-->
+<!--            </snapshots>-->
+<!--            <releases>-->
+<!--                <enabled>false</enabled>-->
+<!--            </releases>-->
+<!--        </repository>-->
     </repositories>
 
     <pluginRepositories>
@@ -1383,6 +1395,11 @@
                 <artifactId>re2j</artifactId>
                 <version>${re2j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.extension.identity.oauth2.grantType.jwt</groupId>
+                <artifactId>org.wso2.carbon.identity.oauth2.grant.jwt</artifactId>
+                <version>${carbon.identity-oauth2-grant-jwt.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1416,6 +1433,9 @@
         <carbon.identity-inbound-auth-openid.version>5.2.5</carbon.identity-inbound-auth-openid.version>
         <carbon.identity-local-auth-basicauth.version>5.3.7</carbon.identity-local-auth-basicauth.version>
         <carbon.identity-outbound-auth-samlsso.version>5.1.12</carbon.identity-outbound-auth-samlsso.version>
+        <carbon.identity-oauth2-grant-jwt.version>1.0.11</carbon.identity-oauth2-grant-jwt.version>
+        <nimbusds5.version>5.8</nimbusds5.version>
+        <json-smart.version>1.3</json-smart.version>
 
         <carbon.governance.version>4.7.23</carbon.governance.version>
         <carbon.deployment.version>4.7.15</carbon.deployment.version>
@@ -1532,6 +1552,7 @@
         <imp.pkg.version.org.wso2.carbon.user.api>[1.0.1, 1.2.0)</imp.pkg.version.org.wso2.carbon.user.api>
         <imp.pkg.version.io.swagger.parser>[2.1.6, 3.0.0)</imp.pkg.version.io.swagger.parser>
         <imp.pkg.version.org.apache.commons.codec>[1.4.0, 2.0.0)</imp.pkg.version.org.apache.commons.codec>
+        <imp.pkg.version.json.smart>[1.3, 1.4)</imp.pkg.version.json.smart>
 
         <carbon.throttle.module.version>4.2.1</carbon.throttle.module.version>
 
