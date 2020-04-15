@@ -90,8 +90,8 @@ const styles = (theme) => {
             leftMenu: { width, position },
         },
     } = theme;
-    const shiftToLeft = position === 'vertical-left' ? width : 0;
-    const shiftToRight = position === 'vertical-right' ? width : 0;
+    const shiftToLeft = position === 'vertical-left' ? width - 4 : 0;
+    const shiftToRight = position === 'vertical-right' ? width - 4 : 0;
     const leftMenuPaddingLeft = position === 'horizontal' ? theme.spacing(3) : 0;
 
     return {
