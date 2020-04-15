@@ -61,7 +61,6 @@ const DefaultConfigurations = {
             backgroundImage: '/site/public/images/leftMenuBack.png',
             leftMenuActive: '#00597f',
             leftMenuActiveSubmenu: '#0d1723',
-            activeBackground: '#191e46',
             rootIconVisible: true,
             rootIconSize: 42,
             rootIconTextVisible: false,
