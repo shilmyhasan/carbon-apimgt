@@ -93,7 +93,6 @@ const styles = (theme) => {
             overflowY: 'hidden',
             position: 'relative',
             minHeight: 'calc(100vh - 114px)',
-            marginLeft: -4,
         },
         push: {
             height: 50,
