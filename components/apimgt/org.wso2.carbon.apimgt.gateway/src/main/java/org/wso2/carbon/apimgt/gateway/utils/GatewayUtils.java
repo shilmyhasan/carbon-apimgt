@@ -342,7 +342,6 @@ public class GatewayUtils {
         if (pipe != null) {
             bufferedInputStream = new BufferedInputStream(pipe.getInputStream());
         }
-
         inputStreamMap = new HashMap<>();
         String contentType = axis2MC.getProperty(ThreatProtectorConstants.CONTENT_TYPE).toString();
         bufferedInputStream.mark(0);
