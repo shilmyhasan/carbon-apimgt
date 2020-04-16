@@ -343,10 +343,11 @@ public class GatewayUtils {
         }
         inputStreamMap = new HashMap<>();
         String contentType = axis2MC.getProperty(ThreatProtectorConstants.CONTENT_TYPE).toString();
-        bufferedInputStream.mark(0);
+
 
         if (bufferedInputStream != null) {
-            if ( bufferedInputStream.read() != -1  ) {
+            bufferedInputStream.mark(0);
+            if (bufferedInputStream.read() != -1  ) {
                 bufferedInputStream.reset();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 byte[] buffer = new byte[requestBufferSize];
@@ -361,7 +362,7 @@ public class GatewayUtils {
                 inputStreamJSON = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
             } else {
                 String payload;
-                if ( ThreatProtectorConstants.APPLICATION_JSON.equals(contentType)){
+                if (ThreatProtectorConstants.APPLICATION_JSON.equals(contentType)){
                     inputStreamJSON = JsonUtil.getJsonPayload(axis2MC);
                 } else {
                    payload = axis2MC.getEnvelope().getBody().getFirstElement().toString();
