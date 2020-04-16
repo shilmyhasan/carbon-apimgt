@@ -29,6 +29,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
+import org.apache.synapse.commons.json.JsonUtil;
 import org.json.JSONObject;
 import org.json.XML;
 import org.json.simple.parser.JSONParser;
@@ -363,16 +364,11 @@ public class GatewayUtils {
             } else {
                 String payload;
                 if ( ThreatProtectorConstants.APPLICATION_JSON.equals(contentType)){
-                    String xmlBody = axis2MC.getEnvelope().getBody().getFirstElement().toString();
-                    JSONObject jsonbody = XML.toJSONObject(xmlBody);
-                    payload = jsonbody.toString();
+                    inputStreamJSON = JsonUtil.getJsonPayload(axis2MC);
                 } else {
                    payload = axis2MC.getEnvelope().getBody().getFirstElement().toString();
+                   inputStreamXml= new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
                 }
-                inputStreamSchema = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-                inputStreamXml= new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-                inputStreamOriginal= new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-                inputStreamJSON= new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
             }
         }
         inputStreamMap.put(ThreatProtectorConstants.SCHEMA, inputStreamSchema);
