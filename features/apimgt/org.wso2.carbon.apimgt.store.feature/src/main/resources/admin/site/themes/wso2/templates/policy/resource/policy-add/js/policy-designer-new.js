@@ -266,12 +266,14 @@ var validIPRange = function (startIP, endIP) {
     var startIPBlocks = startIP.split(".");
     var endIPBlocks = endIP.split(".");
 
+    var startAddr = 0;
+    var endAddr = 0;
+
     for (var i = 0; i < 4; i++) {
-        if (startIPBlocks[i] >= endIPBlocks[i]) {
-            return false;
-        }
+        startAddr = startAddr + startIPBlocks[i] * Math.pow(256, 3 - i);
+        endAddr = endAddr + endIPBlocks[i] * Math.pow(256, 3 - i);
     }
-    return true;
+    return startAddr < endAddr;
 };
 
 var onDateConditionChange = function (id, optionTextOb) {
