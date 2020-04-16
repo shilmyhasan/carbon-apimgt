@@ -29,6 +29,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
+import org.apache.synapse.commons.json.JsonUtil;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -43,12 +44,8 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Collection;
 import java.util.HashMap;
@@ -325,11 +322,11 @@ public class GatewayUtils {
     public static Map<String,InputStream> cloneRequestMessage(org.apache.synapse.MessageContext messageContext)
             throws IOException {
         BufferedInputStream bufferedInputStream = null;
-        Map<String, InputStream> inputStreamMap = null;
-        InputStream inputStreamSchema;
-        InputStream inputStreamXml;
-        InputStream inputStreamJSON;
-        InputStream inputStreamOriginal;
+        Map<String, InputStream> inputStreamMap;
+        InputStream inputStreamSchema = null;
+        InputStream inputStreamXml = null;
+        InputStream inputStreamJSON = null ;
+        InputStream inputStreamOriginal = null;
         int requestBufferSize = 1024;
         org.apache.axis2.context.MessageContext axis2MC;
         Pipe pipe;
@@ -344,25 +341,39 @@ public class GatewayUtils {
         if (pipe != null) {
             bufferedInputStream = new BufferedInputStream(pipe.getInputStream());
         }
+        inputStreamMap = new HashMap<>();
+        String contentType = axis2MC.getProperty(ThreatProtectorConstants.CONTENT_TYPE).toString();
+        bufferedInputStream.mark(0);
+
         if (bufferedInputStream != null) {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] buffer = new byte[requestBufferSize];
-            int length;
-            while ((length = bufferedInputStream.read(buffer)) > -1) {
-                byteArrayOutputStream.write(buffer, 0, length);
+            if (bufferedInputStream.read() != -1) {
+                bufferedInputStream.reset();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                byte[] buffer = new byte[requestBufferSize];
+                int length;
+                while ((length = bufferedInputStream.read(buffer)) > -1) {
+                    byteArrayOutputStream.write(buffer, 0, length);
+                }
+                byteArrayOutputStream.flush();
+                inputStreamSchema = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                inputStreamXml = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                inputStreamOriginal = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                inputStreamJSON = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+            } else {
+                String payload;
+                if (ThreatProtectorConstants.APPLICATION_JSON.equals(contentType)){
+                    inputStreamJSON = JsonUtil.getJsonPayload(axis2MC);
+                } else {
+                   payload = axis2MC.getEnvelope().getBody().getFirstElement().toString();
+                   inputStreamXml= new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
+                }
             }
-            byteArrayOutputStream.flush();
-            inputStreamMap = new HashMap<>();
-            inputStreamSchema = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            inputStreamXml = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            inputStreamOriginal = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            inputStreamJSON = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            inputStreamMap.put(ThreatProtectorConstants.SCHEMA, inputStreamSchema);
-            inputStreamMap.put(ThreatProtectorConstants.XML, inputStreamXml);
-            inputStreamMap.put(ThreatProtectorConstants.ORIGINAL, inputStreamOriginal);
-            inputStreamMap.put(ThreatProtectorConstants.JSON, inputStreamJSON);
         }
-        return  inputStreamMap;
+        inputStreamMap.put(ThreatProtectorConstants.SCHEMA, inputStreamSchema);
+        inputStreamMap.put(ThreatProtectorConstants.XML, inputStreamXml);
+        inputStreamMap.put(ThreatProtectorConstants.ORIGINAL, inputStreamOriginal);
+        inputStreamMap.put(ThreatProtectorConstants.JSON, inputStreamJSON);
+        return inputStreamMap;
     }
 
     /**
