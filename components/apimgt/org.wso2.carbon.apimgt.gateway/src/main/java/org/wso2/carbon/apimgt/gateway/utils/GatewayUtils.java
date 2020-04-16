@@ -346,7 +346,7 @@ public class GatewayUtils {
         bufferedInputStream.mark(0);
 
         if (bufferedInputStream != null) {
-            if (bufferedInputStream.read() != -1  ) {
+            if (bufferedInputStream.read() != -1) {
                 bufferedInputStream.reset();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 byte[] buffer = new byte[requestBufferSize];
