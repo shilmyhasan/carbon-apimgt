@@ -689,6 +689,7 @@ public final class APIConstants {
     public static final String API_STORE_API_KEY_ALIAS = API_STORE + "ApiKeyAlias";
     public static final String WSO2_ANONYMOUS_USER = "wso2.anonymous.user";
 
+
     public static final String API_PUBLISHER = "APIPublisher.";
     public static final String SHOW_API_PUBLISHER_URL_FROM_STORE = API_PUBLISHER + "DisplayURL";
     public static final String API_PUBLISHER_URL = API_PUBLISHER + "URL";
@@ -721,6 +722,8 @@ public final class APIConstants {
     public static final String IDENTITY_PROVIDER = "IdentityProvider.";
     public static final String IDENTITY_PROVIDER_AUTHORIZE_ENDPOINT = IDENTITY_PROVIDER + "AuthorizeEndpoint";
     public static final String IDENTITY_PROVIDER_OIDC_LOGOUT_ENDPOINT = IDENTITY_PROVIDER + "OIDCLogoutEndpoint";
+    public static final String IDENTITY_PROVIDER_SERVER_URL = IDENTITY_PROVIDER + "ServerURL";
+    public static final String IDENTITY_PROVIDER_OIDC_CHECK_SESSION_ENDPOINT = IDENTITY_PROVIDER + "CheckSessionEndpoint";
 
     public static final String SELF_SIGN_UP = "SelfSignUp.";
     public static final String SELF_SIGN_UP_ENABLED = SELF_SIGN_UP + "Enabled";
