@@ -343,10 +343,9 @@ public class GatewayUtils {
         }
         inputStreamMap = new HashMap<>();
         String contentType = axis2MC.getProperty(ThreatProtectorConstants.CONTENT_TYPE).toString();
-
+        bufferedInputStream.mark(0);
 
         if (bufferedInputStream != null) {
-            bufferedInputStream.mark(0);
             if (bufferedInputStream.read() != -1  ) {
                 bufferedInputStream.reset();
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
