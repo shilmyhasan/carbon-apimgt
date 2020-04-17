@@ -38,7 +38,6 @@ public class SubscriptionLoadingDao {
 
     private static Log log = LogFactory.getLog(SubscriptionLoadingDao.class);
     private static SubscriptionLoadingDao subscriptionLoadingDao = null;
-    private static boolean initialAutoCommit = false;
 
     /**
      * Private constructor
@@ -60,17 +59,14 @@ public class SubscriptionLoadingDao {
 
 
     public List<Subscription> getAllSubscriptions() throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
-        ArrayList<Subscription> subscriptions = null;
-        try {
-            conn = APIMgtDBUtil.getConnection();
 
-            String query = SubscriptionConstants.SUBSCRIPTION_LOAD_SQL;
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
-            subscriptions = new ArrayList<Subscription>();
+        ArrayList<Subscription> subscriptions = null;
+        try (Connection conn = APIMgtDBUtil.getConnection();
+             PreparedStatement ps =
+                     conn.prepareStatement(SubscriptionConstants.SUBSCRIPTION_LOAD_SQL);
+             ResultSet resultSet = ps.executeQuery();) {
+
+            subscriptions = new ArrayList<>();
 
             while (resultSet.next()) {
                 Subscription subscription = new Subscription();
@@ -85,26 +81,19 @@ public class SubscriptionLoadingDao {
 
         } catch (SQLException e) {
             handleException("Error in loading Subscription : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
 
         return subscriptions;
     }
 
     public List<Application> getAllApplications() throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
+
         ArrayList<Application> applications = null;
-        try {
-            conn = APIMgtDBUtil.getConnection();
-
-            String query = SubscriptionConstants.APPLICATION_LOAD_SQL;
-
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
-            applications = new ArrayList<Application>();
+        try (Connection conn = APIMgtDBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.APPLICATION_LOAD_SQL);
+             ResultSet resultSet = ps.executeQuery();
+        ) {
+            applications = new ArrayList<>();
 
             while (resultSet.next()) {
                 Application application = new Application();
@@ -121,27 +110,21 @@ public class SubscriptionLoadingDao {
 
         } catch (SQLException e) {
             handleException("Error in loading Applications : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
 
         return applications;
     }
 
     public List<ApplicationKeyMapping> getAllApplicationKeyMappings() throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
+
         ArrayList<ApplicationKeyMapping> keyMappings = null;
-        try {
+        try (
+                Connection conn = APIMgtDBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.AM_KEY_MAPPING);
+                ResultSet resultSet = ps.executeQuery();
+        ) {
 
-            conn = APIMgtDBUtil.getConnection();
-
-            String query = SubscriptionConstants.AM_KEY_MAPPING;
-
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
-            keyMappings = new ArrayList<ApplicationKeyMapping>();
+            keyMappings = new ArrayList<>();
 
             while (resultSet.next()) {
                 ApplicationKeyMapping keyMapping = new ApplicationKeyMapping();
@@ -154,8 +137,6 @@ public class SubscriptionLoadingDao {
 
         } catch (SQLException e) {
             handleException("Error in loading Applications : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
 
         return keyMappings;
@@ -163,17 +144,14 @@ public class SubscriptionLoadingDao {
 
 
     public Map<Integer, Api> getAllApis() throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
+
         Map<Integer, Api> apiMap = null;
-        try {
+        try (
+                Connection conn = APIMgtDBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.API_LOAD_SQL);
+                ResultSet resultSet = ps.executeQuery();
+        ) {
 
-            conn = APIMgtDBUtil.getConnection();
-
-            String query = SubscriptionConstants.API_LOAD_SQL;
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
             apiMap = new HashMap<>();
 
             while (resultSet.next()) {
@@ -184,32 +162,26 @@ public class SubscriptionLoadingDao {
                 api.setApiTier(resultSet.getString("API_TIER"));
                 api.setApiVersion(resultSet.getString("API_VERSION"));
                 api.setContext(resultSet.getString("CONTEXT"));
-                apiMap.put(api.getApiId(),api);
+                apiMap.put(api.getApiId(), api);
             }
 
         } catch (SQLException e) {
             handleException("Error in loading Applications : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
 
         return apiMap;
     }
 
     public List<SubscriptionPolicy> getAllSubscriptionPolicies() throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
+
         ArrayList<SubscriptionPolicy> policies = null;
-        try {
+        try (
+                Connection conn = APIMgtDBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.SUB_POLICY_LOAD_SQL);
+                ResultSet resultSet = ps.executeQuery();
+        ) {
 
-            conn = APIMgtDBUtil.getConnection();
-
-            String query = SubscriptionConstants.SUB_POLICY_LOAD_SQL;
-
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
-            policies = new ArrayList<SubscriptionPolicy>();
+            policies = new ArrayList<>();
 
             while (resultSet.next()) {
                 SubscriptionPolicy policy = new SubscriptionPolicy();
@@ -225,27 +197,20 @@ public class SubscriptionLoadingDao {
 
         } catch (SQLException e) {
             handleException("Error in loading Subscriptions : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
 
         return policies;
     }
 
     public List<ApplicationPolicy> getAllApplicationPolicies() throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
+
         ArrayList<ApplicationPolicy> policies = null;
-        try {
-
-            conn = APIMgtDBUtil.getConnection();
-
-            String query = SubscriptionConstants.APP_POLICY_LOAD_SQL;
-
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
-            policies = new ArrayList<ApplicationPolicy>();
+        try (
+                Connection conn = APIMgtDBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.APP_POLICY_LOAD_SQL);
+                ResultSet resultSet = ps.executeQuery();
+        ) {
+            policies = new ArrayList<>();
 
             while (resultSet.next()) {
                 ApplicationPolicy policy = new ApplicationPolicy();
@@ -258,26 +223,21 @@ public class SubscriptionLoadingDao {
 
         } catch (SQLException e) {
             handleException("Error in loading Subscriptions : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
 
         return policies;
     }
 
-    public Map<Integer, Set<ApiPolicyConditionGroup>> getApiPolicyConditionGroups()  throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
-        Map<Integer,Set<ApiPolicyConditionGroup>> policyMap = null;
+    public Map<Integer, Set<ApiPolicyConditionGroup>> getApiPolicyConditionGroups() throws DataLoadingException {
 
-        try {
-            conn = APIMgtDBUtil.getConnection();
-            String query = SubscriptionConstants.API_POLICY_CONDITION_LOAD_SQL;
+        Map<Integer, Set<ApiPolicyConditionGroup>> policyMap = null;
 
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
-            policyMap = new HashMap<Integer, Set<ApiPolicyConditionGroup>>();
+        try (
+                Connection conn = APIMgtDBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.API_POLICY_CONDITION_LOAD_SQL);
+                ResultSet resultSet = ps.executeQuery();
+        ) {
+            policyMap = new HashMap<>();
 
             while (resultSet.next()) {
                 ApiPolicyConditionGroup policyConditionGroup = new ApiPolicyConditionGroup();
@@ -290,10 +250,10 @@ public class SubscriptionLoadingDao {
                         ApiMgtDAO.getInstance().createConditionGroupDTO(policyConditionGroup.getConditionGroupId());
                 policyConditionGroup.
                         setConditionDTOS(new HashSet<>(Arrays.asList(groupDTO.getConditions())));
-                if(conditionGroups == null) {
+                if (conditionGroups == null) {
                     conditionGroups = new HashSet<>();
                     conditionGroups.add(policyConditionGroup);
-                    policyMap.put(policyConditionGroup.getPolicyId(),conditionGroups);
+                    policyMap.put(policyConditionGroup.getPolicyId(), conditionGroups);
                 } else {
                     conditionGroups.add(policyConditionGroup);
                 }
@@ -303,33 +263,28 @@ public class SubscriptionLoadingDao {
             handleException("Error in loading Subscriptions : " + e.getMessage(), e);
         } catch (APIManagementException e) {
             handleException("Error while creating ConditionGroups : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
         return policyMap;
     }
 
-    public Map<String, Resource> getApiUrlMappings()  throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
-        Map<String,Resource> resourceMap = null;
+    public Map<String, Resource> getApiUrlMappings() throws DataLoadingException {
 
-        try {
-            conn = APIMgtDBUtil.getConnection();
-            String query = SubscriptionConstants.API_URL_MAPPING_LOAD_SQL;
+        Map<String, Resource> resourceMap = null;
 
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
-            resourceMap = new HashMap<String, Resource>();
+        try (
+                Connection conn = APIMgtDBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.API_URL_MAPPING_LOAD_SQL);
+                ResultSet resultSet = ps.executeQuery();
+        ) {
+            resourceMap = new HashMap<>();
 
             while (resultSet.next()) {
                 String urlMapping = resultSet.getString("URL_PATTERN");
                 int apiId = resultSet.getInt("API_ID");
-                Resource resource = new Resource(apiId,urlMapping);
+                Resource resource = new Resource(apiId, urlMapping);
                 Resource cachedResource = resourceMap.get(resource.getCacheKey());
-                if(cachedResource == null){
-                    resourceMap.put(resource.getCacheKey(),resource);
+                if (cachedResource == null) {
+                    resourceMap.put(resource.getCacheKey(), resource);
                     cachedResource = resource;
                 }
                 Verb verb = new Verb();
@@ -347,25 +302,19 @@ public class SubscriptionLoadingDao {
 
         } catch (SQLException e) {
             handleException("Error in loading Subscriptions : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
         return resourceMap;
     }
 
-    public Map<Integer,ApiPolicy> getAllApiPolicies() throws DataLoadingException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet resultSet = null;
-        Map<Integer,ApiPolicy> policyMap = null;
-        try {
+    public Map<Integer, ApiPolicy> getAllApiPolicies() throws DataLoadingException {
 
-            conn = APIMgtDBUtil.getConnection();
-            String query = SubscriptionConstants.API_POLICY_LOAD_SQL;
-
-            ps = conn.prepareStatement(query);
-            resultSet = ps.executeQuery();
-            policyMap = new HashMap<Integer, ApiPolicy>();
+        Map<Integer, ApiPolicy> policyMap = null;
+        try (
+                Connection conn = APIMgtDBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.API_POLICY_LOAD_SQL);
+                ResultSet resultSet = ps.executeQuery();
+        ) {
+            policyMap = new HashMap<>();
 
             while (resultSet.next()) {
                 ApiPolicy policy = new ApiPolicy();
@@ -373,13 +322,11 @@ public class SubscriptionLoadingDao {
                 policy.setTierName(resultSet.getString("NAME"));
                 policy.setQuotaType(resultSet.getString("DEFAULT_QUOTA_TYPE"));
                 policy.setTenantId(resultSet.getInt("TENANT_ID"));
-                policyMap.put(policy.getPolicyId(),policy);
+                policyMap.put(policy.getPolicyId(), policy);
             }
 
         } catch (SQLException e) {
             handleException("Error in loading Subscriptions : " + e.getMessage(), e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
 
         return policyMap;
