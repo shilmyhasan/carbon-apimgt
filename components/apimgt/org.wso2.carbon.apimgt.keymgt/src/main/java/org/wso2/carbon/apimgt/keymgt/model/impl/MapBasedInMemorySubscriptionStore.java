@@ -34,6 +34,7 @@ import org.wso2.carbon.apimgt.keymgt.model.entity.*;
 import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -73,14 +74,6 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         this.apiPolicyMap = new ConcurrentHashMap<>();
         this.subscriptionMap = new ConcurrentHashMap<>();
 
-    }
-
-    public Application finApplicationbyConsumerKey(String consumerKey) {
-        String applicationKeyMappingKey = consumerKey;
-        ApplicationKeyMapping mapping = applicationKeyMappingMap.get(applicationKeyMappingKey);
-
-        return mapping == null ? null :
-                applicationMap.get(mapping.getApplicationId());
     }
 
     @Override
@@ -288,13 +281,19 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         public void run() {
 
             List<V> list = supplier.get();
+            HashMap<K,V> tempMap = new HashMap<>();
 
             if (list != null) {
                 for (V v : list) {
-                    entityMap.put(v.getCacheKey(), v);
+                    tempMap.put(v.getCacheKey(), v);
                     if (log.isDebugEnabled()) {
                         log.debug(String.format("Adding entry Key : %s Value : %s", v.getCacheKey()
                                 , v));
+                    }
+
+                    if(!tempMap.isEmpty()){
+                        entityMap.clear();
+                        entityMap.putAll(tempMap);
                     }
                 }
 
