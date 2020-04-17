@@ -22,7 +22,7 @@ import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
-public class KeyValidationHandlerConfig implements LoadableConfig{
+public class KeyValidationHandlerConfig{
 
     public static final String KEY_VALIDATOR_IMPL = "KeyValidationHandlerImpl";
 
@@ -36,7 +36,6 @@ public class KeyValidationHandlerConfig implements LoadableConfig{
         this.implementingClass = implementingClass;
     }
 
-    @Override
     public void loadFromNode(OMElement node) {
          OMElement childNode = node.getFirstChildWithName(new QName(KEY_VALIDATOR_IMPL));
          implementingClass = childNode.getText();
