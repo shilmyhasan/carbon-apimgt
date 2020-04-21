@@ -116,6 +116,7 @@ import org.wso2.carbon.apimgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.apimgt.impl.template.APITemplateBuilderImpl;
 import org.wso2.carbon.apimgt.impl.template.APITemplateException;
 import org.wso2.carbon.apimgt.impl.template.ThrottlePolicyTemplateBuilder;
+import org.wso2.carbon.apimgt.impl.token.ClaimsRetriever;
 import org.wso2.carbon.apimgt.impl.utils.APIAuthenticationAdminClient;
 import org.wso2.carbon.apimgt.impl.utils.APINameComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIStoreNameComparator;
@@ -181,6 +182,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -2004,6 +2006,55 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             apiMgtDAO.makeKeysForwardCompatible(new ApiTypeWrapper(api), oldVersion
             );
         }
+    }
+
+    /**
+     * Returns the subscriber name for the given subscription id.
+     *
+     * @param subscriptionId The subscription id of the subscriber to be returned
+     * @return The subscriber or null if the requested subscriber does not exist
+     * @throws APIManagementException if failed to get Subscriber
+     */
+    @Override
+    public String getSubscriber(String subscriptionId) throws APIManagementException {
+        return apiMgtDAO.getSubscriberName(subscriptionId);
+    }
+
+    /**
+     * Returns the claims of subscriber for the given subscriber.
+     *
+     * @param subscriber The name of the subscriber to be returned
+     * @return The looked up claims of the subscriber or null if the requested subscriber does not exist
+     * @throws APIManagementException if failed to get Subscriber
+     */
+    @Override
+    public List getSubscriberClaims(String subscriber) throws APIManagementException {
+        String tenantDomain = MultitenantUtils.getTenantDomain(subscriber);
+        int tenantId = 0;
+        List claimList = new ArrayList();
+        try {
+            tenantId = getTenantId(tenantDomain);
+            SortedMap<String, String> subscriberClaims =
+                    APIUtil.getClaims(subscriber, tenantId, ClaimsRetriever.DEFAULT_DIALECT_URI);
+            APIManagerConfiguration configuration = getAPIManagerConfiguration();
+            String configuredClaims = configuration
+                    .getFirstProperty(APIConstants.API_PUBLISHER_SUBSCRIBER_CLAIMS);
+            if (StringUtils.isEmpty(configuredClaims)) {
+                configuredClaims = "http://wso2.org/claims/givenname,http://wso2.org/claims/lastname," +
+                        "http://wso2.org/claims/emailaddress,http://wso2.org/claims/organization";
+            }
+            if (subscriberClaims != null) {
+                for (String claimURI : configuredClaims.split(",")) {
+                    Map<String, String> claimMap = new HashMap<>();
+                    claimMap.put(claimURI, subscriberClaims.get(claimURI));
+                    claimList.add(claimMap);
+                }
+            }
+        } catch (UserStoreException e) {
+            throw new APIManagementException("Error while retrieving tenant id for tenant domain "
+                    + tenantDomain, e);
+        }
+        return claimList;
     }
 
     private Map<String, String> publishToGateway(API api) throws APIManagementException {
