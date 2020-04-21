@@ -31,62 +31,77 @@ public class Subscription implements CachableEntity<String> {
     private long createdTime;
 
     public int getSubscriptionId() {
+
         return subscriptionId;
     }
 
     public void setSubscriptionId(int subscriptionId) {
+
         this.subscriptionId = subscriptionId;
     }
 
     public String getTierName() {
+
         return tierName;
     }
 
     public void setTierName(String tierName) {
+
         this.tierName = tierName;
     }
 
     public int getApiId() {
+
         return apiId;
     }
 
     public void setApiId(int apiId) {
+
         this.apiId = apiId;
     }
 
     public int getAppId() {
+
         return appId;
     }
 
     public void setAppId(int appId) {
+
         this.appId = appId;
     }
 
     public String getSubscriptionState() {
+
         return subscriptionState;
     }
 
     public void setSubscriptionState(String subscriptionState) {
+
         this.subscriptionState = subscriptionState;
     }
 
     public String getSubscriptionWfState() {
+
         return subscriptionWfState;
     }
 
     public void setSubscriptionWfState(String subscriptionWfState) {
+
         this.subscriptionWfState = subscriptionWfState;
     }
 
     public long getCreatedTime() {
+
         return createdTime;
     }
 
     public void setCreatedTime(long createdTime) {
+
         this.createdTime = createdTime;
     }
 
     public String getCacheKey() {
+
         return getAppId() + "." + getApiId();
     }
 }

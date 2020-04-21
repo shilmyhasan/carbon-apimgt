@@ -32,7 +32,7 @@ import org.wso2.carbon.apimgt.keymgt.internal.RegistrationHolder;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
 import org.wso2.carbon.apimgt.keymgt.model.entity.*;
-import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
+import org.wso2.carbon.apimgt.keymgt.model.exception.InitializationException;
 import org.wso2.carbon.apimgt.keymgt.model.impl.MapBasedInMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -45,15 +45,18 @@ import java.util.List;
 /**
  * A validation handler that validates subscription by referring to in-memory data.
  */
-public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationHandler implements KeyValidatorConfigInitializable {
+public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationHandler
+        implements KeyValidatorConfigInitializable {
 
     private static final Log log = LogFactory.getLog(InMemorySubscriptionValidationHandler.class);
     public static final String API_LEVEL_THROTTLING_KEY = "api_level_throttling_key";
     private InMemorySubscriptionStore inMemoryStore = null;
 
     @Override
-    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
-        InMemorySubscriptionValidationHandlerConfig inMemoryConfig = (InMemorySubscriptionValidationHandlerConfig) config;
+    public void initialize(KeyValidationHandlerConfig config) throws InitializationException {
+
+        InMemorySubscriptionValidationHandlerConfig inMemoryConfig =
+                (InMemorySubscriptionValidationHandlerConfig) config;
         String subscriptionStoreClass =
                 inMemoryConfig.getSubscriptionStoreConfig().getImplementingClass();
         try {
@@ -64,26 +67,28 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
                     this.inMemoryStore);
 
             if (this.inMemoryStore instanceof KeyValidatorConfigInitializable) {
-                ((KeyValidatorConfigInitializable) this.inMemoryStore).initialise(inMemoryConfig.getSubscriptionStoreConfig());
+                ((KeyValidatorConfigInitializable) this.inMemoryStore)
+                        .initialize(inMemoryConfig.getSubscriptionStoreConfig());
 
             }
-        } catch (InitialisationException e) {
+        } catch (InitializationException e) {
             log.error("Error occurred while instantiating in MemoryStore", e);
-            throw new InitialisationException(e);
+            throw new InitializationException(e);
         } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException |
                 IllegalAccessException | InvocationTargetException e) {
             log.error("Error occurred while instantiating " + subscriptionStoreClass, e);
-            throw new InitialisationException(e);
+            throw new InitializationException(e);
         }
     }
 
     @Override
     public boolean validateSubscription(TokenValidationContext validationContext) throws APIKeyMgtException {
+
         log.debug("Inside validateSubscription");
 
         boolean state = validateResourceAuthenticationScheme(validationContext);
 
-        if(!state){
+        if (!state) {
             return false;
         }
 
@@ -124,9 +129,9 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
         String subscriptionStatus = subscription.getSubscriptionState();
         String keyType = mapping.getKeyType();
 
-        state = validateAndSetSubscriptionStatus(subscriptionStatus,keyType,dto);
+        state = validateAndSetSubscriptionStatus(subscriptionStatus, keyType, dto);
 
-        if(!state){
+        if (!state) {
             return false;
         }
 
@@ -145,7 +150,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
                     dto, api, subscription, application);
         }
 
-        if(!state){
+        if (!state) {
             setForNonExistentSubscription(validationContext);
             return false;
         }
@@ -153,7 +158,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
         return true;
     }
 
-    private boolean validateResourceAuthenticationScheme(TokenValidationContext validationContext){
+    private boolean validateResourceAuthenticationScheme(TokenValidationContext validationContext) {
 
         if (validationContext == null || validationContext.getValidationInfoDTO() == null) {
             return false;
@@ -165,11 +170,12 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
 
         APIKeyValidationInfoDTO dto = validationContext.getValidationInfoDTO();
 
-
         if (validationContext.getTokenInfo() != null) {
             if (validationContext.getTokenInfo().isApplicationToken()) {
                 dto.setUserType(APIConstants.ACCESS_TOKEN_USER_TYPE_APPLICATION);
             } else {
+
+                // TODO: Replace this with a constant
                 dto.setUserType("APPLICATION_USER");
             }
 
@@ -192,8 +198,10 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
      * @param validationContext
      */
     private void setForNonExistentSubscription(TokenValidationContext validationContext) {
+
         validationContext.getValidationInfoDTO().setAuthorized(false);
-        validationContext.getValidationInfoDTO().setValidationStatus(APIConstants.KeyValidationStatus.API_AUTH_RESOURCE_FORBIDDEN);
+        validationContext.getValidationInfoDTO()
+                .setValidationStatus(APIConstants.KeyValidationStatus.API_AUTH_RESOURCE_FORBIDDEN);
     }
 
     /**
@@ -202,7 +210,8 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
      */
     private boolean validateAndSetAdvancedThrottlingTiers(String matchingResource, String httpVerb,
                                                           APIKeyValidationInfoDTO dto, Api api,
-                                                          Subscription subscription, Application application){
+                                                          Subscription subscription, Application application) {
+
         String apiTier = api.getApiTier();
         if (apiTier == null) {
             Resource resource = api.getResource(matchingResource);
@@ -220,13 +229,14 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
                         MultitenantConstants.SUPER_TENANT_ID);
 
         ApplicationPolicy applicationPolicy =
-                inMemoryStore.getApplicationPolicyByName(application.getAppTier(), MultitenantConstants.SUPER_TENANT_ID);
+                inMemoryStore
+                        .getApplicationPolicyByName(application.getAppTier(), MultitenantConstants.SUPER_TENANT_ID);
 
         ApiPolicy apiPolicy = inMemoryStore.getApiPolicyByName(apiTier, MultitenantConstants.SUPER_TENANT_ID);
 
         // If any of the Policies are null, that means in memory store hasn't been updated in a
         // while.
-        if(subscriptionPolicy == null || applicationPolicy == null || apiPolicy == null) {
+        if (subscriptionPolicy == null || applicationPolicy == null || apiPolicy == null) {
             log.error("Throttling policy not found in the in-memory Store");
             return false;
         }
@@ -264,6 +274,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
      */
     private boolean validateAndSetSubscriptionStatus(String subscriptionStatus, String keyType,
                                                      APIKeyValidationInfoDTO dto) {
+
         if (APIConstants.SubscriptionStatus.BLOCKED.equals(subscriptionStatus)) {
             dto.setValidationStatus(APIConstants.KeyValidationStatus.API_BLOCKED);
             dto.setAuthorized(false);
@@ -284,15 +295,15 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
         return true;
     }
 
-
-
     @Override
     public boolean validateScopes(TokenValidationContext validationContext) throws APIKeyMgtException {
+
         return true;
     }
 
     @Override
     public boolean generateConsumerToken(TokenValidationContext validationContext) throws APIKeyMgtException {
+
         return true;
     }
 }

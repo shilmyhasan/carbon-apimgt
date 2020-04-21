@@ -32,70 +32,87 @@ public class Application implements CachableEntity<Integer> {
     private int tenantId;
 
     public int getSubId() {
+
         return subId;
     }
 
     public void setSubId(int subId) {
+
         this.subId = subId;
     }
 
     public int getTenantId() {
+
         return tenantId;
     }
 
     public void setTenantId(int tenantId) {
+
         this.tenantId = tenantId;
     }
 
     public int getAppId() {
+
         return appId;
     }
 
     public void setAppId(int appId) {
+
         this.appId = appId;
     }
 
     public String getAppName() {
+
         return appName;
     }
 
     public void setAppName(String appName) {
+
         this.appName = appName;
     }
 
     public String getSubName() {
+
         return subName;
     }
 
     public void setSubName(String subName) {
+
         this.subName = subName;
     }
 
     public String getAppTier() {
+
         return appTier;
     }
 
     public void setAppTier(String appTier) {
+
         this.appTier = appTier;
     }
 
     public String getAppStatus() {
+
         return appStatus;
     }
 
     public void setAppStatus(String appStatus) {
+
         this.appStatus = appStatus;
     }
 
     public String getCreatedBy() {
+
         return createdBy;
     }
 
     public void setCreatedBy(String createdBy) {
+
         this.createdBy = createdBy;
     }
 
     public Integer getCacheKey() {
+
         return getAppId();
     }
 }

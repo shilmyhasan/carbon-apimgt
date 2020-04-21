@@ -36,66 +36,82 @@ public class Api implements CachableEntity<String> {
     private Map<String, Resource> resourceMap = new HashMap<>();
 
     public void addResource(Resource resource) {
+
         resourceMap.put(resource.getUrlPattern(), resource);
     }
 
     public Resource getResource(String urlMapping) {
+
         return resourceMap.get(urlMapping);
     }
 
     public List<Resource> getAllResources() {
+
         return Arrays.asList(resourceMap.values().toArray(new Resource[]{}));
     }
 
     public String getContext() {
+
         return context;
     }
 
     public void setContext(String context) {
+
         this.context = context;
     }
 
     public String getApiTier() {
+
         return apiTier;
     }
 
     public void setApiTier(String apiTier) {
+
         this.apiTier = apiTier;
     }
 
     public int getApiId() {
+
         return apiId;
     }
 
     public void setApiId(int apiId) {
+
         this.apiId = apiId;
     }
 
     public String getApiProvider() {
+
         return apiProvider;
     }
 
     public void setApiProvider(String apiProvider) {
+
         this.apiProvider = apiProvider;
     }
 
     public String getApiName() {
+
         return apiName;
     }
 
     public void setApiName(String apiName) {
+
         this.apiName = apiName;
     }
 
     public String getApiVersion() {
+
         return apiVersion;
     }
 
     public void setApiVersion(String apiVersion) {
+
         this.apiVersion = apiVersion;
     }
 
     public String getCacheKey() {
+
         return context + "." + apiVersion;
     }
 }

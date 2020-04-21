@@ -24,9 +24,17 @@ import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataLoader;
 import org.wso2.carbon.apimgt.keymgt.model.dao.SubscriptionLoadingDao;
-import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicyConditionGroup;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Application;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationKeyMapping;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Resource;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Subscription;
+import org.wso2.carbon.apimgt.keymgt.model.entity.SubscriptionPolicy;
 import org.wso2.carbon.apimgt.keymgt.model.exception.DataLoadingException;
-import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
+import org.wso2.carbon.apimgt.keymgt.model.exception.InitializationException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,24 +48,27 @@ public class DbDataLoader implements SubscriptionDataLoader, KeyValidatorConfigI
 
     private static final Log log = LogFactory.getLog(DbDataLoader.class);
 
-
     @Override
     public List<Subscription> loadAllSubscriptions() throws DataLoadingException {
+
         return SubscriptionLoadingDao.getInstance().getAllSubscriptions();
     }
 
     @Override
     public List<Application> loadAllApplications() throws DataLoadingException {
+
         return SubscriptionLoadingDao.getInstance().getAllApplications();
     }
 
     @Override
     public List<ApplicationKeyMapping> loadAllKeyMappings() throws DataLoadingException {
+
         return SubscriptionLoadingDao.getInstance().getAllApplicationKeyMappings();
     }
 
     @Override
     public List<Api> loadAllApis() throws DataLoadingException {
+
         Map<Integer, Api> apiMap = SubscriptionLoadingDao.getInstance().getAllApis();
         Map<String, Resource> resourceMap = SubscriptionLoadingDao.getInstance().getApiUrlMappings();
         for (Resource resource : resourceMap.values()) {
@@ -73,11 +84,13 @@ public class DbDataLoader implements SubscriptionDataLoader, KeyValidatorConfigI
 
     @Override
     public List<SubscriptionPolicy> loadAllSubscriptionPolicies() throws DataLoadingException {
+
         return SubscriptionLoadingDao.getInstance().getAllSubscriptionPolicies();
     }
 
     @Override
     public List<ApiPolicy> loadAllApiPolicies() throws DataLoadingException {
+
         Map<Integer, ApiPolicy> apiPolicyMap =
                 SubscriptionLoadingDao.getInstance().getAllApiPolicies();
         Map<Integer, Set<ApiPolicyConditionGroup>> conditionGroups =
@@ -94,11 +107,12 @@ public class DbDataLoader implements SubscriptionDataLoader, KeyValidatorConfigI
 
     @Override
     public List<ApplicationPolicy> loadAllAppPolicies() throws DataLoadingException {
+
         return SubscriptionLoadingDao.getInstance().getAllApplicationPolicies();
     }
 
     @Override
-    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
+    public void initialize(KeyValidationHandlerConfig config) throws InitializationException {
         // Currently this class doesn't have any configs.
     }
 }

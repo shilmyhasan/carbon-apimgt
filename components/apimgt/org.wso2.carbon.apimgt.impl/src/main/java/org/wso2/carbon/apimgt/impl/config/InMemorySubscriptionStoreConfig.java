@@ -22,12 +22,13 @@ import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
-public class InMemorySubscriptionStoreConfig extends KeyValidationHandlerConfig{
+public class InMemorySubscriptionStoreConfig extends KeyValidationHandlerConfig {
 
     public static final String IN_MEM_SUBSCRIPTION_STORE_IMPL = "InMemorySubscriptionStoreImpl";
 
     @Override
     public void loadFromNode(OMElement node) {
+
         OMElement subImpl = node.getFirstChildWithName(new QName(IN_MEM_SUBSCRIPTION_STORE_IMPL));
         this.implementingClass = subImpl != null ? subImpl.getText() : null;
     }

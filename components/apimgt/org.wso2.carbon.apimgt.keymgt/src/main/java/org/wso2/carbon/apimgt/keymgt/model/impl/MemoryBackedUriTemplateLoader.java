@@ -28,7 +28,11 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.internal.RegistrationHolder;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.model.UriTemplateLoader;
-import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicyConditionGroup;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Resource;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Verb;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.ArrayList;
@@ -47,6 +51,7 @@ public class MemoryBackedUriTemplateLoader implements UriTemplateLoader {
     private InMemorySubscriptionStore memorySubscriptionStore;
 
     public MemoryBackedUriTemplateLoader() {
+
         this.memorySubscriptionStore =
                 (InMemorySubscriptionStore) RegistrationHolder.getInstance().
                         getReference(InMemorySubscriptionStore.class.getName());
@@ -110,6 +115,7 @@ public class MemoryBackedUriTemplateLoader implements UriTemplateLoader {
     }
 
     private void setAdvancedThrottlingPolicies(URITemplate uriTemplate) {
+
         ApiPolicy policy =
                 memorySubscriptionStore.getApiPolicyByName(uriTemplate.getThrottlingTier(),
                         MultitenantConstants.SUPER_TENANT_ID);

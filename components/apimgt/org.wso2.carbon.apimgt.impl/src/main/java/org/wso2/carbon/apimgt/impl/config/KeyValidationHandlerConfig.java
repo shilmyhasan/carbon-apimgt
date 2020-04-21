@@ -22,22 +22,25 @@ import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
-public class KeyValidationHandlerConfig{
+public class KeyValidationHandlerConfig {
 
     public static final String KEY_VALIDATOR_IMPL = "KeyValidationHandlerImpl";
 
     protected String implementingClass;
 
     public String getImplementingClass() {
+
         return implementingClass;
     }
 
     public void setImplementingClass(String implementingClass) {
+
         this.implementingClass = implementingClass;
     }
 
     public void loadFromNode(OMElement node) {
-         OMElement childNode = node.getFirstChildWithName(new QName(KEY_VALIDATOR_IMPL));
-         implementingClass = childNode.getText();
+
+        OMElement childNode = node.getFirstChildWithName(new QName(KEY_VALIDATOR_IMPL));
+        implementingClass = childNode.getText();
     }
 }

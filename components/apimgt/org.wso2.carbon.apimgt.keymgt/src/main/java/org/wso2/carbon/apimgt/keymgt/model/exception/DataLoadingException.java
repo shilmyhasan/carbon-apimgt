@@ -26,14 +26,17 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 public class DataLoadingException extends APIManagementException {
 
     public DataLoadingException(String message) {
+
         super(message);
     }
 
     public DataLoadingException(String message, Throwable cause) {
+
         super(message, cause);
     }
 
     public DataLoadingException(Throwable cause) {
+
         super(cause);
     }
 }

@@ -25,15 +25,18 @@ public class ApiPolicy extends Policy {
     private Set<ApiPolicyConditionGroup> conditionGroups;
 
     public Set<ApiPolicyConditionGroup> getConditionGroups() {
+
         return conditionGroups;
     }
 
     public void setConditionGroups(Set<ApiPolicyConditionGroup> conditionGroups) {
+
         this.conditionGroups = conditionGroups;
     }
 
     @Override
     public boolean isContentAware() {
+
         if (super.isContentAware()) {
             return true;
         }

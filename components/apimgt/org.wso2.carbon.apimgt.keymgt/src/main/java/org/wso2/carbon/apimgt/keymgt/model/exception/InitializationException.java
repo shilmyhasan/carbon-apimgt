@@ -22,20 +22,25 @@ package org.wso2.carbon.apimgt.keymgt.model.exception;
  * Thrown when an error occurs during initialising
  * {@link org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig}
  */
-public class InitialisationException extends Exception {
-    public InitialisationException() {
+public class InitializationException extends Exception {
+
+    public InitializationException() {
+
         super();
     }
 
-    public InitialisationException(String message) {
+    public InitializationException(String message) {
+
         super(message);
     }
 
-    public InitialisationException(String message, Throwable cause) {
+    public InitializationException(String message, Throwable cause) {
+
         super(message, cause);
     }
 
-    public InitialisationException(Throwable cause) {
+    public InitializationException(Throwable cause) {
+
         super(cause);
     }
 }

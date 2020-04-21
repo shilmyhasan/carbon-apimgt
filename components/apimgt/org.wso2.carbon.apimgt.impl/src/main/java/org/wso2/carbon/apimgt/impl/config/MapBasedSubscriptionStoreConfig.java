@@ -41,81 +41,91 @@ public class MapBasedSubscriptionStoreConfig extends InMemorySubscriptionStoreCo
     private int policyLoadingFrequency;
 
     public int getApiLoadingFrequency() {
+
         return apiLoadingFrequency;
     }
 
     public void setApiLoadingFrequency(int apiLoadingFrequency) {
+
         this.apiLoadingFrequency = apiLoadingFrequency;
     }
 
     public int getAppLoadingFrequency() {
+
         return appLoadingFrequency;
     }
 
     public void setAppLoadingFrequency(int appLoadingFrequency) {
+
         this.appLoadingFrequency = appLoadingFrequency;
     }
 
     public int getSubLoadingFrequency() {
+
         return subLoadingFrequency;
     }
 
     public void setSubLoadingFrequency(int subLoadingFrequency) {
+
         this.subLoadingFrequency = subLoadingFrequency;
     }
 
     public int getKeyMappingLoadingFrequency() {
+
         return keyMappingLoadingFrequency;
     }
 
     public void setKeyMappingLoadingFrequency(int keyMappingLoadingFrequency) {
+
         this.keyMappingLoadingFrequency = keyMappingLoadingFrequency;
     }
 
     public int getPolicyLoadingFrequency() {
+
         return policyLoadingFrequency;
     }
 
     public void setPolicyLoadingFrequency(int policyLoadingFrequency) {
+
         this.policyLoadingFrequency = policyLoadingFrequency;
     }
 
-
-
     public SubscriptionDataLoaderConfig getSubscriptionDataLoaderConfig() {
+
         return subscriptionDataLoaderConfig;
     }
 
     @Override
     public void loadFromNode(OMElement node) {
+
         super.loadFromNode(node);
         OMElement configElement =
                 node.getFirstChildWithName(new QName(APIConstants.ApiKeyValidator.CONFIGURATION_ELEMENT));
 
-            if (configElement != null) {
-                OMElement apiElement =
-                        configElement.getFirstChildWithName(new QName(API_LOADING_FREQUENCY));
-                this.apiLoadingFrequency = apiElement != null ?
-                        Integer.parseInt(apiElement.getText()) : -1;
+        if (configElement != null) {
+            OMElement apiElement =
+                    configElement.getFirstChildWithName(new QName(API_LOADING_FREQUENCY));
+            this.apiLoadingFrequency = apiElement != null ?
+                    Integer.parseInt(apiElement.getText()) : -1;
 
-                OMElement appElement = configElement.getFirstChildWithName(new QName(APP_LOADING_FREQUENCY));
-                this.appLoadingFrequency = appElement != null ?
-                        Integer.parseInt(appElement.getText()) : -1;
+            OMElement appElement = configElement.getFirstChildWithName(new QName(APP_LOADING_FREQUENCY));
+            this.appLoadingFrequency = appElement != null ?
+                    Integer.parseInt(appElement.getText()) : -1;
 
-                OMElement kmElement =
-                        configElement.getFirstChildWithName(new QName(KEYMAPPING_LOADING_FREQUENCY));
-                this.keyMappingLoadingFrequency = kmElement != null ?
-                        Integer.parseInt(kmElement.getText()) : -1;
+            OMElement kmElement =
+                    configElement.getFirstChildWithName(new QName(KEYMAPPING_LOADING_FREQUENCY));
+            this.keyMappingLoadingFrequency = kmElement != null ?
+                    Integer.parseInt(kmElement.getText()) : -1;
 
-                OMElement policyElement =
-                        configElement.getFirstChildWithName(new QName(POLICY_LOADING_FREQUENCY));
-                this.policyLoadingFrequency = policyElement != null ?
-                        Integer.parseInt(policyElement.getText()) : -1;
+            OMElement policyElement =
+                    configElement.getFirstChildWithName(new QName(POLICY_LOADING_FREQUENCY));
+            this.policyLoadingFrequency = policyElement != null ?
+                    Integer.parseInt(policyElement.getText()) : -1;
 
-                OMElement subElement =
-                        configElement.getFirstChildWithName(new QName(SUB_LOADING_FREQUENCY));
-                this.subLoadingFrequency = subElement != null ?
-                        Integer.parseInt(subElement.getText()) : -1;
+            OMElement subElement =
+                    configElement.getFirstChildWithName(new QName(SUB_LOADING_FREQUENCY));
+            this.subLoadingFrequency = subElement != null ?
+                    Integer.parseInt(subElement.getText()) : -1;
 
             this.subscriptionDataLoaderConfig = new DbLoaderConfig();
 
@@ -126,6 +136,5 @@ public class MapBasedSubscriptionStoreConfig extends InMemorySubscriptionStoreCo
         }
 
     }
-
 
 }

@@ -30,15 +30,17 @@ public class InMemorySubscriptionValidationHandlerConfig extends KeyValidationHa
     private InMemorySubscriptionStoreConfig subscriptionStoreConfig;
 
     public InMemorySubscriptionStoreConfig getSubscriptionStoreConfig() {
+
         return subscriptionStoreConfig;
     }
 
     @Override
     public void loadFromNode(OMElement node) {
+
         super.loadFromNode(node);
         OMElement configElement =
                 node.getFirstChildWithName(new QName(APIConstants.ApiKeyValidator.CONFIGURATION_ELEMENT));
-        if(configElement != null){
+        if (configElement != null) {
             OMElement subStore =
                     configElement.getFirstChildWithName(new QName(IN_MEM_SUBSCRIPTION_STORE));
             this.subscriptionStoreConfig = new MapBasedSubscriptionStoreConfig();

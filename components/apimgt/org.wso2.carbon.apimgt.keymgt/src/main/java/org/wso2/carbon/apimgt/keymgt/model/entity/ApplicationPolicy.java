@@ -18,5 +18,6 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
-public class ApplicationPolicy extends Policy{
+public class ApplicationPolicy extends Policy {
+
 }

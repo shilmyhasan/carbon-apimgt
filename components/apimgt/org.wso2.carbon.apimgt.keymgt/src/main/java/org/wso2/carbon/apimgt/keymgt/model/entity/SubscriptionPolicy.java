@@ -25,26 +25,32 @@ public class SubscriptionPolicy extends Policy {
     private boolean stopOnQuotaReach;
 
     public int getRateLimitCount() {
+
         return rateLimitCount;
     }
 
     public void setRateLimitCount(int rateLimitCount) {
+
         this.rateLimitCount = rateLimitCount;
     }
 
     public String getRateLimitTimeUnit() {
+
         return rateLimitTimeUnit;
     }
 
     public void setRateLimitTimeUnit(String rateLimitTimeUnit) {
+
         this.rateLimitTimeUnit = rateLimitTimeUnit;
     }
 
     public boolean isStopOnQuotaReach() {
+
         return stopOnQuotaReach;
     }
 
     public void setStopOnQuotaReach(boolean stopOnQuotaReach) {
+
         this.stopOnQuotaReach = stopOnQuotaReach;
     }
 }

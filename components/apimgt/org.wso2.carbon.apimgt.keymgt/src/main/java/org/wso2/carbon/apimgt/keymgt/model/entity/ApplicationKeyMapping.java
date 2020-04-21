@@ -28,39 +28,48 @@ public class ApplicationKeyMapping implements CachableEntity<String> {
     private int applicationId;
 
     public String getConsumerKey() {
+
         return consumerKey;
     }
 
     public void setConsumerKey(String consumerKey) {
+
         this.consumerKey = consumerKey;
     }
 
     public String getKeyType() {
+
         return keyType;
     }
 
     public void setKeyType(String keyType) {
+
         this.keyType = keyType;
     }
 
     public String getWfState() {
+
         return wfState;
     }
 
     public void setWfState(String wfState) {
+
         this.wfState = wfState;
     }
 
     public int getApplicationId() {
+
         return applicationId;
     }
 
     public void setApplicationId(int applicationId) {
+
         this.applicationId = applicationId;
     }
 
     @Override
     public String getCacheKey() {
+
         return getConsumerKey();
     }
 }

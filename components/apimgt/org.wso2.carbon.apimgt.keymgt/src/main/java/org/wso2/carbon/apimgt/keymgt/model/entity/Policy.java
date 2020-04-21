@@ -22,50 +22,60 @@ import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 
 public class Policy implements CachableEntity<String> {
+
     private int policyId;
     private int tenantId;
     private String tierName;
     private String quotaType;
 
     public int getPolicyId() {
+
         return policyId;
     }
 
     public void setPolicyId(int policyId) {
+
         this.policyId = policyId;
     }
 
     public String getQuotaType() {
+
         return quotaType;
     }
 
     public void setQuotaType(String quotaType) {
+
         this.quotaType = quotaType;
     }
 
     public boolean isContentAware() {
+
         return PolicyConstants.BANDWIDTH_TYPE.equals(quotaType);
     }
 
-
     public int getTenantId() {
+
         return tenantId;
     }
 
     public void setTenantId(int tenantId) {
+
         this.tenantId = tenantId;
     }
 
     public String getTierName() {
+
         return tierName;
     }
 
     public void setTierName(String tierName) {
+
         this.tierName = tierName;
     }
 
     @Override
     public String getCacheKey() {
+
         return getTierName() + "." + getTenantId();
     }
 }

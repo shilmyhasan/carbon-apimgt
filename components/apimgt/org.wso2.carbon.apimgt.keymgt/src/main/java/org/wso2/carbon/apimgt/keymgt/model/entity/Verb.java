@@ -31,42 +31,52 @@ public class Verb {
     private String script;
 
     public String getScript() {
+
         return script;
     }
 
     public void setScript(String script) {
+
         this.script = script;
     }
 
     public int getVerbId() {
+
         return verbId;
     }
 
     public void setVerbId(int verbId) {
+
         this.verbId = verbId;
     }
 
     public String getHttpVerb() {
+
         return httpVerb;
     }
 
     public void setHttpVerb(String httpVerb) {
+
         this.httpVerb = httpVerb;
     }
 
     public String getAuthType() {
+
         return authType;
     }
 
     public void setAuthType(String authType) {
+
         this.authType = authType;
     }
 
     public String getThrottlingTier() {
+
         return throttlingTier;
     }
 
     public void setThrottlingTier(String throttlingTier) {
+
         this.throttlingTier = throttlingTier;
     }
 }

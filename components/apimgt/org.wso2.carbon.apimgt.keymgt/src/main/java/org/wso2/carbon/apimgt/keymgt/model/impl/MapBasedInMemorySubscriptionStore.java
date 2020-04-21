@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.impl;
 
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -30,14 +29,24 @@ import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataLoader;
-import org.wso2.carbon.apimgt.keymgt.model.entity.*;
-import org.wso2.carbon.apimgt.keymgt.model.exception.InitialisationException;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Application;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationKeyMapping;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Policy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Subscription;
+import org.wso2.carbon.apimgt.keymgt.model.entity.SubscriptionPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.exception.InitializationException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -65,6 +74,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
     private MapBasedSubscriptionStoreConfig mapBasedSubscriptionStoreConfig;
 
     public MapBasedInMemorySubscriptionStore() {
+
         this.applicationKeyMappingMap = new ConcurrentHashMap<>();
         this.applicationMap = new ConcurrentHashMap<>();
         this.apiMap = new ConcurrentHashMap<>();
@@ -78,16 +88,19 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
     @Override
     public Application getApplicationById(int appId) {
+
         return applicationMap.get(appId);
     }
 
     @Override
     public ApplicationKeyMapping getKeyMappingByConsumerKey(String consumerKey) {
+
         return applicationKeyMappingMap.get(consumerKey);
     }
 
     @Override
     public Api getApiByContextAndVersion(String context, String version) {
+
         Api api = new Api();
         api.setContext(context);
         api.setApiVersion(version);
@@ -96,6 +109,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
     @Override
     public Subscription getSubscriptionByApiAndApplication(Application application, Api api) {
+
         Subscription subKey = new Subscription();
         subKey.setAppId(application.getAppId());
         subKey.setApiId(api.getApiId());
@@ -104,30 +118,35 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
     @Override
     public Policy getPolicyByName(String policyName, int tenantId) {
+
         Policy policy = new Policy();
         policy.setTierName(policyName);
         policy.setTenantId(tenantId);
         return policyMap.get(policy.getCacheKey());
     }
 
-
     @Override
     public SubscriptionPolicy getSubscriptionPolicyByName(String policyName, int tenantId) {
+
         return getPolicy(policyName, tenantId, subPolicyMap);
     }
 
     @Override
     public ApplicationPolicy getApplicationPolicyByName(String policyName, int tenantId) {
+
         return getPolicy(policyName, tenantId, appPolicyMap);
     }
 
     @Override
     public ApiPolicy getApiPolicyByName(String policyName, int tenantId) {
+
         return getPolicy(policyName, tenantId, apiPolicyMap);
     }
 
+    //TODO: change to initialize
     @Override
-    public void initialise(KeyValidationHandlerConfig config) throws InitialisationException {
+    public void initialize(KeyValidationHandlerConfig config) throws InitializationException {
+
         this.mapBasedSubscriptionStoreConfig =
                 (MapBasedSubscriptionStoreConfig) config;
         String subscriptionDataLoader =
@@ -136,20 +155,21 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         if (subscriptionDataLoader != null) {
             try {
                 this.dataLoader =
-                        (SubscriptionDataLoader) APIUtil.getClassForName(subscriptionDataLoader.trim()).getDeclaredConstructor().newInstance();
+                        (SubscriptionDataLoader) APIUtil.getClassForName(subscriptionDataLoader.trim())
+                                .getDeclaredConstructor().newInstance();
                 RegistrationHolder.getInstance().registerInstance(SubscriptionDataLoader.class.getName(),
                         this.dataLoader);
             } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException |
                     IllegalAccessException | InvocationTargetException e) {
                 log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
-                throw new InitialisationException(e);
+                throw new InitializationException(e);
             }
         }
 
-        this.initialiseLoadingTasks();
+        this.initializeLoadingTasks();
     }
 
-    private void initialiseLoadingTasks() {
+    private void initializeLoadingTasks() {
 
         Runnable apiTask = new PeriodicPopulateTask<String, Api>(apiMap,
                 () -> {
@@ -165,7 +185,6 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         executorService.scheduleAtFixedRate(apiTask, 0,
                 mapBasedSubscriptionStoreConfig.getApiLoadingFrequency(), TimeUnit.SECONDS);
 
-
         Runnable subscriptionLoadingTask = new PeriodicPopulateTask<String, Subscription>(subscriptionMap,
                 () -> {
                     try {
@@ -179,7 +198,6 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
         executorService.scheduleAtFixedRate(subscriptionLoadingTask, 0,
                 mapBasedSubscriptionStoreConfig.getSubLoadingFrequency(), TimeUnit.SECONDS);
-
 
         Runnable applicationLoadingTask = new PeriodicPopulateTask<Integer, Application>(applicationMap,
                 () -> {
@@ -222,7 +240,6 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                             return null;
                         });
 
-
         executorService.scheduleAtFixedRate(subPolicyLoadingTask, 0,
                 this.mapBasedSubscriptionStoreConfig.getPolicyLoadingFrequency(), TimeUnit.SECONDS);
 
@@ -237,7 +254,6 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                             }
                             return null;
                         });
-
 
         executorService.scheduleAtFixedRate(appPolicyLoadingTask, 0,
                 this.mapBasedSubscriptionStoreConfig.getPolicyLoadingFrequency(), TimeUnit.SECONDS);
@@ -254,7 +270,6 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                             return null;
                         });
 
-
         executorService.scheduleAtFixedRate(apiPolicyLoadingTask, 0,
                 this.mapBasedSubscriptionStoreConfig.getPolicyLoadingFrequency(), TimeUnit.SECONDS);
 
@@ -262,6 +277,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
     private <T extends Policy> T getPolicy(String policyName, int tenantId,
                                            Map<String, T> policyMap) {
+
         Policy policy = new Policy();
         policy.setTierName(policyName);
         policy.setTenantId(tenantId);
@@ -274,6 +290,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         private Supplier<List<V>> supplier;
 
         PeriodicPopulateTask(Map<K, V> entityMap, Supplier<List<V>> supplier) {
+
             this.entityMap = entityMap;
             this.supplier = supplier;
         }
@@ -281,7 +298,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         public void run() {
 
             List<V> list = supplier.get();
-            HashMap<K,V> tempMap = new HashMap<>();
+            HashMap<K, V> tempMap = new HashMap<>();
 
             if (list != null) {
                 for (V v : list) {
@@ -291,7 +308,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                                 , v));
                     }
 
-                    if(!tempMap.isEmpty()){
+                    if (!tempMap.isEmpty()) {
                         entityMap.clear();
                         entityMap.putAll(tempMap);
                     }

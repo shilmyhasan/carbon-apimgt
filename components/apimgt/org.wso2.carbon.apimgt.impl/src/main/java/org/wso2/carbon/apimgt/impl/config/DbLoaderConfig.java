@@ -20,10 +20,11 @@ package org.wso2.carbon.apimgt.impl.config;
 
 import org.apache.axiom.om.OMElement;
 
-public class DbLoaderConfig extends SubscriptionDataLoaderConfig{
+public class DbLoaderConfig extends SubscriptionDataLoaderConfig {
 
     @Override
     public void loadFromNode(OMElement node) {
+
         super.loadFromNode(node);
-        }
+    }
 }

@@ -31,45 +31,54 @@ public class ApiPolicyConditionGroup {
     private Set<ConditionDTO> conditionDTOS;
 
     public int getPolicyId() {
+
         return policyId;
     }
 
     public void setPolicyId(int policyId) {
+
         this.policyId = policyId;
     }
 
     public int getConditionGroupId() {
+
         return conditionGroupId;
     }
 
     public void setConditionGroupId(int conditionGroupId) {
+
         this.conditionGroupId = conditionGroupId;
     }
 
     public String getQuotaType() {
+
         return quotaType;
     }
 
     public void setQuotaType(String quotaType) {
+
         this.quotaType = quotaType;
     }
 
     public Set<ConditionDTO> getConditionDTOS() {
+
         return conditionDTOS;
     }
 
     public void setConditionDTOS(Set<ConditionDTO> conditionDTOS) {
+
         this.conditionDTOS = conditionDTOS;
     }
 
     public boolean isContentAware() {
+
         if (PolicyConstants.BANDWIDTH_TYPE.equals(quotaType)) {
             return true;
         }
         if (conditionDTOS != null) {
             conditionDTOS.stream().anyMatch(conditionDTO ->
-                    PolicyConstants.BANDWIDTH_TYPE.equals(quotaType)
-            );
+                            PolicyConstants.BANDWIDTH_TYPE.equals(quotaType)
+                                           );
             return false;
         }
         return false;
@@ -77,6 +86,7 @@ public class ApiPolicyConditionGroup {
 
     @Override
     public boolean equals(Object obj) {
+
         if (obj == this) {
             return true;
         }
@@ -92,6 +102,7 @@ public class ApiPolicyConditionGroup {
 
     @Override
     public int hashCode() {
+
         return (policyId == -1 || conditionGroupId == -1) ? super.hashCode() : policyId * conditionGroupId;
     }
 }

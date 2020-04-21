@@ -22,12 +22,13 @@ import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
-public class SubscriptionDataLoaderConfig extends KeyValidationHandlerConfig{
+public class SubscriptionDataLoaderConfig extends KeyValidationHandlerConfig {
 
     public static final String SUBSCRIPTION_DATA_LOADER_IMPL = "SubscriptionDataLoaderImpl";
 
     @Override
     public void loadFromNode(OMElement node) {
+
         OMElement implNode = node.getFirstChildWithName(new QName(SUBSCRIPTION_DATA_LOADER_IMPL));
         this.implementingClass = implNode != null ? implNode.getText() : null;
     }

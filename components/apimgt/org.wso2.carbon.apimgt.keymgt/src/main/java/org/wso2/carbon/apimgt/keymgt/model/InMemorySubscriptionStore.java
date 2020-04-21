@@ -18,7 +18,14 @@
 
 package org.wso2.carbon.apimgt.keymgt.model;
 
-import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Application;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationKeyMapping;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Policy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Subscription;
+import org.wso2.carbon.apimgt.keymgt.model.entity.SubscriptionPolicy;
 
 /**
  * A Facade for obtaining Subscription related Data.

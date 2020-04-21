@@ -34,45 +34,55 @@ public class Resource implements CachableEntity<String> {
     private Map<String, Verb> httpVerbs;
 
     public Resource() {
+
         httpVerbs = new HashMap<>();
     }
 
     public Resource(int apiId, String urlPattern) {
+
         this();
         this.apiId = apiId;
         this.urlPattern = urlPattern;
     }
 
     public List<Verb> getAllVerbs() {
+
         return Arrays.asList(httpVerbs.values().toArray(new Verb[]{}));
     }
 
     public int getApiId() {
+
         return apiId;
     }
 
     public void setApiId(int apiId) {
+
         this.apiId = apiId;
     }
 
     public String getUrlPattern() {
+
         return urlPattern;
     }
 
     public void setUrlPattern(String urlPattern) {
+
         this.urlPattern = urlPattern;
     }
 
     public void addVerb(Verb resourceVerb) {
+
         httpVerbs.put(resourceVerb.getHttpVerb(), resourceVerb);
     }
 
     public Verb getVerb(String httpVerb) {
+
         return httpVerbs.get(httpVerb);
     }
 
     @Override
     public String getCacheKey() {
+
         return urlPattern + "." + apiId;
     }
 }
