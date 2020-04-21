@@ -12309,7 +12309,12 @@ public class ApiMgtDAO {
     }
 
     public boolean isPolicyExist(String policyType, int tenantId, String policyName) throws APIManagementException {
-        return isPolicyExist(null, policyType, tenantId, policyName);
+        try (Connection connection = APIMgtDBUtil.getConnection()) {
+            return isPolicyExist(connection, policyType, tenantId, policyName);
+        } catch (SQLException e) {
+            handleException("Error while checking policy existence " + policyName + "-" + tenantId, e);
+        }
+        return false;
     }
 
     public boolean isPolicyExist(Connection connection, String policyType, int tenantId, String policyName)
@@ -12330,9 +12335,6 @@ public class ApiMgtDAO {
         try {
             String query = "SELECT " + PolicyConstants.POLICY_ID + " FROM " + policyTable
                     + " WHERE TENANT_ID =? AND NAME = ? ";
-            if (connection == null) {
-                connection = APIMgtDBUtil.getConnection();
-            }
             connection.setAutoCommit(true);
             isExistStatement = connection.prepareStatement(query);
             isExistStatement.setInt(1, tenantId);
