@@ -10362,7 +10362,7 @@ public class ApiMgtDAO {
 
             conn.commit();
         } catch (SQLIntegrityConstraintViolationException e){
-            boolean isAppPolicyExists = isPolicyExist(PolicyConstants.POLICY_LEVEL_APP, policy.getTenantId(),
+            boolean isAppPolicyExists = isPolicyExist(conn, PolicyConstants.POLICY_LEVEL_APP, policy.getTenantId(),
                     policy.getPolicyName());
 
             if (isAppPolicyExists) {
@@ -10384,7 +10384,7 @@ public class ApiMgtDAO {
             }
 
             if (StringUtils.containsIgnoreCase(e.getMessage(), "Violation of UNIQUE KEY constraint")) {
-                boolean isAppPolicyExists = isPolicyExist(PolicyConstants.POLICY_LEVEL_APP, policy.getTenantId(),
+                boolean isAppPolicyExists = isPolicyExist(conn, PolicyConstants.POLICY_LEVEL_APP, policy.getTenantId(),
                         policy.getPolicyName());
 
                 if (isAppPolicyExists) {
@@ -10445,7 +10445,7 @@ public class ApiMgtDAO {
 
             conn.commit();
         } catch (SQLIntegrityConstraintViolationException e) {
-            boolean isSubscriptionPolicyExists = isPolicyExist(PolicyConstants.POLICY_LEVEL_SUB, policy.getTenantId(),
+            boolean isSubscriptionPolicyExists = isPolicyExist(conn, PolicyConstants.POLICY_LEVEL_SUB, policy.getTenantId(),
                     policy.getPolicyName());
 
             if (isSubscriptionPolicyExists) {
@@ -10467,7 +10467,7 @@ public class ApiMgtDAO {
             }
 
             if (StringUtils.containsIgnoreCase(e.getMessage(), "Violation of UNIQUE KEY constraint")) {
-                boolean isSubscriptionPolicyExists = isPolicyExist(PolicyConstants.POLICY_LEVEL_SUB, policy.getTenantId(),
+                boolean isSubscriptionPolicyExists = isPolicyExist(conn, PolicyConstants.POLICY_LEVEL_SUB, policy.getTenantId(),
                         policy.getPolicyName());
 
                 if (isSubscriptionPolicyExists) {
@@ -10498,7 +10498,7 @@ public class ApiMgtDAO {
             addAPIPolicy(policy, connection);
             connection.commit();
         } catch (SQLIntegrityConstraintViolationException e) {
-            boolean isAPIPolicyExists = isPolicyExist(PolicyConstants.POLICY_LEVEL_API, policy.getTenantId(),
+            boolean isAPIPolicyExists = isPolicyExist(connection, PolicyConstants.POLICY_LEVEL_API, policy.getTenantId(),
                     policy.getPolicyName());
 
             if (isAPIPolicyExists) {
@@ -10520,7 +10520,7 @@ public class ApiMgtDAO {
             }
 
             if (StringUtils.containsIgnoreCase(e.getMessage(), "Violation of UNIQUE KEY constraint")) {
-                boolean isAPIPolicyExists = isPolicyExist(PolicyConstants.POLICY_LEVEL_API, policy.getTenantId(),
+                boolean isAPIPolicyExists = isPolicyExist(connection, PolicyConstants.POLICY_LEVEL_API, policy.getTenantId(),
                         policy.getPolicyName());
 
                 if (isAPIPolicyExists) {
@@ -12309,7 +12309,11 @@ public class ApiMgtDAO {
     }
 
     public boolean isPolicyExist(String policyType, int tenantId, String policyName) throws APIManagementException {
-        Connection connection = null;
+        return isPolicyExist(null, policyType, tenantId, policyName);
+    }
+
+    public boolean isPolicyExist(Connection connection, String policyType, int tenantId, String policyName)
+            throws APIManagementException {
         PreparedStatement isExistStatement = null;
 
         boolean isExist = false;
@@ -12324,8 +12328,11 @@ public class ApiMgtDAO {
             policyTable = PolicyConstants.POLICY_SUBSCRIPTION_TABLE;
         }
         try {
-            String query = "SELECT " + PolicyConstants.POLICY_ID + " FROM " + policyTable + " WHERE TENANT_ID =? AND NAME = ? ";
-            connection = APIMgtDBUtil.getConnection();
+            String query = "SELECT " + PolicyConstants.POLICY_ID + " FROM " + policyTable
+                    + " WHERE TENANT_ID =? AND NAME = ? ";
+            if (connection == null) {
+                connection = APIMgtDBUtil.getConnection();
+            }
             connection.setAutoCommit(true);
             isExistStatement = connection.prepareStatement(query);
             isExistStatement.setInt(1, tenantId);
