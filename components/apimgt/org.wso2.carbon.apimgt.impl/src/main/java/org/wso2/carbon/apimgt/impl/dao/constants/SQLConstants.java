@@ -3169,6 +3169,8 @@ public class SQLConstants {
 
     public static final String ADD_USER_ID = "INSERT INTO AM_USER (USER_ID, USER_NAME) VALUES (?,?)";
 
+    public static final int UNIQUE_CONTRAINT_VIOLATION_ERROR_CODE = 2627;
+
     /** Throttle related constants**/
 
     public static class ThrottleSQLConstants{

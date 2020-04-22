@@ -10383,7 +10383,7 @@ public class ApiMgtDAO {
                 }
             }
 
-            if (StringUtils.containsIgnoreCase(e.getMessage(), "Violation of UNIQUE KEY constraint")) {
+            if (e.getErrorCode() == SQLConstants.UNIQUE_CONTRAINT_VIOLATION_ERROR_CODE) {
                 boolean isAppPolicyExists = isPolicyExist(conn, PolicyConstants.POLICY_LEVEL_APP, policy.getTenantId(),
                         policy.getPolicyName());
 
@@ -10466,7 +10466,7 @@ public class ApiMgtDAO {
                 }
             }
 
-            if (StringUtils.containsIgnoreCase(e.getMessage(), "Violation of UNIQUE KEY constraint")) {
+            if (e.getErrorCode() == SQLConstants.UNIQUE_CONTRAINT_VIOLATION_ERROR_CODE) {
                 boolean isSubscriptionPolicyExists = isPolicyExist(conn, PolicyConstants.POLICY_LEVEL_SUB, policy.getTenantId(),
                         policy.getPolicyName());
 
@@ -10519,7 +10519,7 @@ public class ApiMgtDAO {
                 }
             }
 
-            if (StringUtils.containsIgnoreCase(e.getMessage(), "Violation of UNIQUE KEY constraint")) {
+            if (e.getErrorCode() == SQLConstants.UNIQUE_CONTRAINT_VIOLATION_ERROR_CODE) {
                 boolean isAPIPolicyExists = isPolicyExist(connection, PolicyConstants.POLICY_LEVEL_API, policy.getTenantId(),
                         policy.getPolicyName());
 
