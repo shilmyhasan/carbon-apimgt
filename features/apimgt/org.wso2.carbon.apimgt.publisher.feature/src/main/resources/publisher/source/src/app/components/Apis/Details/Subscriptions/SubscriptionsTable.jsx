@@ -131,12 +131,11 @@ const styles = (theme) => ({
     InfoToolTip: {
         backgroundColor: theme.custom.disableColor,
         color: theme.palette.getContrastText(theme.custom.disableColor),
-        maxWidth: 500,
         fontSize: theme.typography.fontSize,
-        fontWeight: '400',
-        border: '1px solid #dadde9',
-        borderRadius: '5px',
-        padding: '15px 10px 0 18px',
+        fontWeight: theme.typography.h6.fontWeight,
+        border: 'solid 1px ' + theme.palette.grey,
+        borderRadius: theme.shape.borderRadius,
+        padding: theme.spacing(2),
     },
     subscriberHeader: {
         fontSize: theme.typography.h6.fontSize,
