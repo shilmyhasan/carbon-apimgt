@@ -47,7 +47,7 @@ public class SQLConstantOracle extends SQLConstants{
                     " WHERE " +
                     "   SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
                     " AND " +
-                    "   (GROUP_ID= ?  OR  ((GROUP_ID='' OR GROUP_ID IS NULL ) AND SUB.USER_ID=?))" +
+                    "   (GROUP_ID= ?  OR  ((GROUP_ID='' OR GROUP_ID IS NULL ) AND SUB.USER_ID = ?))" +
                     " And " +
                     "    NAME like ?" +
                     " ) a WHERE r BETWEEN ?+1 AND  r+?"+
