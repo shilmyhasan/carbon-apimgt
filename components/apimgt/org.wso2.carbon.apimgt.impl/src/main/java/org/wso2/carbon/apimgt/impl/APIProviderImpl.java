@@ -2028,10 +2028,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws APIManagementException if failed to get Subscriber
      */
     @Override
-    public List getSubscriberClaims(String subscriber) throws APIManagementException {
+    public Map<String, String> getSubscriberClaims(String subscriber) throws APIManagementException {
         String tenantDomain = MultitenantUtils.getTenantDomain(subscriber);
         int tenantId = 0;
-        List claimList = new ArrayList();
+        Map<String, String> claimMap = new HashMap<>();
         try {
             tenantId = getTenantId(tenantDomain);
             SortedMap<String, String> subscriberClaims =
@@ -2045,16 +2045,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
             if (subscriberClaims != null) {
                 for (String claimURI : configuredClaims.split(",")) {
-                    Map<String, String> claimMap = new HashMap<>();
                     claimMap.put(claimURI, subscriberClaims.get(claimURI));
-                    claimList.add(claimMap);
                 }
             }
         } catch (UserStoreException e) {
             throw new APIManagementException("Error while retrieving tenant id for tenant domain "
                     + tenantDomain, e);
         }
-        return claimList;
+        return claimMap;
     }
 
     private Map<String, String> publishToGateway(API api) throws APIManagementException {
