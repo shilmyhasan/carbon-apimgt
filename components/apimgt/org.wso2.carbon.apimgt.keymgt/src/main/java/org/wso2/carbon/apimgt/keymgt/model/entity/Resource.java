@@ -25,6 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Entity for representing a REST resource (in the API)
+ */
 public class Resource implements CachableEntity<String> {
 
     private String urlPattern;

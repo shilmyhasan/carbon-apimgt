@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
+/**
+ * Entity to represent a Subscription Throttling Policy.
+ */
 public class SubscriptionPolicy extends Policy {
 
     private int rateLimitCount;

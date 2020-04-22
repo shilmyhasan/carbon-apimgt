@@ -23,6 +23,9 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Configuration entity for InMemorySubscriptionValidator
+ */
 public class InMemorySubscriptionValidationHandlerConfig extends KeyValidationHandlerConfig {
 
     public static final String IN_MEM_SUBSCRIPTION_STORE = "InMemorySubscriptionStore";

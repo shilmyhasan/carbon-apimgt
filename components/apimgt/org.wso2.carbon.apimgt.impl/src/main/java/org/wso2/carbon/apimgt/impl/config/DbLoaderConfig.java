@@ -20,6 +20,9 @@ package org.wso2.carbon.apimgt.impl.config;
 
 import org.apache.axiom.om.OMElement;
 
+/**
+ * Configuration entity holding attributes for DbLoader
+ */
 public class DbLoaderConfig extends SubscriptionDataLoaderConfig {
 
     @Override

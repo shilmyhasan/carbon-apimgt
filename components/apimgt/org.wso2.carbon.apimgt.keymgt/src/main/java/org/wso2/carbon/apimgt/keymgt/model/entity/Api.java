@@ -25,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Entity for keeping API related information.
+ */
 public class Api implements CachableEntity<String> {
 
     private int apiId;

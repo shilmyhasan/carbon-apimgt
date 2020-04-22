@@ -22,6 +22,9 @@ import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Super type config entity for holding attributes related to any KeyValidationHandler
+ */
 public class KeyValidationHandlerConfig {
 
     public static final String KEY_VALIDATOR_IMPL = "KeyValidationHandlerImpl";

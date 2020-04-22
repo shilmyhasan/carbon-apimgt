@@ -20,6 +20,9 @@ package org.wso2.carbon.apimgt.keymgt.model.entity;
 
 import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 
+/**
+ * Entity for representing a Subscription in APIM
+ */
 public class Subscription implements CachableEntity<String> {
 
     private int subscriptionId = -1;

@@ -23,6 +23,9 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Config element for MapBasedSubscriptionStore
+ */
 public class MapBasedSubscriptionStoreConfig extends InMemorySubscriptionStoreConfig {
 
     private SubscriptionDataLoaderConfig subscriptionDataLoaderConfig;

@@ -20,6 +20,9 @@ package org.wso2.carbon.apimgt.keymgt.model.entity;
 
 import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 
+/**
+ * Entity for keeping mapping between Application and Consumer key.
+ */
 public class ApplicationKeyMapping implements CachableEntity<String> {
 
     private String consumerKey;

@@ -22,6 +22,9 @@ import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Entity for keeping  Config related to {@link InMemorySubscriptionStoreConfig}
+ */
 public class InMemorySubscriptionStoreConfig extends KeyValidationHandlerConfig {
 
     public static final String IN_MEM_SUBSCRIPTION_STORE_IMPL = "InMemorySubscriptionStoreImpl";

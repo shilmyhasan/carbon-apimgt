@@ -22,6 +22,9 @@ import org.apache.axiom.om.OMElement;
 
 import javax.xml.namespace.QName;
 
+/**
+ * Super type for config entity holding attributes for Data Loader
+ */
 public class SubscriptionDataLoaderConfig extends KeyValidationHandlerConfig {
 
     public static final String SUBSCRIPTION_DATA_LOADER_IMPL = "SubscriptionDataLoaderImpl";

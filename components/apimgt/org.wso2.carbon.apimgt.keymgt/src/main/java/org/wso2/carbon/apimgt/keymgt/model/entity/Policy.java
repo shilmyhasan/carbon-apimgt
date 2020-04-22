@@ -21,6 +21,9 @@ package org.wso2.carbon.apimgt.keymgt.model.entity;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 
+/**
+ * Top level entity for representating a Throttling Policy.
+ */
 public class Policy implements CachableEntity<String> {
 
     private int policyId;

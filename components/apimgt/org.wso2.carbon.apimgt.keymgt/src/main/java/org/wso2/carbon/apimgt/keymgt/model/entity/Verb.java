@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.model.entity;
 
+/**
+ * Entity to represent a Verb in a REST resource.
+ */
 public class Verb {
 
     private int verbId;

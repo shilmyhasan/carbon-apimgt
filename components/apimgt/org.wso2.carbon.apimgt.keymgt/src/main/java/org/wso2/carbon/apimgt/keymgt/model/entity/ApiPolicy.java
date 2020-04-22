@@ -20,6 +20,9 @@ package org.wso2.carbon.apimgt.keymgt.model.entity;
 
 import java.util.Set;
 
+/**
+ * Entity for keeping ApiPolicy related information.
+ */
 public class ApiPolicy extends Policy {
 
     private Set<ApiPolicyConditionGroup> conditionGroups;
