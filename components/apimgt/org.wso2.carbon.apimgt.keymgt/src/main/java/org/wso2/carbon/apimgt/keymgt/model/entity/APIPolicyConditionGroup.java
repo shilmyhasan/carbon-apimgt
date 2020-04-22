@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Entity for keeping details related to ConditionGroups.
  */
-public class ApiPolicyConditionGroup {
+public class APIPolicyConditionGroup {
 
     private int policyId = -1;
     private String quotaType;
@@ -97,7 +97,7 @@ public class ApiPolicyConditionGroup {
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        ApiPolicyConditionGroup conditionGroup = (ApiPolicyConditionGroup) obj;
+        APIPolicyConditionGroup conditionGroup = (APIPolicyConditionGroup) obj;
         return conditionGroup.policyId == policyId &&
                 conditionGroup.conditionGroupId == conditionGroupId;
 

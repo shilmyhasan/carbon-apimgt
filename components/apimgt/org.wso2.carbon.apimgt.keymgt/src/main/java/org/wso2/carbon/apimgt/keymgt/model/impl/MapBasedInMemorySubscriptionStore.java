@@ -29,8 +29,8 @@ import org.wso2.carbon.apimgt.keymgt.model.CachableEntity;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataLoader;
-import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
-import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.API;
+import org.wso2.carbon.apimgt.keymgt.model.entity.APIPolicy;
 import org.wso2.carbon.apimgt.keymgt.model.entity.Application;
 import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationKeyMapping;
 import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationPolicy;
@@ -61,9 +61,9 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
     // Maps for keeping Subscription related details.
     private Map<String, ApplicationKeyMapping> applicationKeyMappingMap;
     private Map<Integer, Application> applicationMap;
-    private Map<String, Api> apiMap;
+    private Map<String, API> apiMap;
     private Map<String, Policy> policyMap;
-    private Map<String, ApiPolicy> apiPolicyMap;
+    private Map<String, APIPolicy> apiPolicyMap;
     private Map<String, SubscriptionPolicy> subPolicyMap;
     private Map<String, ApplicationPolicy> appPolicyMap;
     private Map<String, Subscription> subscriptionMap;
@@ -99,30 +99,21 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
     }
 
     @Override
-    public Api getApiByContextAndVersion(String context, String version) {
+    public API getApiByContextAndVersion(String context, String version) {
 
-        Api api = new Api();
+        API api = new API();
         api.setContext(context);
         api.setApiVersion(version);
         return apiMap.get(api.getCacheKey());
     }
 
     @Override
-    public Subscription getSubscriptionByApiAndApplication(Application application, Api api) {
+    public Subscription getSubscriptionByAPIAndApplication(Application application, API api) {
 
         Subscription subKey = new Subscription();
         subKey.setAppId(application.getAppId());
         subKey.setApiId(api.getApiId());
         return subscriptionMap.get(subKey.getCacheKey());
-    }
-
-    @Override
-    public Policy getPolicyByName(String policyName, int tenantId) {
-
-        Policy policy = new Policy();
-        policy.setTierName(policyName);
-        policy.setTenantId(tenantId);
-        return policyMap.get(policy.getCacheKey());
     }
 
     @Override
@@ -138,7 +129,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
     }
 
     @Override
-    public ApiPolicy getApiPolicyByName(String policyName, int tenantId) {
+    public APIPolicy getApiPolicyByName(String policyName, int tenantId) {
 
         return getPolicy(policyName, tenantId, apiPolicyMap);
     }
@@ -171,7 +162,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
     private void initializeLoadingTasks() {
 
-        Runnable apiTask = new PeriodicPopulateTask<String, Api>(apiMap,
+        Runnable apiTask = new PeriodicPopulateTask<String, API>(apiMap,
                 () -> {
                     try {
                         log.debug("Calling loadAllApis...");
@@ -259,7 +250,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                 this.mapBasedSubscriptionStoreConfig.getPolicyLoadingFrequency(), TimeUnit.SECONDS);
 
         Runnable apiPolicyLoadingTask =
-                new PeriodicPopulateTask<String, ApiPolicy>(apiPolicyMap,
+                new PeriodicPopulateTask<String, APIPolicy>(apiPolicyMap,
                         () -> {
                             try {
                                 log.debug("Calling loadAllApiPolicies...");

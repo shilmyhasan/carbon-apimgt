@@ -27,10 +27,10 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.internal.RegistrationHolder;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
-import org.wso2.carbon.apimgt.keymgt.model.UriTemplateLoader;
-import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
-import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
-import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicyConditionGroup;
+import org.wso2.carbon.apimgt.keymgt.model.URITemplateLoader;
+import org.wso2.carbon.apimgt.keymgt.model.entity.API;
+import org.wso2.carbon.apimgt.keymgt.model.entity.APIPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.APIPolicyConditionGroup;
 import org.wso2.carbon.apimgt.keymgt.model.entity.Resource;
 import org.wso2.carbon.apimgt.keymgt.model.entity.Verb;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -45,12 +45,12 @@ import java.util.Set;
  * the same {@link InMemorySubscriptionStore} instance used by
  * {@link org.wso2.carbon.apimgt.keymgt.handlers.KeyValidationHandler} implementation.
  */
-public class MemoryBackedUriTemplateLoader implements UriTemplateLoader {
+public class MemoryBackedURITemplateLoader implements URITemplateLoader {
 
-    private static final Log log = LogFactory.getLog(MemoryBackedUriTemplateLoader.class);
+    private static final Log log = LogFactory.getLog(MemoryBackedURITemplateLoader.class);
     private InMemorySubscriptionStore memorySubscriptionStore;
 
-    public MemoryBackedUriTemplateLoader() {
+    public MemoryBackedURITemplateLoader() {
 
         this.memorySubscriptionStore =
                 (InMemorySubscriptionStore) RegistrationHolder.getInstance().
@@ -67,7 +67,7 @@ public class MemoryBackedUriTemplateLoader implements UriTemplateLoader {
 
         List<URITemplate> uriTemplates = new ArrayList<>();
 
-        Api api = memorySubscriptionStore.getApiByContextAndVersion(context, version);
+        API api = memorySubscriptionStore.getApiByContextAndVersion(context, version);
         if (api == null) {
             return uriTemplates;
         }
@@ -116,11 +116,11 @@ public class MemoryBackedUriTemplateLoader implements UriTemplateLoader {
 
     private void setAdvancedThrottlingPolicies(URITemplate uriTemplate) {
 
-        ApiPolicy policy =
+        APIPolicy policy =
                 memorySubscriptionStore.getApiPolicyByName(uriTemplate.getThrottlingTier(),
                         MultitenantConstants.SUPER_TENANT_ID);
 
-        Set<ApiPolicyConditionGroup> conditionGroup = policy.getConditionGroups();
+        Set<APIPolicyConditionGroup> conditionGroup = policy.getConditionGroups();
         Set<ConditionGroupDTO> conditionGroupDTOS = new HashSet<>();
         ConditionGroupDTO defaultGroup = new ConditionGroupDTO();
         defaultGroup.setConditionGroupId(APIConstants.THROTTLE_POLICY_DEFAULT);
@@ -128,7 +128,7 @@ public class MemoryBackedUriTemplateLoader implements UriTemplateLoader {
         conditionGroupDTOS.add(defaultGroup);
 
         if (conditionGroup != null) {
-            for (ApiPolicyConditionGroup policyConditionGroup : conditionGroup) {
+            for (APIPolicyConditionGroup policyConditionGroup : conditionGroup) {
                 ConditionGroupDTO groupDTO = new ConditionGroupDTO();
                 groupDTO.setConditionGroupId("_condition_" + policyConditionGroup.getConditionGroupId());
                 groupDTO.setConditions(policyConditionGroup.getConditionDTOS().toArray(new ConditionDTO[]{}));

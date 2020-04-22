@@ -23,16 +23,16 @@ import java.util.Set;
 /**
  * Entity for keeping ApiPolicy related information.
  */
-public class ApiPolicy extends Policy {
+public class APIPolicy extends Policy {
 
-    private Set<ApiPolicyConditionGroup> conditionGroups;
+    private Set<APIPolicyConditionGroup> conditionGroups;
 
-    public Set<ApiPolicyConditionGroup> getConditionGroups() {
+    public Set<APIPolicyConditionGroup> getConditionGroups() {
 
         return conditionGroups;
     }
 
-    public void setConditionGroups(Set<ApiPolicyConditionGroup> conditionGroups) {
+    public void setConditionGroups(Set<APIPolicyConditionGroup> conditionGroups) {
 
         this.conditionGroups = conditionGroups;
     }

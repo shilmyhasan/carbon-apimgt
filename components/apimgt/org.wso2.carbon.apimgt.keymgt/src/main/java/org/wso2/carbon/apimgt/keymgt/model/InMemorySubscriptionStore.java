@@ -18,12 +18,11 @@
 
 package org.wso2.carbon.apimgt.keymgt.model;
 
-import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
-import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.API;
+import org.wso2.carbon.apimgt.keymgt.model.entity.APIPolicy;
 import org.wso2.carbon.apimgt.keymgt.model.entity.Application;
 import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationKeyMapping;
 import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationPolicy;
-import org.wso2.carbon.apimgt.keymgt.model.entity.Policy;
 import org.wso2.carbon.apimgt.keymgt.model.entity.Subscription;
 import org.wso2.carbon.apimgt.keymgt.model.entity.SubscriptionPolicy;
 
@@ -53,9 +52,9 @@ public interface InMemorySubscriptionStore {
      *
      * @param context Context of the API
      * @param version Version of the API
-     * @return {@link Api} entry represented by Context and Version.
+     * @return {@link API} entry represented by Context and Version.
      */
-    Api getApiByContextAndVersion(String context, String version);
+    API getApiByContextAndVersion(String context, String version);
 
     /**
      * Gets Subscription by API and by Application
@@ -64,16 +63,7 @@ public interface InMemorySubscriptionStore {
      * @param api         API for which subscription is created
      * @return {@link Subscription}
      */
-    Subscription getSubscriptionByApiAndApplication(Application application, Api api);
-
-    /**
-     * Gets Policy by the name and Tenant Id
-     *
-     * @param policyName Name of the Policy
-     * @param tenantId   TenantId of the policy owner
-     * @return {@link Policy}
-     */
-    Policy getPolicyByName(String policyName, int tenantId);
+    Subscription getSubscriptionByAPIAndApplication(Application application, API api);
 
     /**
      * Gets Subscription Throttling Policy by the name and Tenant Id
@@ -100,5 +90,5 @@ public interface InMemorySubscriptionStore {
      * @param tenantId   Tenant ID in the Policy
      * @return Api Throttling Policy
      */
-    ApiPolicy getApiPolicyByName(String policyName, int tenantId);
+    APIPolicy getApiPolicyByName(String policyName, int tenantId);
 }

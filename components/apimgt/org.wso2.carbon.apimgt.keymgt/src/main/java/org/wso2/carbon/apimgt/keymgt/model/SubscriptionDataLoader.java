@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.apimgt.keymgt.model;
 
-import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
-import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.API;
+import org.wso2.carbon.apimgt.keymgt.model.entity.APIPolicy;
 import org.wso2.carbon.apimgt.keymgt.model.entity.Application;
 import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationKeyMapping;
 import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationPolicy;
@@ -62,12 +62,12 @@ public interface SubscriptionDataLoader {
     public List<ApplicationKeyMapping> loadAllKeyMappings() throws DataLoadingException;
 
     /**
-     * Load all {@link Api} objects owned by all Tenants.
+     * Load all {@link API} objects owned by all Tenants.
      *
-     * @return A list of {@link Api}
+     * @return A list of {@link API}
      * @throws DataLoadingException
      */
-    public List<Api> loadAllApis() throws DataLoadingException;
+    public List<API> loadAllApis() throws DataLoadingException;
 
     /**
      * Load All Subscription Throttling Policies.
@@ -83,7 +83,7 @@ public interface SubscriptionDataLoader {
      * @return A list of Api  Throttling Policies.
      * @throws DataLoadingException
      */
-    public List<ApiPolicy> loadAllApiPolicies() throws DataLoadingException;
+    public List<APIPolicy> loadAllApiPolicies() throws DataLoadingException;
 
     /**
      * Loads All Application Throttling Policies.

@@ -23,10 +23,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataLoader;
-import org.wso2.carbon.apimgt.keymgt.model.dao.SubscriptionLoadingDao;
-import org.wso2.carbon.apimgt.keymgt.model.entity.Api;
-import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicy;
-import org.wso2.carbon.apimgt.keymgt.model.entity.ApiPolicyConditionGroup;
+import org.wso2.carbon.apimgt.keymgt.model.dao.SubscriptionLoadingDAO;
+import org.wso2.carbon.apimgt.keymgt.model.entity.API;
+import org.wso2.carbon.apimgt.keymgt.model.entity.APIPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.APIPolicyConditionGroup;
 import org.wso2.carbon.apimgt.keymgt.model.entity.Application;
 import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationKeyMapping;
 import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationPolicy;
@@ -51,64 +51,64 @@ public class DbDataLoader implements SubscriptionDataLoader, KeyValidatorConfigI
     @Override
     public List<Subscription> loadAllSubscriptions() throws DataLoadingException {
 
-        return SubscriptionLoadingDao.getInstance().getAllSubscriptions();
+        return SubscriptionLoadingDAO.getInstance().getAllSubscriptions();
     }
 
     @Override
     public List<Application> loadAllApplications() throws DataLoadingException {
 
-        return SubscriptionLoadingDao.getInstance().getAllApplications();
+        return SubscriptionLoadingDAO.getInstance().getAllApplications();
     }
 
     @Override
     public List<ApplicationKeyMapping> loadAllKeyMappings() throws DataLoadingException {
 
-        return SubscriptionLoadingDao.getInstance().getAllApplicationKeyMappings();
+        return SubscriptionLoadingDAO.getInstance().getAllApplicationKeyMappings();
     }
 
     @Override
-    public List<Api> loadAllApis() throws DataLoadingException {
+    public List<API> loadAllApis() throws DataLoadingException {
 
-        Map<Integer, Api> apiMap = SubscriptionLoadingDao.getInstance().getAllApis();
-        Map<String, Resource> resourceMap = SubscriptionLoadingDao.getInstance().getApiUrlMappings();
+        Map<Integer, API> apiMap = SubscriptionLoadingDAO.getInstance().getAllApis();
+        Map<String, Resource> resourceMap = SubscriptionLoadingDAO.getInstance().getApiUrlMappings();
         for (Resource resource : resourceMap.values()) {
-            Api api = apiMap.get(resource.getApiId());
+            API api = apiMap.get(resource.getApiId());
             if (api != null) {
                 api.addResource(resource);
             } else {
                 log.error("Api not found for Id : " + resource.getApiId());
             }
         }
-        return Arrays.asList(apiMap.values().toArray(new Api[]{}));
+        return Arrays.asList(apiMap.values().toArray(new API[]{}));
     }
 
     @Override
     public List<SubscriptionPolicy> loadAllSubscriptionPolicies() throws DataLoadingException {
 
-        return SubscriptionLoadingDao.getInstance().getAllSubscriptionPolicies();
+        return SubscriptionLoadingDAO.getInstance().getAllSubscriptionPolicies();
     }
 
     @Override
-    public List<ApiPolicy> loadAllApiPolicies() throws DataLoadingException {
+    public List<APIPolicy> loadAllApiPolicies() throws DataLoadingException {
 
-        Map<Integer, ApiPolicy> apiPolicyMap =
-                SubscriptionLoadingDao.getInstance().getAllApiPolicies();
-        Map<Integer, Set<ApiPolicyConditionGroup>> conditionGroups =
-                SubscriptionLoadingDao.getInstance().getApiPolicyConditionGroups();
+        Map<Integer, APIPolicy> apiPolicyMap =
+                SubscriptionLoadingDAO.getInstance().getAllApiPolicies();
+        Map<Integer, Set<APIPolicyConditionGroup>> conditionGroups =
+                SubscriptionLoadingDAO.getInstance().getApiPolicyConditionGroups();
 
-        for (Map.Entry<Integer, Set<ApiPolicyConditionGroup>> conditionGroupEntry :
+        for (Map.Entry<Integer, Set<APIPolicyConditionGroup>> conditionGroupEntry :
                 conditionGroups.entrySet()) {
-            ApiPolicy policy = apiPolicyMap.get(conditionGroupEntry.getKey());
+            APIPolicy policy = apiPolicyMap.get(conditionGroupEntry.getKey());
             policy.setConditionGroups(conditionGroupEntry.getValue());
         }
 
-        return Arrays.asList(apiPolicyMap.values().toArray(new ApiPolicy[]{}));
+        return Arrays.asList(apiPolicyMap.values().toArray(new APIPolicy[]{}));
     }
 
     @Override
     public List<ApplicationPolicy> loadAllAppPolicies() throws DataLoadingException {
 
-        return SubscriptionLoadingDao.getInstance().getAllApplicationPolicies();
+        return SubscriptionLoadingDAO.getInstance().getAllApplicationPolicies();
     }
 
     @Override

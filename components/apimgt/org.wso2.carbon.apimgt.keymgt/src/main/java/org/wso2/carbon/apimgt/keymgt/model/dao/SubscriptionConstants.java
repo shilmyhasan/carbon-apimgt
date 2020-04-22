@@ -38,14 +38,14 @@ public class SubscriptionConstants {
 
     public static final String SUBSCRIPTION_LOAD_SQL =
             "SELECT " +
-                    "   SUB.SUBSCRIPTION_ID AS SUB_ID," +
-                    "   SUB.TIER_ID AS TIER," +
-                    "   SUB.API_ID AS API_ID," +
-                    "   SUB.APPLICATION_ID AS APP_ID," +
-                    "   SUB.SUB_STATUS AS STATUS," +
-                    "   SUB.SUBS_CREATE_STATE AS WF_STATUS" +
+                    "   SUBSCRIPTION_ID AS SUB_ID," +
+                    "   TIER_ID AS TIER," +
+                    "   API_ID AS API_ID," +
+                    "   APPLICATION_ID AS APP_ID," +
+                    "   SUB_STATUS AS STATUS," +
+                    "   SUBS_CREATE_STATE AS WF_STATUS" +
                     " FROM " +
-                    "   AM_SUBSCRIPTION AS SUB";
+                    "   AM_SUBSCRIPTION";
 
     public static final String SUB_POLICY_LOAD_SQL =
             "SELECT " +

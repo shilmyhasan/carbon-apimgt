@@ -38,7 +38,7 @@ import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.handlers.KeyValidationHandler;
 import org.wso2.carbon.apimgt.keymgt.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
-import org.wso2.carbon.apimgt.keymgt.model.UriTemplateLoader;
+import org.wso2.carbon.apimgt.keymgt.model.URITemplateLoader;
 import org.wso2.carbon.apimgt.keymgt.model.exception.InitializationException;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
@@ -58,7 +58,7 @@ import java.util.Map;
 public class APIKeyValidationService extends AbstractAdmin {
     private static final Log log = LogFactory.getLog(APIKeyValidationService.class);
     private static KeyValidationHandler keyValidationHandler;
-    private static UriTemplateLoader loader;
+    private static URITemplateLoader loader;
 
     public APIKeyValidationService() {
 
@@ -91,7 +91,7 @@ public class APIKeyValidationService extends AbstractAdmin {
 
                 if (urlTemplateLoader != null) {
                     loader =
-                            (UriTemplateLoader) APIUtil.getClassForName(urlTemplateLoader.trim())
+                            (URITemplateLoader) APIUtil.getClassForName(urlTemplateLoader.trim())
                                     .getDeclaredConstructor().newInstance();
                     log.debug("UriLoader " + loader.getClass().getName() + " instantiated.");
                 }

@@ -33,26 +33,26 @@ import java.util.*;
 
 import static org.wso2.carbon.apimgt.impl.utils.APIUtil.handleException;
 
-public class SubscriptionLoadingDao {
+public class SubscriptionLoadingDAO {
 
 
-    private static Log log = LogFactory.getLog(SubscriptionLoadingDao.class);
-    private static SubscriptionLoadingDao subscriptionLoadingDao = null;
+    private static Log log = LogFactory.getLog(SubscriptionLoadingDAO.class);
+    private static SubscriptionLoadingDAO subscriptionLoadingDao = null;
 
     /**
      * Private constructor
      */
-    private SubscriptionLoadingDao() {
+    private SubscriptionLoadingDAO() {
 
     }
 
     /**
      * Returns an instance of CertificateMgtDao.
      */
-    public static synchronized SubscriptionLoadingDao getInstance() {
+    public static synchronized SubscriptionLoadingDAO getInstance() {
 
         if (subscriptionLoadingDao == null) {
-            subscriptionLoadingDao = new SubscriptionLoadingDao();
+            subscriptionLoadingDao = new SubscriptionLoadingDAO();
         }
         return subscriptionLoadingDao;
     }
@@ -143,9 +143,9 @@ public class SubscriptionLoadingDao {
     }
 
 
-    public Map<Integer, Api> getAllApis() throws DataLoadingException {
+    public Map<Integer, API> getAllApis() throws DataLoadingException {
 
-        Map<Integer, Api> apiMap = null;
+        Map<Integer, API> apiMap = null;
         try (
                 Connection conn = APIMgtDBUtil.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.API_LOAD_SQL);
@@ -155,7 +155,7 @@ public class SubscriptionLoadingDao {
             apiMap = new HashMap<>();
 
             while (resultSet.next()) {
-                Api api = new Api();
+                API api = new API();
                 api.setApiId(resultSet.getInt("API_ID"));
                 api.setApiProvider(resultSet.getString("API_PROVIDER"));
                 api.setApiName(resultSet.getString("API_NAME"));
@@ -228,9 +228,9 @@ public class SubscriptionLoadingDao {
         return policies;
     }
 
-    public Map<Integer, Set<ApiPolicyConditionGroup>> getApiPolicyConditionGroups() throws DataLoadingException {
+    public Map<Integer, Set<APIPolicyConditionGroup>> getApiPolicyConditionGroups() throws DataLoadingException {
 
-        Map<Integer, Set<ApiPolicyConditionGroup>> policyMap = null;
+        Map<Integer, Set<APIPolicyConditionGroup>> policyMap = null;
 
         try (
                 Connection conn = APIMgtDBUtil.getConnection();
@@ -240,11 +240,11 @@ public class SubscriptionLoadingDao {
             policyMap = new HashMap<>();
 
             while (resultSet.next()) {
-                ApiPolicyConditionGroup policyConditionGroup = new ApiPolicyConditionGroup();
+                APIPolicyConditionGroup policyConditionGroup = new APIPolicyConditionGroup();
                 policyConditionGroup.setConditionGroupId(resultSet.getInt("CONDITION_GROUP_ID"));
                 policyConditionGroup.setPolicyId(resultSet.getInt("POLICY_ID"));
                 policyConditionGroup.setQuotaType(resultSet.getString("QUOTA_TYPE"));
-                Set<ApiPolicyConditionGroup> conditionGroups =
+                Set<APIPolicyConditionGroup> conditionGroups =
                         policyMap.get(policyConditionGroup.getPolicyId());
                 ConditionGroupDTO groupDTO =
                         ApiMgtDAO.getInstance().createConditionGroupDTO(policyConditionGroup.getConditionGroupId());
@@ -306,9 +306,9 @@ public class SubscriptionLoadingDao {
         return resourceMap;
     }
 
-    public Map<Integer, ApiPolicy> getAllApiPolicies() throws DataLoadingException {
+    public Map<Integer, APIPolicy> getAllApiPolicies() throws DataLoadingException {
 
-        Map<Integer, ApiPolicy> policyMap = null;
+        Map<Integer, APIPolicy> policyMap = null;
         try (
                 Connection conn = APIMgtDBUtil.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SubscriptionConstants.API_POLICY_LOAD_SQL);
@@ -317,7 +317,7 @@ public class SubscriptionLoadingDao {
             policyMap = new HashMap<>();
 
             while (resultSet.next()) {
-                ApiPolicy policy = new ApiPolicy();
+                APIPolicy policy = new APIPolicy();
                 policy.setPolicyId(resultSet.getInt("POLICY_ID"));
                 policy.setTierName(resultSet.getString("NAME"));
                 policy.setQuotaType(resultSet.getString("DEFAULT_QUOTA_TYPE"));

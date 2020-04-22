@@ -26,7 +26,7 @@ import java.util.List;
  * Abstraction for loading {@link URITemplate}. When making Subscription data memory resident,
  * URITemplates too should be loaded from the in-memory store. Hence this abstraction is needed.
  */
-public interface UriTemplateLoader {
+public interface URITemplateLoader {
 
     /**
      * Returns the list of {@link URITemplate}s associated with an API

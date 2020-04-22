@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Entity for keeping API related information.
  */
-public class Api implements CachableEntity<String> {
+public class API implements CachableEntity<String> {
 
     private int apiId;
     private String apiProvider;

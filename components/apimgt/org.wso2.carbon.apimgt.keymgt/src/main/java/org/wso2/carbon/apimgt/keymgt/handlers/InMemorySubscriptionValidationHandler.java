@@ -110,7 +110,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
             return false;
         }
 
-        Api api = inMemoryStore.getApiByContextAndVersion(validationContext.getContext(),
+        API api = inMemoryStore.getApiByContextAndVersion(validationContext.getContext(),
                 validationContext.getVersion());
 
         if (api == null) {
@@ -118,7 +118,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
             return false;
         }
 
-        Subscription subscription = inMemoryStore.getSubscriptionByApiAndApplication(application,
+        Subscription subscription = inMemoryStore.getSubscriptionByAPIAndApplication(application,
                 api);
 
         if (subscription == null) {
@@ -209,7 +209,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
      * populate validation Info Object with necessary values.
      */
     private boolean validateAndSetAdvancedThrottlingTiers(String matchingResource, String httpVerb,
-                                                          APIKeyValidationInfoDTO dto, Api api,
+                                                          APIKeyValidationInfoDTO dto, API api,
                                                           Subscription subscription, Application application) {
 
         String apiTier = api.getApiTier();
@@ -232,7 +232,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
                 inMemoryStore
                         .getApplicationPolicyByName(application.getAppTier(), MultitenantConstants.SUPER_TENANT_ID);
 
-        ApiPolicy apiPolicy = inMemoryStore.getApiPolicyByName(apiTier, MultitenantConstants.SUPER_TENANT_ID);
+        APIPolicy apiPolicy = inMemoryStore.getApiPolicyByName(apiTier, MultitenantConstants.SUPER_TENANT_ID);
 
         // If any of the Policies are null, that means in memory store hasn't been updated in a
         // while.
