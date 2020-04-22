@@ -10383,6 +10383,9 @@ public class ApiMgtDAO {
                 }
             }
 
+            //In mssql, constraint violation error is wrapped in an SQLServerException instead of an
+            //SQLIntegrityConstraintViolationException. So we are checking the error code of the exception thrown
+            //to identify constrant violation errors in mssql
             if (e.getErrorCode() == SQLConstants.UNIQUE_CONTRAINT_VIOLATION_ERROR_CODE) {
                 boolean isAppPolicyExists = isPolicyExist(conn, PolicyConstants.POLICY_LEVEL_APP, policy.getTenantId(),
                         policy.getPolicyName());
@@ -10466,6 +10469,9 @@ public class ApiMgtDAO {
                 }
             }
 
+            //In mssql, constraint violation error is wrapped in an SQLServerException instead of an
+            //SQLIntegrityConstraintViolationException. So we are checking the error code of the exception thrown
+            //to identify constrant violation errors in mssql
             if (e.getErrorCode() == SQLConstants.UNIQUE_CONTRAINT_VIOLATION_ERROR_CODE) {
                 boolean isSubscriptionPolicyExists = isPolicyExist(conn, PolicyConstants.POLICY_LEVEL_SUB, policy.getTenantId(),
                         policy.getPolicyName());
@@ -10519,6 +10525,9 @@ public class ApiMgtDAO {
                 }
             }
 
+            //In mssql, constraint violation error is wrapped in an SQLServerException instead of an
+            //SQLIntegrityConstraintViolationException. So we are checking the error code of the exception thrown
+            //to identify constrant violation errors in mssql
             if (e.getErrorCode() == SQLConstants.UNIQUE_CONTRAINT_VIOLATION_ERROR_CODE) {
                 boolean isAPIPolicyExists = isPolicyExist(connection, PolicyConstants.POLICY_LEVEL_API, policy.getTenantId(),
                         policy.getPolicyName());
