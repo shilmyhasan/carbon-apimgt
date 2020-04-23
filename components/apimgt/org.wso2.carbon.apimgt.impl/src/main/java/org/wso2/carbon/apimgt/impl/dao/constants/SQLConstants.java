@@ -471,15 +471,6 @@ public class SQLConstants {
             "   AM_SUBSCRIPTION (TIER_ID,API_ID,APPLICATION_ID,SUB_STATUS,SUBS_CREATE_STATE,CREATED_BY,CREATED_TIME, " +
                     "UPDATED_TIME, UUID) " +
             " VALUES (?,?,?,?,?,?,?,?,?)";
-
-    public static final String GET_SUBSCRIBER_ID_BY_SUBSCRIPTION_UUID_SQL =
-            " SELECT APPS.SUBSCRIBER_ID  AS SUBSCRIBER_ID " +
-            " FROM " +
-            " AM_APPLICATION APPS, " +
-            " AM_SUBSCRIPTION SUBS" +
-            " WHERE " +
-            " SUBS.APPLICATION_ID = APPS.APPLICATION_ID " +
-            " AND SUBS.UUID = ?";
     
     public static final String GET_SUBSCRIPTION_UUID_SQL =
             " SELECT UUID " +
