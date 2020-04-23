@@ -18,8 +18,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import InputBase from '@material-ui/core/InputBase';
+import Chip from '@material-ui/core/Chip';
 import MUIDataTable from 'mui-datatables';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import API from 'AppData/api';
 import ResourceNotFound from '../../Base/Errors/ResourceNotFound';
 import SubscriptionPolicySelect from './SubscriptionPolicySelect';
 
@@ -29,6 +33,21 @@ import SubscriptionPolicySelect from './SubscriptionPolicySelect';
  * @param {*} theme
  */
 const styles = theme => ({
+    searchRoot: {
+        padding: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
+        flex: 1,
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+    },
+    input: {
+        marginLeft: theme.spacing(1),
+        flex: 1,
+    },
+    iconButton: {
+        padding: 4,
+    },
     root: {
         display: 'flex',
     },
@@ -44,25 +63,164 @@ const styles = theme => ({
  * @extends {React.Component}
  */
 class APICardView extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: [],
+            loading: true,
+            searchText: '',
+        };
+
+        this.page = 0;
+        this.count = 100;
+        this.rowsPerPage = 10;
+        this.pageType = null;
+
+        this.handleEnterPress = this.handleSubmit.bind(this);
+    }
+
+    componentDidMount() {
+        this.getData();
+    }
+
+    componentDidUpdate(prevProps) {
+        const { subscriptions } = this.props;
+
+        if ( subscriptions.length !== prevProps.subscriptions.length ) {
+            this.getData();
+        }
+    }
+
+    handleSubmit(e, searchHandler) {
+        if (event.keyCode === 13) {
+            e.preventDefault();
+            const value = e.target.value || '';
+            this.setState({searchText: value});
+            this.getData(value);
+            searchHandler();
+        }
+    }
+
+    // get data
+    getData = (query) => {
+        const { intl } = this.props;
+        this.xhrRequest(query)
+            .then((data) => {
+                const { body } = data;
+                const { list, pagination } = body;
+                const { total } = pagination;
+                this.count = total;
+                this.setState({ data: this.updateUnsubscribedApis(list) });
+            })
+            .catch((error) => {
+                const { response } = error;
+                const { setTenantDomain } = this.props;
+                if (response && response.body.code === 901300) {
+                    setTenantDomain('INVALID');
+                    Alert.error(intl.formatMessage({
+                        defaultMessage: 'Invalid tenant domain',
+                        id: 'Apis.Listing.ApiTableView.invalid.tenant.domain',
+                    }));
+                } else {
+                    Alert.error(intl.formatMessage({
+                        defaultMessage: 'Error While Loading APIs',
+                        id: 'Apis.Listing.ApiTableView.error.loading',
+                    }));
+                }
+            })
+            .finally(() => {
+                this.setState({ loading: false });
+            });
+    };
+
+    xhrRequest = (filter) => {
+        const { searchText } = this.state;
+        const { rowsPerPage } = this;
+        const api = new API();
+        const query =  (filter != undefined) ? filter : searchText;
+        this.page =  (filter != undefined) ? 0 : this.page;
+
+        if (query && query !== '') {
+            return api.getAllAPIs({ query: query, limit: rowsPerPage, offset: this.page * rowsPerPage });
+        } else {
+            return api.getAllAPIs({ limit: rowsPerPage, offset: this.page * rowsPerPage });
+        }
+    };
+
+    changePage = (page) => {
+        const { intl } = this.props;
+        this.page = page;
+        this.setState({ loading: true });
+        this.xhrRequest()
+            .then((data) => {
+                const { body } = data;
+                const { list } = body;
+                this.setState({
+                    data: this.updateUnsubscribedApis(list),
+                });
+            })
+            .catch((e) => {
+                Alert.error(intl.formatMessage({
+                    defaultMessage: 'Error While Loading APIs',
+                    id: 'Apis.Listing.ApiTableView.error.loading',
+                }));
+            })
+            .finally(() => {
+                this.setState({ loading: false });
+            });
+    };
+
     /**
+     * Get List of the Ids of all APIs that have been already subscribed
      *
+     * @returns {*} Ids of respective APIs
+     * @memberof APICardView
+    */
+    getIdsOfSubscribedEntities() {
+        const { subscriptions } = this.props;
+
+        // Get arrays of the API Ids and remove all null/empty references by executing 'fliter(Boolean)'
+        const subscribedAPIIds = subscriptions.map((sub) => sub.apiId).filter(Boolean);
+
+        return subscribedAPIIds;
+    }
+
+    /**
+     * Update list of unsubscribed APIs
      *
-     * @returns
+     * @memberof APICardView
+    */
+    updateUnsubscribedApis(list) {
+        const subscribedIds = this.getIdsOfSubscribedEntities();
+        for (let i = 0; i < list.length; i++) {
+            if ((!subscribedIds.includes(list[i].id) && !list[i].advertiseInfo.advertised)
+                && list[i].isSubscriptionAvailable) {
+            } else {
+                list[i].throttlingPolicies = null;
+            }
+        }
+        return list;
+    }
+
+    /**
+     * @returns an APICardView
      * @memberof APICardView
      */
     render() {
         const { apisNotFound } = this.props;
+        const { loading, data, searchText } = this.state;
+        const { page, count, rowsPerPage } = this;
 
         if (apisNotFound) {
             return <ResourceNotFound />;
         }
 
         const {
-            theme, unsubscribedAPIList, handleSubscribe, applicationId, intl,
+            classes, handleSubscribe, applicationId, intl,
         } = this.props;
         const columns = [
             {
-                name: 'Id',
+                name: 'id',
                 label: intl.formatMessage({
                     id: 'Apis.Listing.APIList.id',
                     defaultMessage: 'Id',
@@ -72,14 +230,14 @@ class APICardView extends React.Component {
                 },
             },
             {
-                name: 'Name',
+                name: 'name',
                 label: intl.formatMessage({
                     id: 'Apis.Listing.APIList.name',
                     defaultMessage: 'Name',
                 }),
             },
             {
-                name: 'Policy',
+                name: 'throttlingPolicies',
                 label: intl.formatMessage({
                     id: 'Apis.Listing.APIList.policy',
                     defaultMessage: 'Policy',
@@ -89,6 +247,12 @@ class APICardView extends React.Component {
                         if (tableMeta.rowData) {
                             const apiId = tableMeta.rowData[0];
                             const policies = value;
+                            if (!policies) {
+                                return (intl.formatMessage({
+                                    id: 'Apis.Listing.APICardView.already.subscribed',
+                                    defaultMessage: 'Subscribed',
+                                }))
+                            }
                             return (
                                 <SubscriptionPolicySelect
                                     key={apiId}
@@ -104,12 +268,58 @@ class APICardView extends React.Component {
             },
         ];
 
+        const options = {
+            customSearchRender: (value, handleSearch, hideSearch, options) => {
+                return (
+                    <Paper component="form" className={classes.searchRoot}>
+                        {searchText && searchText !== '' && <Chip
+                            label={searchText}
+                        />}
+                        <InputBase
+                            className={classes.input}
+                            placeholder={intl.formatMessage({defaultMessage:'Search APIs', id:'Applications.Details.Subscriptions.search'})}
+                            inputProps={{ 'aria-label': intl.formatMessage({defaultMessage:'Search APIs', id:'Applications.Details.Subscriptions.search'}) }}
+                            value={value}
+                            onKeyDown={(e)=>{ this.handleSubmit(e, handleSearch) }}
+                        />
+                    </Paper>
+                );
+            },
+            title: false,
+            filter: false,
+            print: false,
+            download: false,
+            viewColumns: false,
+            customToolbar: false,
+            responsive: 'stacked',
+            serverSide: true,
+            count,
+            page,
+            onTableChange: (action, tableState) => {
+                switch (action) {
+                    case 'changePage':
+                        this.changePage(tableState.page);
+                        break;
+                }
+            },
+            selectableRows: 'none',
+            rowsPerPage,
+            onChangeRowsPerPage: (numberOfRows) => {
+                const { page, count } = this;
+                if (page * numberOfRows > count) {
+                    this.page = 0;
+                }
+                this.rowsPerPage = numberOfRows;
+                this.getData();
+            },
+        };
+
         return (
             <MUIDataTable
                 title={<FormattedMessage defaultMessage='APIs' id='Apis.Listing.APIList.apis' />}
-                data={unsubscribedAPIList}
+                data={data}
                 columns={columns}
-                options={{ selectableRows: false }}
+                options={options}
             />
         );
     }
