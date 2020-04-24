@@ -36,7 +36,7 @@
             <name>Version Type</name>
         </field>
         <field type="text">
-            <name>Version</name>
+            <name>Type</name>
         </field>
         <field type="options">
             <name label="isDefaultVersion">Is Default Version</name>
