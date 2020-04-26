@@ -37,6 +37,7 @@ public class ConfigConstants {
     public static final String CONFIGURE_LOCK_FILE_NAME = "configure.lck";
     public static final String CONFIG_TOOL_CONFIG_FILE_NAME = "gateway-config-tool.properties";
     public static final String GATEWAY_CARBON_FILE_NAME = "carbon.xml";
+    public static final String DEPLOYMENT_TOML_FILE_NAME = "deployment.toml";
     public static final String HYBRID_GATEWAY_ENV_METADATA = "api.hybrid.meta.env.";
     public static final String DEFAULT_FILE_DATA_PUBLISHER_CLASS
             = "org.wso2.carbon.apimgt.hybrid.gateway.usage.publisher.APIMgtUsageFileDataPublisher";
@@ -50,6 +51,10 @@ public class ConfigConstants {
             = "org.wso2.carbon.apimgt.hybrid.gateway.throttling.synchronizer.tasks.ThrottlingSyncTask";
     public static final String DEFAULT_API_UPDATE_TASK_CLASS
             = "org.wso2.carbon.apimgt.hybrid.gateway.api.synchronizer.tasks.APISynchronizationTask";
+    public static final String DEPLOYMENT_TOML_TASKS = "cron_tasks";
+    public static final String DEPLOYMENT_TOML_CLASS = "class";
+    public static final String DEPLOYMENT_TOML_NAME = "name";
+    public static final String DEPLOYMENT_TOML_CRON = "cron";
 
     public static final String DELIMITER = ":";
     public static final int GATEWAY_DEFAULT_PORT = 9443;

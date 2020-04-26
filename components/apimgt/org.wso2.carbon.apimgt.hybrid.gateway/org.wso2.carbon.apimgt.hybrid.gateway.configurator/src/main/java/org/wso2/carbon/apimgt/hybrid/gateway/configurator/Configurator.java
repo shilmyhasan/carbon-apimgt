@@ -19,23 +19,7 @@
 package org.wso2.carbon.apimgt.hybrid.gateway.configurator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.config.ConfigManager;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.dto.ConfigDTO;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.exception.OnPremiseGatewayException;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.util.HttpRequestUtil;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.util.OnPremiseGatewayConstants;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.util.TokenUtil;
-import org.wso2.carbon.apimgt.hybrid.gateway.configurator.dto.MicroGatewayInitializationDTO;
-import org.wso2.carbon.utils.CarbonUtils;
-
+import com.moandjiezana.toml.Toml;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,10 +38,26 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalLong;
 import java.util.Properties;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.config.ConfigManager;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.dto.ConfigDTO;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.exception.OnPremiseGatewayException;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.util.HttpRequestUtil;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.util.OnPremiseGatewayConstants;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.util.TokenUtil;
+import org.wso2.carbon.apimgt.hybrid.gateway.configurator.dto.MicroGatewayInitializationDTO;
+import org.wso2.carbon.utils.CarbonUtils;
 
 /**
  * Configurator class for Micro Gateway Configuration specific to WSO2 API Cloud
@@ -98,19 +98,24 @@ public class Configurator {
         }
         carbonConfigDirPath = CarbonUtils.getCarbonConfigDirPath();
 
-        //Read Gateway properties
-        String gatewayConfigPath =
-                carbonConfigDirPath + File.separator + OnPremiseGatewayConstants.CONFIG_FILE_TOML_NAME;
+        String onPremiseGatewayTomlPath =
+            carbonConfigDirPath + File.separator + OnPremiseGatewayConstants.CONFIG_FILE_TOML_NAME;
+        String configToolPropertyFilePath = carbonConfigDirPath + File.separator +
+            ConfigConstants.CONFIG_TOOL_CONFIG_FILE_NAME;
+        String deploymentTomlFilePath =
+            carbonConfigDirPath + File.separator + ConfigConstants.DEPLOYMENT_TOML_FILE_NAME;
+
         try {
-            ConfigDTO gatewayConfigs = getGatewayConfigs(gatewayConfigPath, args);
-            String configToolPropertyFilePath = carbonConfigDirPath + File.separator +
-                    ConfigConstants.CONFIG_TOOL_CONFIG_FILE_NAME;
-            //Configure api-manager.xml
+            ConfigDTO gatewayConfigs = getGatewayConfigs(onPremiseGatewayTomlPath, args);
+            // Read deployment.toml
+            Toml parsed = new Toml().read(new File(deploymentTomlFilePath));
+            Map<String, Object> tomlEntries = parsed.toMap();
+
+            // Configure deployment.toml
             Properties configToolProperties = readPropertiesFromFile(configToolPropertyFilePath);
-            setAPIMConfigurations(configToolProperties, carbonHome, gatewayConfigs);
-            //Configure registry.xml
-            RegistryXmlConfigurator registryXmlConfigurator = new RegistryXmlConfigurator();
-            registryXmlConfigurator.configure(carbonConfigDirPath, gatewayConfigs);
+            DeploymentTomlConfigurator.setDeploymentTomlConfigurations(deploymentTomlFilePath,
+                configToolProperties, tomlEntries, gatewayConfigs);
+
             //Configure log4j.properties
             Log4JConfigurator log4JConfigurator = new Log4JConfigurator();
             log4JConfigurator.configure(carbonConfigDirPath);
@@ -121,34 +126,6 @@ public class Configurator {
             log.error("Error while initializing gateway.", e);
             Runtime.getRuntime().exit(1);
         }
-    }
-
-    /**
-     * Configure api-manager.xml with given properties
-     *
-     * @param configToolProperties Properties
-     * @param carbonHome           String
-     * @param gatewayConfigs       Configuration Properties
-     */
-    protected static void setAPIMConfigurations(Properties configToolProperties, String carbonHome,
-                                                ConfigDTO gatewayConfigs) {
-        Map<String, Map<String, String>> fileMap = new HashMap<>();
-        for (Map.Entry entry : configToolProperties.entrySet()) {
-            String xpathKey = (String) entry.getKey();
-            String[] values = ((String) entry.getValue()).split("::");
-            String file = values[0];
-            String gwPropertyKey = values[1];
-            Map<String, String> xpathMap;
-            if (fileMap.containsKey(file)) {
-                xpathMap = fileMap.get(file);
-            } else {
-                xpathMap = new HashMap<>();
-            }
-            xpathMap.put(xpathKey, gwPropertyKey);
-            fileMap.put(file, xpathMap);
-        }
-        XmlConfigurator xmlConfigurator = new XmlConfigurator();
-        xmlConfigurator.configure(carbonHome, gatewayConfigs, fileMap);
     }
 
     /**

@@ -18,7 +18,21 @@
 
 package org.wso2.carbon.apimgt.hybrid.gateway.configurator;
 
+import static org.mockito.Matchers.any;
+
+import com.moandjiezana.toml.Toml;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Properties;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.apache.xalan.transformer.TransformerIdentityImpl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,17 +40,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.dto.ConfigDTO;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.exception.OnPremiseGatewayException;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.util.OnPremiseGatewayConstants;
-
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.Map;
-import java.util.Properties;
-
-import static org.mockito.Matchers.any;
 
 /**
  * Configurator TestCase
@@ -49,6 +54,7 @@ public class ConfiguratorTest {
     private Properties configToolProperties;
     private String carbonConfigDirPath;
     private String gatewayConfigPath;
+    private String deploymentTomlFilePath;
     private String args[] = { "test-email@test.com", "TestTenant", "TestPassword" };
     private static final String TOKEN = "$token";
 
@@ -64,12 +70,16 @@ public class ConfiguratorTest {
         String configToolPropertyFilePath = carbonConfigDirPath + File.separator +
                 ConfigConstants.CONFIG_TOOL_CONFIG_FILE_NAME;
         configToolProperties = Configurator.readPropertiesFromFile(configToolPropertyFilePath);
+        deploymentTomlFilePath = carbonConfigDirPath + File.separator +
+            ConfigConstants.DEPLOYMENT_TOML_FILE_NAME;
     }
 
     @Test
-    public void setAPIMConfigurations() {
-        String carbonHome = System.getProperty(ConfigConstants.CARBON_HOME);
-        Configurator.setAPIMConfigurations(configToolProperties, carbonHome, gatewayConfigs);
+    public void setAPIMConfigurations() throws OnPremiseGatewayException {
+      Toml parsed = new Toml().read(new File(deploymentTomlFilePath));
+      Map<String, Object> tomlEntries = parsed.toMap();
+      DeploymentTomlConfigurator.setDeploymentTomlConfigurations(deploymentTomlFilePath,
+          configToolProperties, tomlEntries, gatewayConfigs);
     }
 
     @Test
@@ -91,7 +101,10 @@ public class ConfiguratorTest {
     @Test
     public void main() throws Exception {
         String carbonHome = System.getProperty(ConfigConstants.CARBON_HOME);
-        setAPIMConfigurations();
+        Toml parsed = new Toml().read(new File(deploymentTomlFilePath));
+        Map<String, Object> tomlEntries = parsed.toMap();
+        DeploymentTomlConfigurator.setDeploymentTomlConfigurations(deploymentTomlFilePath,
+            configToolProperties, tomlEntries, gatewayConfigs);
         RegistryXmlConfigurator registryXmlConfigurator = new RegistryXmlConfigurator();
         TransformerIdentityImpl transformerIdentity = PowerMockito.mock(TransformerIdentityImpl.class);
         TransformerFactory transformerFactory = PowerMockito.mock(TransformerFactory.class);
@@ -109,4 +122,13 @@ public class ConfiguratorTest {
         writer.close();
     }
 
+    @After
+    public void tearDown () throws IOException {
+        String deploymentTomlBackup = deploymentTomlFilePath + ".backup";
+        if (Files.exists(Paths.get(deploymentTomlFilePath)) &&
+            Files.exists(Paths.get(deploymentTomlBackup))) {
+            Files.deleteIfExists(Paths.get(deploymentTomlFilePath));
+            Files.move(Paths.get(deploymentTomlBackup), Paths.get(deploymentTomlFilePath));
+        }
+    }
 }
