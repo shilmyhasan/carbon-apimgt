@@ -36,10 +36,10 @@ export default class Subscription extends Resource {
      * @param applicationId id of the application 
      * @returns {promise} With all subscription for given applicationId or apiId.
      */
-    getSubscriptions(apiId, applicationId) {
+    getSubscriptions(apiId, applicationId, limit = 25) {
         var promise_get = this.client.then((client) => {
             return client.apis["Subscriptions"].get_subscriptions(
-                { apiId: apiId, applicationId: applicationId });
+                { apiId: apiId, applicationId: applicationId, limit });
         }
         );
         return promise_get;
