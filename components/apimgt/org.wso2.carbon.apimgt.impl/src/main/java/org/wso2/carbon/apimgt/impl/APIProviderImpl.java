@@ -1400,8 +1400,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             failedGateways = publishToGateway(api);
                             //Sending Notifications to existing subscribers
                             if (APIConstants.PUBLISHED.equals(newStatus)) {
-                                List<APIIdentifier> oldPublishedAPIList = getOldPublishedAPIList(api);
-                                sendEmailNotification(api, oldPublishedAPIList);
+                                sendEmailNotification(api);
                             }
                         } else { // API Status : RETIRED or CREATED
                             failedGateways = removeFromGateway(api);
@@ -1640,10 +1639,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * This method used to send notifications to the previous subscribers of older versions of a given API
      *
      * @param api
-     * @param apiIdentifiers
      * @throws APIManagementException
      */
-    private void sendEmailNotification(API api, List<APIIdentifier> apiIdentifiers) throws APIManagementException {
+    private void sendEmailNotification(API api) throws APIManagementException {
         try {
             String isNotificationEnabled = "false";
             Registry configRegistry = ServiceReferenceHolder.getInstance().getRegistryService().
@@ -1657,6 +1655,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
             if (JavaUtils.isTrueExplicitly(isNotificationEnabled)) {
+                List<APIIdentifier> apiIdentifiers = getOldPublishedAPIList(api);
                 for (APIIdentifier oldAPI : apiIdentifiers) {
                     Properties prop = new Properties();
                     prop.put(NotifierConstants.API_KEY, oldAPI);
