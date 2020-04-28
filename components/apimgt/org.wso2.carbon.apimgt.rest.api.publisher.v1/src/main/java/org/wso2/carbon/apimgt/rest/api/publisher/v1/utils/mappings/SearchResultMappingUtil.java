@@ -89,6 +89,7 @@ public class SearchResultMappingUtil {
         apiProductResultDTO.setContext(context);
         apiProductResultDTO.setType(SearchResultDTO.TypeEnum.APIPRODUCT);
         apiProductResultDTO.setDescription(apiProduct.getDescription());
+        apiProductResultDTO.setStatus(apiProduct.getState());
         apiProductResultDTO.setThumbnailUri(apiProduct.getThumbnailUrl());
         return apiProductResultDTO;
     }
