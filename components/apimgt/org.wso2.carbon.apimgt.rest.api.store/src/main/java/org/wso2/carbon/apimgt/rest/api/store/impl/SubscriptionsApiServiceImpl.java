@@ -209,7 +209,8 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
                 //  throw an APIMgtAuthorizationFailedException with the reason as the message
                 RestAPIStoreUtils.checkSubscriptionAllowed(apiTypeWrapper, subscriptionDTO.getTier());
 
-                apiIdentifier.setTier(subscriptionDTO.getTier());
+                //apiIdentifier.setTier(subscriptionDTO.getTier());
+                apiTypeWrapper.setTier(subscriptionDTO.getTier());
                 SubscriptionResponse subscriptionResponse = apiConsumer
                         .addSubscription(apiTypeWrapper, username, application.getId());
                 SubscribedAPI addedSubscribedAPI = apiConsumer
