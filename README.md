@@ -27,3 +27,8 @@ https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.14
 - Support-6.4.50 - APIM 2.6.0
 - Support-6.5.349 - APIM 3.0.0
 - [Support-6.6.163](https://github.com/wso2-support/carbon-apimgt/tree/support-6.6.163) - APIM 3.1.0
+
+    We need to build following additional Repo before building support-6.6.163 branch:
+
+    1. carbon4-kernel/core/javax.cache - support-4.6.0
+https://github.com/wso2-support/carbon4-kernel/tree/support-4.6.0/core/javax.cache
