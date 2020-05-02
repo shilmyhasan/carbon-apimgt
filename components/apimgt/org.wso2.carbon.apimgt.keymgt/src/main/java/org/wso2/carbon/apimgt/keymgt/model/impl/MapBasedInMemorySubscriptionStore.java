@@ -80,6 +80,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         this.policyMap = new ConcurrentHashMap<String, Policy>();
         this.subPolicyMap = new ConcurrentHashMap<String, SubscriptionPolicy>();
         this.appPolicyMap = new ConcurrentHashMap<String, ApplicationPolicy>();
+        this.apiPolicyMap = new ConcurrentHashMap<String, APIPolicy>();
         this.subscriptionMap = new ConcurrentHashMap<String, Subscription>();
 
     }
