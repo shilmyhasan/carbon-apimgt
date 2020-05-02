@@ -65,7 +65,7 @@ public class MemoryBackedURITemplateLoader implements URITemplateLoader {
                     "%s ", context, version));
         }
 
-        List<URITemplate> uriTemplates = new ArrayList<>();
+        List<URITemplate> uriTemplates = new ArrayList<URITemplate>();
 
         API api = memorySubscriptionStore.getApiByContextAndVersion(context, version);
         if (api == null) {
@@ -121,7 +121,7 @@ public class MemoryBackedURITemplateLoader implements URITemplateLoader {
                         MultitenantConstants.SUPER_TENANT_ID);
 
         Set<APIPolicyConditionGroup> conditionGroup = policy.getConditionGroups();
-        Set<ConditionGroupDTO> conditionGroupDTOS = new HashSet<>();
+        Set<ConditionGroupDTO> conditionGroupDTOS = new HashSet<ConditionGroupDTO>();
         ConditionGroupDTO defaultGroup = new ConditionGroupDTO();
         defaultGroup.setConditionGroupId(APIConstants.THROTTLE_POLICY_DEFAULT);
         uriTemplate.getThrottlingConditions().add(APIConstants.THROTTLE_POLICY_DEFAULT);

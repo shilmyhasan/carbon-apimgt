@@ -39,7 +39,7 @@ public class Resource implements CachableEntity<String> {
 
     public Resource() {
 
-        httpVerbs = new HashMap<>();
+        httpVerbs = new HashMap<String, Verb>();
     }
 
     public Resource(int apiId, String urlPattern) {
