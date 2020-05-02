@@ -43,8 +43,13 @@ public class APIPolicy extends Policy {
         if (super.isContentAware()) {
             return true;
         }
-        if (conditionGroups != null) {
-            return conditionGroups.stream().anyMatch((conditionGroup -> conditionGroup.isContentAware()));
+
+        if(conditionGroups != null) {
+            for (APIPolicyConditionGroup conditionGroupDTO : conditionGroups) {
+                if (conditionGroupDTO.isContentAware()) {
+                    return true;
+                }
+            }
         }
         return false;
     }

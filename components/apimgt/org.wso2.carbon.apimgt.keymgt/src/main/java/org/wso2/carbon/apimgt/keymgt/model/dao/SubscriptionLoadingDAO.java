@@ -61,6 +61,7 @@ public class SubscriptionLoadingDAO {
     public List<Subscription> getAllSubscriptions() throws DataLoadingException {
 
         ArrayList<Subscription> subscriptions = null;
+        // TODO : Consider removing try with too
         try (Connection conn = APIMgtDBUtil.getConnection();
              PreparedStatement ps =
                      conn.prepareStatement(SubscriptionConstants.SUBSCRIPTION_LOAD_SQL);
@@ -103,7 +104,7 @@ public class SubscriptionLoadingDAO {
                 application.setAppStatus(resultSet.getString("STATUS"));
                 application.setSubName(resultSet.getString("SUB_NAME"));
                 application.setCreatedBy(resultSet.getString("STATUS"));
-                application.setAppId(resultSet.getInt("SUB_ID"));
+                application.setSubId(resultSet.getInt("SUB_ID"));
                 application.setTenantId(resultSet.getInt("TENANT_ID"));
                 applications.add(application);
             }

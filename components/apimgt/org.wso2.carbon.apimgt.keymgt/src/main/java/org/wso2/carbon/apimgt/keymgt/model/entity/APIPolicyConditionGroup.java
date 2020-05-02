@@ -78,12 +78,7 @@ public class APIPolicyConditionGroup {
         if (PolicyConstants.BANDWIDTH_TYPE.equals(quotaType)) {
             return true;
         }
-        if (conditionDTOS != null) {
-            conditionDTOS.stream().anyMatch(conditionDTO ->
-                            PolicyConstants.BANDWIDTH_TYPE.equals(quotaType)
-                                           );
-            return false;
-        }
+
         return false;
     }
 

@@ -243,6 +243,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
 
         // Checking if any of Subscription, Api or Application Throttling policies are
         // ContentAware
+        // TODO: Check what happens when Unlimited tier is absent
         boolean isContentAware =
                 subscriptionPolicy.isContentAware() || applicationPolicy.isContentAware() || apiPolicy.isContentAware();
 

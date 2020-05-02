@@ -227,11 +227,15 @@
 	         -The Gateway uses this parameter to connect to the key validation thrift service. -->
         <KeyValidatorClientType>ThriftClient</KeyValidatorClientType>
         <ThriftClientConnectionTimeOut>10000</ThriftClientConnectionTimeOut>
+
         <!--ThriftClientPort>10397</ThriftClientPort-->
 
         <EnableThriftServer>true</EnableThriftServer>
         <ThriftServerHost>localhost</ThriftServerHost>
         <!--ThriftServerPort>10397</ThriftServerPort-->
+
+        <!-- Uncomment if URI Loading should happen through an extended class -->
+        <!-- <UriTemplateLoader>org.wso2.carbon.apimgt.keymgt.model.impl.MemoryBackedURITemplateLoader</UriTemplateLoader> -->
 
         <!--ConnectionPool>
             <MaxIdle>100</MaxIdle>
@@ -240,6 +244,29 @@
         <!-- Specifies the implementation to be used for KeyValidationHandler. Steps for validating a token can be controlled by plugging in a 
              custom KeyValidation Handler -->
         <KeyValidationHandlerClassName>org.wso2.carbon.apimgt.keymgt.handlers.DefaultKeyValidationHandler</KeyValidationHandlerClassName>
+
+        <!--
+
+        <KeyValidationHandler>
+            <KeyValidationHandlerImpl>org.wso2.carbon.apimgt.keymgt.handlers.InMemorySubscriptionValidationHandler</KeyValidationHandlerImpl>
+            <Configuration>
+                <InMemorySubscriptionStore>
+                    <InMemorySubscriptionStoreImpl>org.wso2.carbon.apimgt.keymgt.model.impl.MapBasedInMemorySubscriptionStore</InMemorySubscriptionStoreImpl>
+                    <Configuration>
+                        <ApiLoadingFrequency>30</ApiLoadingFrequency>
+                        <ApplicationLoadingFrequency>30</ApplicationLoadingFrequency>
+                        <SubscriptionLoadingFrequency>30</SubscriptionLoadingFrequency>
+                        <KeyMappingLoadingFrequency>30</KeyMappingLoadingFrequency>
+                        <PolicyLoadingFrequency>30</PolicyLoadingFrequency>
+                        <SubscriptionDataLoader>
+                            <SubscriptionDataLoaderImpl>org.wso2.carbon.apimgt.keymgt.model.impl.DbDataLoader</SubscriptionDataLoaderImpl>
+                        </SubscriptionDataLoader>
+                    </Configuration>
+                </InMemorySubscriptionStore>
+            </Configuration>
+        </KeyValidationHandler>
+        -->
+
     </APIKeyValidator>
 
     <!-- Uncomment this section only if you are going to have an instance other than KeyValidator as your KeyManager.

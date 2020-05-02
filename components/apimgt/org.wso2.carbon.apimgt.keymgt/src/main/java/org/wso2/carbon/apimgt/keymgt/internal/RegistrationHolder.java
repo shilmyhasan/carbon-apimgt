@@ -27,7 +27,7 @@ import java.util.Map;
 public class RegistrationHolder {
 
     private static RegistrationHolder registrationHolder = new RegistrationHolder();
-    private Map<String,Object> referenceHolder;
+    private Map<String, Object> referenceHolder;
 
     private RegistrationHolder(){
         referenceHolder = new HashMap<>();

@@ -47,7 +47,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 /**
  * In memory store which keeps data needed to validate subscriptions as Maps. This uses
@@ -134,7 +133,6 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         return getPolicy(policyName, tenantId, apiPolicyMap);
     }
 
-    //TODO: change to initialize
     @Override
     public void initialize(KeyValidationHandlerConfig config) throws InitializationException {
 
@@ -163,42 +161,54 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
     private void initializeLoadingTasks() {
 
         Runnable apiTask = new PeriodicPopulateTask<String, API>(apiMap,
-                () -> {
-                    try {
-                        log.debug("Calling loadAllApis...");
-                        return dataLoader.loadAllApis();
-                    } catch (APIManagementException e) {
-                        log.error("Exception while loading APIs");
+                new Supplier<List<API>>() {
+                    @Override
+                    public List<API> get() {
+
+                        try {
+                            log.debug("Calling loadAllApis...");
+                            return dataLoader.loadAllApis();
+                        } catch (APIManagementException e) {
+                            log.error("Exception while loading APIs");
+                        }
+                        return null;
                     }
-                    return null;
                 });
 
         executorService.scheduleAtFixedRate(apiTask, 0,
                 mapBasedSubscriptionStoreConfig.getApiLoadingFrequency(), TimeUnit.SECONDS);
 
         Runnable subscriptionLoadingTask = new PeriodicPopulateTask<String, Subscription>(subscriptionMap,
-                () -> {
-                    try {
-                        log.debug("Calling loadAllSubscriptions...");
-                        return dataLoader.loadAllSubscriptions();
-                    } catch (APIManagementException e) {
-                        log.error("Exception while loading Subscriptions");
+                new Supplier<List<Subscription>>() {
+                    @Override
+                    public List<Subscription> get() {
+
+                        try {
+                            log.debug("Calling loadAllSubscriptions...");
+                            return dataLoader.loadAllSubscriptions();
+                        } catch (APIManagementException e) {
+                            log.error("Exception while loading Subscriptions");
+                        }
+                        return null;
                     }
-                    return null;
                 });
 
         executorService.scheduleAtFixedRate(subscriptionLoadingTask, 0,
                 mapBasedSubscriptionStoreConfig.getSubLoadingFrequency(), TimeUnit.SECONDS);
 
         Runnable applicationLoadingTask = new PeriodicPopulateTask<Integer, Application>(applicationMap,
-                () -> {
-                    try {
-                        log.debug("Calling loadAllApplications...");
-                        return dataLoader.loadAllApplications();
-                    } catch (APIManagementException e) {
-                        log.error("Exception while loading Applications");
+                new Supplier<List<Application>>() {
+                    @Override
+                    public List<Application> get() {
+
+                        try {
+                            log.debug("Calling loadAllApplications...");
+                            return dataLoader.loadAllApplications();
+                        } catch (APIManagementException e) {
+                            log.error("Exception while loading Applications");
+                        }
+                        return null;
                     }
-                    return null;
                 });
 
         executorService.scheduleAtFixedRate(applicationLoadingTask, 0,
@@ -206,14 +216,18 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
         Runnable keyMappingsTask =
                 new PeriodicPopulateTask<String, ApplicationKeyMapping>(applicationKeyMappingMap,
-                        () -> {
-                            try {
-                                log.debug("Calling loadAllKeyMappings...");
-                                return dataLoader.loadAllKeyMappings();
-                            } catch (APIManagementException e) {
-                                log.error("Exception while loading ApplicationKeyMapping");
+                        new Supplier<List<ApplicationKeyMapping>>() {
+                            @Override
+                            public List<ApplicationKeyMapping> get() {
+
+                                try {
+                                    log.debug("Calling loadAllKeyMappings...");
+                                    return dataLoader.loadAllKeyMappings();
+                                } catch (APIManagementException e) {
+                                    log.error("Exception while loading ApplicationKeyMapping");
+                                }
+                                return null;
                             }
-                            return null;
                         });
 
         executorService.scheduleAtFixedRate(keyMappingsTask, 0,
@@ -221,14 +235,18 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
         Runnable subPolicyLoadingTask =
                 new PeriodicPopulateTask<String, SubscriptionPolicy>(subPolicyMap,
-                        () -> {
-                            try {
-                                log.debug("Calling loadAllSubscriptionPolicies...");
-                                return dataLoader.loadAllSubscriptionPolicies();
-                            } catch (APIManagementException e) {
-                                log.error("Exception while loading Subscription Policies");
+                        new Supplier<List<SubscriptionPolicy>>() {
+                            @Override
+                            public List<SubscriptionPolicy> get() {
+
+                                try {
+                                    log.debug("Calling loadAllSubscriptionPolicies...");
+                                    return dataLoader.loadAllSubscriptionPolicies();
+                                } catch (APIManagementException e) {
+                                    log.error("Exception while loading Subscription Policies");
+                                }
+                                return null;
                             }
-                            return null;
                         });
 
         executorService.scheduleAtFixedRate(subPolicyLoadingTask, 0,
@@ -236,14 +254,18 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
         Runnable appPolicyLoadingTask =
                 new PeriodicPopulateTask<String, ApplicationPolicy>(appPolicyMap,
-                        () -> {
-                            try {
-                                log.debug("Calling loadAllAppPolicies...");
-                                return dataLoader.loadAllAppPolicies();
-                            } catch (APIManagementException e) {
-                                log.error("Exception while loading Application Policies");
+                        new Supplier<List<ApplicationPolicy>>() {
+                            @Override
+                            public List<ApplicationPolicy> get() {
+
+                                try {
+                                    log.debug("Calling loadAllAppPolicies...");
+                                    return dataLoader.loadAllAppPolicies();
+                                } catch (APIManagementException e) {
+                                    log.error("Exception while loading Application Policies");
+                                }
+                                return null;
                             }
-                            return null;
                         });
 
         executorService.scheduleAtFixedRate(appPolicyLoadingTask, 0,
@@ -251,14 +273,18 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
         Runnable apiPolicyLoadingTask =
                 new PeriodicPopulateTask<String, APIPolicy>(apiPolicyMap,
-                        () -> {
-                            try {
-                                log.debug("Calling loadAllApiPolicies...");
-                                return dataLoader.loadAllApiPolicies();
-                            } catch (APIManagementException e) {
-                                log.error("Exception while loading Api Policies");
+                        new Supplier<List<APIPolicy>>() {
+                            @Override
+                            public List<APIPolicy> get() {
+
+                                try {
+                                    log.debug("Calling loadAllApiPolicies...");
+                                    return dataLoader.loadAllApiPolicies();
+                                } catch (APIManagementException e) {
+                                    log.error("Exception while loading Api Policies");
+                                }
+                                return null;
                             }
-                            return null;
                         });
 
         executorService.scheduleAtFixedRate(apiPolicyLoadingTask, 0,
@@ -298,11 +324,11 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                         log.debug(String.format("Adding entry Key : %s Value : %s", v.getCacheKey()
                                 , v));
                     }
+                }
 
-                    if (!tempMap.isEmpty()) {
-                        entityMap.clear();
-                        entityMap.putAll(tempMap);
-                    }
+                if (!tempMap.isEmpty()) {
+                    entityMap.clear();
+                    entityMap.putAll(tempMap);
                 }
 
             } else {
@@ -311,6 +337,12 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                 }
             }
         }
+    }
+
+    // Defining Supplier to minimize changes while porting from java 8
+    public interface Supplier<T> {
+
+        T get();
     }
 
 }
