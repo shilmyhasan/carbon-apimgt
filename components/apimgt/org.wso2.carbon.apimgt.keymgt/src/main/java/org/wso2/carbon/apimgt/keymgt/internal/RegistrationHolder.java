@@ -31,7 +31,7 @@ public class RegistrationHolder {
 
     private RegistrationHolder() {
 
-        referenceHolder = new HashMap<>();
+        referenceHolder = new HashMap<String, Object>();
     }
 
     public static RegistrationHolder getInstance() {

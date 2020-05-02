@@ -109,8 +109,12 @@ public class APIKeyValidationService extends AbstractAdmin {
             log.error("Error while accessing class" + e.toString());
         } catch (ClassNotFoundException e) {
             log.error("Error while creating keyManager instance" + e.toString());
-        } catch (InitializationException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InitializationException e) {
             log.error("Error while instantiating KeyValidationService " + e, e);
+        } catch (NoSuchMethodException e) {
+            log.error("Error while creating keyManager instance" + e.toString());
+        } catch (InvocationTargetException e) {
+            log.error("Error while creating keyManager instance" + e.toString());
         }
     }
 
@@ -258,12 +262,12 @@ public class APIKeyValidationService extends AbstractAdmin {
         Timer timer6 = MetricManager.timer(org.wso2.carbon.metrics.manager.Level.INFO, MetricManager.name(
                 APIConstants.METRICS_PREFIX, this.getClass().getSimpleName(), "GET_URI_TEMPLATE"));
         Timer.Context timerContext6 = timer6.start();
-        ArrayList<URITemplate> templates;
+        ArrayList<URITemplate> templates = null;
         if (loader == null) {
             templates = ApiMgtDAO.getInstance().getAllURITemplates(context, version);
         } else {
             List<URITemplate> uriTemplates = loader.getAllURITemplates(context, version);
-            templates = new ArrayList<>(uriTemplates);
+            templates = new ArrayList<URITemplate>(uriTemplates);
         }
         timerContext6.stop();
         return templates;

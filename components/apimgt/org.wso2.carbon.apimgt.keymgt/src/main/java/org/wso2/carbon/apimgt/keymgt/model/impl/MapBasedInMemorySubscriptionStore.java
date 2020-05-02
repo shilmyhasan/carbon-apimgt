@@ -74,14 +74,14 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
 
     public MapBasedInMemorySubscriptionStore() {
 
-        this.applicationKeyMappingMap = new ConcurrentHashMap<>();
-        this.applicationMap = new ConcurrentHashMap<>();
-        this.apiMap = new ConcurrentHashMap<>();
-        this.policyMap = new ConcurrentHashMap<>();
-        this.subPolicyMap = new ConcurrentHashMap<>();
-        this.appPolicyMap = new ConcurrentHashMap<>();
-        this.apiPolicyMap = new ConcurrentHashMap<>();
-        this.subscriptionMap = new ConcurrentHashMap<>();
+        this.applicationKeyMappingMap = new ConcurrentHashMap<String, ApplicationKeyMapping>();
+        this.applicationMap = new ConcurrentHashMap<Integer, Application>();
+        this.apiMap = new ConcurrentHashMap<String, API>();
+        this.policyMap = new ConcurrentHashMap<String, Policy>();
+        this.subPolicyMap = new ConcurrentHashMap<String, SubscriptionPolicy>();
+        this.appPolicyMap = new ConcurrentHashMap<String, ApplicationPolicy>();
+        this.apiPolicyMap = new ConcurrentHashMap<String, APIPolicy>();
+        this.subscriptionMap = new ConcurrentHashMap<String, Subscription>();
 
     }
 
@@ -148,13 +148,23 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
                                 .getDeclaredConstructor().newInstance();
                 RegistrationHolder.getInstance().registerInstance(SubscriptionDataLoader.class.getName(),
                         this.dataLoader);
-            } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException |
-                    IllegalAccessException | InvocationTargetException e) {
+            } catch (InstantiationException e) {
+                log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
+                throw new InitializationException(e);
+            } catch (ClassNotFoundException e) {
+                log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
+                throw new InitializationException(e);
+            } catch (NoSuchMethodException e) {
+                log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
+                throw new InitializationException(e);
+            } catch (IllegalAccessException e) {
+                log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
+                throw new InitializationException(e);
+            } catch (InvocationTargetException e) {
                 log.error("Error occurred while instantiating " + subscriptionDataLoader, e);
                 throw new InitializationException(e);
             }
         }
-
         this.initializeLoadingTasks();
     }
 
@@ -315,7 +325,7 @@ public class MapBasedInMemorySubscriptionStore implements InMemorySubscriptionSt
         public void run() {
 
             List<V> list = supplier.get();
-            HashMap<K, V> tempMap = new HashMap<>();
+            HashMap<K, V> tempMap = new HashMap<K, V>();
 
             if (list != null) {
                 for (V v : list) {

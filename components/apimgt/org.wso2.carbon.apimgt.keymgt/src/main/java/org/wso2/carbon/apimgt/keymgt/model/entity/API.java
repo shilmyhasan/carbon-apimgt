@@ -36,7 +36,7 @@ public class API implements CachableEntity<String> {
     private String apiVersion;
     private String context;
     private String apiTier;
-    private Map<String, Resource> resourceMap = new HashMap<>();
+    private Map<String, Resource> resourceMap = new HashMap<String, Resource>();
 
     public void addResource(Resource resource) {
 

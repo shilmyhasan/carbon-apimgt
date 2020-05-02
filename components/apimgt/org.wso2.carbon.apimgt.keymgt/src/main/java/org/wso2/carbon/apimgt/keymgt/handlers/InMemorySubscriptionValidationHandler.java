@@ -81,8 +81,19 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
         } catch (InitializationException e) {
             log.error("Error occurred while instantiating in MemoryStore", e);
             throw new InitializationException(e);
-        } catch (InstantiationException | ClassNotFoundException | NoSuchMethodException |
-                IllegalAccessException | InvocationTargetException e) {
+        } catch (InstantiationException e) {
+            log.error("Error occurred while instantiating " + subscriptionStoreClass, e);
+            throw new InitializationException(e);
+        } catch (ClassNotFoundException e) {
+            log.error("Error occurred while instantiating " + subscriptionStoreClass, e);
+            throw new InitializationException(e);
+        } catch (NoSuchMethodException e) {
+            log.error("Error occurred while instantiating " + subscriptionStoreClass, e);
+            throw new InitializationException(e);
+        } catch (IllegalAccessException e) {
+            log.error("Error occurred while instantiating " + subscriptionStoreClass, e);
+            throw new InitializationException(e);
+        } catch (InvocationTargetException e) {
             log.error("Error occurred while instantiating " + subscriptionStoreClass, e);
             throw new InitializationException(e);
         }
@@ -267,7 +278,7 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
         String spikeArrestUnit = subscriptionPolicy.getRateLimitTimeUnit();
 
         boolean stopOnQuotaReach = subscriptionPolicy.isStopOnQuotaReach();
-        List<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<String>();
         list.add(API_LEVEL_THROTTLING_KEY);
         dto.setSpikeArrestLimit(spikeArrest);
         dto.setSpikeArrestUnit(spikeArrestUnit);
