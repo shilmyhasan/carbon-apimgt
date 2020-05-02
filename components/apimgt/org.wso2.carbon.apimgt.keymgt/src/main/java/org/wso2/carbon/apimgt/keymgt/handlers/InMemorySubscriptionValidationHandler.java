@@ -77,7 +77,6 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
             if (this.inMemoryStore instanceof KeyValidatorConfigInitializable) {
                 ((KeyValidatorConfigInitializable) this.inMemoryStore)
                         .initialize(inMemoryConfig.getSubscriptionStoreConfig());
-
             }
         } catch (InitializationException e) {
             log.error("Error occurred while instantiating in MemoryStore", e);

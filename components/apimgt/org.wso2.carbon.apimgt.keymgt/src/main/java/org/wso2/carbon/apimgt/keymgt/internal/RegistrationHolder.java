@@ -29,23 +29,28 @@ public class RegistrationHolder {
     private static RegistrationHolder registrationHolder = new RegistrationHolder();
     private Map<String, Object> referenceHolder;
 
-    private RegistrationHolder(){
+    private RegistrationHolder() {
+
         referenceHolder = new HashMap<>();
     }
 
-    public static RegistrationHolder getInstance(){
+    public static RegistrationHolder getInstance() {
+
         return registrationHolder;
     }
 
     public void registerInstance(String className, Object instance) {
-        referenceHolder.put(className,instance);
+
+        referenceHolder.put(className, instance);
     }
 
-    public Object getReference(String className){
+    public Object getReference(String className) {
+
         return referenceHolder.get(className);
     }
 
-    public void unregister(String className){
+    public void unregister(String className) {
+
         referenceHolder.remove(className);
     }
 }

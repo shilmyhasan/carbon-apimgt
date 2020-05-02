@@ -18,13 +18,13 @@
 
 package org.wso2.carbon.apimgt.impl;
 
-import javax.xml.namespace.QName;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  * This class represents the constants that are used for APIManager implementation
@@ -512,14 +512,13 @@ public final class APIConstants {
             + "KeyValidationHandlerClassName";
     public static final String URL_TEMPLATE_LOADER = API_KEY_VALIDATOR + "UriTemplateLoader";
 
+    public static class ApiKeyValidator {
 
-    public static class ApiKeyValidator{
         public static final String KEY_VALIDATION_HANDLER = "KeyValidationHandler";
         public static final String KEY_VALIDATOR_HANDLER = "KeyValidationHandlerImpl";
         public static final String IN_MEM_SUBSCRIPTION_STORE = "InMemorySubscriptionStore";
         public static final String IN_MEM_SUBSCRIPTION_STORE_IMPL = "InMemorySubscriptionStoreImpl";
         public static final String CONFIGURATION_ELEMENT = "Configuration";
-
     }
 
     public static final String USER_DEFAULT_PROFILE = "default";
