@@ -31,7 +31,15 @@ import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.internal.RegistrationHolder;
 import org.wso2.carbon.apimgt.keymgt.model.InMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
-import org.wso2.carbon.apimgt.keymgt.model.entity.*;
+import org.wso2.carbon.apimgt.keymgt.model.entity.API;
+import org.wso2.carbon.apimgt.keymgt.model.entity.APIPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Application;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationKeyMapping;
+import org.wso2.carbon.apimgt.keymgt.model.entity.ApplicationPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Resource;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Subscription;
+import org.wso2.carbon.apimgt.keymgt.model.entity.SubscriptionPolicy;
+import org.wso2.carbon.apimgt.keymgt.model.entity.Verb;
 import org.wso2.carbon.apimgt.keymgt.model.exception.InitializationException;
 import org.wso2.carbon.apimgt.keymgt.model.impl.MapBasedInMemorySubscriptionStore;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
@@ -110,8 +118,14 @@ public class InMemorySubscriptionValidationHandler extends DefaultKeyValidationH
             return false;
         }
 
-        API api = inMemoryStore.getApiByContextAndVersion(validationContext.getContext(),
-                validationContext.getVersion());
+        String version = validationContext.getVersion();
+
+        if (version != null && version.startsWith(APIConstants.DEFAULT_VERSION_PREFIX)) {
+            //Remove the prefix from the version.
+            version = version.split(APIConstants.DEFAULT_VERSION_PREFIX)[1];
+        }
+
+        API api = inMemoryStore.getApiByContextAndVersion(validationContext.getContext(), version);
 
         if (api == null) {
             setForNonExistentSubscription(validationContext);
