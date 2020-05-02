@@ -27,16 +27,15 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.APIPublisher;
 import org.wso2.carbon.apimgt.api.model.APIStore;
+import org.wso2.carbon.apimgt.impl.config.InMemorySubscriptionValidationHandlerConfig;
+import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowProperties;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +51,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * Global API Manager configuration. This is generally populated from a special XML descriptor
@@ -80,6 +82,7 @@ public class APIManagerConfiguration {
 
     private boolean initialized;
     private ThrottleProperties throttleProperties = new ThrottleProperties();
+    private KeyValidationHandlerConfig keyValidationHandlerConfig = null;
     private WorkflowProperties workflowProperties = new WorkflowProperties();
     private Map<String, Environment> apiGatewayEnvironments = new HashMap<String, Environment>();
     private Set<APIStore> externalAPIStores = new HashSet<APIStore>();
@@ -315,10 +318,12 @@ public class APIManagerConfiguration {
                     parseLoginConfig(loginOMElement);
                 }
 
-            } else if (APIConstants.AdvancedThrottleConstants.THROTTLING_CONFIGURATIONS.equals(localName)){
+            } else if (APIConstants.AdvancedThrottleConstants.THROTTLING_CONFIGURATIONS.equals(localName)) {
                 setThrottleProperties(serverConfig);
-            } else if (APIConstants.WorkflowConfigConstants.WORKFLOW.equals(localName)){
+            } else if (APIConstants.WorkflowConfigConstants.WORKFLOW.equals(localName)) {
                 setWorkflowProperties(serverConfig);
+            } else if (APIConstants.ApiKeyValidator.KEY_VALIDATION_HANDLER.equals(localName)) {
+                setKeyValidationHandlerProperties(element);
             }
             readChildElements(element, nameStack);
             nameStack.pop();
@@ -404,6 +409,10 @@ public class APIManagerConfiguration {
             }
         }
         return null;
+    }
+
+    public KeyValidationHandlerConfig getKeyValidationHandlerConfig() {
+        return keyValidationHandlerConfig;
     }
 
     /**
@@ -512,6 +521,16 @@ public class APIManagerConfiguration {
 
         }
     }
+
+    /**
+     * Load Configuration related to KeyValidationHandler.
+     * @param node - Element with KeyValidationHandler config.
+     */
+    private void setKeyValidationHandlerProperties(OMElement node) {
+        this.keyValidationHandlerConfig = new InMemorySubscriptionValidationHandlerConfig();
+        this.keyValidationHandlerConfig.loadFromNode(node);
+    }
+
     /**
      * set the Advance Throttle Properties into Configuration
      *

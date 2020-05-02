@@ -379,7 +379,7 @@ public class SQLConstants {
                     "   AND SUB.APPLICATION_ID = APP.APPLICATION_ID" +
                     "   AND APP.SUBSCRIBER_ID = SUBS.SUBSCRIBER_ID" +
                     "   AND API.API_ID = SUB.API_ID" +
-                    "   AND AKM.APPLICATION_ID=APP.APPLICATION_ID" +
+                    "   AND AKM.APPLICATION_ID = APP.APPLICATION_ID" +
                     "   AND APS.NAME = SUB.TIER_ID" +
                     "   AND SUBS.TENANT_ID = APS.TENANT_ID";
 

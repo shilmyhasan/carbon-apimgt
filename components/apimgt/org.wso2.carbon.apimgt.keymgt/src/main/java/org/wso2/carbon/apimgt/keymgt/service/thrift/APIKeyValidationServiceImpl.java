@@ -218,7 +218,6 @@ public class APIKeyValidationServiceImpl extends AbstractAdmin
                             templates.add(temp);
                         }
 
-
                     } finally {
                         PrivilegedCarbonContext.endTenantFlow();
                     }

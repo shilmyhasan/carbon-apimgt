@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.apimgt.keymgt.service;
 
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.http.HTTPConstants;
@@ -30,28 +29,28 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.config.KeyValidationHandlerConfig;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
-import org.wso2.carbon.apimgt.impl.dao.constants.SQLConstants;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
-import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.handlers.KeyValidationHandler;
 import org.wso2.carbon.apimgt.keymgt.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.keymgt.model.KeyValidatorConfigInitializable;
+import org.wso2.carbon.apimgt.keymgt.model.URITemplateLoader;
+import org.wso2.carbon.apimgt.keymgt.model.exception.InitializationException;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.metrics.manager.MetricManager;
 import org.wso2.carbon.metrics.manager.Timer;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -59,15 +58,44 @@ import java.util.*;
 public class APIKeyValidationService extends AbstractAdmin {
     private static final Log log = LogFactory.getLog(APIKeyValidationService.class);
     private static KeyValidationHandler keyValidationHandler;
+    private static URITemplateLoader loader;
 
     public APIKeyValidationService() {
+
         try {
             if (keyValidationHandler == null) {
 
+                APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+
+                String keyValidationClassName =
+                        configuration.getFirstProperty(APIConstants.API_KEY_MANGER_VALIDATIONHANDLER_CLASS_NAME);
+
+                if (keyValidationClassName == null) {
+                    KeyValidationHandlerConfig handlerConfig =
+                            configuration.getKeyValidationHandlerConfig();
+                    keyValidationClassName = handlerConfig.getImplementingClass();
+                }
+
                 KeyValidationHandler validationHandler = (KeyValidationHandler) APIUtil.getClassForName
-                        (ServiceReferenceHolder.getInstance().
-                                getAPIManagerConfigurationService().getAPIManagerConfiguration().
-                                getFirstProperty(APIConstants.API_KEY_MANGER_VALIDATIONHANDLER_CLASS_NAME).trim()).newInstance();
+                        (keyValidationClassName.trim()).newInstance();
+
+                if (validationHandler != null && validationHandler instanceof KeyValidatorConfigInitializable) {
+                    KeyValidatorConfigInitializable configLoadable =
+                            (KeyValidatorConfigInitializable) validationHandler;
+                    configLoadable.initialize(configuration.getKeyValidationHandlerConfig());
+                }
+
+                String urlTemplateLoader =
+                        configuration.getFirstProperty(APIConstants.URL_TEMPLATE_LOADER);
+
+                if (urlTemplateLoader != null) {
+                    loader =
+                            (URITemplateLoader) APIUtil.getClassForName(urlTemplateLoader.trim())
+                                    .getDeclaredConstructor().newInstance();
+                    log.debug("UriLoader " + loader.getClass().getName() + " instantiated.");
+                }
+
                 log.info("Initialised KeyValidationHandler instance successfully");
                 if (keyValidationHandler == null) {
                     synchronized (this) {
@@ -81,6 +109,8 @@ public class APIKeyValidationService extends AbstractAdmin {
             log.error("Error while accessing class" + e.toString());
         } catch (ClassNotFoundException e) {
             log.error("Error while creating keyManager instance" + e.toString());
+        } catch (InitializationException | NoSuchMethodException | InvocationTargetException e) {
+            log.error("Error while instantiating KeyValidationService " + e, e);
         }
     }
 
@@ -224,10 +254,17 @@ public class APIKeyValidationService extends AbstractAdmin {
      */
     public ArrayList<URITemplate> getAllURITemplates(String context, String version)
             throws APIKeyMgtException, APIManagementException {
+
         Timer timer6 = MetricManager.timer(org.wso2.carbon.metrics.manager.Level.INFO, MetricManager.name(
                 APIConstants.METRICS_PREFIX, this.getClass().getSimpleName(), "GET_URI_TEMPLATE"));
         Timer.Context timerContext6 = timer6.start();
-        ArrayList<URITemplate> templates = ApiMgtDAO.getInstance().getAllURITemplates(context, version);
+        ArrayList<URITemplate> templates;
+        if (loader == null) {
+            templates = ApiMgtDAO.getInstance().getAllURITemplates(context, version);
+        } else {
+            List<URITemplate> uriTemplates = loader.getAllURITemplates(context, version);
+            templates = new ArrayList<>(uriTemplates);
+        }
         timerContext6.stop();
         return templates;
     }
