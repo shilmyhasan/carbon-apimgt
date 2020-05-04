@@ -730,7 +730,7 @@ public enum EndpointImplementationTypeEnum {
   }
 
   
-  @ApiModelProperty(value = "Labels of micro-gateway environments attached to the API. ")
+  @ApiModelProperty(example = "[\"Pizzashack\",\"Petstore\"]", value = "Labels of micro-gateway environments attached to the API. ")
   @JsonProperty("labels")
   public List<String> getLabels() {
     return labels;
@@ -747,7 +747,7 @@ public enum EndpointImplementationTypeEnum {
   }
 
   
-  @ApiModelProperty(example = "\"\\\"mediationPolicies\\\": [ {\\\"name\\\": \\\"json_to_xml_in_message\\\",\\\"type\\\": \\\"in\\\"}, {\\\"name\\\": \\\"xml_to_json_out_message\\\",\\\"type\\\": \\\"out\\\"}, {\\\"name\\\": \\\"json_fault\\\",\\\"type\\\": \\\"fault\\\"} ],\"", value = "")
+  @ApiModelProperty(example = "[{\"name\":\"json_to_xml_in_message\",\"type\":\"in\"},{\"name\":\"xml_to_json_out_message\",\"type\":\"out\"},{\"name\":\"json_fault\",\"type\":\"fault\"}]", value = "")
   @JsonProperty("mediationPolicies")
   public List<MediationPolicyDTO> getMediationPolicies() {
     return mediationPolicies;
@@ -765,7 +765,7 @@ public enum EndpointImplementationTypeEnum {
   }
 
   
-  @ApiModelProperty(example = "current_tenant", value = "The subscription availability. Accepts one of the following. current_tenant, all_tenants or specific_tenants.")
+  @ApiModelProperty(example = "CURRENT_TENANT", value = "The subscription availability. Accepts one of the following. current_tenant, all_tenants or specific_tenants.")
   @JsonProperty("subscriptionAvailability")
   public SubscriptionAvailabilityEnum getSubscriptionAvailability() {
     return subscriptionAvailability;

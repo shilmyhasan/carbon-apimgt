@@ -67,7 +67,7 @@ public class APIOperationsDTO   {
   }
 
   
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(example = "POST", value = "")
   @JsonProperty("verb")
   public String getVerb() {
     return verb;
@@ -84,7 +84,7 @@ public class APIOperationsDTO   {
   }
 
   
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(example = "Any", value = "")
   @JsonProperty("authType")
   public String getAuthType() {
     return authType;
@@ -135,7 +135,7 @@ public class APIOperationsDTO   {
   }
 
   
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(example = "\"\"", value = "")
   @JsonProperty("usedProductIds")
   public List<String> getUsedProductIds() {
     return usedProductIds;
