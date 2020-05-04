@@ -6857,17 +6857,12 @@ definitions:
         type: array
         items:
           type: string
-          example: ["Pizzashack, Petstore"]
+        example: ["Pizzashack", "Petstore"]
       mediationPolicies:
         type: array
         items:
           $ref: '#/definitions/MediationPolicy'
-        example: "\"mediationPolicies\":
-          [
-            {\"name\": \"json_to_xml_in_message\",\"type\": \"in\"},
-            {\"name\": \"xml_to_json_out_message\",\"type\": \"out\"},
-            {\"name\": \"json_fault\",\"type\": \"fault\"}
-          ],"
+        example:  [ {"name": "json_to_xml_in_message","type": "in"}, {"name": "xml_to_json_out_message","type": "out"}, {"name": "json_fault","type": "fault"} ]
       subscriptionAvailability:
         type: string
         description: The subscription availability. Accepts one of the following. current_tenant, all_tenants or specific_tenants.
@@ -6875,7 +6870,7 @@ definitions:
           - current_tenant
           - all_tenants
           - specific_tenants
-        example: current_tenant
+        example: CURRENT_TENANT
         default: all_tenants
         x-otherScopes:
           - apim:api_publish
@@ -6922,10 +6917,10 @@ definitions:
         example: APPROVED
       createdTime:
         type: string
-        example: 2017-02-20T13:57:16.229
+        example: "2017-02-20T13:57:16.229"
       lastUpdatedTime:
         type: string
-        example: 2017-02-20T13:57:16.229
+        example: "2017-02-20T13:57:16.229"
       endpointConfig:
         type: object
         description: |
@@ -7922,7 +7917,7 @@ definitions:
     properties:
       type:
         type: string
-        example: basic
+        example: BASIC
         description: Accepts one of the following, basic or digest.
         enum:
           - basic
@@ -8094,10 +8089,12 @@ definitions:
             type: string
             description: |
               Type of binding role / permission
+            example: role
           values:
             type: array
             items:
               type: string
+            example: [ "admin" ]
 
   APIOperations :
     title: Operation
@@ -8109,9 +8106,11 @@ definitions:
         type: string
       verb:
         type: string
+        example: "POST"
       authType:
         type: string
         default: "Any"
+        example: "Any"
       throttlingPolicy:
         type: string
         example: "Unlimited"
@@ -8123,6 +8122,7 @@ definitions:
         type: array
         items:
           type: string
+        example: []
 
 
 #-----------------------------------------------------
