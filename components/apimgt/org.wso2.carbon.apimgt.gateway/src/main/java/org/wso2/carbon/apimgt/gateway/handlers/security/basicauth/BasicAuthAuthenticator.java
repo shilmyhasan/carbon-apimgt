@@ -33,8 +33,8 @@ import org.wso2.carbon.apimgt.gateway.MethodStats;
 import org.wso2.carbon.apimgt.gateway.handlers.security.*;
 import org.wso2.carbon.apimgt.gateway.utils.OpenAPIUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.dto.BasicAuthValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
-import org.wso2.carbon.apimgt.keymgt.stub.types.carbon.BasicAuthValidationDTO;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.List;
@@ -173,9 +173,8 @@ public class BasicAuthAuthenticator implements Authenticator {
             String clientIP = null;
             org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) synCtx).
                     getAxis2MessageContext();
-            TreeMap<String, String> transportHeaderMap = (TreeMap<String, String>)
-                    axis2MessageContext.getProperty
-                            (org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+            TreeMap<String, String> transportHeaderMap = (TreeMap<String, String>) axis2MessageContext
+                    .getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
             if (transportHeaderMap != null) {
                 clientIP = transportHeaderMap.get(APIMgtGatewayConstants.X_FORWARDED_FOR);
@@ -187,7 +186,8 @@ public class BasicAuthAuthenticator implements Authenticator {
                     clientIP = clientIP.substring(0, clientIP.indexOf(","));
                 }
             } else {
-                clientIP = (String) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.REMOTE_ADDR);
+                clientIP = (String) axis2MessageContext
+                        .getProperty(org.apache.axis2.context.MessageContext.REMOTE_ADDR);
             }
 
             //Create a dummy AuthenticationContext object with hard coded values for
@@ -196,7 +196,8 @@ public class BasicAuthAuthenticator implements Authenticator {
             AuthenticationContext authContext = new AuthenticationContext();
             authContext.setAuthenticated(true);
             authContext.setTier(APIConstants.UNAUTHENTICATED_TIER);
-            authContext.setStopOnQuotaReach(true);//Since we don't have details on unauthenticated tier we setting stop on quota reach true
+            //Since we don't have details on unauthenticated tier we setting stop on quota reach true
+            authContext.setStopOnQuotaReach(true);
             //Requests are throttled by the ApiKey that is set here. In an unauthenticated scenario,
             //we will use the client's IP address for throttling.
             authContext.setApiKey(clientIP);
@@ -209,7 +210,7 @@ public class BasicAuthAuthenticator implements Authenticator {
             authContext.setConsumerKey(null);
             APISecurityUtils.setAuthenticationContext(synCtx, authContext, null);
 
-            if (log.isDebugEnabled()) {;
+            if (log.isDebugEnabled()) {
                 log.debug("Basic Authentication: Authentication succeeded by ignoring auth headers for API resource: "
                         .concat(matchingResource));
             }
@@ -224,14 +225,7 @@ public class BasicAuthAuthenticator implements Authenticator {
         }
         String username = getEndUserName(credentials[0]);
         String password = credentials[1];
-        BasicAuthValidationDTO basicAuthValidationDTO;
-        try {
-            basicAuthValidationDTO = basicAuthCredentialValidator.getUserAuthenticationInfo(username, password);
-        } catch (APISecurityException ex) {
-            return new AuthenticationResponse(false, isMandatory, true, ex.getErrorCode(), ex.getMessage());
-        }
-        //get the domain qualified username
-        username = basicAuthValidationDTO.getDomainQualifiedUsername();
+
         // If end user tenant domain does not match the API publisher's tenant domain, return error
         if (!MultitenantUtils.getTenantDomain(username).equals(synCtx.getProperty(PUBLISHER_TENANT_DOMAIN))) {
             log.error("Basic Authentication failure: tenant domain mismatch for user :" + username);
@@ -239,10 +233,13 @@ public class BasicAuthAuthenticator implements Authenticator {
                     APISecurityConstants.API_AUTH_FORBIDDEN_MESSAGE);
         }
 
-        boolean authenticated = basicAuthCredentialValidator
-                .validate(username, password, basicAuthValidationDTO.getAuthenticated());
-
-        if (!authenticated) {
+        BasicAuthValidationInfoDTO basicAuthValidationInfoObj;
+        try {
+            basicAuthValidationInfoObj = basicAuthCredentialValidator.validate(username, password);
+        } catch (APISecurityException ex) {
+            return new AuthenticationResponse(false, isMandatory, true, ex.getErrorCode(), ex.getMessage());
+        }
+        if (!basicAuthValidationInfoObj.isAuthenticated()) {
             log.error("Basic Authentication failure: Username and Password mismatch");
             return new AuthenticationResponse(false, isMandatory, true,
                     APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
@@ -255,10 +252,11 @@ public class BasicAuthAuthenticator implements Authenticator {
             boolean scopesValid = false;
             try {
                 scopesValid = basicAuthCredentialValidator
-                        .validateScopes(username, openAPI, synCtx, basicAuthValidationDTO.getUserRoleList());
+                        .validateScopes(username,  openAPI, synCtx, basicAuthValidationInfoObj.getUserRoleList());
             } catch (APISecurityException ex) {
                 return new AuthenticationResponse(false, isMandatory, true, ex.getErrorCode(), ex.getMessage());
             }
+            String domainQualifiedUserName = basicAuthValidationInfoObj.getDomainQualifiedUsername();
 
             if (scopesValid) {
                 if (APISecurityUtils.getAuthenticationContext(synCtx) == null) {
@@ -272,12 +270,13 @@ public class BasicAuthAuthenticator implements Authenticator {
                             true);//Since we don't have details on unauthenticated tier we setting stop on quota reach true
                     synCtx.setProperty(APIConstants.VERB_INFO_DTO, verbInfoList);
                     //In basic authentication scenario, we will use the username for throttling.
-                    authContext.setApiKey(username);
+                    authContext.setApiKey(domainQualifiedUserName);
                     authContext.setKeyType(APIConstants.API_KEY_TYPE_PRODUCTION);
-                    authContext.setUsername(username);
+                    authContext.setUsername(domainQualifiedUserName);
                     authContext.setCallerToken(null);
                     authContext.setApplicationName(APIConstants.BASIC_AUTH_APPLICATION_NAME);
-                    authContext.setApplicationId(username); //Set username as application ID in basic auth scenario
+                    authContext.setApplicationId(
+                            domainQualifiedUserName); //Set username as application ID in basic auth scenario
                     authContext.setConsumerKey(null);
                     APISecurityUtils.setAuthenticationContext(synCtx, authContext, null);
                 }

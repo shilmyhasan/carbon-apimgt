@@ -37,7 +37,7 @@ import org.wso2.carbon.apimgt.gateway.utils.OpenAPIUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
-import org.wso2.carbon.apimgt.keymgt.stub.types.carbon.BasicAuthValidationDTO;
+import org.wso2.carbon.apimgt.impl.dto.BasicAuthValidationInfoDTO;
 import org.wso2.carbon.apimgt.keymgt.stub.usermanager.APIKeyMgtRemoteUserStoreMgtService;
 import org.wso2.carbon.apimgt.keymgt.stub.usermanager.APIKeyMgtRemoteUserStoreMgtServiceAPIManagementException;
 import org.wso2.carbon.apimgt.keymgt.stub.usermanager.APIKeyMgtRemoteUserStoreMgtServiceStub;
@@ -114,83 +114,72 @@ public class BasicAuthCredentialValidator {
      * @throws APISecurityException If an authentication failure or some other error occurs
      */
     @MethodStats
-    public boolean validate(String username, String password) throws APISecurityException {
+    public BasicAuthValidationInfoDTO validate(String username, String password) throws APISecurityException {
+        boolean isAuthenticated;
+        String cachedPasswordHash = null;
         String providedPasswordHash = null;
+        String invalidCachedPasswordHash;
         if (gatewayKeyCacheEnabled) {
             providedPasswordHash = hashString(password);
-            String cachedPasswordHash = (String) getGatewayUsernameCache().get(username);
+            BasicAuthValidationInfoDTO cachedValidationInfoObj = (BasicAuthValidationInfoDTO) getGatewayUsernameCache()
+                    .get(username);
+            if (cachedValidationInfoObj != null) {
+                cachedPasswordHash = cachedValidationInfoObj.getHashedPassword();
+            }
             if (cachedPasswordHash != null && cachedPasswordHash.equals(providedPasswordHash)) {
                 log.debug("Basic Authentication: <Valid Username Cache> Username & password authenticated");
-                return true; //If (username->password) is in the valid cache
+                return cachedValidationInfoObj;
             } else {
-                String invalidCachedPasswordHash = (String) getInvalidUsernameCache().get(username);
-                if (invalidCachedPasswordHash != null && invalidCachedPasswordHash.equals(providedPasswordHash)) {
-                    log.debug("Basic Authentication: <Invalid Username Cache> Username & password authentication failed");
-                    return false; //If (username->password) is in the invalid cache
+                BasicAuthValidationInfoDTO invalidCacheValidationInfoObj = (BasicAuthValidationInfoDTO) getInvalidUsernameCache()
+                        .get(username);
+                if (invalidCacheValidationInfoObj != null) {
+                    invalidCachedPasswordHash = invalidCacheValidationInfoObj.getHashedPassword();
+                    if (invalidCachedPasswordHash != null && invalidCachedPasswordHash.equals(providedPasswordHash)) {
+                        log.debug(
+                                "Basic Authentication: <Invalid Username Cache> Username & password authentication failed");
+                        invalidCacheValidationInfoObj
+                                .setAuthenticated(false); //If (username->password) is in the invalid cache
+                        return invalidCacheValidationInfoObj;
+                    }
                 }
+
             }
         }
-
-        boolean authenticated;
+        BasicAuthValidationInfoDTO basicAuthValidationInfoDTO;
         try {
-            authenticated = apiKeyMgtRemoteUserStoreMgtServiceStub.authenticate(username, password);
+            org.wso2.carbon.apimgt.impl.dto.xsd.BasicAuthValidationInfoDTO generatedInfoDTO = apiKeyMgtRemoteUserStoreMgtServiceStub
+                    .getUserAuthenticationInfo(username, password);
+            basicAuthValidationInfoDTO = convertToDTO(generatedInfoDTO);
+            isAuthenticated = basicAuthValidationInfoDTO.isAuthenticated();
         } catch (APIKeyMgtRemoteUserStoreMgtServiceAPIManagementException | RemoteException e) {
-            log.debug("Basic Authentication: Username and Password authentication failure");
+            log.error(
+                    "Basic Authentication: Error while accessing backend services to validate user authentication for user : "
+                            + username);
             throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR, e.getMessage(), e);
         }
 
         if (gatewayKeyCacheEnabled) {
-            if (authenticated) {
-                // put (username->password) into the valid cache
-                getGatewayUsernameCache().put(username, providedPasswordHash);
-            } else {
-                // put (username->password) into the invalid cache
-                getInvalidUsernameCache().put(username, providedPasswordHash);
-            }
-        }
-
-        return authenticated;
-    }
-
-    /**
-     * Validates the given username and password against the users in the user store.
-     *
-     * @param username        given username
-     * @param password        given password
-     * @param isAuthenticated is the user authenticated
-     * @return true if the validation passed
-     * @throws APISecurityException If an authentication failure or some other error occurs
-     */
-    @MethodStats
-    public boolean validate(String username, String password, boolean isAuthenticated) {
-        String providedPasswordHash = null;
-        if (gatewayKeyCacheEnabled) {
-            providedPasswordHash = hashString(password);
-            String cachedPasswordHash = (String) getGatewayUsernameCache().get(username);
-            if (cachedPasswordHash != null && cachedPasswordHash.equals(providedPasswordHash)) {
-                log.debug("Basic Authentication: <Valid Username Cache> Username & password authenticated");
-                return true; //If (username->password) is in the valid cache
-            } else {
-                String invalidCachedPasswordHash = (String) getInvalidUsernameCache().get(username);
-                if (invalidCachedPasswordHash != null && invalidCachedPasswordHash.equals(providedPasswordHash)) {
-                    log.debug(
-                            "Basic Authentication: <Invalid Username Cache> Username & password authentication failed");
-                    return false; //If (username->password) is in the invalid cache
-                }
-            }
-        }
-
-        if (gatewayKeyCacheEnabled) {
+            basicAuthValidationInfoDTO.setHashedPassword(providedPasswordHash);
             if (isAuthenticated) {
                 // put (username->password) into the valid cache
-                getGatewayUsernameCache().put(username, providedPasswordHash);
+                getGatewayUsernameCache().put(username, basicAuthValidationInfoDTO);
             } else {
                 // put (username->password) into the invalid cache
-                getInvalidUsernameCache().put(username, providedPasswordHash);
+                getInvalidUsernameCache().put(username, basicAuthValidationInfoDTO);
             }
         }
 
-        return isAuthenticated;
+        return basicAuthValidationInfoDTO;
+    }
+
+    private BasicAuthValidationInfoDTO convertToDTO(
+            org.wso2.carbon.apimgt.impl.dto.xsd.BasicAuthValidationInfoDTO generatedDto) {
+        BasicAuthValidationInfoDTO dto = new BasicAuthValidationInfoDTO();
+        dto.setAuthenticated(generatedDto.getAuthenticated());
+        dto.setHashedPassword(generatedDto.getHashedPassword());
+        dto.setDomainQualifiedUsername(generatedDto.getDomainQualifiedUsername());
+        dto.setUserRoleList(generatedDto.getUserRoleList());
+        return dto;
     }
 
     /**
@@ -411,28 +400,6 @@ public class BasicAuthCredentialValidator {
                     "Basic Authentication: Scope validation failed for the API resource: ".concat(apiElectedResource));
         }
         throw new APISecurityException(APISecurityConstants.INVALID_SCOPE, "Scope validation failed");
-    }
-
-    /**
-     * Validates and retrieves the user authentication information by calling the APIKeyMgtRemoteUserStoreMgtService
-     *
-     * @param username given username
-     * @param password given password
-     * @return true if successfully retrieved user authentication information
-     * @throws APISecurityException If an authentication failure or some other error occurs
-     */
-    @MethodStats
-    public BasicAuthValidationDTO getUserAuthenticationInfo(String username, String password)
-            throws APISecurityException {
-        BasicAuthValidationDTO basicAuthValidationDTO;
-        try {
-            basicAuthValidationDTO = apiKeyMgtRemoteUserStoreMgtServiceStub
-                    .getUserAuthenticationInfo(username, password);
-        } catch (APIKeyMgtRemoteUserStoreMgtServiceAPIManagementException | RemoteException e) {
-            log.debug("Basic Authentication: error retrieving user authentication info for user : " + username);
-            throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR, e.getMessage(), e);
-        }
-        return basicAuthValidationDTO;
     }
 
     /**
