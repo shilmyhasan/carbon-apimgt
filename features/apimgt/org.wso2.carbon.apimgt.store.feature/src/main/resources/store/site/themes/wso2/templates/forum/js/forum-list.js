@@ -191,7 +191,18 @@ function forum_load_replies(page) {
             }
 
             $(forum_reply_editor).summernote({
-                height: 300
+                height: 300,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline','italic', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture', 'video']],
+                    ['view', ['fullscreen', 'help']],
+                ]
             });
 
 
@@ -331,7 +342,18 @@ $(document).ready(function () {
         var topicDescriptionEditor = $("#forum_topic_description_edit_editor");
         $(topicDescriptionEditor).summernote({
             height: 100,
-            width:"99.9%"
+            width:"99.9%",
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline','italic', 'clear']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'help']],
+            ]
         });
 
         $(topicDescriptionEditor).code(description);
@@ -502,7 +524,18 @@ $(document).ready(function () {
         // Show the editor.
         var editor = $("#forum_reply_edit_editor_" + id);
         $(editor).summernote({
-            height: 300
+            height: 300,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline','italic', 'clear']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'help']],
+            ]
         });
         $(editor).code(reply);
 
@@ -639,7 +672,18 @@ $(document).ready(function () {
     // If we are in the add new topic page.
     if ($('#forum_add_new_topic_page').length) {
         $('#topicDescriptioEditor').summernote({
-            height: 350
+            height: 350,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline','italic', 'clear']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'help']],
+            ]
         });
     }
 
