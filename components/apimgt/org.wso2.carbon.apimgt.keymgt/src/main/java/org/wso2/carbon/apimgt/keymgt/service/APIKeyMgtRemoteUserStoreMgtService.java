@@ -21,11 +21,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.keymgt.BasicAuthValidationDTO;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.util.UserCoreUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 public class APIKeyMgtRemoteUserStoreMgtService extends AbstractAdmin {
@@ -85,6 +87,43 @@ public class APIKeyMgtRemoteUserStoreMgtService extends AbstractAdmin {
             PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
         }
         return userRoles;
+    }
+
+    public BasicAuthValidationDTO getUserAuthenticationInfo(String username, String password)
+            throws APIManagementException {
+
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        PrivilegedCarbonContext.startTenantFlow();
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+
+        UserStoreManager userStoreManager;
+        BasicAuthValidationDTO basicAuthValidationDTO = new BasicAuthValidationDTO();
+        boolean isAuthenticated;
+        String userRoles[];
+        String domainQualifiedUsername;
+        try {
+            userStoreManager = CarbonContext.getThreadLocalCarbonContext().getUserRealm().getUserStoreManager();
+            isAuthenticated = userStoreManager
+                    .authenticate(MultitenantUtils.getTenantAwareUsername(username), password);
+            if (isAuthenticated) {
+                basicAuthValidationDTO.setAuthenticated(true);
+                domainQualifiedUsername = UserCoreUtil.addDomainToName(username, UserCoreUtil.getDomainFromThreadLocal());
+                basicAuthValidationDTO.setDomainQualifiedUsername(domainQualifiedUsername);
+            } else {
+                //return default validation DTO with authentication false
+                return basicAuthValidationDTO;
+            }
+            //Get role list of user.
+            //Should give the domain qualified username when getting the role list of user.
+            userRoles = userStoreManager
+                    .getRoleListOfUser(MultitenantUtils.getTenantAwareUsername(domainQualifiedUsername));
+            basicAuthValidationDTO.setUserRoleList(userRoles);
+        } catch (UserStoreException e) {
+            APIUtil.handleException("Error occurred while retrieving user authentication info of user " + username, e);
+        } finally {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().endTenantFlow();
+        }
+        return basicAuthValidationDTO;
     }
 
 }

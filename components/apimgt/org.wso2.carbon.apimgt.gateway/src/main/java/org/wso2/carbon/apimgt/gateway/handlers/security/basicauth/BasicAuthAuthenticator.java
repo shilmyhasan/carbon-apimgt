@@ -34,6 +34,7 @@ import org.wso2.carbon.apimgt.gateway.handlers.security.*;
 import org.wso2.carbon.apimgt.gateway.utils.OpenAPIUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
+import org.wso2.carbon.apimgt.keymgt.stub.types.carbon.BasicAuthValidationDTO;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.List;
@@ -223,21 +224,24 @@ public class BasicAuthAuthenticator implements Authenticator {
         }
         String username = getEndUserName(credentials[0]);
         String password = credentials[1];
-
-        // If end user tenant domain does not match the API publisher's tenant domain, return error
-        if (!MultitenantUtils.getTenantDomain(username).equals(synCtx.getProperty(PUBLISHER_TENANT_DOMAIN))) {
-            log.error("Basic Authentication failure: tenant domain mismatch for user :" + username);
-            return new AuthenticationResponse(false, isMandatory, true,
-                    APISecurityConstants.API_AUTH_FORBIDDEN,
-                    APISecurityConstants.API_AUTH_FORBIDDEN_MESSAGE);
-        }
-
-        boolean authenticated = false;
+        BasicAuthValidationDTO basicAuthValidationDTO;
         try {
-            authenticated = basicAuthCredentialValidator.validate(username, password);
+            basicAuthValidationDTO = basicAuthCredentialValidator.getUserAuthenticationInfo(username, password);
         } catch (APISecurityException ex) {
             return new AuthenticationResponse(false, isMandatory, true, ex.getErrorCode(), ex.getMessage());
         }
+        //get the domain qualified username
+        username = basicAuthValidationDTO.getDomainQualifiedUsername();
+        // If end user tenant domain does not match the API publisher's tenant domain, return error
+        if (!MultitenantUtils.getTenantDomain(username).equals(synCtx.getProperty(PUBLISHER_TENANT_DOMAIN))) {
+            log.error("Basic Authentication failure: tenant domain mismatch for user :" + username);
+            return new AuthenticationResponse(false, isMandatory, true, APISecurityConstants.API_AUTH_FORBIDDEN,
+                    APISecurityConstants.API_AUTH_FORBIDDEN_MESSAGE);
+        }
+
+        boolean authenticated = basicAuthCredentialValidator
+                .validate(username, password, basicAuthValidationDTO.getAuthenticated());
+
         if (!authenticated) {
             log.error("Basic Authentication failure: Username and Password mismatch");
             return new AuthenticationResponse(false, isMandatory, true,
@@ -250,7 +254,8 @@ public class BasicAuthAuthenticator implements Authenticator {
             //scope validation
             boolean scopesValid = false;
             try {
-                scopesValid = basicAuthCredentialValidator.validateScopes(username, openAPI, synCtx);
+                scopesValid = basicAuthCredentialValidator
+                        .validateScopes(username, openAPI, synCtx, basicAuthValidationDTO.getUserRoleList());
             } catch (APISecurityException ex) {
                 return new AuthenticationResponse(false, isMandatory, true, ex.getErrorCode(), ex.getMessage());
             }
@@ -263,7 +268,8 @@ public class BasicAuthAuthenticator implements Authenticator {
                     AuthenticationContext authContext = new AuthenticationContext();
                     authContext.setAuthenticated(true);
                     authContext.setTier(APIConstants.UNAUTHENTICATED_TIER);
-                    authContext.setStopOnQuotaReach(true);//Since we don't have details on unauthenticated tier we setting stop on quota reach true
+                    authContext.setStopOnQuotaReach(
+                            true);//Since we don't have details on unauthenticated tier we setting stop on quota reach true
                     synCtx.setProperty(APIConstants.VERB_INFO_DTO, verbInfoList);
                     //In basic authentication scenario, we will use the username for throttling.
                     authContext.setApiKey(username);
