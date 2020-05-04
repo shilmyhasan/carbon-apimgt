@@ -154,7 +154,7 @@ public class ApplicationInfoDTO   {
   }
 
   
-  @ApiModelProperty(example = "\"External Reference ID, Billing Tier\"", value = "")
+  @ApiModelProperty(example = "{\"External Reference ID\":\"12345\"}", value = "")
   @JsonProperty("attributes")
   public Object getAttributes() {
     return attributes;
