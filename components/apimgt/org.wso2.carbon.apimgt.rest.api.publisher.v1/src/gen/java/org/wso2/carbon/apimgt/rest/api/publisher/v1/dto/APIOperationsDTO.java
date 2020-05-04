@@ -135,7 +135,7 @@ public class APIOperationsDTO   {
   }
 
   
-  @ApiModelProperty(example = "\"\"", value = "")
+  @ApiModelProperty(example = "[]", value = "")
   @JsonProperty("usedProductIds")
   public List<String> getUsedProductIds() {
     return usedProductIds;

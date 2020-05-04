@@ -46,7 +46,7 @@ public class ScopeBindingsDTO   {
   }
 
   
-  @ApiModelProperty(example = "\"admin\"", value = "")
+  @ApiModelProperty(example = "[\"admin\"]", value = "")
   @JsonProperty("values")
   public List<String> getValues() {
     return values;
