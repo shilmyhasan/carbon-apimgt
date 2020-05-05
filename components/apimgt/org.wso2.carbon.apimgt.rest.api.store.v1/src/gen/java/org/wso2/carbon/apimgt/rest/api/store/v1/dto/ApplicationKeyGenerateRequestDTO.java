@@ -86,7 +86,7 @@ public enum KeyTypeEnum {
   }
 
   
-  @ApiModelProperty(required = true, value = "Grant types that should be supported by the application")
+  @ApiModelProperty(example = "[\"refresh_token\",\"urn:ietf:params:oauth:grant-type:saml2-bearer\",\"password\",\"client_credentials\",\"iwa:ntlm\",\"urn:ietf:params:oauth:grant-type:jwt-bearer\"]", required = true, value = "Grant types that should be supported by the application")
   @JsonProperty("grantTypesToBeSupported")
   @NotNull
   public List<String> getGrantTypesToBeSupported() {

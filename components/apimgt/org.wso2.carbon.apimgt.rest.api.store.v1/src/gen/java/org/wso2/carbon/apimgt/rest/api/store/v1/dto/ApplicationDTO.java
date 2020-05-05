@@ -181,7 +181,7 @@ public enum TokenTypeEnum {
   }
 
   
-  @ApiModelProperty(example = "\"\"", value = "")
+  @ApiModelProperty(example = "[]", value = "")
   @JsonProperty("groups")
   public List<String> getGroups() {
     return groups;
@@ -232,7 +232,7 @@ public enum TokenTypeEnum {
   }
 
   
-  @ApiModelProperty(example = "\"External Reference ID, Billing Tier\"", value = "")
+  @ApiModelProperty(example = "{\"External Reference ID\":\"12345\"}", value = "")
   @JsonProperty("attributes")
   public Map<String, String> getAttributes() {
     return attributes;

@@ -69,7 +69,7 @@ public class APIOperationsDTO   {
   }
 
   
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(example = "POST", value = "")
   @JsonProperty("verb")
   public String getVerb() {
     return verb;

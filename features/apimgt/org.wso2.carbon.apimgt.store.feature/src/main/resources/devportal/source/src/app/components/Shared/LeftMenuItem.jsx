@@ -77,6 +77,16 @@ const styles = (theme) => ({
     submenu: {
         paddingLeft: theme.spacing(4),
     },
+    mainMenuActiveText: {
+        '& span': {
+            color: theme.palette.getContrastText(theme.custom.leftMenu.leftMenuActive),
+        }
+    },
+    subMenuActiveText: {
+        '& span': {
+            color: theme.palette.getContrastText(theme.custom.leftMenu.leftMenuActiveSubmenu),
+        }
+    },
 });
 /**
  * Renders the left menu section.
@@ -91,7 +101,7 @@ function LeftMenuItem(props) {
     } = props;
     const routeToCheck = route || text;
     const { leftMenu } = theme.custom;
-    const strokeColor = theme.palette.getContrastText(leftMenu.background);
+    let strokeColor = theme.palette.getContrastText(leftMenu.background);
     const { iconSize } = leftMenu;
     const ditectCurrentMenu = (location = null) => {
         if(!location) {
@@ -118,6 +128,7 @@ function LeftMenuItem(props) {
     let activeBackground = '';
     if(selected && !submenu) {
         activeBackground = leftMenu.leftMenuActive;
+        strokeColor = theme.palette.getContrastText(leftMenu.leftMenuActive);
     } else if ( selected && submenu ) {
         activeBackground = leftMenu.leftMenuActiveSubmenu;
     } 
@@ -173,6 +184,8 @@ function LeftMenuItem(props) {
                     {
                         [classes.leftLInkText_IconLeft]: leftMenu.style === 'icon left',
                         [classes.leftLInkText_NoText]: leftMenu.style === 'no text',
+                        [classes.mainMenuActiveText]: selected && !submenu,
+                        [classes.subMenuActiveText]: selected && submenu,
                     },
                     'leftLInkText',
                 )}

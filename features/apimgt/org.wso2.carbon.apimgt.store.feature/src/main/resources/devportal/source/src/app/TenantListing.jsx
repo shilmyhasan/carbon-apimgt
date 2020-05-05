@@ -35,6 +35,9 @@ const styles = theme => ({
 
     },
     paper: {
+        '& p': {
+            color: theme.palette.getContrastText(theme.palette.background.paper),
+        },
         padding: theme.spacing(2),
         textAlign: 'left',
         color: theme.palette.text.secondary,
@@ -45,7 +48,14 @@ const styles = theme => ({
         '&:hover': {
             background: theme.palette.grey[100],
             cursor: 'grab',
+            '& p': {
+                color: theme.palette.getContrastText(theme.palette.grey[100]),
+            },
         },
+        
+    },
+    mainTitle: {
+        color: theme.palette.getContrastText(theme.palette.background.default),
     },
     list: {
         background: theme.palette.background.paper,
@@ -73,7 +83,7 @@ const tenantListing = (props) => {
     return (
         <div className={classes.root}>
             <Grid container md={4} justify='left' spacing={0} className={classes.wrapper}>
-                <Typography variant='h4'>
+                <Typography variant='h4' className={classes.mainTitle}>
                     <FormattedMessage id='TenantListing.title' defaultMessage='Tenant Developer Portals' />
                 </Typography>
                 <div className={classes.list}>
