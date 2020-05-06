@@ -80,6 +80,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>com.moandjiezana.toml</groupId>
+            <artifactId>toml4j</artifactId>
+            <version>${toml4j.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
@@ -139,17 +144,6 @@
                             <value>com.sun.xml.bind.v2.ContextFactory</value>
                         </property>
                     </systemProperties>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.wso2.carbon.apimgt.hybrid.gateway.configurator.Configurator</mainClass>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
             <plugin>
