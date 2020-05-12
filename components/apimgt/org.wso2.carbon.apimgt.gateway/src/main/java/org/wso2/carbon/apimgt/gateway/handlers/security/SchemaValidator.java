@@ -16,10 +16,27 @@
 
 package org.wso2.carbon.apimgt.gateway.handlers.security;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.jayway.jsonpath.JsonPath;
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.AxisFault;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.commons.json.JsonUtil;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
+import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -29,25 +46,9 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
-import org.apache.axiom.om.OMElement;
-import org.apache.axis2.AxisFault;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.commons.json.JsonUtil;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.ValidationException;
-import org.everit.json.schema.loader.SchemaLoader;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.google.common.collect.Lists;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.util.Map;
 
 /**
  * This SchemaValidator handler validates the request/response messages against schema defined in the swagger.
@@ -57,7 +58,7 @@ public class SchemaValidator extends AbstractHandler {
     private static final Log logger = LogFactory.getLog(SchemaValidator.class);
     private String uuid;
     private String swagger = null;
-    private JsonNode rootNode;
+    private JsonObject rootNode;
     private String requestMethod;
     private String schemaContent = null;
 
@@ -83,8 +84,9 @@ public class SchemaValidator extends AbstractHandler {
             return true;
         }
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            rootNode = objectMapper.readTree(swagger.getBytes());
+            JsonParser jsonParser = new JsonParser();
+            rootNode = jsonParser.parse(swagger).getAsJsonObject();
+
             Object reqMethod = messageContext.getProperty(APIMgtGatewayConstants.
                     ELECTED_REQUEST_METHOD);
             if (reqMethod == null) {
@@ -264,12 +266,12 @@ public class SchemaValidator extends AbstractHandler {
      * @param refNode JSON node to be extracted
      * @return Extracted schema
      */
-    private JsonNode extractSchemaObject(JsonNode refNode) {
+    private JsonElement extractSchemaObject(JsonElement refNode) {
         String[] val = refNode.toString().split("" + APIMgtGatewayConstants.HASH);
         String path = val[1].replace("\\{^\"|\"}", APIMgtGatewayConstants.EMPTY).replace
                 ("\"", APIMgtGatewayConstants.EMPTY).replace("}", APIMgtGatewayConstants.EMPTY)
                 .replaceAll(APIMgtGatewayConstants.BACKWARD_SLASH, APIMgtGatewayConstants.EMPTY);
-        return rootNode.at(path);
+        return fromJsonPath(rootNode, path);
     }
 
     /**
@@ -382,9 +384,9 @@ public class SchemaValidator extends AbstractHandler {
                         append(responseStatus).append(APIMgtGatewayConstants.JSON_SCHEMA);
 
                 schema = JsonPath.read(swagger, pathBuilder.toString()).toString();
-                JsonNode jsonNode = mapper.convertValue(schema, JsonNode.class);
-                if (jsonNode.get(0) != null) {
-                    value = jsonNode.get(0).toString();
+                JsonElement jsonNode = mapper.convertValue(schema, JsonElement.class);
+                if (jsonNode.isJsonArray()) {
+                    value = jsonNode.getAsJsonArray().get(0).toString();
                 } else {
                     value = jsonNode.toString();
                 }
@@ -476,28 +478,28 @@ public class SchemaValidator extends AbstractHandler {
      *
      * @param entry Array reference to be replaced from actual value.
      */
-    private void generateArraySchemas(Map.Entry<String, JsonNode> entry) {
-        JsonNode entryRef;
-        JsonNode ref;
-        JsonNode schemaProperty;
+    private void generateArraySchemas(Map.Entry<String, JsonElement> entry) {
+        JsonElement entryRef;
+        JsonElement ref;
+        JsonElement schemaProperty;
         if (entry.getValue() != null) {
             schemaProperty = entry.getValue();
             if (schemaProperty == null) {
                 return;
             }
-            Iterator<JsonNode> arrayElements = schemaProperty.elements();
-            List<JsonNode> nodeList = Lists.newArrayList(arrayElements);
+            Iterator<JsonElement> arrayElements = schemaProperty.getAsJsonArray().iterator();
+            List<JsonElement> nodeList = Lists.newArrayList(arrayElements);
             for (int i = 0; i < nodeList.size(); i++) {
                 entryRef = nodeList.get(i);
-                if (entryRef.has(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
+                if (entryRef.isJsonObject() && entryRef.getAsJsonObject().has(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
                     ref = extractSchemaObject(entryRef);
                     nodeList.remove(i);
-                    nodeList.add(ref);
+                    nodeList.add(i, ref);
                 }
             }
-            ObjectMapper mapper = new ObjectMapper();
-            ArrayNode array = mapper.valueToTree(nodeList);
-            entry.setValue(array);
+
+            Gson gson = new Gson();
+            entry.setValue(gson.toJsonTree(nodeList));
         }
     }
 
@@ -544,9 +546,9 @@ public class SchemaValidator extends AbstractHandler {
         String value;
         ObjectMapper mapper = new ObjectMapper();
 
-        JsonNode jsonSchema = mapper.convertValue(object, JsonNode.class);
-        if (jsonSchema.get(0) != null) {
-            value = jsonSchema.get(0).toString();
+        JsonElement jsonSchema = mapper.convertValue(object, JsonElement.class);
+        if (jsonSchema.isJsonArray()) {
+            value = jsonSchema.getAsJsonArray().get(0).toString();
         } else {
             value = jsonSchema.toString();
         }
@@ -578,10 +580,10 @@ public class SchemaValidator extends AbstractHandler {
                                 APIMgtGatewayConstants.JSONPATH_SCHEMAS + searchLastIndex);
                         mapper = new ObjectMapper();
                         try {
-                            JsonNode jsonNode = mapper.convertValue(componentSchema, JsonNode.class);
+                            JsonElement jsonNode = mapper.convertValue(componentSchema, JsonElement.class);
                             generateSchema(jsonNode);
-                            if (jsonNode.get(0) != null) {
-                                name = jsonNode.get(0).toString();
+                            if (jsonNode.isJsonArray()) {
+                                name = jsonNode.getAsJsonArray().get(0).toString();
                             } else {
                                 name = jsonNode.toString();
                             }
@@ -599,10 +601,10 @@ public class SchemaValidator extends AbstractHandler {
                         APIMgtGatewayConstants.JSONPATH_SCHEMAS + searchLastIndex);
                 mapper = new ObjectMapper();
                 try {
-                    JsonNode jsonNode = mapper.convertValue(componentSchema, JsonNode.class);
+                    JsonElement jsonNode = mapper.convertValue(componentSchema, JsonElement.class);
                     generateSchema(jsonNode);
-                    if (jsonNode.get(0) != null) {
-                        name = jsonNode.get(0).toString();
+                    if (jsonNode.isJsonArray()) {
+                        name = jsonNode.getAsJsonArray().get(0).toString();
                     } else {
                         name = jsonNode.toString();
                     }
@@ -620,10 +622,10 @@ public class SchemaValidator extends AbstractHandler {
             Object nameObj = JsonPath.read(swagger, requestSchemaPath.toString());
             mapper = new ObjectMapper();
             try {
-                JsonNode jsonNode = mapper.convertValue(nameObj, JsonNode.class);
+                JsonElement jsonNode = mapper.convertValue(nameObj, JsonElement.class);
                 generateSchema(jsonNode);
-                if (jsonNode.get(0) != null) {
-                    name = jsonNode.get(0).toString();
+                if (jsonNode.isJsonArray()) {
+                    name = jsonNode.getAsJsonArray().get(0).toString();
                 } else {
                     name = jsonNode.toString();
                 }
@@ -645,23 +647,23 @@ public class SchemaValidator extends AbstractHandler {
      * @param parent Swagger definition parent Node
      * @throws APIManagementException Throws an APIManagement exception
      */
-    private void generateSchema(JsonNode parent) throws APIManagementException {
-        JsonNode schemaProperty;
-        Iterator<Map.Entry<String, JsonNode>> schemaNode;
-        if (parent.get(0) != null) {
-            schemaNode = parent.get(0).fields();
+    private void generateSchema(JsonElement parent) throws APIManagementException {
+        JsonElement schemaProperty;
+        Iterator<Map.Entry<String, JsonElement>> schemaNode;
+        if (parent.isJsonArray()) {
+            schemaNode = parent.getAsJsonArray().get(0).getAsJsonObject().entrySet().iterator();
         } else {
-            schemaNode = parent.fields();
+            schemaNode = parent.getAsJsonObject().entrySet().iterator();
         }
         while (schemaNode.hasNext()) {
-            Map.Entry<String, JsonNode> entry = schemaNode.next();
-            if (entry.getValue().has(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
-                JsonNode refNode = entry.getValue();
-                Iterator<Map.Entry<String, JsonNode>> refItems = refNode.fields();
+            Map.Entry<String, JsonElement> entry = schemaNode.next();
+            if (entry.getValue().isJsonObject() && entry.getValue().getAsJsonObject().has(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
+                JsonObject refNode = entry.getValue().getAsJsonObject();
+                Iterator<Map.Entry<String, JsonElement>> refItems = refNode.entrySet().iterator();
                 while (refItems.hasNext()) {
-                    Map.Entry<String, JsonNode> entryRef = refItems.next();
+                    Map.Entry<String, JsonElement> entryRef = refItems.next();
                     if (entryRef.getKey().equals(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
-                        JsonNode schemaObject = extractSchemaObject(entryRef.getValue());
+                        JsonElement schemaObject = extractSchemaObject(entryRef.getValue());
                         if (schemaObject != null) {
                             entry.setValue(schemaObject);
                         }
@@ -669,12 +671,36 @@ public class SchemaValidator extends AbstractHandler {
                 }
             }
             schemaProperty = entry.getValue();
-            if (JsonNodeType.OBJECT == schemaProperty.getNodeType()) {
+            if (schemaProperty.isJsonObject()) {
                 generateSchema(schemaProperty);
             }
-            if (JsonNodeType.ARRAY == schemaProperty.getNodeType()) {
+            if (schemaProperty.isJsonArray()) {
                 generateArraySchemas(entry);
             }
         }
+    }
+
+    /**
+     * Get JSON element of given JSON object from the path given
+     *
+     * @param json JSON object to get element
+     * @param path Path of the JSON element
+     * @return extracted JSON element
+     */
+    private static JsonElement fromJsonPath(JsonObject json, String path) {
+        path = StringUtils.strip(path, "\\/");
+        String[] pathSegments = path.split("\\/");
+        for (String pathSegment : pathSegments) {
+            if (json != null) {
+                JsonElement element = json.get(pathSegment);
+                if (!element.isJsonObject())
+                    return element;
+                else
+                    json = element.getAsJsonObject();
+            } else {
+                return null;
+            }
+        }
+        return json;
     }
 }
