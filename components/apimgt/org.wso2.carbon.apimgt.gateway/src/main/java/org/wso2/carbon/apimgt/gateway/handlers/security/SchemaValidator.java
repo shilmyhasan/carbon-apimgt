@@ -383,9 +383,9 @@ public class SchemaValidator extends AbstractHandler {
                         append(APIMgtGatewayConstants.JSON_RESPONSES).
                         append(responseStatus).append(APIMgtGatewayConstants.JSON_SCHEMA);
 
-                schema = JsonPath.read(swagger, pathBuilder.toString()).toString();
+                schema = JsonPath.read(swagger, pathBuilder.toString());
                 JsonElement jsonNode = mapper.convertValue(schema, JsonElement.class);
-                if (jsonNode.isJsonArray()) {
+                if (jsonNode.isJsonArray() && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(jsonNode.toString())) {
                     value = jsonNode.getAsJsonArray().get(0).toString();
                 } else {
                     value = jsonNode.toString();
@@ -414,9 +414,9 @@ public class SchemaValidator extends AbstractHandler {
                 append(APIMgtGatewayConstants.JSON_RESPONSES).append(responseStatus).append
                 (APIMgtGatewayConstants.SCHEMA);
         resource = JsonPath.read(swagger, resPath.toString());
-        JsonNode json = mapper.convertValue(resource, JsonNode.class);
-        if (json.get(0) != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(json.get(0))) {
-            value = json.get(0).toString();
+        JsonElement json = mapper.convertValue(resource, JsonElement.class);
+        if (json.isJsonArray() && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(json.toString())) {
+            value = json.getAsJsonArray().get(0).toString();
         } else {
             value = json.toString();
         }
@@ -443,9 +443,9 @@ public class SchemaValidator extends AbstractHandler {
                     append(APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase()).
                     append(APIMgtGatewayConstants.JSON_RESPONSES).append(APIMgtGatewayConstants.DEFAULT);
             resourceSchema = JsonPath.read(swagger, responseDefaultPath.toString());
-            JsonNode jnode = mapper.convertValue(resourceSchema, JsonNode.class);
-            if (jnode.get(0) != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(jnode)) {
-                value = jnode.get(0).toString();
+            JsonElement jnode = mapper.convertValue(resourceSchema, JsonElement.class);
+            if (jnode.getAsJsonArray().get(0) != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(jnode)) {
+                value = jnode.getAsJsonArray().get(0).toString();
             } else {
                 value = jnode.toString();
             }
