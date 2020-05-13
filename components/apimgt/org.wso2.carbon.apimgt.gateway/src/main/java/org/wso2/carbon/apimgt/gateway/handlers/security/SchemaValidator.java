@@ -337,13 +337,13 @@ public class SchemaValidator extends AbstractHandler {
      * @throws APIManagementException wrap and throw IOException
      */
     private String extractResponse(MessageContext messageContext) throws APIManagementException {
-        Object resourceSchema;
-        Object resource;
+        JsonElement resourceSchema;
+        JsonElement resource;
         Object content = null;
         Object schemaCon = null;
         ObjectMapper mapper = new ObjectMapper();
         String name;
-        Object schema;
+
         String value;
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext)
                 messageContext).getAxis2MessageContext();
@@ -383,12 +383,11 @@ public class SchemaValidator extends AbstractHandler {
                         append(APIMgtGatewayConstants.JSON_RESPONSES).
                         append(responseStatus).append(APIMgtGatewayConstants.JSON_SCHEMA);
 
-                schema = JsonPath.read(swagger, pathBuilder.toString());
-                JsonElement jsonNode = mapper.convertValue(schema, JsonElement.class);
-                if (jsonNode.isJsonArray() && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(jsonNode.toString())) {
-                    value = jsonNode.getAsJsonArray().get(0).toString();
+                JsonElement schema = JsonPath.read(swagger, pathBuilder.toString());
+                if (schema.isJsonArray() && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(schema.toString())) {
+                    value = schema.getAsJsonArray().get(0).toString();
                 } else {
-                    value = jsonNode.toString();
+                    value = schema.toString();
                 }
                 if (value.contains(APIMgtGatewayConstants.ITEMS)) {
                     StringBuilder requestSchemaPath = new StringBuilder();
@@ -414,11 +413,10 @@ public class SchemaValidator extends AbstractHandler {
                 append(APIMgtGatewayConstants.JSON_RESPONSES).append(responseStatus).append
                 (APIMgtGatewayConstants.SCHEMA);
         resource = JsonPath.read(swagger, resPath.toString());
-        JsonElement json = mapper.convertValue(resource, JsonElement.class);
-        if (json.isJsonArray() && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(json.toString())) {
-            value = json.getAsJsonArray().get(0).toString();
+        if (resource.isJsonArray() && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(resource.toString())) {
+            value = resource.getAsJsonArray().get(0).toString();
         } else {
-            value = json.toString();
+            value = resource.toString();
         }
         if (value != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(value)) {
             if (value.contains(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
@@ -443,11 +441,10 @@ public class SchemaValidator extends AbstractHandler {
                     append(APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase()).
                     append(APIMgtGatewayConstants.JSON_RESPONSES).append(APIMgtGatewayConstants.DEFAULT);
             resourceSchema = JsonPath.read(swagger, responseDefaultPath.toString());
-            JsonElement jnode = mapper.convertValue(resourceSchema, JsonElement.class);
-            if (jnode.getAsJsonArray().get(0) != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(jnode)) {
-                value = jnode.getAsJsonArray().get(0).toString();
+            if (resourceSchema.getAsJsonArray().get(0) != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(resourceSchema)) {
+                value = resourceSchema.getAsJsonArray().get(0).toString();
             } else {
-                value = jnode.toString();
+                value = resourceSchema.toString();
             }
             if (resourceSchema != null) {
                 if (value.contains(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
@@ -542,11 +539,9 @@ public class SchemaValidator extends AbstractHandler {
 
         String nodeVal = path.replaceAll("" + APIMgtGatewayConstants.FORWARD_SLASH, ".");
         String name = null;
-        Object object = JsonPath.read(swagger, APIMgtGatewayConstants.JSON_PATH + nodeVal);
+        JsonElement jsonSchema = JsonPath.read(swagger, APIMgtGatewayConstants.JSON_PATH + nodeVal);
         String value;
-        ObjectMapper mapper = new ObjectMapper();
 
-        JsonElement jsonSchema = mapper.convertValue(object, JsonElement.class);
         if (jsonSchema.isJsonArray()) {
             value = jsonSchema.getAsJsonArray().get(0).toString();
         } else {
@@ -576,16 +571,14 @@ public class SchemaValidator extends AbstractHandler {
                             APIMgtGatewayConstants.CONTENT).append(APIMgtGatewayConstants.JSON_CONTENT);
                     name = JsonPath.read(swagger, jsonSchemaRef.toString()).toString();
                     if (name.contains(APIMgtGatewayConstants.COMPONENT_SCHEMA)) {
-                        Object componentSchema = JsonPath.read(swagger,
+                        JsonElement componentSchema = JsonPath.read(swagger,
                                 APIMgtGatewayConstants.JSONPATH_SCHEMAS + searchLastIndex);
-                        mapper = new ObjectMapper();
                         try {
-                            JsonElement jsonNode = mapper.convertValue(componentSchema, JsonElement.class);
-                            generateSchema(jsonNode);
-                            if (jsonNode.isJsonArray()) {
-                                name = jsonNode.getAsJsonArray().get(0).toString();
+                            generateSchema(componentSchema);
+                            if (componentSchema.isJsonArray()) {
+                                name = componentSchema.getAsJsonArray().get(0).toString();
                             } else {
-                                name = jsonNode.toString();
+                                name = componentSchema.toString();
                             }
                         } catch (APIManagementException e) {
                             logger.error("Error occurred while generating the schema content for " +
@@ -597,16 +590,14 @@ public class SchemaValidator extends AbstractHandler {
                     }
                 }
             } else if (nodeVal.contains(APIMgtGatewayConstants.SCHEMA)) {
-                Object componentSchema = JsonPath.read(swagger,
+                JsonElement componentSchema = JsonPath.read(swagger,
                         APIMgtGatewayConstants.JSONPATH_SCHEMAS + searchLastIndex);
-                mapper = new ObjectMapper();
                 try {
-                    JsonElement jsonNode = mapper.convertValue(componentSchema, JsonElement.class);
-                    generateSchema(jsonNode);
-                    if (jsonNode.isJsonArray()) {
-                        name = jsonNode.getAsJsonArray().get(0).toString();
+                    generateSchema(componentSchema);
+                    if (componentSchema.isJsonArray()) {
+                        name = componentSchema.getAsJsonArray().get(0).toString();
                     } else {
-                        name = jsonNode.toString();
+                        name = componentSchema.toString();
                     }
                 } catch (APIManagementException e) {
                     logger.error("Error occurred while generating the schema content for " +
@@ -619,15 +610,13 @@ public class SchemaValidator extends AbstractHandler {
             requestSchemaPath.append(APIMgtGatewayConstants.JSON_PATH).
                     append(APIMgtGatewayConstants.DEFINITIONS).append(APIMgtGatewayConstants.JSONPATH_SEPARATE
             ).append(searchLastIndex);
-            Object nameObj = JsonPath.read(swagger, requestSchemaPath.toString());
-            mapper = new ObjectMapper();
+            JsonElement nameObj = JsonPath.read(swagger, requestSchemaPath.toString());
             try {
-                JsonElement jsonNode = mapper.convertValue(nameObj, JsonElement.class);
-                generateSchema(jsonNode);
-                if (jsonNode.isJsonArray()) {
-                    name = jsonNode.getAsJsonArray().get(0).toString();
+                generateSchema(nameObj);
+                if (nameObj.isJsonArray()) {
+                    name = nameObj.getAsJsonArray().get(0).toString();
                 } else {
-                    name = jsonNode.toString();
+                    name = nameObj.toString();
                 }
             } catch (APIManagementException e) {
                 logger.error("Error occurred while generating the schema content for " +
