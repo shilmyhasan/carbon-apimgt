@@ -31,6 +31,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.commons.json.JsonUtil;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -51,6 +52,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * This SchemaValidator handler validates the request/response messages against schema defined in the swagger.
@@ -112,7 +114,7 @@ public class SchemaValidator extends AbstractHandler {
             if (!APIMgtGatewayConstants.APPLICATION_JSON.equals(contentType)) {
                 return true;
             }
-            JSONObject payloadObject = getMessageContent(messageContext);
+            JsonElement payloadObject = getMessageContent(messageContext);
             if (!APIConstants.SupportedHTTPVerbs.GET.name().equals(requestMethod) &&
                     payloadObject != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(payloadObject)) {
                 validateRequest(messageContext);
@@ -172,8 +174,9 @@ public class SchemaValidator extends AbstractHandler {
      * @param payloadObject  Request/response payload
      * @param schemaString   Schema which uses to validate request/response messages
      * @param messageContext Message context
+     * @return Weather Schema validation success or not, if schema is null return true
      */
-    private void validateContent(JSONObject payloadObject, String schemaString, MessageContext messageContext) {
+    private boolean validateContent(JsonElement payloadObject, String schemaString, MessageContext messageContext) {
         logger.debug("Validating JSON content against the schema");
         StringBuilder finalMessage = new StringBuilder();
         List<String> errorMessages;
@@ -181,10 +184,11 @@ public class SchemaValidator extends AbstractHandler {
         JSONObject jsonSchema = new JSONObject(schemaString);
         Schema schema = SchemaLoader.load(jsonSchema);
         if (schema == null) {
-            return;
+            return true;
         }
         try {
-            schema.validate(payloadObject);
+            schema.validate(new JSONObject(payloadObject.toString()));
+            return true;
         } catch (ValidationException e) {
             errorMessages = e.getAllMessages();
             for (String message : errorMessages) {
@@ -201,7 +205,7 @@ public class SchemaValidator extends AbstractHandler {
                 GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
                         errMessage + finalMessage);
             }
-
+            return false;
         }
     }
 
@@ -214,10 +218,19 @@ public class SchemaValidator extends AbstractHandler {
         //extract particular schema content.
         String schema = getSchemaContent(messageContext);
         //extract the request payload.
-        JSONObject payloadObject = getMessageContent(messageContext);
+        JsonElement payloadObject = getMessageContent(messageContext);
         if (schema != null && !APIMgtGatewayConstants.EMPTY.equals(schema) &&
                 payloadObject != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(payloadObject)) {
-            validateContent(payloadObject, schema, messageContext);
+            if (payloadObject.isJsonArray()) {
+                for (JsonElement payloadItem : payloadObject.getAsJsonArray()) {
+                    // if validation fails stop validation other items.
+                    if (!validateContent(payloadItem, schema, messageContext)) {
+                        return;
+                    }
+                }
+            } else {
+                validateContent(payloadObject, schema, messageContext);
+            }
         }
     }
 
@@ -233,10 +246,19 @@ public class SchemaValidator extends AbstractHandler {
         } catch (JSONException ex) {
             return;
         }
-        JSONObject payloadObject = getMessageContent(messageContext);
+        JsonElement payloadObject = getMessageContent(messageContext);
         if (responseSchema != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(responseSchema) &&
                 payloadObject != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(payloadObject)) {
-            validateContent(payloadObject, responseSchema, messageContext);
+            if (payloadObject.isJsonArray()) {
+                for (JsonElement payloadItem : payloadObject.getAsJsonArray()) {
+                    // if validation fails stop validation other items.
+                    if (validateContent(payloadItem, responseSchema, messageContext)) {
+                        return;
+                    }
+                }
+            } else {
+                validateContent(payloadObject, responseSchema, messageContext);
+            }
         }
     }
 
@@ -244,16 +266,17 @@ public class SchemaValidator extends AbstractHandler {
      * Get the Request/Response messageContent as a JsonObject.
      *
      * @param messageContext Message context
-     * @return JsonObject which contains the request/response message content
+     * @return JsonElement which contains the request/response message content
      */
-    private JSONObject getMessageContent(MessageContext messageContext) {
-        JSONObject payloadObject = null;
+    private JsonElement getMessageContent(MessageContext messageContext) {
+        JsonElement payloadObject = null;
         if (messageContext.getEnvelope().getBody() != null) {
             Object objFirstElement = messageContext.getEnvelope().getBody().getFirstElement();
             if (objFirstElement != null) {
                 OMElement xmlResponse = messageContext.getEnvelope().getBody().getFirstElement();
                 try {
-                    payloadObject = new JSONObject(JsonUtil.toJsonString(xmlResponse).toString());
+                    JsonParser jsonParser = new JsonParser();
+                    payloadObject = jsonParser.parse(JsonUtil.toJsonString(xmlResponse).toString());
                 } catch (AxisFault axisFault) {
                     logger.error(" Error occurred while converting the String payload to Json");
                 }
