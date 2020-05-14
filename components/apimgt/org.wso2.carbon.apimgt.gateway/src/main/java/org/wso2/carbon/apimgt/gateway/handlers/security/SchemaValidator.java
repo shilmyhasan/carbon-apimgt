@@ -20,9 +20,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
@@ -115,7 +117,7 @@ public class SchemaValidator extends AbstractHandler {
                     payloadObject != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(payloadObject)) {
                 validateRequest(messageContext);
             }
-        } catch (IOException | XMLStreamException e) {
+        } catch (JsonSyntaxException | IllegalStateException | IOException | XMLStreamException e) {
             logger.error("Error occurred while building the API request", e);
             return false;
         } catch (APIManagementException e) {
@@ -340,9 +342,6 @@ public class SchemaValidator extends AbstractHandler {
      */
     private String extractResponse(MessageContext messageContext) throws APIManagementException {
         JsonElement resourceSchema;
-        JsonElement resource;
-        Object content = null;
-        Object schemaCon = null;
         ObjectMapper mapper = new ObjectMapper();
         String name;
 
@@ -362,60 +361,53 @@ public class SchemaValidator extends AbstractHandler {
 
         String responseStatus = axis2MC.getProperty(APIMgtGatewayConstants.HTTP_SC).toString();
         StringBuilder responseSchemaPath = new StringBuilder();
-        responseSchemaPath.append(APIMgtGatewayConstants.PATHS).append(electedResource).
-                append(APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase()).
-                append(APIMgtGatewayConstants.JSON_RESPONSES).append(responseStatus);
-        resource = JsonPath.read(swagger, responseSchemaPath.toString());
+        responseSchemaPath.append(APIMgtGatewayConstants.PATHS).append(electedResource)
+                .append(APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase())
+                .append(APIMgtGatewayConstants.JSON_RESPONSES).append(responseStatus)
+                .append(APIMgtGatewayConstants.CONTENT)
+                .append(APIMgtGatewayConstants.JSON_CONTENT);
+        JsonArray schema = JsonPath.read(swagger, responseSchemaPath.toString());
 
-        if (resource != null) {
-            responseSchemaPath.append(APIMgtGatewayConstants.CONTENT);
-            content = JsonPath.read(swagger, responseSchemaPath.toString());
-        }
-        if (content != null) {
-            responseSchemaPath.append(APIMgtGatewayConstants.JSON_CONTENT);
-            schemaCon = JsonPath.read(swagger, responseSchemaPath.toString());
-        }
-        if (schemaCon != null) {
-            if (!schemaCon.toString().equals(APIMgtGatewayConstants.EMPTY_ARRAY)) {
-                return extractReference(schemaCon.toString());
+        if (schema.size() != 0) {
+            return extractReference(schema.toString());
+        } else {
+            StringBuilder pathBuilder = new StringBuilder();
+            pathBuilder.append(APIMgtGatewayConstants.PATHS).append(electedResource).
+                    append(APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase()).
+                    append(APIMgtGatewayConstants.JSON_RESPONSES).
+                    append(responseStatus).append(APIMgtGatewayConstants.JSON_SCHEMA);
+
+            schema = JsonPath.read(swagger, pathBuilder.toString());
+            if (schema.size() != 0) {
+                value = schema.getAsJsonArray().get(0).toString();
             } else {
-                StringBuilder pathBuilder = new StringBuilder();
-                pathBuilder.append(APIMgtGatewayConstants.PATHS).append(electedResource).
+                value = schema.toString();
+            }
+            if (value.contains(APIMgtGatewayConstants.ITEMS)) {
+                StringBuilder requestSchemaPath = new StringBuilder();
+                requestSchemaPath.append(APIMgtGatewayConstants.PATHS).append(electedResource).
                         append(APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase()).
-                        append(APIMgtGatewayConstants.JSON_RESPONSES).
-                        append(responseStatus).append(APIMgtGatewayConstants.JSON_SCHEMA);
-
-                JsonElement schema = JsonPath.read(swagger, pathBuilder.toString());
-                if (schema.isJsonArray() && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(schema.toString())) {
-                    value = schema.getAsJsonArray().get(0).toString();
-                } else {
-                    value = schema.toString();
+                        append(APIMgtGatewayConstants.JSON_RESPONSES).append(responseStatus).
+                        append(APIMgtGatewayConstants.JSON_SCHEMA).append(
+                        APIMgtGatewayConstants.JSONPATH_SEPARATE).append(APIMgtGatewayConstants.ITEMS);
+                name = JsonPath.read(swagger, requestSchemaPath.toString()).toString();
+                if (name.contains(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
+                    requestSchemaPath.append(APIMgtGatewayConstants.JSONPATH_SEPARATE).
+                            append(APIMgtGatewayConstants.SCHEMA_REFERENCE);
+                    extractReference(name);
+                    return JsonPath.read(swagger, requestSchemaPath.toString()).toString();
                 }
-                if (value.contains(APIMgtGatewayConstants.ITEMS)) {
-                    StringBuilder requestSchemaPath = new StringBuilder();
-                    requestSchemaPath.append(APIMgtGatewayConstants.PATHS).append(electedResource).
-                            append(APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase()).
-                            append(APIMgtGatewayConstants.JSON_RESPONSES).append(responseStatus).
-                            append(APIMgtGatewayConstants.JSON_SCHEMA).append(
-                            APIMgtGatewayConstants.JSONPATH_SEPARATE).append(APIMgtGatewayConstants.ITEMS);
-                    name = JsonPath.read(swagger, requestSchemaPath.toString()).toString();
-                    if (name.contains(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
-                        requestSchemaPath.append(APIMgtGatewayConstants.JSONPATH_SEPARATE).
-                                append(APIMgtGatewayConstants.SCHEMA_REFERENCE);
-                        extractReference(name);
-                        return JsonPath.read(swagger, requestSchemaPath.toString()).toString();
-                    }
-                    return value;
-                }
+                return value;
             }
         }
+
         StringBuilder resPath = new StringBuilder();
         resPath.append(APIMgtGatewayConstants.PATHS).append(electedResource).append(
                 APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase()).
                 append(APIMgtGatewayConstants.JSON_RESPONSES).append(responseStatus).append
                 (APIMgtGatewayConstants.SCHEMA);
-        resource = JsonPath.read(swagger, resPath.toString());
-        if (resource.isJsonArray() && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(resource.toString())) {
+        JsonArray resource = JsonPath.read(swagger, resPath.toString());
+        if (resource.size() != 0) {
             value = resource.getAsJsonArray().get(0).toString();
         } else {
             value = resource.toString();
@@ -443,27 +435,23 @@ public class SchemaValidator extends AbstractHandler {
                     append(APIMgtGatewayConstants.JSONPATH_SEPARATE).append(reqMethod.toLowerCase()).
                     append(APIMgtGatewayConstants.JSON_RESPONSES).append(APIMgtGatewayConstants.DEFAULT);
             resourceSchema = JsonPath.read(swagger, responseDefaultPath.toString());
-            if (resourceSchema.getAsJsonArray().get(0) != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(resourceSchema)) {
+            if (resource.size() != 0) {
                 value = resourceSchema.getAsJsonArray().get(0).toString();
             } else {
                 value = resourceSchema.toString();
             }
-            if (resourceSchema != null) {
-                if (value.contains(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
-                    byte[] bytes = value.getBytes();
-                    try {
-                        JsonNode node = mapper.readTree(bytes);
-                        if (node != null) {
-                            Iterator<JsonNode> schemaNode = node.findParent(
-                                    APIMgtGatewayConstants.SCHEMA_REFERENCE).elements();
-                            return extractRef(schemaNode);
-                        }
-                    } catch (IOException e) {
-                        logger.error("Error occurred while reading the schema.", e);
-                        throw new APIManagementException(e);
+            if (value.contains(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
+                byte[] bytes = value.getBytes();
+                try {
+                    JsonNode node = mapper.readTree(bytes);
+                    if (node != null) {
+                        Iterator<JsonNode> schemaNode = node.findParent(
+                                APIMgtGatewayConstants.SCHEMA_REFERENCE).elements();
+                        return extractRef(schemaNode);
                     }
-                } else {
-                    return value;
+                } catch (IOException e) {
+                    logger.error("Error occurred while reading the schema.", e);
+                    throw new APIManagementException(e);
                 }
             } else {
                 return value;
