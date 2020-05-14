@@ -26,7 +26,6 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.JwtTokenInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
@@ -37,7 +36,6 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -48,7 +46,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class APIMJWTGenerator extends JWTGenerator {
+public class APIMJWTGenerator extends JWTGenerator implements JWTAccessTokenGenerator {
 
     private static final Log log = LogFactory.getLog(APIMJWTGenerator.class);
     private static final String SHA256_WITH_RSA = "SHA256withRSA";
@@ -57,6 +55,7 @@ public class APIMJWTGenerator extends JWTGenerator {
     private String userAttributeSeparator = APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT;
     private static final String NONE = "NONE";
 
+    @Override
     public String generateJWT(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
 
         String jwtHeader = buildHeader();
