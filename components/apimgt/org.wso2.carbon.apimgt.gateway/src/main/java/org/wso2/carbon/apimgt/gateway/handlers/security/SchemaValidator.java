@@ -271,7 +271,9 @@ public class SchemaValidator extends AbstractHandler {
         String path = val[1].replace("\\{^\"|\"}", APIMgtGatewayConstants.EMPTY).replace
                 ("\"", APIMgtGatewayConstants.EMPTY).replace("}", APIMgtGatewayConstants.EMPTY)
                 .replaceAll(APIMgtGatewayConstants.BACKWARD_SLASH, APIMgtGatewayConstants.EMPTY);
-        return fromJsonPath(rootNode, path);
+        String jsonPath = APIMgtGatewayConstants.JSON_PATH + StringUtils.strip(path, String.valueOf(APIMgtGatewayConstants.FORWARD_SLASH))
+                .replace(APIMgtGatewayConstants.FORWARD_SLASH, APIMgtGatewayConstants.JSONPATH_SEPARATE);
+        return JsonPath.read(rootNode, jsonPath);
     }
 
     /**
@@ -667,29 +669,5 @@ public class SchemaValidator extends AbstractHandler {
                 generateArraySchemas(entry);
             }
         }
-    }
-
-    /**
-     * Get JSON element of given JSON object from the path given
-     *
-     * @param json JSON object to get element
-     * @param path Path of the JSON element
-     * @return extracted JSON element
-     */
-    private static JsonElement fromJsonPath(JsonObject json, String path) {
-        path = StringUtils.strip(path, "\\/");
-        String[] pathSegments = path.split("\\/");
-        for (String pathSegment : pathSegments) {
-            if (json != null) {
-                JsonElement element = json.get(pathSegment);
-                if (!element.isJsonObject())
-                    return element;
-                else
-                    json = element.getAsJsonObject();
-            } else {
-                return null;
-            }
-        }
-        return json;
     }
 }
