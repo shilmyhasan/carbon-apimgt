@@ -1601,6 +1601,11 @@
                 <artifactId>javax.cache.wso2</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.claim.mgt</artifactId>
+                <version>${carbon.identity.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
