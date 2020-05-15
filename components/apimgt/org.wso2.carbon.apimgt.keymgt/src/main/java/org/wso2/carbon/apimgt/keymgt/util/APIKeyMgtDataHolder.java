@@ -134,14 +134,6 @@ public class APIKeyMgtDataHolder {
                     } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                         log.error("Error instantiating JWT access token generator from the class: " + jwtGenClassName,
                                 e);
-                    } finally {
-                        if (jwtAccessTokenGenerator == null) {
-                            // support the existing default behavior in case of any exception
-                            log.warn(
-                                    "JWT access token generator not initialised successfully. Hence using the default generator.");
-                            jwtAccessTokenGenerator = new APIMJWTGenerator();
-
-                        }
                     }
                 } else {
                     // support the existing default behavior
@@ -149,7 +141,7 @@ public class APIKeyMgtDataHolder {
                 }
             }
         } catch (Exception e) {
-            log.error("Error occur while initializing API KeyMgt Data Holder.Default configuration will be used." + e.toString());
+            log.error("Error occur while initializing API KeyMgt Data Holder.Default configuration will be used.", e);
         }
     }
 
