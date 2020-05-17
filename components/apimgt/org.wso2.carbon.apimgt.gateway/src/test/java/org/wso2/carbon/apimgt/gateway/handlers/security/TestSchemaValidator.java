@@ -62,6 +62,8 @@ public class TestSchemaValidator {
 
     @BeforeClass
     public static void init() {
+        // Set GsonJsonProvider as the default Jayway JSON path default configuration
+        // Which is set by synapse-core at runtime of the server
         Configuration.setDefaults(new Configuration.Defaults() {
             private final JsonProvider jsonProvider = new GsonJsonProvider(new GsonBuilder().serializeNulls().create());
             private final MappingProvider mappingProvider = new GsonMappingProvider();
@@ -97,6 +99,30 @@ public class TestSchemaValidator {
                 "<tags><id>12</id><name>Black</name></tags><tags><id>43</id><name>German Shepherd</name></tags>" +
                 "<status>available</status>" +
                 "</jsonObject>");
+        assertValidRequest();
+    }
+
+    @Test
+    public void testValidRequestPostStoreOrder() throws IOException, XMLStreamException {
+        // Happy Path: Valid Store Order: Valid date
+        setMockedRequest("POST", "/store/order", "<jsonObject>" +
+                "<id>123</id><petId>22</petId><quantity>8</quantity><shipDate>2020-05-14T10:29:24.160Z</shipDate>" +
+                "<status>placed</status><complete>false</complete>" +
+                "</jsonObject>");
+        assertValidRequest();
+    }
+
+    @Test
+    public void testValidRequestPostArrayOfUsers() throws IOException, XMLStreamException {
+        // Happy Path: Valid Array of Users
+        setMockedRequest("POST", "/user/createWithArray", "<jsonArray><jsonElement>" +
+                "<id>1234</id><username>andy</username><firstName>Andy</firstName>" +
+                "<lastName>Fernando</lastName><email>andy@abc.com</email><password>pw1234</password>" +
+                "<phone>01234567890</phone><userStatus>3</userStatus></jsonElement>" +
+                "<jsonElement><id>2345</id><username>ann</username><firstName>Ann</firstName>" +
+                "<lastName>Fernando</lastName><email>ann@abc.com</email><password>pw2233</password>" +
+                "<phone>01234567890</phone><userStatus>5</userStatus>" +
+                "</jsonElement></jsonArray>");
         assertValidRequest();
     }
 
@@ -140,7 +166,17 @@ public class TestSchemaValidator {
     }
 
     @Test
-    public void testBadRequestMessRequiredField() throws IOException, XMLStreamException {
+    public void testBadRequestInvalidDate() throws IOException, XMLStreamException {
+        // Invalid date
+        setMockedRequest("POST", "/store/order", "<jsonObject>" +
+                "<id>123</id><petId>22</petId><quantity>8</quantity><shipDate>2020-05-14</shipDate>" +
+                "<status>placed</status><complete>false</complete>" +
+                "</jsonObject>");
+        assertBadRequest();
+    }
+
+    @Test
+    public void testBadRequestMissRequiredField() throws IOException, XMLStreamException {
         // Missing required field - Name of Pet
         setMockedRequest("POST", "/pet", "<jsonObject>" +
                 "<id>123</id>" +
@@ -163,7 +199,7 @@ public class TestSchemaValidator {
         Mockito.verify(messageContext).setProperty(APIMgtGatewayConstants.THREAT_FOUND, true);
     }
 
-    private void setMockedRequest(String httpMethod, String resource, String xmlMessage) throws XMLStreamException, IOException {
+    private void setMockedRequest(String httpMethod, String resourcePath, String xmlMessage) throws XMLStreamException, IOException {
         SOAPFactory fac = OMAbstractFactory.getSOAP12Factory();
         SOAPEnvelope env = fac.createSOAPEnvelope();
         fac.createSOAPBody(env);
@@ -190,7 +226,7 @@ public class TestSchemaValidator {
 
         Mockito.when(messageContext.getConfiguration()).thenReturn(synapseConfiguration);
         Mockito.when((String) messageContext.getProperty((APIMgtGatewayConstants.API_ELECTED_RESOURCE))).
-                thenReturn(resource);
+                thenReturn(resourcePath);
         Mockito.when(synapseConfiguration.getLocalRegistry()).thenReturn(map);
         Mockito.when(map.get(ApiId)).thenReturn(entry);
         Mockito.when((String) entry.getValue()).thenReturn(swaggerValue);
