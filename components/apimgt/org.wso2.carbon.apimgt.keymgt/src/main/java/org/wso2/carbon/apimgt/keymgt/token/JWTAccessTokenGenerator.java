@@ -21,7 +21,7 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.dto.JwtTokenInfoDTO;
 
 /**
- * Interface JWTAccessTokenGenerator
+ * Interface JWTAccessTokenGenerator to provide implementation to generate JWT token access tokens.
  */
 public interface JWTAccessTokenGenerator {
     String generateJWT(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException;

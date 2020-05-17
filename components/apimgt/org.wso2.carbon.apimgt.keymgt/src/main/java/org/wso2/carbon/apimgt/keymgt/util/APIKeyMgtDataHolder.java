@@ -47,6 +47,7 @@ public class APIKeyMgtDataHolder {
     private static Map<String, AbstractScopesIssuer> scopesIssuers = new HashMap<String, AbstractScopesIssuer>();
     private static final Log log = LogFactory.getLog(APIKeyMgtDataHolder.class);
     private static JWTAccessTokenGenerator jwtAccessTokenGenerator;
+    public static final String JWT_ACCESS_TOKEN_GEN_CONFIG = APIConstants.API_KEY_VALIDATOR + "JWTAccessTokenGenerator";
 
     // Scope used for marking Application Tokens
     private static String applicationTokenScope;
@@ -121,15 +122,14 @@ public class APIKeyMgtDataHolder {
                     }
                 }
 
-                String jwtGenClassName =
-                        configuration.getFirstProperty(APIConstants.API_KEY_VALIDATOR + "JWTTokenGenerator");
+                String jwtGenClassName = configuration.getFirstProperty(JWT_ACCESS_TOKEN_GEN_CONFIG);
                 if (jwtGenClassName != null && !jwtGenClassName.isEmpty()) {
                     try {
                         jwtAccessTokenGenerator =
                                 (JWTAccessTokenGenerator) APIUtil.getClassForName(jwtGenClassName).newInstance();
                         if (log.isDebugEnabled()) {
-                            log.debug("Custom JWT access token generator initialized '" + jwtGenClassName
-                                    + "' successfully.");
+                            log.debug("Custom JWT access token generator '" + jwtGenClassName
+                                    + "' initialized successfully.");
                         }
                     } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
                         log.error("Error instantiating JWT access token generator from the class: " + jwtGenClassName,
