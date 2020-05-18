@@ -37,6 +37,7 @@ import org.wso2.carbon.apimgt.keymgt.JWTAccessTokenIssuerDTO;
 import org.wso2.carbon.apimgt.keymgt.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.apimgt.keymgt.token.APIMJWTGenerator;
+import org.wso2.carbon.apimgt.keymgt.token.JWTAccessTokenGenerator;
 import org.wso2.carbon.apimgt.keymgt.token.TokenGenerator;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.oauth.common.exception.InvalidOAuthClientException;
@@ -206,8 +207,7 @@ public class APIMTokenIssuerUtil {
             jwtTokenInfoDTO.setConsumerKey(clientId);
             jwtTokenInfoDTO.setTokenReqMessageContext(jwtAccessTokenIssuerDTO.getTokReqMsgCtx());
             jwtTokenInfoDTO.setOauthAuthzMsgCtx(jwtAccessTokenIssuerDTO.getOauthAuthzMsgCtx());
-            APIMJWTGenerator apimjwtGenerator = new APIMJWTGenerator();
-            accessToken = apimjwtGenerator.generateJWT(jwtTokenInfoDTO);
+            accessToken = APIKeyMgtDataHolder.getJwtAccessTokenGenerator().generateJWT(jwtTokenInfoDTO);
 
         } catch (InvalidOAuthClientException | IdentityOAuth2Exception | APIManagementException e) {
             log.error("Error occurred while getting JWT Token client ID : " + clientId + " when getting oAuth App " +

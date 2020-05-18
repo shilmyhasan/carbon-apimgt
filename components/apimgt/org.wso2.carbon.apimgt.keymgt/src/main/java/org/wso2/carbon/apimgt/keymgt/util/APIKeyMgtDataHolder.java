@@ -26,6 +26,8 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.dto.JWTConfigurationDto;
 import org.wso2.carbon.apimgt.keymgt.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.keymgt.issuers.AbstractScopesIssuer;
+import org.wso2.carbon.apimgt.keymgt.token.APIMJWTGenerator;
+import org.wso2.carbon.apimgt.keymgt.token.JWTAccessTokenGenerator;
 import org.wso2.carbon.apimgt.keymgt.token.JWTGenerator;
 import org.wso2.carbon.apimgt.keymgt.token.TokenGenerator;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
@@ -44,6 +46,8 @@ public class APIKeyMgtDataHolder {
     private static TokenGenerator tokenGenerator;
     private static Map<String, AbstractScopesIssuer> scopesIssuers = new HashMap<String, AbstractScopesIssuer>();
     private static final Log log = LogFactory.getLog(APIKeyMgtDataHolder.class);
+    private static JWTAccessTokenGenerator jwtAccessTokenGenerator;
+    public static final String JWT_ACCESS_TOKEN_GEN_CONFIG = APIConstants.API_KEY_VALIDATOR + "JWTAccessTokenGenerator";
 
     // Scope used for marking Application Tokens
     private static String applicationTokenScope;
@@ -117,9 +121,27 @@ public class APIKeyMgtDataHolder {
                         }
                     }
                 }
+
+                String jwtGenClassName = configuration.getFirstProperty(JWT_ACCESS_TOKEN_GEN_CONFIG);
+                if (jwtGenClassName != null && !jwtGenClassName.isEmpty()) {
+                    try {
+                        jwtAccessTokenGenerator =
+                                (JWTAccessTokenGenerator) APIUtil.getClassForName(jwtGenClassName).newInstance();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Custom JWT access token generator '" + jwtGenClassName
+                                    + "' initialized successfully.");
+                        }
+                    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                        log.error("Error instantiating JWT access token generator from the class: " + jwtGenClassName,
+                                e);
+                    }
+                } else {
+                    // support the existing default behavior
+                    jwtAccessTokenGenerator = new APIMJWTGenerator();
+                }
             }
         } catch (Exception e) {
-            log.error("Error occur while initializing API KeyMgt Data Holder.Default configuration will be used." + e.toString());
+            log.error("Error occur while initializing API KeyMgt Data Holder.Default configuration will be used.", e);
         }
     }
 
@@ -166,5 +188,9 @@ public class APIKeyMgtDataHolder {
 
     public static Map<String, AbstractScopesIssuer> getScopesIssuers() {
         return scopesIssuers;
+    }
+
+    public static JWTAccessTokenGenerator getJwtAccessTokenGenerator() {
+        return jwtAccessTokenGenerator;
     }
 }
