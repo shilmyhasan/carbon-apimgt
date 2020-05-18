@@ -1257,12 +1257,20 @@ public class OAS3Parser extends APIDefinition {
      */
     private boolean isDefaultGiven(String swaggerContent) throws APIManagementException {
         OpenAPI openAPI = getOpenAPI(swaggerContent);
-        boolean isDefaultIsGiven = true;
+
+        Components components = openAPI.getComponents();
+        if (components == null) {
+            return false;
+        }
+        Map<String, SecurityScheme> securitySchemes = components.getSecuritySchemes();
+        if (securitySchemes == null) {
+            return false;
+        }
         SecurityScheme checkDefault = openAPI.getComponents().getSecuritySchemes().get(OPENAPI_SECURITY_SCHEMA_KEY);
         if (checkDefault == null) {
-            isDefaultIsGiven = false;
+            return false;
         }
-        return isDefaultIsGiven;
+        return true;
     }
 
     /**
@@ -1455,233 +1463,73 @@ public class OAS3Parser extends APIDefinition {
     }
 
     /**
-     * This method returns api that is attched with api extensions related to micro-gw
+     * This method returns api that is attached with api extensions related to micro-gw
      *
-     * @param apiDefinition String
-     * @param api           API
-     * @param isPublisherPortalUsed boolean
+     * @param apiDefinition                  String
+     * @param api                            API
+     * @param isBasepathExtractedFromSwagger boolean
      * @return URITemplate
      */
     @Override
-    public API setExtensionsToAPI(String apiDefinition, API api, boolean isPublisherPortalUsed) throws APIManagementException {
+    public API setExtensionsToAPI(String apiDefinition, API api, boolean isBasepathExtractedFromSwagger) throws APIManagementException {
         OpenAPI openAPI = getOpenAPI(apiDefinition);
         Map<String, Object> extensions = openAPI.getExtensions();
         if (extensions == null) {
             return api;
         }
 
-        //        //Setup Custom auth header for API
-        String authHeader = getAuthorizationHeader(extensions);
+        //Setup Custom auth header for API
+        String authHeader = OASParserUtil.getAuthorizationHeaderFromSwagger(extensions);
         if (authHeader != null) {
             api.setAuthorizationHeader(authHeader);
         }
         //Setup mutualSSL configuration
-        String mutualSSL = getMutualSSLEnabled(extensions);
-        if (mutualSSL != null) {
+        String mutualSSL = OASParserUtil.getMutualSSLEnabledFromSwagger(extensions);
+        if (StringUtils.isBlank(mutualSSL)) {
             String securityList = api.getApiSecurity();
-            if ("".equals(securityList)) {
-                securityList = APIConstants.DEFAULT_API_SECURITY_OAUTH2 ;
+            if (StringUtils.isBlank(securityList)) {
+                securityList = APIConstants.DEFAULT_API_SECURITY_OAUTH2;
             }
             if (APIConstants.OPTIONAL.equals(mutualSSL)) {
                 securityList = securityList + "," + APIConstants.API_SECURITY_MUTUAL_SSL;
-            }
-            else if (APIConstants.MANDATORY.equals(mutualSSL)) {
+            } else if (APIConstants.MANDATORY.equals(mutualSSL)) {
                 securityList = securityList + "," + APIConstants.API_SECURITY_MUTUAL_SSL_MANDATORY;
             }
             api.setApiSecurity(securityList);
         }
         //Setup CORSConfigurations
-        CORSConfiguration corsConfiguration = getCorsConfig(extensions);
+        CORSConfiguration corsConfiguration = OASParserUtil.getCorsConfigFromSwagger(extensions);
         if (corsConfiguration != null) {
             api.setCorsConfiguration(corsConfiguration);
         }
         //Setup Response cache enabling
-        boolean responseCacheEnable = getResponseCache(extensions);
+        boolean responseCacheEnable = OASParserUtil.getResponseCacheFromSwagger(extensions);
         if (responseCacheEnable) {
             api.setResponseCache(APIConstants.ENABLED);
         }
         //Setup cache timeOut
-        int cacheTimeOut = getCacheTimeOut(extensions);
+        int cacheTimeOut = OASParserUtil.getCacheTimeOutFromSwagger(extensions);
         if (cacheTimeOut != 0) {
             api.setCacheTimeout(cacheTimeOut);
         }
         //Setup Transports
-        String transports = getTransports(extensions);
+        String transports = OASParserUtil.getTransportsFromSwagger(extensions);
         if (transports != null) {
             api.setTransports(transports);
         }
-        //Setup Trottlingtiers
-        String throttleTier = getTrottleTier(extensions);
+        //Setup Throttlingtiers
+        String throttleTier = OASParserUtil.getThrottleTierFromSwagger(extensions);
         if (throttleTier != null) {
             api.setApiLevelPolicy(throttleTier);
         }
         //Setup Basepath
-        String basePath = getBasePath(extensions);
-        if (basePath != null && !isPublisherPortalUsed) {
-            basePath = basePath.replace("{version}",api.getId().getVersion());
+        String basePath = OASParserUtil.getBasePathFromSwagger(extensions);
+        if (basePath != null && isBasepathExtractedFromSwagger) {
+            basePath = basePath.replace("{version}", api.getId().getVersion());
             api.setContextTemplate(basePath);
             api.setContext(basePath);
         }
         return api;
     }
-
-    /**
-     * This method returns extension of trottling tier related to micro-gw
-     *
-     * @param extensions Map<String, Object> extensions
-     * @return String String
-     * @throws APIManagementException throws if an error occurred
-     */
-    private String getBasePath(Map<String, Object> extensions) throws APIManagementException {
-        String basepath = null;
-        ObjectMapper mapper = new ObjectMapper();
-        if (extensions.containsKey(APIConstants.X_WSO2_BASEPATH)) {
-            Object object = extensions.get(APIConstants.X_WSO2_BASEPATH).toString();
-            basepath = mapper.convertValue(object,String.class);
-        }
-        return basepath;
-    }
-
-    /**
-     * This method returns extension of trottling tier related to micro-gw
-     *
-     * @param extensions Map<String, Object> extensions
-     * @return String String
-     * @throws APIManagementException throws if an error occurred
-     */
-    private String getTrottleTier(Map<String, Object> extensions) throws APIManagementException {
-        String trottleTier = null;
-        ObjectMapper mapper = new ObjectMapper();
-        if (extensions.containsKey(APIConstants.X_WSO2_THROTTLING_TIER)) {
-            Object object = extensions.get(APIConstants.X_WSO2_THROTTLING_TIER).toString();
-            trottleTier = mapper.convertValue(object,String.class);
-        }
-        return trottleTier;
-    }
-
-    /**
-     * This method returns extension of transports(http,https) related to micro-gw
-     *
-     * @param extensions Map<String, Object> extensions
-     * @return String getTransports
-     * @throws APIManagementException throws if an error occurred
-     */
-    private String getTransports(Map<String, Object> extensions) throws APIManagementException {
-        String transports = null;
-        ObjectMapper mapper = new ObjectMapper();
-        if (extensions.containsKey(APIConstants.X_WSO2_TRANSPORTS)) {
-            Object object = extensions.get(APIConstants.X_WSO2_TRANSPORTS).toString();
-            transports = mapper.convertValue(object,String.class);
-            transports = transports.replace("[","");
-            transports = transports.replace("]","");
-            transports = transports.replace(" ","");
-        }
-        return transports;
-    }
-
-    /**
-     * This method returns extension of mutualSSL related to micro-gw
-     *
-     * @param extensions Map<String, Object> extensions
-     * @return String getMutualSSLEnabled
-     * @throws APIManagementException throws if an error occurred
-     */
-    private String getMutualSSLEnabled(Map<String, Object> extensions) throws APIManagementException {
-        String mutualSSl = null;
-        ObjectMapper mapper = new ObjectMapper();
-        if (extensions.containsKey(APIConstants.X_WSO2_MUTUAL_SSL)) {
-            Object object = extensions.get(APIConstants.X_WSO2_MUTUAL_SSL).toString();
-            mutualSSl = mapper.convertValue(object,String.class);
-        }
-        return mutualSSl;
-    }
-
-    /**
-     * This method returns extension of CORS config related to micro-gw
-     *
-     * @param extensions Map<String, Object> extensions
-     * @return CORSConfiguration getCorsConfig
-     * @throws APIManagementException throws if an error occurred
-     */
-    private CORSConfiguration getCorsConfig(Map<String, Object> extensions) throws APIManagementException {
-        boolean corsConfigurationEnabled = false;
-        boolean accessControlAllowCredentials = false;
-        List<String> accessControlAllowOrigins = new ArrayList<>();
-        List<String> accessControlAllowHeaders = new ArrayList<>();
-        List<String> accessControlAllowMethods = new ArrayList<>();
-        CORSConfiguration corsConfig = new CORSConfiguration(corsConfigurationEnabled,
-                accessControlAllowOrigins, accessControlAllowCredentials, accessControlAllowHeaders,
-                accessControlAllowMethods);
-        ObjectMapper mapper = new ObjectMapper();
-
-        if (extensions.containsKey(APIConstants.X_WSO2_CORS)) {
-            Object corsConfigObject = extensions.get(APIConstants.X_WSO2_CORS);
-            JsonNode objectNode = mapper.convertValue(corsConfigObject, JsonNode.class);
-            corsConfigurationEnabled = Boolean.parseBoolean(String.valueOf(objectNode.get("corsConfigurationEnabled")));
-            accessControlAllowCredentials = Boolean.parseBoolean(String.valueOf(objectNode.get("accessControlAllowCredentials")));
-            accessControlAllowHeaders = mapper.convertValue(objectNode.get("accessControlAllowHeaders"), ArrayList.class);
-            accessControlAllowOrigins = mapper.convertValue(objectNode.get("accessControlAllowOrigins"), ArrayList.class);
-            accessControlAllowMethods = mapper.convertValue(objectNode.get("accessControlAllowMethods"), ArrayList.class);
-            corsConfig.setCorsConfigurationEnabled(corsConfigurationEnabled);
-            corsConfig.setAccessControlAllowCredentials(accessControlAllowCredentials);
-            corsConfig.setAccessControlAllowHeaders(accessControlAllowHeaders);
-            corsConfig.setAccessControlAllowOrigins(accessControlAllowOrigins);
-            corsConfig.setAccessControlAllowMethods(accessControlAllowMethods);
-        }
-        return corsConfig;
-    }
-
-    /**
-     * This method returns extension of responseCache enabling check related to micro-gw
-     *
-     * @param extensions Map<String, Object> extensions
-     * @return String getResponseCache
-     * @throws APIManagementException throws if an error occurred
-     */
-    private boolean getResponseCache(Map<String, Object> extensions) throws APIManagementException {
-        ObjectMapper mapper = new ObjectMapper();
-        boolean responseCache = false;
-        if (extensions.containsKey(APIConstants.X_WSO2_RESPONSE_CACHE)) {
-            Object responseCacheConfig = extensions.get(APIConstants.X_WSO2_RESPONSE_CACHE);
-            ObjectNode cacheConfigNode = mapper.convertValue(responseCacheConfig, ObjectNode.class);
-            responseCache = Boolean.parseBoolean(String.valueOf(cacheConfigNode.get(APIConstants.RESPONSE_CACHING_ENABLED)));
-        }
-
-        return responseCache;
-    }
-
-    /**
-     * This method returns extension of cache timeout related to micro-gw
-     *
-     * @param extensions Map<String, Object> extensions
-     * @return int cacheTimeOut
-     * @throws APIManagementException throws if an error occurred
-     */
-    private int getCacheTimeOut(Map<String, Object> extensions) throws APIManagementException {
-        ObjectMapper mapper = new ObjectMapper();
-        int timeOut = 0;
-        if (extensions.containsKey(APIConstants.X_WSO2_RESPONSE_CACHE)) {
-            Object responseCacheConfig = extensions.get(APIConstants.X_WSO2_RESPONSE_CACHE);
-            ObjectNode cacheConfigNode = mapper.convertValue(responseCacheConfig, ObjectNode.class);
-            timeOut = Integer.parseInt(String.valueOf(cacheConfigNode.get(APIConstants.RESPONSE_CACHING_TIMEOUT)));
-        }
-        return timeOut;
-    }
-
-    /**
-     * This method returns extension of custom authorization Header related to micro-gw
-     *
-     * @param extensions Map<String, Object> extensions
-     * @return String authorizationHeader
-     * @throws APIManagementException throws if an error occurred
-     */
-    private String getAuthorizationHeader(Map<String, Object> extensions) throws APIManagementException {
-        String authorizationHeader = null;
-        if (extensions.containsKey(APIConstants.X_WSO2_AUTH_HEADER)) {
-            authorizationHeader = extensions.get(APIConstants.X_WSO2_AUTH_HEADER).toString();
-        }
-        return authorizationHeader;
-    }
-
 
 }

@@ -211,10 +211,10 @@ public abstract class APIDefinition {
      *
      * @param swaggerContent String
      * @param api            API
-     * @param isPublisherPortalUsed boolean
+     * @param isBasepathExtractedFromSwagger boolean
      * @return URITemplate
      */
-    public abstract API setExtensionsToAPI(String swaggerContent, API api, boolean isPublisherPortalUsed)
+    public abstract API setExtensionsToAPI(String swaggerContent, API api, boolean isBasepathExtractedFromSwagger)
             throws APIManagementException;
 
 }
