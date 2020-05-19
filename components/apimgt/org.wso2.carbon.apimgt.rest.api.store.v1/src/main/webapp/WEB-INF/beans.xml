@@ -78,7 +78,6 @@
             <ref bean="ETagInInterceptor"/>
         </cxf:inInterceptors>
         <cxf:outInterceptors>
-            <ref bean="ETagOutInterceptor"/>
             <ref bean="gZipInterceptor"/>
         </cxf:outInterceptors>
     </cxf:bus>
