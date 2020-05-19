@@ -25,19 +25,22 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.JwtTokenInfoDTO;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.openidconnect.CustomClaimsCallbackHandler;
+import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 
 import java.nio.charset.Charset;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -48,7 +51,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class APIMJWTGenerator extends JWTGenerator {
+public class APIMJWTGenerator implements JWTAccessTokenGenerator {
 
     private static final Log log = LogFactory.getLog(APIMJWTGenerator.class);
     private static final String SHA256_WITH_RSA = "SHA256withRSA";
@@ -57,6 +60,7 @@ public class APIMJWTGenerator extends JWTGenerator {
     private String userAttributeSeparator = APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT;
     private static final String NONE = "NONE";
 
+    @Override
     public String generateJWT(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
 
         String jwtHeader = buildHeader();
@@ -248,5 +252,31 @@ public class APIMJWTGenerator extends JWTGenerator {
             String error = "Error obtaining keystore";
             throw new APIManagementException(error, e);
         }
+    }
+
+    //adding same method from AbstractJWTGenerator to remove super class
+    protected String getMultiAttributeSeparator(int tenantId) {
+        try {
+            RealmConfiguration realmConfiguration = null;
+            RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
+
+            if (realmService != null && tenantId != MultitenantConstants.INVALID_TENANT_ID) {
+                UserStoreManager userStoreManager =
+                        (UserStoreManager) realmService.getTenantUserRealm(tenantId).getUserStoreManager();
+
+                realmConfiguration = userStoreManager.getRealmConfiguration();
+            }
+
+            if (realmConfiguration != null) {
+                String claimSeparator = realmConfiguration.getUserStoreProperty(APIConstants.MULTI_ATTRIBUTE_SEPARATOR);
+                if (claimSeparator != null && !claimSeparator.trim().isEmpty()) {
+                    return claimSeparator;
+                }
+            }
+        } catch (UserStoreException e) {
+            log.error("Error occurred while getting the realm configuration, User store properties might not be "
+                    + "returned", e);
+        }
+        return null;
     }
 }

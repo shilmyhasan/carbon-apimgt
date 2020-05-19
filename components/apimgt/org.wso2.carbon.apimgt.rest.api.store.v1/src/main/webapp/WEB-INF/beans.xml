@@ -48,6 +48,8 @@
     <bean id="ETagInInterceptor" class="org.wso2.carbon.apimgt.rest.api.util.interceptors.eTag.ETagInInterceptor"/>
     <bean id="ETagOutInterceptor" class="org.wso2.carbon.apimgt.rest.api.util.interceptors.eTag.ETagOutInterceptor"/>
     <bean id="TokenMergeInterceptor" class="org.wso2.carbon.apimgt.rest.api.util.interceptors.auth.TokenMergeInterceptor" />
+    <bean id="gZipInterceptor" class="org.apache.cxf.transport.common.gzip.GZIPOutInterceptor" />
+
     <bean id="cors-filter" class="org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter">
         <property name="allowHeaders">
             <list>
@@ -76,7 +78,7 @@
             <ref bean="ETagInInterceptor"/>
         </cxf:inInterceptors>
         <cxf:outInterceptors>
-            <ref bean="ETagOutInterceptor"/>
+            <ref bean="gZipInterceptor"/>
         </cxf:outInterceptors>
     </cxf:bus>
 </beans>
