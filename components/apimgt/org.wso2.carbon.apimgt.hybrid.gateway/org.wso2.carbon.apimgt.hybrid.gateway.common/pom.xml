@@ -194,7 +194,6 @@
                             org.wso2.carbon.apimgt.api.*; version="${carbon.apimgt.imp.pkg.version}",
                             org.wso2.carbon.governance.lcm.*,
                             org.wso2.carbon.registry.*; version="${carbon.registry.imp.pkg.version}",
-                            net.consensys.*,
                             org.json.*;
                         </Import-Package>
                     </instructions>

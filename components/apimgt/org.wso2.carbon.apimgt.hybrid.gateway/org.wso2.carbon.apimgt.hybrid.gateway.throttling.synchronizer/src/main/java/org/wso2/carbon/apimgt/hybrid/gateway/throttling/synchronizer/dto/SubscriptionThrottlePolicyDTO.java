@@ -31,6 +31,8 @@ public class SubscriptionThrottlePolicyDTO extends ThrottlePolicyDTO {
 
   private ThrottleLimitDTO defaultLimit = null;
 
+  private MonetizationInfoDTO monetization = null;
+
   private Integer rateLimitCount = null;
 
   private String rateLimitTimeUnit = null;
@@ -38,7 +40,7 @@ public class SubscriptionThrottlePolicyDTO extends ThrottlePolicyDTO {
   private List<CustomAttributeDTO> customAttributes = new ArrayList<CustomAttributeDTO>();
 
   private Boolean stopOnQuotaReach = false;
-  
+
   private String billingPlan = null;
 
   /**
@@ -55,6 +57,18 @@ public class SubscriptionThrottlePolicyDTO extends ThrottlePolicyDTO {
   /**
    **/
   @ApiModelProperty(value = "")
+  @JsonProperty("monetization")
+  public MonetizationInfoDTO getMonetization() {
+    return monetization;
+  }
+  public void setMonetization(MonetizationInfoDTO monetization) {
+    this.monetization = monetization;
+  }
+
+  /**
+   * Burst control request count
+   **/
+  @ApiModelProperty(value = "Burst control request count")
   @JsonProperty("rateLimitCount")
   public Integer getRateLimitCount() {
     return rateLimitCount;
@@ -64,8 +78,9 @@ public class SubscriptionThrottlePolicyDTO extends ThrottlePolicyDTO {
   }
 
   /**
+   * Burst control time unit
    **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "Burst control time unit")
   @JsonProperty("rateLimitTimeUnit")
   public String getRateLimitTimeUnit() {
     return rateLimitTimeUnit;
@@ -75,9 +90,9 @@ public class SubscriptionThrottlePolicyDTO extends ThrottlePolicyDTO {
   }
 
   /**
-   * Custom attributes added to the Subscription Throttle policy\n
+   * Custom attributes added to the Subscription Throttling Policy\n
    **/
-  @ApiModelProperty(value = "Custom attributes added to the Subscription Throttle policy\n")
+  @ApiModelProperty(value = "Custom attributes added to the Subscription Throttling Policy\n")
   @JsonProperty("customAttributes")
   public List<CustomAttributeDTO> getCustomAttributes() {
     return customAttributes;
@@ -87,8 +102,9 @@ public class SubscriptionThrottlePolicyDTO extends ThrottlePolicyDTO {
   }
 
   /**
+   * This indicates the action to be taken when a user goes beyond the allocated quota. If checked, the user's requests will be dropped. If unchecked, the requests will be allowed to pass through.\n
    **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "This indicates the action to be taken when a user goes beyond the allocated quota. If checked, the user's requests will be dropped. If unchecked, the requests will be allowed to pass through.\n")
   @JsonProperty("stopOnQuotaReach")
   public Boolean getStopOnQuotaReach() {
     return stopOnQuotaReach;
@@ -98,8 +114,9 @@ public class SubscriptionThrottlePolicyDTO extends ThrottlePolicyDTO {
   }
 
   /**
+   * define whether this is Paid or a Free plan. Allowed values are FREE or COMMERCIAL.\n
    **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "define whether this is Paid or a Free plan. Allowed values are FREE or COMMERCIAL.\n")
   @JsonProperty("billingPlan")
   public String getBillingPlan() {
     return billingPlan;
@@ -114,6 +131,7 @@ public class SubscriptionThrottlePolicyDTO extends ThrottlePolicyDTO {
     sb.append("class SubscriptionThrottlePolicyDTO {\n");
     sb.append("  " + super.toString()).append("\n");
     sb.append("  defaultLimit: ").append(defaultLimit).append("\n");
+    sb.append("  monetization: ").append(monetization).append("\n");
     sb.append("  rateLimitCount: ").append(rateLimitCount).append("\n");
     sb.append("  rateLimitTimeUnit: ").append(rateLimitTimeUnit).append("\n");
     sb.append("  customAttributes: ").append(customAttributes).append("\n");
