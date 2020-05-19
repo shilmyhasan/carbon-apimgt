@@ -18,10 +18,6 @@
 
 package org.wso2.carbon.apimgt.rest.api.publisher.v1;
 
-import io.swagger.models.Swagger;
-import io.swagger.parser.SwaggerParser;
-import io.swagger.util.Json;
-import io.swagger.util.Yaml;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +30,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 
 @Path("/swagger.yaml")
@@ -73,7 +70,10 @@ public class SwaggerYamlApi {
                     }
                 }
             }
-            return Response.ok().entity(openAPIDef).build();
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(86400); //one day
+            cacheControl.setPrivate(true);
+            return Response.ok().entity(openAPIDef).cacheControl(cacheControl).build();
         } catch (IOException e) { 
             String errorMessage = "Error while retrieving the swagger definition of the Publisher API";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
