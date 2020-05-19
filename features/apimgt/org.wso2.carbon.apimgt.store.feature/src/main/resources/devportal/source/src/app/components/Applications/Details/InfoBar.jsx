@@ -340,7 +340,7 @@ class InfoBar extends React.Component {
                                 {application.name}
                             </Typography>
                         </Hidden>
-                        <Hidden mdDown xlUp>
+                        <Hidden mdDown>
                             <Typography className={classes.appNameBig} variant='h4'>
                                 {application.name}
                             </Typography>
