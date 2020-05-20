@@ -59,6 +59,7 @@ class DevPortal extends React.Component {
             tenantDomain: null,
             theme: null,
             lanuage: null,
+            redirecting: false,
         };
         this.systemTheme = merge(cloneDeep(DefaultConfigurations), Configurations);
         this.setTenantTheme = this.setTenantTheme.bind(this);
@@ -82,8 +83,20 @@ class DevPortal extends React.Component {
             });
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('tenant') === null || urlParams.get('tenant') === 'carbon.super') {
-            this.updateLocale();
-            this.setState({ theme: this.systemTheme });
+            const { custom: { publicTenantStore } } = this.systemTheme;
+            if(publicTenantStore) {
+                const { active: publicTenantStoreActive, redirectToIfInactive } = publicTenantStore;
+                if( !publicTenantStoreActive ) {
+                    window.location.href = redirectToIfInactive;
+                    this.setState( { redirecting: true})
+                } else {
+                    this.updateLocale();
+                    this.setState({ theme: this.systemTheme, redirecting: false });
+                }
+            } else {
+                this.updateLocale();
+                this.setState({ theme: this.systemTheme, redirecting: false });
+            }
         } else {
             this.setTenantTheme(urlParams.get('tenant'));
         }
@@ -263,10 +276,15 @@ class DevPortal extends React.Component {
      * @memberof DevPortal
      */
     render() {
-        const { settings, tenantDomain, theme, messages, language } = this.state;
+        const { settings, tenantDomain, theme, messages, language, redirecting } = this.state;
         const { app: { context } } = Settings;
-        return (
-            settings && theme && messages && language && (
+        if(redirecting) {
+            return (
+                <Progress />
+            )
+        }
+        if (settings && theme && messages && language) {
+            return (
                 <SettingsProvider value={{
                     settings,
                     setSettings: this.setSettings,
@@ -293,8 +311,13 @@ class DevPortal extends React.Component {
                         </StylesProvider>
                     </MuiThemeProvider>
                 </SettingsProvider>
+            );
+        } else {
+            return (
+                <Progress />
             )
-        );
+        }
+
     }
 }
 
