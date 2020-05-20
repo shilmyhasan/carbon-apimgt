@@ -14,7 +14,7 @@ DCID VARCHAR2 (50) DEFAULT 'DC2',                                               
                                                                                                 #
 Change 2                                                                                        #
 --------------------                                                                            #
-The sequences in tables.sql and apimgt/tables.sql files should be altered to create             #
+The CREATE TABLE queries  in tables.sql and apimgt/tables.sql files should be altered to create #
 a unique number for each DC based on the number of DB instances in your environment.            #
 At the start of tables.sql files there are list of tables under "Tables need to be edited". At  #
 those tables primary key is defined with the Keyword "IDENTITY".The above keyword and it's      #
@@ -27,7 +27,7 @@ After the keyword "IDENTITY", in the brackets there are two values.             
                                                                                                 #
 The  start value should be set as the instance id of the particular DC and increment value      #
 should be set based on the number of DC in your deployment. The below example shows how to alter#
-the sequences on a sample scenario where you have 3 master DB instances in 3 DC's               #
+the queries on a sample scenario where you have 3 master DB instances in 3 DC's                 #
                                                                                                 #
 DC1 TABLES                                                                                      # 
 ID INTEGER IDENTITY(1,3)                                                                        #
