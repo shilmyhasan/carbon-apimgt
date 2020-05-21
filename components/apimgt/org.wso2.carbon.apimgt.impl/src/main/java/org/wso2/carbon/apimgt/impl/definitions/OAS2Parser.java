@@ -202,6 +202,7 @@ public class OAS2Parser extends APIDefinition {
                     (Map<String, Object>) extensions.get(APIConstants.SWAGGER_X_WSO2_SECURITY);
             for (Map.Entry<String, Object> entry : securityDefinitions.entrySet()) {
                 Map<String, Object> securityDefinition = (Map<String, Object>) entry.getValue();
+
                 if (securityDefinition.containsKey(APIConstants.SWAGGER_X_WSO2_SCOPES)) {
                     List<Map<String, String>> oauthScope =
                             (List<Map<String, String>>) securityDefinition.get(APIConstants.SWAGGER_X_WSO2_SCOPES);
@@ -543,8 +544,8 @@ public class OAS2Parser extends APIDefinition {
         if (scopes != null && !scopes.isEmpty()) {
             Map<String, String> scopeBindings = new HashMap<>();
             for (Scope scope : scopes) {
-                oAuth2Definition.addScope(scope.getName(), scope.getDescription());
-                scopeBindings.put(scope.getName(), scope.getRoles());
+                oAuth2Definition.addScope(scope.getKey(), scope.getDescription());
+                scopeBindings.put(scope.getKey(), scope.getRoles());
             }
             oAuth2Definition.setVendorExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
         }
