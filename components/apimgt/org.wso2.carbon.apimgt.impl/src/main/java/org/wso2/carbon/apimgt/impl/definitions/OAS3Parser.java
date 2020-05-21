@@ -623,7 +623,7 @@ public class OAS3Parser extends APIDefinition {
         Set<Scope> scopes = swaggerData.getScopes();
         if (scopes != null && !scopes.isEmpty()) {
             Map<String, String> scopeBindings = new HashMap<>();
-            Map<String, Map<String, String> > scopeMappings = new HashMap<>();
+            Map<String, Map<String, String>> scopeMappings = new HashMap<>();
             for (Scope scope : scopes) {
                 oas3Scopes.put(scope.getKey(), scope.getDescription());
                 scopeBindings.put(scope.getKey(), scope.getRoles());
