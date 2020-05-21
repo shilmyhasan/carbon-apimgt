@@ -1210,8 +1210,7 @@ public class OAS2Parser extends APIDefinition {
      */
     @Override
     public String processOtherSchemeScopes(String swaggerContent) throws APIManagementException {
-        boolean isDefaultAvailable = isDefaultGiven(swaggerContent);
-        if (!isDefaultAvailable) {
+        if (!isDefaultGiven(swaggerContent)) {
             Swagger swagger = getSwagger(swaggerContent);
             swagger = injectOtherScopesToDefaultScheme(swagger);
             swagger = injectOtherResourceScopesToDefaultScheme(swagger);
@@ -1228,7 +1227,7 @@ public class OAS2Parser extends APIDefinition {
      * @throws APIManagementException
      */
     private Swagger injectOtherScopesToDefaultScheme(Swagger swagger) throws APIManagementException {
-
+        //Get security definitions from swagger
         Map<String, SecuritySchemeDefinition> securityDefinitions = swagger.getSecurityDefinitions();
         List<String> otherSetOfSchemes = new ArrayList<>();
         Map<String, String> defaultScopeBindings = null;
@@ -1236,9 +1235,12 @@ public class OAS2Parser extends APIDefinition {
             //If there is no default type schemes set a one
             OAuth2Definition newDefault = new OAuth2Definition();
             securityDefinitions.put(SWAGGER_SECURITY_SCHEMA_KEY, newDefault);
+            //Check all the security definitions
             for (Map.Entry<String, SecuritySchemeDefinition> definition : securityDefinitions.entrySet()) {
                 String checkType = definition.getValue().getType();
+                //Inject other scheme scopes into default scope
                 if (!SWAGGER_SECURITY_SCHEMA_KEY.equals(definition.getKey()) && "oauth2".equals(checkType)) {
+                    //Add non default scopes to other scopes list
                     otherSetOfSchemes.add(definition.getKey());
                     //Check for default one
                     OAuth2Definition noneDefaultFlowType = (OAuth2Definition) definition.getValue();
@@ -1249,11 +1251,9 @@ public class OAS2Parser extends APIDefinition {
                         defaultTypeScopes = new HashMap<>();
                     }
                     for (Map.Entry<String, String> input : noneDefaultFlowScopes.entrySet()) {
-                        String name = input.getKey();
-                        String description = input.getValue();
-                        defaultTypeScopes.put(name, description);
-                        defaultTypeFlow.setScopes(defaultTypeScopes);
+                        defaultTypeScopes.put(input.getKey(), input.getValue());
                     }
+                    defaultTypeFlow.setScopes(defaultTypeScopes);
                     //Check X-Scope Bindings
                     Map<String, String> noneDefaultScopeBindings = null;
                     Map<String, Object> defaultTypeExtension = defaultTypeFlow.getVendorExtensions();
@@ -1263,10 +1263,9 @@ public class OAS2Parser extends APIDefinition {
                         if (defaultScopeBindings == null) {
                             defaultScopeBindings = new HashMap<>();
                         }
+                        //Inject non default scope bindings into default scheme
                         for (Map.Entry<String, String> roleInUse : noneDefaultScopeBindings.entrySet()) {
-                            String noneDefaultTypeScope = roleInUse.getKey();
-                            String noneDefaultTypeeRole = roleInUse.getValue();
-                            defaultScopeBindings.put(noneDefaultTypeScope, noneDefaultTypeeRole);
+                            defaultScopeBindings.put(roleInUse.getKey(), roleInUse.getValue());
                         }
                     }
                     defaultTypeExtension.put(APIConstants.SWAGGER_X_SCOPES_BINDINGS, defaultScopeBindings);
@@ -1275,6 +1274,7 @@ public class OAS2Parser extends APIDefinition {
                 }
             }
         }
+        //update list of security schemes in the swagger object
         setOtherSchemes(otherSetOfSchemes);
         swagger.setSecurityDefinitions(securityDefinitions);
         return swagger;
@@ -1287,7 +1287,7 @@ public class OAS2Parser extends APIDefinition {
      * @return URI Templates
      * @throws APIManagementException
      */
-    public Swagger injectOtherResourceScopesToDefaultScheme(Swagger swagger) throws APIManagementException {
+    private Swagger injectOtherResourceScopesToDefaultScheme(Swagger swagger) throws APIManagementException {
         List<String> schemes = getOtherSchemes();
 
         Map<String, Path> paths = swagger.getPaths();
@@ -1357,12 +1357,12 @@ public class OAS2Parser extends APIDefinition {
 
         //Setup Custom auth header for API
         String authHeader = OASParserUtil.getAuthorizationHeaderFromSwagger(extensions);
-        if (authHeader != null) {
+        if (StringUtils.isNotBlank(authHeader)) {
             api.setAuthorizationHeader(authHeader);
         }
         //Setup mutualSSL configuration
         String mutualSSL = OASParserUtil.getMutualSSLEnabledFromSwagger(extensions);
-        if (StringUtils.isBlank(mutualSSL)) {
+        if (StringUtils.isNotBlank(mutualSSL)) {
             String securityList = api.getApiSecurity();
             if (StringUtils.isBlank(securityList)) {
                 securityList = APIConstants.DEFAULT_API_SECURITY_OAUTH2;
@@ -1391,17 +1391,17 @@ public class OAS2Parser extends APIDefinition {
         }
         //Setup Transports
         String transports = OASParserUtil.getTransportsFromSwagger(extensions);
-        if (transports != null) {
+        if (StringUtils.isNotBlank(transports)) {
             api.setTransports(transports);
         }
         //Setup Throttlingtiers
         String throttleTier = OASParserUtil.getThrottleTierFromSwagger(extensions);
-        if (throttleTier != null) {
+        if (StringUtils.isNotBlank(throttleTier)) {
             api.setApiLevelPolicy(throttleTier);
         }
         //Setup Basepath
         String basePath = OASParserUtil.getBasePathFromSwagger(extensions);
-        if (basePath != null && isBasepathExtractedFromSwagger) {
+        if (StringUtils.isNotBlank(basePath) && isBasepathExtractedFromSwagger) {
             basePath = basePath.replace("{version}", api.getId().getVersion());
             api.setContextTemplate(basePath);
             api.setContext(basePath);

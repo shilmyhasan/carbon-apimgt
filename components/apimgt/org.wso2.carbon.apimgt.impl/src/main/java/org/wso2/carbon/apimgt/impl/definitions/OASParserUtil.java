@@ -1218,13 +1218,12 @@ public class OASParserUtil {
      * This method will change the given definition
      *
      * @param swaggerContent
-     * @return processedSwaggerContent
+     * @return String
      */
     public static String preProcess(String swaggerContent) throws APIManagementException {
         //Load required properties from swagger to the API
         APIDefinition apiDefinition = getOASParser(swaggerContent);
-        String swaggerContentUpdated = apiDefinition.processOtherSchemeScopes(swaggerContent);
-        return swaggerContentUpdated;
+        return apiDefinition.processOtherSchemeScopes(swaggerContent);
     }
 
     /**
@@ -1236,49 +1235,38 @@ public class OASParserUtil {
      */
     public static API setExtensionsToAPI(String swaggerContent, API api, boolean isBasepathExtractedFromSwagger) throws APIManagementException {
         APIDefinition apiDefinition = getOASParser(swaggerContent);
-        api = apiDefinition.setExtensionsToAPI(swaggerContent, api, isBasepathExtractedFromSwagger);
-        return api;
+        return apiDefinition.setExtensionsToAPI(swaggerContent, api, isBasepathExtractedFromSwagger);
     }
 
     /**
      * This method returns extension of basepath related to micro-gw
      *
      * @param extensions Map<String, Object> extensions
-     * @return String String
+     * @return String
      * @throws APIManagementException throws if an error occurred
      */
     public static String getBasePathFromSwagger(Map<String, Object> extensions) throws APIManagementException {
-        String basepath = null;
-        ObjectMapper mapper = new ObjectMapper();
-        if (extensions.containsKey(APIConstants.X_WSO2_BASEPATH)) {
-            Object object = extensions.get(APIConstants.X_WSO2_BASEPATH).toString();
-            basepath = mapper.convertValue(object, String.class);
-        }
-        return basepath;
+        Object basepath = extensions.get(APIConstants.X_WSO2_BASEPATH);
+        return basepath == null ? null : basepath.toString();
     }
 
     /**
      * This method returns extension of throttling tier related to micro-gw
      *
      * @param extensions Map<String, Object> extensions
-     * @return String String
+     * @return String
      * @throws APIManagementException throws if an error occurred
      */
     public static String getThrottleTierFromSwagger(Map<String, Object> extensions) throws APIManagementException {
-        String throttleTier = null;
-        ObjectMapper mapper = new ObjectMapper();
-        if (extensions.containsKey(APIConstants.X_WSO2_THROTTLING_TIER)) {
-            Object object = extensions.get(APIConstants.X_WSO2_THROTTLING_TIER).toString();
-            throttleTier = mapper.convertValue(object, String.class);
-        }
-        return throttleTier;
+        Object throttleTier = extensions.get(APIConstants.X_WSO2_THROTTLING_TIER);
+        return throttleTier == null ? null : throttleTier.toString();
     }
 
     /**
      * This method returns extension of transports(http,https) related to micro-gw
      *
      * @param extensions Map<String, Object> extensions
-     * @return String getTransports
+     * @return String
      * @throws APIManagementException throws if an error occurred
      */
     public static String getTransportsFromSwagger(Map<String, Object> extensions) throws APIManagementException {
@@ -1298,17 +1286,12 @@ public class OASParserUtil {
      * This method returns extension of mutualSSL related to micro-gw
      *
      * @param extensions Map<String, Object> extensions
-     * @return String getMutualSSLEnabled
+     * @return String
      * @throws APIManagementException throws if an error occurred
      */
     public static String getMutualSSLEnabledFromSwagger(Map<String, Object> extensions) throws APIManagementException {
-        String mutualSSl = null;
-        ObjectMapper mapper = new ObjectMapper();
-        if (extensions.containsKey(APIConstants.X_WSO2_MUTUAL_SSL)) {
-            Object object = extensions.get(APIConstants.X_WSO2_MUTUAL_SSL).toString();
-            mutualSSl = mapper.convertValue(object, String.class);
-        }
-        return mutualSSl;
+        Object mutualSSl = extensions.get(APIConstants.X_WSO2_MUTUAL_SSL);
+        return mutualSSl == null ? null : mutualSSl.toString();
     }
 
     /**
@@ -1350,7 +1333,7 @@ public class OASParserUtil {
      * This method returns extension of responseCache enabling check related to micro-gw
      *
      * @param extensions Map<String, Object> extensions
-     * @return String getResponseCache
+     * @return String
      * @throws APIManagementException throws if an error occurred
      */
     public static boolean getResponseCacheFromSwagger(Map<String, Object> extensions) throws APIManagementException {
@@ -1361,7 +1344,6 @@ public class OASParserUtil {
             ObjectNode cacheConfigNode = mapper.convertValue(responseCacheConfig, ObjectNode.class);
             responseCache = Boolean.parseBoolean(String.valueOf(cacheConfigNode.get(APIConstants.RESPONSE_CACHING_ENABLED)));
         }
-
         return responseCache;
     }
 
@@ -1369,7 +1351,7 @@ public class OASParserUtil {
      * This method returns extension of cache timeout related to micro-gw
      *
      * @param extensions Map<String, Object> extensions
-     * @return int cacheTimeOut
+     * @return int
      * @throws APIManagementException throws if an error occurred
      */
     public static int getCacheTimeOutFromSwagger(Map<String, Object> extensions) throws APIManagementException {
@@ -1387,16 +1369,12 @@ public class OASParserUtil {
      * This method returns extension of custom authorization Header related to micro-gw
      *
      * @param extensions Map<String, Object> extensions
-     * @return String authorizationHeader
+     * @return String
      * @throws APIManagementException throws if an error occurred
      */
     public static String getAuthorizationHeaderFromSwagger(Map<String, Object> extensions) throws APIManagementException {
-        String authorizationHeader = null;
-        if (extensions.containsKey(APIConstants.X_WSO2_AUTH_HEADER)) {
-            authorizationHeader = extensions.get(APIConstants.X_WSO2_AUTH_HEADER).toString();
-        }
-        return authorizationHeader;
+        Object authorizationHeader = extensions.get(APIConstants.X_WSO2_AUTH_HEADER);
+        return authorizationHeader == null ? null : authorizationHeader.toString();
     }
-
 
 }
