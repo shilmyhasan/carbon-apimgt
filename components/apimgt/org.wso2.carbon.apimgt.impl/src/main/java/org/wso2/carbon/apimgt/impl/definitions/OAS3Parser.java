@@ -623,11 +623,16 @@ public class OAS3Parser extends APIDefinition {
         Set<Scope> scopes = swaggerData.getScopes();
         if (scopes != null && !scopes.isEmpty()) {
             Map<String, String> scopeBindings = new HashMap<>();
+            Map<String,Map<String, String> > scopeMappings = new HashMap<>();
             for (Scope scope : scopes) {
                 oas3Scopes.put(scope.getKey(), scope.getDescription());
                 scopeBindings.put(scope.getKey(), scope.getRoles());
+                Map<String, String> scopeDisplayName = new HashMap<>();
+                scopeDisplayName.put(APIConstants.SWAGGER_X_SCOPES_NAME,scope.getName());
+                scopeMappings .put(scope.getKey(),scopeDisplayName);
             }
             oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
+            oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_MAPPINGS, scopeMappings);
         }
         oAuthFlow.setScopes(oas3Scopes);
     }
