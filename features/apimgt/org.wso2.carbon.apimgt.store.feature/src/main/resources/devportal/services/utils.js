@@ -115,3 +115,13 @@ var getServiceProviderTenantDomain = function(){
         return "carbon.super";
     }
 };
+
+var isEnableEmailUserName = function(){
+    var CarbonUtils = Packages.org.wso2.carbon.utils.CarbonUtils;
+    var carbonUtils = new CarbonUtils();
+    var isEnableEmailUserName = carbonUtils.getServerConfiguration().getFirstProperty("EnableEmailUserName");
+    if (isEnableEmailUserName != null)
+        return isEnableEmailUserName;
+    else
+        return false;
+};
