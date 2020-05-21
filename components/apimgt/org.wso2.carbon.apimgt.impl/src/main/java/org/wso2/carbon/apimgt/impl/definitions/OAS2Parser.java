@@ -543,13 +543,13 @@ public class OAS2Parser extends APIDefinition {
         Set<Scope> scopes = swaggerData.getScopes();
         if (scopes != null && !scopes.isEmpty()) {
             Map<String, String> scopeBindings = new HashMap<>();
-            Map<String,Map<String, String> > scopeMappings = new HashMap<>();
+            Map<String, Map<String, String> > scopeMappings = new HashMap<>();
             for (Scope scope : scopes) {
                 oAuth2Definition.addScope(scope.getKey(), scope.getDescription());
                 scopeBindings.put(scope.getKey(), scope.getRoles());
                 Map<String, String> scopeDisplayName = new HashMap<>();
-                scopeDisplayName.put(APIConstants.SWAGGER_X_SCOPES_NAME,scope.getName());
-                scopeMappings .put(scope.getKey(),scopeDisplayName);
+                scopeDisplayName.put(APIConstants.SWAGGER_X_SCOPES_NAME, scope.getName());
+                scopeMappings .put(scope.getKey(), scopeDisplayName);
             }
             oAuth2Definition.setVendorExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
             oAuth2Definition.setVendorExtension(APIConstants.SWAGGER_X_SCOPES_MAPPINGS, scopeMappings);
