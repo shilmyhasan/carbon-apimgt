@@ -886,7 +886,7 @@ public class APIMappingUtil {
             }
             dto.setWsdlInfo(wsdlInfoDTO);
         }
-
+        dto.setWsdlUrl(model.getWsdlUrl());
         setEndpointSecurityFromModelToApiDTO(model, dto);
         setMaxTpsFromModelToApiDTO(model, dto);
 
