@@ -9100,14 +9100,24 @@ public class ApiMgtDAO {
                 if (scopeHashMap.containsKey(scopeId)) {
                     // scope already exists append roles.
                     scope = scopeHashMap.get(scopeId);
-                    scope.setRoles(scope.getRoles().concat("," + resultSet.getString(5)).trim());
+                    String roles = scope.getRoles();
+                    if (roles != null) {
+                        scope.setRoles(scope.getRoles().concat("," + resultSet.getString(5)).trim());
+                    } else {
+                        scope.setRoles("");
+                    }
                 } else {
                     scope = new Scope();
                     scope.setId(scopeId);
                     scope.setKey(resultSet.getString(2));
                     scope.setName(resultSet.getString(3));
                     scope.setDescription(resultSet.getString(4));
-                    scope.setRoles(resultSet.getString(5).trim());
+                    String roles = resultSet.getString(5);
+                    if (roles != null) {
+                        scope.setRoles(roles.trim());
+                    } else {
+                        scope.setRoles("");
+                    }
                 }
                 scopeHashMap.put(scopeId, scope);
             }
