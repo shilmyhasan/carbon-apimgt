@@ -30,6 +30,7 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.openidconnect.CustomClaimsCallbackHandler;
 import org.wso2.carbon.user.api.RealmConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -61,7 +62,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
     private static final String NONE = "NONE";
 
     @Override
-    public String generateJWT(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
+    public String generateJWT(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException, IdentityOAuth2Exception {
 
         String jwtHeader = buildHeader();
 
@@ -93,7 +94,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
         }
     }
 
-    public String buildBody(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
+    public String buildBody(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException, IdentityOAuth2Exception {
 
         Map<String, Object> standardClaims = populateStandardClaims(jwtTokenInfoDTO);
         Map<String, Object> customClaims = populateCustomClaims(jwtTokenInfoDTO);
@@ -157,7 +158,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
         return null;
     }
 
-    public Map<String, Object> populateCustomClaims(JwtTokenInfoDTO jwtTokenInfoDTO) {
+    public Map<String, Object> populateCustomClaims(JwtTokenInfoDTO jwtTokenInfoDTO) throws IdentityOAuth2Exception {
 
         CustomClaimsCallbackHandler claimsCallBackHandler =
                 OAuthServerConfiguration.getInstance().getOpenIDConnectCustomClaimsCallbackHandler();
