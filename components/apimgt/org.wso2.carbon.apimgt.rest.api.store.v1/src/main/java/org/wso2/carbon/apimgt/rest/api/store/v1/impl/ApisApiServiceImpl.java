@@ -609,7 +609,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             } else if (RestApiUtil.isDueToResourceNotFound(e)) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, apiId, e, log);
             } else {
-                String errorMessage = "Error while retrieving API : " + apiId;
+                String errorMessage = "Error while retrieving swagger of API : " + apiId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         } catch (UserStoreException e) {

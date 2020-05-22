@@ -5683,8 +5683,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             Environment environment = allEnvironments.get(environmentName);
 
             if (environment == null) {
-                handleException(
-                        "Could not find provided environment '" + environmentName);
+                handleResourceNotFoundException("Could not find provided environment '" + environmentName);
             }
 
             assert environment != null;
