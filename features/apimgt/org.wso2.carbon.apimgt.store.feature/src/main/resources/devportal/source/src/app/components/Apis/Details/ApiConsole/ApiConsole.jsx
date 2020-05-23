@@ -239,10 +239,7 @@ class ApiConsole extends React.Component {
                 if (process.env.NODE_ENV !== 'production') {
                     console.error(error);
                 }
-                const { status } = error;
-                if (status === 404) {
-                    this.setState({ notFound: true });
-                }
+                this.setState({ serverError: `${error.statusCode} - ${error.response.body.description}` });
             });
     }
 
@@ -379,7 +376,7 @@ class ApiConsole extends React.Component {
     render() {
         const { classes } = this.props;
         const {
-            api, notFound, swagger, accessToken, showToken, subscriptions, selectedApplication, selectedKeyType,
+            api, serverError, swagger, accessToken, showToken, subscriptions, selectedApplication, selectedKeyType,
             selectedEnvironment, environments, labels, securitySchemeType, username, password,
         } = this.state;
         const user = AuthManager.getUser();
@@ -387,12 +384,16 @@ class ApiConsole extends React.Component {
         const downloadLink = 'data:text/json;charset=utf-8, ' + encodeURIComponent(downloadSwagger);
         const fileName = 'swagger.json';
 
+        if (serverError) {
+            return <Typography variant='h4' className={classes.titleSub}>
+                    <FormattedMessage id='Apis.Details.ApiConsole.ApiConsole.error' defaultMessage={serverError} />
+                </Typography>;
+        }
+
         if (api == null || swagger == null) {
             return <Progress />;
         }
-        if (notFound) {
-            return 'API Not found !';
-        }
+        
         let isApiKeyEnabled = false;
         let isBasicAuthEnabled = false;
         let isOAuthEnabled = false;
