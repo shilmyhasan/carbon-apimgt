@@ -611,7 +611,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                     // handle gateway not found exception otherwise pass it
                     if (RestApiUtil.isDueToResourceNotFound(e)) {
                         RestApiUtil.handleResourceNotFoundError(
-                                "Provided environment '" + environmentName + "' not found", e, log);
+                                "Gateway environment '" + environmentName + "' not found", e, log);
                         return null;
                     }
                     throw e;
