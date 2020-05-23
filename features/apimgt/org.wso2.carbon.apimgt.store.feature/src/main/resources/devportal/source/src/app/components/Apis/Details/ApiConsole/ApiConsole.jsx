@@ -385,15 +385,17 @@ class ApiConsole extends React.Component {
         const fileName = 'swagger.json';
 
         if (serverError) {
-            return <Typography variant='h4' className={classes.titleSub}>
+            return (
+                <Typography variant='h4' className={classes.titleSub}>
                     <FormattedMessage id='Apis.Details.ApiConsole.ApiConsole.error' defaultMessage={serverError} />
-                </Typography>;
+                </Typography>
+            );
         }
 
         if (api == null || swagger == null) {
             return <Progress />;
         }
-        
+
         let isApiKeyEnabled = false;
         let isBasicAuthEnabled = false;
         let isOAuthEnabled = false;
