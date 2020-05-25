@@ -18,12 +18,15 @@
 package org.wso2.carbon.apimgt.keymgt.issuers;
 
 import org.apache.axis2.util.JavaUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opensaml.saml2.core.Assertion;
 import org.wso2.carbon.apimgt.keymgt.handlers.ResourceConstants;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
+import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.oauth.callback.OAuthCallback;
 import org.wso2.carbon.identity.oauth.common.GrantType;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
@@ -34,6 +37,7 @@ import org.wso2.carbon.user.core.util.UserCoreUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,13 +50,12 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
     private static Log log = LogFactory.getLog(RoleBasedScopesIssuer.class);
     private static final String DEFAULT_SCOPE_NAME = "default";
     private static final String PRESERVED_CASE_SENSITIVE_VARIABLE = "preservedCaseSensitive";
-
+    public static final String OAUTH_JWT_BEARER_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:jwt-bearer";
     // set role based scopes issuer as the default
     private static final String ISSUER_PREFIX = "default";
 
     @Override
     public String getPrefix() {
-
         return ISSUER_PREFIX;
     }
 
@@ -107,11 +110,22 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             String[] userRoles;
 
             // If GrantType is SAML20_BEARER and CHECK_ROLES_FROM_SAML_ASSERTION is true,
-            // use user roles from assertion otherwise use roles from userstore.
+            // use user roles from assertion or from JWT otherwise use roles from userstore.
             String isSAML2Enabled = System.getProperty(ResourceConstants.CHECK_ROLES_FROM_SAML_ASSERTION);
+            String isValidateScopeRolesFromUserStore = System.getProperty(ResourceConstants.VALIDATE_SCOPE_ROLES_FROM_USERSTORE);
             if (GrantType.SAML20_BEARER.toString().equals(grantType) && Boolean.parseBoolean(isSAML2Enabled)) {
                 Assertion assertion = (Assertion) tokReqMsgCtx.getProperty(ResourceConstants.SAML2_ASSERTION);
                 userRoles = getRolesFromAssertion(assertion);
+            } else if (OAUTH_JWT_BEARER_GRANT_TYPE.equals(grantType)
+                    && !(Boolean.parseBoolean(isValidateScopeRolesFromUserStore))) {
+                AuthenticatedUser user = tokReqMsgCtx.getAuthorizedUser();
+                Map<ClaimMapping, String> userAttributes = user.getUserAttributes();
+                if (tokReqMsgCtx.getProperty(ResourceConstants.ROLE_CLAIM) != null) {
+                    userRoles = getRolesFromUserAttribute(userAttributes,
+                            tokReqMsgCtx.getProperty(ResourceConstants.ROLE_CLAIM).toString());
+                } else {
+                    userRoles = new String[0];
+                }
             } else {
                 userRoles = getUserRoles(authenticatedUser);
             }
@@ -131,7 +145,6 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
      */
     private List<String> getAuthorizedScopes(String[] userRoles, String[] requestedScopes,
                                              Map<String, String> appScopes, List<String> whiteListedScopes) {
-
         List<String> defaultScope = new ArrayList<String>();
         defaultScope.add(DEFAULT_SCOPE_NAME);
 
@@ -183,6 +196,25 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
         }
 
         return (!authorizedScopes.isEmpty()) ? authorizedScopes : defaultScope;
+    }
+
+    /**
+     * extract the roles from the user attributes
+     * @param userAttributes retrieved from the token
+     * @return roles
+     */
+    private String[] getRolesFromUserAttribute(Map<ClaimMapping, String> userAttributes, String roleClaim) {
+        for (Iterator<Map.Entry<ClaimMapping, String>> iterator = userAttributes.entrySet().iterator(); iterator
+                .hasNext(); ) {
+            Map.Entry<ClaimMapping, String> entry = iterator.next();
+            if (roleClaim.equals(entry.getKey().getLocalClaim().getClaimUri()) && StringUtils
+                    .isNotBlank(entry.getValue())) {
+                return entry.getValue().replace("\\/", "/").
+                        replace("[", "").replace("]", "").
+                        replace("\"", "").split(FrameworkUtils.getMultiAttributeSeparator());
+            }
+        }
+        return null;
     }
 
     /**

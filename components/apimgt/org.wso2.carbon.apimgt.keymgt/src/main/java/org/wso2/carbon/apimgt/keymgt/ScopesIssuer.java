@@ -43,11 +43,9 @@ public class ScopesIssuer {
     private static ScopesIssuer scopesIssuer;
 
     private ScopesIssuer() {
-
     }
 
     public static void loadInstance(List<String> whitelist) {
-
         scopesIssuer = new ScopesIssuer();
         if (whitelist != null && !whitelist.isEmpty()) {
             scopesIssuer.scopeSkipList.addAll(whitelist);
@@ -56,7 +54,6 @@ public class ScopesIssuer {
     }
 
     public static ScopesIssuer getInstance() {
-
         return scopesIssuer;
     }
 
@@ -68,7 +65,6 @@ public class ScopesIssuer {
      * @return true if the requested scopes are authorized, false if no scopes requested or scopes issuers are empty.
      */
     public boolean setScopes(OAuthCallback scopeValidationCallback) {
-
         List<String> authorizedScopes;
         List<String> sortedScopes;
         Map<String, List<String>> scopeSets;
@@ -121,7 +117,6 @@ public class ScopesIssuer {
      * @return true if the requested scopes are authorized, false if no scopes requested or scopes issuers are empty.
      */
     public boolean setScopes(OAuthTokenReqMessageContext tokReqMsgCtx) {
-
         Map<String, List<String>> scopeSets;
         List<String> authorizedScopes;
         List<String> sortedScopes;

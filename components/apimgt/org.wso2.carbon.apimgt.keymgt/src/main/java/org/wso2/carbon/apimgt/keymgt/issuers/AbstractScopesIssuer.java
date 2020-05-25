@@ -119,7 +119,6 @@ public abstract class AbstractScopesIssuer {
      * @return Application Scope List
      */
     public Map<String, String> getAppScopes(String consumerKey, AuthenticatedUser authenticatedUser) {
-
         //Get all the scopes and roles against the scopes defined for the APIs subscribed to the application.
         Map<String, String> appScopes = null;
         String tenantDomain = authenticatedUser.getTenantDomain();
@@ -153,7 +152,6 @@ public abstract class AbstractScopesIssuer {
      * @return if the scopes list is empty
      */
     public Boolean isAppScopesEmpty(Map<String, String> appScopes, String clientId) {
-
         if (appScopes.isEmpty()) {
             if (log.isDebugEnabled()) {
                 log.debug("No scopes defined for the Application " + clientId);
