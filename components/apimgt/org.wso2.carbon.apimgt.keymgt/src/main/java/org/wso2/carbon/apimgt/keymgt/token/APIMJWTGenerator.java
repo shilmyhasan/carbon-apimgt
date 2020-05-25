@@ -30,6 +30,7 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.openidconnect.CustomClaimsCallbackHandler;
 import org.wso2.carbon.user.api.RealmConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -157,18 +158,24 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
         return null;
     }
 
-    public Map<String, Object> populateCustomClaims(JwtTokenInfoDTO jwtTokenInfoDTO) {
+    public Map<String, Object> populateCustomClaims(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
 
-        CustomClaimsCallbackHandler claimsCallBackHandler =
-                OAuthServerConfiguration.getInstance().getOpenIDConnectCustomClaimsCallbackHandler();
-        if (jwtTokenInfoDTO.getOauthAuthzMsgCtx() != null) {
-            JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
-                    .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getOauthAuthzMsgCtx());
-            return jwtClaimsSet.getClaims();
-        } else if (jwtTokenInfoDTO.getTokReqMsgCtx() != null) {
-            JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
-                    .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getTokReqMsgCtx());
-            return jwtClaimsSet.getClaims();
+        try {
+            CustomClaimsCallbackHandler claimsCallBackHandler = OAuthServerConfiguration.getInstance()
+                    .getOpenIDConnectCustomClaimsCallbackHandler();
+            if (jwtTokenInfoDTO.getOauthAuthzMsgCtx() != null) {
+                JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
+                        .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getOauthAuthzMsgCtx());
+                return jwtClaimsSet.getClaims();
+            } else if (jwtTokenInfoDTO.getTokReqMsgCtx() != null) {
+                JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
+                        .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getTokReqMsgCtx());
+                return jwtClaimsSet.getClaims();
+            }
+        } catch (IdentityOAuth2Exception e) {
+            String error = "Error while handling custom claims";
+            log.error(error, e);
+            throw new APIManagementException(error, e);
         }
         return new LinkedHashMap<>();
     }
