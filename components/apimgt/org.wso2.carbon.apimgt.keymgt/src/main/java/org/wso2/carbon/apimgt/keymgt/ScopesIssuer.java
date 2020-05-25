@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.keymgt.issuers.AbstractScopesIssuer;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
+import org.wso2.carbon.identity.oauth.callback.OAuthCallback;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 
 import java.util.*;
@@ -40,7 +41,7 @@ public class ScopesIssuer {
      * Singleton of ScopeIssuer.*
      */
     private static ScopesIssuer scopesIssuer;
-    
+
     private ScopesIssuer() {
     }
 
@@ -50,14 +51,77 @@ public class ScopesIssuer {
             scopesIssuer.scopeSkipList.addAll(whitelist);
         }
         scopesIssuers = APIKeyMgtDataHolder.getScopesIssuers();
-    }  
+    }
 
     public static ScopesIssuer getInstance() {
         return scopesIssuer;
     }
 
-    public boolean setScopes(OAuthTokenReqMessageContext tokReqMsgCtx) {
+    /**
+     * This method is used to validate the scopes in OAuthCallback and set the authorized scopes back to the
+     * callback object.
+     *
+     * @param scopeValidationCallback OAuthCallback
+     * @return true if the requested scopes are authorized, false if no scopes requested or scopes issuers are empty.
+     */
+    public boolean setScopes(OAuthCallback scopeValidationCallback) {
+        List<String> authorizedScopes;
+        List<String> sortedScopes;
+        Map<String, List<String>> scopeSets;
+        boolean isAllAuthorized = false;
+        Set<String> authorizedAllScopes = new HashSet<String>();
 
+        String[] requestedScopes = scopeValidationCallback.getRequestedScope();
+        String[] defaultScope = new String[]{DEFAULT_SCOPE_NAME};
+
+        // if no issuers are defined
+        if (scopesIssuers == null || scopesIssuers.isEmpty()) {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Scope Issuers are not loaded");
+            }
+            scopeValidationCallback.setApprovedScope(defaultScope);
+            return true;
+        }
+
+        //If no scopes were requested.
+        if (requestedScopes == null || requestedScopes.length == 0) {
+            scopeValidationCallback.setApprovedScope(defaultScope);
+            return true;
+        }
+
+        scopeSets = initializeScopeSets(requestedScopes);
+        for (Map.Entry<String, List<String>> entry : scopeSets.entrySet()) {
+            sortedScopes = entry.getValue();
+            if (!sortedScopes.isEmpty()) {
+                scopeValidationCallback.setRequestedScope(sortedScopes.toArray(new String[sortedScopes.size()]));
+                authorizedScopes = scopesIssuers.get(entry.getKey()).getScopes(scopeValidationCallback, scopeSkipList);
+                authorizedAllScopes.addAll(authorizedScopes);
+                isAllAuthorized = true;
+            }
+        }
+
+        if (isAllAuthorized) {
+            scopeValidationCallback
+                    .setApprovedScope(authorizedAllScopes.toArray(new String[authorizedAllScopes.size()]));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method is used to validate the scopes in OAuthToken Request and set the authorized scopes back to the
+     * context.
+     *
+     * @param tokReqMsgCtx OAuthTokenReqMessageContext
+     * @return true if the requested scopes are authorized, false if no scopes requested or scopes issuers are empty.
+     */
+    public boolean setScopes(OAuthTokenReqMessageContext tokReqMsgCtx) {
+        Map<String, List<String>> scopeSets;
+        List<String> authorizedScopes;
+        List<String> sortedScopes;
+        Set<String> authorizedAllScopes = new HashSet<String>();
+        boolean isAllAuthorized = false;
         String[] requestedScopes = tokReqMsgCtx.getScope();
         String[] defaultScope = new String[]{DEFAULT_SCOPE_NAME};
 
@@ -77,13 +141,37 @@ public class ScopesIssuer {
             return true;
         }
 
-        Map<String, List<String>> scopeSets = new HashMap<String, List<String>>();
+        scopeSets = initializeScopeSets(requestedScopes);
+        for (Map.Entry<String, List<String>> entry : scopeSets.entrySet()) {
+            sortedScopes = entry.getValue();
+            if (!sortedScopes.isEmpty()) {
+                tokReqMsgCtx.setScope(sortedScopes.toArray(new String[sortedScopes.size()]));
+                authorizedScopes = scopesIssuers.get(entry.getKey()).getScopes(tokReqMsgCtx, scopeSkipList);
+                authorizedAllScopes.addAll(authorizedScopes);
+                isAllAuthorized = true;
+            }
+        }
 
+        if (isAllAuthorized) {
+            tokReqMsgCtx.setScope(authorizedAllScopes.toArray(new String[authorizedAllScopes.size()]));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Initialize scope sets for the requested scopes with respect to scope issuer prefix
+     *
+     * @param requestedScopes requested scopes
+     * @return initialized scope sets
+     */
+    private Map<String, List<String>> initializeScopeSets(String[] requestedScopes) {
+
+        Map<String, List<String>> scopeSets = new HashMap<String, List<String>>();
         // initializing scope sets with respect to prefixes
         for (String prefix : scopesIssuers.keySet()) {
             scopeSets.put(prefix, new ArrayList<String>());
         }
-
         for (String scope : requestedScopes) {
             boolean scopeAssigned = false;
             for (String prefix : scopesIssuers.keySet()) {
@@ -97,28 +185,6 @@ public class ScopesIssuer {
                 scopeSets.get(DEFAULT_SCOPE_NAME).add(scope);
             }
         }
-
-        Set<String> authorizedAllScopes = new HashSet<String>();
-        List<String> authorizedScopes;
-        List<String> sortedScopes;
-        boolean isAllAuthorized = false;
-        for (String prefix : scopeSets.keySet()) {
-            sortedScopes = scopeSets.get(prefix);
-            if (sortedScopes.size() > 0) {
-                tokReqMsgCtx.setScope(sortedScopes.toArray(new String[sortedScopes.size()]));
-                authorizedScopes = scopesIssuers.get(prefix).getScopes(tokReqMsgCtx, scopeSkipList);
-                authorizedAllScopes.addAll(authorizedScopes);
-                isAllAuthorized = true;
-            }
-        }
-
-        if (isAllAuthorized) {
-            tokReqMsgCtx.setScope(authorizedAllScopes.toArray(new String[authorizedAllScopes.size()]));
-            return true;
-        }
-        return false;
+        return scopeSets;
     }
-
 }
-
-

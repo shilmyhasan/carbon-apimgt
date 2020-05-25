@@ -784,6 +784,7 @@ public final class APIConstants {
     //API caching related constants
     public static final String API_MANAGER_CACHE_MANAGER = "API_MANAGER_CACHE";
     public static final String API_CONTEXT_CACHE_MANAGER = "API_CONTEXT_CACHE_MANAGER";
+    public static final String REST_API_SCOPE_CACHE = "REST_API_SCOPE_CACHE";
     public static final String RESOURCE_CACHE_NAME = "resourceCache";
     public static final String POLICY_CACHE_CONTEXT = "POLICY:";
     public static final String GATEWAY_KEY_CACHE_NAME = "gatewayKeyCache";
