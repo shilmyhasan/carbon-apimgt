@@ -59,6 +59,10 @@ public class JMSMessageListener implements MessageListener {
     public static final int RESOURCE_PATTERN_GROUPS = 4;
     public static final int RESOURCE_PATTERN_CONDITION_INDEX = 3;
 
+    private Pattern productPattern = Pattern.compile("/.*/(.*):[A-Z]{0,5}_(condition_(\\d*)|default)");
+    private static final int PRODUCT_PATTERN_GROUPS = 3;
+    private static final int PRODUCT_CONDITION_INDEX = 2;
+
     public void onMessage(Message message) {
 
         try {
@@ -263,11 +267,11 @@ public class JMSMessageListener implements MessageListener {
         if (APIConstants.BLOCKING_CONDITIONS_APPLICATION.equals(condition)) {
             if (APIConstants.AdvancedThrottleConstants.TRUE.equals(conditionState)) {
                 ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .addBlockingCondition(APIConstants.BLOCKING_CONDITIONS_APPLICATION,conditionValue,
+                        .addBlockingCondition(APIConstants.BLOCKING_CONDITIONS_APPLICATION, conditionValue,
                                 conditionValue);
             } else {
                 ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .removeBlockCondition(APIConstants.BLOCKING_CONDITIONS_APPLICATION,conditionValue);
+                        .removeBlockCondition(APIConstants.BLOCKING_CONDITIONS_APPLICATION, conditionValue);
             }
         } else if (APIConstants.BLOCKING_CONDITIONS_API.equals(condition)) {
             if (APIConstants.AdvancedThrottleConstants.TRUE.equals(conditionState)) {
@@ -314,6 +318,14 @@ public class JMSMessageListener implements MessageListener {
                     String resourceKey = throttleKey.substring(0, throttleKey.indexOf("_" + condition));
                     return new APICondition(resourceKey, condition);
                 }
+            }
+        }
+        m = productPattern.matcher(throttleKey);
+        if (m.matches()) {
+            if (m.groupCount() == PRODUCT_PATTERN_GROUPS) {
+                String condition = m.group(PRODUCT_CONDITION_INDEX);
+                String resourceKey = throttleKey.substring(0, throttleKey.indexOf("_" + condition));
+                return new APICondition(resourceKey, condition);
             }
         }
         return null;
