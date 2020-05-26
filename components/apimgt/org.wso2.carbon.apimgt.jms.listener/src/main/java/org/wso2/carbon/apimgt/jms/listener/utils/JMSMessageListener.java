@@ -59,9 +59,9 @@ public class JMSMessageListener implements MessageListener {
     public static final int RESOURCE_PATTERN_GROUPS = 4;
     public static final int RESOURCE_PATTERN_CONDITION_INDEX = 3;
 
-    private Pattern productPattern = Pattern.compile("/.*/(.*):[A-Z]{0,5}_(condition_(\\d*)|default)");
-    private static final int PRODUCT_PATTERN_GROUPS = 3;
-    private static final int PRODUCT_CONDITION_INDEX = 2;
+    private Pattern productResourcePattern = Pattern.compile("/.*/(.*):[A-Z]{0,5}_(condition_(\\d*)|default)");
+    private static final int PRODUCT_RESOURCE_PATTERN_GROUPS = 3;
+    private static final int PRODUCT_RESOURCE_CONDITION_INDEX = 2;
 
     private Pattern productAPIPattern = Pattern.compile("/.*:.*(condition_(\\d*)|default)");
     private static final int PRODUCT_API_PATTERN_GROUPS = 2;
@@ -325,10 +325,10 @@ public class JMSMessageListener implements MessageListener {
             }
         }
         // For API Products
-        m = productPattern.matcher(throttleKey);
+        m = productResourcePattern.matcher(throttleKey);
         if (m.matches()) {
-            if (m.groupCount() == PRODUCT_PATTERN_GROUPS) {
-                String condition = m.group(PRODUCT_CONDITION_INDEX);
+            if (m.groupCount() == PRODUCT_RESOURCE_PATTERN_GROUPS) {
+                String condition = m.group(PRODUCT_RESOURCE_CONDITION_INDEX);
                 String resourceKey = throttleKey.substring(0, throttleKey.indexOf("_" + condition));
                 return new APICondition(resourceKey, condition);
             }
