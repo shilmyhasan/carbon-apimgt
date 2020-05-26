@@ -63,6 +63,10 @@ public class JMSMessageListener implements MessageListener {
     private static final int PRODUCT_PATTERN_GROUPS = 3;
     private static final int PRODUCT_CONDITION_INDEX = 2;
 
+    private Pattern productAPIPattern = Pattern.compile("/.*:.*(condition_(\\d*)|default)");
+    private static final int PRODUCT_API_PATTERN_GROUPS = 2;
+    private static final int PRODUCT_API_CONDITION_INDEX = 1;
+
     public void onMessage(Message message) {
 
         try {
@@ -320,12 +324,22 @@ public class JMSMessageListener implements MessageListener {
                 }
             }
         }
+        // For API Products
         m = productPattern.matcher(throttleKey);
         if (m.matches()) {
             if (m.groupCount() == PRODUCT_PATTERN_GROUPS) {
                 String condition = m.group(PRODUCT_CONDITION_INDEX);
                 String resourceKey = throttleKey.substring(0, throttleKey.indexOf("_" + condition));
                 return new APICondition(resourceKey, condition);
+            }
+        } else {
+            m = productAPIPattern.matcher(throttleKey);
+            if (m.matches()) {
+                if (m.groupCount() == PRODUCT_API_PATTERN_GROUPS) {
+                    String condition = m.group(PRODUCT_API_CONDITION_INDEX);
+                    String resourceKey = throttleKey.substring(0, throttleKey.indexOf("_" + condition));
+                    return new APICondition(resourceKey, condition);
+                }
             }
         }
         return null;
