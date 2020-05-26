@@ -5,6 +5,18 @@
 
 <!-- Start script to add role mappings -->
 <script id="role-mappings-add-template" type="text/x-handlebars-template">
+<style>
+.wrapword {
+    white-space: -moz-pre-wrap !important;
+    white-space: -webkit-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+}
+</style>
 <div>
     <div class="page-header">
         <h2><%=i18n.localize("Role Mapping")%></h2>
@@ -47,8 +59,8 @@
                     </thead>
                     {{#each roleMappings}}
                         <tr>
-                            <td style="width: 30%">{{@key}}</td>
-                            <td style="width: 60%">{{this}}</td>
+                            <td class="wrapword" style="width: 30%">{{@key}}</td>
+                            <td class="wrapword" style="width: 60%">{{this}}</td>
                             <td style="width: 10%" align="right">
                                 <a class="delete-role-mappings" data-key="{{@key}}" data-value="{{this}}">
                                     <span class="fw-stack" style="font-size:10px">
@@ -96,7 +108,7 @@ if (roleMappingsJSONString != null) {
                 %>
                 <tr data-name="<%=mappings[i]['Name']%>" data-roles="<%=mappings[i]['Roles']%>">
                     <td style="vertical-align: middle;"><%=mappings[i]['Name']%></td>
-                    <td style="vertical-align: middle;">
+                    <td class="wrapword" style="vertical-align: middle;">
                         <span class="mappingRolesView"><%=mappings[i]['Roles']%></span>
                         <input 
                             class="mappingRolesEdit hidden" 
