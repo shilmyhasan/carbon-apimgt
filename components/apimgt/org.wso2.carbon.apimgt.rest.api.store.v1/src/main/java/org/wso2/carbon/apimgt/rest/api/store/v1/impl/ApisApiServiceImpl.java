@@ -575,25 +575,14 @@ public class ApisApiServiceImpl implements ApisApiService {
 
             // gets the first available environment if neither label nor environment is not provided
             if (StringUtils.isEmpty(labelName) && StringUtils.isEmpty(environmentName)) {
-                Map<String, Environment> existingEnvironments = APIUtil.getEnvironments();
-
-                // find a valid environment name from API
-                // gateway environment may be invalid due to inconsistent state of the API
-                // example: publish an API and later rename gateway environment from configurations
-                //          then the old gateway environment name becomes invalid
-                for (String environmentNameOfApi : api.getEnvironments()) {
-                    if (existingEnvironments.get(environmentNameOfApi) != null) {
-                        environmentName = environmentNameOfApi;
-                        break;
-                    }
-                }
-
-                // if all environment of API are invalid or there are no environments (i.e. empty)
-                if (StringUtils.isEmpty(environmentName)) {
+                if (!api.getEnvironments().isEmpty()) {
+                    environmentName = api.getEnvironments().iterator().next();
+                } else {
                     // if there are no environments in the API, take a random environment from the existing ones.
                     // This is to make sure the swagger doesn't have invalid endpoints
-                    if (!existingEnvironments.keySet().isEmpty()) {
-                        environmentName = existingEnvironments.keySet().iterator().next();
+                    Map<String, Environment> environments = APIUtil.getEnvironments();
+                    if (!environments.keySet().isEmpty()) {
+                        environmentName = environments.keySet().iterator().next();
                     }
                 }
             }
@@ -605,17 +594,7 @@ public class ApisApiServiceImpl implements ApisApiService {
 
             String apiSwagger = null;
             if (StringUtils.isNotEmpty(environmentName)) {
-                try {
-                    apiSwagger = apiConsumer.getOpenAPIDefinitionForEnvironment(api.getId(), environmentName);
-                } catch (APIManagementException e) {
-                    // handle gateway not found exception otherwise pass it
-                    if (RestApiUtil.isDueToResourceNotFound(e)) {
-                        RestApiUtil.handleResourceNotFoundError(
-                                "Gateway environment '" + environmentName + "' not found", e, log);
-                        return null;
-                    }
-                    throw e;
-                }
+                apiSwagger = apiConsumer.getOpenAPIDefinitionForEnvironment(api.getId(), environmentName);
             } else if (StringUtils.isNotEmpty(labelName)) {
                 apiSwagger = apiConsumer.getOpenAPIDefinitionForLabel(api.getId(), labelName);
             } else {
@@ -630,7 +609,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             } else if (RestApiUtil.isDueToResourceNotFound(e)) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, apiId, e, log);
             } else {
-                String errorMessage = "Error while retrieving swagger of API : " + apiId;
+                String errorMessage = "Error while retrieving API : " + apiId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         } catch (UserStoreException e) {
