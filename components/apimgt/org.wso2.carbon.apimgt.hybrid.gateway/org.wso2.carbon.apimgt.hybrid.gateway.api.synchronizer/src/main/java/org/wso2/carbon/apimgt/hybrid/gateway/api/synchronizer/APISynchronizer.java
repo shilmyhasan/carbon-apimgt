@@ -108,6 +108,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
     public void completedInitialization() {
         try {
             synchronizeApis();
+            createHealthCheckAPI();
             APISynchronizationScheduler.schedule();
         } catch (APISynchronizationException e) {
             log.error("API Synchronization failed.", e);
@@ -887,6 +888,101 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
             if (log.isDebugEnabled()) {
                 log.debug("Skipping loading super tenant space since execution is currently in super tenant flow.");
             }
+        }
+    }
+
+    /**
+     * Method to create health check API
+     */
+    private void createHealthCheckAPI(){
+
+        try {
+            boolean isMultiTenantEnabled = ConfigManager.getConfigurationDTO().isMulti_tenant_enabled();
+            if (isMultiTenantEnabled) {
+                Map<String, String> multiTenantUserMap = MicroGatewayCommonUtil.getMultiTenantUserMap();
+                Set<String> tenantUsernameSet = multiTenantUserMap.keySet();
+                for (String tenantUsername : tenantUsernameSet) {
+                    String tenantDomain = MultitenantUtils.getTenantDomain(tenantUsername);
+                    createHealthCheckApiForTenant(tenantDomain, tenantUsername);
+                }
+            } else {
+                APIManagerConfiguration config = ServiceDataHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                String tenantUsername = config.getFirstProperty(APIConstants.API_KEY_VALIDATOR_USERNAME);
+                String tenantDomain = MultitenantUtils.getTenantDomain(tenantUsername);
+                createHealthCheckApiForTenant(tenantDomain, tenantUsername);
+            }
+        } catch (OnPremiseGatewayException e) {
+            log.error("An error occurred while retrieving micro gateway configuration.", e);
+        }
+    }
+
+    /**
+     * Creates health check api for a specific tenant
+     *
+     * @param tenantDomain   Tenant Domain
+     * @param tenantUsername Tenant Username
+     */
+    private void createHealthCheckApiForTenant(String tenantDomain, String tenantUsername) {
+
+        String sourceApiFilePath = CarbonUtils.getCarbonHome() + File.separator +
+                APISynchronizationConstants.HEALTH_CHECK_API_PATH;
+        try {
+            int tenantId = ServiceDataHolder.getInstance().getRealmService().getTenantManager()
+                    .getTenantId(tenantDomain);
+            String tenantApisPath = CarbonUtils.getCarbonTenantsDirPath() + File.separator + tenantId +
+                    File.separator + "synapse-configs" + File.separator + "default" + File.separator +
+                    "api";
+            String healthCheckFileName = tenantUsername.replace("@", "-AT-") +
+                    APISynchronizationConstants.HEALTH_CHECK_API_FILE_NAME;
+            File destFile = new File(tenantApisPath + File.separator + healthCheckFileName);
+            File sourceFile = new File(sourceApiFilePath);
+            if (!destFile.exists()) {
+                String apiName = tenantUsername.replace("@", "-AT-") +
+                        APISynchronizationConstants.HEALTH_CHECK_API_NAME;
+                modifyXmlAttribute(sourceApiFilePath, apiName, tenantDomain);
+                try {
+                    FileUtils.copyFile(sourceFile, destFile);
+                    log.info("Health check API successfully created for tenant: " + tenantDomain);
+                } catch (IOException e) {
+                    log.error("Error while copying health check API to destination folder of tenant:"
+                            + tenantDomain, e);
+                }
+            } else {
+                log.info("Health check API already exists for tenant:" + tenantDomain);
+            }
+        } catch (UserStoreException e) {
+            log.error("Error while getting tenant id of tenant" + tenantDomain, e);
+        }
+    }
+
+    /**
+     * Method to update health-check-api.xml with tenant details
+     *
+     * @param filePath     File path to the _health-check-api_.xml template file
+     * @param apiName      API name of the health check API to be created
+     * @param tenantDomain Current Tenant domain
+     */
+    private void modifyXmlAttribute(String filePath, String apiName, String tenantDomain) {
+
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            dbFactory.setNamespaceAware(true);
+            Document doc = dbFactory
+                    .newDocumentBuilder().parse(new InputSource(filePath));
+            Node api = doc.getElementsByTagName("api").item(0);
+            NamedNodeMap apiAttributes = api.getAttributes();
+            // Updating api name attribute
+            Node name = apiAttributes.getNamedItem("name");
+            name.setTextContent(apiName);
+            // Updating context attribute
+            Node context = apiAttributes.getNamedItem("context");
+            context.setTextContent("/t/" + tenantDomain + APISynchronizationConstants.HEALTH_CHECK_API_CONTEXT);
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.transform(new DOMSource(doc), new StreamResult(new File(filePath)));
+        } catch (SAXException | ParserConfigurationException | IOException
+                | TransformerException e) {
+            log.error("Error occurred while modifying _health-check-api.xml_", e);
         }
     }
 }
