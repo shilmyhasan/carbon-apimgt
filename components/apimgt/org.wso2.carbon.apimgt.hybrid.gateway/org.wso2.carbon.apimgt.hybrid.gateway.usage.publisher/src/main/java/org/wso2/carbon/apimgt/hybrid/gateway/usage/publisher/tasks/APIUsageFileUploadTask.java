@@ -40,7 +40,6 @@ import org.wso2.carbon.apimgt.hybrid.gateway.common.util.HttpRequestUtil;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.util.MicroGatewayCommonUtil;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.util.TokenUtil;
 import org.wso2.carbon.apimgt.hybrid.gateway.usage.publisher.internal.ServiceReferenceHolder;
-import org.wso2.carbon.ntask.core.Task;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
@@ -53,27 +52,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Map;
 
 /**
  * Task for uploading the usage file
  */
-public class APIUsageFileUploadTask implements Task {
+public class APIUsageFileUploadTask implements Runnable {
 
     private static final Log log = LogFactory.getLog(APIUsageFileUploadTask.class);
 
     private ConfigDTO configDTO;
 
     @Override
-    public void setProperties(Map<String, String> map) {
-    }
-
-    @Override
-    public void init() {
-    }
-
-    @Override
-    public void execute() {
+    public void run() {
         log.info("Running API Usage File Upload Task.");
         try {
             configDTO = ConfigManager.getConfigurationDTO();

@@ -110,7 +110,6 @@ public class ConfiguratorTest {
         DeploymentTomlConfigurator
             .setDeploymentTomlConfigurations(deploymentTomlFilePath, configToolProperties,
                 tomlEntries, gatewayConfigs);
-        RegistryXmlConfigurator registryXmlConfigurator = new RegistryXmlConfigurator();
         TransformerIdentityImpl transformerIdentity = PowerMockito
             .mock(TransformerIdentityImpl.class);
         TransformerFactory transformerFactory = PowerMockito.mock(TransformerFactory.class);
@@ -119,7 +118,6 @@ public class ConfiguratorTest {
         PowerMockito.when(transformerFactory.newTransformer()).thenReturn(transformerIdentity);
         PowerMockito.doNothing().when(transformerIdentity)
             .transform(any(DOMSource.class), any(StreamResult.class));
-        registryXmlConfigurator.configure(carbonConfigDirPath, gatewayConfigs);
         Log4JConfigurator log4JConfigurator = new Log4JConfigurator();
         log4JConfigurator.configure(carbonConfigDirPath);
         Configurator.writeConfiguredLock(carbonHome);

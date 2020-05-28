@@ -187,18 +187,7 @@ public class ThrottlingSyncTaskTest {
                 fromAdvancedPolicyDTOToPolicy(any(AdvancedThrottlePolicyDTO.class))).thenReturn(apiPolicy);
 
         ThrottlingSyncTask throttlingSynchronizerTask = new ThrottlingSyncTask();
-        throttlingSynchronizerTask.execute();
+        throttlingSynchronizerTask.run();
     }
 
-    @Test
-    public void initTest() throws Exception {
-        ThrottlingSyncTask throttlingSynchronizerTask = new ThrottlingSyncTask();
-        throttlingSynchronizerTask.init();
-    }
-
-    @Test
-    public void setPropertiesTest() throws Exception {
-        ThrottlingSyncTask throttlingSynchronizerTask = new ThrottlingSyncTask();
-        throttlingSynchronizerTask.setProperties(new HashMap<String, String>());
-    }
 }

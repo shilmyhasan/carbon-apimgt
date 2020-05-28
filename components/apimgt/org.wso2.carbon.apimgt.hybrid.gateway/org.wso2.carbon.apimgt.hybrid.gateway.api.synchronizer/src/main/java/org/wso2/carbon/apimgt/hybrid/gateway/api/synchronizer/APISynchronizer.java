@@ -46,6 +46,7 @@ import org.wso2.carbon.apimgt.hybrid.gateway.api.synchronizer.dto.MediationListD
 import org.wso2.carbon.apimgt.hybrid.gateway.api.synchronizer.dto.SequenceDTO;
 import org.wso2.carbon.apimgt.hybrid.gateway.api.synchronizer.exceptions.APISynchronizationException;
 import org.wso2.carbon.apimgt.hybrid.gateway.api.synchronizer.internal.ServiceDataHolder;
+import org.wso2.carbon.apimgt.hybrid.gateway.api.synchronizer.tasks.APISynchronizationScheduler;
 import org.wso2.carbon.apimgt.hybrid.gateway.api.synchronizer.util.APIMappingUtil;
 import org.wso2.carbon.apimgt.hybrid.gateway.api.synchronizer.util.APISynchronizationConstants;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.OnPremiseGatewayInitListener;
@@ -107,6 +108,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
     public void completedInitialization() {
         try {
             synchronizeApis();
+            APISynchronizationScheduler.schedule();
         } catch (APISynchronizationException e) {
             log.error("API Synchronization failed.", e);
         }
@@ -302,6 +304,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                     initializeAPISynchronization(updatedApiIds, username, password);
                 }
             }
+            MicroGatewayCommonUtil.cleanPasswordCharArray(password);
         } catch (OnPremiseGatewayException e) {
             throw new APISynchronizationException(e);
         }
@@ -491,7 +494,6 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
 
             HttpGet httpGet = new HttpGet(updatedAPIViewUrl);
             String authHeaderValue = TokenUtil.getBasicAuthHeaderValue(username, password);
-            MicroGatewayCommonUtil.cleanPasswordCharArray(password);
             httpGet.addHeader(OnPremiseGatewayConstants.AUTHORIZATION_HEADER, authHeaderValue);
             String response = HttpRequestUtil.executeHTTPMethodWithRetry(httpClient, httpGet,
                     OnPremiseGatewayConstants.DEFAULT_RETRY_COUNT);
@@ -527,7 +529,9 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                 // synced out of the APIs that have been updated.
                 if (StringUtils.isNotBlank(label)) {
                     for (LabelDTO labelDTO : apiDTO.getLabels()) {
-                        if (label.equals(labelDTO.getName())) {
+                        //Trimming labels to remove trailing white spaces and prevent
+                        //label mismatch during API synchronization
+                        if (StringUtils.equals(label.trim(), labelDTO.getName().trim())) {
                             apiDtoList.add(apiDTO);
                             break;
                         }
