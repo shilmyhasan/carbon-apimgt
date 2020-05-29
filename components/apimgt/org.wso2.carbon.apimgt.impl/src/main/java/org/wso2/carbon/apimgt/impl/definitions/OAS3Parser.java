@@ -1251,9 +1251,9 @@ public class OAS3Parser extends APIDefinition {
     /**
      * This method returns the boolean value which checks whether the swagger is included default security scheme or not
      *
-     * @param swaggerContent resource json
-     * @return is default is given already
-     * @throws APIManagementException
+     * @param swaggerContent resourceJson of api definition
+     * @return boolean
+     * @throws APIManagementException if failed to get objects from openAPI
      */
     private boolean isDefaultGiven(String swaggerContent) throws APIManagementException {
         OpenAPI openAPI = getOpenAPI(swaggerContent);
@@ -1276,9 +1276,9 @@ public class OAS3Parser extends APIDefinition {
     /**
      * This method will inject scopes of other schemes to the swagger definition
      *
-     * @param swaggerContent resource json
-     * @return updated json string
-     * @throws APIManagementException
+     * @param swaggerContent resourceJson of API definition
+     * @return String
+     * @throws APIManagementException if failed to get objects from openAPI
      */
     @Override
     public String processOtherSchemeScopes(String swaggerContent) throws APIManagementException {
@@ -1292,11 +1292,11 @@ public class OAS3Parser extends APIDefinition {
     }
 
     /**
-     * This method returns the oauth scopes according to the given swagger(version 3)
+     * This method injects the oauth scopes from other schemes into default scheme
      *
      * @param openAPI - OpenApi object
-     * @return scope set as all defaults
-     * @throws APIManagementException
+     * @return OpenAPI
+     * @throws APIManagementException if failed to get objects from openAPI
      */
     private OpenAPI injectOtherScopesToDefaultScheme(OpenAPI openAPI) throws APIManagementException {
         Map<String, SecurityScheme> securitySchemes = null;
@@ -1361,9 +1361,9 @@ public class OAS3Parser extends APIDefinition {
     /**
      * This method returns the oauth scopes of Oauthflows according to the given swagger(version 3)
      *
-     * @param noneDefaultTypeFlow , OAuthflow
-     * @param defaultTypeFlow,    OAuthflow
-     * @return scopes of given flow
+     * @param noneDefaultTypeFlow , OAuthflow which is not owned by default scheme
+     * @param defaultTypeFlow,    OAuthflow which is owned by default scheme
+     * @return OAuthFlow
      */
     private OAuthFlow extractAndInjectScopesFromFlow(OAuthFlow noneDefaultTypeFlow, OAuthFlow defaultTypeFlow) {
         Scopes noneDefaultFlowScopes = noneDefaultTypeFlow.getScopes();
@@ -1401,11 +1401,11 @@ public class OAS3Parser extends APIDefinition {
     }
 
     /**
-     * This method returns URI templates according to the given swagger file(Swagger version 3)
+     * This method returns openAPI object after injecting other type scopes into default scheme in resource level
      *
-     * @param openAPI OpenAPI,isDefaultAvailable boolean
-     * @return URI Templates
-     * @throws APIManagementException
+     * @param openAPI OpenAPIObject
+     * @return OpenAPI
+     * @throws APIManagementException if failed to get objects from openAPI
      */
     private OpenAPI injectOtherResourceScopesToDefaultScheme(OpenAPI openAPI) throws APIManagementException {
         List<String> schemes = getOtherSchemes();
@@ -1459,10 +1459,10 @@ public class OAS3Parser extends APIDefinition {
     /**
      * This method returns api that is attached with api extensions related to micro-gw
      *
-     * @param apiDefinition                  String
-     * @param api                            API
-     * @param isBasepathExtractedFromSwagger boolean
-     * @return URITemplate
+     * @param apiDefinition                  String of APIDefinition
+     * @param api                            API api object
+     * @param isBasepathExtractedFromSwagger booleanValue to check whether definition imported from apictl
+     * @return API
      */
     @Override
     public API setExtensionsToAPI(String apiDefinition, API api, boolean isBasepathExtractedFromSwagger) throws APIManagementException {

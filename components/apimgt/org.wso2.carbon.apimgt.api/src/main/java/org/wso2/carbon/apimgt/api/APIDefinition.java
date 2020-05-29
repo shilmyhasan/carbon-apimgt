@@ -199,6 +199,7 @@ public abstract class APIDefinition {
 
     /**
      * This method changes the URI templates from the API definition as it support different schemes
+     *
      * @param resourceConfigsJSON json String of oasDefinition
      * @throws APIManagementException throws if an error occurred
      * @return String
@@ -209,9 +210,10 @@ public abstract class APIDefinition {
     /**
      * This method returns api that is attached with api extensions related to micro-gw
      *
-     * @param swaggerContent String
-     * @param api            API
+     * @param swaggerContent json String of oasDefinition
+     * @param api            API api object
      * @param isBasepathExtractedFromSwagger boolean
+     * @throws APIManagementException throws if an error occurred
      * @return API
      */
     public abstract API setExtensionsToAPI(String swaggerContent, API api, boolean isBasepathExtractedFromSwagger)

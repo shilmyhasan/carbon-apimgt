@@ -1183,9 +1183,9 @@ public class OAS2Parser extends APIDefinition {
     /**
      * This method returns the boolean value which checks whether the swagger is included default security scheme or not
      *
-     * @param swaggerContent resource json
-     * @return is default is given already
-     * @throws APIManagementException
+     * @param swaggerContent resourceJson of api definition
+     * @return boolean
+     * @throws APIManagementException if failed to get objects from openAPI
      */
     private boolean isDefaultGiven(String swaggerContent) throws APIManagementException {
         Swagger swagger = getSwagger(swaggerContent);
@@ -1204,9 +1204,9 @@ public class OAS2Parser extends APIDefinition {
     /**
      * This method will inject scopes of other schemes to the swagger definition
      *
-     * @param swaggerContent resource json
-     * @return updated json string
-     * @throws APIManagementException
+     * @param swaggerContent resourceJson of API definition
+     * @return String
+     * @throws APIManagementException if failed to get objects from openAPI
      */
     @Override
     public String processOtherSchemeScopes(String swaggerContent) throws APIManagementException {
@@ -1220,11 +1220,11 @@ public class OAS2Parser extends APIDefinition {
     }
 
     /**
-     * This method returns the oauth scopes according to the given swagger(version 2)
+     * This method injects the oauth scopes from other schemes into default scheme
      *
-     * @param swagger resource json
-     * @return scope set as all defaults
-     * @throws APIManagementException
+     * @param swagger - Swagger object
+     * @return Swagger
+     * @throws APIManagementException if failed to get objects from openAPI
      */
     private Swagger injectOtherScopesToDefaultScheme(Swagger swagger) throws APIManagementException {
         //Get security definitions from swagger
@@ -1281,11 +1281,11 @@ public class OAS2Parser extends APIDefinition {
     }
 
     /**
-     * This method returns URI templates according to the given swagger file(Swagger version 2)
+     * This method returns openAPI object after injecting other type scopes into default scheme in resource level
      *
-     * @param swagger Swagger
-     * @return URI Templates
-     * @throws APIManagementException
+     * @param swagger Swagger Object
+     * @return Swagger
+     * @throws APIManagementException if failed to get objects from openAPI
      */
     private Swagger injectOtherResourceScopesToDefaultScheme(Swagger swagger) throws APIManagementException {
         List<String> schemes = getOtherSchemes();
@@ -1342,10 +1342,10 @@ public class OAS2Parser extends APIDefinition {
     /**
      * This method returns api that is attached with api extensions related to micro-gw
      *
-     * @param apiDefinition                  String
-     * @param api                            API
-     * @param isBasepathExtractedFromSwagger boolean
-     * @return URITemplate
+     * @param apiDefinition                  String of APIDefinition
+     * @param api                            API api object
+     * @param isBasepathExtractedFromSwagger booleanValue to check whether definition imported from apictl
+     * @return API
      */
     @Override
     public API setExtensionsToAPI(String apiDefinition, API api, boolean isBasepathExtractedFromSwagger) throws APIManagementException {
