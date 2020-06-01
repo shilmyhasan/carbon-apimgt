@@ -34,25 +34,18 @@ import java.util.Map;
 /**
  * Task for cleaning up old usage files
  */
-public class APIUsageFileCleanupTask implements Task {
+public class APIUsageFileCleanupTask implements Runnable {
 
     private static final Log log = LogFactory.getLog(APIUsageFileCleanupTask.class);
-    private Map<String, String> properties;
-
+    private String fileRetentionDays;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    @Override
-    public void setProperties(Map<String, String> map) {
-        this.properties = map;
+    public APIUsageFileCleanupTask(String fileRetentionDays) {
+        this.fileRetentionDays = fileRetentionDays;
     }
 
     @Override
-    public void init() {
-    }
-
-    @Override
-    public void execute() {
-        String fileRetentionDays = properties.get("fileRetentionDays");
+    public void run() {
         if (fileRetentionDays != null && !fileRetentionDays.isEmpty()) {
             Date lastKeptDate = getLastKeptDate(Integer.parseInt(fileRetentionDays));
             log.info("API Usage data files will be cleaned up to : " +

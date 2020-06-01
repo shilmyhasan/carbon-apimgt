@@ -19,8 +19,11 @@ package org.wso2.carbon.apimgt.hybrid.gateway.usage.publisher.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.OnPremiseGatewayInitListener;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.dto.ConfigDTO;
+import org.wso2.carbon.apimgt.hybrid.gateway.usage.publisher.APIUsageFIleSynchronizer;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.config.ConfigManager;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.exception.OnPremiseGatewayException;
@@ -47,6 +50,9 @@ public class APIUsagePublisherComponent {
 
     @Activate
     protected void activate(ComponentContext ctx) {
+        BundleContext bundleContext = ctx.getBundleContext();
+        bundleContext.registerService(OnPremiseGatewayInitListener.class.getName(), new APIUsageFIleSynchronizer(),
+                null);
         // usage data publishing is enabled thorough a property.
         try {
             ConfigDTO configDTO = ConfigManager.getConfigurationDTO();
