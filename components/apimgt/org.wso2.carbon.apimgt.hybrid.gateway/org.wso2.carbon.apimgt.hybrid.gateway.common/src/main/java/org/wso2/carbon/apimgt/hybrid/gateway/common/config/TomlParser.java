@@ -44,7 +44,7 @@ public class TomlParser {
 
     }
 
-    static Map<String, Object> parse(String filePath) throws ConfigParserException {
+    public static Map<String, Object> parse(String filePath) throws ConfigParserException {
         try {
             TomlParseResult parseResult = Toml.parse(Paths.get(filePath));
             if (parseResult.hasErrors()) {
