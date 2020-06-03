@@ -1539,6 +1539,11 @@ paths:
           description: Additional attributes specified as a stringified JSON with API's schema
           type: string
           required: false
+        - in: formData
+          name: inlineAPIDefinition
+          description: Inline content of the swagger file
+          type: string
+          required: false
       x-examples:
         $ref: docs/examples/apis/import_openapi_post.yaml
       tags:
