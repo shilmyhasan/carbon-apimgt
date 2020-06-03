@@ -878,6 +878,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.claim.mgt</artifactId>
+                <version>${carbon.identity.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
                 <artifactId>org.wso2.carbon.identity.oauth</artifactId>
                 <version>${carbon.identity-inbound-auth-oauth.version}</version>
