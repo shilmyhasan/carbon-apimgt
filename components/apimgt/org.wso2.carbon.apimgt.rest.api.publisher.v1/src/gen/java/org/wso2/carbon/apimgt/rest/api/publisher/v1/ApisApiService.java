@@ -109,6 +109,6 @@ public interface ApisApiService {
       public Response validateAPI(String query, String ifNoneMatch, MessageContext messageContext) throws APIManagementException;
       public Response validateDocument(String apiId, String name, String ifMatch, MessageContext messageContext) throws APIManagementException;
       public Response validateEndpoint(String endpointUrl, String apiId, MessageContext messageContext) throws APIManagementException;
-      public Response validateOpenAPIDefinition(String url, InputStream fileInputStream, Attachment fileDetail, Boolean returnContent, MessageContext messageContext) throws APIManagementException;
+      public Response validateOpenAPIDefinition(String url, InputStream fileInputStream, Attachment fileDetail, String inlineAPIDefinition, Boolean returnContent, MessageContext messageContext) throws APIManagementException;
       public Response validateWSDLDefinition(String url, InputStream fileInputStream, Attachment fileDetail, MessageContext messageContext) throws APIManagementException;
 }

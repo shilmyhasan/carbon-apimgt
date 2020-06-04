@@ -3139,18 +3139,19 @@ public class ApisApiServiceImpl implements ApisApiService {
      * @param url URL of the OpenAPI definition
      * @param fileInputStream InputStream for the provided file
      * @param fileDetail File meta-data
+     * @param inlineApiDefinition Swagger API definition String
      * @param returnContent Whether to return the definition content
      * @param messageContext CXF message context
      * @return API Definition validation response
      */
     @Override
     public Response validateOpenAPIDefinition(String url, InputStream fileInputStream, Attachment fileDetail,
-          Boolean returnContent, MessageContext messageContext) {
+          String inlineApiDefinition, Boolean returnContent, MessageContext messageContext) {
 
         // Validate and retrieve the OpenAPI definition
         Map validationResponseMap = null;
         try {
-            validationResponseMap = validateOpenAPIDefinition(url, fileInputStream, fileDetail, null,
+            validationResponseMap = validateOpenAPIDefinition(url, fileInputStream, fileDetail, inlineApiDefinition,
                     returnContent);
         } catch (APIManagementException e) {
             RestApiUtil.handleInternalServerError("Error occurred while validating API Definition", e, log);

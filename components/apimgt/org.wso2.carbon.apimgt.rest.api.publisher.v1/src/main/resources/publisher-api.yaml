@@ -1774,6 +1774,11 @@ paths:
           description: OpenAPI definition as a file
           type: file
           required: false
+        - in: formData
+          name: inlineAPIDefinition
+          description: Inline content of the swagger file
+          type: string
+          required: false
         - in: query
           name: returnContent
           description: |
