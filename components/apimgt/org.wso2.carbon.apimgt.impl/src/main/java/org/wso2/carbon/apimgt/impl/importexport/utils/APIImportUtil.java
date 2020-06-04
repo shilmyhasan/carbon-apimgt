@@ -401,6 +401,8 @@ public final class APIImportUtil {
                     throw new APIImportExportException("Cannot remove following resource paths " +
                             resourcesToRemove.toString() + " because they are used by one or more API Products");
                 }
+                //preProcess swagger definition
+                swaggerContent = OASParserUtil.preProcess(swaggerContent);
 
                 addSwaggerDefinition(importedApi.getId(), swaggerContent, apiProvider);
                 //If graphQL API, import graphQL schema definition to registry
@@ -424,6 +426,9 @@ public final class APIImportUtil {
                     importedApi.setUriTemplates(uriTemplates);
                     Set<Scope> scopes = apiDefinition.getScopes(swaggerContent);
                     importedApi.setScopes(scopes);
+                    boolean isBasepathExtractedFromSwagger = true;
+                    //Setup vendor extensions to API when importing through CTL tool
+                    importedApi = OASParserUtil.setExtensionsToAPI(swaggerContent, importedApi, isBasepathExtractedFromSwagger);
                 }
             }
             // This is required to make url templates and scopes get effected

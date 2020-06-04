@@ -78,6 +78,7 @@ import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIProductIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIProductResource;
+import org.wso2.carbon.apimgt.api.model.CORSConfiguration;
 import org.wso2.carbon.apimgt.api.model.Identifier;
 import org.wso2.carbon.apimgt.api.model.Scope;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
@@ -1211,4 +1212,171 @@ public class OASParserUtil {
         scopesSortedlist.sort(Comparator.comparing(Scope::getName));
         return new LinkedHashSet<>(scopesSortedlist);
     }
+
+    /**
+     * This method changes the URI templates from the API definition as it support different schemes
+     *
+     * @param swaggerContent json String of oasDefinition
+     * @throws APIManagementException throws if an error occurred
+     * @return String
+     */
+    public static String preProcess(String swaggerContent) throws APIManagementException {
+        //Load required properties from swagger to the API
+        APIDefinition apiDefinition = getOASParser(swaggerContent);
+        return apiDefinition.processOtherSchemeScopes(swaggerContent);
+    }
+
+    /**
+     * This method returns api that is attached with api extensions related to micro-gw
+     *
+     * @param swaggerContent json String of oasDefinition
+     * @param api            API api object
+     * @param isBasepathExtractedFromSwagger boolean
+     * @throws APIManagementException throws if an error occurred
+     * @return API
+     */
+    public static API setExtensionsToAPI(String swaggerContent, API api, boolean isBasepathExtractedFromSwagger) throws APIManagementException {
+        APIDefinition apiDefinition = getOASParser(swaggerContent);
+        return apiDefinition.setExtensionsToAPI(swaggerContent, api, isBasepathExtractedFromSwagger);
+    }
+
+    /**
+     * This method returns extension of basepath related to micro-gw
+     *
+     * @param extensions Map<String, Object> list of extensions
+     * @return String
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static String getBasePathFromSwagger(Map<String, Object> extensions) throws APIManagementException {
+        Object basepath = extensions.get(APIConstants.X_WSO2_BASEPATH);
+        return basepath == null ? null : basepath.toString();
+    }
+
+    /**
+     * This method returns extension of throttling tier related to micro-gw
+     *
+     * @param extensions Map<String, Object> list of extensions
+     * @return String
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static String getThrottleTierFromSwagger(Map<String, Object> extensions) throws APIManagementException {
+        Object throttleTier = extensions.get(APIConstants.X_WSO2_THROTTLING_TIER);
+        return throttleTier == null ? null : throttleTier.toString();
+    }
+
+    /**
+     * This method returns extension of transports(http,https) related to micro-gw
+     *
+     * @param extensions Map<String, Object> list of extensions
+     * @return String
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static String getTransportsFromSwagger(Map<String, Object> extensions) throws APIManagementException {
+        String transports = null;
+        ObjectMapper mapper = new ObjectMapper();
+        if (extensions.containsKey(APIConstants.X_WSO2_TRANSPORTS)) {
+            Object object = extensions.get(APIConstants.X_WSO2_TRANSPORTS).toString();
+            transports = mapper.convertValue(object, String.class);
+            transports = transports.replace("[", "");
+            transports = transports.replace("]", "");
+            transports = transports.replace(" ", "");
+        }
+        return transports;
+    }
+
+    /**
+     * This method returns extension of mutualSSL related to micro-gw
+     *
+     * @param extensions Map<String, Object> list of extensions
+     * @return String
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static String getMutualSSLEnabledFromSwagger(Map<String, Object> extensions) throws APIManagementException {
+        Object mutualSSl = extensions.get(APIConstants.X_WSO2_MUTUAL_SSL);
+        return mutualSSl == null ? null : mutualSSl.toString();
+    }
+
+    /**
+     * This method returns extension of CORS config related to micro-gw
+     *
+     * @param extensions Map<String, Object> list of extensions
+     * @return CORSConfiguration
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static CORSConfiguration getCorsConfigFromSwagger(Map<String, Object> extensions) throws APIManagementException {
+        boolean corsConfigurationEnabled = false;
+        boolean accessControlAllowCredentials = false;
+        List<String> accessControlAllowOrigins = new ArrayList<>();
+        List<String> accessControlAllowHeaders = new ArrayList<>();
+        List<String> accessControlAllowMethods = new ArrayList<>();
+        CORSConfiguration corsConfig = new CORSConfiguration(corsConfigurationEnabled,
+                accessControlAllowOrigins, accessControlAllowCredentials, accessControlAllowHeaders,
+                accessControlAllowMethods);
+        ObjectMapper mapper = new ObjectMapper();
+
+        if (extensions.containsKey(APIConstants.X_WSO2_CORS)) {
+            Object corsConfigObject = extensions.get(APIConstants.X_WSO2_CORS);
+            JsonNode objectNode = mapper.convertValue(corsConfigObject, JsonNode.class);
+            corsConfigurationEnabled = Boolean.parseBoolean(String.valueOf(objectNode.get("corsConfigurationEnabled")));
+            accessControlAllowCredentials = Boolean.parseBoolean(String.valueOf(objectNode.get("accessControlAllowCredentials")));
+            accessControlAllowHeaders = mapper.convertValue(objectNode.get("accessControlAllowHeaders"), ArrayList.class);
+            accessControlAllowOrigins = mapper.convertValue(objectNode.get("accessControlAllowOrigins"), ArrayList.class);
+            accessControlAllowMethods = mapper.convertValue(objectNode.get("accessControlAllowMethods"), ArrayList.class);
+            corsConfig.setCorsConfigurationEnabled(corsConfigurationEnabled);
+            corsConfig.setAccessControlAllowCredentials(accessControlAllowCredentials);
+            corsConfig.setAccessControlAllowHeaders(accessControlAllowHeaders);
+            corsConfig.setAccessControlAllowOrigins(accessControlAllowOrigins);
+            corsConfig.setAccessControlAllowMethods(accessControlAllowMethods);
+        }
+        return corsConfig;
+    }
+
+    /**
+     * This method returns extension of responseCache enabling check related to micro-gw
+     *
+     * @param extensions Map<String, Object> list of extensions
+     * @return boolean
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static boolean getResponseCacheFromSwagger(Map<String, Object> extensions) throws APIManagementException {
+        ObjectMapper mapper = new ObjectMapper();
+        boolean responseCache = false;
+        if (extensions.containsKey(APIConstants.X_WSO2_RESPONSE_CACHE)) {
+            Object responseCacheConfig = extensions.get(APIConstants.X_WSO2_RESPONSE_CACHE);
+            ObjectNode cacheConfigNode = mapper.convertValue(responseCacheConfig, ObjectNode.class);
+            responseCache = Boolean.parseBoolean(String.valueOf(cacheConfigNode.get(APIConstants.RESPONSE_CACHING_ENABLED)));
+        }
+        return responseCache;
+    }
+
+    /**
+     * This method returns extension of cache timeout related to micro-gw
+     *
+     * @param extensions Map<String, Object> list of extensions
+     * @return int
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static int getCacheTimeOutFromSwagger(Map<String, Object> extensions) throws APIManagementException {
+        ObjectMapper mapper = new ObjectMapper();
+        int timeOut = 0;
+        if (extensions.containsKey(APIConstants.X_WSO2_RESPONSE_CACHE)) {
+            Object responseCacheConfig = extensions.get(APIConstants.X_WSO2_RESPONSE_CACHE);
+            ObjectNode cacheConfigNode = mapper.convertValue(responseCacheConfig, ObjectNode.class);
+            timeOut = Integer.parseInt(String.valueOf(cacheConfigNode.get(APIConstants.RESPONSE_CACHING_TIMEOUT)));
+        }
+        return timeOut;
+    }
+
+    /**
+     * This method returns extension of custom authorization Header related to micro-gw
+     *
+     * @param extensions Map<String, Object> list of extensions
+     * @return String
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static String getAuthorizationHeaderFromSwagger(Map<String, Object> extensions) throws APIManagementException {
+        Object authorizationHeader = extensions.get(APIConstants.X_WSO2_AUTH_HEADER);
+        return authorizationHeader == null ? null : authorizationHeader.toString();
+    }
+
 }

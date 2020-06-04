@@ -197,4 +197,26 @@ public abstract class APIDefinition {
     public abstract String getOASDefinitionWithTierContentAwareProperty(String oasDefinition,
             List<String> contentAwareTiersList, String apiLevelTier) throws APIManagementException;
 
+    /**
+     * This method changes the URI templates from the API definition as it support different schemes
+     *
+     * @param resourceConfigsJSON json String of oasDefinition
+     * @throws APIManagementException throws if an error occurred
+     * @return String
+     */
+    public abstract String processOtherSchemeScopes(String resourceConfigsJSON)
+            throws APIManagementException;
+
+    /**
+     * This method returns api that is attached with api extensions related to micro-gw
+     *
+     * @param swaggerContent json String of oasDefinition
+     * @param api            API api object
+     * @param isBasepathExtractedFromSwagger boolean
+     * @throws APIManagementException throws if an error occurred
+     * @return API
+     */
+    public abstract API setExtensionsToAPI(String swaggerContent, API api, boolean isBasepathExtractedFromSwagger)
+            throws APIManagementException;
+
 }
