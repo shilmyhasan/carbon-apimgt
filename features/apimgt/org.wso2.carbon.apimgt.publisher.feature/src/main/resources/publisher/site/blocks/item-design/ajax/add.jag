@@ -804,7 +804,7 @@ if(jagg.isCSRFTokenValid())
                     });
                     return;
                 } else {
-                    var swaggerJSON = JSON.parse(swagger);
+                    var swaggerJSON = JSON.parse(JSON.stringify(swagger));
                     if (swaggerJSON.paths) {
                         var swaggerPaths = swaggerJSON.paths;
                         for (var pathKey in swaggerPaths) {
