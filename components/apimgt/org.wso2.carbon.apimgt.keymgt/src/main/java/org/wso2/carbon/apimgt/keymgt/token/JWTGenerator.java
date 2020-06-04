@@ -24,22 +24,29 @@ import org.apache.commons.logging.LogFactory;
 
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.Application;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.keymgt.MethodStats;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
-import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.token.ClaimsRetriever;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
+import org.wso2.carbon.claim.mgt.ClaimManagementException;
+import org.wso2.carbon.claim.mgt.ClaimManagerHandler;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataHandler;
+import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCache;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheEntry;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheKey;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.core.util.UserCoreUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static org.apache.commons.collections.MapUtils.isNotEmpty;
 
@@ -120,12 +127,16 @@ public class JWTGenerator extends AbstractJWTGenerator {
             String accessToken = validationContext.getAccessToken();
             AuthorizationGrantCacheKey cacheKey = new AuthorizationGrantCacheKey(accessToken);
 
-            Map<String, String> customClaims = getClaimsFromCache(cacheKey);
+            String username = validationContext.getValidationInfoDTO().getEndUserName();
+            int tenantId = APIUtil.getTenantId(username);
+
+            Map<String, String> customClaims = getClaimsFromCache(cacheKey, username);
             if (isNotEmpty(customClaims)) {
                 if (log.isDebugEnabled()) {
                     log.debug("The custom claims are retrieved from AuthorizationGrantCache for user : "
                             + validationContext.getValidationInfoDTO().getEndUserName());
                 }
+                return customClaims;
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("Custom claims are not available in the AuthorizationGrantCache. Hence will be "
@@ -133,20 +144,17 @@ public class JWTGenerator extends AbstractJWTGenerator {
                             .getEndUserName());
                 }
             }
+
             // If claims are not found in AuthorizationGrantCache, they will be retrieved from the userstore.
-            String userName = validationContext.getValidationInfoDTO().getEndUserName();
-
             try {
-                int tenantId = APIUtil.getTenantId(userName);
-
                 if (tenantId != -1) {
                     UserStoreManager manager = ServiceReferenceHolder.getInstance().
                             getRealmService().getTenantUserRealm(tenantId).getUserStoreManager();
 
-                    String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(userName);
+                    String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(username);
 
                     if (manager.isExistingUser(tenantAwareUserName)) {
-                        customClaims.putAll(claimsRetriever.getClaims(userName));
+                        customClaims.putAll(claimsRetriever.getClaims(username));
                         return customClaims;
                     } else {
                         if (!customClaims.isEmpty()) {
@@ -156,7 +164,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
                         }
                     }
                 } else {
-                    log.error("Tenant cannot be found for username: " + userName);
+                    log.error("Tenant cannot be found for username: " + username);
                 }
             } catch (APIManagementException e) {
                 log.error("Error while retrieving claims ", e);
@@ -167,18 +175,74 @@ public class JWTGenerator extends AbstractJWTGenerator {
         return null;
     }
 
-    private static Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey) {
-
+    private Map<String, String> getClaimsFromCache(AuthorizationGrantCacheKey cacheKey, String username)
+            throws APIManagementException {
         AuthorizationGrantCacheEntry cacheEntry = AuthorizationGrantCache.getInstance()
                 .getValueFromCacheByToken(cacheKey);
         if (cacheEntry == null) {
             return new HashMap<String, String>();
         }
+
         Map<ClaimMapping, String> userAttributes = cacheEntry.getUserAttributes();
-        Map<String, String> userClaims = new HashMap<String, String>();
+        Map<String, String> oidcUserClaims = new HashMap<>();
+        Map<String, String> oidcUserClaimsCopy = new HashMap<>();
+
         for (Map.Entry<ClaimMapping, String> entry : userAttributes.entrySet()) {
-            userClaims.put(entry.getKey().getRemoteClaim().getClaimUri(), entry.getValue());
+            oidcUserClaims.put(entry.getKey().getRemoteClaim().getClaimUri(), entry.getValue());
+            oidcUserClaimsCopy.put(entry.getKey().getRemoteClaim().getClaimUri(), entry.getValue());
         }
-        return userClaims;
+
+        String convertClaimsFromOIDCtoConsumerDialect =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(APIConstants.CONVERT_CLAIMS_TO_CONSUMER_DIALECT);
+
+        if (convertClaimsFromOIDCtoConsumerDialect != null
+                && !Boolean.parseBoolean(convertClaimsFromOIDCtoConsumerDialect)) {
+            return oidcUserClaims;
+        }
+
+        int tenantId = APIUtil.getTenantId(username);
+        String tenantDomain = APIUtil.getTenantDomainFromTenantId(tenantId);
+        String dialect;
+        ClaimsRetriever claimsRetriever = getClaimsRetriever();
+        if (claimsRetriever != null) {
+            dialect = claimsRetriever.getDialectURI(username);
+        } else {
+            dialect = getDialectURI();
+        }
+
+        Map<String, String> configuredDialectToCarbonClaimMapping; // (key) configuredDialectClaimURI -> (value) carbonClaimURI
+        Map<String, String> carbonToOIDCclaimMapping; // (key) carbonClaimURI ->  value (oidcClaimURI)
+
+        Set<String> claimUris = new HashSet<>(oidcUserClaims.keySet());
+        try {
+            carbonToOIDCclaimMapping = new ClaimMetadataHandler()
+                    .getMappingsMapFromOtherDialectToCarbon("http://wso2.org/oidc/claim",
+                    claimUris, tenantDomain, true);
+            configuredDialectToCarbonClaimMapping =
+                    ClaimManagerHandler.getInstance().getMappingsMapFromCarbonDialectToOther(dialect,
+                            carbonToOIDCclaimMapping.keySet(), tenantDomain);
+        } catch (ClaimMetadataException e) {
+            String error = "Error while mapping claims from Carbon dialect to http://wso2.org/oidc/claim dialect";
+            throw new APIManagementException(error, e);
+        } catch (ClaimManagementException e) {
+            String error = "Error while mapping claims from configured dialect to Carbon dialect";
+            throw new APIManagementException(error, e);
+        }
+
+        for (Map.Entry<String, String> oidcClaimValEntry : oidcUserClaims.entrySet()) {
+            for (Map.Entry<String, String> carbonToOIDCEntry : carbonToOIDCclaimMapping.entrySet()) {
+                if (oidcClaimValEntry.getKey().equals(carbonToOIDCEntry.getValue())) {
+                    for (Map.Entry<String, String> configuredToCarbonEntry :
+                            configuredDialectToCarbonClaimMapping.entrySet()) {
+                        if (configuredToCarbonEntry.getValue().equals(carbonToOIDCEntry.getKey())) {
+                            oidcUserClaimsCopy.remove(oidcClaimValEntry.getKey());
+                            oidcUserClaimsCopy.put(configuredToCarbonEntry.getKey(), oidcClaimValEntry.getValue());
+                        }
+                    }
+                }
+            }
+        }
+        return oidcUserClaimsCopy;
     }
 }
