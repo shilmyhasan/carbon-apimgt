@@ -822,39 +822,6 @@ public class APIGatewayManager {
         }
         return failedEnvironmentsMap;
     }
-
-	/**
-	 * Checks whether the API has been published.
-	 * 
-	 * @param api
-	 *            - The API to be cheked.
-	 * @param tenantDomain
-	 *            - Tenant Domain of the publisher
-	 * @return True if the API is available in at least one Gateway. False if
-	 *         available in none.
-	 */
-    public boolean isAPIPublished(API api, String tenantDomain)throws APIManagementException {
-        for (Environment environment : environments.values()) {
-            try {
-                APIGatewayAdminClient client = new APIGatewayAdminClient(environment);
-                // If the API exists in at least one environment, consider as
-                // published and return true.
-                APIIdentifier id = api.getId();
-                if (client.getApi(tenantDomain, id) != null) {
-                    return true;
-                }
-            } catch (AxisFault axisFault) {
-                /*
-                didn't throw this exception to check api available in all the environments
-                therefore we didn't throw exception to avoid if gateway unreachable affect
-                */
-                if (!APIConstants.CREATED.equals(api.getStatus())) {
-                    log.error("Error occurred when check api is published on gateway" + environment.getName(), axisFault);
-                }
-            }
-        }
-        return false;
-    }
     
     /**
      * Get the endpoint Security type of the published API

@@ -1246,10 +1246,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         getAPIManagerConfigurationService().getAPIManagerConfiguration();
                 boolean gatewayExists = config.getApiGatewayEnvironments().size() > 0;
                 String gatewayType = config.getFirstProperty(APIConstants.API_GATEWAY_TYPE);
-                boolean isAPIPublished = false;
+                boolean isAPIPublished = true;
                 // gatewayType check is required when API Management is deployed on other servers to avoid synapse
                 if (APIConstants.API_GATEWAY_TYPE_SYNAPSE.equalsIgnoreCase(gatewayType)) {
-                    isAPIPublished = isAPIPublished(api);
                     if (gatewayExists) {
                         if (isAPIPublished) {
                             API apiPublished = getAPI(api.getId());
@@ -1317,7 +1316,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             //If gateway(s) exist, remove resource paths saved on the cache.
 
-            if (gatewayExists && isAPIPublished && !oldApi.getUriTemplates().equals(api.getUriTemplates())) {
+            if (gatewayExists && !oldApi.getUriTemplates().equals(api.getUriTemplates())) {
                 Set<URITemplate> resourceVerbs = api.getUriTemplates();
 
 
@@ -1453,34 +1452,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 String errorMessage = "Artifact manager is null when updating API artifact ID " + api.getId();
                 log.error(errorMessage);
                 throw new APIManagementException(errorMessage);
-            }
-
-            //This is a fix for broken APIs after migrating from 1.10 to 2.0.0.
-            //This sets the endpoint security of the APIs based on the old artifact.
-            APIGatewayManager gatewayManager = APIGatewayManager.getInstance();
-            if (gatewayManager.isAPIPublished(api, tenantDomain)) {
-                if ((!api.isEndpointSecured() && !api.isEndpointAuthDigest())) {
-                    boolean isSecured = Boolean.parseBoolean(
-                            artifact.getAttribute(APIConstants.API_OVERVIEW_ENDPOINT_SECURED));
-                    boolean isDigestSecured = Boolean.parseBoolean(
-                            artifact.getAttribute(APIConstants.API_OVERVIEW_ENDPOINT_AUTH_DIGEST));
-                    String userName = artifact.getAttribute(APIConstants.API_OVERVIEW_ENDPOINT_USERNAME);
-                    String password = artifact.getAttribute(APIConstants.API_OVERVIEW_ENDPOINT_PASSWORD);
-
-                    //Check for APIs marked as non-secured, but username is set.
-                    if (!isSecured && !isDigestSecured && userName != null) {
-                        String epAuthType = gatewayManager.getAPIEndpointSecurityType(api, tenantDomain);
-                        if (APIConstants.APIEndpointSecurityConstants.DIGEST_AUTH.equalsIgnoreCase(epAuthType)) {
-                            api.setEndpointSecured(true);
-                            api.setEndpointAuthDigest(true);
-                        } else if (APIConstants.APIEndpointSecurityConstants.BASIC_AUTH.equalsIgnoreCase(epAuthType)) {
-                            api.setEndpointSecured(true);
-                        }
-                        api.setEndpointUTUsername(userName);
-                        api.setEndpointUTPassword(password);
-                    }
-
-                }
             }
 
             String oldStatus = artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS);
@@ -2433,18 +2404,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         APIGatewayManager gatewayManager = APIGatewayManager.getInstance();
         return gatewayManager.removeDefaultAPIFromGateway(api, tenantDomain);
 
-    }
-
-    private boolean isAPIPublished(API api) throws APIManagementException {
-        String tenantDomain = null;
-        if (api.getId().getProviderName().contains("AT")) {
-            String provider = api.getId().getProviderName().replace("-AT-", "@");
-            tenantDomain = MultitenantUtils.getTenantDomain(provider);
-        } else {
-            tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        }
-        APIGatewayManager gatewayManager = APIGatewayManager.getInstance();
-        return gatewayManager.isAPIPublished(api, tenantDomain);
     }
 
     private APITemplateBuilder getAPITemplateBuilder(API api) throws APIManagementException {

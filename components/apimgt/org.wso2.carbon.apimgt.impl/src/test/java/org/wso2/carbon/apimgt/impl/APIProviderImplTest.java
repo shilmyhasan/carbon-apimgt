@@ -1220,8 +1220,6 @@ public class APIProviderImplTest {
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("CREATED");
         Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
 
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
-
         Mockito.when(artifact.getId()).thenReturn("12640983654");
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
                 thenReturn(apiSourcePath);
@@ -1295,8 +1293,6 @@ public class APIProviderImplTest {
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("CREATED");
         Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
 
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
-
         Mockito.when(artifact.getId()).thenReturn("12640983654");
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
                 thenReturn(apiSourcePath);
@@ -1362,7 +1358,6 @@ public class APIProviderImplTest {
         GenericArtifact artifact = Mockito.mock(GenericArtifact.class);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("CREATED");
         Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
         PowerMockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
         Mockito.when(artifact.getId()).thenReturn("12640983654");
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
@@ -2406,7 +2401,6 @@ public class APIProviderImplTest {
             }
         }).when(artifactManager).updateGenericArtifact(artifact);
 
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
         Mockito.when(APIUtil.getTiers(APIConstants.TIER_RESOURCE_TYPE, "carbon.super")).thenReturn(tiers);
         apiProvider.updateAPI(api);
         Assert.assertEquals(0, api.getEnvironments().size());
@@ -2567,7 +2561,6 @@ public class APIProviderImplTest {
         }).when(artifactManager).updateGenericArtifact(artifact);
 
         //Mocking API already not published and published
-        Mockito.when(gatewayManager.isAPIPublished(any(API.class), Matchers.anyString())).thenReturn(true);
         Mockito.when(gatewayManager.getAPIEndpointSecurityType(any(API.class), Matchers.anyString()))
                 .thenReturn(APIConstants.APIEndpointSecurityConstants.BASIC_AUTH,
                         APIConstants.APIEndpointSecurityConstants.DIGEST_AUTH);
@@ -2810,8 +2803,6 @@ public class APIProviderImplTest {
                 return null;
             }
         }).when(artifactManager).updateGenericArtifact(artifact);
-
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
 
 
         //Mock faulty GWs
@@ -3397,7 +3388,6 @@ public class APIProviderImplTest {
         PowerMockito.when(apiProvider.registry.get(apiSourcePath)).thenReturn(apiSourceArtifact);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("CREATED");
         Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
         PowerMockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
         Mockito.when(artifact.getId()).thenReturn("12640983654");
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
@@ -3448,7 +3438,6 @@ public class APIProviderImplTest {
         PowerMockito.when(apiProvider.registry.get(apiSourcePath)).thenReturn(apiSourceArtifact);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("CREATED");
         Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
         PowerMockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
         Mockito.when(artifact.getId()).thenReturn("12640983654");
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
@@ -3503,7 +3492,6 @@ public class APIProviderImplTest {
         PowerMockito.when(apiProvider.registry.get(apiSourcePath)).thenReturn(apiSourceArtifact);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("CREATED");
         Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
         PowerMockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
         Mockito.when(artifact.getId()).thenReturn("12640983654");
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
@@ -3559,7 +3547,6 @@ public class APIProviderImplTest {
         PowerMockito.when(apiProvider.registry.get(apiSourcePath)).thenReturn(apiSourceArtifact);
         Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("CREATED");
         Mockito.when(artifactManager.getGenericArtifact(apiSourceArtifact.getUUID())).thenReturn(artifact);
-        Mockito.when(gatewayManager.isAPIPublished(api, "carbon.super")).thenReturn(false);
         Mockito.when(artifact.getId()).thenReturn("12640983654");
         PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, "12640983654")).
                 thenReturn(apiSourcePath);
