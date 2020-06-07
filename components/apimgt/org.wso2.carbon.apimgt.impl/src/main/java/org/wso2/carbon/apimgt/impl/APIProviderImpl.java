@@ -1246,11 +1246,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         getAPIManagerConfigurationService().getAPIManagerConfiguration();
                 boolean gatewayExists = config.getApiGatewayEnvironments().size() > 0;
                 String gatewayType = config.getFirstProperty(APIConstants.API_GATEWAY_TYPE);
-                boolean isAPIPublished = true;
                 // gatewayType check is required when API Management is deployed on other servers to avoid synapse
                 if (APIConstants.API_GATEWAY_TYPE_SYNAPSE.equalsIgnoreCase(gatewayType)) {
                     if (gatewayExists) {
-                        if (isAPIPublished) {
+                        if (!APIConstants.CREATED.equals(oldApi.getStatus()) && !APIConstants.RETIRED
+                                .equals(oldApi.getStatus())) {
                             API apiPublished = getAPI(api.getId());
                             apiPublished.setAsDefaultVersion(api.isDefaultVersion());
                             if (api.getId().getVersion().equals(previousDefaultVersion) && !api.isDefaultVersion()) {
@@ -1260,6 +1260,16 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             } else {
                                 apiPublished.setAsPublishedDefaultVersion(
                                         api.getId().getVersion().equals(publishedDefaultVersion));
+                            }
+                            if ("INLINE".equals(api.getImplementation()) && api.getEnvironments().isEmpty()) {
+                                apiPublished.setEnvironments(
+                                        ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                                                .getAPIManagerConfiguration().getApiGatewayEnvironments().keySet());
+                            }
+                            if ("MARKDOWN".equals(api.getImplementation()) && api.getEnvironments().isEmpty()) {
+                                apiPublished.setEnvironments(
+                                        ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                                                .getAPIManagerConfiguration().getApiGatewayEnvironments().keySet());
                             }
                             apiPublished.setOldInSequence(oldApi.getInSequence());
                             apiPublished.setOldOutSequence(oldApi.getOutSequence());
@@ -1285,29 +1295,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             failedGateways.clear();
                             failedGateways.put("UNPUBLISHED", failedToRemoveEnvironments);
                             failedGateways.put("PUBLISHED", failedToPublishEnvironments);
-                        } else if (!APIConstants.CREATED.equals(api.getStatus()) && !APIConstants.RETIRED
-                                .equals(api.getStatus())) {
-                            if ("INLINE".equals(api.getImplementation()) && api.getEnvironments().isEmpty()) {
-                                api.setEnvironments(
-                                        ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
-                                                .getAPIManagerConfiguration().getApiGatewayEnvironments().keySet());
-                            }
-                            if ("MARKDOWN".equals(api.getImplementation()) && api.getEnvironments().isEmpty()) {
-                                api.setEnvironments(
-                                        ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
-                                                .getAPIManagerConfiguration().getApiGatewayEnvironments().keySet());
-                            }
-                            Map<String, String> failedToPublishEnvironments = publishToGateway(api);
-                            if (!failedToPublishEnvironments.isEmpty()) {
-                                Set<String> publishedEnvironments =
-                                        new HashSet<String>(api.getEnvironments());
-                                publishedEnvironments.removeAll(failedToPublishEnvironments.keySet());
-                                api.setEnvironments(publishedEnvironments);
-                                updateApiArtifact(api, true, false);
-                                failedGateways.clear();
-                                failedGateways.put("PUBLISHED", failedToPublishEnvironments);
-                                failedGateways.put("UNPUBLISHED", Collections.<String,String>emptyMap());
-                            }
+
+
                         }
                     } else {
                         log.debug("Gateway is not existed for the current API Provider");
