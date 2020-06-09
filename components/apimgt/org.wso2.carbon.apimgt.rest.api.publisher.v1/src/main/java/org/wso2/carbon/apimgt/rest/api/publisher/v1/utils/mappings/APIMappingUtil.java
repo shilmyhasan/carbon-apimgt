@@ -1609,7 +1609,7 @@ public class APIMappingUtil {
         operationsDTO.setTarget(uriTemplate.getUriTemplate());
         if (uriTemplate.getScope() != null) {
             operationsDTO.setScopes(new ArrayList<String>() {{
-                add(uriTemplate.getScope().getName());
+                add(uriTemplate.getScope().getKey());
             }});
         }
         operationsDTO.setThrottlingPolicy(uriTemplate.getThrottlingTier());
@@ -2233,7 +2233,7 @@ public class APIMappingUtil {
         List<ScopeDTO> scopeDTOS = new ArrayList<>();
         for (Scope aScope : scopes) {
             ScopeDTO scopeDTO = new ScopeDTO();
-            scopeDTO.setName(aScope.getName());
+            scopeDTO.setName(aScope.getKey());
             scopeDTO.setDescription(aScope.getDescription());
             ScopeBindingsDTO bindingsDTO = new ScopeBindingsDTO();
             String roles = aScope.getRoles();
