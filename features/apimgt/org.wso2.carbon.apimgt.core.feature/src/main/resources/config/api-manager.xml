@@ -367,7 +367,10 @@
         <!--StoreTokenDisplayURL>https://${carbon.local.ip}:${https.nio.port}</StoreTokenDisplayURL-->
 
         <!--This parameter specifies allowed token types for application creation-->
-        <!--AllowedApplicationTokenTypes>JWT,OAUTH</AllowedApplicationTokenTypes-->
+        <!--AllowedApplicationTokenTypes>
+            <TokenType>JWT</TokenType>
+            <TokenType>OAUTH</TokenType>
+        </AllowedApplicationTokenTypes-->
     </APIStore>
 
     <APIPublisher>

@@ -10514,11 +10514,6 @@ public final class APIUtil {
     public static List<String> getAllowedTokenTypesForAppCreation() {
         APIManagerConfiguration apiManagerConfiguration =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String allowedTokenTypes =
-                apiManagerConfiguration.getFirstProperty(APIConstants.API_STORE_ALLOWED_APPLICATION_TOKEN_TYPES);
-        if (allowedTokenTypes != null) {
-            return Arrays.asList(allowedTokenTypes.split(","));
-        }
-        return null;
+        return apiManagerConfiguration.getProperty(APIConstants.API_STORE_ALLOWED_APPLICATION_TOKEN_TYPES);
     }
 }

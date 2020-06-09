@@ -513,7 +513,11 @@
 
         <!--This parameter specifies allowed token types for application creation-->
         {% if apim.devportal.allowed_application_token_types is defined %}
-            <AllowedApplicationTokenTypes>{% for tokenType in apim.devportal.allowed_application_token_types %}{{tokenType}}{{ "," if not loop.last }}{% endfor %}</AllowedApplicationTokenTypes>
+            <AllowedApplicationTokenTypes>
+                {%for tokenType in apim.devportal.allowed_application_token_types%}
+                    <TokenType>{{tokenType}}</TokenType>
+                {% endfor %}
+            </AllowedApplicationTokenTypes>
         {% endif %}
     </APIStore>
 
