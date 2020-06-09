@@ -3696,14 +3696,14 @@ public class ApisApiServiceImpl implements ApisApiService {
         String username = RestApiUtil.getLoggedInUsername();
 
         for (Scope scope : api.getScopes()) {
-            if (!(APIUtil.isWhiteListedScope(scope.getName()))) {
+            if (!(APIUtil.isWhiteListedScope(scope.getKey()))) {
                 String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
                 int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
                 APIProvider apiProvider = RestApiUtil.getProvider(username);
 
-                if (apiProvider.isScopeKeyAssigned(apiId, scope.getName(), tenantId)) {
+                if (apiProvider.isScopeKeyAssigned(apiId, scope.getKey(), tenantId)) {
                     RestApiUtil
-                            .handleBadRequest("Scope " + scope.getName() + " is already assigned by another API",
+                            .handleBadRequest("Scope " + scope.getKey() + " is already assigned by another API",
                                     log);
                 }
             }
