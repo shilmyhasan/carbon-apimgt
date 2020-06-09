@@ -80,9 +80,9 @@
 <!-- End script to add role mappings -->
 
 <%
-var roleMappingsJSONString = encode.forHtml(JSON.stringify(roleMappingsConfig));
+var roleMappingsJSONString = JSON.stringify(roleMappingsConfig);
 %>
-<input hidden id="role_mappings" value="<%= roleMappingsJSONString%>"></input>
+<input hidden id="role_mappings" value='<%= roleMappingsJSONString%>'></input>
 <div id="roleListing"></div>
 
 <div id="listing">
