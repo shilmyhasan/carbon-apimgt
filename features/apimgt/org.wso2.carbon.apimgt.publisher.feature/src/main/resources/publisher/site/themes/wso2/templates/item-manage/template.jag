@@ -845,7 +845,10 @@
                     <!-- Resources Information -->
                         <div id="api_designer">
                             <div id ="apidoc_details"></div>
-                            <div id="scopes_view"></div>
+                            <div id="scopes_view">
+                                <img src="<%=jagg.getAbsoluteUrl(jagg.getThemeFile("templates/item-manage/img/loading.gif"))%>">
+                                <%=i18n.localize("Loading Resources...")%>
+                            </div>
                             <div id ="resource_details"></div>
                         </div>
                         <!-- Resources Information -->
@@ -1093,6 +1096,10 @@
             <td><a class="operation-summary scope_select"  data-type="select" data-path="$.paths.['{{ path }}'].{{@key}}" data-attr="x-scope" title="x-scope">{{ x-scope }}</a></td>        </tr>
         <tr><td colspan="6" class="resource_body " data-path="$.paths.['{{ path }}'].{{@key}}"></td></tr>
     {{/each}}
+    {{else}}
+    <div id ="resource_details_load">
+        <img src="<%=jagg.getAbsoluteUrl(jagg.getThemeFile("templates/item-manage/img/loading.gif"))%>">
+        <%=i18n.localize("Loading Resources...")%>
 {{/each}}
 </table>
 </script>
