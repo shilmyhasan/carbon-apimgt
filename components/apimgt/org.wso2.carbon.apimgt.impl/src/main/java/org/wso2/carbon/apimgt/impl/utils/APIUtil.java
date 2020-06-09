@@ -10506,4 +10506,19 @@ public final class APIUtil {
         return temp;
     }
 
+    /**
+     * Returns the allowed token types for application creation.
+     * Ex: JWT,OAUTH or JWT or OAUTH
+     * @return allowed token types
+     */
+    public static List<String> getAllowedTokenTypesForAppCreation() {
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String allowedTokenTypes =
+                apiManagerConfiguration.getFirstProperty(APIConstants.API_STORE_ALLOWED_APPLICATION_TOKEN_TYPES);
+        if (allowedTokenTypes != null) {
+            return Arrays.asList(allowedTokenTypes.split(","));
+        }
+        return null;
+    }
 }

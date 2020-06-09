@@ -4867,6 +4867,10 @@ definitions:
       IsUnlimitedTierPaid:
         type: boolean
         default: false
+      allowedAppTokenTypes:
+        type: array
+        items:
+          type: string
 #-----------------------------------------------------
 # The Application Attribute resource
 #-----------------------------------------------------

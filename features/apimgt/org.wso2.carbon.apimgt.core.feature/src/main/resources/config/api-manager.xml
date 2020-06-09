@@ -365,6 +365,9 @@
         cURL command under subscriptions section in API Store.
         -->
         <!--StoreTokenDisplayURL>https://${carbon.local.ip}:${https.nio.port}</StoreTokenDisplayURL-->
+
+        <!--This parameter specifies allowed token types for application creation-->
+        <!--AllowedApplicationTokenTypes>JWT,OAUTH</AllowedApplicationTokenTypes-->
     </APIStore>
 
     <APIPublisher>
