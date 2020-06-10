@@ -55,6 +55,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.Response;
@@ -139,6 +140,13 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
                 }
             } else {
                 RestApiUtil.handleBadRequest("Throttling tier cannot be null", log);
+            }
+
+            if (APIUtil.getAllowedTokenTypesForAppCreation() != null) {
+                List<String> allowedTokenTypes = APIUtil.getAllowedTokenTypesForAppCreation();
+                if (!allowedTokenTypes.contains(body.getTokenType().toString())) {
+                    RestApiUtil.handleBadRequest("Specified token type is not allowed", log);
+                }
             }
 
             Object applicationAttributesFromUser = body.getAttributes();
@@ -408,6 +416,21 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
             Application oldApplication = apiConsumer.getApplicationByUUID(applicationId);
             if (oldApplication != null) {
                 if (RestAPIStoreUtils.isUserOwnerOfApplication(oldApplication)) {
+
+                    if (APIUtil.getAllowedTokenTypesForAppCreation() != null) {
+                        List<String> allowedTokenTypes = APIUtil.getAllowedTokenTypesForAppCreation();
+                        /*
+                         * If the old application token type is equal to updated application type or the token type is
+                         * in the allowed token types, proceed. Otherwise throw and error. In here we check for the old
+                         * application token type as in a scenario where token type A is restricted after creating an
+                         * app with that type, still we allow to use token type A for that application.
+                         * */
+                        if (!(oldApplication.getTokenType().equalsIgnoreCase(body.getTokenType().toString())
+                                || allowedTokenTypes.contains(body.getTokenType().toString()))) {
+                            RestApiUtil.handleBadRequest("Specified token type is not allowed", log);
+                        }
+                    }
+
                     Object applicationAttributesFromUser = body.getAttributes();
                     Map<String, String> applicationAttributes = new ObjectMapper().convertValue(applicationAttributesFromUser, Map.class);
 

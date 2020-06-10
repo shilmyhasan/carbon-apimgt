@@ -510,6 +510,15 @@
 
         <!--This parameter specifies the alias value of the Api Key which will be used for Api Key Authentication-->
         <ApiKeyAlias>{{apim.devportal.api_key_alias}}</ApiKeyAlias>
+
+        <!--This parameter specifies allowed token types for application creation-->
+        {% if apim.devportal.allowed_application_token_types is defined %}
+            <AllowedApplicationTokenTypes>
+                {%for tokenType in apim.devportal.allowed_application_token_types%}
+                    <TokenType>{{tokenType}}</TokenType>
+                {% endfor %}
+            </AllowedApplicationTokenTypes>
+        {% endif %}
     </APIStore>
 
     <APIPublisher>
