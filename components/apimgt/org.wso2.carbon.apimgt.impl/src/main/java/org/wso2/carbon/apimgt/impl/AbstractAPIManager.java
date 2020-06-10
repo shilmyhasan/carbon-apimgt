@@ -1675,7 +1675,8 @@ public abstract class AbstractAPIManager implements APIManager {
         //application will not be shared within the group
         defaultApp.setGroupId("");
         List<String> allowedTokenTypes = APIUtil.getAllowedTokenTypesForAppCreation();
-        if (allowedTokenTypes != null && !allowedTokenTypes.contains(APIConstants.TOKEN_TYPE_JWT)) {
+        if (allowedTokenTypes != null && !allowedTokenTypes.isEmpty()
+                && !allowedTokenTypes.contains(APIConstants.TOKEN_TYPE_JWT)) {
             defaultApp.setTokenType(allowedTokenTypes.get(0));
         } else {
             defaultApp.setTokenType(APIConstants.TOKEN_TYPE_JWT);
