@@ -129,7 +129,7 @@ $(document).ready(function () {
             okCallback: function () {
                 var deleteMappingJSON = JSON.parse($("#role_mappings").val());
                 delete deleteMappingJSON[key];
-                $("#role_mappings").val(JSON.stringify(deleteMappingJSON).replace(" ", ""));
+                $("#role_mappings").val(JSON.stringify(deleteMappingJSON));
                 jagg.post("/site/blocks/settings/scope-mapping/ajax/scope-mapping.jag",
                     {
                         originalRole: key,
