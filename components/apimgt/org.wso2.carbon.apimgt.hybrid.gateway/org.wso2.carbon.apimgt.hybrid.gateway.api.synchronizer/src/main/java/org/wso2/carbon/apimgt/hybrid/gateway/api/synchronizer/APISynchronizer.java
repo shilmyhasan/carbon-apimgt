@@ -293,7 +293,9 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                 Map<String, String> multiTenantUserMap = MicroGatewayCommonUtil.getMultiTenantUserMap();
                 Set<String> tenantUsernameSet = multiTenantUserMap.keySet();
                 for (String tenantUsername : tenantUsernameSet) {
-                    password = multiTenantUserMap.get(tenantUsername).toCharArray();
+                    // Trimming password to remove new line character appended to the password
+                    // after reading from toml file
+                    password = multiTenantUserMap.get(tenantUsername).trim().toCharArray();
                     JSONArray updatedApiIds = getIdentifiersOfUpdatedAPIs(tenantUsername, password);
                     if (updatedApiIds.size() != 0) {
                         initializeAPISynchronization(updatedApiIds, tenantUsername, password);
