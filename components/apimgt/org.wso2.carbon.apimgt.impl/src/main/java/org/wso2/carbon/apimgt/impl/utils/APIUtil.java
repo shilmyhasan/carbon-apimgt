@@ -3976,10 +3976,7 @@ public final class APIUtil {
             if (log.isDebugEnabled()) {
                 log.debug("Adding/updating tenant-conf.json to the registry of tenant " + tenantID);
             }
-            Resource resource = registry.newResource();
-            resource.setMediaType(APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-            resource.setContent(data);
-            registry.put(APIConstants.API_TENANT_CONF_LOCATION, resource);
+            updateTenantConf(registry, data);
             if (log.isDebugEnabled()) {
                 log.debug("Successfully added/updated tenant-conf.json of tenant  " + tenantID);
             }
@@ -3988,6 +3985,25 @@ public final class APIUtil {
         } catch (IOException e) {
             throw new APIManagementException("Error while reading tenant conf file content of tenant " + tenantID, e);
         }
+    }
+
+    public static void updateTenantConf(String tenantConfString, String tenantDomain) throws APIManagementException {
+        RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
+        int tenantId = getTenantIdFromTenantDomain(tenantDomain);
+        try {
+            UserRegistry registry = registryService.getConfigSystemRegistry(tenantId);
+            updateTenantConf(registry, tenantConfString.getBytes());
+        } catch (RegistryException e) {
+            throw new APIManagementException("Error while saving tenant conf to the registry of tenant "
+                    + tenantDomain, e);
+        }
+    }
+
+    private static void updateTenantConf(UserRegistry registry, byte[] data) throws RegistryException {
+        Resource resource = registry.newResource();
+        resource.setMediaType(APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+        resource.setContent(data);
+        registry.put(APIConstants.API_TENANT_CONF_LOCATION, resource);
     }
 
     /**
@@ -4006,15 +4022,17 @@ public final class APIUtil {
             }
             byte[] data = getLocalTenantConfFileData();
             log.debug("Adding tenant config to the registry");
-            Resource resource = registry.newResource();
-            resource.setMediaType(APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-            resource.setContent(data);
-            registry.put(APIConstants.API_TENANT_CONF_LOCATION, resource);
+            updateTenantConf(registry, data);
         } catch (RegistryException e) {
             throw new APIManagementException("Error while saving tenant conf to the registry", e);
         } catch (IOException e) {
             throw new APIManagementException("Error while reading tenant conf file content", e);
         }
+    }
+
+    public static JSONObject getTenantConfig(String tenantDomain) throws APIManagementException {
+        int tenantId = getTenantIdFromTenantDomain(tenantDomain);
+        return getTenantConfig(tenantId);
     }
 
     /**
@@ -4052,8 +4070,10 @@ public final class APIUtil {
         JSONObject tenantConf = getTenantConfig(tenantId);
         JSONObject scopesConfigTenant = getRESTAPIScopesFromTenantConfig(tenantConf);
         JSONObject scopeConfigLocal = getRESTAPIScopesConfigFromFileSystem();
-        Map<String, String> scopesTenant = getRESTAPIScopesFromConfig(scopesConfigTenant);
-        Map<String, String> scopesLocal = getRESTAPIScopesFromConfig(scopeConfigLocal);
+        JSONObject roleMappingConfigTenant = getRESTAPIScopeRoleMappingsFromTenantConfig(tenantConf);
+        JSONObject roleMappingConfigLocal = getRESTAPIRoleMappingsConfigFromFileSystem();
+        Map<String, String> scopesTenant = getRESTAPIScopesFromConfig(scopesConfigTenant, roleMappingConfigTenant);
+        Map<String, String> scopesLocal = getRESTAPIScopesFromConfig(scopeConfigLocal, roleMappingConfigLocal);
         JSONArray tenantScopesArray = (JSONArray) scopesConfigTenant.get(APIConstants.REST_API_SCOPE);
         boolean isRoleUpdated = false;
         boolean isMigrated = false;
@@ -4132,6 +4152,61 @@ public final class APIUtil {
             return Optional.empty();
         }
     }
+
+    /**
+     * Returns the REST API role mappings JSONObject from the tenant-conf.json in the file system
+     *
+     * @return REST API role mappings JSONObject from the tenant-conf.json in the file system
+     * @throws APIManagementException when error occurred while retrieving local REST API role mappings.
+     */
+    private static JSONObject getRESTAPIRoleMappingsConfigFromFileSystem() throws APIManagementException {
+        try {
+            byte[] tenantConfData = getLocalTenantConfFileData();
+            String tenantConfDataStr = new String(tenantConfData, Charset.defaultCharset());
+            JSONParser parser = new JSONParser();
+            JSONObject tenantConfJson = (JSONObject) parser.parse(tenantConfDataStr);
+            if (tenantConfJson == null) {
+                throw new APIManagementException("tenant-conf.json (in file system) content cannot be null");
+            }
+            JSONObject roleMappings = getRESTAPIScopeRoleMappingsFromTenantConfig(tenantConfJson);
+            if (roleMappings == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Scope role mappings are not defined in the tenant-conf.json in file system");
+                }
+            }
+            return roleMappings;
+        } catch (IOException e) {
+            throw new APIManagementException("Error while reading tenant conf file content from file system", e);
+        } catch (ParseException e) {
+            throw new APIManagementException("ParseException thrown when parsing tenant config json from string " +
+                    "content", e);
+        }
+    }
+
+    /**
+     * @param tenantDomain Tenant domain to be used to get configurations for REST API scopes
+     * @return JSON object which contains configuration for REST API scopes
+     * @throws APIManagementException
+     */
+    public static JSONObject getTenantRESTAPIScopeRoleMappingsConfig(String tenantDomain) throws APIManagementException {
+        JSONObject restAPIConfigJSON = null;
+        int tenantId = getTenantIdFromTenantDomain(tenantDomain);
+        JSONObject tenantConfJson = getTenantConfig(tenantId);
+        if (tenantConfJson != null) {
+            restAPIConfigJSON = getRESTAPIScopeRoleMappingsFromTenantConfig(tenantConfJson);
+            if (restAPIConfigJSON == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("No REST API role mappings are defined for the tenant " + tenantDomain);
+                }
+            }
+        }
+        return restAPIConfigJSON;
+    }
+
+    private static JSONObject getRESTAPIScopeRoleMappingsFromTenantConfig(JSONObject tenantConf) {
+        return (JSONObject) tenantConf.get(APIConstants.REST_API_ROLE_MAPPINGS_CONFIG);
+    }
+
 
     /**
      * Returns the REST API scopes JSONObject from the tenant-conf.json in the file system
@@ -7088,8 +7163,8 @@ public final class APIUtil {
                 .get(tenantDomain);
         if (restAPIScopes == null) {
             try {
-                restAPIScopes =
-                        APIUtil.getRESTAPIScopesFromConfig(APIUtil.getTenantRESTAPIScopesConfig(tenantDomain));
+                restAPIScopes = APIUtil.getRESTAPIScopesFromConfig(APIUtil.getTenantRESTAPIScopesConfig(tenantDomain),
+                        APIUtil.getTenantRESTAPIScopeRoleMappingsConfig(tenantDomain));
                 //call load tenant config for rest API.
                 //then put cache
                 Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER)
@@ -7143,16 +7218,38 @@ public final class APIUtil {
     }
 
     /**
-     * @param config JSON configuration object with scopes and associated roles
+     * @param scopesConfig JSON configuration object with scopes and associated roles
+     * @param roleMappings JSON Configuration object with role mappings
      * @return Map of scopes which contains scope names and associated role list
      */
-    public static Map<String, String> getRESTAPIScopesFromConfig(JSONObject config) {
+    public static Map<String, String> getRESTAPIScopesFromConfig(JSONObject scopesConfig, JSONObject roleMappings) {
         Map<String, String> scopes = new HashMap<String, String>();
-        JSONArray scopesArray = (JSONArray) config.get("Scope");
+        JSONArray scopesArray = (JSONArray) scopesConfig.get("Scope");
         for (Object scopeObj : scopesArray) {
             JSONObject scope = (JSONObject) scopeObj;
             String scopeName = scope.get(APIConstants.REST_API_SCOPE_NAME).toString();
             String scopeRoles = scope.get(APIConstants.REST_API_SCOPE_ROLE).toString();
+            if (roleMappings != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("REST API scope role mappings exist. Hence proceeding to swap original scope roles "
+                            + "for mapped scope roles.");
+                }
+                //split role list string read using comma separator
+                List<String> originalRoles = Arrays.asList(scopeRoles.split("\\s*,\\s*"));
+                List<String> mappedRoles = new ArrayList<String>();
+                for (String role : originalRoles) {
+                    String mappedRole = (String) roleMappings.get(role);
+                    if (mappedRole != null) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(role + " was mapped to " + mappedRole);
+                        }
+                        mappedRoles.add(mappedRole);
+                    } else {
+                        mappedRoles.add(role);
+                    }
+                }
+                scopeRoles = String.join(",", mappedRoles);
+            }
             scopes.put(scopeName, scopeRoles);
         }
         return scopes;
