@@ -58,7 +58,7 @@ public class RoleBasedScopesIssuerWrapper extends RoleBasedScopesIssuer {
     }
 
     @Override
-    protected Map<String, String> getRESTAPIScopesFromConfig(JSONObject scopesConfig, JSONObject roleMappings) {
+    protected Map<String, String> getRESTAPIScopesFromConfig(JSONObject jsonObject) {
 
         Map<String, String> scopes = new HashMap<String, String>();
         scopes.put("default", "default");

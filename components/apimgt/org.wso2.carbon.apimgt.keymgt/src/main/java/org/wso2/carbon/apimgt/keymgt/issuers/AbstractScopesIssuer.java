@@ -127,12 +127,11 @@ public abstract class AbstractScopesIssuer {
     /**
      * Get REST API scopes from the configuration
      *
-     * @param scopesConfig Scopes config as a Json object
-     * @param roleMappingConfig rolemappings config as a Json object
+     * @param jsonObject Scopes config as a Json object
      * @return JSONObject
      */
-    protected Map<String, String> getRESTAPIScopesFromConfig(JSONObject scopesConfig, JSONObject roleMappingConfig) {
-        return APIUtil.getRESTAPIScopesFromConfig(scopesConfig, roleMappingConfig);
+    protected Map<String, String> getRESTAPIScopesFromConfig(JSONObject jsonObject) {
+        return APIUtil.getRESTAPIScopesFromConfig(jsonObject);
     }
 
     /**
