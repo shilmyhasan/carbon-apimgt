@@ -103,7 +103,7 @@ $(document).ready(function () {
         //render role mappings table
         var addMappingJSON = JSON.parse($("#role_mappings").val()) != null ? JSON.parse($("#role_mappings").val()) : {};
         addMappingJSON[originalRoleVal] = mappedRoleVal;
-        $("#role_mappings").val(JSON.stringify(addMappingJSON).replace(" ", ""));
+        $("#role_mappings").val(JSON.stringify(addMappingJSON);
         renderRoleMappings();
     });
 
