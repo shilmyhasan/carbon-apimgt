@@ -144,6 +144,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                     .replace(APISynchronizationConstants.API_VERSION_PARAM, apiVersion)
                     .replace("//", APISynchronizationConstants.URL_PATH_SEPARATOR);
             apiViewAdminUrl = apiPublisherUrl + APISynchronizationConstants.API_VIEW_ADMIN_PATH
+                    .replace(APISynchronizationConstants.API_VERSION_PARAM, apiVersion)
                     .replace("//", APISynchronizationConstants.URL_PATH_SEPARATOR);
             mediationPolicyUrl = apiPublisherUrl + APISynchronizationConstants.API_VIEW_GLOBAL_MEDIATION_POLICY_PATH
                     .replace(APISynchronizationConstants.API_VERSION_PARAM, apiVersion)
@@ -247,7 +248,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                 apidto.setContext(context);
                 APIMappingUtil.apisUpdate(apidto, username);
             } catch (APISynchronizationException e) {
-                log.error("Failed to create API " + apidto.getId());
+                log.error("Failed to create API " + apidto.getId(), e);
             }
         }
     }
@@ -627,7 +628,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
                 throw new APISynchronizationException("An error occurred while de-serializing MediationListDTO " +
                         "object of API " + apiId + " from input stream.", e);
             } catch (APISynchronizationException e) {
-                throw new APISynchronizationException("Error while deploying custom sequences of API " + apiId);
+                throw new APISynchronizationException("Error while deploying custom sequences of API " + apiId, e);
             }
         }
     }
@@ -714,7 +715,7 @@ public class APISynchronizer implements OnPremiseGatewayInitListener {
     private void deployGlobalSequence(APIDTO api, String apiId, String seqId, AccessTokenDTO accessTokenDTO, String username)
             throws APISynchronizationException {
         try {
-            String uri = apiViewAdminUrl + APISynchronizationConstants.URL_PATH_SEPARATOR
+            String uri = apiViewAdminUrl
                     + APISynchronizationConstants.API_VIEW_MEDIATION_POLICY_PATH
                     + APISynchronizationConstants.URL_PATH_SEPARATOR + seqId;
             deploySequenceFromUrl(api, apiId, seqId, accessTokenDTO, uri, username);
