@@ -6616,6 +6616,10 @@ public class ApiMgtDAO {
                         application.setGroupId(getGroupId(applicationId));
                     }
                 }
+                if (application != null) {
+                    Map<String,String> applicationAttributes = getApplicationAttributes(connection, applicationId);
+                    application.setApplicationAttributes(applicationAttributes);
+                }
             }
 
         } catch (SQLException e) {
