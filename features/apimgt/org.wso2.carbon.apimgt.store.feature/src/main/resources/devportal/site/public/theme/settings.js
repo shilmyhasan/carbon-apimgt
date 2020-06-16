@@ -9,6 +9,7 @@ const Settings = {
             host: 'localhost',
         },
         subscriptionLimit: 1000,
+        subscribeApplicationLimit: 5000,
     },
     grantTypes: {
         authorization_code: 'Code',

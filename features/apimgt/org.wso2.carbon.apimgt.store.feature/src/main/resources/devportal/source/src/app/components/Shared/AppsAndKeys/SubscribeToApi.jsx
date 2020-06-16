@@ -28,6 +28,8 @@ import Select from '@material-ui/core/Select';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { FormattedMessage } from 'react-intl';
 import classNames from 'classnames';
 
@@ -127,7 +129,7 @@ const subscribeToApi = (props) => {
     useEffect(() => {
         if (applicationsAvailable && applicationsAvailable[0]) {
             setApplicationsList(applicationsAvailable);
-            setAppSelected(applicationsAvailable[0].value);
+            setAppSelected(applicationsAvailable[0]);
             const newRequest = { ...subscriptionRequest };
             newRequest.applicationId = applicationsAvailable[0].value;
         }
@@ -139,13 +141,13 @@ const subscribeToApi = (props) => {
      * @param {*} field field that should be updated in subscription request
      * @param {*} event event fired
      */
-    const handleChange = (field, event) => {
+    const handleChange = (field, event,value = null) => {
         const newRequest = { ...subscriptionRequest };
         const { target } = event;
         switch (field) {
             case 'application':
-                newRequest.applicationId = target.value;
-                setAppSelected(target.value);
+                newRequest.applicationId = value.value;
+                setAppSelected(value);
                 break;
             case 'throttlingPolicy':
                 newRequest.throttlingPolicy = target.value;
@@ -168,20 +170,16 @@ const subscribeToApi = (props) => {
                                 defaultMessage='Application'
                             />
                         </InputLabel>
-                        <Select
-                            value={appSelected}
-                            onChange={e => handleChange('application', e)}
-                            input={<Input name='appSelected' id='app-label-placeholder' />}
-                            displayEmpty
-                            name='appSelected'
-                            className={classes.selectEmpty}
-                        >
-                            {applicationsList.map(app => (
-                                <MenuItem value={app.value} key={app.value}>
-                                    {app.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
+                        <Autocomplete
+                               id="combo-box-demo"
+                               options={applicationsList}
+                               value={(applicationsList.length !== 0 && appSelected === '') ?
+                                    applicationsList[0] : appSelected}
+                               onChange={(e, value) => handleChange('application', e, value)}
+                               getOptionLabel={(option) => option.label}
+                               className={classes.selectEmpty}
+                               renderInput={(params) => <TextField {...params} />}
+                             />
                         <FormHelperText>
                             <FormattedMessage
                                 id='Shared.AppsAndKeys.SubscribeToApi.select.an.application.to.subscribe'
