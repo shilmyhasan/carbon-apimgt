@@ -1351,9 +1351,9 @@ public class OAS3Parser extends APIDefinition {
                     defaultType.setFlows(defaultTypeFlows);
                 }
             }
+            component.setSecuritySchemes(securitySchemes);
+            openAPI.setComponents(component);
         }
-        component.setSecuritySchemes(securitySchemes);
-        openAPI.setComponents(component);
         setOtherSchemes(otherSetOfSchemes);
         return openAPI;
     }
