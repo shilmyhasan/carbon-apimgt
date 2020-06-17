@@ -140,6 +140,7 @@ class ApiConsole extends React.Component {
         let keys;
         let selectedKeyType = 'PRODUCTION';
         let accessToken;
+        let selectedTokenType;
 
         this.apiClient = new Api();
         const promiseAPI = this.apiClient.getAPIById(apiID);
@@ -182,6 +183,8 @@ class ApiConsole extends React.Component {
 
                         promiseApp
                             .then((application) => {
+                                selectedTokenType = application.tokenType;
+
                                 return application.getKeys();
                             })
                             .then((appKeys) => {
@@ -204,6 +207,7 @@ class ApiConsole extends React.Component {
                                     keys: appKeys,
                                     selectedKeyType,
                                     accessToken,
+                                    selectedTokenType,
                                 });
                             });
                     } else {
@@ -218,6 +222,7 @@ class ApiConsole extends React.Component {
                             keys,
                             selectedKeyType,
                             accessToken,
+                            selectedTokenType,
                         });
                     }
                 } else {
@@ -232,6 +237,7 @@ class ApiConsole extends React.Component {
                         keys,
                         selectedKeyType,
                         accessToken,
+                        selectedTokenType,
                     });
                 }
             })
@@ -359,6 +365,7 @@ class ApiConsole extends React.Component {
 
         promiseApp
             .then((application) => {
+                this.setState({ selectedTokenType: application.tokenType });
                 return application.getKeys();
             })
             .then((appKeys) => {
@@ -377,7 +384,7 @@ class ApiConsole extends React.Component {
         const { classes } = this.props;
         const {
             api, serverError, swagger, accessToken, showToken, subscriptions, selectedApplication, selectedKeyType,
-            selectedEnvironment, environments, labels, securitySchemeType, username, password,
+            selectedEnvironment, environments, labels, securitySchemeType, username, password, selectedTokenType,
         } = this.state;
         const user = AuthManager.getUser();
         const downloadSwagger = JSON.stringify({ ...swagger });
@@ -448,6 +455,7 @@ class ApiConsole extends React.Component {
                                             handleChanges={this.handleChanges}
                                             selectedApplication={selectedApplication}
                                             selectedKeyType={selectedKeyType}
+                                            selectedTokenType={selectedTokenType}
                                         />
                                     )}
                                     {subscriptions && subscriptions.length === 0 && (
