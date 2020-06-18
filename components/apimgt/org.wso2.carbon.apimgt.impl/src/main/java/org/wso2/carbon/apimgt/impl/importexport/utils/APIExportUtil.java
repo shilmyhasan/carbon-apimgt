@@ -86,6 +86,9 @@ import javax.xml.stream.XMLStreamException;
 public class APIExportUtil {
 
     private static final Log log = LogFactory.getLog(APIExportUtil.class);
+    private static final String IN = "in";
+    private static final String OUT = "out";
+    private static final String SOAPTOREST = "SoapToRest";
 
     private APIExportUtil() {
     }
@@ -119,6 +122,9 @@ public class APIExportUtil {
 
             //export thumbnail
             exportAPIThumbnail(archivePath, apiIDToReturn, registry);
+
+            //export SOAP to REST Mediation
+            exportSOAPToRESTMediation(archivePath, apiIDToReturn, registry);
 
             //export documents
             List<Documentation> docList = provider.getAllDocumentation(apiIDToReturn, userName);
@@ -208,6 +214,68 @@ public class APIExportUtil {
             //Exception is ignored by logging due to the reason that Thumbnail is not essential for
             //an API to be recreated.
             log.error("I/O error while writing API Thumbnail: " + thumbnailUrl + " to file", e);
+        }
+    }
+
+    /**
+     * Retrieve SOAP to REST mediation logic for the exporting API and store it in the archive directory
+     *
+     * @param apiIdentifier ID of the requesting API
+     * @param registry      Current tenant registry
+     * @throws APIImportExportException If an error occurs while retrieving image from the registry or
+     *                            storing in the archive directory
+     */
+    private static void exportSOAPToRESTMediation(String archivePath, APIIdentifier apiIdentifier, Registry registry)
+            throws APIImportExportException {
+        String soapToRestBaseUrl = "/apimgt/applicationdata/provider" + RegistryConstants.PATH_SEPARATOR +
+                apiIdentifier.getProviderName() + RegistryConstants.PATH_SEPARATOR +
+                apiIdentifier.getApiName() + RegistryConstants.PATH_SEPARATOR +
+                apiIdentifier.getVersion() + RegistryConstants.PATH_SEPARATOR +
+                "soap_to_rest";
+
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            if (registry.resourceExists(soapToRestBaseUrl)) {
+                Collection inFlow = (org.wso2.carbon.registry.api.Collection) registry.get(soapToRestBaseUrl
+                        + RegistryConstants.PATH_SEPARATOR + IN);
+                Collection outFlow = (org.wso2.carbon.registry.api.Collection) registry.get(soapToRestBaseUrl
+                        + RegistryConstants.PATH_SEPARATOR + OUT);
+
+                CommonUtil.createDirectory(archivePath + File.separator + SOAPTOREST + File.separator + IN);
+                CommonUtil.createDirectory(archivePath + File.separator + SOAPTOREST + File.separator + OUT);
+                if (inFlow != null) {
+                    for (String inFlowPath : inFlow.getChildren()) {
+                        inputStream = registry.get(inFlowPath).getContentStream();
+                        outputStream = new FileOutputStream(archivePath + File.separator + SOAPTOREST
+                                + File.separator + IN +
+                                inFlowPath.substring(inFlowPath.lastIndexOf(RegistryConstants.PATH_SEPARATOR)));
+                        IOUtils.copy(inputStream, outputStream);
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
+                    }
+                }
+                if (outFlow != null) {
+                    for (String outFlowPath : outFlow.getChildren()) {
+                        inputStream = registry.get(outFlowPath).getContentStream();
+                        outputStream = new FileOutputStream(archivePath + File.separator + SOAPTOREST
+                                + File.separator + OUT +
+                                outFlowPath.substring(outFlowPath.lastIndexOf(RegistryConstants.PATH_SEPARATOR)));
+                        IOUtils.copy(inputStream, outputStream);
+                        IOUtils.closeQuietly(inputStream);
+                        IOUtils.closeQuietly(outputStream);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.error("I/O error while  writing API SOAP to REST logic to file", e);
+            throw new APIImportExportException("I/O error while writing API SOAP to REST logic to file", e);
+        } catch (RegistryException e) {
+            log.error("Error while retrieving API SOAP to REST logic ", e);
+            throw new APIImportExportException("Error while retrieving SOAP to REST logic", e);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+            IOUtils.closeQuietly(outputStream);
         }
     }
 

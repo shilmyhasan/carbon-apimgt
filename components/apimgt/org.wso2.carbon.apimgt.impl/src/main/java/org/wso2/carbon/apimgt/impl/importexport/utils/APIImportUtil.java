@@ -59,6 +59,7 @@ import org.wso2.carbon.apimgt.impl.importexport.lifecycle.LifeCycle;
 import org.wso2.carbon.apimgt.impl.importexport.lifecycle.LifeCycleTransition;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.wsdl.util.SOAPToRESTConstants;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
@@ -79,6 +80,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -90,6 +96,9 @@ import javax.xml.parsers.ParserConfigurationException;
 public final class APIImportUtil {
 
     private static final Log log = LogFactory.getLog(APIImportUtil.class);
+    private static final String IN = "in";
+    private static final String OUT = "out";
+    private static final String SOAPTOREST = "SoapToRest";
 
     /**
      * This method returns the lifecycle action which can be used to transit from currentStatus to targetStatus.
@@ -398,6 +407,7 @@ public final class APIImportUtil {
             addAPISpecificSequences(pathToArchive, importedApi, registry);
             addAPIWsdl(pathToArchive, importedApi, apiProvider, registry);
             addEndpointCertificates(pathToArchive, importedApi, apiProvider, tenantId);
+            addSOAPToRESTMediation(pathToArchive, importedApi, registry);
 
             // Change API lifecycle if state transition is required
             if (StringUtils.isNotEmpty(lifecycleAction)) {
@@ -872,6 +882,83 @@ public final class APIImportUtil {
                     + alias + " ] tenant user ["
                     + APIUtil.replaceEmailDomainBack(importedApi.getId().getProviderName()) + "]";
             log.error(errorMessage, e);
+        }
+    }
+
+    /**
+     * This method adds API sequences to the imported API. If the sequence is a newly defined one, it is added.
+     *
+     * @param pathToArchive location of the extracted folder of the API
+     */
+    private static void addSOAPToRESTMediation(String pathToArchive, API importedApi, Registry registry)
+            throws APIImportExportException {
+
+        String inFlowFileLocation = pathToArchive + File.separator + SOAPTOREST + File.separator + IN;
+        String outFlowFileLocation = pathToArchive + File.separator + SOAPTOREST + File.separator + OUT;
+
+        //Adding in-sequence, if any
+        if (CommonUtil.checkFileExistence(inFlowFileLocation)) {
+            APIIdentifier apiId = importedApi.getId();
+            String soapToRestLocationIn =
+                    APIConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR + apiId.getProviderName()
+                            + RegistryConstants.PATH_SEPARATOR + apiId.getApiName() + RegistryConstants.PATH_SEPARATOR
+                            + apiId.getVersion() + RegistryConstants.PATH_SEPARATOR
+                            + SOAPToRESTConstants.SequenceGen.SOAP_TO_REST_IN_RESOURCE;
+            String soapToRestLocationOut =
+                    APIConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR + apiId.getProviderName()
+                            + RegistryConstants.PATH_SEPARATOR + apiId.getApiName() + RegistryConstants.PATH_SEPARATOR
+                            + apiId.getVersion() + RegistryConstants.PATH_SEPARATOR
+                            + SOAPToRESTConstants.SequenceGen.SOAP_TO_REST_OUT_RESOURCE;
+            try {
+                // Import inflow mediation logic
+                Path inFlowDirectory = Paths.get(inFlowFileLocation);
+                ImportMediationLogic(inFlowDirectory, registry, soapToRestLocationIn);
+
+                // Import outflow mediation logic
+                Path outFlowDirectory = Paths.get(outFlowFileLocation);
+                ImportMediationLogic(outFlowDirectory, registry, soapToRestLocationOut);
+
+            } catch (DirectoryIteratorException e) {
+                throw new APIImportExportException("Error in importing SOAP to REST mediation logic", e);
+            }
+        }
+    }
+
+    /**
+     * Method created to add inflow and outflow mediation logic
+     *
+     * @param flowDirectory      inflow and outflow directory
+     * @param registry           Registry
+     * @param soapToRestLocation folder location
+     * @throws APIImportExportException
+     */
+    private static void ImportMediationLogic(Path flowDirectory, Registry registry, String soapToRestLocation)
+            throws APIImportExportException {
+        InputStream inputFlowStream = null;
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(flowDirectory)) {
+            for (Path file : stream) {
+                String fileName = file.getFileName().toString();
+                String method = "";
+                if (fileName.split(".xml").length != 0) {
+                    method = fileName.split(".xml")[0]
+                            .substring(file.getFileName().toString().lastIndexOf("_") + 1);
+                }
+                inputFlowStream = new FileInputStream(file.toFile());
+                byte[] inSeqData = IOUtils.toByteArray(inputFlowStream);
+                Resource inSeqResource = (Resource) registry.newResource();
+                inSeqResource.setContent(inSeqData);
+                inSeqResource.addProperty(SOAPToRESTConstants.METHOD, method);
+                inSeqResource.setMediaType("text/xml");
+                registry.put(soapToRestLocation + RegistryConstants.PATH_SEPARATOR + file.getFileName(),
+                        inSeqResource);
+                IOUtils.closeQuietly(inputFlowStream);
+            }
+        } catch (IOException | DirectoryIteratorException e) {
+            throw new APIImportExportException("Error in importing SOAP to REST mediation logic", e);
+        } catch (org.wso2.carbon.registry.core.exceptions.RegistryException e) {
+            throw new APIImportExportException("Error in storing imported SOAP to REST mediation logic", e);
+        } finally {
+            IOUtils.closeQuietly(inputFlowStream);
         }
     }
 }
