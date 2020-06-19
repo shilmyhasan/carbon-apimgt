@@ -6,18 +6,24 @@
     <div class="content-data" style="overflow-x:auto;">
     <%
           var conditionslist =  outputs.conditions;
-            var conditonsArray = conditionslist.toArray();
+            var conditionsArray = conditionslist.toArray();
             var conditionsListSize  = conditionslist.size();
+            var filteredConditionsArray = new Array();
 
             for (i = 0; i < conditionsListSize; i++) {
-                if ("IP".equals(conditonsArray[i].getConditionType())) {
-                    var value = conditonsArray[i].getConditionValue();
+                if ("IP".equals(conditionsArray[i].getConditionType())) {
+                    var value = conditionsArray[i].getConditionValue();
                     var index = value.indexOf(":");
-                    conditonsArray[i].setConditionValue(value);
+                    conditionsArray[i].setConditionValue(value);
+                }
+
+                if (!"SUBSCRIPTION".equals(conditionsArray[i].getConditionType())) {
+                    filteredConditionsArray.push(conditionsArray[i]);
                 }
             }
+            var filteredConditionsArraySize  = filteredConditionsArray.length;
     %>
-    <%if(conditionsListSize > 0){%>
+    <%if(filteredConditionsArraySize > 0){%>
     <table class="table table-responsive table-striped" id="manage-tiers">
         <thead>
             <tr>
@@ -32,8 +38,8 @@
         <%
             var count = 0;
 
-            for(j = 0; j < conditionsListSize; j++) {
-                var condition = conditonsArray[j];
+            for(j = 0; j < filteredConditionsArraySize; j++) {
+                var condition = filteredConditionsArray[j];
         %>
                 <tr>
                     <td><%=encode.forHtml(String(condition.getConditionId()))%></td>

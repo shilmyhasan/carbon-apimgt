@@ -42,6 +42,8 @@ public class BlockConditionsDTO {
   
   private List<String> custom = new ArrayList<String>();
 
+  private List<String> subscription = new ArrayList<String>();
+
   public List<String> getApi() {
     return api;
   }
@@ -80,5 +82,13 @@ public class BlockConditionsDTO {
 
   public void setCustom(List<String> custom) {
     this.custom = custom;
+  }
+
+  public void setSubscription(List<String> subscription) {
+    this.subscription = subscription;
+  }
+
+  public List<String> getSubscription() {
+    return subscription;
   }
 }

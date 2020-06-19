@@ -50,6 +50,7 @@ public class ThrottleDataHolder {
     private Map<String, String> blockedApplicationConditionsMap = new ConcurrentHashMap<String, String>();
     private Map<String, String> blockedUserConditionsMap = new ConcurrentHashMap<String, String>();
     private Map<String, Set<IPRange>> blockedIpConditionsMap = new ConcurrentHashMap<>();
+    private Map<String, String> blockedSubscriptionConditionsMap = new ConcurrentHashMap<String, String>();
     private Map<String, String> keyTemplateMap = new ConcurrentHashMap<String, String>();
     private boolean isBlockingConditionsPresent = true;
     private boolean isKeyTemplatesPresent = false;
@@ -179,6 +180,11 @@ public class ThrottleDataHolder {
         }
         return ipRange;
     }
+
+    public void addSubscriptionBlockingCondition(String name, String value) {
+        blockedSubscriptionConditionsMap.put(name, value);
+    }
+
     public void addUserBlockingConditionsFromMap(Map<String, String> data) {
         if(data.size() > 0) {
             blockedUserConditionsMap.putAll(data);
@@ -200,6 +206,12 @@ public class ThrottleDataHolder {
     public void addApplicationBlockingConditionsFromMap(Map<String, String> data) {
         if(data.size() > 0) {
             blockedApplicationConditionsMap.putAll(data);
+        }
+    }
+
+    public void addSubscriptionBlockingConditionsFromMap(Map<String, String> data) {
+        if (data.size() > 0) {
+            blockedSubscriptionConditionsMap.putAll(data);
         }
     }
 
@@ -231,6 +243,10 @@ public class ThrottleDataHolder {
         }
     }
 
+    public void removeSubscriptionBlockingCondition(String name) {
+        blockedSubscriptionConditionsMap.remove(name);
+    }
+
     public void addKeyTemplate(String key, String value) {
         keyTemplateMap.put(key, value);
         isKeyTemplatesPresent = true;
@@ -257,10 +273,11 @@ public class ThrottleDataHolder {
     }
 
     public boolean isRequestBlocked(String apiBlockingKey, String applicationBlockingKey, String userBlockingKey,
-                                    String ipBlockingKey, String apiTenantDomain) {
+                                    String ipBlockingKey, String apiTenantDomain, String subscriptionBlockingKey) {
         return (blockedAPIConditionsMap.containsKey(apiBlockingKey) ||
                 blockedApplicationConditionsMap.containsKey(applicationBlockingKey) ||
                 blockedUserConditionsMap.containsKey(userBlockingKey) ||
+                blockedSubscriptionConditionsMap.containsKey(subscriptionBlockingKey) ||
                 isIpLevelBlocked(apiTenantDomain, ipBlockingKey));
     }
 
