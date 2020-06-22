@@ -6186,6 +6186,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         publishBlockingEvent(blockCondition, "delete");
     }
 
+    public void deleteSubscriptionBlockCondition(String conditionValue)
+            throws APIManagementException {
+        BlockConditionsDTO blockCondition = apiMgtDAO.getSubscriptionBlockCondition(conditionValue, tenantDomain);
+        if (blockCondition != null) {
+            deleteBlockConditionByUUID(blockCondition.getUUID());
+        }
+    }
+
     @Override
     public APIPolicy getAPIPolicy(String username, String policyName) throws APIManagementException {
         return apiMgtDAO.getAPIPolicy(policyName, APIUtil.getTenantId(username));
@@ -7929,6 +7937,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public String getGraphqlSchema(APIIdentifier apiId) throws APIManagementException {
         return getGraphqlSchemaDefinition(apiId);
+    }
+
+    /**
+     * This method is used to get the context of API identified by the given APIIdentifier
+     *
+     * @param apiId api identifier
+     * @return apiContext
+     * @throws APIManagementException if failed to fetch the context for apiID
+     */
+    public String getAPIContext(APIIdentifier apiId) throws APIManagementException {
+        return apiMgtDAO.getAPIContext(apiId);
     }
 
     /**
