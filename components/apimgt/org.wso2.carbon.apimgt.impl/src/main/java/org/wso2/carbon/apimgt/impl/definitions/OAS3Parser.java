@@ -321,7 +321,7 @@ public class OAS3Parser extends APIDefinition {
         }
         updateSwaggerSecurityDefinition(openAPI, swaggerData, "https://test.com");
         updateLegacyScopesFromSwagger(openAPI, swaggerData);
-        
+
         if (StringUtils.isEmpty(openAPI.getInfo().getTitle())) {
             openAPI.getInfo().setTitle(swaggerData.getTitle());
         }
@@ -421,8 +421,8 @@ public class OAS3Parser extends APIDefinition {
     /**
      * Update OAS definition for store
      *
-     * @param api            API
-     * @param oasDefinition  OAS definition
+     * @param api              API
+     * @param oasDefinition    OAS definition
      * @param hostsWithSchemes host addresses with protocol mapping
      * @return OAS definition
      */
@@ -437,14 +437,15 @@ public class OAS3Parser extends APIDefinition {
     /**
      * Update OAS definition for store
      *
-     * @param product        APIProduct
-     * @param oasDefinition  OAS definition
+     * @param product          APIProduct
+     * @param oasDefinition    OAS definition
      * @param hostsWithSchemes host addresses with protocol mapping
      * @return OAS definition
      * @throws APIManagementException throws if an error occurred
      */
-    @Override public String getOASDefinitionForStore(APIProduct product, String oasDefinition,
-            Map<String, String> hostsWithSchemes) {
+    @Override
+    public String getOASDefinitionForStore(APIProduct product, String oasDefinition,
+                                           Map<String, String> hostsWithSchemes) {
         OpenAPI openAPI = getOpenAPI(oasDefinition);
         updateOperations(openAPI);
         updateEndpoints(product, hostsWithSchemes, openAPI);
@@ -629,7 +630,7 @@ public class OAS3Parser extends APIDefinition {
                 scopeBindings.put(scope.getKey(), scope.getRoles());
                 Map<String, String> scopeDisplayName = new HashMap<>();
                 scopeDisplayName.put(APIConstants.SWAGGER_X_SCOPES_NAME, scope.getName());
-                scopeMappings .put(scope.getKey(), scopeDisplayName);
+                scopeMappings.put(scope.getKey(), scopeDisplayName);
             }
             oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
             oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_MAPPINGS, scopeMappings);
@@ -794,13 +795,13 @@ public class OAS3Parser extends APIDefinition {
     /**
      * Update OAS definition with authorization endpoints.
      *
-     * @param openAPI        OpenAPI
-     * @param swaggerData    SwaggerData
+     * @param openAPI          OpenAPI
+     * @param swaggerData      SwaggerData
      * @param hostsWithSchemes GW hosts with protocols
      * @return updated OAS definition
      */
     private String updateSwaggerSecurityDefinitionForStore(OpenAPI openAPI, SwaggerData swaggerData,
-            Map<String,String> hostsWithSchemes) {
+                                                           Map<String, String> hostsWithSchemes) {
         String authUrl;
         // By Default, add the GW host with HTTPS protocol if present.
         if (hostsWithSchemes.containsKey(APIConstants.HTTPS_PROTOCOL)) {
@@ -815,9 +816,9 @@ public class OAS3Parser extends APIDefinition {
     /**
      * Update OAS definition with GW endpoints
      *
-     * @param product           APIProduct
-     * @param hostsWithSchemes  GW hosts with protocol mapping
-     * @param openAPI           OpenAPI
+     * @param product          APIProduct
+     * @param hostsWithSchemes GW hosts with protocol mapping
+     * @param openAPI          OpenAPI
      */
     private void updateEndpoints(APIProduct product, Map<String, String> hostsWithSchemes, OpenAPI openAPI) {
         String basePath = product.getContext();
@@ -828,9 +829,9 @@ public class OAS3Parser extends APIDefinition {
     /**
      * Update OAS definition with GW endpoints
      *
-     * @param api               API
-     * @param hostsWithSchemes  GW hosts with protocol mapping
-     * @param openAPI           OpenAPI
+     * @param api              API
+     * @param hostsWithSchemes GW hosts with protocol mapping
+     * @param openAPI          OpenAPI
      * @throws APIManagementException
      */
     private void updateEndpoints(API api, Map<String, String> hostsWithSchemes, OpenAPI openAPI) {
@@ -848,10 +849,11 @@ public class OAS3Parser extends APIDefinition {
      * @param hostsWithSchemes GW hosts with protocol mapping
      */
     private void updateEndpoints(OpenAPI openAPI, String basePath, String transports,
-            Map<String, String> hostsWithSchemes) {
+                                 Map<String, String> hostsWithSchemes) {
         String[] apiTransports = transports.split(",");
         List<Server> servers = new ArrayList<>();
-        if (ArrayUtils.contains(apiTransports, APIConstants.HTTPS_PROTOCOL)) {
+        if (ArrayUtils.contains(apiTransports, APIConstants.HTTPS_PROTOCOL) && hostsWithSchemes.containsKey(
+                APIConstants.HTTPS_PROTOCOL)) {
             String host = hostsWithSchemes.get(APIConstants.HTTPS_PROTOCOL).trim()
                     .replace(APIConstants.HTTPS_PROTOCOL_URL_PREFIX, "");
             String httpsURL = APIConstants.HTTPS_PROTOCOL + "://" + host + basePath;
@@ -859,7 +861,8 @@ public class OAS3Parser extends APIDefinition {
             httpsServer.setUrl(httpsURL);
             servers.add(httpsServer);
         }
-        if (ArrayUtils.contains(apiTransports, APIConstants.HTTP_PROTOCOL)) {
+        if (ArrayUtils.contains(apiTransports, APIConstants.HTTP_PROTOCOL) && hostsWithSchemes.containsKey(
+                APIConstants.HTTP_PROTOCOL)) {
             String host = hostsWithSchemes.get(APIConstants.HTTP_PROTOCOL).trim()
                     .replace(APIConstants.HTTP_PROTOCOL_URL_PREFIX, "");
             String httpURL = APIConstants.HTTP_PROTOCOL + "://" + host + basePath;
