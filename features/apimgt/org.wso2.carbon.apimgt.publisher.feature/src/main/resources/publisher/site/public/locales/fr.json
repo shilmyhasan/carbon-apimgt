@@ -801,6 +801,8 @@
   "Apis.Details.Subscriptions.SubscriptionsTable.subscription.blocked.prod.only": "",
   "Apis.Details.Subscriptions.SubscriptionsTable.subscription.unblocked": "",
   "Apis.Details.Subscriptions.SubscriptionsTable.tier": "",
+  "Apis.Details.Subscriptions.SubscriptionsTable.subscriber.info.error": "",
+  "Apis.Details.Subscriptions.SubscriptionsTable.subscriptions.error": "",
   "Apis.Details.Subscriptions.table.empty": "",
   "Apis.Details.components.APIDetailsTopMenu.back.to.listing": "",
   "Apis.Details.components.APIDetailsTopMenu.error": "",
