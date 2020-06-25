@@ -566,13 +566,13 @@ class SubscriptionsTable extends Component {
                         })
                         .catch((errorMessage) => {
                             console.error(errorMessage);
-                            Alert.error(JSON.stringify(errorMessage));
+                            Alert.error('Error while retrieving the subscriber information');
                         });
                 }
             })
             .catch((errorMessage) => {
                 console.error(errorMessage);
-                Alert.error(JSON.stringify(errorMessage));
+                Alert.error('Error while retrieving the subscriptions');
             });
         api.getMonetization(this.props.api.id).then((status) => {
             this.setState({ monetizationStatus: status.enabled });
