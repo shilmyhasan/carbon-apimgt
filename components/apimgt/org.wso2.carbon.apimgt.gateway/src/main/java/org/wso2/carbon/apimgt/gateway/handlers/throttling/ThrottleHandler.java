@@ -74,6 +74,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -98,6 +99,7 @@ public class ThrottleHandler extends AbstractHandler implements ManagedLifecycle
     private static final String HANDLE_THROTTLE_OUT = "HANDLE_THROTTLE_OUT";
     private static final String RESOURCE_THROTTLE = "RESOURCE_THROTTLE";
     private static final String BLOCKED_TEST = "BLOCKED_TEST";
+    private static final String CUSTOM_PROPERTY = "customProperty";
 
     /**
      * The key for getting the throttling policy - key refers to a/an [registry] Resource entry
@@ -952,6 +954,7 @@ public class ThrottleHandler extends AbstractHandler implements ManagedLifecycle
                                         String apiTenant, String appId, String clientIp,
                                         Map<String, String> keyTemplateMap,
                                         MessageContext messageContext) {
+        HashMap<String, Object> propertyFromMap = (HashMap<String, Object>) messageContext.getProperty(CUSTOM_PROPERTY);
         if (keyTemplateMap != null && keyTemplateMap.size() > 0) {
             for (String key : keyTemplateMap.keySet()) {
                 key = key.replaceAll("\\$resourceKey", resourceKey);
@@ -963,6 +966,15 @@ public class ThrottleHandler extends AbstractHandler implements ManagedLifecycle
                 key = key.replaceAll("\\$appId", appId);
                 if (clientIp != null){
                     key = key.replaceAll("\\$clientIp", APIUtil.ipToBigInteger(clientIp).toString());
+                }
+                /* The Key $customProperty is treated as an actual map even though only one value
+                 * can be assigned to the key. This is because in the current implementation stream parameters are
+                 * treated as one string variable. Therefore, propertyMap cannot be used as an actual map.
+                 * */
+                if (propertyFromMap != null) {
+                    for (String mapKey : propertyFromMap.keySet()) {
+                        key = key.replaceAll("\\$customProperty." + mapKey, (String) propertyFromMap.get(mapKey));
+                    }
                 }
                 if (getThrottleDataHolder().isThrottled(key)) {
                     long timestamp = getThrottleDataHolder().getThrottleNextAccessTimestamp(key);

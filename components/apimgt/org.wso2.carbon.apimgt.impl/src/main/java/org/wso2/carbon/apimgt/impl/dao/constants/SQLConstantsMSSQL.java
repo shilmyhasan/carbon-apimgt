@@ -186,7 +186,7 @@ public class SQLConstantsMSSQL extends SQLConstants{
             "    LOWER(SUB.USER_ID) = LOWER(?)"+
             " And "+
             "    NAME like ?"+
-            " ) a WHERE a.row > ? and a.row <= a.row + ?"+
+            " ) a WHERE a.row > ? and a.row <= ?"+
             " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = (x.USER_ID + ':') + x.NAME)"+
             " ORDER BY $1 $2 ";
 
