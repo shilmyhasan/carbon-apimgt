@@ -92,5 +92,6 @@ public class APIMgtGatewayConstants {
     public static final String SCHEMA_VALIDATION = "schemaValidation";
     public static final String XSD_URL = "xsdURL";
     public static final String FAULT = "fault";
+    public static final String HTTP_RESPONSE_STATUS_CODE = "HTTP_RESPONSE_STATUS_CODE";
 }
 
