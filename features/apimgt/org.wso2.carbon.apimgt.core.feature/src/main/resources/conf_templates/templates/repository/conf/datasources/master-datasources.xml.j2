@@ -14,7 +14,6 @@
             </jndiConfig>
             <definition type="RDBMS">
                 <configuration>
-                    {% if database.local is defined %}
                     <url>{{database.local.url}}</url>
                     <username>{{database.local.username}}</username>
                     <password>{{database.local.password}}</password>
@@ -23,18 +22,6 @@
                     {% for property_name,property_value in database.local.pool_options.items() %}
                     <{{property_name}}>{{property_value}}</{{property_name}}>
                     {% endfor %}
-                    {% else %}
-                    <url>jdbc:h2:./repository/database/WSO2CARBON_DB;DB_CLOSE_ON_EXIT=FALSE;MVCC=TRUE</url>
-                    <username>wso2carbon</username>
-                    <password>wso2carbon</password>
-                    <driverClassName>org.h2.Driver</driverClassName>
-                    <maxActive>50</maxActive>
-                    <maxWait>60000</maxWait>
-                    <testOnBorrow>true</testOnBorrow>
-                    <validationQuery>SELECT 1</validationQuery>
-                    <validationInterval>30000</validationInterval>
-                    <defaultAutoCommit>true</defaultAutoCommit>
-                    {% endif%}
                 </configuration>
             </definition>
         </datasource>
