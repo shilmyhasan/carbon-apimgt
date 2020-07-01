@@ -9887,6 +9887,18 @@ public final class APIUtil {
         return alias;
     }
 
+    public static String getApiKeyGeneratorImpl() {
+        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String keyGeneratorClassName = config.getFirstProperty(APIConstants.API_STORE_API_KEY_GENERATOR_IMPL);
+        if (keyGeneratorClassName == null) {
+            log.warn("The configurations related to Api Key Generator Impl class in APIStore " +
+                    "is missing in api-manager.xml. Hence returning the default value.");
+            return APIConstants.DEFAULT_API_KEY_GENERATOR_IMPL;
+        }
+        return keyGeneratorClassName;
+    }
+
     /**
      * Get the workflow status information for the given api for the given workflow type
      *

@@ -1365,21 +1365,24 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         jwtTokenInfoDTO.setExpirationTime(validityPeriod);
         jwtTokenInfoDTO.setKeyType(application.getKeyType());
 
-        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
-                getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String keyGeneratorClassName = config.getFirstProperty(APIConstants.API_STORE_API_KEY_GENERATOR_IMPL);
-        ApiKeyGenerator keyGenerator = null;
+        ApiKeyGenerator apiKeyGenerator = loadApiKeyGenerator();
+        return apiKeyGenerator.generateToken(jwtTokenInfoDTO);
+    }
+
+    private ApiKeyGenerator loadApiKeyGenerator() {
+        ApiKeyGenerator apiKeyGenerator = null;
+        String keyGeneratorClassName = APIUtil.getApiKeyGeneratorImpl();
 
         try {
             Class keyGeneratorClass = APIConsumerImpl.class.getClassLoader().loadClass(keyGeneratorClassName);
             Constructor constructor = keyGeneratorClass.getDeclaredConstructor();
-            keyGenerator = (ApiKeyGenerator) constructor.newInstance();
+            apiKeyGenerator = (ApiKeyGenerator) constructor.newInstance();
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException |
                 InvocationTargetException e) {
             log.error("Error while loading the api key generator class: " + keyGeneratorClassName, e);
         }
 
-        return keyGenerator.generateToken(jwtTokenInfoDTO);
+        return apiKeyGenerator;
     }
 
     /**
