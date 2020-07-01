@@ -94,6 +94,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.ConstraintViolation;
 import javax.ws.rs.core.Response;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public class RestApiUtil {
 
@@ -1657,5 +1660,18 @@ public class RestApiUtil {
             uriTemplates = RestApiUtil.getAdminAPIAppResourceMapping();
         }
         return uriTemplates;
+    }
+
+    /**
+     * Convert the date to UTC format
+     *
+     * @param date to be converted date
+     * @return UTC time
+     */
+    public static String convertToUTC(Date date) {
+        Instant ofEpochMilli = Instant.ofEpochMilli(date.getTime());
+        ZonedDateTime timeInUTC = ZonedDateTime.ofInstant(ofEpochMilli, ZoneOffset.systemDefault())
+                .withZoneSameInstant(ZoneOffset.UTC);
+        return timeInUTC.toString();
     }
 }
