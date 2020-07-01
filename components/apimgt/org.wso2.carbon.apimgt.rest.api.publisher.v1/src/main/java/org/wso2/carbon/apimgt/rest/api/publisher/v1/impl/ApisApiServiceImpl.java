@@ -592,15 +592,20 @@ public class ApisApiServiceImpl implements ApisApiService {
             List<String> apiSecurity = body.getSecurityScheme();
             if (!apiProvider.isClientCertificateBasedAuthenticationConfigured() && apiSecurity != null && apiSecurity
                     .contains(APIConstants.API_SECURITY_MUTUAL_SSL)) {
-                RestApiUtil.handleBadRequest("Mutual SSL based authentication is not supported in this server.", log);
+                RestApiUtil.handleBadRequest("Mutual SSL based authentication is " +
+                        "not supported in this server.", log);
             }
             //validation for tiers
             List<String> tiersFromDTO = body.getPolicies();
             String originalStatus = originalAPI.getStatus();
-            if (tiersFromDTO == null || tiersFromDTO.isEmpty() &&
-                    !(APIConstants.CREATED.equals(originalStatus) || APIConstants.PROTOTYPED.equals(originalStatus))) {
-                RestApiUtil.handleBadRequest("A tier should be defined " +
-                        "if the API is not in CREATED or PROTOTYPED state", log);
+            if (apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) ||
+                    apiSecurity.contains(APIConstants.API_SECURITY_API_KEY)) {
+                if (tiersFromDTO == null || tiersFromDTO.isEmpty() &&
+                        !(APIConstants.CREATED.equals(originalStatus) ||
+                                APIConstants.PROTOTYPED.equals(originalStatus))) {
+                    RestApiUtil.handleBadRequest("A tier should be defined " +
+                            "if the API is not in CREATED or PROTOTYPED state", log);
+                }
             }
 
             if (tiersFromDTO != null && !tiersFromDTO.isEmpty()) {
