@@ -23,6 +23,7 @@ import { FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
 import ApplicationLevel from './components/ApplicationLevel';
 import TransportLevel from './components/TransportLevel';
 
@@ -63,14 +64,17 @@ export default function APISecurity(props) {
         (securityScheme.includes(API_SECURITY_BASIC_AUTH) ||
         securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2) || securityScheme.includes(API_SECURITY_API_KEY));
     const classes = useStyles();
+    const [apiFromContext] = useAPI();
 
     // Check the validation conditions and return an error message
     const Validate = () => {
+        const resourcesWithSecurity = apiFromContext.operations.findIndex(op => op.authType !== 'None') > -1;
         if (
             !securityScheme.includes(API_SECURITY_MUTUAL_SSL) &&
             !securityScheme.includes(API_SECURITY_BASIC_AUTH) &&
             !securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2) &&
-            !securityScheme.includes(API_SECURITY_API_KEY)
+            !securityScheme.includes(API_SECURITY_API_KEY) &&
+            resourcesWithSecurity
         ) {
             return (
                 <Typography className={classes.bottomSpace}>
