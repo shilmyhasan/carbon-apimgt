@@ -116,11 +116,15 @@ public class DefaultApiKeyGenerator implements ApiKeyGenerator {
         //get super tenant's key store manager
         KeyStoreManager tenantKSM = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
         try {
+
             ServerConfigurationService config =  tenantKSM.getServerConfigService();
+            String apiKeySignKeyStoreName = APIUtil.getApiKeySignKeyStoreName();
             String keyStorePassword = config.getFirstProperty(APIConstants.KeyStoreManagement
-                    .SERVER_APIKEYSIGN_PRIVATE_KEY_PASSWORD);
+                    .SERVER_APIKEYSIGN_PRIVATE_KEY_PASSWORD.replaceFirst(APIConstants.KeyStoreManagement.KeyStoreName,
+                    apiKeySignKeyStoreName));
             String apiKeySignAlias = config.getFirstProperty(APIConstants.KeyStoreManagement
-                    .SERVER_APIKEYSIGN_KEYSTORE_KEY_ALIAS);
+                    .SERVER_APIKEYSIGN_KEYSTORE_KEY_ALIAS.replaceFirst(APIConstants.KeyStoreManagement.KeyStoreName,
+                    apiKeySignKeyStoreName));
             KeyStore apiKeySignKeyStore = getApiKeySignKeyStore(tenantKSM);
             if (apiKeySignKeyStore != null) {
                 privateKey = (PrivateKey) apiKeySignKeyStore.getKey(apiKeySignAlias,
@@ -135,17 +139,24 @@ public class DefaultApiKeyGenerator implements ApiKeyGenerator {
     private KeyStore getApiKeySignKeyStore(KeyStoreManager keyStoreManager) throws Exception {
         KeyStore apiKeySignKeyStore;
         ServerConfigurationService config = keyStoreManager.getServerConfigService();
+        String apiKeySignKeyStoreName = APIUtil.getApiKeySignKeyStoreName();
         if (config.
-                getFirstProperty(APIConstants.KeyStoreManagement.SERVER_APIKEYSIGN_KEYSTORE_FILE) == null) {
+                getFirstProperty(APIConstants.KeyStoreManagement.SERVER_APIKEYSIGN_KEYSTORE_FILE.
+                replaceFirst(APIConstants.KeyStoreManagement.KeyStoreName, apiKeySignKeyStoreName)) == null) {
             return null;
         }
+
         String file = new File(config
-                .getFirstProperty(APIConstants.KeyStoreManagement.SERVER_APIKEYSIGN_KEYSTORE_FILE))
+                .getFirstProperty(APIConstants.KeyStoreManagement.SERVER_APIKEYSIGN_KEYSTORE_FILE
+                .replaceFirst(APIConstants.KeyStoreManagement.KeyStoreName, apiKeySignKeyStoreName)))
                 .getAbsolutePath();
         KeyStore store = KeyStore.getInstance(config
-                .getFirstProperty(APIConstants.KeyStoreManagement.SERVER_APIKEYSIGN_KEYSTORE_TYPE));
+                .getFirstProperty(APIConstants.KeyStoreManagement.SERVER_APIKEYSIGN_KEYSTORE_TYPE
+                .replaceFirst(APIConstants.KeyStoreManagement.KeyStoreName, apiKeySignKeyStoreName)));
         String password = config
-                .getFirstProperty(APIConstants.KeyStoreManagement.SERVER_APIKEYSIGN_KEYSTORE_PASSWORD);
+                .getFirstProperty(APIConstants.KeyStoreManagement.SERVER_APIKEYSIGN_KEYSTORE_PASSWORD
+                .replaceFirst(APIConstants.KeyStoreManagement.KeyStoreName, apiKeySignKeyStoreName));
+
         try (FileInputStream in = new FileInputStream(file)) {
             store.load(in, password.toCharArray());
             apiKeySignKeyStore = store;
