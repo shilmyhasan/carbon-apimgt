@@ -26,6 +26,9 @@ import cloneDeep from 'lodash.clonedeep';
 import { injectIntl } from 'react-intl';
 import { makeStyles } from '@material-ui/core/styles';
 import ButtonPanel from './ButtonPanel';
+import Application from "AppData/Application";
+import { FormattedMessage } from 'react-intl';
+import Settings from 'AppComponents/Shared/SettingsContext';
 
 const useStyles = makeStyles((theme) => ({
     appCreateFormWrapper: {
@@ -50,10 +53,12 @@ const createAppStep = (props) => {
     });
     const [isNameValid, setIsNameValid] = useState(true);
     const [allAppAttributes, setAllAppAttributes] = useState(null);
+    const [allowedTokenTypes, setAllowedTokenTypes] = useState({});
     const [notFound, setNotFound] = useState(false);
     const {
         currentStep, setCreatedApp, incrementStep, intl, setStepStatus, stepStatuses,
     } = props;
+    const settingsContext = useContext(Settings);
 
     const validateName = (value) => {
         if (!value || value.trim() === '') {
@@ -162,11 +167,46 @@ const createAppStep = (props) => {
         setApplicationRequest(newRequest);
     };
 
+    /**
+     * Returns the allowed token types map.
+     * @returns {object}
+     */
+    const getAllowedTokenTypes = () => {
+        const allowedTokenTypesArray = settingsContext.settings.allowedAppTokenTypes;
+        let allowedTokenTypesMap = {};
+        // iterate through Application.TOKEN_TYPES map and populate the allowed types as a map
+        if (allowedTokenTypesArray) {
+            Object.entries(Application.TOKEN_TYPES).map(([key, value]) => (
+                allowedTokenTypesArray.map((tokenType) => {
+                    if (tokenType === key) {
+                        allowedTokenTypesMap[key] = value;
+                    }
+                })
+            ));
+            return allowedTokenTypesMap;
+        } else {
+            return Application.TOKEN_TYPES;
+        }
+    };
+
+     /**
+     * Checks token type to complete the helper text for token type field.
+     */
+     const checkTokenType = () => {
+        return (
+            <FormattedMessage
+                defaultMessage='Select token type'
+                id='Shared.AppsAndKeys.ApplicationCreateForm.select.token.type'
+            />
+        );
+    };
+
     useEffect(() => {
         // Get all the tiers to populate the drop down.
         const api = new API();
         const promiseTiers = api.getAllTiers('application');
         const promisedAttributes = api.getAllApplicationAttributes();
+        const allowedTokenTypes = getAllowedTokenTypes();
         Promise.all([promiseTiers, promisedAttributes])
             .then((response) => {
                 const [tierResponse, allAttributes] = response;
@@ -174,6 +214,12 @@ const createAppStep = (props) => {
                 const newRequest = { ...applicationRequest };
                 if (throttlingPolicyListLocal.length > 0) {
                     [newRequest.throttlingPolicy] = throttlingPolicyListLocal;
+                }
+                if (allowedTokenTypes.JWT) {
+                    // set the default selected token type to JWT if it is in the allowed token type map.
+                    newRequest.tokenType = 'JWT';
+                } else {
+                    newRequest.tokenType = Object.keys(allowedTokenTypes)[0];
                 }
                 const allAppAttr = [];
                 allAttributes.body.list.map((item) => allAppAttr.push(item));
@@ -183,6 +229,7 @@ const createAppStep = (props) => {
                 setApplicationRequest(newRequest);
                 setThrottlingPolicyList(throttlingPolicyListLocal);
                 setAllAppAttributes(allAppAttr);
+                setAllowedTokenTypes(allowedTokenTypes);
             })
             .catch((error) => {
                 if (process.env.NODE_ENV !== 'production') {
@@ -213,6 +260,8 @@ const createAppStep = (props) => {
                         getAttributeValue={getAttributeValue}
                         handleDeleteChip={handleDeleteChip}
                         handleAddChip={handleAddChip}
+                        allowedTokenTypes={allowedTokenTypes}
+                        checkTokenType={checkTokenType}
                     />
                 </Grid>
             </Box>
