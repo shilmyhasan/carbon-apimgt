@@ -8875,7 +8875,7 @@ public class ApiMgtDAO {
                             roleList = Lists.newArrayList(Splitter.on(",").trimResults().split(roles));
                         } else {
                             //Handling the case where the scope binding is not provided
-                            roleList = Arrays.asList("");
+                            roleList = Collections.emptyList();
                         }
                         for (String role : roleList) {
                             ps3.setInt(1, uriTemplate.getScope().getId());
