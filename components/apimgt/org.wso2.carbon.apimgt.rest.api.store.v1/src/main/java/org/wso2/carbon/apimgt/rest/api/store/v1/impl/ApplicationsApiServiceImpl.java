@@ -59,7 +59,6 @@ import org.wso2.carbon.apimgt.rest.api.store.v1.dto.ApplicationTokenDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.ApplicationTokenGenerateRequestDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.PaginationDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.ScopeInfoDTO;
-import org.wso2.carbon.apimgt.rest.api.store.v1.mappings.APIMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.store.v1.mappings.ApplicationKeyMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.store.v1.mappings.ApplicationMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
@@ -122,7 +121,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
             int applicationCount = apiMgtDAO.getAllApplicationCount(subscriber, groupId, query);
 
             applicationListDTO = ApplicationMappingUtil.fromApplicationsToDTO(applications);
-            ApplicationMappingUtil.setPaginationParams(applicationListDTO, groupId, limit, offset, applicationCount);
+            ApplicationMappingUtil.setPaginationParamsWithSortParams(applicationListDTO, groupId, limit, offset,
+                    applicationCount,sortOrder, sortBy.toLowerCase());
 
             return Response.ok().entity(applicationListDTO).build();
         } catch (APIManagementException e) {

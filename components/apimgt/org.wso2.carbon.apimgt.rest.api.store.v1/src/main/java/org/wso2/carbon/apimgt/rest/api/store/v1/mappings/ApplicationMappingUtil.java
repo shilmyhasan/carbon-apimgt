@@ -17,14 +17,9 @@
 
 package org.wso2.carbon.apimgt.rest.api.store.v1.mappings;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.api.model.APIKey;
 import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.Scope;
 import org.wso2.carbon.apimgt.api.model.Subscriber;
@@ -137,6 +132,22 @@ public class ApplicationMappingUtil {
     public static void setPaginationParams(ApplicationListDTO applicationListDTO, String groupId, int limit, int offset,
             int size) {
 
+        setPaginationParamsWithSortParams(applicationListDTO, groupId, limit, offset,size, null, null);
+    }
+
+
+    /** Sets pagination urls for a ApplicationListDTO object given pagination parameters and url parameters
+     *
+     * @param applicationListDTO a SubscriptionListDTO object
+     * @param groupId group id of the applications to be returned
+     * @param limit max number of objects returned
+     * @param offset starting index
+     * @param size max offset
+     */
+    public static void setPaginationParamsWithSortParams(ApplicationListDTO applicationListDTO, String groupId,
+                                                         int limit, int offset,int size, String sortOrder,
+                                                         String sortBy) {
+
         Map<String, Integer> paginatedParams = RestApiUtil.getPaginationParams(offset, limit, size);
 
         String paginatedPrevious = "";
@@ -144,14 +155,15 @@ public class ApplicationMappingUtil {
 
         if (paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET) != null) {
             paginatedPrevious = RestApiUtil
-                    .getApplicationPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
-                            paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), groupId);
+                    .getApplicationPaginatedURLWithSortParams(paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
+                            paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), groupId,
+                            sortOrder, sortBy);
         }
 
         if (paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET) != null) {
             paginatedNext = RestApiUtil
-                    .getApplicationPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
-                            paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), groupId);
+                    .getApplicationPaginatedURLWithSortParams(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
+                            paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), groupId, sortOrder, sortBy);
         }
         PaginationDTO paginationDTO = CommonMappingUtil
                 .getPaginationDTO(limit, offset, size, paginatedNext, paginatedPrevious);
