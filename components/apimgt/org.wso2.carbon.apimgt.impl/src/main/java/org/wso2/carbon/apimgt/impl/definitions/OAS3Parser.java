@@ -760,13 +760,16 @@ public class OAS3Parser extends APIDefinition {
     private void updateOperationManagedInfo(SwaggerData.Resource resource, Operation operation) {
         String authType = resource.getAuthType();
         if (APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN.equals(authType)) {
-            authType = "Application & Application User";
+            authType = APIConstants.OASResourceAuthTypes.APPLICATION_OR_APPLICATION_USER;
         }
         if (APIConstants.AUTH_APPLICATION_USER_LEVEL_TOKEN.equals(authType)) {
-            authType = "Application User";
+            authType = APIConstants.OASResourceAuthTypes.APPLICATION_USER;
         }
         if (APIConstants.AUTH_APPLICATION_LEVEL_TOKEN.equals(authType)) {
-            authType = "Application";
+            authType = APIConstants.OASResourceAuthTypes.APPLICATION;
+        }
+        else{
+            authType = APIConstants.OASResourceAuthTypes.APPLICATION_OR_APPLICATION_USER;
         }
         operation.addExtension(APIConstants.SWAGGER_X_AUTH_TYPE, authType);
         operation.addExtension(APIConstants.SWAGGER_X_THROTTLING_TIER, resource.getPolicy());
