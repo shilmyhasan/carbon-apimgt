@@ -212,11 +212,10 @@ public abstract class APIDefinition {
      *
      * @param swaggerContent json String of oasDefinition
      * @param api            API api object
-     * @param isBasepathExtractedFromSwagger boolean
-     * @throws APIManagementException throws if an error occurred
      * @return API
+     * @throws APIManagementException throws if an error occurred
      */
-    public abstract API setExtensionsToAPI(String swaggerContent, API api, boolean isBasepathExtractedFromSwagger)
+    public abstract API setExtensionsToAPI(String swaggerContent, API api)
             throws APIManagementException;
 
 }
