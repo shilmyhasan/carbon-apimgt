@@ -1461,11 +1461,10 @@ public class OAS3Parser extends APIDefinition {
      *
      * @param apiDefinition                  String of APIDefinition
      * @param api                            API api object
-     * @param isBasepathExtractedFromSwagger booleanValue to check whether definition imported from apictl
      * @return API
      */
     @Override
-    public API setExtensionsToAPI(String apiDefinition, API api, boolean isBasepathExtractedFromSwagger) throws APIManagementException {
+    public API setExtensionsToAPI(String apiDefinition, API api) throws APIManagementException {
         OpenAPI openAPI = getOpenAPI(apiDefinition);
         Map<String, Object> extensions = openAPI.getExtensions();
         if (extensions == null) {
@@ -1516,13 +1515,7 @@ public class OAS3Parser extends APIDefinition {
         if (StringUtils.isNotBlank(throttleTier)) {
             api.setApiLevelPolicy(throttleTier);
         }
-        //Setup Basepath
-        String basePath = OASParserUtil.getBasePathFromSwagger(extensions);
-        if (StringUtils.isNotBlank(basePath) && isBasepathExtractedFromSwagger) {
-            basePath = basePath.replace("{version}", api.getId().getVersion());
-            api.setContextTemplate(basePath);
-            api.setContext(basePath);
-        }
+
         return api;
     }
 
