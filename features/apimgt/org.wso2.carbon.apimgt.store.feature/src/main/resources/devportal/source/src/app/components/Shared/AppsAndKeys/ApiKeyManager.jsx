@@ -32,6 +32,7 @@ import FormGroup from '@material-ui/core/FormGroup';
 import Grid from '@material-ui/core/Grid';
 import ViewToken from './ViewToken';
 import ApiKey from '../ApiKey';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = (theme) => ({
     root: {
@@ -99,6 +100,7 @@ class ApiKeyManager extends React.Component {
             accessTokenRequest: {
                 timeout: -1,
             },
+            isGenerating: false,
         };
     }
 
@@ -115,6 +117,7 @@ class ApiKeyManager extends React.Component {
     }
 
     generateKeys = (selectedApp, keyType) => {
+        this.setState({isGenerating: true});
         const client = new API();
         const promisedKey = client.generateApiKey(selectedApp.appId, keyType, this.state.accessTokenRequest.timeout);
         promisedKey
@@ -122,6 +125,7 @@ class ApiKeyManager extends React.Component {
                 console.log('Non empty response received');
                 const apikey = { accessToken: response.body.apikey, validityTime: response.body.validityTime, isOauth: false };
                 this.setState(() => ({ apikey, open: true, showToken: true }));
+                this.setState({isGenerating: false});
             })
             .catch((error) => {
                 if (process.env.NODE_ENV !== 'production') {
@@ -131,13 +135,14 @@ class ApiKeyManager extends React.Component {
                 if (status === 404) {
                     this.setState({ notFound: true });
                 }
+                this.setState({isGenerating: false});
             });
     }
 
     render() {
         const { classes, selectedApp, keyType } = this.props;
         const {
-            showToken, accessTokenRequest, open, apikey,
+            showToken, accessTokenRequest, open, apikey, isGenerating,
         } = this.state;
         return (
             <div className={classes.root}>
@@ -189,8 +194,8 @@ class ApiKeyManager extends React.Component {
                     <DialogActions>
                         {!showToken && (
                             <Button 
-                                onClick={() => this.generateKeys(selectedApp, keyType)} 
-                                disabled={!accessTokenRequest.timeout} 
+                                onClick={() => this.generateKeys(selectedApp, keyType)}
+                                disabled={!accessTokenRequest.timeout || isGenerating}
                                 color='primary'
                                 variant='contained'
                                 className={classes.button}
@@ -199,6 +204,7 @@ class ApiKeyManager extends React.Component {
                                     id='Shared.AppsAndKeys.ViewKeys.consumer.generate.btn'
                                     defaultMessage='Generate'
                                 />
+                                {isGenerating && <CircularProgress size={24} />}
                             </Button>
                         )}
                         <Button onClick={this.handleClose} color='primary' autoFocus>
