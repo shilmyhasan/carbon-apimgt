@@ -767,8 +767,7 @@ public class OAS3Parser extends APIDefinition {
         }
         if (APIConstants.AUTH_APPLICATION_LEVEL_TOKEN.equals(authType)) {
             authType = APIConstants.OASResourceAuthTypes.APPLICATION;
-        }
-        else{
+        } else {
             authType = APIConstants.OASResourceAuthTypes.APPLICATION_OR_APPLICATION_USER;
         }
         operation.addExtension(APIConstants.SWAGGER_X_AUTH_TYPE, authType);

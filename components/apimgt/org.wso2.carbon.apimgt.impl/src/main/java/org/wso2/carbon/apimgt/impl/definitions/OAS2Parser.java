@@ -602,8 +602,7 @@ public class OAS2Parser extends APIDefinition {
         }
         if (APIConstants.AUTH_APPLICATION_LEVEL_TOKEN.equals(authType)) {
             authType = APIConstants.OASResourceAuthTypes.APPLICATION;
-        }
-        else{
+        } else {
             authType = APIConstants.OASResourceAuthTypes.APPLICATION_OR_APPLICATION_USER;
         }
         operation.setVendorExtension(APIConstants.SWAGGER_X_AUTH_TYPE, authType);
