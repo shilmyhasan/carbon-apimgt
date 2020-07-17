@@ -101,6 +101,7 @@ class TokenManager extends React.Component {
             isLoading: false,
             keys: null,
             isKeyJWT: false,
+            isProvisionedApp: false,
             keyRequest: {
                 keyType,
                 serverSupportedGrantTypes: [],
@@ -345,7 +346,7 @@ class TokenManager extends React.Component {
     provideOAuthKeySecret() {
         const { providedConsumerKey, providedConsumerSecret } = this.state;
         const { keyType, intl } = this.props;
-
+        this.state.isProvisionedApp = true;
         this.application
             .then((application) => {
                 return application.provideKeys(keyType, providedConsumerKey, providedConsumerSecret);
@@ -531,7 +532,7 @@ class TokenManager extends React.Component {
                                     color='primary'
                                     className={classes.button}
                                     onClick={keys.size > 0 && keys.get(keyType) ? this.updateKeys : this.generateKeys}
-                                    disabled={!generateEnabled || isLoading}
+                                    disabled={!generateEnabled || isLoading || (mapExistingAuthApps && keys.get(keyType) && keys.get(keyType).consumerSecret=="") || this.state.isProvisionedApp}
                                 >
                                     {keys.size > 0 && keys.get(keyType) ? 'Update' : 'Generate Keys'}
                                     {isLoading && <CircularProgress size={20} />}
