@@ -160,22 +160,16 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
 
     public Map<String, Object> populateCustomClaims(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
 
-        try {
-            CustomClaimsCallbackHandler claimsCallBackHandler = OAuthServerConfiguration.getInstance()
-                    .getOpenIDConnectCustomClaimsCallbackHandler();
-            if (jwtTokenInfoDTO.getOauthAuthzMsgCtx() != null) {
-                JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
-                        .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getOauthAuthzMsgCtx());
-                return jwtClaimsSet.getClaims();
-            } else if (jwtTokenInfoDTO.getTokReqMsgCtx() != null) {
-                JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
-                        .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getTokReqMsgCtx());
-                return jwtClaimsSet.getClaims();
-            }
-        } catch (IdentityOAuth2Exception e) {
-            String error = "Error while handling custom claims";
-            log.error(error, e);
-            throw new APIManagementException(error, e);
+        CustomClaimsCallbackHandler claimsCallBackHandler = OAuthServerConfiguration.getInstance()
+                .getOpenIDConnectCustomClaimsCallbackHandler();
+        if (jwtTokenInfoDTO.getOauthAuthzMsgCtx() != null) {
+            JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
+                    .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getOauthAuthzMsgCtx());
+            return jwtClaimsSet.getClaims();
+        } else if (jwtTokenInfoDTO.getTokReqMsgCtx() != null) {
+            JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
+                    .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getTokReqMsgCtx());
+            return jwtClaimsSet.getClaims();
         }
         return new LinkedHashMap<>();
     }
