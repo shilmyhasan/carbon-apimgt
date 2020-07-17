@@ -2640,6 +2640,16 @@ public class SQLConstants {
             "   APPLICATION_ID = ? " +
             "   AND KEY_TYPE = ? ";
 
+    public static final String GET_CONSUMER_KEY_CREATE_MODE_BY_APPLICATION_AND_KEY_SQL =
+            " SELECT " +
+                    "   CONSUMER_KEY, " +
+                    "   CREATE_MODE " +
+                    " FROM " +
+                    "   AM_APPLICATION_KEY_MAPPING " +
+                    " WHERE " +
+                    "   APPLICATION_ID = ? " +
+                    "   AND KEY_TYPE = ? ";
+
     public static final String GET_LAST_PUBLISHED_API_VERSION_SQL =
             "SELECT " +
             "   API.API_VERSION " +

@@ -3137,7 +3137,9 @@ public abstract class AbstractAPIManager implements APIManager {
      * @throws APIManagementException
      */
     private APIKey getApplicationKey(int applicationId, String keyType) throws APIManagementException {
-        String consumerKey = apiMgtDAO.getConsumerkeyByApplicationIdAndKeyType(String.valueOf(applicationId), keyType);
+        Map<String, String> appValues = apiMgtDAO.getConsumerkeyAndCreateModeByApplicationIdAndKeyType(String.valueOf(applicationId), keyType);
+        String consumerKey = appValues.get("CONSUMER_KEY");
+        String createMode = appValues.get("CREATE_MODE");
         if (StringUtils.isNotEmpty(consumerKey)) {
             String consumerKeyStatus = apiMgtDAO.getKeyStatusOfApplication(keyType, applicationId).getState();
             KeyManager keyManager = KeyManagerHolder.getKeyManagerInstance();
@@ -3155,6 +3157,10 @@ public abstract class AbstractAPIManager implements APIManager {
                     apiKey.setAdditionalProperties(
                             oAuthApplicationInfo.getParameter(APIConstants.JSON_ADDITIONAL_PROPERTIES).toString());
                 }
+            } else if ("MAPPED".equals(createMode)) {
+                apiKey.setConsumerSecret("");
+                apiKey.setCallbackUrl("");
+                apiKey.setGrantTypes("");
             }
             if (tokenInfo != null) {
                 apiKey.setAccessToken(tokenInfo.getAccessToken());
