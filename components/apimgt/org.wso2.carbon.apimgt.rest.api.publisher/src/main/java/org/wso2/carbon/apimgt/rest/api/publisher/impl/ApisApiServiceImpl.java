@@ -927,14 +927,14 @@ public class ApisApiServiceImpl extends ApisApiService {
                     RestApiUtil.handleBadRequest(errorMessage, log);
                 }
             }
+            API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName());
             if (!isWSAPI) {
                 String oldDefinition = body.getApiDefinition();
                 APIDefinition apiDefinition = OASParserUtil.getOASParser(oldDefinition);
-                SwaggerData swaggerData = new SwaggerData(apiInfo);
+                SwaggerData swaggerData = new SwaggerData(apiToUpdate);
                 String newDefinition = apiDefinition.generateAPIDefinition(swaggerData, oldDefinition);
-                apiProvider.saveSwaggerDefinition(apiInfo, newDefinition);
+                apiProvider.saveSwaggerDefinition(apiToUpdate, newDefinition);
             }
-            API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName());
 
             //attach micro-geteway labels
             apiToUpdate = assignLabelsToDTO(body,apiToUpdate);
