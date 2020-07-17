@@ -50,9 +50,8 @@ public class SQLConstantOracle extends SQLConstants{
                     "   (GROUP_ID= ?  OR  ((GROUP_ID='' OR GROUP_ID IS NULL ) AND LOWER (SUB.USER_ID) = LOWER(?)))" +
                     " And " +
                     "    NAME like ?" +
-                    " ) a WHERE r BETWEEN ?+1 AND  r+?"+
-                    " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
-                    " ORDER BY $1 $2 ";
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
 
@@ -82,9 +81,8 @@ public class SQLConstantOracle extends SQLConstants{
                     "   (GROUP_ID= ?  OR ((GROUP_ID='' OR GROUP_ID IS NULL ) AND SUB.USER_ID=?))"+
                     " And "+
                     "    NAME like ?"+
-                    " ) a WHERE r BETWEEN ?+1 AND  r+?"+
-                    " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
-                    " ORDER BY $1 $2 ";
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
     public static final String GET_APPLICATIONS_PREFIX_CASESENSITVE_WITH_MULTIGROUPID =
             "select distinct x.*,bl.ENABLED from (" +
@@ -108,17 +106,17 @@ public class SQLConstantOracle extends SQLConstants{
                     " WHERE " +
                     "   SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
                     " AND (" +
-                    "    (APPLICATION_ID IN ( SELECT APPLICATION_ID FROM AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID IN ($params) AND TENANT = ?)) " +
+                    "    (APPLICATION_ID IN ( SELECT APPLICATION_ID FROM AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID " +
+                    "IN ($params) AND TENANT = ?)) " +
                     "           OR " +
                     "    (LOWER (SUB.USER_ID) = LOWER(?))" +
                     "           OR  " +
                     "    (APP.APPLICATION_ID IN (SELECT APPLICATION_ID FROM AM_APPLICATION WHERE GROUP_ID = ?))" +
                     " )" +
                     " And " +
-                    "    NAME like ?" +
-                    " ) a WHERE r BETWEEN ?+1 AND  r+?"+
-                    " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
-                    " ORDER BY $1 $2 ";
+                    "    NAME like ? ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND " +
+                    "bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
     public static final String GET_APPLICATIONS_PREFIX_NONE_CASESENSITVE_WITH_MULTIGROUPID =
@@ -152,9 +150,8 @@ public class SQLConstantOracle extends SQLConstants{
                     " )" +
                     " And " +
                     "    NAME like ?"+
-                    " ) a WHERE r BETWEEN ?+1 AND  r+?"+
-                    " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
-                    " ORDER BY $1 $2 ";
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
     public static final String GET_APPLICATIONS_PREFIX_CASESENSITVE =
@@ -182,9 +179,9 @@ public class SQLConstantOracle extends SQLConstants{
                     "    LOWER(SUB.USER_ID) = LOWER(?)"+
                     " And "+
                     "    NAME like ?"+
-                    " ) a WHERE r BETWEEN ?+1 AND  r+?"+
-                    " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
-                    " ORDER BY $1 $2 ";
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE =" +
+                    " concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
     public static final String GET_APPLICATIONS_PREFIX_NONE_CASESENSITVE =
@@ -212,9 +209,8 @@ public class SQLConstantOracle extends SQLConstants{
                     "   SUB.USER_ID=?" +
                     " And "+
                     "    NAME like ?"+
-                    " ) a WHERE r BETWEEN ?+1 AND  r+?"+
-                    " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
-                    " ORDER BY $1 $2 ";
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
     public static final String GET_APPLICATIONS_BY_TENANT_ID =
             "select distinct x.* from (" +
@@ -239,9 +235,8 @@ public class SQLConstantOracle extends SQLConstants{
                     " And "+
                     "    ( SUB.CREATED_BY like ?"+
                     " OR APP.NAME like ?"+
-                    " )) a WHERE r BETWEEN ?+1 AND  r+?"+
-                    " )x "+
-                    " ORDER BY $1 $2 ";
+                    " )) a )x "+
+                    " ORDER BY $1 $2  OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
 }
