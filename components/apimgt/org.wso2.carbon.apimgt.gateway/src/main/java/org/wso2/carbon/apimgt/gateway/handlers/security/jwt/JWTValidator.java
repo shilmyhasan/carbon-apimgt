@@ -612,7 +612,7 @@ public class JWTValidator {
             }
             String[] tokenScopes = null;
             if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) instanceof String) {
-                 tokenScopes = String.valueOf(payload.getClaim(APIConstants.JwtTokenConstants.SCOPE))
+                tokenScopes = String.valueOf(payload.getClaim(APIConstants.JwtTokenConstants.SCOPE))
                         .split(APIConstants.JwtTokenConstants.SCOPE_DELIMITER);
             } else if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) instanceof List) {
                 tokenScopes = (String[]) ((List) payload.getClaim(APIConstants.JwtTokenConstants.SCOPE)).toArray();
