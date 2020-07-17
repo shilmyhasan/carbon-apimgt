@@ -607,21 +607,16 @@ public class JWTValidator {
             throws APISecurityException, ParseException {
         if (StringUtils.isNotBlank(resourceScope)) {
             if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) == null) {
-                //payload -< scope stirn? array?  array ->
                 log.error("Scopes not found in the token.");
                 throw new APISecurityException(APISecurityConstants.INVALID_SCOPE, "Scope validation failed");
             }
-            String[] tokenScopes;
+            String[] tokenScopes = null;
             if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) instanceof String) {
                  tokenScopes = String.valueOf(payload.getClaim(APIConstants.JwtTokenConstants.SCOPE))
                         .split(APIConstants.JwtTokenConstants.SCOPE_DELIMITER);
             } else if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) instanceof List) {
                 tokenScopes = (String[]) ((List) payload.getClaim(APIConstants.JwtTokenConstants.SCOPE)).toArray();
             }
-
-
-           tokenScopes = payload.getStringClaim(APIConstants.JwtTokenConstants.SCOPE)
-                    .split(APIConstants.JwtTokenConstants.SCOPE_DELIMITER);
 
             boolean scopeFound = false;
 
