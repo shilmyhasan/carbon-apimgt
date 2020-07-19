@@ -1060,7 +1060,15 @@ public class RestApiUtil {
        return getApplicationPaginatedURLWithSortParams(offset, limit, groupId, null, null);
     }
 
-
+    /**
+     * Returns the paginated url for Applications API when it comes to sortOrder and sortBy
+     * @param offset starting index
+     * @param limit max number of objects returned
+     * @param groupId group ID of the application
+     * @param sortOrder specified sorting order ex: ASC
+     * @param sortBy specified parameter for the sort ex: name
+     * @return constructed paginated url
+     */
     public static String getApplicationPaginatedURLWithSortParams(Integer offset, Integer limit, String groupId,
                                                                   String sortOrder, String sortBy) {
         groupId = groupId == null ? "" : groupId;
