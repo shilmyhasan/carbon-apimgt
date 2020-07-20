@@ -624,6 +624,8 @@ public final class APIConstants {
     public static final String API_KEY_VALIDATOR_PASSWORD = API_KEY_VALIDATOR + "Password";
     public static final String API_KEY_VALIDATOR_APPLICATION_ACCESS_TOKEN_VALIDATION_PERIOD = API_KEY_VALIDATOR
             + "ApplicationTokenDefaultValidityPeriod";
+    public static final String API_KEY_VALIDATOR_ENABLE_PROVISION_APP_VALIDATION = API_KEY_VALIDATOR + "EnableProvisionedAppValidation";
+
 
     // Constants needed for KeyManager section
     public static final String API_KEY_MANAGER = "APIKeyManager.";
