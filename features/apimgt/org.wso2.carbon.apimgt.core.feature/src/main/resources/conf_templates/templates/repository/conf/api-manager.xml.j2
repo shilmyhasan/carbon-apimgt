@@ -387,7 +387,7 @@
     <!--APIKeyManager>
         <KeyManagerClientImpl>org.wso2.carbon.apimgt.impl.AMDefaultKeyManagerImpl</KeyManagerClientImpl>
         <Configuration>
-            <ServerURL>https://localhost:${mgt.transport.https.port}${carbon.context}services/</ServerURL>
+            <ServerURL>{{apim.auth_manager.service_url}}</ServerURL>
             <Username>${admin.username}</Username>
             <Password>${admin.password}</Password>
             <TokenURL>https://${carbon.local.ip}:${https.nio.port}/token</TokenURL>
