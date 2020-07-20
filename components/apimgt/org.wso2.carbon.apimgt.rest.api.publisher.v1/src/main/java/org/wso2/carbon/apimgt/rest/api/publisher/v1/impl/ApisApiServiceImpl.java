@@ -3312,7 +3312,6 @@ public class ApisApiServiceImpl implements ApisApiService {
                     validationResponse =
                             APIMWSDLReader.extractAndValidateWSDLArchive(fileInputStream);
                 } else if (filename.endsWith(".wsdl")) {
-                    //APIMWSDLReader.extractAndValidateWSDLArchive(fileInputStream);
                     validationResponse = APIMWSDLReader.validateWSDLFile(fileInputStream);
                 } else {
                     RestApiUtil.handleBadRequest("Unsupported extension type of file: " + filename, log);
@@ -3515,9 +3514,9 @@ public class ApisApiServiceImpl implements ApisApiService {
                 if (filename.endsWith(".zip")) {
                     swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
                 } else if (filename.endsWith(".wsdl")) {
-                    byte[] wsdlContent = APIUtil.toByteArray(fileInputStream);
-                    wsdlArchiveExtractedPath = wsdlArchiveExtractedPath.substring(0, wsdlArchiveExtractedPath.lastIndexOf('/'));
-                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url, wsdlContent);
+                    wsdlArchiveExtractedPath = wsdlArchiveExtractedPath.substring(0,
+                            wsdlArchiveExtractedPath.lastIndexOf('/'));
+                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
                 } else {
                     throw new APIManagementException(ExceptionCodes.UNSUPPORTED_WSDL_FILE_EXTENSION);
                 }
@@ -3525,7 +3524,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             String updatedSwagger = updateSwagger(createdApi.getUUID(), swaggerStr);
             SequenceGenerator.generateSequencesFromSwagger(updatedSwagger, apiToAdd.getId());
             return createdApi;
-        } catch (FaultGatewaysException | IOException e) {
+        } catch (FaultGatewaysException  e) {
             throw new APIManagementException("Error while importing WSDL to create a SOAP-to-REST API", e);
         }
     }
