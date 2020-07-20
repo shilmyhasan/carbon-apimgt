@@ -236,7 +236,7 @@ public class DataProcessAndPublishingAgent implements Runnable {
         }
 
         //adding any custom property if available to stream's property map
-        if (this.customPropertyMap != null){
+        if (this.customPropertyMap != null) {
             jsonObMap.putAll(this.customPropertyMap);
         }
 
