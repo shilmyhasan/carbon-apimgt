@@ -190,7 +190,14 @@ public class OAS2Parser extends APIDefinition {
                 String finalGenCode = genCode.toString();
                 apiResourceMediationPolicyObject.setContent(finalGenCode);
                 apiResourceMediationPolicyList.add(apiResourceMediationPolicyObject);
-                op.setVendorExtension(APIConstants.SWAGGER_X_MEDIATION_SCRIPT, genCode);
+                if (op.getVendorExtensions() != null && op.getVendorExtensions().get
+                        (APIConstants.SWAGGER_X_MEDIATION_SCRIPT) == null) {
+                    if (op.getVendorExtensions().get(APIConstants.SWAGGER_X_MEDIATION_SCRIPT) == null) {
+                        op.setVendorExtension(APIConstants.SWAGGER_X_MEDIATION_SCRIPT, genCode);
+                    }
+                } else if (op.getVendorExtensions() == null) {
+                    op.setVendorExtension(APIConstants.SWAGGER_X_MEDIATION_SCRIPT, genCode);
+                }
             }
             returnMap.put(APIConstants.SWAGGER, Json.pretty(swagger));
             returnMap.put(APIConstants.MOCK_GEN_POLICY_LIST, apiResourceMediationPolicyList);

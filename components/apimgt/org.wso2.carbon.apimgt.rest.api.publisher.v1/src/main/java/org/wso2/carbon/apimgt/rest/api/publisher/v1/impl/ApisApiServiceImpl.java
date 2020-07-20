@@ -3511,10 +3511,11 @@ public class ApisApiServiceImpl implements ApisApiService {
             } else if (fileInputStream != null) {
                 String filename = fileDetail.getContentDisposition().getFilename();
                 if (filename.endsWith(".zip")) {
-                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath);;
+                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
                 } else if (filename.endsWith(".wsdl")) {
-                    byte[] wsdlContent = APIUtil.toByteArray(fileInputStream);
-                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlContent);
+                    wsdlArchiveExtractedPath = wsdlArchiveExtractedPath.substring(0,
+                            wsdlArchiveExtractedPath.lastIndexOf('/'));
+                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
                 } else {
                     throw new APIManagementException(ExceptionCodes.UNSUPPORTED_WSDL_FILE_EXTENSION);
                 }
@@ -3522,7 +3523,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             String updatedSwagger = updateSwagger(createdApi.getUUID(), swaggerStr);
             SequenceGenerator.generateSequencesFromSwagger(updatedSwagger, apiToAdd.getId());
             return createdApi;
-        } catch (FaultGatewaysException | IOException e) {
+        } catch (FaultGatewaysException  e) {
             throw new APIManagementException("Error while importing WSDL to create a SOAP-to-REST API", e);
         }
     }

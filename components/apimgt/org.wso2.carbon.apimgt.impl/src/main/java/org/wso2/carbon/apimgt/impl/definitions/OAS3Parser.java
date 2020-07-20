@@ -186,6 +186,14 @@ public class OAS3Parser extends APIDefinition {
                 genCode.append(responseSection);
                 String finalGenCode = genCode.toString();
                 apiResourceMediationPolicyObject.setContent(finalGenCode);
+                if (op.getExtensions() != null && op.getExtensions().get
+                        (APIConstants.SWAGGER_X_MEDIATION_SCRIPT) == null) {
+                    if (op.getExtensions().get(APIConstants.SWAGGER_X_MEDIATION_SCRIPT) == null) {
+                        op.addExtension(APIConstants.SWAGGER_X_MEDIATION_SCRIPT, genCode);
+                    }
+                } else if (op.getExtensions() == null) {
+                    op.addExtension(APIConstants.SWAGGER_X_MEDIATION_SCRIPT, genCode);
+                }
                 op.addExtension(APIConstants.SWAGGER_X_MEDIATION_SCRIPT, genCode);
                 apiResourceMediationPolicyList.add(apiResourceMediationPolicyObject);
             }
