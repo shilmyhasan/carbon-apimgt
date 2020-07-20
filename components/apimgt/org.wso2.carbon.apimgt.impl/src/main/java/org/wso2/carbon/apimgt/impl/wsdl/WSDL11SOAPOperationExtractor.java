@@ -333,7 +333,7 @@ public class WSDL11SOAPOperationExtractor extends WSDL11ProcessorImpl {
                 currentProperty = generateSwaggerModelForComplexType(element, model, currentProp,
                         true, prevNode);
             } catch (APIManagementException e) {
-                log.error("", e);
+                log.error("Error occurred while generating a swagger model for complex type", e);
             }
             setNamespaceDetails(model, element);
         } else {
@@ -341,7 +341,7 @@ public class WSDL11SOAPOperationExtractor extends WSDL11ProcessorImpl {
                 currentProperty = generateSwaggerModelForComplexType(element, model, currentProp,
                         false, null);
             } catch (APIManagementException e) {
-                log.error("", e);
+                log.error("Error occurred while generating a swagger model for complex type", e);
             }
             setNamespaceDetails(model, element);
         }
