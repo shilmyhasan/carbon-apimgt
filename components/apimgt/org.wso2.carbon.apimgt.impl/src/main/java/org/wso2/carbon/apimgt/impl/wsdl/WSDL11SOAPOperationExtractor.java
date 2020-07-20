@@ -159,7 +159,7 @@ public class WSDL11SOAPOperationExtractor extends WSDL11ProcessorImpl {
     @Override
     public void loadXSDs(APIMWSDLReader wsdlReader, String url) throws APIManagementException {
         Collection<File> foundXSDFiles = new java.util.LinkedList<>();
-        if (url!= null && url.endsWith(File.pathSeparator + "extracted")) {
+        if (url != null && url.endsWith(File.pathSeparator + "extracted")) {
             File folderToImport = new File(url);
             foundXSDFiles = APIFileUtil.searchFilesWithMatchingExtension(folderToImport, "xsd",
                     false);
