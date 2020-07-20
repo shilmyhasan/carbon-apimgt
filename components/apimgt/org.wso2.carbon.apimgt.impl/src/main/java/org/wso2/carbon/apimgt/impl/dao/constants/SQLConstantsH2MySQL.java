@@ -48,7 +48,7 @@ public class SQLConstantsH2MySQL extends SQLConstants{
             " AND " +
             "   (GROUP_ID= ?  OR  (GROUP_ID='' AND LOWER (SUB.USER_ID) = LOWER(?)))" +
             " And " +
-            "    NAME like ?"+
+            "    NAME like ?" +
             " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
             " ORDER BY $1 $2 limit ? , ?";
 

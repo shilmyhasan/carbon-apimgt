@@ -50,7 +50,7 @@ public class SQLConstantOracle extends SQLConstants{
                     "   (GROUP_ID= ?  OR  ((GROUP_ID='' OR GROUP_ID IS NULL ) AND LOWER (SUB.USER_ID) = LOWER(?)))" +
                     " And " +
                     "    NAME like ?" +
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
@@ -78,10 +78,10 @@ public class SQLConstantOracle extends SQLConstants{
                     " WHERE " +
                     "   SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
                     " AND " +
-                    "   (GROUP_ID= ?  OR ((GROUP_ID='' OR GROUP_ID IS NULL ) AND SUB.USER_ID=?))"+
-                    " And "+
-                    "    NAME like ?"+
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    "   (GROUP_ID= ?  OR ((GROUP_ID='' OR GROUP_ID IS NULL ) AND SUB.USER_ID=?))" +
+                    " And " +
+                    "    NAME like ?" +
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
     public static final String GET_APPLICATIONS_PREFIX_CASESENSITVE_WITH_MULTIGROUPID =
@@ -115,7 +115,7 @@ public class SQLConstantOracle extends SQLConstants{
                     " )" +
                     " And " +
                     "    NAME like ? ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND " +
-                    "bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    "bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
@@ -150,7 +150,7 @@ public class SQLConstantOracle extends SQLConstants{
                     " )" +
                     " And " +
                     "    NAME like ?"+
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
@@ -180,7 +180,7 @@ public class SQLConstantOracle extends SQLConstants{
                     " And "+
                     "    NAME like ?"+
                     " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE =" +
-                    " concat(concat(x.USER_ID,':'),x.name)) "+
+                    " concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
 
@@ -209,7 +209,7 @@ public class SQLConstantOracle extends SQLConstants{
                     "   SUB.USER_ID=?" +
                     " And "+
                     "    NAME like ?"+
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
     public static final String GET_APPLICATIONS_BY_TENANT_ID =
@@ -231,13 +231,12 @@ public class SQLConstantOracle extends SQLConstants{
                     " WHERE " +
                     "   SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
                     " AND " +
-                    "    SUB.TENANT_ID = ? "+
-                    " And "+
-                    "    ( SUB.CREATED_BY like ?"+
-                    " OR APP.NAME like ?"+
-                    " )) a )x "+
+                    "    SUB.TENANT_ID = ? " +
+                    " And " +
+                    "    ( SUB.CREATED_BY like ?" +
+                    " OR APP.NAME like ?" +
+                    " )) a )x " +
                     " ORDER BY $1 $2  OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-
 
 }
 

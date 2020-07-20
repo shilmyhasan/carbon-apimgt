@@ -51,7 +51,7 @@ public class SQLConstantsDB2 extends SQLConstants{
                     "   (GROUP_ID= ?  OR  (GROUP_ID='' AND LOWER (SUB.USER_ID) = LOWER(?)))" +
                     " And " +
                     "    NAME like ?" +
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
 
@@ -81,8 +81,8 @@ public class SQLConstantsDB2 extends SQLConstants{
                     " AND " +
                     "   (GROUP_ID= ?  OR (GROUP_ID='' AND SUB.USER_ID=?))"+
                     " And "+
-                    "    NAME like ?"+
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    "    NAME like ?" +
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
     public static final String GET_APPLICATIONS_PREFIX_CASESENSITVE =
@@ -109,8 +109,8 @@ public class SQLConstantsDB2 extends SQLConstants{
                     " AND " +
                     "    LOWER(SUB.USER_ID) = LOWER(?)"+
                     " And "+
-                    "    NAME like ?"+
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    "    NAME like ?" +
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
 
@@ -138,8 +138,8 @@ public class SQLConstantsDB2 extends SQLConstants{
                     " AND " +
                     "   SUB.USER_ID=?" +
                     " And "+
-                    "    NAME like ?"+
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) "+
+                    "    NAME like ?" +
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
     public static final String GET_APPLICATIONS_PREFIX_NONE_CASESENSITVE_WITH_MULTIGROUPID =
@@ -199,7 +199,7 @@ public class SQLConstantsDB2 extends SQLConstants{
                     " And "+
                     "    ( SUB.CREATED_BY like ?"+
                     " OR APP.NAME like ?"+
-                    " )) a )x "+
+                    " )) a )x " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
 }

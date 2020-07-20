@@ -201,7 +201,7 @@ public class APIMWSDLReader {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             writer.writeWSDL(wsdlDefinition, byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
+        } catch (WSDLException e) {
             throw new APIManagementException("Error occurs when change the address URL of the WSDL", e);
         }
     }
@@ -301,14 +301,10 @@ public class APIMWSDLReader {
             DocumentBuilderFactory factory = getSecuredDocumentBuilder();
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(inputStream);
-        } catch (ParserConfigurationException e) {
-            throw new APIManagementException(errorMsg, e);
-        } catch (IOException e) {
-            throw new APIManagementException(errorMsg, e);
-        } catch (SAXException e) {
+        } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new APIManagementException(errorMsg, e);
         } finally {
-            if(inputStream != null) {
+            if (inputStream != null) {
                 IOUtils.closeQuietly(inputStream);
             }
         }

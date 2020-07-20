@@ -122,7 +122,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
             applicationListDTO = ApplicationMappingUtil.fromApplicationsToDTO(applications);
             ApplicationMappingUtil.setPaginationParamsWithSortParams(applicationListDTO, groupId, limit, offset,
-                    applicationCount,sortOrder, sortBy.toLowerCase());
+                    applicationCount, sortOrder, sortBy.toLowerCase());
 
             return Response.ok().entity(applicationListDTO).build();
         } catch (APIManagementException e) {
