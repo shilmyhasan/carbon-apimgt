@@ -106,7 +106,6 @@ public class JWTGenerator extends AbstractJWTGenerator {
                     log.debug("The custom claims are retrieved from AuthorizationGrantCache for user : "
                             + validationContext.getValidationInfoDTO().getEndUserName());
                 }
-                return customClaims;
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("Custom claims are not available in the AuthorizationGrantCache. Hence will be "
@@ -115,24 +114,29 @@ public class JWTGenerator extends AbstractJWTGenerator {
                 }
             }
             // If claims are not found in AuthorizationGrantCache, they will be retrieved from the userstore.
-            String userName = validationContext.getValidationInfoDTO().getEndUserName();
+            String username = validationContext.getValidationInfoDTO().getEndUserName();
 
             try {
-                int tenantId = APIUtil.getTenantId(userName);
+                int tenantId = APIUtil.getTenantId(username);
 
                 if (tenantId != -1) {
                     UserStoreManager manager = ServiceReferenceHolder.getInstance().
                             getRealmService().getTenantUserRealm(tenantId).getUserStoreManager();
 
-                    String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(userName);
+                    String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(username);
 
                     if (manager.isExistingUser(tenantAwareUserName)) {
-                        return claimsRetriever.getClaims(userName);
+                        customClaims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
+                        return customClaims;
                     } else {
-                        log.warn("User " + userName + " cannot be found by user store manager");
+                        if (!customClaims.isEmpty()) {
+                            return customClaims;
+                        } else {
+                            log.warn("User " + tenantAwareUserName + " cannot be found by user store manager");
+                        }
                     }
                 } else {
-                    log.error("Tenant cannot be found for username: " + userName);
+                    log.error("Tenant cannot be found for username: " + username);
                 }
             } catch (APIManagementException e) {
                 log.error("Error while retrieving claims ", e);
