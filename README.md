@@ -34,8 +34,8 @@ https://github.com/wso2-support/carbon-consent-management/tree/support-2.0.18
 https://github.com/wso2-support/carbon-identity-framework/tree/support-5.12.153
     3. identity-inbound-auth-oauth - support-6.0.53
 https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.53
-    4. carbon.kernel - support-4.4.35
-https://github.com/wso2-support/carbon-kernel/tree/support-4.4.35
+    4. carbon4-kernel/core - support-4.4.35
+https://github.com/wso2-support/carbon-kernel/tree/support-4.4.35/core
 
 - Support-6.5.349 - APIM 3.0.0
 - [Support-6.6.163](https://github.com/wso2-support/carbon-apimgt/tree/support-6.6.163) - APIM 3.1.0
