@@ -25,6 +25,16 @@ https://github.com/wso2-support/wso2-wsdl4j/tree/support-1.6.2-wso2v4
 https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.14
 
 - Support-6.4.50 - APIM 2.6.0
+
+    We need to build following additional Repo before building support-6.4.50 branch:
+    
+    1. carbon-consent-management - support-2.0.18
+https://github.com/wso2-support/carbon-consent-management/tree/support-2.0.18
+    2. carbon-identity-framework - support-5.12.153
+https://github.com/wso2-support/carbon-identity-framework/tree/support-5.12.153
+    3. identity-inbound-auth-oauth - support-6.0.53
+https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.53
+
 - Support-6.5.349 - APIM 3.0.0
 - [Support-6.6.163](https://github.com/wso2-support/carbon-apimgt/tree/support-6.6.163) - APIM 3.1.0
 
