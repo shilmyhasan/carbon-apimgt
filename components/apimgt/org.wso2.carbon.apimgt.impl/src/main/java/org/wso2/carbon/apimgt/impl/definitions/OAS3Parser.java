@@ -194,10 +194,8 @@ public class OAS3Parser extends APIDefinition {
                 } else if (op.getExtensions() == null) {
                     op.addExtension(APIConstants.SWAGGER_X_MEDIATION_SCRIPT, genCode);
                 }
-                op.addExtension(APIConstants.SWAGGER_X_MEDIATION_SCRIPT, genCode);
                 apiResourceMediationPolicyList.add(apiResourceMediationPolicyObject);
             }
-
             checkAndSetEmptyScope(swagger);
             returnMap.put(APIConstants.SWAGGER, Json.pretty(swagger));
             //returnMap.put("SWAGGER", Json.pretty(swagger));
