@@ -46,3 +46,5 @@ https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.53
 https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.4.2
     2. carbon4-kernel/core/javax.cache - support-4.6.0
 https://github.com/wso2-support/carbon4-kernel/tree/support-4.6.0/core/javax.cache
+    3. /carbon-identity-framework - support-5.17.5
+https://github.com/wso2-support/carbon-identity-framework/tree/support-5.17.5
