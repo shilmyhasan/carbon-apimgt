@@ -180,7 +180,7 @@ public class JWTValidator {
                 header = parsedJWTToken.getHeader();
                 payload = transformJWTClaims(parsedJWTToken.getJWTClaimsSet());
 
-                if (payload.getStringClaim(APIConstants.BINDING_REF) != null &&
+                if (payload != null && payload.getStringClaim(APIConstants.BINDING_REF) != null &&
                         payload.getStringClaim(APIConstants.BINDING_TYPE) != null &&
                         payload.getStringClaim(APIConstants.BINDING_TYPE).equals(APIConstants.COOKIE.toLowerCase())) {
                     checkCSRF(synCtx, payload.getStringClaim(APIConstants.BINDING_REF));
@@ -237,7 +237,7 @@ public class JWTValidator {
                 // Token is found in the key cache
                 payload = payloadInfo.getPayload();
                 try {
-                    if (payload.getStringClaim(APIConstants.BINDING_REF) != null &&
+                    if (payload != null && payload.getStringClaim(APIConstants.BINDING_REF) != null &&
                             payload.getStringClaim(APIConstants.BINDING_TYPE) != null &&
                             payload.getStringClaim(APIConstants.BINDING_TYPE).equals(APIConstants.COOKIE.toLowerCase())) {
                         checkCSRF(synCtx, payload.getStringClaim(APIConstants.BINDING_REF));
@@ -371,10 +371,9 @@ public class JWTValidator {
         APIManagerConfiguration config = getApiManagerConfiguration();
         String cookieName = config.getFirstProperty(APIConstants.BROWSER_COOKIE);
 
-
         org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         Map headers = (Map) msgContext.getProperty((org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
-        if (headers != null && headers.get(APIConstants.COOKIE) != null) {
+        if (headers != null && headers.get(APIConstants.COOKIE) != null && StringUtils.isNotBlank(cookieName)) {
             String[] cookieArray = headers.get(APIConstants.COOKIE).toString().split(";");
             for (String ele : cookieArray) {
                 if (ele.trim().startsWith(cookieName)) {
@@ -383,7 +382,7 @@ public class JWTValidator {
             }
         }
 
-        if (!cookieBindingValue.isEmpty()) {
+        if (StringUtils.isNotBlank(cookieName)) {
             log.debug("Verifying CSRF");
             if (DigestUtils.md5Hex(cookieBindingValue).equals(bindingRef)) {
                 isCSRFAttackDetected = false;
@@ -395,7 +394,7 @@ public class JWTValidator {
                         "Invalid JWT token");
             }
         } else {
-            log.debug("Required cookie is not presented in request");
+            log.debug("Browser cookie name has not been configured");
         }
     }
 
@@ -714,12 +713,12 @@ public class JWTValidator {
 
         APIManagerConfiguration config = getApiManagerConfiguration();
         String oneTimeTokenScope = config.getFirstProperty(APIConstants.ONE_TIME_TOKEN);
-        if (StringUtils.isNotBlank(resourceScope) || (oneTimeTokenScope != null && !oneTimeTokenScope.isEmpty())) {
+        if (StringUtils.isNotBlank(resourceScope) || StringUtils.isNotBlank (oneTimeTokenScope)) {
             if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) == null) {
                 log.error("Scopes not found in the token.");
                 throw new APISecurityException(APISecurityConstants.INVALID_SCOPE, "Scope validation failed");
             }
-            String[] tokenScopes = null;
+            String[] tokenScopes = new String[0];
             if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) instanceof String) {
                 tokenScopes = String.valueOf(payload.getClaim(APIConstants.JwtTokenConstants.SCOPE))
                         .split(APIConstants.JwtTokenConstants.SCOPE_DELIMITER);
