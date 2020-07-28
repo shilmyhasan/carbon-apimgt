@@ -245,6 +245,10 @@ public class JWTValidator {
                         checkCSRF(synCtx, cookieBindingRef);
                     }
                 } catch (ParseException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error occured when retrieving binding claims from payload. Token: "
+                                + GatewayUtils.getMaskedToken(splitToken[0]), e);
+                    }
                     throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
                             APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
                 }
@@ -363,14 +367,14 @@ public class JWTValidator {
     }
 
     /**
-     *  Check CSRF
+     *  Check CSRF token mismatch
      *
      * @param synCtx The message to be authenticated
      * @param bindingRef binding_ref value of JWT token
      * @throws APISecurityException  in case of authentication failure
      */
     private void checkCSRF(MessageContext synCtx, String bindingRef) throws APISecurityException {
-
+        log.debug("Verifying CSRF token mismatch");
         String cookieBindingValue = "" ;
         boolean isCSRFAttackDetected = true;
         APIManagerConfiguration config = getApiManagerConfiguration();
@@ -378,28 +382,27 @@ public class JWTValidator {
 
         org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         Map headers = (Map) msgContext.getProperty((org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
-        if (headers != null && headers.get(APIConstants.COOKIE) != null && StringUtils.isNotBlank(cookieName)) {
+
+        if(StringUtils.isBlank(cookieName)) {
+            cookieName = APIConstants.DEFAULT_COOKIE_BINDING_NAME;
+        }
+        if (headers != null && headers.get(APIConstants.COOKIE) != null) {
             String[] cookieArray = headers.get(APIConstants.COOKIE).toString().split(";");
             for (String ele : cookieArray) {
-                if (ele.trim().startsWith(cookieName)) {
+                if (ele.trim().startsWith(cookieName + "=")) {
                     cookieBindingValue = ele.split("=")[1];
                 }
             }
         }
 
-        if (StringUtils.isNotBlank(cookieName)) {
-            log.debug("Verifying CSRF");
-            if (DigestUtils.md5Hex(cookieBindingValue).equals(bindingRef)) {
-                isCSRFAttackDetected = false;
-            }
+        if (DigestUtils.md5Hex(cookieBindingValue).equals(bindingRef)) {
+            isCSRFAttackDetected = false;
+        }
 
-            if (isCSRFAttackDetected) {
-                log.debug("CSRF attack has been detected");
-                throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
+        if (isCSRFAttackDetected) {
+            log.warn("CSRF attack has been detected");
+            throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token");
-            }
-        } else {
-            log.debug("Browser cookie name has not been configured");
         }
     }
 
@@ -470,43 +473,38 @@ public class JWTValidator {
     }
 
     /**
-     * Revoke the one Time Token
+     * Revoke the one-time-token
      *
      * @param jwtToken JWT Token
      * @param payload payload
      * @throws APISecurityException in case of authentication failure
      */
     private void revokeOneTimeToken(String jwtToken, JWTClaimsSet payload) throws APISecurityException {
-        if (log.isDebugEnabled()) {
-            log.debug("This is an one time token");
-        }
-        try {
-            String consumerKey = null;
-            try {
-                if (payload.getClaim(APIConstants.JwtTokenConstants.CONSUMER_KEY) != null) {
-                    consumerKey = payload.getStringClaim(APIConstants.JwtTokenConstants.CONSUMER_KEY);
-                } else if (payload.getClaim(APIConstants.JwtTokenConstants.AUTHORIZED_PARTY) != null) {
-                    consumerKey = payload.getStringClaim(APIConstants.JwtTokenConstants.AUTHORIZED_PARTY);
-                }
-            } catch (ParseException e) {
-                throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
-                        APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
-            }
 
+        log.debug("This is an one-time-token");
+        String consumerKey;
+        try {
+            consumerKey = payload.getStringClaim(APIConstants.JwtTokenConstants.CONSUMER_KEY);
             if (consumerKey != null) {
-                RevokedJWTDataHolder.getInstance().revokeJWTAccessToken(jwtToken, consumerKey);
-                if (log.isDebugEnabled()) {
-                    log.debug("The one time token is revoked");
-                }
-            } else {
+                consumerKey = payload.getStringClaim(APIConstants.JwtTokenConstants.AUTHORIZED_PARTY);
+            }
+        } catch (ParseException e) {
+            if (log.isDebugEnabled()) {
+                String[] splitToken = jwtToken.split("\\.");
+                log.debug("Cannot retrieve claims from Token: " + GatewayUtils.getMaskedToken(splitToken[0]));
+            }
+            throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
+                    APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
+        }
+
+        if (consumerKey != null) {
+            RevokedJWTDataHolder.getInstance().revokeJWTAccessToken(jwtToken, consumerKey);
+            log.debug("The one time token is revoked");
+        } else {
                 log.debug("Cannot call Key Manager to revoke the token. Payload of the token does not " +
                         "contain the Authorized party - the party to which the ID Token was issued");
                 throw new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN,
                         APISecurityConstants.API_AUTH_FORBIDDEN_MESSAGE);
-            }
-        } catch (APISecurityException e) {
-            throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
-                    APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
         }
     }
 

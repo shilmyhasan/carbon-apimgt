@@ -640,6 +640,7 @@ public final class APIConstants {
     public static final String COOKIE = "Cookie";
     public static final String BINDING_REF = "binding_ref";
     public static final String BINDING_TYPE = "binding_type";
+    public static final String DEFAULT_COOKIE_BINDING_NAME = "atbv";
 
     // Constants needed for Single Usage Token implementation
     public static final String ONE_TIME_TOKEN_SCOPE = "OneTimeTokenScope";
