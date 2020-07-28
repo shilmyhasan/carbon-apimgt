@@ -243,9 +243,12 @@ public class JWTValidator {
                         checkCSRF(synCtx, payload.getStringClaim(APIConstants.BINDING_REF));
                     }
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
+                            APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
                 }
-                checkTokenExpiration(tokenSignature, payload, tenantDomain);
+                if (payload != null) {
+                    checkTokenExpiration(tokenSignature, payload, tenantDomain);
+                }
             } else {
                 // Retrieve payload from token
                 log.debug("Token payload not found in the cache.");
