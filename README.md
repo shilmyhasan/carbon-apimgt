@@ -28,13 +28,17 @@ https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.14
 
     We need to build following additional Repo before building support-6.4.50 branch:
     
-    1. carbon4-kernel/core - support-4.4.35
-https://github.com/wso2-support/carbon-kernel/tree/support-4.4.35/core
-    2. carbon-consent-management - support-2.0.18
+    1. orbit - master
+https://github.com/wso2-support/orbit
+    2. carbon-kernel - support-4.4.35
+https://github.com/wso2-support/carbon-kernel/tree/support-4.4.35
+    3. carbon-consent-management - support-2.0.18
 https://github.com/wso2-support/carbon-consent-management/tree/support-2.0.18
-    3. carbon-identity-framework - support-5.12.153
+    4. carbon-identity-framework - support-5.12.153
 https://github.com/wso2-support/carbon-identity-framework/tree/support-5.12.153
-    4. identity-inbound-auth-oauth - support-6.0.53
+    5. wso2-axis2 - support-1.6.1-wso2v28
+https://github.com/wso2-support/wso2-axis2/tree/support-1.6.1-wso2v28
+    6. identity-inbound-auth-oauth - support-6.0.53
 https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.53
 
 - Support-6.5.349 - APIM 3.0.0
