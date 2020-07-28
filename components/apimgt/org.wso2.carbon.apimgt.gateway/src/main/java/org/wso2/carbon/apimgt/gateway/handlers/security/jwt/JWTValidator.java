@@ -182,8 +182,9 @@ public class JWTValidator {
 
                 if (payload != null && payload.getStringClaim(APIConstants.BINDING_REF) != null &&
                         payload.getStringClaim(APIConstants.BINDING_TYPE) != null &&
-                        payload.getStringClaim(APIConstants.BINDING_TYPE).equals(APIConstants.COOKIE.toLowerCase())) {
-                    checkCSRF(synCtx, payload.getStringClaim(APIConstants.BINDING_REF));
+                        APIConstants.COOKIE.toLowerCase().equals(payload.getStringClaim(APIConstants.BINDING_TYPE))) {
+                    String cookieBindingRef = payload.getStringClaim(APIConstants.BINDING_REF);
+                    checkCSRF(synCtx, cookieBindingRef);
                 }
             } catch (JSONException | IllegalArgumentException | ParseException e) {
                 if (log.isDebugEnabled()) {
@@ -239,8 +240,9 @@ public class JWTValidator {
                 try {
                     if (payload != null && payload.getStringClaim(APIConstants.BINDING_REF) != null &&
                             payload.getStringClaim(APIConstants.BINDING_TYPE) != null &&
-                            payload.getStringClaim(APIConstants.BINDING_TYPE).equals(APIConstants.COOKIE.toLowerCase())) {
-                        checkCSRF(synCtx, payload.getStringClaim(APIConstants.BINDING_REF));
+                            APIConstants.COOKIE.toLowerCase().equals(payload.getStringClaim(APIConstants.BINDING_TYPE))) {
+                        String cookieBindingRef = payload.getStringClaim(APIConstants.BINDING_REF);
+                        checkCSRF(synCtx, cookieBindingRef);
                     }
                 } catch (ParseException e) {
                     throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,

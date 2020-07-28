@@ -635,14 +635,15 @@ public final class APIConstants {
     public static final String KEY_MANAGER_PASSWORD = "Password";
     public static final String AUTHSERVER_URL = "ServerURL";
 
+    // Constants needed for CSRF protection implemetation
     public static final String BROWSER_COOKIE = "BrowserCookie";
     public static final String COOKIE = "Cookie";
     public static final String BINDING_REF = "binding_ref";
     public static final String BINDING_TYPE = "binding_type";
 
+    // Constants needed for Single Usage Token implementation
     public static final String ONE_TIME_TOKEN_SCOPE = "OneTimeTokenScope";
     public static final String ONE_TIME_TOKEN = "OneTimeToken";
-
 
     public static final String TOKEN_URL = "TokenURL";
     public static final String REVOKE_URL = "RevokeURL";

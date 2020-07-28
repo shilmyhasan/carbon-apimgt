@@ -578,6 +578,15 @@
         <Access-Control-Allow-Credentials>{{apim.cors.allow_credentials}}</Access-Control-Allow-Credentials>
     </CORSConfiguration>
 
+
+    {% if browser_cookie is defined %}
+        <BrowserCookie>{{browser_cookie.cookie_name}}</BrowserCookie>
+    {% endif %}
+
+    {% if one_time_token is defined %}
+        <OneTimeToken>{{one_time_token.scope_name}}</OneTimeToken>
+    {% endif %}
+
     <!-- This property is there to configure velocity log output into existing Log4j carbon Logger.
          You can enable this and set preferable Logger name. -->
     <!-- VelocityLogger>VELOCITY</VelocityLogger -->

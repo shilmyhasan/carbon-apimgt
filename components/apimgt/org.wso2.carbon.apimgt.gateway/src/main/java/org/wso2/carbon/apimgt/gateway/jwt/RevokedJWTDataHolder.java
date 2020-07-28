@@ -103,13 +103,14 @@ public class RevokedJWTDataHolder {
     public void revokeJWTAccessToken(String accessToken, String consumerKey) {
 
         KeyManagerConfiguration configuration;
-        RealmConfiguration realmConfig;
 
         try {
-            realmConfig = new RealmConfigXMLProcessor().buildRealmConfigurationFromFile();
             configuration = KeyManagerHolder.getKeyManagerInstance().getKeyManagerConfiguration();
 
             String revokeEndpoint = configuration.getParameter(APIConstants.REVOKE_URL);
+            String username =  configuration.getParameter(APIConstants.KEY_MANAGER_USERNAME);
+            String password =  configuration.getParameter(APIConstants.KEY_MANAGER_PASSWORD);
+
             URL keyMgtURL = new URL(revokeEndpoint);
             int keyMgtPort = keyMgtURL.getPort();
             String keyMgtProtocol = keyMgtURL.getProtocol();
@@ -120,8 +121,8 @@ public class RevokedJWTDataHolder {
             List<BasicNameValuePair> urlParameters = new ArrayList<>();
             urlParameters.add(new BasicNameValuePair(APIConstants.TOKEN_KEY, accessToken));
             urlParameters.add(new BasicNameValuePair("client_id", consumerKey));
-            urlParameters.add(new BasicNameValuePair("username", realmConfig.getAdminUserName()));
-            urlParameters.add(new BasicNameValuePair("password", realmConfig.getAdminPassword()));
+            urlParameters.add(new BasicNameValuePair("username", username));
+            urlParameters.add(new BasicNameValuePair("password", password));
             urlParameters.add(new BasicNameValuePair("token_type_hint", "access_token"));
 
             httpRevokePost.setEntity(new UrlEncodedFormEntity(urlParameters, "UTF-8"));
@@ -139,7 +140,7 @@ public class RevokedJWTDataHolder {
                         + httpResponse.getStatusLine().getStatusCode() + ". Reason " + responseBody);
             }
 
-        } catch (APIManagementException | IOException | UserStoreException e) {
+        } catch (APIManagementException | IOException e) {
             log.error("Error occurred when revoking the One Time Access Token", e);
         }
     }
