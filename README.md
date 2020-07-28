@@ -1,5 +1,26 @@
 # carbon-apimgt
 
+## Prerequisite for building support branches
+
+- Replace the ```<repositories>``` tag of the parent pom.xml file of the relevant support branch with the following before building the branch.
+```
+<repositories>
+    <repository>
+        <id>wso2-nexus</id>
+        <name>WSO2 internal Repository</name>
+        <url>https://support-maven.wso2.org/nexus/content/repositories/releases/</url>
+        <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>ignore</checksumPolicy>
+        </releases>
+    </repository>
+</repositories>
+```
+- Make sure to be connected to the wso2 vpn when following this method.
+- This method does not require to build the additional repos required by the corresponding support branch.
+- As an alternative, build the additional repos mentioned under the relevant support branch before building the branch. (Do not need to be connected to the wso2 vpn when following this method)
+
 ## Corresponding APIM version of each support branch
 
 - Support-1.2.0 - APIM 1.9.0
