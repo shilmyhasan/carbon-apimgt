@@ -51,6 +51,7 @@ public class APIMTokenIssuer extends OauthTokenIssuerImpl {
     public String accessToken(OAuthTokenReqMessageContext tokReqMsgCtx) throws OAuthSystemException {
 
         String clientId = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getClientId();
+
         Application application;
         long start_time = 0;
         if (log.isDebugEnabled()) {
@@ -99,6 +100,15 @@ public class APIMTokenIssuer extends OauthTokenIssuerImpl {
                 jwtAccessTokenIssuerDTO.setScopeList(scopes);
                 jwtAccessTokenIssuerDTO.setValidityPeriod(validityPeriod);
                 jwtAccessTokenIssuerDTO.setTokenReqMessageContext(tokReqMsgCtx);
+
+                if (tokReqMsgCtx.getTokenBinding() != null && StringUtils
+                        .isNotBlank(tokReqMsgCtx.getTokenBinding().getBindingReference()) &&
+                        tokReqMsgCtx.getTokenBinding().getBindingType().equals(APIConstants.COOKIE.toLowerCase())) {
+                    // Include token binding reference into the jwt token.
+                    jwtAccessTokenIssuerDTO.setBindingRef(tokReqMsgCtx.getTokenBinding().getBindingReference());
+                    jwtAccessTokenIssuerDTO.setBindingType(tokReqMsgCtx.getTokenBinding().getBindingType());
+                }
+
                 String token = APIMTokenIssuerUtil.generateToken(jwtAccessTokenIssuerDTO, application);
                 if (log.isDebugEnabled()) {
                     long end_time_2 = System.nanoTime();

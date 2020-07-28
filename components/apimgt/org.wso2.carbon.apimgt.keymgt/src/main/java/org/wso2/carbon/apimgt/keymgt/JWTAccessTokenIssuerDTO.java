@@ -29,6 +29,8 @@ public class JWTAccessTokenIssuerDTO {
 
     private String clientId;
     private long validityPeriod;
+    private String bindingRef;
+    private String bindingType;
     private String[] scopeList;
     private AuthenticatedUser user;
     private OAuthAuthzReqMessageContext oauthAuthzMsgCtx;
@@ -42,6 +44,26 @@ public class JWTAccessTokenIssuerDTO {
     public void setClientId(String clientId) {
 
         this.clientId = clientId;
+    }
+
+    public void setBindingRef(String token) {
+
+        this.bindingRef = token;
+    }
+
+    public String getBindingRef() {
+
+        return bindingRef;
+    }
+
+    public void setBindingType(String bindingType) {
+
+        this.bindingType = bindingType;
+    }
+
+    public String getBindingType() {
+
+        return bindingType;
     }
 
     public long getValidityPeriod() {

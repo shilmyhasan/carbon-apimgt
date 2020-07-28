@@ -635,6 +635,15 @@ public final class APIConstants {
     public static final String KEY_MANAGER_PASSWORD = "Password";
     public static final String AUTHSERVER_URL = "ServerURL";
 
+    public static final String BROWSER_COOKIE = "BrowserCookie";
+    public static final String COOKIE = "Cookie";
+    public static final String BINDING_REF = "binding_ref";
+    public static final String BINDING_TYPE = "binding_type";
+
+    public static final String ONE_TIME_TOKEN_SCOPE = "OneTimeTokenScope";
+    public static final String ONE_TIME_TOKEN = "OneTimeToken";
+
+
     public static final String TOKEN_URL = "TokenURL";
     public static final String REVOKE_URL = "RevokeURL";
     public static final String SERVICES_URL_RELATIVE_PATH = "services";

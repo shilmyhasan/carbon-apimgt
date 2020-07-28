@@ -158,29 +158,23 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
         return null;
     }
 
-    public Map<String, Object> populateCustomClaims(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
+    private Map<String, Object> populateCustomClaims(JwtTokenInfoDTO jwtTokenInfoDTO) {
 
-        try {
-            CustomClaimsCallbackHandler claimsCallBackHandler = OAuthServerConfiguration.getInstance()
-                    .getOpenIDConnectCustomClaimsCallbackHandler();
-            if (jwtTokenInfoDTO.getOauthAuthzMsgCtx() != null) {
-                JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
-                        .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getOauthAuthzMsgCtx());
-                return jwtClaimsSet.getClaims();
-            } else if (jwtTokenInfoDTO.getTokReqMsgCtx() != null) {
-                JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
-                        .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getTokReqMsgCtx());
-                return jwtClaimsSet.getClaims();
-            }
-        } catch (IdentityOAuth2Exception e) {
-            String error = "Error while handling custom claims";
-            log.error(error, e);
-            throw new APIManagementException(error, e);
+        CustomClaimsCallbackHandler claimsCallBackHandler = OAuthServerConfiguration.getInstance()
+                .getOpenIDConnectCustomClaimsCallbackHandler();
+        if (jwtTokenInfoDTO.getOauthAuthzMsgCtx() != null) {
+            JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
+                    .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getOauthAuthzMsgCtx());
+            return jwtClaimsSet.getClaims();
+        } else if (jwtTokenInfoDTO.getTokReqMsgCtx() != null) {
+            JWTClaimsSet jwtClaimsSet = claimsCallBackHandler
+                    .handleCustomClaims(new JWTClaimsSet.Builder(), jwtTokenInfoDTO.getTokReqMsgCtx());
+            return jwtClaimsSet.getClaims();
         }
         return new LinkedHashMap<>();
     }
 
-    public Map<String, Object> populateStandardClaims(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
+    private Map<String, Object> populateStandardClaims(JwtTokenInfoDTO jwtTokenInfoDTO) {
 
         //generating expiring timestamp
         long currentTime = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis());
@@ -204,11 +198,13 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
         claims.put("application", jwtTokenInfoDTO.getApplication());
         claims.put("keytype", jwtTokenInfoDTO.getKeyType());
         claims.put("consumerKey", jwtTokenInfoDTO.getConsumerKey());
+        claims.put("binding_ref", jwtTokenInfoDTO.getBindingRef());
+        claims.put("binding_type", jwtTokenInfoDTO.getBindingType());
 
         return claims;
     }
 
-    public byte[] signJWT(String assertion) throws APIManagementException {
+    private byte[] signJWT(String assertion) throws APIManagementException {
 
         PrivateKey privateKey;
         KeyStoreManager superTenantKSM = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
@@ -222,7 +218,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
         return APIUtil.signJwt(assertion, privateKey, signatureAlgorithm);
     }
 
-    public String buildHeader() throws APIManagementException {
+    private String buildHeader() throws APIManagementException {
 
         String jwtHeader = null;
 
@@ -249,7 +245,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
      *
      * @throws APIManagementException
      */
-    protected String addCertificateThumbPrintToHeader() throws APIManagementException {
+    private String addCertificateThumbPrintToHeader() throws APIManagementException {
 
         try {
             KeyStoreManager superTenantKSM = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
@@ -262,7 +258,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
     }
 
     //adding same method from AbstractJWTGenerator to remove super class
-    protected String getMultiAttributeSeparator(int tenantId) {
+    private String getMultiAttributeSeparator(int tenantId) {
         try {
             RealmConfiguration realmConfiguration = null;
             RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();

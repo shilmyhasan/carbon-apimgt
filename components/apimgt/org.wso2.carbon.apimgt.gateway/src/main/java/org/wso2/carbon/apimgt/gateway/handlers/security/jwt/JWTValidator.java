@@ -26,6 +26,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.axis2.Constants;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,6 +52,7 @@ import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTDataHolder;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.gateway.utils.OpenAPIUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.JWTConfigurationDto;
@@ -67,7 +69,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.cache.Cache;
 
 /**
@@ -179,6 +180,11 @@ public class JWTValidator {
                 header = parsedJWTToken.getHeader();
                 payload = transformJWTClaims(parsedJWTToken.getJWTClaimsSet());
 
+                if (payload.getStringClaim(APIConstants.BINDING_REF) != null &&
+                        payload.getStringClaim(APIConstants.BINDING_TYPE) != null &&
+                        payload.getStringClaim(APIConstants.BINDING_TYPE).equals(APIConstants.COOKIE.toLowerCase())) {
+                    checkCSRF(synCtx, payload.getStringClaim(APIConstants.BINDING_REF));
+                }
             } catch (JSONException | IllegalArgumentException | ParseException e) {
                 if (log.isDebugEnabled()) {
                     log.debug("Invalid JWT token. Token: " + GatewayUtils.getMaskedToken(splitToken[0]));
@@ -230,6 +236,15 @@ public class JWTValidator {
             if (isGatewayTokenCacheEnabled && payloadInfo != null) {
                 // Token is found in the key cache
                 payload = payloadInfo.getPayload();
+                try {
+                    if (payload.getStringClaim(APIConstants.BINDING_REF) != null &&
+                            payload.getStringClaim(APIConstants.BINDING_TYPE) != null &&
+                            payload.getStringClaim(APIConstants.BINDING_TYPE).equals(APIConstants.COOKIE.toLowerCase())) {
+                        checkCSRF(synCtx, payload.getStringClaim(APIConstants.BINDING_REF));
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 checkTokenExpiration(tokenSignature, payload, tenantDomain);
             } else {
                 // Retrieve payload from token
@@ -313,6 +328,14 @@ public class JWTValidator {
             }
 
             log.debug("JWT authentication successful.");
+
+            // Check One_Time_Token
+            boolean isOneTimeToken = synCtx.getProperty(APIConstants.ONE_TIME_TOKEN_SCOPE) != null &&
+                    (boolean) synCtx.getProperty(APIConstants.ONE_TIME_TOKEN_SCOPE);
+            if (isOneTimeToken) {
+                revokeOneTimeToken(jwtToken, payload);
+            }
+
             String endUserToken = null;
             try {
                 if (jwtGenerationEnabled) {
@@ -332,6 +355,48 @@ public class JWTValidator {
         }
         throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                 "Invalid JWT token. Signature verification failed.");
+    }
+
+    /**
+     *  Check CSRF
+     *
+     * @param synCtx The message to be authenticated
+     * @param bindingRef binding_ref value of JWT token
+     * @throws APISecurityException  in case of authentication failure
+     */
+    private void checkCSRF(MessageContext synCtx, String bindingRef) throws APISecurityException {
+
+        String cookieBindingValue = "" ;
+        boolean isCSRFAttackDetected = true;
+        APIManagerConfiguration config = getApiManagerConfiguration();
+        String cookieName = config.getFirstProperty(APIConstants.BROWSER_COOKIE);
+
+
+        org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        Map headers = (Map) msgContext.getProperty((org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
+        if (headers != null && headers.get(APIConstants.COOKIE) != null) {
+            String[] cookieArray = headers.get(APIConstants.COOKIE).toString().split(";");
+            for (String ele : cookieArray) {
+                if (ele.trim().startsWith(cookieName)) {
+                    cookieBindingValue = ele.split("=")[1];
+                }
+            }
+        }
+
+        if (!cookieBindingValue.isEmpty()) {
+            log.debug("Verifying CSRF");
+            if (DigestUtils.md5Hex(cookieBindingValue).equals(bindingRef)) {
+                isCSRFAttackDetected = false;
+            }
+
+            if (isCSRFAttackDetected) {
+                log.debug("CSRF attack has been detected");
+                throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
+                        "Invalid JWT token");
+            }
+        } else {
+            log.debug("Required cookie is not presented in request");
+        }
     }
 
     private String generateAndRetrieveJWTToken(String tokenSignature, JWTInfoDto jwtInfoDto)
@@ -395,6 +460,47 @@ public class JWTValidator {
             throw new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN,
                     APISecurityConstants.API_AUTH_FORBIDDEN_MESSAGE);
         } catch (ParseException e) {
+            throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
+                    APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Revoke the one Time Token
+     *
+     * @param jwtToken JWT Token
+     * @param payload payload
+     * @throws APISecurityException in case of authentication failure
+     */
+    private void revokeOneTimeToken(String jwtToken, JWTClaimsSet payload) throws APISecurityException {
+        if (log.isDebugEnabled()) {
+            log.debug("This is an one time token");
+        }
+        try {
+            String consumerKey = null;
+            try {
+                if (payload.getClaim(APIConstants.JwtTokenConstants.CONSUMER_KEY) != null) {
+                    consumerKey = payload.getStringClaim(APIConstants.JwtTokenConstants.CONSUMER_KEY);
+                } else if (payload.getClaim(APIConstants.JwtTokenConstants.AUTHORIZED_PARTY) != null) {
+                    consumerKey = payload.getStringClaim(APIConstants.JwtTokenConstants.AUTHORIZED_PARTY);
+                }
+            } catch (ParseException e) {
+                throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
+                        APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
+            }
+
+            if (consumerKey != null) {
+                RevokedJWTDataHolder.getInstance().revokeJWTAccessToken(jwtToken, consumerKey);
+                if (log.isDebugEnabled()) {
+                    log.debug("The one time token is revoked");
+                }
+            } else {
+                log.debug("Cannot call Key Manager to revoke the token. Payload of the token does not " +
+                        "contain the Authorized party - the party to which the ID Token was issued");
+                throw new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN,
+                        APISecurityConstants.API_AUTH_FORBIDDEN_MESSAGE);
+            }
+        } catch (APISecurityException e) {
             throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
                     APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
         }
@@ -594,18 +700,21 @@ public class JWTValidator {
             String[] operationList = ((String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE)).split(",");
             for (String operation: operationList) {
                 String operationScope = operationScopeMappingList.get(operation);
-                checkTokenWithTheScope(operation, operationScope, payload);
+                checkTokenWithTheScope(operation, operationScope, payload, synCtx);
             }
         } else {
             String resource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
             String resourceScope = OpenAPIUtils.getScopesOfResource(openAPI, synCtx);
-            checkTokenWithTheScope(resource, resourceScope, payload);
+            checkTokenWithTheScope(resource, resourceScope, payload, synCtx);
         }
     }
 
-    private void checkTokenWithTheScope(String resource, String resourceScope, JWTClaimsSet payload)
+    private void checkTokenWithTheScope(String resource, String resourceScope, JWTClaimsSet payload, MessageContext synCtx)
             throws APISecurityException, ParseException {
-        if (StringUtils.isNotBlank(resourceScope)) {
+
+        APIManagerConfiguration config = getApiManagerConfiguration();
+        String oneTimeTokenScope = config.getFirstProperty(APIConstants.ONE_TIME_TOKEN);
+        if (StringUtils.isNotBlank(resourceScope) || (oneTimeTokenScope != null && !oneTimeTokenScope.isEmpty())) {
             if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) == null) {
                 log.error("Scopes not found in the token.");
                 throw new APISecurityException(APISecurityConstants.INVALID_SCOPE, "Scope validation failed");
@@ -619,14 +728,23 @@ public class JWTValidator {
             }
 
             boolean scopeFound = false;
+            boolean oneTimetoken = false;
 
             for (String scope : tokenScopes) {
                 if (scope.trim().equals(resourceScope)) {
                     scopeFound = true;
+
+                } else if (scope.equals(oneTimeTokenScope)) {
+                    oneTimetoken = true;
+                    synCtx.setProperty(APIConstants.ONE_TIME_TOKEN_SCOPE, true);
+                }
+
+                if (scopeFound && oneTimetoken) {
                     break;
                 }
             }
-            if (!scopeFound) {
+
+            if (StringUtils.isNotBlank(resourceScope) && !scopeFound) {
                 if (log.isDebugEnabled()) {
                     log.debug("Scope validation failed. User: " + payload.getSubject());
                 }
@@ -747,5 +865,9 @@ public class JWTValidator {
     }
     private Cache getJWKSCache(){
         return CacheProvider.getJWKSCache();
+    }
+
+    protected APIManagerConfiguration getApiManagerConfiguration() {
+        return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
     }
 }

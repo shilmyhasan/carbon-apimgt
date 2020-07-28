@@ -200,6 +200,8 @@ public class APIMTokenIssuerUtil {
                     endUser.toFullQualifiedUsername(),
                     endUser.getTenantDomain());
             jwtTokenInfoDTO.setScopes(scopeString.toString().trim());
+            jwtTokenInfoDTO.setBindingRef(jwtAccessTokenIssuerDTO.getBindingRef());
+            jwtTokenInfoDTO.setBindingType(jwtAccessTokenIssuerDTO.getBindingType());
             jwtTokenInfoDTO.setAudience(audienceList);
             jwtTokenInfoDTO.setExpirationTime(jwtAccessTokenIssuerDTO.getValidityPeriod());
             jwtTokenInfoDTO.setApplication(applicationDTO);
