@@ -246,7 +246,7 @@ public class JWTValidator {
                     }
                 } catch (ParseException e) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Cannot retrieve binding claims from payload. Token: "
+                        log.debug("Cannot retrieve binding claims from the payload. Token: "
                                 + GatewayUtils.getMaskedToken(splitToken[0]), e);
                     }
                     log.error("Error occured while retrieving binding claims from payload");
@@ -384,7 +384,7 @@ public class JWTValidator {
         org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         Map headers = (Map) msgContext.getProperty((org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
 
-        if(StringUtils.isBlank(cookieName)) {
+        if (StringUtils.isBlank(cookieName)) {
             cookieName = APIConstants.DEFAULT_COOKIE_BINDING_NAME;
         }
         if (headers != null && headers.get(APIConstants.COOKIE) != null) {
@@ -492,9 +492,9 @@ public class JWTValidator {
         } catch (ParseException e) {
             if (log.isDebugEnabled()) {
                 String[] splitToken = jwtToken.split("\\.");
-                log.debug("Cannot retrieve claims from Token: " + GatewayUtils.getMaskedToken(splitToken[0]),e);
+                log.debug("Cannot retrieve claims from Token: " + GatewayUtils.getMaskedToken(splitToken[0]), e);
             }
-            log.error("Error occured while retrieving binding claims from payload");
+            log.error("Error occured while retrieving binding claims from the payload");
             throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
                     APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
         }
