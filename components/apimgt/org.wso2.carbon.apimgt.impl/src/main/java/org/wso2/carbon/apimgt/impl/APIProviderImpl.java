@@ -2583,11 +2583,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             APIUtil.setResourcePermissions(api.getId().getProviderName(), visibility, authorizedRoles,
                     artifact.getPath(), registry);
 
-            String docFilePath = artifact.getAttribute(APIConstants.DOC_FILE_PATH);
-            if (StringUtils.isEmpty(docFilePath)) {
-                int startIndex = docFilePath.indexOf("governance") + "governance".length();
-                String filePath = docFilePath.substring(startIndex, docFilePath.length());
-                APIUtil.setResourcePermissions(api.getId().getProviderName(), visibility, authorizedRoles, filePath,
+            String docType = artifact.getAttribute(APIConstants.DOC_SOURCE_TYPE);
+            if (APIConstants.IMPLEMENTATION_TYPE_INLINE.equals(docType) || APIConstants.IMPLEMENTATION_TYPE_MARKDOWN
+                    .equals(docType)) {
+                String docContentPath = APIUtil.getAPIDocPath(api.getId()) + APIConstants.INLINE_DOCUMENT_CONTENT_DIR
+                        + RegistryConstants.PATH_SEPARATOR + artifact.getAttribute(APIConstants.DOC_NAME);
+                clearResourcePermissions(docContentPath, api.getId());
+                APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(), authorizedRoles,
+                        docContentPath, registry);
+            } else if (APIConstants.IMPLEMENTATION_TYPE_FILE.equals(docType)) {
+                String docFilePath = APIUtil.getDocumentationFilePath(api.getId(),
+                        artifact.getAttribute(APIConstants.DOC_FILE_PATH)
+                                .split(APIConstants.DOCUMENT_FILE_DIR + RegistryConstants.PATH_SEPARATOR)[1]);
+                clearResourcePermissions(docFilePath, api.getId());
+                APIUtil.setResourcePermissions(api.getId().getProviderName(), visibility, authorizedRoles, docFilePath,
                         registry);
             }
         } catch (RegistryException e) {
