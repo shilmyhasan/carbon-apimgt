@@ -1312,6 +1312,7 @@ public class OAS3Parser extends APIDefinition {
         if (openAPI.getComponents() != null && (securitySchemes = openAPI.getComponents().getSecuritySchemes()) != null) {
             //If there is no default type schemes set a one
             SecurityScheme newDefault = new SecurityScheme();
+            newDefault.setType(SecurityScheme.Type.OAUTH2);
             securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, newDefault);
             for (Map.Entry<String, SecurityScheme> entry : securitySchemes.entrySet()) {
                 if (!OPENAPI_SECURITY_SCHEMA_KEY.equals(entry.getKey()) && "oauth2".equals(entry.getValue().getType().toString())) {
