@@ -131,7 +131,7 @@ public class RevokedJWTDataHolder {
             HttpResponse httpResponse = httpClient.execute(httpRevokePost);
 
             if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    log.debug("Successfully revoked the token");
+                log.debug("Successfully revoked the token");
             } else {
                 String responseBody = EntityUtils.toString(httpResponse.getEntity());
                 log.error("Error occurred when revoking the Access token. Server responded with "

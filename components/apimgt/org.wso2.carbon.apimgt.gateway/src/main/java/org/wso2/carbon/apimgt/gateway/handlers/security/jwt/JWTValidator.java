@@ -246,9 +246,10 @@ public class JWTValidator {
                     }
                 } catch (ParseException e) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Error occured when retrieving binding claims from payload. Token: "
+                        log.debug("Cannot retrieve binding claims from payload. Token: "
                                 + GatewayUtils.getMaskedToken(splitToken[0]), e);
                     }
+                    log.error("Error occured while retrieving binding claims from payload");
                     throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
                             APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
                 }
@@ -473,7 +474,7 @@ public class JWTValidator {
     }
 
     /**
-     * Revoke the one-time-token
+     * Revoke the one-time token
      *
      * @param jwtToken JWT Token
      * @param payload payload
@@ -481,18 +482,19 @@ public class JWTValidator {
      */
     private void revokeOneTimeToken(String jwtToken, JWTClaimsSet payload) throws APISecurityException {
 
-        log.debug("This is an one-time-token");
+        log.debug("This is an one-time token");
         String consumerKey;
         try {
             consumerKey = payload.getStringClaim(APIConstants.JwtTokenConstants.CONSUMER_KEY);
-            if (consumerKey != null) {
+            if (consumerKey == null) {
                 consumerKey = payload.getStringClaim(APIConstants.JwtTokenConstants.AUTHORIZED_PARTY);
             }
         } catch (ParseException e) {
             if (log.isDebugEnabled()) {
                 String[] splitToken = jwtToken.split("\\.");
-                log.debug("Cannot retrieve claims from Token: " + GatewayUtils.getMaskedToken(splitToken[0]));
+                log.debug("Cannot retrieve claims from Token: " + GatewayUtils.getMaskedToken(splitToken[0]),e);
             }
+            log.error("Error occured while retrieving binding claims from payload");
             throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
                     APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
         }
@@ -716,7 +718,7 @@ public class JWTValidator {
 
         APIManagerConfiguration config = getApiManagerConfiguration();
         String oneTimeTokenScope = config.getFirstProperty(APIConstants.ONE_TIME_TOKEN);
-        if (StringUtils.isNotBlank(resourceScope) || StringUtils.isNotBlank (oneTimeTokenScope)) {
+        if (StringUtils.isNotBlank(resourceScope) || StringUtils.isNotBlank(oneTimeTokenScope)) {
             if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) == null) {
                 log.error("Scopes not found in the token.");
                 throw new APISecurityException(APISecurityConstants.INVALID_SCOPE, "Scope validation failed");
