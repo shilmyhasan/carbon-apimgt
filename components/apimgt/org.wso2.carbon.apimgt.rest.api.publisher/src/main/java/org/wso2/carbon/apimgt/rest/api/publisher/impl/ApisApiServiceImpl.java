@@ -848,6 +848,9 @@ public class ApisApiServiceImpl extends ApisApiService {
                 }
             }
             API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName());
+            if (APIConstants.PUBLIC_STORE_VISIBILITY.equals(apiToUpdate.getVisibility())) {
+                apiToUpdate.setVisibleRoles(StringUtils.EMPTY);
+            }
             apiProvider.updateAPI(apiToUpdate);
 
             if (!isWSAPI) {
