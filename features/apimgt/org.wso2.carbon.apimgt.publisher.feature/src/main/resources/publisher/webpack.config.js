@@ -25,10 +25,8 @@ const config = {
     entry: { index: './source/index.jsx', swaggerWorkerInit: './source/src/app/webWorkers/swaggerWorkerInit.js' },
     output: {
         path: path.resolve(__dirname, 'site/public/dist'),
-        filename: '[name].bundle.js',
         filename: '[name].[contenthash].bundle.js',
         chunkFilename: '[name].[contenthash].bundle.js',
-        chunkFilename: '[name].bundle.js',
         publicPath: 'site/public/dist/',
     },
     node: {
