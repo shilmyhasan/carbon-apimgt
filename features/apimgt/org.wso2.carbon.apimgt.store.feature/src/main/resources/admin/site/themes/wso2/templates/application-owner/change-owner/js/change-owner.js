@@ -5,7 +5,7 @@ var changeOwner = function () {
     $('#add-tier-btn').buttonLoader('start');
     jagg.post("/site/blocks/application-owner/change-owner/ajax/change-owner.jag", {
             action: $('#applicationAction').val(),
-            newOwner: $('#applicationOwner').val(),
+            newOwner: htmlEscape($('#applicationOwner').val()),
             oldOwner: $('#oldOwner').val(),
             applicationUuid: $('#applicationUuid').val(),
             applicationName: $('#applicationName').val(),
@@ -112,4 +112,17 @@ function validateForSpaces(text, element, errorMsg) {
         return true;
     }
 }
+
+function htmlEscape(str) {
+    if (str == null || str == "") {
+        return "";
+    }
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+} 
+
  
