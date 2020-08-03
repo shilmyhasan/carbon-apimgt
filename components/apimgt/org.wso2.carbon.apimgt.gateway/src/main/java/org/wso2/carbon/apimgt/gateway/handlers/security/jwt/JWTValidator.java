@@ -787,7 +787,7 @@ public class JWTValidator {
                     break;
                 }
             }
-            if (scopeFound) {
+            if (!scopeFound) {
                 if (log.isDebugEnabled()) {
                     log.debug("Scope validation failed. User: " + payload.getSubject());
                 }
