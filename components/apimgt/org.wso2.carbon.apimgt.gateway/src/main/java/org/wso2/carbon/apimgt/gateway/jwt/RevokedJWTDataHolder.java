@@ -34,12 +34,9 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 
 import java.io.IOException;
 import org.apache.axis2.util.URL;
-import org.wso2.carbon.user.api.RealmConfiguration;
-import org.wso2.carbon.user.core.UserStoreException;
-import org.wso2.carbon.user.core.config.RealmConfigXMLProcessor;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -108,7 +105,7 @@ public class RevokedJWTDataHolder {
             configuration = KeyManagerHolder.getKeyManagerInstance().getKeyManagerConfiguration();
 
             String revokeEndpoint = configuration.getParameter(APIConstants.REVOKE_URL);
-            String username =  configuration.getParameter(APIConstants.KEY_MANAGER_USERNAME);
+            char[] username =  configuration.getParameter(APIConstants.KEY_MANAGER_USERNAME).toCharArray();
             String password =  configuration.getParameter(APIConstants.KEY_MANAGER_PASSWORD);
 
             URL keyMgtURL = new URL(revokeEndpoint);
@@ -121,7 +118,7 @@ public class RevokedJWTDataHolder {
             List<BasicNameValuePair> urlParameters = new ArrayList<>();
             urlParameters.add(new BasicNameValuePair(APIConstants.TOKEN_KEY, accessToken));
             urlParameters.add(new BasicNameValuePair("client_id", consumerKey));
-            urlParameters.add(new BasicNameValuePair("username", username));
+            urlParameters.add(new BasicNameValuePair("username", String.copyValueOf(username)));
             urlParameters.add(new BasicNameValuePair("password", password));
             urlParameters.add(new BasicNameValuePair("token_type_hint", "access_token"));
 

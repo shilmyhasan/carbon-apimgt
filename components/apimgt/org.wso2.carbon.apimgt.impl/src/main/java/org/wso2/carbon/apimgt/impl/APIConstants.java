@@ -436,10 +436,15 @@ public final class APIConstants {
     public static final String JWT_AS_OPAQUE_TOKEN = OAUTH_CONFIGS + "JWTAsOpaqueToken";
     public static final String APPLICATION_TOKEN_SCOPE = OAUTH_CONFIGS + "ApplicationTokenScope";
     public static final String WHITELISTED_SCOPES = OAUTH_CONFIGS + "ScopeWhitelist.Scope";
+
+    public static final String CSRF_COOKIE_NAME = OAUTH_CONFIGS + "CSRFCookie";
+    public static final String ONE_TIME_TOKEN_SCOPE = OAUTH_CONFIGS + "OneTimeTokenScope";
+
     public static final String TOKEN_ENDPOINT_NAME = OAUTH_CONFIGS + "TokenEndPointName";
     public static final String REVOKE_API_URL = OAUTH_CONFIGS + "RevokeAPIURL";
     public static final String ENCRYPT_TOKENS_ON_PERSISTENCE = OAUTH_CONFIGS + "EncryptPersistedTokens";
     public static final String HASH_TOKENS_ON_PERSISTENCE = OAUTH_CONFIGS + "EnableTokenHashMode";
+
 
     public static final String DEFAULT_MODIFIED_ENDPOINT_PASSWORD = "*****"; //5 stars
     public static final String REGISTRY_HIDDEN_ENDPOINT_PROPERTY = "registry.HiddenEpProperty";
@@ -643,8 +648,7 @@ public final class APIConstants {
     public static final String DEFAULT_COOKIE_BINDING_NAME = "atbv";
 
     // Constants needed for Single Usage Token implementation
-    public static final String ONE_TIME_TOKEN_SCOPE = "OneTimeTokenScope";
-    public static final String ONE_TIME_TOKEN = "OneTimeToken";
+    // public static final String ONE_TIME_TOKEN = "OneTimeToken";
 
     public static final String TOKEN_URL = "TokenURL";
     public static final String REVOKE_URL = "RevokeURL";
@@ -1090,6 +1094,7 @@ public final class APIConstants {
 
     public static final String API_RESOURCE_CACHE_KEY = "API_RESOURCE_CACHE_KEY";
     public static final String API_ELECTED_RESOURCE = "API_ELECTED_RESOURCE";
+    public static final String API_TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
 
     // GraphQL related constants
     public static final String API_TYPE = "API_TYPE";

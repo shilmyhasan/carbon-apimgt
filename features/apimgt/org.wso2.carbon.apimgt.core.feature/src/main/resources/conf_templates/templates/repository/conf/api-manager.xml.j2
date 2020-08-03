@@ -420,6 +420,14 @@
         {% endfor %}
         </ScopeWhitelist>
 
+        {% if apim.oauth_config.csrf_cookie_name is defined %}
+        <CSRFCookie>{{apim.oauth_config.csrf_cookie_name}}</CSRFCookie>
+        {% endif %}
+
+        {% if apim.oauth_config.one_time_token is defined %}
+        <OneTimeTokenScope>{{apim.oauth_config.one_time_token_scope}}</OneTimeTokenScope>
+        {% endif %}
+
         <!-- Name of the token API -->
         <TokenEndPointName>/oauth2/token</TokenEndPointName>
         <!-- This the API URL for revoke API. When we revoke tokens revoke requests should go through this
@@ -577,15 +585,6 @@
              It is false by default and if you set it to true then make sure that the Access-Control-Allow-Origin header does not contain the wildcard (*) -->
         <Access-Control-Allow-Credentials>{{apim.cors.allow_credentials}}</Access-Control-Allow-Credentials>
     </CORSConfiguration>
-
-
-    {% if browser_cookie is defined %}
-        <BrowserCookie>{{browser_cookie.cookie_name}}</BrowserCookie>
-    {% endif %}
-
-    {% if one_time_token is defined %}
-        <OneTimeToken>{{one_time_token.scope_name}}</OneTimeToken>
-    {% endif %}
 
     <!-- This property is there to configure velocity log output into existing Log4j carbon Logger.
          You can enable this and set preferable Logger name. -->
