@@ -204,6 +204,8 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
         claims.put("application", jwtTokenInfoDTO.getApplication());
         claims.put("keytype", jwtTokenInfoDTO.getKeyType());
         claims.put("consumerKey", jwtTokenInfoDTO.getConsumerKey());
+        claims.put("binding_ref", jwtTokenInfoDTO.getBindingRef());
+        claims.put("binding_type", jwtTokenInfoDTO.getBindingType());
 
         return claims;
     }

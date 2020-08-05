@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.apimgt.keymgt.internal;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceRegistration;
@@ -108,6 +109,14 @@ public class APIKeyMgtServiceComponent {
                     whitelist.add(APIConstants.OPEN_ID_SCOPE_NAME);
                     whitelist.add(APIConstants.DEVICE_SCOPE_PATTERN);
                 }
+
+                String oneTimeTokenScope = configurationService.getAPIManagerConfiguration().
+                        getFirstProperty(APIConstants.ONE_TIME_TOKEN_SCOPE);
+
+                if (StringUtils.isNotBlank(oneTimeTokenScope)) {
+                    whitelist.add(oneTimeTokenScope);
+                }
+
             } else {
                 log.debug("API Manager Configuration couldn't be read successfully. Scopes might not work correctly.");
             }

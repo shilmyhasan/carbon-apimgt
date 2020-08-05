@@ -420,6 +420,14 @@
         {% endfor %}
         </ScopeWhitelist>
 
+        {% if apim.oauth_config.csrf_cookie_name is defined %}
+        <CSRFCookie>{{apim.oauth_config.csrf_cookie_name}}</CSRFCookie>
+        {% endif %}
+
+        {% if apim.oauth_config.one_time_token is defined %}
+        <OneTimeTokenScope>{{apim.oauth_config.one_time_token_scope}}</OneTimeTokenScope>
+        {% endif %}
+
         <!-- Name of the token API -->
         <TokenEndPointName>/oauth2/token</TokenEndPointName>
         <!-- This the API URL for revoke API. When we revoke tokens revoke requests should go through this

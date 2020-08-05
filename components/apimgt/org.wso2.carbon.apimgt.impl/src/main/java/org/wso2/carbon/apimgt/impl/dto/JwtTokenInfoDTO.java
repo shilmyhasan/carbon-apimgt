@@ -45,6 +45,8 @@ public class JwtTokenInfoDTO implements Serializable {
     private Map<String, SubscriptionPolicyDTO> subscriptionPolicyDTOList = new HashMap<String, SubscriptionPolicyDTO>();
     private OAuthTokenReqMessageContext tokReqMsgCtx;
     private OAuthAuthzReqMessageContext oauthAuthzMsgCtx;
+    private String bindingType;
+    private String bindingRef;
 
     public String getSubscriber() {
         return subscriber;
@@ -156,5 +158,21 @@ public class JwtTokenInfoDTO implements Serializable {
 
     public OAuthAuthzReqMessageContext getOauthAuthzMsgCtx() {
         return oauthAuthzMsgCtx;
+    }
+
+    public void setBindingRef(String bindingRef) {
+        this.bindingRef = bindingRef;
+    }
+
+    public String getBindingRef() {
+        return bindingRef;
+    }
+
+    public void setBindingType(String bindingType) {
+        this.bindingType = bindingType;
+    }
+
+    public String getBindingType() {
+        return bindingType;
     }
 }
