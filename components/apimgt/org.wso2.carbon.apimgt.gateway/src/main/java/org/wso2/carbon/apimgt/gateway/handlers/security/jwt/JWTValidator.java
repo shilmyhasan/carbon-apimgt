@@ -106,6 +106,17 @@ public class JWTValidator {
                 ServiceReferenceHolder.getInstance().getApiMgtGatewayJWTGenerator()
                         .get(jwtConfigurationDto.getGatewayJWTGeneratorImpl());
 
+        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+        String oneTimeTokenScope = config.getFirstProperty(APIConstants.ONE_TIME_TOKEN_SCOPE);
+
+        if (StringUtils.isNotBlank(oneTimeTokenScope)) {
+            int corePoolSize = 200;
+            int maximumPoolSize = 500;
+            long keepAliveTime = 100;
+            executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+                    TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>() {
+            });
+        }
     }
 
     /**
@@ -382,16 +393,8 @@ public class JWTValidator {
             }
 
             if (isOneTimeToken) {
-                int corePoolSize = 200;
-                int maximumPoolSize = 500;
-                long keepAliveTime = 100;
-
                 jwtTokenToRevoke = jwtToken;
                 extractedPayload = payload;
-
-                executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
-                        TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>() {
-                });
                 executorService.execute(new Runnable() {
                     @Override
                     public void run() {
