@@ -69,6 +69,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import javax.cache.Cache;
 
 /**
@@ -86,6 +93,7 @@ public class JWTValidator {
     private String jwtTokenToRevoke;
     private JWTClaimsSet extractedPayload;
     JWTConfigurationDto jwtConfigurationDto;
+    private static ExecutorService executorService;
 
     public JWTValidator(String apiLevelPolicy, APIKeyValidator apiKeyValidator) {
         this.apiLevelPolicy = apiLevelPolicy;
@@ -374,9 +382,17 @@ public class JWTValidator {
             }
 
             if (isOneTimeToken) {
+                int corePoolSize = 200;
+                int maximumPoolSize = 500;
+                long keepAliveTime = 100;
+
                 jwtTokenToRevoke = jwtToken;
                 extractedPayload = payload;
-                Thread revokeToken = new Thread(new Runnable() {
+
+                executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+                        TimeUnit.MILLISECONDS, new LinkedBlockingDeque<Runnable>() {
+                });
+                executorService.execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -385,10 +401,8 @@ public class JWTValidator {
                             log.error("Cannot call Key Manager to revoke the token. Payload of the token does not " +
                                     "contain the Authorized party - the party to which the ID Token was issued " + e);
                         }
-
                     }
                 });
-                revokeToken.start();
             }
         }
     }
@@ -755,16 +769,16 @@ public class JWTValidator {
             String[] operationList = ((String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE)).split(",");
             for (String operation: operationList) {
                 String operationScope = operationScopeMappingList.get(operation);
-                checkTokenWithTheScope(operation, operationScope, payload, synCtx);
+                checkTokenWithTheScope(operation, operationScope, payload);
             }
         } else {
             String resource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
             String resourceScope = OpenAPIUtils.getScopesOfResource(openAPI, synCtx);
-            checkTokenWithTheScope(resource, resourceScope, payload, synCtx);
+            checkTokenWithTheScope(resource, resourceScope, payload);
         }
     }
 
-    private void checkTokenWithTheScope(String resource, String resourceScope, JWTClaimsSet payload, MessageContext synCtx)
+    private void checkTokenWithTheScope(String resource, String resourceScope, JWTClaimsSet payload)
             throws APISecurityException, ParseException {
         if (StringUtils.isNotBlank(resourceScope)) {
             if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) == null) {
