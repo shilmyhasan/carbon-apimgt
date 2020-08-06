@@ -38,7 +38,7 @@ describe('Test APIs main routing component', () => {
         shallow(<APIs />);
     });
 
-    test('should return API Listing component when request path match with /apis', () => {
+    test.skip('should return API Listing component when request path match with /apis', () => {
         const exactPath = '/apis';
         const exactApisPath = (
             <MemoryRouter initialEntries={[exactPath]}>
@@ -49,7 +49,7 @@ describe('Test APIs main routing component', () => {
         expect(wrapper.find(Route).prop('path')).toEqual(exactPath);
         expect(wrapper.contains('Testing Listing page')).toBeTruthy();
     });
-    test('should return API product Listing component when request path match with /api-products', () => {
+    test.skip('should return API product Listing component when request path match with /api-products', () => {
         const exactPath = '/api-products';
         const exactApisPath = (
             <MemoryRouter initialEntries={[exactPath]}>
