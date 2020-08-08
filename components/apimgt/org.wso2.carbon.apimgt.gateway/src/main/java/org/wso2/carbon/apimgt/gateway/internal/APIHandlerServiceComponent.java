@@ -39,6 +39,7 @@ import org.wso2.carbon.apimgt.gateway.handlers.security.jwt.transformer.JWTTrans
 import org.wso2.carbon.apimgt.gateway.handlers.security.keys.APIKeyValidatorClientPool;
 import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTMapCleaner;
 import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTTokensRetriever;
+import org.wso2.carbon.apimgt.gateway.perlogging.PerAPILogger;
 import org.wso2.carbon.apimgt.gateway.service.APIThrottleDataServiceImpl;
 import org.wso2.carbon.apimgt.gateway.service.CacheInvalidationServiceImpl;
 import org.wso2.carbon.apimgt.gateway.service.RevokedTokenDataImpl;
@@ -53,6 +54,7 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfigurationServiceImpl;
 import org.wso2.carbon.apimgt.impl.caching.CacheInvalidationService;
 import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.JWTConfigurationDto;
+import org.wso2.carbon.apimgt.impl.perlog.PerAPILogService;
 import org.wso2.carbon.apimgt.impl.throttling.APIThrottleDataService;
 import org.wso2.carbon.apimgt.impl.token.RevokedTokenService;
 import org.wso2.carbon.apimgt.tracing.TracingService;
@@ -115,12 +117,15 @@ public class APIHandlerServiceComponent {
                     APIThrottleDataServiceImpl throttleDataServiceImpl =
                             new APIThrottleDataServiceImpl(throttleDataHolder);
                     CacheInvalidationService cacheInvalidationService = new CacheInvalidationServiceImpl();
+                    PerAPILogService perAPILogService = PerAPILogger.getInstance();
                     // Register APIThrottleDataService so that ThrottleData maps are available to other components.
                     registration = context.getBundleContext().registerService(APIThrottleDataService.class.getName(),
                             throttleDataServiceImpl, null);
                     registration =
                             context.getBundleContext().registerService(CacheInvalidationService.class.getName(),
                                     cacheInvalidationService, null);
+                    registration = context.getBundleContext()
+                            .registerService(PerAPILogService.class.getName(), perAPILogService, null);
                     ServiceReferenceHolder.getInstance().setThrottleDataHolder(throttleDataHolder);
                     log.debug("APIThrottleDataService Registered...");
                     // start web service throttle data retriever as separate thread and start it.

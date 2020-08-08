@@ -299,7 +299,12 @@ public enum ExceptionCodes implements ErrorHandler {
 
 
     // Tenant related
-    INVALID_TENANT(901300,"Tenant Not Found", 400, "Tenant Not Found");
+    INVALID_TENANT(901300,"Tenant Not Found", 400, "Tenant Not Found"),
+
+    LOGGING_API_NOT_FOUND(901400,"Requested Resource Not Found", 404, "Request API Not Found for context: %s"),
+    LOGGING_API_INCORRECT_LOG_LEVEL(901401,"Bad Request", 400, "Log level should be either all,body or headers"),
+    LOGGING_API_MISSING_DATA(901402,"Missing data", 400, "API context or log level is missing");
+
 
 
     private final long errorCode;

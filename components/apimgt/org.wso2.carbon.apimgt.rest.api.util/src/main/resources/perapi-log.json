@@ -1,0 +1,227 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/apilogging": {
+      "post": {
+        "parameters": [
+          {
+            "name": "Payload",
+            "description": "Request Body",
+            "required": false,
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/APIList"
+            }
+          },
+          {
+            "name": "context",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "logLevel",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "all",
+              "headers",
+              "body"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": "Not Found.\nRequest API resource or external store Ids not found.\n",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Internal server error while configuring API to be logged",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/APIList"
+            }
+          },
+          "404": {
+            "description": "Not Found.\nRequest API resource or external store Ids not found.\n",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Internal server error while retrieving API details",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "404": {
+            "description": "Not Found.\nRequest API resource or external store Ids not found.\n",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Internal server error while retrieving API details",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ]
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/API"
+            }
+          },
+          "404": {
+            "description": "Not Found.\nRequest API resource or external store Ids not found.\n",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Internal server error while retrieving API details",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "logLevel",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "perlogapi",
+    "version": "v0.16"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "definitions": {
+    "APIList": {
+      "title": "apis",
+      "properties": {
+        "apis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/API"
+          }
+        }
+      }
+    },
+    "API": {
+      "title": "API Info object with log details",
+      "properties": {
+        "context": {
+          "type": "string",
+          "example": "pizashack/v1.0.0"
+        },
+        "logLevel": {
+          "type": "string",
+          "example": "all"
+        }
+      }
+    },
+    "Error": {
+      "title": "Error object returned with 4XX HTTP Status",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detail description about the error message.\n"
+        },
+        "moreInfo": {
+          "type": "string",
+          "description": "Preferably an url with more details about the error.\n"
+        },
+        "error": {
+          "type": "array",
+          "description": "If there are more than one error list them out.\nFor example, list out validation errors by each field.\n",
+          "items": {
+            "$ref": "#/definitions/ErrorListItem"
+          }
+        }
+      }
+    },
+    "ErrorListItem": {
+      "title": "Description of individual errors that may have occurred during a request.",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string",
+          "description": "Description about individual errors occurred\n"
+        },
+        "description": {
+          "type": "string",
+          "description": "A detail description about the error message.\n"
+        }
+      }
+    }
+  }
+}

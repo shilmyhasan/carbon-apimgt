@@ -135,6 +135,13 @@ public class JMSMessageListener implements MessageListener {
                             }
 
                         }
+                    } else if (JMSConstants.PER_API_LOG.equalsIgnoreCase(jmsDestination.getTopicName())) {
+                        /**
+                         * This message contains PER API Logging related data context and the log level of the API as
+                         * two map entries. The handlePerAPILogging method ensure that the data is being synced with the
+                         * local log API data holder (new entries, update entries, delete entries)
+                         */
+                        handlePerAPILogging(map);
                     }
                 } else {
                     log.warn("Event dropped due to unsupported message type " + message.getClass());
@@ -159,6 +166,16 @@ public class JMSMessageListener implements MessageListener {
             ServiceReferenceHolder.getInstance().getCacheInvalidationService()
                     .invalidateCachedUsernames((String[]) jsonValue.toArray(new String[jsonValue.size()]));
         }
+    }
+
+    /**
+     * This method sync the local log data holder and put or remote the entry depending on the received value for
+     * a given API context
+     *
+     * @param map Incoming data map consisting API ctx and the log level
+     */
+    private void handlePerAPILogging(Map<String, Object> map) {
+        ServiceReferenceHolder.getInstance().getPerAPILogService().syncLocalAPILogDetailsMap(map);
     }
 
     private void handleKeyCacheInvalidationMessage(Map<String, Object> map) throws ParseException {
