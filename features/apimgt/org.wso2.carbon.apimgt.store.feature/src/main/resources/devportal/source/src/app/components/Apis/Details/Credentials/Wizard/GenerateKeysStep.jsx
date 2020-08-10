@@ -16,7 +16,7 @@
  * under the License.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -29,6 +29,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { makeStyles } from '@material-ui/core/styles';
 import cloneDeep from 'lodash.clonedeep';
 import ButtonPanel from './ButtonPanel';
+import Settings from 'AppComponents/Shared/SettingsContext';
 
 const useStyles = makeStyles((theme) => ({
     keyConfigWrapper: {
@@ -50,12 +51,15 @@ const generateKeysStep = (props) => {
     const [notFound, setNotFound] = useState(false);
     const [nextActive, setNextActive] = useState(true);
     const [isUserOwner, setIsUserOwner] = useState(false);
+    const settingContext = useContext(Settings);
+    const { appAccessTokenValidity } = settingContext.settings;
 
     const [keyRequest, setKeyRequest] = useState({
         keyType: 'PRODUCTION',
         serverSupportedGrantTypes: [],
         supportedGrantTypes: [],
         callbackUrl: '',
+        validityTime: appAccessTokenValidity,
     });
 
     const {
@@ -161,6 +165,7 @@ const generateKeysStep = (props) => {
                     keyType={selectedType}
                     isUserOwner={isUserOwner}
                     setGenerateEnabled={setNextActive}
+                    isGenerateKeyStep
                 />
             </div>
             <ButtonPanel

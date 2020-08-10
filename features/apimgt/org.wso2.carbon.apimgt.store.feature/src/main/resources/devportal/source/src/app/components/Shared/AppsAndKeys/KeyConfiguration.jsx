@@ -155,7 +155,7 @@ const KeyConfiguration = (props) => {
      * @memberof KeyConfiguration
      */
     const {
-        classes, keyRequest, notFound, intl, isUserOwner, isKeysAvailable,
+        classes, keyRequest, notFound, intl, isUserOwner, isKeysAvailable, isGenerateKeyStep,
     } = props;
     const {
         serverSupportedGrantTypes, supportedGrantTypes, callbackUrl, validityTime,
@@ -284,7 +284,7 @@ const KeyConfiguration = (props) => {
                             margin='normal'
                             variant='outlined'
                             error={isValidityTimeError}
-                            disabled={!isUserOwner || isKeysAvailable}
+                            disabled={!isUserOwner || isKeysAvailable || isGenerateKeyStep}
                         />
                     </Box>
                 </Grid>

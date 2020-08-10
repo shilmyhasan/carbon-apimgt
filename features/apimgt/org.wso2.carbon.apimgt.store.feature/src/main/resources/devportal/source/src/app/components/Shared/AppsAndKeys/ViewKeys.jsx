@@ -37,6 +37,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import Settings from 'AppComponents/Shared/SettingsContext';
 import ResourceNotFound from '../../Base/Errors/ResourceNotFound';
 import Loading from '../../Base/Loading/Loading';
 import Application from '../../../data/Application';
@@ -95,6 +96,9 @@ const styles = (theme) => ({
  * Class used to displays in key generation UI
  */
 class ViewKeys extends React.Component {
+
+    static contextType = Settings; 
+
     /**
      * @param {*} props properties
      */
@@ -127,11 +131,14 @@ class ViewKeys extends React.Component {
      */
     componentDidMount() {
         const { accessTokenRequest } = this.state;
+        const settingsContext = this.context;
+        const { appAccessTokenValidity } = settingsContext.settings;
         const { keyType } = this.props;
         this.applicationPromise
             .then((application) => {
                 application.getKeys().then(() => {
                     const newRequest = { ...accessTokenRequest, keyType };
+                    newRequest.timeout = appAccessTokenValidity;
                     const subscriptionScopes = application.subscriptionScopes
                         .map((scope) => { return scope.key; });
                     this.setState({ accessTokenRequest: newRequest, subscriptionScopes });
