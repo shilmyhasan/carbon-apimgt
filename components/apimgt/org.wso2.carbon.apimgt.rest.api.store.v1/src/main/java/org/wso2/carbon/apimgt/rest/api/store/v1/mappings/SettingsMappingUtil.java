@@ -29,6 +29,7 @@ import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SettingsDTO;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.identity.core.util.IdentityConfigParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class SettingsMappingUtil {
             settingsDTO.setMapExistingAuthApps(APIUtil.isMapExistingAuthAppsEnabled());
             settingsDTO.setRecommendationEnabled(recommendationEnabled);
             settingsDTO.setAllowedAppTokenTypes(APIUtil.getAllowedTokenTypesForAppCreation());
+            settingsDTO.setAppAccessTokenValidity(String.valueOf(IdentityConfigParser.getInstance().
+                    getConfiguration().get("OAuth.AccessTokenDefaultValidityPeriod")));
             Map<String, Environment> environments = APIUtil.getEnvironments();
             if (environments.isEmpty()) {
                 settingsDTO.apiGatewayEndpoint("http://localhost:8280,https://localhost:8243");
@@ -74,6 +77,8 @@ public class SettingsMappingUtil {
             settingsDTO.setMonetizationEnabled(moneatizationEnabled);
             settingsDTO.setRecommendationEnabled(recommendationEnabled);
             settingsDTO.setAllowedAppTokenTypes(APIUtil.getAllowedTokenTypesForAppCreation());
+            settingsDTO.setAppAccessTokenValidity(String.valueOf(IdentityConfigParser.getInstance().
+                    getConfiguration().get("OAuth.AccessTokenDefaultValidityPeriod")));
         }
         return settingsDTO;
     }
