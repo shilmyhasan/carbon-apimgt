@@ -16,13 +16,14 @@
  * under the License.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Tokens from 'AppComponents/Shared/AppsAndKeys/Tokens';
 import Application from 'AppData/Application';
 import { makeStyles } from '@material-ui/core/styles';
 import { injectIntl, defineMessages } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import ButtonPanel from './ButtonPanel';
+import Settings from 'AppComponents/Shared/SettingsContext';
 
 const useStyles = makeStyles((theme) => ({
     tokenWrapper: {
@@ -47,9 +48,12 @@ const generateAccessTokenStep = (props) => {
     const {
         currentStep, createdApp, setCreatedToken, incrementStep, createdKeyType, intl,
     } = props;
+    const settingContext = useContext(Settings);
 
     useEffect(() => {
         const newRequest = { ...accessTokenRequest, keyType: createdKeyType };
+        const { appAccessTokenValidity } = settingContext.settings;
+        newRequest.timeout = appAccessTokenValidity;
         setKeyType(createdKeyType);
         setAccessTokenRequest(newRequest);
     }, [createdKeyType]);
@@ -101,7 +105,7 @@ const generateAccessTokenStep = (props) => {
     const messages = defineMessages({
         dataInfo: {
             id: 'Apis.Details.Credentials.Wizard.GenerateAccessTokenStep',
-            defaultMessage: 'Generate Access Toke for {keyType} environment',
+            defaultMessage: 'Generate Access Token for {keyType} environment',
         },
     });
 
