@@ -26,6 +26,7 @@ public class SettingsDTO   {
     private Boolean recommendationEnabled = false;
     private Boolean isUnlimitedTierPaid = false;
     private List<String> allowedAppTokenTypes = new ArrayList<>();
+    private String appAccessTokenValidity = "3600";
 
   /**
    **/
@@ -180,6 +181,23 @@ public class SettingsDTO   {
     this.allowedAppTokenTypes = allowedAppTokenTypes;
   }
 
+  /**
+   **/
+  public SettingsDTO appAccessTokenValidity(String appAccessTokenValidity) {
+    this.appAccessTokenValidity = appAccessTokenValidity;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("appAccessTokenValidity")
+  public String getAppAccessTokenValidity() {
+    return appAccessTokenValidity;
+  }
+  public void setAppAccessTokenValidity(String appAccessTokenValidity) {
+    this.appAccessTokenValidity = appAccessTokenValidity;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -198,12 +216,13 @@ public class SettingsDTO   {
         Objects.equals(monetizationEnabled, settings.monetizationEnabled) &&
         Objects.equals(recommendationEnabled, settings.recommendationEnabled) &&
         Objects.equals(isUnlimitedTierPaid, settings.isUnlimitedTierPaid) &&
-        Objects.equals(allowedAppTokenTypes, settings.allowedAppTokenTypes);
+        Objects.equals(allowedAppTokenTypes, settings.allowedAppTokenTypes) &&
+        Objects.equals(appAccessTokenValidity, settings.appAccessTokenValidity);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, monetizationEnabled, recommendationEnabled, isUnlimitedTierPaid, allowedAppTokenTypes);
+    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, monetizationEnabled, recommendationEnabled, isUnlimitedTierPaid, allowedAppTokenTypes, appAccessTokenValidity);
   }
 
   @Override
@@ -220,6 +239,7 @@ public class SettingsDTO   {
     sb.append("    recommendationEnabled: ").append(toIndentedString(recommendationEnabled)).append("\n");
     sb.append("    isUnlimitedTierPaid: ").append(toIndentedString(isUnlimitedTierPaid)).append("\n");
     sb.append("    allowedAppTokenTypes: ").append(toIndentedString(allowedAppTokenTypes)).append("\n");
+    sb.append("    appAccessTokenValidity: ").append(toIndentedString(appAccessTokenValidity)).append("\n");
     sb.append("}");
     return sb.toString();
   }
