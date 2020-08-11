@@ -40,6 +40,7 @@ public class ScopesIssuer {
     private static Map<String, AbstractScopesIssuer> scopesIssuers;
     private static final String DEFAULT_SCOPE_NAME = "default";
     private static final String CONFIG_ELEM_SCOPE_ISSUER = "OAuthConfigurations.ScopeIssuer";
+
     /**
      * Singleton of ScopeIssuer.*
      */
@@ -48,9 +49,9 @@ public class ScopesIssuer {
     public ScopesIssuer() {
     }
 
-    public static void loadInstance(List<String> whitelist) throws APIKeyMgtException{
-        APIManagerConfiguration apiManagerConfiguration = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
-                .getAPIManagerConfiguration();
+    public static void loadInstance(List<String> whitelist) throws APIKeyMgtException {
+        APIManagerConfiguration apiManagerConfiguration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
         if (apiManagerConfiguration != null) {
             String scopeIssuerClass = apiManagerConfiguration.getFirstProperty(CONFIG_ELEM_SCOPE_ISSUER);
             if (scopeIssuerClass != null) {
