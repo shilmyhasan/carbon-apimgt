@@ -891,7 +891,7 @@ public class GatewayUtils {
                 return null;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while executing the http client", e);
         }
         return null;
     }
