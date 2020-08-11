@@ -36,9 +36,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
@@ -861,21 +864,36 @@ public class GatewayUtils {
 
     public static String retrieveJWKSConfiguration(String jwksEndpoint) throws IOException {
 
-        URL url = new URL(jwksEndpoint);
-        try (CloseableHttpClient httpClient = (CloseableHttpClient) APIUtil
-                .getHttpClient(url.getPort(), url.getProtocol())) {
-            HttpGet httpGet = new HttpGet(jwksEndpoint);
-            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    HttpEntity entity = response.getEntity();
-                    try (InputStream content = entity.getContent()) {
-                        return IOUtils.toString(content);
-                    }
-                } else {
-                    return null;
-                }
+        HttpClient client = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(jwksEndpoint);
+        client.getParams().setParameter("http.socket.timeout", 4000);
+        client.getParams().setParameter("http.connection.timeout", 4000);
+
+        if (System.getProperty(APIConstants.HTTP_PROXY_HOST) != null &&
+                System.getProperty(APIConstants.HTTP_PROXY_PORT) != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Proxy configured, hence routing through configured proxy");
             }
+            String proxyHost = System.getProperty(APIConstants.HTTP_PROXY_HOST);
+            String proxyPort = System.getProperty(APIConstants.HTTP_PROXY_PORT);
+            client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
+                    new HttpHost(proxyHost, Integer.parseInt(proxyPort)));
         }
+
+        try {
+            HttpResponse httpResponse = client.execute(httpGet);
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                HttpEntity entity = httpResponse.getEntity();
+                try (InputStream content = entity.getContent()) {
+                    return IOUtils.toString(content);
+                }
+            } else {
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void setAPIRelatedTags(TracingSpan tracingSpan, org.apache.synapse.MessageContext messageContext) {
