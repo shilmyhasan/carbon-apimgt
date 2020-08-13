@@ -871,22 +871,21 @@ public class GatewayUtils {
         client.getParams().setParameter("http.socket.timeout", 4000);
         client.getParams().setParameter("http.connection.timeout", 4000);
 
-        if (System.getProperty(APIConstants.HTTP_PROXY_HOST) != null &&
-                System.getProperty(APIConstants.HTTP_PROXY_PORT) != null) {
+        String proxyHost = System.getProperty(APIConstants.HTTP_PROXY_HOST);
+        String proxyPort = System.getProperty(APIConstants.HTTP_PROXY_PORT);
+        String proxyUser = System.getProperty(APIConstants.HTTP_PROXY_USER);
+        String proxyPassword = System.getProperty(APIConstants.HTTP_PROXY_PASSWORD);
+        if (proxyHost != null && proxyPort != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Proxy configured, hence routing through configured proxy");
             }
-            String proxyHost = System.getProperty(APIConstants.HTTP_PROXY_HOST);
-            String proxyPort = System.getProperty(APIConstants.HTTP_PROXY_PORT);
-            String proxyUser = System.getProperty(APIConstants.HTTP_PROXY_USER);
-            String proxyPassword = System.getProperty(APIConstants.HTTP_PROXY_PASSWORD);
             if (proxyUser != null && proxyPassword != null) {
                 ((DefaultHttpClient) client).getCredentialsProvider().setCredentials(
-                    new AuthScope(proxyHost, Integer.parseInt(proxyPort)),
-                    new UsernamePasswordCredentials(proxyUser, proxyPassword));
+                        new AuthScope(proxyHost, Integer.parseInt(proxyPort)),
+                        new UsernamePasswordCredentials(proxyUser, proxyPassword));
             }
-                client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
-                        new HttpHost(proxyHost, Integer.parseInt(proxyPort)));
+            client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
+                    new HttpHost(proxyHost, Integer.parseInt(proxyPort)));
         }
 
         try {
