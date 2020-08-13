@@ -424,7 +424,7 @@
         <CSRFCookie>{{apim.oauth_config.csrf_cookie_name}}</CSRFCookie>
         {% endif %}
 
-        {% if apim.oauth_config.one_time_token is defined %}
+        {% if apim.oauth_config.one_time_token_scope is defined %}
         <OneTimeTokenScope>{{apim.oauth_config.one_time_token_scope}}</OneTimeTokenScope>
         {% endif %}
 
