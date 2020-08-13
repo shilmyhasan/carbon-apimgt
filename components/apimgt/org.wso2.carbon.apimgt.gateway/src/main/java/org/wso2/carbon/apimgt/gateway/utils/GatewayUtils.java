@@ -875,11 +875,11 @@ public class GatewayUtils {
         String proxyPort = System.getProperty(APIConstants.HTTP_PROXY_PORT);
         String proxyUser = System.getProperty(APIConstants.HTTP_PROXY_USER);
         String proxyPassword = System.getProperty(APIConstants.HTTP_PROXY_PASSWORD);
-        if (proxyHost != null && proxyPort != null) {
+        if (!StringUtils.isEmpty(proxyHost) && !StringUtils.isEmpty(proxyPort)) {
             if (log.isDebugEnabled()) {
                 log.debug("Proxy configured, hence routing through configured proxy");
             }
-            if (proxyUser != null && proxyPassword != null) {
+            if (!StringUtils.isEmpty(proxyUser) && !StringUtils.isEmpty(proxyPassword)) {
                 ((DefaultHttpClient) client).getCredentialsProvider().setCredentials(
                         new AuthScope(proxyHost, Integer.parseInt(proxyPort)),
                         new UsernamePasswordCredentials(proxyUser, proxyPassword));
