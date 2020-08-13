@@ -37,18 +37,23 @@ import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationContext;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import java.text.ParseException;
+import java.util.HashMap;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({JWTValidator.class, GatewayUtils.class})
+@PrepareForTest({JWTValidator.class, GatewayUtils.class, ServiceReferenceHolder.class})
 public class JWTValidatorTest {
     private JWTValidator jwtValidator;
     private MessageContext messageContext;
     private org.apache.axis2.context.MessageContext axis2MsgCntxt;
     private JSONObject payload;
     private String validJwtToken;
+    private String validJwtTokenWithCookieBindingRef;
+    private APIManagerConfiguration amConfig;
 
     @Before
     public void setup() throws Exception {
@@ -82,7 +87,7 @@ public class JWTValidatorTest {
                         "            \"name\": \"DefaultApplication\",\n" +
                         "            \"id\": 1\n" +
                         "          },\n" +
-                        "          \"scope\": \"am_application_scope default\",\n" +
+                        "          \"scope\": \"am_application_scope default OTT\",\n" +
                         "          \"consumerKey\": \"U6Sjm1pawuc6K0mx5Hc9je5PTN8a\",\n" +
                         "          \"exp\": 1563032691,\n" +
                         "          \"iat\": 1563029091,\n" +
@@ -109,17 +114,47 @@ public class JWTValidatorTest {
                 "xLAogICJqdGkiOiAiM2YzMWEyZGItMzlmOS00YTAwLWEzMTQtZjU0OGM4ZTY1N2UyIgp9" +
                 ".ghi";
 
+        validJwtTokenWithCookieBindingRef = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IlpERTVNRE01TURoaU1EbGlZ" +
+                "ekJqWVdNeE56WTNNV05sTlRVNU1tSTVNV1JrT1ROa09URTJPUT09In0.eyJiaW5kaW5nX3R5cGUiOiJjb29raWUiLCJzdWIiO" +
+                "iJhZG1pbkBjYXJib24uc3VwZXIiLCJpc3MiOiJodHRwczpcL1wvaXNrbS5jb206OTQ0NFwvb2F1dGgyXC90b2tlbiIsInRpZX" +
+                "JJbmZvIjp7IkdvbGQiOnsidGllclF1b3RhVHlwZSI6InJlcXVlc3RDb3VudCIsInN0b3BPblF1b3RhUmVhY2giOnRydWUsInNw" +
+                "aWtlQXJyZXN0TGltaXQiOjAsInNwaWtlQXJyZXN0VW5pdCI6bnVsbH0sIlVubGltaXRlZCI6eyJ0aWVyUXVvdGFUeXBlIjoicm" +
+                "VxdWVzdENvdW50Iiwic3RvcE9uUXVvdGFSZWFjaCI6dHJ1ZSwic3Bpa2VBcnJlc3RMaW1pdCI6MCwic3Bpa2VBcnJlc3RVbml0" +
+                "IjpudWxsfX0sImtleXR5cGUiOiJQUk9EVUNUSU9OIiwic3Vic2NyaWJlZEFQSXMiOlt7InN1YnNjcmliZXJUZW5hbnREb21haW" +
+                "4iOiJjYXJib24uc3VwZXIiLCJuYW1lIjoiUGl6emFTaGFja0FQSSIsImNvbnRleHQiOiJcL3Bpenphc2hhY2tcLzEuMC4wIiwi" +
+                "cHVibGlzaGVyIjoiYWRtaW4iLCJ2ZXJzaW9uIjoiMS4wLjAiLCJzdWJzY3JpcHRpb25UaWVyIjoiVW5saW1pdGVkIn0seyJzdW" +
+                "JzY3JpYmVyVGVuYW50RG9tYWluIjoiY2FyYm9uLnN1cGVyIiwibmFtZSI6IlJlc3RBUEkiLCJjb250ZXh0IjoiXC90ZXN0XC8x" +
+                "LjAuMCIsInB1Ymxpc2hlciI6ImFkbWluIiwidmVyc2lvbiI6IjEuMC4wIiwic3Vic2NyaXB0aW9uVGllciI6IkdvbGQifSx7In" +
+                "N1YnNjcmliZXJUZW5hbnREb21haW4iOiJjYXJib24uc3VwZXIiLCJuYW1lIjoiUmVzdEFQSTEiLCJjb250ZXh0IjoiXC90ZXN0" +
+                "M1wvMS4wLjAiLCJwdWJsaXNoZXIiOiJhZG1pbiIsInZlcnNpb24iOiIxLjAuMCIsInN1YnNjcmlwdGlvblRpZXIiOiJHb2xkIn" +
+                "1dLCJhdWQiOiJodHRwOlwvXC9vcmcud3NvMi5hcGltZ3RcL2dhdGV3YXkiLCJhcHBsaWNhdGlvbiI6eyJvd25lciI6ImFkbWlu" +
+                "IiwidGllclF1b3RhVHlwZSI6InJlcXVlc3RDb3VudCIsInRpZXIiOiJVbmxpbWl0ZWQiLCJuYW1lIjoiRGVmYXVsdEFwcGxpY2F" +
+                "0aW9uIiwiaWQiOjEsInV1aWQiOm51bGx9LCJzY29wZSI6Im9wZW5pZCIsImNvbnN1bWVyS2V5IjoicUZYNE5SenlXWGtNZ0RxeW" +
+                "puX25sNWh3QnpRYSIsImV4cCI6MTU5NjA5OTUxNSwiYmluZGluZ19yZWYiOiI0ZThmNmY4NjQzYmYxM2VmNWY1ZDIwYWU2ZGQ2O" +
+                "TQ3NiIsImlhdCI6MTU5NjA5NTkxNSwianRpIjoiMmVlODhjNmYtOGVlOC00YWEyLTg1MmEtMGNiOGQ0YTNlMmJjIn0.0AK0ksMj" +
+                "MXpjL0eEMMzeRl8g1uzw_PZPnd4FcRukFSzUGvSYD7PBrpUyuPfUBB9FyjqUGnVO9fi5rFK4tEqv_LxYjKpsisk8l2MtoAQ9N_9" +
+                "ZlwpXmASGxTeHSmyrq0lwt1ix3sHjojVIx4iiVIeV_ms-90o55UK7VpAf3o-OkShTSgi9FedX-YcxwB5Ig3UF-MdNh017jTdpMc" +
+                "SJZ2QQZk7OuBUmA_grPLlFqHhM0s9w1wbedSvNd7OwX0Q7kq-7MKvTmANgWdBhSAfifnQoH_uCFF4JEyLoPWbs5ZjuGYfHVV3vl" +
+                "Brhb2vA2vvIByfQovOV5c1aA3EdcTZdL6uQQg";
+
         jwtValidator = PowerMockito.mock(JWTValidator.class);
         PowerMockito.when(jwtValidator, "authenticate",
                 Mockito.any(), Mockito.any(), Mockito.any()).thenCallRealMethod();
 
         messageContext = Mockito.mock(Axis2MessageContext.class);
         axis2MsgCntxt = Mockito.mock(org.apache.axis2.context.MessageContext.class);
+        amConfig = Mockito.mock(APIManagerConfiguration.class);
+
         Mockito.when(((Axis2MessageContext) messageContext).getAxis2MessageContext()).thenReturn(axis2MsgCntxt);
         Mockito.when(messageContext.getProperty(RESTConstants.REST_API_CONTEXT)).thenReturn("/pizzashack/1.0.0");
         Mockito.when(messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION)).thenReturn("1.0.0");
         Mockito.when(messageContext.getProperty(APIConstants.API_ELECTED_RESOURCE)).thenReturn("/menu");
         Mockito.when(axis2MsgCntxt.getProperty(Constants.Configuration.HTTP_METHOD)).thenReturn("get");
+
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+        Mockito.when(serviceReferenceHolder.getAPIManagerConfiguration()).thenReturn(amConfig);
     }
 
     @Test
@@ -201,6 +236,60 @@ public class JWTValidatorTest {
         } catch (APISecurityException e) {
             Assert.assertEquals(APISecurityConstants.API_AUTH_FORBIDDEN, e.getErrorCode());
         }
+    }
+
+    @Test
+    public void testCSRFAttackIdentification() throws Exception {
+        initMocks();
+
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Cookie" , "commonAuthId=5869ce9e-3d10-4412-ad16-cdba2ee923f6; " +
+                "atbv=8424cb1e-65a2-4131-b5f6-34f096105220; opbs=a016b339-b789-4da2-81f3-026c4c560aec; " +
+                "pastr-b3e99280-3d46-4174-877f-d912773e4f5b=79bbed9a-3f76-4d14-8e53-417afc8de004");
+
+        JSONObject csrfPayload = payload;
+        csrfPayload = csrfPayload.put("binding_type", "cookie");
+        csrfPayload = csrfPayload.put("binding_ref", "4e8f6f8643bf13ef5f5d20ae6dd69476");
+        JWTClaimsSet jwtClaimsSet = JWTClaimsSet.parse(csrfPayload.toString());
+
+        String[] splitToken = validJwtTokenWithCookieBindingRef.split("\\.");
+        AuthenticationContext authenticationContext = GatewayUtils.generateAuthenticationContext(splitToken[2],
+                jwtClaimsSet, null, null, APIConstants.UNLIMITED_TIER, null,true);
+
+        Mockito.when(amConfig.getFirstProperty(APIConstants.CSRF_COOKIE_NAME)).
+                thenReturn(APIConstants.DEFAULT_COOKIE_BINDING_NAME);
+        Mockito.when(axis2MsgCntxt.getProperty(APIConstants.API_TRANSPORT_HEADERS)).thenReturn(headers);
+
+        PowerMockito.when(jwtValidator, "verifyTokenSignature", Mockito.any(), Mockito.anyString()).
+                thenReturn(true);
+        PowerMockito.when(jwtValidator, "transformJWTClaims", Mockito.any()).thenReturn(jwtClaimsSet);
+        PowerMockito.when(jwtValidator, "transformJWTClaims", Mockito.any()).thenReturn(jwtClaimsSet);
+        PowerMockito.when(jwtValidator, "checkCSRF", messageContext, validJwtTokenWithCookieBindingRef,
+                jwtClaimsSet).thenCallRealMethod();
+        PowerMockito.when(jwtValidator, "getApiManagerConfiguration").thenCallRealMethod();
+
+        AuthenticationContext result = jwtValidator.authenticate(validJwtTokenWithCookieBindingRef, messageContext,
+                null);
+
+        Assert.assertEquals(result, authenticationContext);
+    }
+
+    @Test
+    public void testOneTimeToken() throws Exception {
+        initMocks();
+        String[] splitToken = validJwtToken.split("\\.");
+        JWTClaimsSet jwtClaimsSet = JWTClaimsSet.parse(payload.toString());
+
+        AuthenticationContext authenticationContext = GatewayUtils.generateAuthenticationContext(splitToken[2],
+                jwtClaimsSet, null, null, APIConstants.UNLIMITED_TIER, null,true);
+
+        Mockito.when(amConfig.getFirstProperty(APIConstants.ONE_TIME_TOKEN_SCOPE)).thenReturn("OTT");
+        PowerMockito.when(jwtValidator, "verifyTokenSignature", Mockito.any(), Mockito.anyString()).thenReturn(true);
+        PowerMockito.when(jwtValidator, "transformJWTClaims", Mockito.any()).thenReturn(jwtClaimsSet);
+        PowerMockito.when(jwtValidator, "getApiManagerConfiguration").thenCallRealMethod();
+        PowerMockito.when(jwtValidator, "checkOneTimeToken", validJwtToken, jwtClaimsSet).thenCallRealMethod();
+        AuthenticationContext result = jwtValidator.authenticate(validJwtTokenWithCookieBindingRef, messageContext, null);
+        Assert.assertEquals(result, authenticationContext);
     }
 
     @Test

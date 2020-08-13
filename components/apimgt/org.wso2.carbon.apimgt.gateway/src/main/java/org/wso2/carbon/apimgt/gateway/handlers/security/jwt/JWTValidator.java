@@ -69,11 +69,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import javax.cache.Cache;
@@ -418,7 +415,7 @@ public class JWTValidator {
      * @param payload JWTClaimsSet of the JWT
      * @throws APISecurityException  in case of authentication failure
      */
-    private void checkCSRF(MessageContext synCtx,String jwtToken, JWTClaimsSet payload) throws APISecurityException {
+    private void checkCSRF(MessageContext synCtx, String jwtToken, JWTClaimsSet payload) throws APISecurityException {
 
         try {
             if (payload != null && payload.getStringClaim(APIConstants.BINDING_REF) != null &&
