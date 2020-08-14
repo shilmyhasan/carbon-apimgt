@@ -1233,6 +1233,8 @@ public class OASParserUtil {
     public static String preProcess(String swaggerContent) throws APIManagementException {
         //Load required properties from swagger to the API
         APIDefinition apiDefinition = getOASParser(swaggerContent);
+        //Inject and map mgw throttling extensions to default type
+        swaggerContent = apiDefinition.injectMgwThrottlingExtensionsToDefault(swaggerContent);
         return apiDefinition.processOtherSchemeScopes(swaggerContent);
     }
 
