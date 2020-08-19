@@ -1340,17 +1340,20 @@ public class OAS3Parser extends APIDefinition {
 
         if (openAPI.getComponents() != null && (securitySchemes = openAPI.getComponents().getSecuritySchemes()) != null) {
             //If there is no default type schemes set a one
-            SecurityScheme newDefault = new SecurityScheme();
-            newDefault.setType(SecurityScheme.Type.OAUTH2);
+            SecurityScheme newDefault = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
+            if (newDefault == null) {
+                newDefault = new SecurityScheme();
+                newDefault.setType(SecurityScheme.Type.OAUTH2);
 
-            OAuthFlows newDefaultFlows = new OAuthFlows();
-            OAuthFlow newDefaultFlow = new OAuthFlow();
-            newDefaultFlow.setAuthorizationUrl("https://test.com");
-            Scopes newDefaultScopes = new Scopes();
-            newDefaultFlow.setScopes(newDefaultScopes);
-            newDefaultFlows.setImplicit(newDefaultFlow);
-            newDefault.setFlows(newDefaultFlows);
-            securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, newDefault);
+                OAuthFlows newDefaultFlows = new OAuthFlows();
+                OAuthFlow newDefaultFlow = new OAuthFlow();
+                newDefaultFlow.setAuthorizationUrl("https://test.com");
+                Scopes newDefaultScopes = new Scopes();
+                newDefaultFlow.setScopes(newDefaultScopes);
+                newDefaultFlows.setImplicit(newDefaultFlow);
+                newDefault.setFlows(newDefaultFlows);
+                securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, newDefault);
+            }
             for (Map.Entry<String, SecurityScheme> entry : securitySchemes.entrySet()) {
                 if (!OPENAPI_SECURITY_SCHEMA_KEY.equals(entry.getKey()) && "oauth2".equals(entry.getValue().getType().toString())) {
                     otherSetOfSchemes.add(entry.getKey());
