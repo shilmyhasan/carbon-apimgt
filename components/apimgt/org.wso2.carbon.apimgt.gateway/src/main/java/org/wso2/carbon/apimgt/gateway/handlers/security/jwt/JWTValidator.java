@@ -386,6 +386,7 @@ public class JWTValidator {
             for (String scope : tokenScopes) {
                 if (scope.equals(oneTimeTokenScope)) {
                     isOneTimeToken = true;
+                    break;
                 }
             }
 
