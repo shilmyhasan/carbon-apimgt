@@ -1344,7 +1344,7 @@ public class OAS3Parser extends APIDefinition {
             if (newDefault == null) {
                 newDefault = new SecurityScheme();
                 newDefault.setType(SecurityScheme.Type.OAUTH2);
-
+                //Populating the default security scheme with default values
                 OAuthFlows newDefaultFlows = new OAuthFlows();
                 OAuthFlow newDefaultFlow = new OAuthFlow();
                 newDefaultFlow.setAuthorizationUrl("https://test.com");
