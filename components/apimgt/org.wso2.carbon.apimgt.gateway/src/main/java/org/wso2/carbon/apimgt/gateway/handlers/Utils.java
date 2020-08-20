@@ -76,7 +76,6 @@ import javax.xml.namespace.QName;
 public class Utils {
     
     private static final Log log = LogFactory.getLog(Utils.class);
-    private static boolean isClientCertificateEncoded = isClientCertificateEncoded();
 
     public static void sendFault(MessageContext messageContext, int status) {
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
@@ -402,7 +401,7 @@ public class Utils {
                     String certificate = (String) headers.get(Utils.getClientCertificateHeader());
                     byte[] bytes;
                     if (certificate != null) {
-                        if (!isClientCertificateEncoded) {
+                        if (!isClientCertificateEncoded()) {
                             certificate = certificate
                                     .replaceAll(APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING, "")
                                     .replaceAll(APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING_SPACE, "")
