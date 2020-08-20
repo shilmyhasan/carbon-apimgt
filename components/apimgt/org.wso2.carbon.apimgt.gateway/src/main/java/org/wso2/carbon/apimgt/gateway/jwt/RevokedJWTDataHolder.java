@@ -100,6 +100,7 @@ public class RevokedJWTDataHolder {
     public void revokeJWTAccessToken(String accessToken, String consumerKey) {
 
         KeyManagerConfiguration configuration;
+        String[] splitToken = accessToken.split("\\.");
 
         try {
             configuration = KeyManagerHolder.getKeyManagerInstance().getKeyManagerConfiguration();
@@ -128,15 +129,20 @@ public class RevokedJWTDataHolder {
             HttpResponse httpResponse = httpClient.execute(httpRevokePost);
 
             if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                log.debug("Successfully revoked the token");
+                if (log.isDebugEnabled()) {
+                    log.debug("Successfully revoked the token:" + APIUtil.getMaskedToken(splitToken[0]) +
+                            " of the client id:" + consumerKey);
+                }
             } else {
                 String responseBody = EntityUtils.toString(httpResponse.getEntity());
-                log.error("Error occurred when revoking the Access token. Server responded with "
-                        + httpResponse.getStatusLine().getStatusCode() + ". Reason " + responseBody);
+                log.error("Error occurred when revoking the Access token:" + APIUtil.getMaskedToken(splitToken[0])
+                        + " of the client id:" + consumerKey + ". Server responded with " +
+                        httpResponse.getStatusLine().getStatusCode() + ". Reason " + responseBody);
             }
 
         } catch (APIManagementException | IOException e) {
-            log.error("Error occurred when revoking the One Time Access Token", e);
+            log.error("Error occurred when revoking the One Time Access Token:" +
+                    APIUtil.getMaskedToken(splitToken[0]) + " of the client id:" + consumerKey, e);
         }
     }
 }
