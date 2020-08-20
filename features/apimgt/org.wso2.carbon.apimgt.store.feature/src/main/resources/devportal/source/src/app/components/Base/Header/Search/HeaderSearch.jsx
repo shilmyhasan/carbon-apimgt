@@ -95,12 +95,13 @@ const styles = theme => ({
     InfoToolTip: {
         backgroundColor: theme.custom.appBar.searchInputBackground,
         color: theme.palette.getContrastText(theme.custom.appBar.searchInputBackground),
-        maxWidth: 249,
+        maxWidth: 500,
         fontSize: theme.typography.pxToRem(14),
         fontWeight: '400',
         border: '1px solid #dadde9',
         borderRadius: '5px',
         padding: '15px 10px 0 18px',
+        lineHeight: '22px',
     },
 });
 
@@ -373,6 +374,18 @@ class HeaderSearch extends React.Component {
                                     <FormattedMessage
                                         id='Base.Header.headersearch.HeaderSearch.tooltip.option9'
                                         defaultMessage='By Microgateway Label [ Syntax - label:xxxx ]'
+                                    />
+                                </li>
+                                <li>
+                                    <FormattedMessage
+                                        id='Base.Header.headersearch.HeaderSearch.tooltip.option11'
+                                        defaultMessage='By Tags [ Syntax - tags:xxxx ]'
+                                    />
+                                </li>
+                                <li>
+                                    <FormattedMessage
+                                        id='Base.Header.headersearch.HeaderSearch.tooltip.option12'
+                                        defaultMessage='By Api Category [ Syntax - api-category:xxxx ]'
                                     />
                                 </li>
                                 <li>
