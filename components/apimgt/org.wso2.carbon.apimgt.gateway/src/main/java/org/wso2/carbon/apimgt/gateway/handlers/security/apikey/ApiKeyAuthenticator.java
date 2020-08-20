@@ -81,6 +81,7 @@ public class ApiKeyAuthenticator implements Authenticator {
     private String securityParam;
     private String apiLevelPolicy;
     private boolean isMandatory;
+    private boolean jwtGenerationEnabled;
 
     public ApiKeyAuthenticator(String authorizationHeader, String apiLevelPolicy, boolean isApiKeyMandatory) {
         this.securityParam = authorizationHeader;
@@ -89,6 +90,7 @@ public class ApiKeyAuthenticator implements Authenticator {
         this.isMandatory = isApiKeyMandatory;
         jwtConfigurationDto =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getJwtConfigurationDto();
+        jwtGenerationEnabled  = jwtConfigurationDto.isEnabled();
         this.apiMgtGatewayJWTGenerator =
                 ServiceReferenceHolder.getInstance().getApiMgtGatewayJWTGenerator()
                         .get(jwtConfigurationDto.getGatewayJWTGeneratorImpl());
@@ -343,12 +345,20 @@ public class ApiKeyAuthenticator implements Authenticator {
                     log.debug("Api Key authentication successful.");
                 }
 
-                JWTInfoDto jwtInfoDto = GatewayUtils.generateJWTInfoDto(payload, api, null, synCtx);
-                String endUserToken = generateAndRetrieveBackendJWTToken(tokenSignature, jwtInfoDto);
-                AuthenticationContext authenticationContext;
-                authenticationContext = GatewayUtils.generateAuthenticationContext(tokenSignature, payload, api,
-                        null, getApiLevelPolicy(), endUserToken, false);
-                APISecurityUtils.setAuthenticationContext(synCtx, authenticationContext, getContextHeader());
+                if (jwtGenerationEnabled) {
+                    JWTInfoDto jwtInfoDto = GatewayUtils.generateJWTInfoDto(payload, api, null, synCtx);
+                    String endUserToken = generateAndRetrieveBackendJWTToken(tokenSignature, jwtInfoDto);
+                    AuthenticationContext authenticationContext;
+                    authenticationContext = GatewayUtils.generateAuthenticationContext(tokenSignature, payload, api,
+                            null, getApiLevelPolicy(), endUserToken, false);
+                    APISecurityUtils.setAuthenticationContext(synCtx, authenticationContext, getContextHeader());
+                }
+                else {
+                    AuthenticationContext authenticationContext;
+                    authenticationContext = GatewayUtils.generateAuthenticationContext(tokenSignature, payload, api,
+                            null, getApiLevelPolicy(), null, false);
+                    APISecurityUtils.setAuthenticationContext(synCtx, authenticationContext, null);
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("User is authorized to access the resource using Api Key.");
                 }
