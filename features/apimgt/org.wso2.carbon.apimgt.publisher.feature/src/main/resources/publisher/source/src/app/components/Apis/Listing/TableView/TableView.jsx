@@ -35,6 +35,7 @@ import InlineMessage from 'AppComponents/Shared/InlineMessage';
 import Typography from '@material-ui/core/Typography';
 import TopMenu from 'AppComponents/Apis/Listing/components/TopMenu';
 import CustomIcon from 'AppComponents/Shared/CustomIcon';
+import Alert from 'AppComponents/Shared/Alert';
 
 const styles = theme => ({
     contentInside: {
@@ -201,6 +202,7 @@ class TableView extends React.Component {
         this.setState({ listType: value });
     };
     changePage = (page) => {
+        const { intl } = this.props;
         this.page = page;
         this.xhrRequest().then((data) => {
             const { body } = data;
@@ -215,10 +217,7 @@ class TableView extends React.Component {
                 defaultMessage: 'Error While Loading APIs',
                 id: 'Apis.Listing.TableView.TableView.error.loading',
             }));
-        })
-            .finally(() => {
-                this.setState({ loading: false });
-            });
+        });
     };
 
     xhrRequest = () => {
@@ -449,9 +448,13 @@ class TableView extends React.Component {
             options.download = true;
             options.viewColumns = true;
         }
-
+        if (page === 0 && this.count <= rowsPerPage && rowsPerPage === 10) {
+            options.pagination = false;
+        } else {
+            options.pagination = true;
+        }
         if (!apisAndApiProducts) {
-            return <Progress />;
+            return <Progress per={90} message='Loading APIs ...' />;
         }
         if (notFound) {
             return <ResourceNotFound />;
