@@ -106,8 +106,8 @@ public class RevokedJWTDataHolder {
             configuration = KeyManagerHolder.getKeyManagerInstance().getKeyManagerConfiguration();
 
             String revokeEndpoint = configuration.getParameter(APIConstants.REVOKE_URL);
-            char[] username =  configuration.getParameter(APIConstants.KEY_MANAGER_USERNAME).toCharArray();
-            String password =  configuration.getParameter(APIConstants.KEY_MANAGER_PASSWORD);
+            String username = configuration.getParameter(APIConstants.KEY_MANAGER_USERNAME);
+            char[] password = configuration.getParameter(APIConstants.KEY_MANAGER_PASSWORD).toCharArray();
 
             URL keyMgtURL = new URL(revokeEndpoint);
             int keyMgtPort = keyMgtURL.getPort();
@@ -119,8 +119,8 @@ public class RevokedJWTDataHolder {
             List<BasicNameValuePair> urlParameters = new ArrayList<>();
             urlParameters.add(new BasicNameValuePair(APIConstants.TOKEN_KEY, accessToken));
             urlParameters.add(new BasicNameValuePair("client_id", consumerKey));
-            urlParameters.add(new BasicNameValuePair("username", String.copyValueOf(username)));
-            urlParameters.add(new BasicNameValuePair("password", password));
+            urlParameters.add(new BasicNameValuePair("username", username));
+            urlParameters.add(new BasicNameValuePair("password", String.copyValueOf(password)));
             urlParameters.add(new BasicNameValuePair("token_type_hint", "access_token"));
 
             httpRevokePost.setEntity(new UrlEncodedFormEntity(urlParameters, "UTF-8"));
