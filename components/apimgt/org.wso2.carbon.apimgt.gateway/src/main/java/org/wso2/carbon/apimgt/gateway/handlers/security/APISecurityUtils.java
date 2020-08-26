@@ -45,7 +45,7 @@ public class APISecurityUtils {
                                                 String contextHeader) {
         synCtx.setProperty(API_AUTH_CONTEXT, authContext);
         synCtx.setProperty(APIConstants.API_KEY_TYPE, authContext.getKeyType());
-        if(authContext.getIssuer() != null) {
+        if (authContext.getIssuer() != null) {
             synCtx.setProperty(APIConstants.JWT_ISSUER, authContext.getIssuer());
         }
         if (contextHeader != null && authContext.getCallerToken() != null) {
