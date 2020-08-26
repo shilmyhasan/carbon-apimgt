@@ -600,6 +600,9 @@ public class GatewayUtils {
             } else if (payload.getClaim(APIConstants.JwtTokenConstants.AUTHORIZED_PARTY) !=  null) {
                 authContext.setConsumerKey(payload.getStringClaim(APIConstants.JwtTokenConstants.AUTHORIZED_PARTY));
             }
+            if (payload.getIssuer() != null) {
+                authContext.setIssuer(payload.getIssuer());
+            }
         }
 
         if (apiKeyValidationInfoDTO == null && api != null) {

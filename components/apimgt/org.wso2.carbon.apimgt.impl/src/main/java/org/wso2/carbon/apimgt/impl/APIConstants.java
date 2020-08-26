@@ -778,6 +778,7 @@ public final class APIConstants {
             + "Access-Control-Allow-Credentials";
 
     public static final String API_KEY_TYPE = "AM_KEY_TYPE";
+    public static final String JWT_ISSUER = "Issuer";
     public static final String API_KEY_TYPE_PRODUCTION = "PRODUCTION";
     public static final String API_KEY_TYPE_SANDBOX = "SANDBOX";
 
