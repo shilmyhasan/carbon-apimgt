@@ -159,7 +159,23 @@ public class APIMTokenIssuer extends OauthTokenIssuerImpl {
         return false;
     }
 
+    @Override
+    public boolean renewAccessTokenPerRequest(OAuthAuthzReqMessageContext oauthAuthzMsgCtx) {
 
+        String clientId = oauthAuthzMsgCtx.getAuthorizationReqDTO().getConsumerKey();
+        Application application;
+        try {
+            application = APIUtil.getApplicationByClientId(clientId);
+            if (null != application) {
+                if (APIConstants.JWT.equals(application.getTokenType())) {
+                    return true;
+                }
+            }
+        } catch (APIManagementException e) {
+            log.error("Error occurred while getting Token type.", e);
+        }
+        return false;
+    }
 
     //This method will be called for implicit grant
     @Override
