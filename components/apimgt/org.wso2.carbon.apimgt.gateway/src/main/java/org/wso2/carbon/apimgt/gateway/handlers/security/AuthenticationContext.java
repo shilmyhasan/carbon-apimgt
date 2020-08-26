@@ -47,6 +47,7 @@ public class AuthenticationContext {
     private String productProvider;
     private String apiName;
     private String apiPublisher;
+    private String issuer;
 
     public List<String> getThrottlingDataList() {
         return throttlingDataList;
@@ -57,6 +58,14 @@ public class AuthenticationContext {
     }
     //Following throttle data list can be use to hold throttle data and api level throttle key
     //should be its first element.
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
 
     public boolean isContentAwareTierPresent() {
         return isContentAwareTierPresent;
@@ -86,12 +95,24 @@ public class AuthenticationContext {
         return authenticated;
     }
 
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+    }
+
     public String getUsername() {
         return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getTier() {
         return tier;
+    }
+
+    public void setTier(String tier) {
+        this.tier = tier;
     }
 
     public String getApiKey() {
@@ -100,18 +121,6 @@ public class AuthenticationContext {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
-    }
-
-    public void setAuthenticated(boolean authenticated) {
-        this.authenticated = authenticated;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setTier(String tier) {
-        this.tier = tier;
     }
 
     public String getKeyType() {
@@ -195,20 +204,20 @@ public class AuthenticationContext {
         this.stopOnQuotaReach = stopOnQuotaReach;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
     public String getProductName() {
         return productName;
     }
 
-    public void setProductProvider(String productProvider) {
-        this.productProvider = productProvider;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public String getProductProvider() {
         return productProvider;
+    }
+
+    public void setProductProvider(String productProvider) {
+        this.productProvider = productProvider;
     }
 
     public String getApiName() {
