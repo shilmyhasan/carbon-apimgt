@@ -32,6 +32,8 @@ import org.wso2.carbon.apimgt.api.model.APIStore;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowProperties;
+import org.wso2.carbon.apimgt.impl.dto.TokenIssuerDto;
+import org.wso2.carbon.apimgt.impl.dto.JWKSConfigurationDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
@@ -88,6 +90,7 @@ public class APIManagerConfiguration {
     private ThrottleProperties throttleProperties = new ThrottleProperties();
     private WorkflowProperties workflowProperties = new WorkflowProperties();
     private Map<String, Environment> apiGatewayEnvironments = new LinkedHashMap<String, Environment>();
+    private Map<String,TokenIssuerDto> tokenIssuerDtoMap = new HashMap();
     private static Properties realtimeNotifierProperties;
     private static Properties persistentNotifierProperties;
     private static String tokenRevocationClassName;
@@ -398,6 +401,8 @@ public class APIManagerConfiguration {
                 if (additionalAttributes != null) {
                     setMonetizationAdditionalAttributes(additionalAttributes);
                 }
+            } else if (APIConstants.TOKEN_ISSUERS.equals(localName)) {
+                setJWTTokenIssuers(element);
             }
             readChildElements(element, nameStack);
             nameStack.pop();
@@ -1091,5 +1096,29 @@ public class APIManagerConfiguration {
             monetizationAttribute.put(APIConstants.Monetization.IS_ATTRIBITE_REQUIRED, isRequired);
             monetizationAttributes.add(monetizationAttribute);
         }
+    }
+
+    private void setJWTTokenIssuers(OMElement omElement) {
+
+        Iterator tokenIssuersElement =
+                omElement.getChildrenWithLocalName(APIConstants.TokenIssuer.TOKEN_ISSUER);
+        while (tokenIssuersElement.hasNext()) {
+            OMElement issuerElement = (OMElement) tokenIssuersElement.next();
+            String issuer = issuerElement.getAttributeValue(new QName("issuer"));
+            TokenIssuerDto tokenIssuerDto = new TokenIssuerDto(issuer);
+            OMElement jwksConfiguration =
+                    issuerElement.getFirstChildWithName(new QName(APIConstants.TokenIssuer.JWKS_CONFIGURATION));
+            if (jwksConfiguration != null) {
+                JWKSConfigurationDTO jwksConfigurationDTO = tokenIssuerDto.getJwksConfigurationDTO();
+                jwksConfigurationDTO.setEnabled(true);
+                jwksConfigurationDTO.setUrl(jwksConfiguration
+                        .getFirstChildWithName(new QName(APIConstants.TokenIssuer.JWKSConfiguration.URL)).getText());
+            }
+            tokenIssuerDtoMap.put(tokenIssuerDto.getIssuer(), tokenIssuerDto);
+        }
+    }
+
+    public Map<String, TokenIssuerDto> getTokenIssuerDtoMap() {
+        return tokenIssuerDtoMap;
     }
 }

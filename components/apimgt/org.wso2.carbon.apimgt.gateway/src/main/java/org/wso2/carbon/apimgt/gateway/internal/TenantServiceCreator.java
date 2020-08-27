@@ -147,6 +147,7 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
         CacheProvider.createGatewayBasicAuthResourceCache();
         CacheProvider.createGatewayUsernameCache();
         CacheProvider.createInvalidUsernameCache();
+        CacheProvider.createGatewayJWKSCache();
 
         //Initialize product REST API token caches
         CacheProvider.createRESTAPITokenCache();
