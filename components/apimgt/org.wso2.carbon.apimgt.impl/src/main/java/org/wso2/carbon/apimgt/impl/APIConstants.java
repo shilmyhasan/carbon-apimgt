@@ -366,6 +366,7 @@ public final class APIConstants {
     public static final String CLAIMS_RETRIEVER_CLASS = JWT_CONFIGS + "ClaimsRetrieverImplClass";
     public static final String CONSUMER_DIALECT_URI = JWT_CONFIGS + "ConsumerDialectURI";
     public static final String JWT_SIGNATURE_ALGORITHM = JWT_CONFIGS + "SignatureAlgorithm";
+    public static final String TOKEN_ISSUERS = "TokenIssuers";
     public static final String CONVERT_CLAIMS_TO_CONSUMER_DIALECT = JWT_CONFIGS + "ConvertClaimsToConsumerDialect";
     public static final String OAUTH_CONFIGS = "OAuthConfigurations.";
     public static final String AUTHORIZATION_HEADER = "AuthorizationHeader";
@@ -467,6 +468,8 @@ public final class APIConstants {
     public static final String TOKEN_TYPE_JWT = "JWT";
 
     public static final String PASSWORD_RESOLVER_IMPL_CLASS = "PasswordResolverImpl";
+
+    public static final String GATEWAY_JWKS_CACHE = "JWKS_CACHE";
 
     public static class TokenStatus {
         public static final String ACTIVE = "ACTIVE";
@@ -1820,4 +1823,16 @@ public final class APIConstants {
 
 
     public static final String APPLICATION_TOKEN_TYPE_JWT = "JWT";
+
+    public static class TokenIssuer {
+
+        public static String TOKEN_ISSUER = "TokenIssuer";
+        public static final String JWKS_CONFIGURATION = "JWKSConfiguration";
+
+        public static class JWKSConfiguration {
+
+            public static final String URL = "URL";
+        }
+    }
+
 }
