@@ -120,7 +120,7 @@ const styles = theme => ({
         flexGrow: 1,
     },
     root: {
-        height: 80,
+        minHeight: 80,
         background: theme.custom.infoBar.background,
         color: theme.palette.getContrastText(theme.custom.infoBar.background),
         borderBottom: `solid 1px ${theme.palette.grey.A200}`,
@@ -197,7 +197,12 @@ class Listing extends Component {
      * @memberof Listing
      */
     setQuery = (event) => {
-        this.setState({ query: event.target.value });
+        const newQuery = event.target.value;
+        if(newQuery === '') {
+            this.clearSearch();
+        } else {
+            this.setState({ query: newQuery});
+        }
     };
     /**
      * @memberof Listing
@@ -302,7 +307,11 @@ class Listing extends Component {
      * @memberof Listing
      */
     handleChangeRowsPerPage = (event) => {
-        this.setState({ rowsPerPage: event.target.value }, this.updateApps);
+        const nextRowsPerPage = event.target.value;
+        const { rowsPerPage, page } = this.state;
+        const rowsPerPageRatio = rowsPerPage / nextRowsPerPage;
+        const nextPage = Math.floor(page * rowsPerPageRatio);
+        this.setState({ rowsPerPage: nextRowsPerPage, page: nextPage }, this.updateApps);
     };
 
     /**
@@ -382,41 +391,27 @@ class Listing extends Component {
                                     defaultMessage='Applications'
                                 />
                             </Typography>
-                            {(data.size !== 0) && (
-                                <div className={classes.createLinkWrapper}>
-                                    <ScopeValidation
-                                        resourcePath={resourcePaths.APPLICATIONS}
-                                        resourceMethod={resourceMethods.POST}
-                                    >
-                                        <Link to='/applications/create'>
-                                            <Button
-                                                variant='contained'
-                                                color='primary'
-                                            >
-                                                <FormattedMessage
-                                                    id='Applications.Create.Listing.add.new.application'
-                                                    defaultMessage='Add New Application'
-                                                />
-                                            </Button>
-                                        </Link>
-                                    </ScopeValidation>
-                                </div>
-                            )}
-                            {data && (
-                                <Typography variant='caption' gutterBottom align='left'>
-                                    {data.count === 0 && (
-                                        <React.Fragment>
+                            <div className={classes.createLinkWrapper}>
+                                <ScopeValidation
+                                    resourcePath={resourcePaths.APPLICATIONS}
+                                    resourceMethod={resourceMethods.POST}
+                                >
+                                    <Link to='/applications/create'>
+                                        <Button
+                                            variant='contained'
+                                            color='primary'
+                                        >
                                             <FormattedMessage
-                                                id='Applications.Listing.Listing.no.applications.created'
-                                                defaultMessage='No Applications created'
+                                                id='Applications.Create.Listing.add.new.application'
+                                                defaultMessage='Add New Application'
                                             />
-                                        </React.Fragment>
-                                    )}
-                                </Typography>
-                            )}
+                                        </Button>
+                                    </Link>
+                                </ScopeValidation>
+                            </div>
                         </div>
                     </Box>
-                    <Box display='flex' pl={3}>
+                    <Box display='flex' pl={4}>
                         <Typography variant='caption' gutterBottom align='left'>
                             <FormattedMessage
                                 id='Applications.Listing.Listing.logical.description'
@@ -428,25 +423,7 @@ class Listing extends Component {
                         </Typography>
                     </Box>
                 </div>
-                {query === "" && data.size === 0 ? (
-                    <GenericDisplayDialog
-                        classes={classes}
-                        handleClick={this.handleClickOpen}
-                        heading='Create New Application'
-                        caption={intl.formatMessage({
-                            defaultMessage: `An application is a logical collection of APIs. Applications
-                    allow you to use a single access token to invoke a collection
-                    of APIs and to subscribe to one API multiple times with different
-                    SLA levels. The DefaultApplication is pre-created and allows unlimited
-                    access by default.`,
-                            id: 'Applications.Listing.Listing.generic.display.description',
-                        })}
-                        buttonText={intl.formatMessage({
-                            defaultMessage: 'ADD NEW APPLICATION',
-                            id: 'Applications.Listing.Listing.generic.display.description',
-                        })}
-                    />
-                ) : (<Paper className={classes.paper}>
+                <Paper className={classes.paper}>
                     <AppBar className={classes.searchBar} position="static" color="default" elevation={0}>
                         <Toolbar>
                             <Grid container spacing={2} alignItems="center">
@@ -485,7 +462,10 @@ class Listing extends Component {
                             </Grid>
                         </Toolbar>
                     </AppBar>
-                    <div className={classes.contentWrapper}>
+                    {!data && (<div className={classes.contentWrapper}>
+                        <Loading />
+                    </div>)}
+                    {data && (<div className={classes.contentWrapper}>
                         {data.size > 0 ? (
                             <div className={classes.appContent}>
                                 <Paper className={data.size < 9 ? classes.fullHeight : ''}>
@@ -529,7 +509,26 @@ class Listing extends Component {
                                 </Paper>
                             </div>
                         ) : (
-                                <div className={classes.noDataMessage}>
+                            query === '' ? (
+                                    <div className={classes.noDataMessage}>
+                                        <Typography variant="h6" gutterBottom>
+                                            <FormattedMessage
+                                                id='Applications.Listing.Listing.noapps.display.title'
+                                                defaultMessage='No Applications Available'
+                                            />
+                                        </Typography>
+
+                                        <Typography variant="body2" gutterBottom>
+                                            <a onClick={this.handleClickOpen} className={classes.clearSearchLink}>
+                                                <FormattedMessage
+                                                    id='Applications.Listing.Listing.noapps.display.link.text'
+                                                    defaultMessage='Add New Application'
+                                                />
+                                            </a>
+                                        </Typography>
+                                    </div>
+                                ) :
+                                (<div className={classes.noDataMessage}>
                                     <Typography variant="h6" gutterBottom>
                                         <FormattedMessage
                                             id='Applications.Listing.Listing.applications.no.search.results.title'
@@ -548,15 +547,15 @@ class Listing extends Component {
                                             />
                                         </a>
                                     </Typography>
-                                </div>
+                                </div>)
                             )}
                         <DeleteConfirmation
                             handleAppDelete={this.handleAppDelete}
                             isDeleteOpen={isDeleteOpen}
                             toggleDeleteConfirmation={this.toggleDeleteConfirmation}
                         />
-                    </div>
-                </Paper>)}
+                    </div>)}
+                </Paper>
             </main>
         );
     }
