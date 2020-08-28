@@ -20,6 +20,9 @@
 <html lang="en">
 <%
     var settings = require("/site/public/theme/settings.js");
+    var manifest = require("/site/public/dist/manifest.json");
+    var indexKey = 'index.js';
+    var indexBundle = manifest[indexKey].split("dist/")[1];
 %>
 <head>
   <base href="<%= settings.Settings.app.context %>/" />
@@ -41,7 +44,7 @@
   <script type="text/javascript" src="<%= settings.Settings.app.context %>/site/public/theme/defaultTheme.js"></script>
   <script type="text/javascript" src="<%= settings.Settings.app.context %>/site/public/theme/settings.js"></script>
   <script src="<%= settings.Settings.app.context %>/site/public/fonts/iconfont/MaterialIcons.js"></script>
-  <script src="<%= settings.Settings.app.context %>/site/public/dist/index.bundle.js"></script>
+  <script src="<%= settings.Settings.app.context %>/site/public/dist/<%= indexBundle %>"></script>
   <link rel="stylesheet" href="<%= settings.Settings.app.context %>/site/public/fonts/iconfont/material-icons.css">
 </body>
 
