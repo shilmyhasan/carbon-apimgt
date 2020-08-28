@@ -356,7 +356,11 @@ public class ApisApiServiceImpl extends ApisApiService {
                     RestApiUtil.handleInternalServerError(errorMessage, log);
                 }
             } else if (!isWSAPI) {
-                apiProvider.saveSwagger20Definition(apiToAdd.getId(), body.getApiDefinition());
+                String oldDefinition = body.getApiDefinition();
+                APIDefinition apiDefinition = OASParserUtil.getOASParser(oldDefinition);
+                SwaggerData swaggerData = new SwaggerData(apiToAdd);
+                String newDefinition = apiDefinition.generateAPIDefinition(swaggerData, oldDefinition);
+                apiProvider.saveSwaggerDefinition(apiToAdd, newDefinition);
             }
             APIIdentifier createdApiId = apiToAdd.getId();
             //Retrieve the newly added API to send in the response payload
