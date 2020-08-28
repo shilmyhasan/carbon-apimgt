@@ -1772,7 +1772,10 @@ public final class APIConstants {
     public static final String TENANT_STATE_ACTIVE = "ACTIVE";
     public static final String TENANT_STATE_INACTIVE = "INACTIVE";
 
+    public static final String DEFAULT_API_KEY_SIGN_KEY_STORE = "InternalKeyStore";
     public static final String GATEWAY_PUBLIC_CERTIFICATE_ALIAS = "gateway_certificate_alias";
+    public static final String DEFAULT_API_KEY_GENERATOR_IMPL = "org.wso2.carbon.apimgt.impl.token" +
+            ".DefaultApiKeyGenerator";
 
     //Constants for user API ratings
     public static final String API_ID = "apiId";
