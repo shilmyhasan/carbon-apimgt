@@ -48,6 +48,7 @@ import org.wso2.carbon.apimgt.api.model.Scope;
 import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
 import org.wso2.carbon.apimgt.api.model.Tier;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
+import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.policy.APIPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.impl.APIConstants;
@@ -357,7 +358,11 @@ public class ApisApiServiceImpl extends ApisApiService {
                     RestApiUtil.handleInternalServerError(errorMessage, log);
                 }
             } else if (!isWSAPI) {
-                apiProvider.saveSwagger20Definition(apiToAdd.getId(), body.getApiDefinition());
+                String oldDefinition = body.getApiDefinition();
+                APIDefinition apiDefinition = OASParserUtil.getOASParser(oldDefinition);
+                SwaggerData swaggerData = new SwaggerData(apiToAdd);
+                String newDefinition = apiDefinition.generateAPIDefinition(swaggerData, oldDefinition);
+                apiProvider.saveSwaggerDefinition(apiToAdd, newDefinition);
             }
             APIIdentifier createdApiId = apiToAdd.getId();
             //Retrieve the newly added API to send in the response payload
@@ -924,13 +929,17 @@ public class ApisApiServiceImpl extends ApisApiService {
                 }
             }
             API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName());
+            if (!isWSAPI) {
+                String oldDefinition = body.getApiDefinition();
+                APIDefinition apiDefinition = OASParserUtil.getOASParser(oldDefinition);
+                SwaggerData swaggerData = new SwaggerData(apiToUpdate);
+                String newDefinition = apiDefinition.generateAPIDefinition(swaggerData, oldDefinition);
+                apiProvider.saveSwaggerDefinition(apiToUpdate, newDefinition);
+            }
 
             //attach micro-geteway labels
             apiToUpdate = assignLabelsToDTO(body,apiToUpdate);
 
-            if (!isWSAPI) {
-                apiProvider.saveSwagger20Definition(apiToUpdate.getId(), body.getApiDefinition());
-            }
 
             apiProvider.updateAPI(apiToUpdate);
 
