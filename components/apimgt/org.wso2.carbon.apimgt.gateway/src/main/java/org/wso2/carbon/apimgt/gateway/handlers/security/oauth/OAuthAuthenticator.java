@@ -506,7 +506,7 @@ public class OAuthAuthenticator implements Authenticator {
     }
 
     public String getChallengeString() {
-        return "Bearer realm=\"WSO2 API Manager\"";
+        return "OAuth2 realm=\"WSO2 API Manager\"";
     }
 
     private String getClientDomain(MessageContext synCtx) {
