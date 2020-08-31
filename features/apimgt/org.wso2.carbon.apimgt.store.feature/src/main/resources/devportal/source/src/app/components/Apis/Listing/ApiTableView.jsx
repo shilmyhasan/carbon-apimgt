@@ -180,6 +180,7 @@ class ApiTableView extends React.Component {
     // get data
     getData = () => {
         const { intl } = this.props;
+        this.setState({loading: true})
         this.xhrRequest()
             .then((data) => {
                 const { body } = data;
