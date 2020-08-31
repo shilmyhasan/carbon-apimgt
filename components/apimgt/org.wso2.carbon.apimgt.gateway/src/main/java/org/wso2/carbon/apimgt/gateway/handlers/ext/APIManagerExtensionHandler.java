@@ -17,7 +17,6 @@
 package org.wso2.carbon.apimgt.gateway.handlers.ext;
 
 
-import org.apache.axis2.addressing.EndpointReference;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
@@ -89,13 +88,10 @@ public class APIManagerExtensionHandler extends AbstractHandler {
         try {
             boolean isMediated = mediate(messageContext, DIRECTION_IN);
             if (isMediated) {
-                EndpointReference headerTo = ((Axis2MessageContext) messageContext).getAxis2MessageContext()
-                        .getOptions().getTo();
-                if (headerTo != null) {
-                    String requestDestination = headerTo.getAddress();
-                    if (requestDestination != null) {
-                        messageContext.setProperty(APIMgtGatewayConstants.SYNAPSE_ENDPOINT_ADDRESS, requestDestination);
-                    }
+                String requestDestination = ((Axis2MessageContext) messageContext).getAxis2MessageContext()
+                        .getOptions().getTo().getAddress();
+                if (requestDestination != null) {
+                    messageContext.setProperty(APIMgtGatewayConstants.SYNAPSE_ENDPOINT_ADDRESS, requestDestination);
                 }
             }
             return isMediated;
