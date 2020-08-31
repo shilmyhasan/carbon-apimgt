@@ -131,7 +131,7 @@ public class MethodTimeLogger
                 if (StringUtils.isNotEmpty(correlationId)) {
                     MDC.put(APIConstants.CORRELATION_ID, correlationId);
                 }
-                if (StringUtils.isEmpty(MDC.get(APIConstants.CORRELATION_ID))) {
+                else if (StringUtils.isEmpty(MDC.get(APIConstants.CORRELATION_ID))) {
                     correlationId = UUID.randomUUID().toString();
                     MDC.put(APIConstants.CORRELATION_ID, correlationId);
                     headers.put(APIConstants.AM_ACTIVITY_ID, correlationId);
