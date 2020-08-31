@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.keymgt.handlers;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.identity.application.authentication.framework.context.AuthenticationContext;
 import org.wso2.carbon.identity.application.authentication.framework.context.SessionContext;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
@@ -44,6 +45,7 @@ import org.wso2.carbon.user.core.util.UserCoreUtil;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.cache.Cache;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.wso2.carbon.identity.oauth.OAuthUtil.handleError;
@@ -133,8 +135,10 @@ public class SessionDataPublisherImpl extends AbstractAuthenticationDataPublishe
         }
 
         for (OAuthConsumerAppDTO appDTO : appDTOs) {
-            if (StringUtils.equalsIgnoreCase("admin_store", appDTO.getApplicationName()) || StringUtils
-                    .equalsIgnoreCase("admin_publisher", appDTO.getApplicationName())) {
+            if (StringUtils.equalsIgnoreCase("admin_store", appDTO.getApplicationName()) ||
+                    StringUtils.equalsIgnoreCase("admin_publisher", appDTO.getApplicationName()) ||
+                    StringUtils.equalsIgnoreCase("admin_admin_store", appDTO.getApplicationName()) ||
+                    StringUtils.equalsIgnoreCase("admin_admin_publisher", appDTO.getApplicationName())) {
                 Set<AccessTokenDO> accessTokenDOs = null;
                 try {
                     // Retrieve all ACTIVE or EXPIRED access tokens for particular client authorized by this user
@@ -154,6 +158,10 @@ public class SessionDataPublisherImpl extends AbstractAuthenticationDataPublishe
                                 OAuth2Util.buildScopeString(accessTokenDO.getScope()));
                         OAuthUtil.clearOAuthCache(accessTokenDO.getConsumerKey(), authzUser);
                         OAuthUtil.clearOAuthCache(accessTokenDO.getAccessToken());
+                        Cache restApiTokenCache = CacheProvider.getRESTAPITokenCache();
+                        if (restApiTokenCache != null) {
+                            restApiTokenCache.remove(accessTokenDO.getAccessToken());
+                        }
                         AccessTokenDO scopedToken = null;
                         try {
                             // Retrieve latest access token for particular client, user and scope combination if
@@ -319,6 +327,7 @@ public class SessionDataPublisherImpl extends AbstractAuthenticationDataPublishe
         user.setUserStoreDomain(IdentityUtil.extractDomainFromName(tenantAwareusername));
         user.setFederatedUser(true);
         user.setUserStoreDomain(OAuth2Util.getUserStoreForFederatedUser(authenticatedUser));
+        user.setFederatedIdPName(authenticatedUser.getFederatedIdPName());
         return user;
     }
 }
