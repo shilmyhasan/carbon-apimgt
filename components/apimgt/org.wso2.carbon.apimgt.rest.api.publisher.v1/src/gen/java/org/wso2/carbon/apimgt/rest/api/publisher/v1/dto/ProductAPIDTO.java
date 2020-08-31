@@ -20,7 +20,6 @@ public class ProductAPIDTO   {
   
     private String name = null;
     private String apiId = null;
-    private String version = null;
     private List<APIOperationsDTO> operations = new ArrayList<>();
 
   /**
@@ -60,23 +59,6 @@ public class ProductAPIDTO   {
 
   /**
    **/
-  public ProductAPIDTO version(String version) {
-    this.version = version;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "1.0", value = "")
-  @JsonProperty("version")
-  public String getVersion() {
-    return version;
-  }
-  public void setVersion(String version) {
-    this.version = version;
-  }
-
-  /**
-   **/
   public ProductAPIDTO operations(List<APIOperationsDTO> operations) {
     this.operations = operations;
     return this;
@@ -104,13 +86,12 @@ public class ProductAPIDTO   {
     ProductAPIDTO productAPI = (ProductAPIDTO) o;
     return Objects.equals(name, productAPI.name) &&
         Objects.equals(apiId, productAPI.apiId) &&
-        Objects.equals(version, productAPI.version) &&
         Objects.equals(operations, productAPI.operations);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, apiId, version, operations);
+    return Objects.hash(name, apiId, operations);
   }
 
   @Override
@@ -120,7 +101,6 @@ public class ProductAPIDTO   {
     
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    apiId: ").append(toIndentedString(apiId)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    operations: ").append(toIndentedString(operations)).append("\n");
     sb.append("}");
     return sb.toString();
