@@ -150,7 +150,8 @@ public class SQLConstants {
                     "   AND SB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
                     "   AND APP.APPLICATION_ID=SP.APPLICATION_ID " +
                     "   AND API.API_ID = SP.API_ID" +
-                    "   AND SP.SUB_STATUS = '"+ APIConstants.SubscriptionStatus.UNBLOCKED +"'" + 
+                    "   AND (SP.SUB_STATUS = '" + APIConstants.SubscriptionStatus.UNBLOCKED +
+                    "' OR SP.SUB_STATUS = '" + APIConstants.SubscriptionStatus.PROD_ONLY_BLOCKED + "')" +
                     "   AND SP.SUBS_CREATE_STATE = '" + APIConstants.SubscriptionCreatedStatus.SUBSCRIBE + "'" +
                     "   AND APP.APPLICATION_ID = ?";
 
@@ -171,7 +172,8 @@ public class SQLConstants {
                     "   AND SB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
                     "   AND APP.APPLICATION_ID=SP.APPLICATION_ID " +
                     "   AND API.API_ID = SP.API_ID" +
-                    "   AND SP.SUB_STATUS = '"+ APIConstants.SubscriptionStatus.UNBLOCKED +"'" + 
+                    "   AND (SP.SUB_STATUS = '" + APIConstants.SubscriptionStatus.UNBLOCKED +
+                    "' OR SP.SUB_STATUS = '" + APIConstants.SubscriptionStatus.PROD_ONLY_BLOCKED + "')" +
                     "   AND SP.SUBS_CREATE_STATE = '" + APIConstants.SubscriptionCreatedStatus.SUBSCRIBE + "'" +
                     "   AND APP.APPLICATION_ID = ?";
 

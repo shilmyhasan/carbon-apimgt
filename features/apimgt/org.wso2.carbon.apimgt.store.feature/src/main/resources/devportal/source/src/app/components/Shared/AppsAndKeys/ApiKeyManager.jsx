@@ -45,6 +45,7 @@ import ApiKey from './../ApiKey'
 import FormLabel from '@material-ui/core/FormLabel';
 import FormGroup from '@material-ui/core/FormGroup';
 import Grid from '@material-ui/core/Grid';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
     root: {
@@ -108,6 +109,7 @@ class ApiKeyManager extends React.Component {
             accessTokenRequest: {
                 timeout: -1,
             },
+            isGenerating: false,
         };
     }
 
@@ -124,6 +126,7 @@ class ApiKeyManager extends React.Component {
     }
 
     generateKeys = (selectedApp, keyType) => {
+        this.setState({isGenerating: true});
         const client = new API();
         const promisedKey = client.generateApiKey(selectedApp.appId, keyType, this.state.accessTokenRequest.timeout);
         promisedKey
@@ -131,6 +134,7 @@ class ApiKeyManager extends React.Component {
                 console.log('Non empty response received');
                 const apikey = {accessToken: response.body.apikey, validityTime: response.body.validityTime, isOauth:false};
                 this.setState(() => ({apikey: apikey, open: true, showToken: true}));
+                this.setState({isGenerating: false});
             })
             .catch((error) => {
                 if (process.env.NODE_ENV !== 'production') {
@@ -140,12 +144,13 @@ class ApiKeyManager extends React.Component {
                 if (status === 404) {
                     this.setState({ notFound: true });
                 }
+                this.setState({isGenerating: false});
             });
     }
 
     render() {
         const {classes, selectedApp, keyType } = this.props;
-        const {showToken, accessTokenRequest, open, apikey} = this.state;
+        const {showToken, accessTokenRequest, open, apikey, isGenerating} = this.state;
         return (
             <div className={classes.root}>
                     <Typography variant='h5' className={classes.keyTitle}>
@@ -191,11 +196,13 @@ class ApiKeyManager extends React.Component {
                         </DialogContent>
                         <DialogActions>
                             {!showToken && (
-                                <Button onClick={() => this.generateKeys(selectedApp,keyType)} disabled={!accessTokenRequest.timeout} color='primary'>
+                                <Button onClick={() => this.generateKeys(selectedApp,keyType)}
+                                        disabled={!accessTokenRequest.timeout || isGenerating} color='primary'>
                                     <FormattedMessage
                                         id='Shared.AppsAndKeys.ViewKeys.consumer.generate.btn'
                                         defaultMessage='Generate'
                                     />
+                                    {isGenerating && <CircularProgress size={24} />}
                                 </Button>
                             )}
                             <Button onClick={this.handleClose} color='primary' autoFocus>

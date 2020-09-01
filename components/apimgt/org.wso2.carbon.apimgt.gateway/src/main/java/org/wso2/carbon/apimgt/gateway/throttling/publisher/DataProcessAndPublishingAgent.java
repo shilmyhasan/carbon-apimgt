@@ -21,6 +21,10 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.databridge.agent.DataPublisher;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.TreeMap;
@@ -152,7 +156,25 @@ public class DataProcessAndPublishingAgent implements Runnable {
         String remoteIP = GatewayUtils.getIp(axis2MessageContext);
 
         if (remoteIP != null && remoteIP.length() > 0) {
-            jsonObMap.put(APIThrottleConstants.IP, APIUtil.ipToLong(remoteIP));
+            if (remoteIP.contains(":")) {
+                log.warn("Client port will be ignored and only the IP address will concern from " + remoteIP);
+                remoteIP = remoteIP.split(":")[0];
+            }
+            try {
+                InetAddress address = APIUtil.getAddress(remoteIP);
+                if (address instanceof Inet4Address) {
+                    jsonObMap.put(APIThrottleConstants.IP, APIUtil.ipToLong(remoteIP));
+                    jsonObMap.put(APIThrottleConstants.IPv6, 0);
+                } else if (address instanceof Inet6Address) {
+                    jsonObMap.put(APIThrottleConstants.IPv6, APIUtil.ipToBigInteger(remoteIP));
+                    jsonObMap.put(APIThrottleConstants.IP, 0);
+                }
+            } catch (UnknownHostException e) {
+                //send empty value as ip
+                log.error("Error while parsing host IP " + remoteIP, e);
+                jsonObMap.put(APIThrottleConstants.IPv6, 0);
+                jsonObMap.put(APIThrottleConstants.IP, 0);
+            }
         }
 
         //HeaderMap will only be set if the Header Publishing has been enabled.

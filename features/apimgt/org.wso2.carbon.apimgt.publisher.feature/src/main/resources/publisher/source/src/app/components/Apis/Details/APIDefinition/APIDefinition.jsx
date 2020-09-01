@@ -35,6 +35,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import yaml from 'js-yaml';
 import Alert from 'AppComponents/Shared/Alert';
 import API from 'AppData/api.js';
@@ -78,6 +79,9 @@ const styles = theme => ({
     button: {
         marginLeft: theme.spacing(1),
     },
+    progressLoader: {
+        marginLeft: theme.spacing(1),
+    },
 });
 /**
  * This component holds the functionality of viewing the api definition content of an api. The initial view is a
@@ -97,6 +101,7 @@ class APIDefinition extends React.Component {
             graphQL: null,
             format: null,
             convertTo: null,
+            isUpdating: false,
         };
         this.handleNo = this.handleNo.bind(this);
         this.handleOk = this.handleOk.bind(this);
@@ -265,6 +270,7 @@ class APIDefinition extends React.Component {
      * */
     updateSwaggerDefinition(swaggerContent, specFormat, toFormat) {
         const { api, intl } = this.props;
+        this.setState({ isUpdating: true });
         let parsedContent = {};
         if (this.hasJsonStructure(swaggerContent)) {
             parsedContent = JSON.parse(swaggerContent);
@@ -294,6 +300,7 @@ class APIDefinition extends React.Component {
                         this.setState({ swagger: swaggerContent });
                     }
                 }
+                this.setState({ isUpdating: false });
             })
             .catch((err) => {
                 console.log(err);
@@ -301,6 +308,7 @@ class APIDefinition extends React.Component {
                     id: 'Apis.Details.APIDefinition.APIDefinition.error.while.updating.api.definition',
                     defaultMessage: 'Error occurred while updating the API Definition',
                 }));
+                this.setState({ isUpdating: false });
             });
     }
 
@@ -309,7 +317,7 @@ class APIDefinition extends React.Component {
      */
     render() {
         const {
-            swagger, graphQL, openEditor, openDialog, format, convertTo, notFound,
+            swagger, graphQL, openEditor, openDialog, format, convertTo, notFound, isUpdating,
         } = this.state;
         const { classes, resourceNotFountMessage, api } = this.props;
         let downloadLink;
@@ -437,24 +445,19 @@ class APIDefinition extends React.Component {
                             variant='contained'
                             color='primary'
                             onClick={this.openUpdateConfirmation}
+                            disabled={isUpdating}
                         >
                             <FormattedMessage
                                 id='Apis.Details.APIDefinition.APIDefinition.documents.swagger.editor.update.content'
                                 defaultMessage='Update Content'
                             />
+                            {isUpdating && <CircularProgress className={classes.progressLoader} size={24} />}
                         </Button>
                     </Paper>
                     <Suspense
-                        fallback={
-                            <div>
-                                (
-                                <FormattedMessage
-                                    id='Apis.Details.APIDefinition.APIDefinition.loading'
-                                    defaultMessage='Loading...'
-                                />
-                                )
-                            </div>
-                        }
+                        fallback={(
+                            <Progress />
+                        )}
                     >
                         <EditorDialog />
                     </Suspense>
