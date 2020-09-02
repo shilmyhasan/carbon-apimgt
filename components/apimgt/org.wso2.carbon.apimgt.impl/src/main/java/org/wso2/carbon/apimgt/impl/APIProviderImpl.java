@@ -1272,11 +1272,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             //update doc visibility
             List<Documentation> docsList = getAllDocumentation(api.getId());
             if (docsList != null) {
-                Iterator it = docsList.iterator();
-                while (it.hasNext()) {
-                    Object docsObject = it.next();
-                    Documentation docs = (Documentation) docsObject;
-                    updateDocVisibility(api, docs);
+                for (Documentation document : docsList) {
+                    updateDocVisibility(api, document);
                 }
             }
 
@@ -1315,11 +1312,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             int tenantId;
-            String tenantDomain =
-                    MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+            String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil
+                    .replaceEmailDomainBack(api.getId().getProviderName()));
             try {
                 tenantId = getTenantId(tenantDomain);
-
                 GenericArtifact updateApiArtifact = APIUtil.createDocArtifactContent(artifact, api.getId(), documentation);
                 artifactManager.updateGenericArtifact(updateApiArtifact);
                 APIUtil.clearResourcePermissions(artifact.getPath(), api.getId(), tenantId);
