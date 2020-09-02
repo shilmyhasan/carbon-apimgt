@@ -9491,10 +9491,18 @@ public final class APIUtil {
      */
     public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws APIManagementException {
         try {
+            boolean enableX5C = false;
+            String x5c = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                    getAPIManagerConfiguration().getFirstProperty(APIConstants.JWT_X5C_ENABLED);
+            if (x5c != null) {
+                enableX5C = Boolean.parseBoolean(x5c);
+            }
+
             //generate the SHA-1 thumbprint of the certificate
             MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
             byte[] der = publicCert.getEncoded();
             digestValue.update(der);
+            Base64 base64 = new Base64(true);
             byte[] digestInBytes = digestValue.digest();
             String publicCertThumbprint = hexify(digestInBytes);
             String base64UrlEncodedThumbPrint;
@@ -9511,7 +9519,24 @@ public final class APIUtil {
 
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64UrlEncodedThumbPrint);
-            jwtHeader.append('\"');
+
+            if (enableX5C) {
+                // If the "EnableX5C" property is true
+                /**
+                 * Sample header
+                 * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
+                 * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256",
+                 * "x5c":"MIdsadasdasd..........Iwq"}
+                 */
+                String base64UrlEncodedpublicCert = com.nimbusds.jose.util.Base64
+                        .encode(publicCert.getEncoded()).toJSONString();
+                jwtHeader.append("\",");
+                jwtHeader.append("\"x5c\":[");
+                jwtHeader.append(base64UrlEncodedpublicCert);
+                jwtHeader.append("]");
+            } else {
+                jwtHeader.append("\"");
+            }
 
             jwtHeader.append('}');
             return jwtHeader.toString();
