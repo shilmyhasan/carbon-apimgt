@@ -106,6 +106,7 @@ public class ApiLoggingApiServiceImpl implements ApiLoggingApiService {
         if (payload != null) {
             for (int i = 0; i < payload.getApis().size(); i++) {
                 APIDTO apidto = payload.getApis().get(i);
+                apidto.setContext(GatewayAPIUtils.contextTemplateValidation(apidto.getContext()));
                 perAPILogService.publishLogAPIData(apidto.getContext(), apidto.getLogLevel());
             }
             //Response would be the added payload
@@ -119,15 +120,16 @@ public class ApiLoggingApiServiceImpl implements ApiLoggingApiService {
         if (LOG_ALL.equalsIgnoreCase(logLevel) || LOG_HEADERS.equalsIgnoreCase(logLevel) || LOG_BODY
                 .equalsIgnoreCase(logLevel)) {
 
-            perAPILogService.publishLogAPIData(context, logLevel);
             // Response would be the added details as API details list object
+            context = GatewayAPIUtils.contextTemplateValidation(context);
             APIListDTO apiListDTO = new APIListDTO();
             APIDTO apidto = new APIDTO();
-            apidto.setContext(GatewayAPIUtils.contextTemplateValidation(context));
+            apidto.setContext(context);
             apidto.setLogLevel(logLevel.toLowerCase());
             List<APIDTO> apidtos = new ArrayList<>();
             apidtos.add(apidto);
             apiListDTO.setApis(apidtos);
+            perAPILogService.publishLogAPIData(context, logLevel);
             return Response.ok().entity(apiListDTO).build();
         }
         // Invalid log level handle as a bad request

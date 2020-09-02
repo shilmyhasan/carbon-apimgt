@@ -27,7 +27,7 @@ public class GatewayAPIUtils {
     public static String contextTemplateValidation(String context) {
         // To check if starts with "/" eg: /pizzashack/1.0.0
         if (context.startsWith("/")) {
-            context.replaceFirst("/", "");
+            context = context.replaceFirst("/", "");
         }
         // To check if ends with "/" eg: /pizzashack/1.0.0/
         if (context.endsWith("/")) {

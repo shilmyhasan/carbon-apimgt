@@ -34,7 +34,7 @@
             }
           },
           "404" : {
-            "description" : "Not Found.\nRequest API resource or external store Ids not found.\n",
+            "description" : "Not Found.\nRequest API context not found.\n",
             "schema" : {
               "$ref" : "#/definitions/Error"
             }
@@ -73,7 +73,7 @@
             "description" : ""
           },
           "404" : {
-            "description" : "Not Found.\nRequest API resource or external store Ids not found.\n",
+            "description" : "Not Found.\nRequest resource not found.\n",
             "schema" : {
               "$ref" : "#/definitions/Error"
             }
@@ -98,13 +98,13 @@
             "description" : ""
           },
           "404" : {
-            "description" : "Not Found.\nRequest API resource or external store Ids not found.\n",
+            "description" : "Not Found.\nRequested API context not found.\n",
             "schema" : {
               "$ref" : "#/definitions/Error"
             }
           },
           "500" : {
-            "description" : "IInternal server error while deleting API details",
+            "description" : "Internal server error while deleting API details",
             "schema" : {
               "$ref" : "#/definitions/Error"
             }
@@ -179,7 +179,7 @@
         },
         "description" : {
           "type" : "string",
-          "description" : "A detail description about the error message."
+          "description" : "A detail description about the error message.\n"
         }
       },
       "title" : "Description of individual errors that may have occurred during a request."

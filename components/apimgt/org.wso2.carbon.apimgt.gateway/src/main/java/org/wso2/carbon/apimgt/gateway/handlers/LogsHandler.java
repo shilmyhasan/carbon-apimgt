@@ -352,16 +352,16 @@ public class LogsHandler extends AbstractSynapseHandler {
      */
     private String getAPILogLevel(MessageContext ctx) {
         // if the logging API data holder is empty or null return null
-        if (logProperties != null || !logProperties.isEmpty()) {
+        if (!logProperties.isEmpty()) {
             // API REST url post fix
-            this.apiTo = LogUtils.getTo(ctx);
+            String apiCtx = LogUtils.getTransportInURL(ctx);
             for (Map.Entry<String, String> entry : logProperties.entrySet()) {
                 String key = entry.getKey();
                 // REST URL POST FIX pizzashack/1.0.0/menu pizzashack/1.0.0/ and  pizzashack/1.0.0
                 // context value pizzashack/1.0
-                if (this.apiTo.startsWith(key + "/") || this.apiTo.equals(key)) {
+                if (apiCtx.startsWith(key + "/") || apiCtx.equals(key)) {
                     ctx.setProperty("LOG_LEVEL", entry.getValue());
-                    ctx.setProperty("API_TO", this.apiTo);
+                    ctx.setProperty("API_TO", apiCtx);
                     return entry.getValue();
                 }
             }
