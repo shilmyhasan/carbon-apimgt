@@ -1505,13 +1505,23 @@ public class ApiMgtDAO {
                             if (scopeHashMap.containsKey(scopeKey)) {
                                 // scope already exists append roles.
                                 scope = scopeHashMap.get(scopeKey);
-                                scope.setRoles(scope.getRoles().concat("," + finalResultSet.getString(4)).trim());
+                                String roles = scope.getRoles();
+                                if (roles != null) {
+                                    scope.setRoles(roles.concat("," + finalResultSet.getString(4)).trim());
+                                } else {
+                                    scope.setRoles("");
+                                }
                             } else {
                                 scope = new Scope();
                                 scope.setKey(scopeKey);
                                 scope.setName(finalResultSet.getString(2));
                                 scope.setDescription(finalResultSet.getString(3));
-                                scope.setRoles(finalResultSet.getString(4).trim());
+                                String roles = finalResultSet.getString(4);
+                                if (roles != null) {
+                                    scope.setRoles(roles.trim());
+                                } else {
+                                    scope.setRoles("");
+                                }
                             }
                             scopeHashMap.put(scopeKey, scope);
                         }
