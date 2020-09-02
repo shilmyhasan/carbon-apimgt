@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.gateway.perlogging.PerAPILogger;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.perlog.PerAPILogService;
 import org.wso2.carbon.apimgt.rest.api.perapilogger.v1.*;
 import org.wso2.carbon.apimgt.rest.api.perapilogger.v1.dto.*;
@@ -49,20 +50,18 @@ public class ApiLoggingApiServiceImpl implements ApiLoggingApiService {
     private static final String LOG_ALL = "all";
     private static final String LOG_HEADERS = "headers";
     private static final String LOG_BODY = "body";
-    private static final String DELETE = "delete";
-    private static final String DELETEALL = "deleteAll";
 
     PerAPILogService perAPILogService = PerAPILogger.getInstance();
 
     public Response apiLoggingDelete(String context, MessageContext messageContext) throws APIManagementException {
         // check if the value exists
         if (context == null) {
-            perAPILogService.publishLogAPIData("", DELETEALL);
+            perAPILogService.publishLogAPIData("", APIConstants.APILogHandler.DELETE_ALL);
             return Response.status(204).build();
         }
         String logLevel = perAPILogService.getLogData(context);
         if (logLevel != null) {
-            perAPILogService.publishLogAPIData(context, DELETE);
+            perAPILogService.publishLogAPIData(context, APIConstants.APILogHandler.DELETE);
             return Response.status(204).build();
         } else {
             throw new APIManagementException("The API data to be deleted not found for context : " + context,
@@ -107,7 +106,12 @@ public class ApiLoggingApiServiceImpl implements ApiLoggingApiService {
             for (int i = 0; i < payload.getApis().size(); i++) {
                 APIDTO apidto = payload.getApis().get(i);
                 apidto.setContext(GatewayAPIUtils.contextTemplateValidation(apidto.getContext()));
-                perAPILogService.publishLogAPIData(apidto.getContext(), apidto.getLogLevel());
+                if (GatewayAPIUtils.validateLogLevel(logLevel)) {
+                    perAPILogService.publishLogAPIData(apidto.getContext(), apidto.getLogLevel());
+                } else {
+                    throw new APIManagementException("The input log level is incorrect: Input log level : " + logLevel,
+                            ExceptionCodes.from(ExceptionCodes.LOGGING_API_INCORRECT_LOG_LEVEL));
+                }
             }
             //Response would be the added payload
             return Response.ok().entity(payload).build();
@@ -117,9 +121,7 @@ public class ApiLoggingApiServiceImpl implements ApiLoggingApiService {
             throw new APIManagementException("Context or the log level is missing",
                     ExceptionCodes.from(ExceptionCodes.LOGGING_API_MISSING_DATA));
         }
-        if (LOG_ALL.equalsIgnoreCase(logLevel) || LOG_HEADERS.equalsIgnoreCase(logLevel) || LOG_BODY
-                .equalsIgnoreCase(logLevel)) {
-
+        if (GatewayAPIUtils.validateLogLevel(logLevel)) {
             // Response would be the added details as API details list object
             context = GatewayAPIUtils.contextTemplateValidation(context);
             APIListDTO apiListDTO = new APIListDTO();

@@ -319,19 +319,22 @@ public class LogsHandler extends AbstractSynapseHandler {
         String apictx = (String) map.get("context");
         String logLevel = (String) map.get("value");
 
-        if (!"delete".equals(logLevel) && !"deleteAll".equals(logLevel)) {
+        if (!APIConstants.APILogHandler.DELETE.equals(logLevel) && !APIConstants.APILogHandler.DELETE_ALL
+                .equals(logLevel)) {
             // value "delete" & "deleteAll" responsible for deleting operations
             // If the values are other than than, then they should be added to the map
             log.debug("Adding context : " + apictx + ", value : " + logLevel);
             logProperties.put(apictx, logLevel);
-        } else if ("deleteAll".equals(logLevel)) {
-            //handle updating already existing API values
-            log.debug("Deleting all entries");
-            logProperties.clear();
-        } else if (logProperties.containsKey(apictx) && logLevel.equals("delete")) {
-            //handle already existing hence update
-            log.debug("Deleting entry with context : " + apictx + ", value : " + logLevel);
-            logProperties.remove(apictx);
+        } else {
+            if (APIConstants.APILogHandler.DELETE_ALL.equals(logLevel)) {
+                //handle updating already existing API values
+                log.debug("Deleting all entries");
+                logProperties.clear();
+            } else if (logProperties.containsKey(apictx) && APIConstants.APILogHandler.DELETE.equals(logLevel)) {
+                //handle already existing hence update
+                log.debug("Deleting entry with context : " + apictx + ", value : " + logLevel);
+                logProperties.remove(apictx);
+            }
         }
         return logProperties;
     }

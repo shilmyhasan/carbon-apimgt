@@ -2072,4 +2072,12 @@ public final class APIConstants {
         public static final String SERVER_APIKEYSIGN_KEYSTORE_TYPE = "Security.KeyStoreName.Type";
         public static final String SERVER_APIKEYSIGN_PRIVATE_KEY_PASSWORD = "Security.KeyStoreName.KeyPassword";
     }
+
+    public static class APILogHandler {
+        public static final String DELETE = "delete";
+        public static final String DELETE_ALL = "deleteAll";
+        public static final String HEADERS = "headers";
+        public static final String ALL = "all";
+        public static final String BODY = "body";
+    }
 }

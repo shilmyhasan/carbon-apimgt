@@ -117,9 +117,6 @@ public class RoleBasedBasicAuthInterceptor extends AbstractPhaseInterceptor {
                 carbonContext.setTenantDomain(tenantDomain);
                 carbonContext.setTenantId(tenantId);
                 carbonContext.setUsername(username);
-                if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                    APIUtil.loadTenantConfigBlockingMode(tenantDomain);
-                }
                 return validateRoles(userRealm, username);
             } else {
                 log.error("Authentication failed: Invalid credentials");

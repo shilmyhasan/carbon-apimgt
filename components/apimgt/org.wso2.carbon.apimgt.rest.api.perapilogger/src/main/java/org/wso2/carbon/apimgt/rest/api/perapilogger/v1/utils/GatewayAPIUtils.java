@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.apimgt.rest.api.perapilogger.v1.utils;
 
+import org.wso2.carbon.apimgt.impl.APIConstants;
+
 public class GatewayAPIUtils {
 
     /**
@@ -36,4 +38,16 @@ public class GatewayAPIUtils {
         // Returning context would be pizzashack/1.0.0
         return context;
     }
+
+    /**
+     * Validate the user input log level
+     *
+     * @param logLevel user input
+     * @return true or false
+     */
+    public static boolean validateLogLevel(String logLevel) {
+        return (APIConstants.APILogHandler.ALL.equalsIgnoreCase(logLevel) || APIConstants.APILogHandler.BODY
+                .equalsIgnoreCase(logLevel) || APIConstants.APILogHandler.HEADERS.equalsIgnoreCase(logLevel));
+    }
+
 }
