@@ -299,7 +299,7 @@ class ViewKeys extends React.Component {
             });
     };
 
-    viewKeyAndSecret = (consumerKey, consumerSecret) => {
+    viewKeyAndSecret = (consumerKey, consumerSecret, isUserOwner) => {
         const { classes, intl, selectedApp: { hashEnabled }, keyType } = this.props;
         const { keyCopied, secretCopied, showCS } = this.state;
         return (
@@ -496,7 +496,7 @@ class ViewKeys extends React.Component {
         if (summary) {
             return (
                 <Grid container spacing={3} className={classes.gridWrapper}>
-                    {this.viewKeyAndSecret(consumerKey, consumerSecret)}
+                    {this.viewKeyAndSecret(consumerKey, consumerSecret, isUserOwner)}
                 </Grid>
             );
         }
