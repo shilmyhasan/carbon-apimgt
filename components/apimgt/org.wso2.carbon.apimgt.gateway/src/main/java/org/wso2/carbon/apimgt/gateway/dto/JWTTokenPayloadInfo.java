@@ -29,6 +29,7 @@ public class JWTTokenPayloadInfo implements Serializable {
 
     JWTClaimsSet payload;
     String rawPayload;
+    String scopes;
 
     public JWTClaimsSet getPayload() {
         return payload;
@@ -44,5 +45,13 @@ public class JWTTokenPayloadInfo implements Serializable {
 
     public void setRawPayload(String rawPayload) {
         this.rawPayload = rawPayload;
+    }
+
+    public String getScopes() {
+        return scopes;
+    }
+
+    public void setScopes(String scopes) {
+        this.scopes = scopes;
     }
 }
