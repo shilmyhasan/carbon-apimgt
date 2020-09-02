@@ -177,7 +177,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/perapi-log.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/gateway-api.yaml</inputSpec>
                             <language>jaxrs-cxf-cdi</language>
                             <configOptions>
                                 <apiPackage>org.wso2.carbon.apimgt.rest.api.gateway.v1</apiPackage>
