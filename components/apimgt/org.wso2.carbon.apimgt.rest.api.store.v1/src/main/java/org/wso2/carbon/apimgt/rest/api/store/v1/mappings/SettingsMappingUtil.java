@@ -44,8 +44,8 @@ public class SettingsMappingUtil {
 
     public SettingsDTO fromSettingstoDTO(Boolean isUserAvailable) throws APIManagementException {
         SettingsDTO settingsDTO = new SettingsDTO();
-        String appAccessTokenValidityPeriod = (String) IdentityConfigParser.getInstance()
-                .getConfiguration().get("OAuth.AccessTokenDefaultValidityPeriod");
+        String appAccessTokenValidityPeriod = String.valueOf(IdentityConfigParser.getInstance()
+                .getConfiguration().get("OAuth.AccessTokenDefaultValidityPeriod"));
         if (isUserAvailable) {
             settingsDTO.setGrantTypes(APIUtil.getGrantTypes());
             settingsDTO.setScopes(GetScopeList());
