@@ -81,11 +81,13 @@ export default function APISecurity(props) {
 
     // Check the validation conditions and return an error message
     const Validate = () => {
+        const resourcesWithSecurity = apiContext.api.operations.findIndex(op => op.authType !== 'None') > -1;
         if (
             !securityScheme.includes(API_SECURITY_MUTUAL_SSL)
             && !securityScheme.includes(API_SECURITY_BASIC_AUTH)
             && !securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2)
             && !securityScheme.includes(API_SECURITY_API_KEY)
+            && resourcesWithSecurity
         ) {
             return (
                 <Typography className={classes.bottomSpace}>
