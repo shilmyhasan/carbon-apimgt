@@ -7541,7 +7541,7 @@ public class ApiMgtDAO {
 
     public Set<URITemplate> getURITemplatesOfAPI(APIIdentifier identifier)
             throws APIManagementException {
-        Map<Integer, URITemplate> uriTemplates = new HashMap<>();
+        Map<Integer, URITemplate> uriTemplates = new LinkedHashMap<>();
 
         try (Connection conn = APIMgtDBUtil.getConnection();
             PreparedStatement ps = conn.prepareStatement(SQLConstants.GET_URL_TEMPLATES_OF_API_SQL)) {
@@ -7580,7 +7580,7 @@ public class ApiMgtDAO {
             handleException("Failed to get URI Templates of API" + identifier, e);
         }
 
-        return new HashSet<>(uriTemplates.values());
+        return new LinkedHashSet<>(uriTemplates.values());
     }
 
     private void setAssociatedAPIProducts(APIIdentifier identifier, Map<Integer, URITemplate> uriTemplates)
