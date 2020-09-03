@@ -83,7 +83,7 @@ export default function ApplicationLevel(props) {
     const [apiFromContext] = useAPI();
     const classes = useStyles();
     let mandatoryValue = null;
-    const hasResourceWithSecurity = apiFromContext.operations.findIndex(op => op.authType !== 'None') > -1;
+    const hasResourceWithSecurity = apiFromContext.operations.findIndex((op) => op.authType !== 'None') > -1;
 
     if (hasResourceWithSecurity) {
         mandatoryValue = 'optional';
@@ -140,8 +140,8 @@ export default function ApplicationLevel(props) {
                             <FormControlLabel
                                 control={(
                                     <Checkbox
-                                        disabled={isRestricted(['apim:api_create'], apiFromContext) ||
-                                        !hasResourceWithSecurity}
+                                        disabled={isRestricted(['apim:api_create'], apiFromContext)
+                                        || !hasResourceWithSecurity}
                                         checked={securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2)}
                                         onChange={({ target: { checked, value } }) => configDispatcher({
                                             action: 'securityScheme',
@@ -157,8 +157,8 @@ export default function ApplicationLevel(props) {
                                 control={(
                                     <Checkbox
                                         disabled={isRestricted(['apim:api_create'], apiFromContext)}
-                                        checked={securityScheme.includes(API_SECURITY_BASIC_AUTH) ||
-                                        !hasResourceWithSecurity}
+                                        checked={securityScheme.includes(API_SECURITY_BASIC_AUTH)
+                                        || !hasResourceWithSecurity}
                                         onChange={({ target: { checked, value } }) => configDispatcher({
                                             action: 'securityScheme',
                                             event: { checked, value },
@@ -173,8 +173,8 @@ export default function ApplicationLevel(props) {
                                 control={(
                                     <Checkbox
                                         checked={securityScheme.includes(API_SECURITY_API_KEY)}
-                                        disabled={isRestricted(['apim:api_create'], apiFromContext) ||
-                                        !hasResourceWithSecurity}
+                                        disabled={isRestricted(['apim:api_create'], apiFromContext)
+                                        || !hasResourceWithSecurity}
                                         onChange={({ target: { checked, value } }) => configDispatcher({
                                             action: 'securityScheme',
                                             event: { checked, value },
