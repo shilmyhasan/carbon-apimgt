@@ -522,6 +522,9 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         oAuthApplicationInfo.addParameter(ApplicationConstants.VALIDITY_PERIOD,
                                       getConfigurationParamValue(APIConstants.IDENTITY_OAUTH2_FIELD_VALIDITY_PERIOD));
 
+        if (!isKeyValidationEnabled()) {
+            return oAuthApplicationInfo;
+        }
 
         //check whether given consumer key and secret match or not. If it does not match throw an exception.
         org.wso2.carbon.apimgt.api.model.xsd.OAuthApplicationInfo info = null;
@@ -574,6 +577,15 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
 
 
         return oAuthApplicationInfo;
+    }
+
+    public boolean isKeyValidationEnabled(){
+        String validationEnabled =
+                getConfigurationElementValue(APIConstants.API_KEY_VALIDATOR_ENABLE_PROVISION_APP_VALIDATION);
+        if (validationEnabled == null) {
+            return false;
+        }
+        return Boolean.parseBoolean(validationEnabled);
     }
 
     @Override

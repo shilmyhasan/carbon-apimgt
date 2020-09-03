@@ -53,6 +53,13 @@ public class AMDefaultKeyManagerImplWrapper extends AMDefaultKeyManagerImpl {
     //Mocked App credentials
     private String CLIENT_SECRET = "GGGGGGG";
     private String CLIENT_ID = "XXXXXXXXXX";
+    private boolean validation = false;
+
+    public AMDefaultKeyManagerImplWrapper(){}
+
+    public AMDefaultKeyManagerImplWrapper(boolean validation){
+        this.validation = validation;
+    }
     
     @Override
     protected org.wso2.carbon.apimgt.api.model.xsd.OAuthApplicationInfo createOAuthApplicationbyApplicationInfo(
@@ -177,4 +184,8 @@ public class AMDefaultKeyManagerImplWrapper extends AMDefaultKeyManagerImpl {
         return false;
     }
 
+    @Override
+    public boolean isKeyValidationEnabled() {
+        return validation;
+    }
 }

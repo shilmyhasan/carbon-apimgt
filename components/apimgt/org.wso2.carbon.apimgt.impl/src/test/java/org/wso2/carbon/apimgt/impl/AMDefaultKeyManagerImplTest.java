@@ -214,7 +214,7 @@ public class AMDefaultKeyManagerImplTest {
         oauthRequest.setMappingId("123");
         oauthRequest.setOAuthApplicationInfo(oauthApplication);
         
-        AMDefaultKeyManagerImplWrapper keyManager = new AMDefaultKeyManagerImplWrapper();
+        AMDefaultKeyManagerImplWrapper keyManager = new AMDefaultKeyManagerImplWrapper(true);
         keyManager.createApplication(oauthRequest);
         
         oauthApplication.addParameter("tokenScope", "read_scope");
