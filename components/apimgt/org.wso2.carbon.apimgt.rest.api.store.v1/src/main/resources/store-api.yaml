@@ -5069,6 +5069,9 @@ definitions:
       enableEmailUsername:
         type: boolean
         default: false
+      appAccessTokenValidity:
+        type: string
+        default: '3600'
 #-----------------------------------------------------
 # The Application Attribute resource
 #-----------------------------------------------------
