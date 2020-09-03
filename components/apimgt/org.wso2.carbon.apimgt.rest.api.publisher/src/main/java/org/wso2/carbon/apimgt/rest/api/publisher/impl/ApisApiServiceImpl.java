@@ -938,9 +938,6 @@ public class ApisApiServiceImpl extends ApisApiService {
             //attach micro-geteway labels
             apiToUpdate = assignLabelsToDTO(body,apiToUpdate);
 
-            if (!isWSAPI) {
-                apiProvider.saveSwagger20Definition(apiToUpdate.getId(), body.getApiDefinition());
-            }
 
             apiProvider.updateAPI(apiToUpdate);
 
