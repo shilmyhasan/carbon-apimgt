@@ -9502,7 +9502,6 @@ public final class APIUtil {
             MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
             byte[] der = publicCert.getEncoded();
             digestValue.update(der);
-            Base64 base64 = new Base64(true);
             byte[] digestInBytes = digestValue.digest();
             String publicCertThumbprint = hexify(digestInBytes);
             String base64UrlEncodedThumbPrint;

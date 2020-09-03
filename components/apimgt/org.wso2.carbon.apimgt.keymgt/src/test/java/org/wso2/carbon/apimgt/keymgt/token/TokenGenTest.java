@@ -253,25 +253,14 @@ public class TokenGenTest {
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.JWT_X5C_ENABLED)).thenReturn("true");
 
         System.setProperty("x5tEncoding", "base64Url");
-        AbstractJWTGenerator jwtGenerator = new JWTGenerator();
-        PowerMockito.mockStatic(APIUtil.class);
-        PowerMockito.mockStatic(KeyStoreManager.class);
-        PowerMockito.doNothing().when(APIUtil.class, "loadTenantRegistry", Mockito.anyInt());
-        KeyStoreManager keyStoreManager = Mockito.mock(KeyStoreManager.class);
-        PowerMockito.when(keyStoreManager.getInstance(Mockito.anyInt())).thenReturn(keyStoreManager);
-        //Read public certificate
         InputStream inputStream = new FileInputStream("src/test/resources/wso2carbon.jks");
         KeyStore keystore = KeyStore.getInstance("JKS");
         char[] pwd = "wso2carbon".toCharArray();
         keystore.load(inputStream, pwd);
         Certificate cert = keystore.getCertificate("wso2carbon");
 
-        Mockito.when(keyStoreManager.getDefaultPrimaryCertificate()).thenReturn((X509Certificate) cert);
-        //Generate JWT header using the above certificate
-        String header = jwtGenerator.addCertToHeader("admin@carbon.super");
+        String header = APIUtil.generateHeader(cert, "SHA256withRSA");
 
-        //Get the public certificate encoded
-        Base64 base64 = new Base64(true);
         String x5c = com.nimbusds.jose.util.Base64.encode(cert.getEncoded()).toJSONString();
         //Check if the encoded pub cert present in JWT
         Assert.assertTrue("JWT header doest not contain x5c value", header.contains(x5c));
@@ -296,12 +285,6 @@ public class TokenGenTest {
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.JWT_X5C_ENABLED)).thenReturn("false");
 
         System.setProperty("x5tEncoding", "base64Url");
-        AbstractJWTGenerator jwtGenerator = new JWTGenerator();
-        PowerMockito.mockStatic(APIUtil.class);
-        PowerMockito.mockStatic(KeyStoreManager.class);
-        PowerMockito.doNothing().when(APIUtil.class, "loadTenantRegistry", Mockito.anyInt());
-        KeyStoreManager keyStoreManager = Mockito.mock(KeyStoreManager.class);
-        PowerMockito.when(keyStoreManager.getInstance(Mockito.anyInt())).thenReturn(keyStoreManager);
         //Read public certificat
         InputStream inputStream = new FileInputStream("src/test/resources/wso2carbon.jks");
         KeyStore keystore = KeyStore.getInstance("JKS");
@@ -309,12 +292,8 @@ public class TokenGenTest {
         keystore.load(inputStream, pwd);
         Certificate cert = keystore.getCertificate("wso2carbon");
 
-        Mockito.when(keyStoreManager.getDefaultPrimaryCertificate()).thenReturn((X509Certificate) cert);
-        //Generate JWT header using the above certificate
-        String header = jwtGenerator.addCertToHeader("admin@carbon.super");
+        String header = APIUtil.generateHeader(cert, "SHA256withRSA");
 
-        //Get the public certificate encoded
-        Base64 base64 = new Base64(true);
         String x5c = com.nimbusds.jose.util.Base64.encode(cert.getEncoded()).toJSONString();
         //Check if the encoded pub cert is present in JWT header with x5c property
         Assert.assertTrue("JWT Header contains x5c value", !header.contains(x5c));
