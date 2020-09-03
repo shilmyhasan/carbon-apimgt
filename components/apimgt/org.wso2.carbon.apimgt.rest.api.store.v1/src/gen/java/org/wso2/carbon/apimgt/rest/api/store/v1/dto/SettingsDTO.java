@@ -23,6 +23,7 @@ public class SettingsDTO   {
     private Boolean mapExistingAuthApps = false;
     private String apiGatewayEndpoint = null;
     private Boolean enableEmailUsername = false;
+    private String appAccessTokenValidity = "3600";
 
   /**
    **/
@@ -126,6 +127,23 @@ public class SettingsDTO   {
     this.enableEmailUsername = enableEmailUsername;
   }
 
+  /**
+   **/
+  public SettingsDTO appAccessTokenValidity(String appAccessTokenValidity) {
+    this.appAccessTokenValidity = appAccessTokenValidity;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("appAccessTokenValidity")
+  public String getAppAccessTokenValidity() {
+    return appAccessTokenValidity;
+  }
+  public void setAppAccessTokenValidity(String appAccessTokenValidity) {
+    this.appAccessTokenValidity = appAccessTokenValidity;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -141,12 +159,13 @@ public class SettingsDTO   {
         Objects.equals(applicationSharingEnabled, settings.applicationSharingEnabled) &&
         Objects.equals(mapExistingAuthApps, settings.mapExistingAuthApps) &&
         Objects.equals(apiGatewayEndpoint, settings.apiGatewayEndpoint) &&
-        Objects.equals(enableEmailUsername, settings.enableEmailUsername);
+        Objects.equals(enableEmailUsername, settings.enableEmailUsername) &&
+        Objects.equals(appAccessTokenValidity, settings.appAccessTokenValidity);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, enableEmailUsername);
+    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, enableEmailUsername, appAccessTokenValidity);
   }
 
   @Override
@@ -160,6 +179,7 @@ public class SettingsDTO   {
     sb.append("    mapExistingAuthApps: ").append(toIndentedString(mapExistingAuthApps)).append("\n");
     sb.append("    apiGatewayEndpoint: ").append(toIndentedString(apiGatewayEndpoint)).append("\n");
     sb.append("    enableEmailUsername: ").append(toIndentedString(enableEmailUsername)).append("\n");
+    sb.append("    appAccessTokenValidity: ").append(toIndentedString(appAccessTokenValidity)).append("\n");
     sb.append("}");
     return sb.toString();
   }
