@@ -2773,6 +2773,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (registry.resourceExists(targetPath)) {
                 apiTargetArtifact = registry.get(targetPath);
             }
+            JSONObject additionalProperties = new JSONObject();
             if (apiTargetArtifact != null) {
                 // Copying all the properties.
                 Properties properties = apiSourceArtifact.getProperties();
@@ -2782,6 +2783,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         String propertyName = (String) propertyNames.nextElement();
                         if (propertyName.startsWith(APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX)) {
                             apiTargetArtifact.setProperty(propertyName, apiSourceArtifact.getProperty(propertyName));
+                            additionalProperties.put(propertyName
+                                            .substring(APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX.length()),
+                                    apiSourceArtifact.getProperty(propertyName));
                         }
                     }
                 }
@@ -2816,6 +2820,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             APIIdentifier newId = new APIIdentifier(api.getId().getProviderName(),
                     api.getId().getApiName(), newVersion);
             API newAPI = getAPI(newId, api.getId(), oldContext);
+
+            //Populate additional properties in the API object
+            if (additionalProperties.size() != 0) {
+                newAPI.setAdditionalProperties(additionalProperties);
+            }
 
             if (api.isDefaultVersion()) {
                 newAPI.setAsDefaultVersion(true);
