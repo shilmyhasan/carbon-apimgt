@@ -157,8 +157,18 @@ class CommonListing extends React.Component {
      */
     constructor(props) {
         super(props);
+        let { defaultApiView } = props.theme.custom;
+        this.showToggle = true;
+        if(typeof defaultApiView === 'object' && defaultApiView.length > 0) {
+            if(defaultApiView.length === 1) { // We will disable the other
+                this.showToggle = false;
+            }
+            defaultApiView = defaultApiView[0];
+        } else {
+            defaultApiView = localStorage.getItem('portal.listType') || defaultApiView;
+        }
         this.state = {
-            listType: props.theme.custom.defaultApiView,
+            listType: defaultApiView,
             allTags: null,
             showLeftMenu: false,
         };
@@ -171,6 +181,7 @@ class CommonListing extends React.Component {
      * @memberof CommonListing
      */
     setListType = (value) => {
+        localStorage.setItem('portal.listType', value);
         this.setState({ listType: value });
     };
     /**
