@@ -3,6 +3,7 @@
 exports[`Progress component test should comply with the snapshot 1`] = `
 <div
   className="apim-dual-ring"
+  id="apim-dual-ring-loader"
 >
   <span
     style={
