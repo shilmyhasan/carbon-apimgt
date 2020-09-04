@@ -19,7 +19,7 @@
     authentication logic relies on this. -->
     <AuthManager>
         <!-- Server URL of the Authentication service -->
-        <ServerURL>https://localhost:${mgt.transport.https.port}${carbon.context}services/</ServerURL>
+        <ServerURL>{{apim.auth_manager.service_url}}</ServerURL>
         <!-- Admin username for the Authentication manager. -->
         <Username>${admin.username}</Username>
         <!-- Admin password for the Authentication manager. -->
@@ -653,6 +653,10 @@
             <WhiteListedURI>
                 <URI>/api/am/store/{version}/apis/{apiId}/comments</URI>
                 <HTTPMethods>GET,HEAD</HTTPMethods>
+            </WhiteListedURI>
+            <WhiteListedURI>
+                 <URI>/api/am/store/{version}/apis/{apiId}/subscription-policies</URI>
+                 <HTTPMethods>GET,HEAD</HTTPMethods>
             </WhiteListedURI>
             <WhiteListedURI>
                  <URI>/api/am/store/{version}/apis/{apiId}/graphql-schema</URI>
