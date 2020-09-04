@@ -473,6 +473,13 @@ public class WSDL11SOAPOperationExtractor extends WSDL11ProcessorImpl {
                                 }
                                 parentProp = ((ArrayProperty) parentProp).getItems();
                             } else if (parentProp instanceof ObjectProperty) {
+                                if (((ObjectProperty) parentProp).getProperties() != null &&
+                                        ((ObjectProperty) parentProp).getProperties().containsKey(element) &&
+                                        pos != elements.length - 1) {
+                                    parentProp = ((ObjectProperty) parentProp).getProperties().get(element);
+                                    pos++;
+                                    continue;
+                                }
                                 if (SOAPToRESTConstants.RESTRICTION_ATTR.equals(type) && pos == elements.length - 1) {
                                     parentProp = createPropertyFromNode(current, true);
                                     parentProp.setName(element);
@@ -629,7 +636,7 @@ public class WSDL11SOAPOperationExtractor extends WSDL11ProcessorImpl {
                     for (int i = 0; i < childNodes.getLength(); i++) {
                         Node childNode = childNodes.item(i);
                         if (SOAPToRESTConstants.COMPLEX_TYPE_NODE_NAME.equals(childNode.getLocalName())) {
-                            isComplexTypeContainsArray(childNode, false);
+                            isComplexTypeContainsArray(childNode);
                         }
                     }
                 }
@@ -644,14 +651,14 @@ public class WSDL11SOAPOperationExtractor extends WSDL11ProcessorImpl {
         return property;
     }
 
-    private void isComplexTypeContainsArray(Node current, boolean isRecursiveCall) {
+    private void isComplexTypeContainsArray(Node current) {
         if (current.getAttributes() != null && isArrayType(current)) {
             isArrayType = true;
         } else if (current.hasChildNodes()) {
             NodeList nodeList = current.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node child = nodeList.item(i);
-                isComplexTypeContainsArray(child, true);
+                isComplexTypeContainsArray(child);
             }
         }
     }
