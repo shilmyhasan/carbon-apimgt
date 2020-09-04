@@ -18,6 +18,7 @@
 package org.wso2.carbon.apimgt.keymgt.issuers;
 
 import org.apache.axis2.util.JavaUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opensaml.saml2.core.Assertion;
@@ -28,7 +29,9 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.handlers.ResourceConstants;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.oauth.common.GrantType;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -42,6 +45,9 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 /**
  * This class represents the functions related to an scope issuer which
@@ -97,7 +103,7 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             int tenantId;
             RealmService realmService = getRealmService();
             UserStoreManager userStoreManager;
-            String[] userRoles;
+            String[] userRoles = null;
 
             try {
                 tenantId = realmService.getTenantManager().
@@ -118,7 +124,21 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
                     Assertion assertion = (Assertion) tokReqMsgCtx.getProperty(ResourceConstants.SAML2_ASSERTION);
                     userRoles = getRolesFromAssertion(assertion);
                 } else {
-                    userRoles = userStoreManager.getRoleListOfUser(endUsernameWithDomain);
+                    Map<ClaimMapping, String> userAttributes = tokReqMsgCtx.getAuthorizedUser().getUserAttributes();
+                    String[] fedUserRoles = getRolesFromUserAttribute(userAttributes,
+                            ResourceConstants.ROLE_ATTRIBUTE_NAME);
+                    String[] tempUserRoles = userStoreManager.getRoleListOfUser(endUsernameWithDomain);
+
+                    if (fedUserRoles != null && tempUserRoles != null) {
+                        Set<String> roleList = new LinkedHashSet<>();
+                        roleList.addAll(Arrays.asList(fedUserRoles));
+                        roleList.addAll(Arrays.asList(tempUserRoles));
+                        userRoles = roleList.toArray(new String[roleList.size()]);
+                    } else if (fedUserRoles != null) {
+                        userRoles = fedUserRoles;
+                    } else if (tempUserRoles != null) {
+                        userRoles = tempUserRoles;
+                    }
                 }
 
             } catch (UserStoreException e) {
@@ -184,6 +204,27 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             log.error("Error while getting scopes of application " + e.getMessage(), e);
             return null;
         }
+    }
+
+    /**
+     * Extract the roles from the user attributes.
+     *
+     * @param userAttributes retrieved from the token
+     * @return roles
+     */
+    private String[] getRolesFromUserAttribute(Map<ClaimMapping, String> userAttributes, String roleClaim) {
+
+        for (Iterator<Map.Entry<ClaimMapping, String>> iterator = userAttributes.entrySet().iterator(); iterator
+                .hasNext(); ) {
+            Map.Entry<ClaimMapping, String> entry = iterator.next();
+            if (roleClaim.equals(entry.getKey().getLocalClaim().getClaimUri())
+                    && StringUtils.isNotBlank(entry.getValue())) {
+                return entry.getValue().replace("\\/", "/").
+                        replace("[", "").replace("]", "").
+                        replace("\"", "").split(FrameworkUtils.getMultiAttributeSeparator());
+            }
+        }
+        return null;
     }
 
     /**
