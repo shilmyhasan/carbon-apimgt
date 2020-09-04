@@ -9773,9 +9773,11 @@ public final class APIUtil {
             base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
                     .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
             StringBuilder jwtHeader = new StringBuilder();
-            //Sample header
-            //{"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10"}
-            //{"typ":"JWT", "alg":"[2]", "x5t":"[1]"}
+            /**
+             * Sample header
+             * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
+             * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256"}}
+             **/
             jwtHeader.append("{\"typ\":\"JWT\",");
             jwtHeader.append("\"alg\":\"");
             jwtHeader.append(getJWSCompliantAlgorithmCode(signatureAlgorithm));
@@ -9783,9 +9785,13 @@ public final class APIUtil {
 
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64UrlEncodedThumbPrint);
-            jwtHeader.append('\"');
+            jwtHeader.append("\"");
 
-            jwtHeader.append('}');
+            jwtHeader.append("\"kid\":\"");
+            jwtHeader.append(getKID(base64UrlEncodedThumbPrint, getJWSCompliantAlgorithmCode(signatureAlgorithm)));
+            jwtHeader.append("\"");
+
+            jwtHeader.append("}");
             return jwtHeader.toString();
 
         } catch (Exception e) {
@@ -9807,6 +9813,17 @@ public final class APIUtil {
         } else {
             return signatureAlgorithm;
         }
+    }
+
+    /**
+     * Helper method to add kid claim into to JWT_HEADER.
+     *
+     * @param certThumbprint  thumbPrint generated for certificate
+     * @param signatureAlgorithm  relevant signature algorithm
+     * @return KID
+     */
+    private static String getKID(String certThumbprint, String signatureAlgorithm) {
+        return certThumbprint + "_" + signatureAlgorithm;
     }
 
     /**
