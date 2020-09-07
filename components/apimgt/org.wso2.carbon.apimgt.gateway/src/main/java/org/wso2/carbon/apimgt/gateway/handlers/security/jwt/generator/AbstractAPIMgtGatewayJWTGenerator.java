@@ -169,7 +169,7 @@ public abstract class AbstractAPIMgtGatewayJWTGenerator {
         try {
             KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
             Certificate publicCert = keyStoreManager.getDefaultPrimaryCertificate();
-            return APIUtil.generateHeader(publicCert, signatureAlgorithm);
+            return APIUtil.generateBackendJWTHeader(publicCert, signatureAlgorithm);
         } catch (Exception e) {
             String error = "Error in obtaining keystore";
             throw new APIManagementException(error, e);
