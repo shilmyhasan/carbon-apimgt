@@ -35,6 +35,7 @@ import InlineMessage from 'AppComponents/Shared/InlineMessage';
 import Typography from '@material-ui/core/Typography';
 import TopMenu from 'AppComponents/Apis/Listing/components/TopMenu';
 import CustomIcon from 'AppComponents/Shared/CustomIcon';
+import Alert from 'AppComponents/Shared/Alert';
 
 const styles = theme => ({
     contentInside: {
@@ -63,29 +64,36 @@ const styles = theme => ({
 class TableView extends React.Component {
     constructor(props) {
         super(props);
+        let { defaultApiView } = props.theme.custom;
+        this.showToggle = true;
+        if (typeof defaultApiView === 'object' && defaultApiView.length > 0) {
+            if (defaultApiView.length === 1) { // We will disable toggle buttons
+                this.showToggle = false;
+            }
+            defaultApiView = defaultApiView[defaultApiView.length - 1];
+        } else {
+            defaultApiView = localStorage.getItem('publisher.listType') || defaultApiView;
+        }
         this.state = {
             apisAndApiProducts: null,
             notFound: true,
             displayCount: 0,
-            listType: props.theme.custom.defaultApiView,
+            listType: defaultApiView,
         };
         this.page = 0;
         this.count = 100;
-        this.rowsPerPage = 10;
-        this.getLocalStorage();
+        this.rowsPerPage = localStorage.getItem('publisher.rowsPerPage') || 10;
         this.setListType = this.setListType.bind(this);
         this.updateData = this.updateData.bind(this);
     }
 
     componentDidMount() {
-        this.getLocalStorage();
         this.getData();
     }
 
     componentDidUpdate(prevProps) {
         const { isAPIProduct, query } = this.props;
         if (isAPIProduct !== prevProps.isAPIProduct || query !== prevProps.query) {
-            this.getLocalStorage();
             this.getData();
         }
     }
@@ -171,23 +179,16 @@ class TableView extends React.Component {
             const { body } = data;
             const { list, pagination, count } = body;
             const { total } = pagination;
+            // When there is a count stored in the localstorage and it's greater than 0
+            // We check if the response in the rest api callls have 0 items.
+            // We remove the local storage and redo the api call
+            if (this.count > 0 && total === 0) {
+                this.page = 0;
+                this.getData();
+            }
             this.count = total;
             this.setState({ apisAndApiProducts: list, notFound: false, displayCount: count });
         });
-    };
-
-    getLocalStorage = () => {
-        const { isAPIProduct } = this.props;
-        const paginationSufix = isAPIProduct ? 'products' : 'apis';
-        const storedPagination = window.localStorage.getItem('pagination-' + paginationSufix);
-        if (storedPagination) {
-            const pagination = JSON.parse(storedPagination);
-            if (pagination.page && pagination.count && pagination.rowsPerPage) {
-                this.page = pagination.page;
-                this.count = pagination.count;
-                this.rowsPerPage = pagination.rowsPerPage;
-            }
-        }
     };
 
     /**
@@ -197,16 +198,11 @@ class TableView extends React.Component {
      * @memberof Listing
      */
     setListType = (value) => {
+        localStorage.setItem('publisher.listType', value);
         this.setState({ listType: value });
     };
-    setLocalStorage = () => {
-        // Set the page to the localstorage
-        const { isAPIProduct } = this.props;
-        const paginationSufix = isAPIProduct ? 'products' : 'apis';
-        const pagination = { page: this.page, count: this.count, rowsPerPage: this.rowsPerPage };
-        window.localStorage.setItem('pagination-' + paginationSufix, JSON.stringify(pagination));
-    };
     changePage = (page) => {
+        const { intl } = this.props;
         this.page = page;
         this.xhrRequest().then((data) => {
             const { body } = data;
@@ -216,8 +212,28 @@ class TableView extends React.Component {
                 notFound: false,
                 displayCount: count,
             });
-            this.setLocalStorage();
+        }).catch(() => {
+            Alert.error(intl.formatMessage({
+                defaultMessage: 'Error While Loading APIs',
+                id: 'Apis.Listing.TableView.TableView.error.loading',
+            }));
         });
+    };
+
+    xhrRequest = () => {
+        const { page, rowsPerPage } = this;
+        const { isAPIProduct, query } = this.props;
+        if (query) {
+            const composeQuery = queryString.parse(query);
+            composeQuery.limit = this.rowsPerPage;
+            composeQuery.offset = page * rowsPerPage;
+            return API.search(composeQuery);
+        }
+        if (isAPIProduct) {
+            return APIProduct.all({ limit: this.rowsPerPage, offset: page * rowsPerPage });
+        } else {
+            return API.all({ limit: this.rowsPerPage, offset: page * rowsPerPage });
+        }
     };
     /**
      *
@@ -396,8 +412,8 @@ class TableView extends React.Component {
                 if (count - 1 === rowsPerPage * page && page !== 0) {
                     this.page = page - 1;
                 }
+                localStorage.setItem('publisher.rowsPerPage', numberOfRows);
                 this.getData();
-                this.setLocalStorage();
             },
         };
         if (listType === 'grid') {
@@ -432,9 +448,13 @@ class TableView extends React.Component {
             options.download = true;
             options.viewColumns = true;
         }
-
+        if (page === 0 && this.count <= rowsPerPage && rowsPerPage === 10) {
+            options.pagination = false;
+        } else {
+            options.pagination = true;
+        }
         if (!apisAndApiProducts) {
-            return <Progress />;
+            return <Progress per={90} message='Loading APIs ...' />;
         }
         if (notFound) {
             return <ResourceNotFound />;

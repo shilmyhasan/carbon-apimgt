@@ -162,10 +162,10 @@ function getSuggestionValue(suggestion) {
  * @param lcState
  * @returns {string}
  */
-function buildSearchQuery(searchText, lcState) {
+function buildSearchQuery(searchText, lcstate) {
     searchText = (searchText && !searchText.includes(':')) ? 'content:' + searchText : searchText;
-    return lcState
-        ? (searchText + ' status:' + lcState).trim().toLowerCase() : searchText.trim().toLowerCase();
+    return lcstate
+        ? (searchText + ' status:' + lcstate).trim().toLowerCase() : searchText.trim();
 }
 
 /**
