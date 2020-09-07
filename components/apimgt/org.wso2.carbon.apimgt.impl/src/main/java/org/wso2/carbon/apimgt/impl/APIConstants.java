@@ -1850,4 +1850,18 @@ public final class APIConstants {
         }
     }
 
+    public static class CertificateReLoaderConfiguration {
+
+        public static final String CERTIFICATE_RELOADER_CONFIGURATION_ROOT = "CertificateReLoaderConfiguration";
+        public static final String PERIOD = CERTIFICATE_RELOADER_CONFIGURATION_ROOT + ".Period";
+    }
+
+    public static class MutualSSL {
+
+        public static final String MUTUAL_SSL_CONFIG_ROOT = "MutualSSL";
+        public static final String CLIENT_CERTIFICATE_HEADER = MUTUAL_SSL_CONFIG_ROOT + ".ClientCertificateHeader";
+        public static final String ENABLE_CLIENT_CERTIFICATE_VALIDATION = MUTUAL_SSL_CONFIG_ROOT +
+                ".EnableClientCertificateValidation";
+    }
+
 }
