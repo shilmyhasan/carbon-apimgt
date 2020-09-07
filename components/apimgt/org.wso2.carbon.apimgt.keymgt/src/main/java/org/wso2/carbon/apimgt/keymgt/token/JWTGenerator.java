@@ -42,6 +42,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -55,7 +56,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
 
     private static final Log log = LogFactory.getLog(JWTGenerator.class);
     private static final String OIDC_DIALECT_URI = "http://wso2.org/oidc/claim";
-
+    private static final String SHA256_WITH_RSA = "SHA256withRSA";
 
     @Override
     public Map<String, String> populateStandardClaims(TokenValidationContext validationContext)
@@ -116,6 +117,24 @@ public class JWTGenerator extends AbstractJWTGenerator {
         }
 
         return claims;
+    }
+
+    @Override
+    public String generateToken(TokenValidationContext validationContext) throws APIManagementException{
+
+        String jwtHeader = buildHeader(validationContext.getValidationInfoDTO().getEndUserName(), true);
+
+        String base64UrlEncodedHeader = "";
+        if (jwtHeader != null) {
+            base64UrlEncodedHeader = encode(jwtHeader.getBytes(Charset.defaultCharset()));
+        }
+
+        String jwtBody = buildBody(validationContext);
+        String base64UrlEncodedBody = "";
+        if (jwtBody != null) {
+            base64UrlEncodedBody = encode(jwtBody.getBytes());
+        }
+        return generateToken(base64UrlEncodedHeader, base64UrlEncodedBody, validationContext);
     }
 
     @Override
