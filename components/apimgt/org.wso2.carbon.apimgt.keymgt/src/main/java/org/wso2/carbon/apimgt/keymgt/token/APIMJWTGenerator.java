@@ -151,7 +151,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
     }
 
 
-    public String buildHeader(String endUserName, boolean isBackendJWT) throws APIManagementException {
+    public String buildHeader(String endUserName) throws APIManagementException {
         String jwtHeader = null;
 
         //if signature algo==NONE, header without cert
@@ -166,7 +166,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
             jwtHeader = jwtHeaderBuilder.toString();
 
         } else if (SHA256_WITH_RSA.equals(signatureAlgorithm)) {
-            jwtHeader = addCertToHeader(endUserName, isBackendJWT);
+            jwtHeader = addCertToHeader(endUserName);
         }
         return jwtHeader;
     }
@@ -284,7 +284,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
      * @param endUserName - The end user name
      * @throws APIManagementException
      */
-    protected String addCertToHeader(String endUserName, boolean isBackendJWT) throws APIManagementException {
+    protected String addCertToHeader(String endUserName) throws APIManagementException {
 
         try {
             //get tenant domain
