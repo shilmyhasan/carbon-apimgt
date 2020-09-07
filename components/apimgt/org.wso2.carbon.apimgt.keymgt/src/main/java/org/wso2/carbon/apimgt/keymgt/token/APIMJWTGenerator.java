@@ -25,14 +25,27 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.KeyManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.dto.JwtTokenInfoDTO;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 
 import java.nio.charset.Charset;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -43,16 +56,22 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class APIMJWTGenerator extends JWTGenerator {
+public class APIMJWTGenerator implements JWTAccessTokenGenerator {
 
     private static final Log log = LogFactory.getLog(APIMJWTGenerator.class);
     private static final String SHA256_WITH_RSA = "SHA256withRSA";
     private String signatureAlgorithm = SHA256_WITH_RSA;
+    private static final String NONE = "NONE";
     private static Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
     private String userAttributeSeparator = APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT;
 
+    private static ConcurrentHashMap<Integer, Key> privateKeys = new ConcurrentHashMap<Integer, Key>();
+    private static ConcurrentHashMap<Integer, Certificate> publicCerts = new ConcurrentHashMap<Integer, Certificate>();
+
+    @Override
     public String generateJWT(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
 
         String jwtHeader = buildHeader(MultitenantUtils.getTenantAwareUsername(jwtTokenInfoDTO.getEndUserName()),
@@ -85,6 +104,72 @@ public class APIMJWTGenerator extends JWTGenerator {
         } else {
             return base64UrlEncodedHeader + '.' + base64UrlEncodedBody + '.';
         }
+    }
+
+    public byte[] signJWT(String assertion, String endUserName) throws APIManagementException {
+
+        String tenantDomain = null;
+
+        try {
+            //get tenant domain
+            tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
+            //get tenantId
+            int tenantId = APIUtil.getTenantId(endUserName);
+
+            Key privateKey = null;
+
+            if (!(privateKeys.containsKey(tenantId))) {
+                APIUtil.loadTenantRegistry(tenantId);
+                //get tenant's key store manager
+                KeyStoreManager tenantKSM = KeyStoreManager.getInstance(tenantId);
+
+                if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    //derive key store name
+                    String ksName = tenantDomain.trim().replace('.', '-');
+                    String jksName = ksName + ".jks";
+                    //obtain private key
+                    //TODO: maintain a hash map with tenants' private keys after first initialization
+                    privateKey = tenantKSM.getPrivateKey(jksName, tenantDomain);
+                } else {
+                    try {
+                        privateKey = tenantKSM.getDefaultPrivateKey();
+                    } catch (Exception e) {
+                        log.error("Error while obtaining private key for super tenant", e);
+                    }
+                }
+                if (privateKey != null) {
+                    privateKeys.put(tenantId, privateKey);
+                }
+            } else {
+                privateKey = privateKeys.get(tenantId);
+            }
+            return APIUtil.signJwt(assertion, (PrivateKey) privateKey, signatureAlgorithm);
+        } catch (RegistryException e) {
+            String error = "Error in loading tenant registry for " + tenantDomain;
+            //do not log
+            throw new APIManagementException(error, e);
+        }
+    }
+
+
+    public String buildHeader(String endUserName, boolean isBackendJWT) throws APIManagementException {
+        String jwtHeader = null;
+
+        //if signature algo==NONE, header without cert
+        if (NONE.equals(signatureAlgorithm)) {
+            StringBuilder jwtHeaderBuilder = new StringBuilder();
+            jwtHeaderBuilder.append("{\"typ\":\"JWT\",");
+            jwtHeaderBuilder.append("\"alg\":\"");
+            jwtHeaderBuilder.append(APIUtil.getJWSCompliantAlgorithmCode(NONE));
+            jwtHeaderBuilder.append('\"');
+            jwtHeaderBuilder.append('}');
+
+            jwtHeader = jwtHeaderBuilder.toString();
+
+        } else if (SHA256_WITH_RSA.equals(signatureAlgorithm)) {
+            jwtHeader = addCertToHeader(endUserName, isBackendJWT);
+        }
+        return jwtHeader;
     }
 
     public String buildBody(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
@@ -166,5 +251,84 @@ public class APIMJWTGenerator extends JWTGenerator {
         claims.put("backendJwt", jwtTokenInfoDTO.getBackendJwt());
 
         return claims;
+    }
+
+    //adding same method from AbstractJWTGenerator to remove super class
+    protected String getMultiAttributeSeparator(int tenantId) {
+        try {
+            RealmConfiguration realmConfiguration = null;
+            RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
+
+            if (realmService != null && tenantId != MultitenantConstants.INVALID_TENANT_ID) {
+                UserStoreManager userStoreManager =
+                        (UserStoreManager) realmService.getTenantUserRealm(tenantId).getUserStoreManager();
+
+                realmConfiguration = userStoreManager.getRealmConfiguration();
+            }
+
+            if (realmConfiguration != null) {
+                String claimSeparator = realmConfiguration.getUserStoreProperty(APIConstants.MULTI_ATTRIBUTE_SEPARATOR);
+                if (claimSeparator != null && !claimSeparator.trim().isEmpty()) {
+                    return claimSeparator;
+                }
+            }
+        } catch (UserStoreException e) {
+            log.error("Error occurred while getting the realm configuration, User store properties might not be "
+                    + "returned", e);
+        }
+        return null;
+    }
+
+    /**
+     * Helper method to add public certificate to JWT_HEADER to signature verification.
+     *
+     * @param endUserName - The end user name
+     * @throws APIManagementException
+     */
+    protected String addCertToHeader(String endUserName, boolean isBackendJWT) throws APIManagementException {
+
+        try {
+            //get tenant domain
+            String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
+            //get tenantId
+            int tenantId = APIUtil.getTenantId(endUserName);
+            Certificate publicCert;
+
+            if (!(publicCerts.containsKey(tenantId))) {
+                //get tenant's key store manager
+                APIUtil.loadTenantRegistry(tenantId);
+                KeyStoreManager tenantKSM = KeyStoreManager.getInstance(tenantId);
+
+                KeyStore keyStore;
+                if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    //derive key store name
+                    String ksName = tenantDomain.trim().replace('.', '-');
+                    String jksName = ksName + ".jks";
+                    keyStore = tenantKSM.getKeyStore(jksName);
+                    publicCert = keyStore.getCertificate(tenantDomain);
+                } else {
+                    //keyStore = tenantKSM.getPrimaryKeyStore();
+                    publicCert = tenantKSM.getDefaultPrimaryCertificate();
+                }
+                if (publicCert != null) {
+                    publicCerts.put(tenantId, publicCert);
+                }
+            } else {
+                publicCert = publicCerts.get(tenantId);
+            }
+
+            //TODO: maintain a hashmap with tenants' pubkey thumbprints after first initialization
+            if (publicCert == null) {
+                throw new APIManagementException("Error in obtaining keystore for tenantDomain = " + tenantDomain);
+            } else {
+                return APIUtil.generateHeader(publicCert, signatureAlgorithm);
+            }
+        } catch (KeyStoreException e) {
+            String error = "Error in obtaining tenant's keystore";
+            throw new APIManagementException(error, e);
+        } catch (Exception e) {
+            String error = "Error in obtaining tenant's keystore";
+            throw new APIManagementException(error, e);
+        }
     }
 }
