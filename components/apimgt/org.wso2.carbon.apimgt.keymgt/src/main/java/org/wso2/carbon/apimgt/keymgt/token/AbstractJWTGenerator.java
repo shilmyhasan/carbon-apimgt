@@ -137,7 +137,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
     public String generateToken(TokenValidationContext validationContext) throws APIManagementException{
 
-        String jwtHeader = buildHeader(validationContext.getValidationInfoDTO().getEndUserName(), false);
+        String jwtHeader = buildHeader(validationContext.getValidationInfoDTO().getEndUserName());
 
         String base64UrlEncodedHeader = "";
         if (jwtHeader != null) {
@@ -149,31 +149,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         if (jwtBody != null) {
             base64UrlEncodedBody = encode(jwtBody.getBytes());
         }
-        return generateToken(base64UrlEncodedHeader, base64UrlEncodedBody, validationContext);
-    }
 
-    public String buildHeader(String endUserName, boolean isBackendJWT) throws APIManagementException {
-        String jwtHeader = null;
-
-        //if signature algo==NONE, header without cert
-        if (NONE.equals(signatureAlgorithm)) {
-            StringBuilder jwtHeaderBuilder = new StringBuilder();
-            jwtHeaderBuilder.append("{\"typ\":\"JWT\",");
-            jwtHeaderBuilder.append("\"alg\":\"");
-            jwtHeaderBuilder.append(APIUtil.getJWSCompliantAlgorithmCode(NONE));
-            jwtHeaderBuilder.append('\"');
-            jwtHeaderBuilder.append('}');
-
-            jwtHeader = jwtHeaderBuilder.toString();
-
-        } else if (SHA256_WITH_RSA.equals(signatureAlgorithm)) {
-            jwtHeader = addCertToHeader(endUserName, isBackendJWT);
-        }
-        return jwtHeader;
-    }
-
-    protected String generateToken(String base64UrlEncodedHeader, String base64UrlEncodedBody,
-                                   TokenValidationContext validationContext) throws APIManagementException {
         if (SHA256_WITH_RSA.equals(signatureAlgorithm)) {
             String assertion = base64UrlEncodedHeader + '.' + base64UrlEncodedBody;
 
@@ -189,6 +165,26 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         } else {
             return base64UrlEncodedHeader + '.' + base64UrlEncodedBody + '.';
         }
+    }
+
+    public String buildHeader(String endUserName) throws APIManagementException {
+        String jwtHeader = null;
+
+        //if signature algo==NONE, header without cert
+        if (NONE.equals(signatureAlgorithm)) {
+            StringBuilder jwtHeaderBuilder = new StringBuilder();
+            jwtHeaderBuilder.append("{\"typ\":\"JWT\",");
+            jwtHeaderBuilder.append("\"alg\":\"");
+            jwtHeaderBuilder.append(APIUtil.getJWSCompliantAlgorithmCode(NONE));
+            jwtHeaderBuilder.append('\"');
+            jwtHeaderBuilder.append('}');
+
+            jwtHeader = jwtHeaderBuilder.toString();
+
+        } else if (SHA256_WITH_RSA.equals(signatureAlgorithm)) {
+            jwtHeader = addCertToHeader(endUserName);
+        }
+        return jwtHeader;
     }
 
     public String buildBody(TokenValidationContext validationContext) throws APIManagementException {
@@ -339,7 +335,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @param endUserName - The end user name
      * @throws APIManagementException
      */
-    protected String addCertToHeader(String endUserName, boolean isBackendJWT) throws APIManagementException {
+    protected String addCertToHeader(String endUserName) throws APIManagementException {
 
         try {
             //get tenant domain
@@ -375,11 +371,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             if (publicCert == null) {
                 throw new APIManagementException("Error in obtaining keystore for tenantDomain = " + tenantDomain);
             } else {
-                if(isBackendJWT) {
-                    return APIUtil.generateBackendJWTHeader(publicCert, signatureAlgorithm);
-                } else {
-                    return APIUtil.generateHeader(publicCert, signatureAlgorithm);
-                }
+                return APIUtil.generateHeader(publicCert, signatureAlgorithm);
             }
         } catch (KeyStoreException e) {
             String error = "Error in obtaining tenant's keystore";

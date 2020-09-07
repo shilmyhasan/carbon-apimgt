@@ -74,8 +74,7 @@ public class APIMJWTGenerator implements JWTAccessTokenGenerator {
     @Override
     public String generateJWT(JwtTokenInfoDTO jwtTokenInfoDTO) throws APIManagementException {
 
-        String jwtHeader = buildHeader(MultitenantUtils.getTenantAwareUsername(jwtTokenInfoDTO.getEndUserName()),
-                false);
+        String jwtHeader = buildHeader(MultitenantUtils.getTenantAwareUsername(jwtTokenInfoDTO.getEndUserName()));
 
         String base64UrlEncodedHeader = "";
         if (jwtHeader != null) {
