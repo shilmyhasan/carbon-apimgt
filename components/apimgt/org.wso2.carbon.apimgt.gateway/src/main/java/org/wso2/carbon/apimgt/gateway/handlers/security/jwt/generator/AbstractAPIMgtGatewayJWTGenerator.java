@@ -49,12 +49,14 @@ public abstract class AbstractAPIMgtGatewayJWTGenerator {
 
     public AbstractAPIMgtGatewayJWTGenerator() {
         dialectURI = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
-                getAPIManagerConfiguration().getFirstProperty(APIConstants.CONSUMER_DIALECT_URI);
+                getAPIManagerConfiguration().getFirstProperty(APIConstants.JWT_CONFIGS + APIConstants.DOT +
+                APIConstants.CONSUMER_DIALECT_URI);
         if (dialectURI == null) {
             dialectURI = ClaimsRetriever.DEFAULT_DIALECT_URI;
         }
         signatureAlgorithm = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
-                getAPIManagerConfiguration().getFirstProperty(APIConstants.JWT_SIGNATURE_ALGORITHM);
+                getAPIManagerConfiguration().getFirstProperty(APIConstants.JWT_CONFIGS + APIConstants.DOT +
+                APIConstants.JWT_SIGNATURE_ALGORITHM);
         if (signatureAlgorithm == null || !(NONE.equals(signatureAlgorithm)
                 || SHA256_WITH_RSA.equals(signatureAlgorithm))) {
             signatureAlgorithm = SHA256_WITH_RSA;
