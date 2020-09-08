@@ -171,9 +171,9 @@ export default function ApplicationLevel(props) {
                             <FormControlLabel
                                 control={(
                                     <Checkbox
-                                        disabled={isRestricted(['apim:api_create'], apiFromContext)}
-                                        checked={securityScheme.includes(API_SECURITY_BASIC_AUTH)
+                                        disabled={isRestricted(['apim:api_create'], apiFromContext)
                                         || !hasResourceWithSecurity}
+                                        checked={securityScheme.includes(API_SECURITY_BASIC_AUTH)}
                                         onChange={({ target: { checked, value } }) => configDispatcher({
                                             action: 'securityScheme',
                                             event: { checked, value },
