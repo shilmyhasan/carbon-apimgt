@@ -366,6 +366,10 @@ public class Utils {
                 .getCache(APIConstants.GATEWAY_TOKEN_CACHE_NAME).get(token);
     }
 
+    /**
+     *  Get client certificate header from config
+     * @return client certificate header
+     */
     public static String getClientCertificateHeader() {
 
         APIManagerConfiguration apiManagerConfiguration =
@@ -380,6 +384,12 @@ public class Utils {
         return APIMgtGatewayConstants.BASE64_ENCODED_CLIENT_CERTIFICATE_HEADER;
     }
 
+    /**
+     * Get certificate fromm message context using header and validate according to config
+     * @param axis2MessageContext
+     * @return certificate
+     * @throws APIManagementException
+     */
     public static X509Certificate getClientCertificate(org.apache.axis2.context.MessageContext axis2MessageContext)
             throws APIManagementException {
 
@@ -430,6 +440,10 @@ public class Utils {
         return certificateFromMessageContext;
     }
 
+    /**
+     *  Check if certificate validation is enabled in configs
+     * @return boolean value of enabled or not
+     */
     private static boolean isClientCertificateValidationEnabled() {
 
         APIManagerConfiguration apiManagerConfiguration =
@@ -442,3 +456,4 @@ public class Utils {
         return false;
     }
 }
+
