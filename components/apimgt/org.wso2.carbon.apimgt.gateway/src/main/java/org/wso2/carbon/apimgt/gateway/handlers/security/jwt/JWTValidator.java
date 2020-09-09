@@ -64,11 +64,14 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import java.io.IOException;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -253,6 +256,7 @@ public class JWTValidator {
                 if (payload != null) {
                     checkTokenExpiration(tokenSignature, payload, tenantDomain);
                 }
+                synCtx.setProperty(APIMgtGatewayConstants.SCOPES, payloadInfo.getScopes());
             } else {
                 // Retrieve payload from token
                 log.debug("Token payload not found in the cache.");
@@ -279,11 +283,19 @@ public class JWTValidator {
                     throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
                             APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
                 }
-
+                //setting scopes
+                Set<String> scopeSet = new HashSet<>();
+                if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) instanceof String) {
+                    String[] tokenScopes = String.valueOf(payload.getClaim(APIConstants.JwtTokenConstants.SCOPE))
+                            .split(APIConstants.JwtTokenConstants.SCOPE_DELIMITER);
+                    scopeSet = new HashSet<>(Arrays.asList(tokenScopes));
+                    synCtx.setProperty(APIMgtGatewayConstants.SCOPES, scopeSet.toString());
+                }
                 if (isGatewayTokenCacheEnabled) {
                     JWTTokenPayloadInfo jwtTokenPayloadInfo = new JWTTokenPayloadInfo();
                     jwtTokenPayloadInfo.setPayload(payload);
                     jwtTokenPayloadInfo.setRawPayload(splitToken[1]);
+                    jwtTokenPayloadInfo.setScopes(scopeSet.toString());
                     getGatewayKeyCache().put(cacheKey, jwtTokenPayloadInfo);
                 }
             }
