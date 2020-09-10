@@ -56,12 +56,17 @@ const styles = theme => ({
 });
 
 /**
+ * Table view for api listing
  *
- *
- * @class TableView
+ * @class ApiTableView
  * @extends {React.Component}
  */
 class TableView extends React.Component {
+    /**
+     * @inheritdoc
+     * @param {*} props properties
+     * @memberof ApiTableView
+     */
     constructor(props) {
         super(props);
         let { defaultApiView } = props.theme.custom;
@@ -79,6 +84,7 @@ class TableView extends React.Component {
             notFound: true,
             displayCount: 0,
             listType: defaultApiView,
+            loading: true,
         };
         this.page = 0;
         this.count = 100;
@@ -175,6 +181,7 @@ class TableView extends React.Component {
 
     // get apisAndApiProducts
     getData = () => {
+        const { intl } = this.props;
         this.xhrRequest().then((data) => {
             const { body } = data;
             const { list, pagination, count } = body;
@@ -188,6 +195,13 @@ class TableView extends React.Component {
             }
             this.count = total;
             this.setState({ apisAndApiProducts: list, notFound: false, displayCount: count });
+        }).catch(() => {
+            Alert.error(intl.formatMessage({
+                defaultMessage: 'Error While Loading APIs',
+                id: 'Apis.Listing.TableView.TableView.error.loading',
+            }));
+        }).finally(() => {
+            this.setState({ loading: false });
         });
     };
 
@@ -204,6 +218,7 @@ class TableView extends React.Component {
     changePage = (page) => {
         const { intl } = this.props;
         this.page = page;
+        this.setState({ loading: true });
         this.xhrRequest().then((data) => {
             const { body } = data;
             const { list, count } = body;
@@ -217,7 +232,10 @@ class TableView extends React.Component {
                 defaultMessage: 'Error While Loading APIs',
                 id: 'Apis.Listing.TableView.TableView.error.loading',
             }));
-        });
+        })
+            .finally(() => {
+                this.setState({ loading: false });
+            });
     };
 
     xhrRequest = () => {
@@ -295,6 +313,7 @@ class TableView extends React.Component {
         const {
             intl, isAPIProduct, classes, query,
         } = this.props;
+        const { loading } = this.state;
         const columns = [
             {
                 name: 'id',
@@ -453,7 +472,7 @@ class TableView extends React.Component {
         } else {
             options.pagination = true;
         }
-        if (!apisAndApiProducts) {
+        if (loading || !apisAndApiProducts) {
             return <Progress per={90} message='Loading APIs ...' />;
         }
         if (notFound) {

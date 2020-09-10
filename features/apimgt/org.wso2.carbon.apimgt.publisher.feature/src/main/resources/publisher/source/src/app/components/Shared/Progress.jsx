@@ -22,7 +22,7 @@ import PropTypes from 'prop-types';
 const Progress = (props) => {
     const { message } = props;
     return (
-        <div className='apim-dual-ring'>
+        <div id='apim-dual-ring-loader' className='apim-dual-ring'>
             <span style={{ width: '200px' }}>{message}</span>
         </div>
     );
