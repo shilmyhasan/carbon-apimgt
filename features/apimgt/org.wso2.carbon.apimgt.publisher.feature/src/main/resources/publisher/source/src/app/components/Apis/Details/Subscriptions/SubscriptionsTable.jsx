@@ -562,6 +562,7 @@ class SubscriptionsTable extends Component {
     fetchSubscriptionData() {
         const api = new API();
         const { page, rowsPerPage, searchQuery } = this.state;
+        const { intl } = this.props;
         const promisedSubscriptions = api.subscriptions(this.api.id, page * rowsPerPage, rowsPerPage, searchQuery);
         promisedSubscriptions
             .then(response =>
@@ -571,7 +572,10 @@ class SubscriptionsTable extends Component {
                 }))
             .catch((errorMessage) => {
                 console.error(errorMessage);
-                Alert.error(JSON.stringify(errorMessage));
+                Alert.error(intl.formatMessage({
+                    id: 'Apis.Details.Subscriptions.SubscriptionsTable.subscriptions.error',
+                    defaultMessage: 'Error while retrieving the subscriptions',
+                }));
             });
         api.getMonetization(this.props.api.id).then((status) => {
             this.setState({ monetizationStatus: status.enabled });
