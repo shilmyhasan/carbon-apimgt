@@ -31,6 +31,7 @@ import ResourceNotFound from 'AppComponents/Base/Errors/ResourceNotFound';
 import { ScopeValidation, resourceMethods, resourcePaths } from 'AppComponents/Shared/ScopeValidation';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import AuthManager from 'AppData/AuthManager';
 
 /**
  * @inheritdoc
@@ -46,7 +47,30 @@ const styles = theme => ({
             padding: theme.spacing(0.5),
         }
     },
+    appOwner: {
+        pointerEvents: 'none',
+    },
 });
+const StyledTableCell = withStyles(theme => ({
+    head: {
+        backgroundColor: theme.palette.common.black,
+        color: theme.palette.common.white,
+    },
+    body: {
+        fontSize: 14,
+    },
+    root: {
+        padding: `0 0 0  ${theme.spacing(2)}px`,
+    },
+}))(TableCell);
+
+const StyledTableRow = withStyles(theme => ({
+    root: {
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.background.default,
+        },
+    },
+}))(TableRow);
 /**
  *
  *
@@ -93,19 +117,19 @@ class AppsTableContent extends Component {
             <TableBody className={classes.fullHeight}>
                 {appsTableData
                     .map((app) => {
+                        const isAppOwner = app.owner === AuthManager.getUser().name;
                         return (
-                            <TableRow className={classes.tableRow} key={app.applicationId}>
-                                <TableCell align='left'>
+                            <StyledTableRow className={classes.tableRow} key={app.applicationId}>
+                                <StyledTableCell align='left'>
                                     {app.status === this.APPLICATION_STATES.APPROVED ? (
                                         <Link to={'/applications/' + app.applicationId}>{app.name}</Link>
                                     ) : (
                                         app.name
-                                    )
-                                    }
-                                </TableCell>
-                                <TableCell align='left'>{app.owner}</TableCell>
-                                <TableCell align='left'>{app.throttlingPolicy}</TableCell>
-                                <TableCell align='left'>
+                                    )}
+                                </StyledTableCell>
+                                <StyledTableCell align='left'>{app.owner}</StyledTableCell>
+                                <StyledTableCell align='left'>{app.throttlingPolicy}</StyledTableCell>
+                                <StyledTableCell align='left'>
                                     {app.status === this.APPLICATION_STATES.APPROVED && (
                                         <Typography variant='subtitle1' gutterBottom>
                                             <FormattedMessage
@@ -115,7 +139,7 @@ class AppsTableContent extends Component {
                                         </Typography>
                                     )}
                                     {app.status === this.APPLICATION_STATES.CREATED && (
-                                        <React.Fragment>
+                                        <>
                                             <Typography variant='subtitle1' gutterBottom>
                                                 <FormattedMessage
                                                     id='Applications.Listing.AppsTableContent.inactive'
@@ -129,7 +153,7 @@ class AppsTableContent extends Component {
                                                     defaultMessage='waiting for approval'
                                                 />
                                             </Typography>
-                                        </React.Fragment>
+                                        </>
                                     )}
                                     {app.status === this.APPLICATION_STATES.REJECTED && (
                                         <Typography variant='subtitle1' gutterBottom>
@@ -139,17 +163,32 @@ class AppsTableContent extends Component {
                                             />
                                         </Typography>
                                     )}
-                                </TableCell>
-                                <TableCell align='left'>{app.subscriptionCount}</TableCell>
-                                <TableCell align='left'>
+                                </StyledTableCell>
+                                <StyledTableCell align='left'>{app.subscriptionCount}</StyledTableCell>
+                                <StyledTableCell align='left'>
                                     <ScopeValidation
                                         resourcePath={resourcePaths.SINGLE_APPLICATION}
                                         resourceMethod={resourceMethods.PUT}
                                     >
                                         {app.status === this.APPLICATION_STATES.APPROVED && (
-                                            <Tooltip title='Edit'>
-                                                <Link to={`/applications/${app.applicationId}/edit/`}>
-                                                    <IconButton>
+                                            <Tooltip title={isAppOwner ? 
+                                            (
+                                                <FormattedMessage
+                                                    id='Applications.Listing.AppsTableContent.edit.tooltip'
+                                                    defaultMessage='Edit'
+                                                />
+                                            ) : (
+                                                <FormattedMessage
+                                                    id='Applications.Listing.AppsTableContent.edit.tooltip.disabled.button'
+                                                    defaultMessage='Not allowed to modify shared applications'
+                                                />
+                                            )
+                                            }>
+                                                <span>
+                                                <Link to={`/applications/${app.applicationId}/edit/`} className={!isAppOwner && classes.appOwner}>
+                                                    <IconButton
+                                                    disabled={!isAppOwner}
+                                                    >
                                                         <Icon aria-label={(
                                                             <FormattedMessage
                                                                 id='Applications.Listing.AppsTableContent.edit.btn'
@@ -161,6 +200,7 @@ class AppsTableContent extends Component {
                                                         </Icon>
                                                     </IconButton>
                                                 </Link>
+                                                </span>
                                             </Tooltip>
                                         )}
                                     </ScopeValidation>
@@ -168,16 +208,22 @@ class AppsTableContent extends Component {
                                         resourcePath={resourcePaths.SINGLE_APPLICATION}
                                         resourceMethod={resourceMethods.DELETE}
                                     >
-                                        <Tooltip title={(
+                                        <Tooltip title={isAppOwner ? (
                                             <FormattedMessage
                                                 id='Applications.Listing.AppsTableContent.delete.tooltip'
                                                 defaultMessage='Delete'
                                             />
+                                        ) : (
+                                            <FormattedMessage
+                                                id='Applications.Listing.AppsTableContent.delete.tooltip.disabled.button'
+                                                defaultMessage='Not allowed to delete shared applications'
+                                            />
                                         )}
                                         >
+                                            <span>
                                             <IconButton
-                                                disabled={app.deleting}
-                                                data-appId={app.applicationId}
+                                                disabled={app.deleting || !isAppOwner}
+                                                data-appid={app.applicationId}
                                                 onClick={toggleDeleteConfirmation}
                                                 color='default'
                                                 aria-label={(
@@ -189,17 +235,14 @@ class AppsTableContent extends Component {
                                             >
                                                 <Icon>delete</Icon>
                                             </IconButton>
+                                            </span>
                                         </Tooltip>
                                     </ScopeValidation>
                                     {app.deleting && <CircularProgress size={24} />}
-                                </TableCell>
-                            </TableRow>
+                                </StyledTableCell>
+                            </StyledTableRow>
                         );
                     })}
-                {apps.size < 8 && (
-                    <TableRow>
-                        <TableCell colSpan={6} />
-                    </TableRow>)}
             </TableBody>
         );
     }
@@ -209,4 +252,3 @@ AppsTableContent.propTypes = {
     apps: PropTypes.instanceOf(Map).isRequired,
 };
 export default withStyles(styles)(AppsTableContent);
-
