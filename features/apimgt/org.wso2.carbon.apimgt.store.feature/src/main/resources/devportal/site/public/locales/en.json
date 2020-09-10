@@ -133,8 +133,6 @@
   "Apis.Details.index.try.out": "Try out",
   "Apis.Listing.APIList.apis": "APIs",
   "Apis.Listing.ApiBreadcrumbs.apigroups.main": "API Groups",
-<<<<<<< HEAD
-=======
   "Apis.Listing.ApiTableView.business.owner.caption": "(Business Owner)",
   "Apis.Listing.ApiTableView.context": "Context",
   "Apis.Listing.ApiTableView.error.loading": "Error While Loading APIs",
@@ -145,7 +143,6 @@
   "Apis.Listing.ApiTableView.rating": "Rating",
   "Apis.Listing.ApiTableView.type": "Type",
   "Apis.Listing.ApiTableView.version": "Version",
->>>>>>> 8817c838002... Fixing issues https://github.com/wso2/docs-apim/issues/1631 and https://github.com/wso2/product-apim/issues/8957
   "Apis.Listing.ApiTagCloud.title": "Tag Cloud",
   "Apis.Listing.ApiThumb.by": "By",
   "Apis.Listing.ApiThumb.by.colon": ":",
