@@ -140,6 +140,7 @@ class TokenManager extends React.Component {
                 const { keyRequest } = this.state;
                 const newKeyRequest = { ...keyRequest };
                 newKeyRequest.serverSupportedGrantTypes = response.obj.grantTypes;
+                newKeyRequest.validityTime = response.body.appAccessTokenValidity;
                 newKeyRequest.supportedGrantTypes = response.obj.grantTypes.filter(item => item !== 'authorization_code'
                     && item !== 'implicit');
                 this.setState({ keyRequest: newKeyRequest });

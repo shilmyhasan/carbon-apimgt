@@ -16,13 +16,14 @@
  * under the License.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Grid from '@material-ui/core/Grid';
 import Tokens from 'AppComponents/Shared/AppsAndKeys/Tokens';
 import Application from 'AppData/Application';
 import ButtonPanel from './ButtonPanel';
+import Settings from 'AppComponents/Shared/SettingsContext';
 
 const generateAccessTokenStep = (props) => {
     const [keyType, setKeyType] = useState('PRODUCTION');
@@ -37,9 +38,12 @@ const generateAccessTokenStep = (props) => {
     const {
         currentStep, createdApp, setCreatedToken, incrementStep, createdKeyType, classes,
     } = props;
+    const settingContext = useContext(Settings);
 
     useEffect(() => {
         const newRequest = { ...accessTokenRequest, keyType: createdKeyType };
+        const { appAccessTokenValidity } = settingContext.settings;
+        newRequest.timeout = appAccessTokenValidity;
         setKeyType(createdKeyType);
         setAccessTokenRequest(newRequest);
     }, [createdKeyType]);
