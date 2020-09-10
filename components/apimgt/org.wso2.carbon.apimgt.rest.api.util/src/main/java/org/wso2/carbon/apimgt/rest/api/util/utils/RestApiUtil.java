@@ -1047,8 +1047,30 @@ public class RestApiUtil {
      * @return constructed paginated url
      */
     public static String getApplicationPaginatedURL(Integer offset, Integer limit, String groupId) {
+       return getApplicationPaginatedURLWithSortParams(offset, limit, groupId, null, null);
+    }
+
+    /**
+     * Returns the paginated url for Applications API when it comes to sortOrder and sortBy
+     *
+     * @param offset    starting index
+     * @param limit     max number of objects returned
+     * @param groupId   group ID of the application
+     * @param sortOrder specified sorting order ex: ASC
+     * @param sortBy    specified parameter for the sort ex: name
+     * @return constructed paginated url
+     */
+    public static String getApplicationPaginatedURLWithSortParams(Integer offset, Integer limit, String groupId,
+                                                                  String sortOrder, String sortBy) {
         groupId = groupId == null ? "" : groupId;
         String paginatedURL = RestApiConstants.APPLICATIONS_GET_PAGINATION_URL;
+        if (StringUtils.isNoneBlank(sortBy) || StringUtils.isNotBlank(sortOrder)) {
+            sortOrder = sortOrder == null ? "" : sortOrder;
+            sortBy = sortBy == null ? "" : sortBy;
+            paginatedURL = RestApiConstants.APPLICATIONS_GET_PAGINATION_URL_WITH_SORTBY_SORTORDER;
+            paginatedURL = paginatedURL.replace(RestApiConstants.SORTBY_PARAM, sortBy);
+            paginatedURL = paginatedURL.replace(RestApiConstants.SORTORDER_PARAM, sortOrder);
+        }
         paginatedURL = paginatedURL.replace(RestApiConstants.LIMIT_PARAM, String.valueOf(limit));
         paginatedURL = paginatedURL.replace(RestApiConstants.OFFSET_PARAM, String.valueOf(offset));
         paginatedURL = paginatedURL.replace(RestApiConstants.GROUPID_PARAM, groupId);
