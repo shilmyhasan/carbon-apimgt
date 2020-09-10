@@ -2026,7 +2026,6 @@ public class ApisApiServiceImpl implements ApisApiService {
                 fileName = seqElement.getAttributeValue(new QName("name"));
                 //Constructing mediation resource path
                 mediationResourcePath = mediationResourcePath + fileName;
-                checkMediationPolicy(apiProvider, mediationResourcePath);
                 if (APIConstants.MEDIATION_SEQUENCE_ELEM.equals(localName)) {
                     ResourceFile contentFile = new ResourceFile(inSequenceStream, fileContentType);
                     //Adding api specific mediation policy
@@ -2077,18 +2076,6 @@ public class ApisApiServiceImpl implements ApisApiService {
         return null;
     }
 
-    /**
-     * Check the existence of the mediation policy
-     *
-     * @param mediationResourcePath mediation config content
-     */
-    public void checkMediationPolicy(APIProvider apiProvider, String mediationResourcePath) throws APIManagementException {
-
-        if (apiProvider.checkIfResourceExists(mediationResourcePath)) {
-            RestApiUtil.handleConflict("Mediation policy already " +
-                    "exists in the given resource path, cannot create new", log);
-        }
-    }
     /**
      * Get API monetization status and monetized tier to billing plan mapping
      *
