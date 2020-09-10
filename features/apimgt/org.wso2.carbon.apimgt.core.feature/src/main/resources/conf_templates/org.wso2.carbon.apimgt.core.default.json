@@ -11,6 +11,7 @@
   "apim.gateway_type": "Synapse",
   "apim.enable_secure_vault": "false",
   "apim.jwt.enable": false,
+  "apim.enable_x5c": false,
   "apim.jwt.header": "X-JWT-Assertion",
   "apim.jwt.claim_dialect": "http://wso2.org/claims",
   "apim.jwt.convert_dialect": false,
@@ -128,5 +129,8 @@
   "apim.token.revocation.persistent_notifier.username": "admin",
   "apim.token.revocation.persistent_notifier.password": "admin",
   "oauth.grant_type.iwa_ntlm.grant_handler": "org.wso2.carbon.identity.oauth2.token.handlers.grant.iwa.ntlm.NTLMAuthenticationGrantHandlerWithHandshake",
-  "oauth.grant_type.iwa_ntlm.grant_validator": "org.wso2.carbon.identity.oauth.common.NTLMAuthenticationValidator"
+  "oauth.grant_type.iwa_ntlm.grant_validator": "org.wso2.carbon.identity.oauth.common.NTLMAuthenticationValidator",
+  "apim.certificate_reloader.period": "600",
+  "apimgt.mutual_ssl.certificate_header": "X-WSO2-CLIENT-CERTIFICATE",
+  "apimgt.mutual_ssl.enable_client_validation": true
 }

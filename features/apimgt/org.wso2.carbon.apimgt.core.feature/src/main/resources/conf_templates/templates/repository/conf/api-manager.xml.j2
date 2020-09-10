@@ -33,7 +33,7 @@
     <JWTConfiguration>
         <!-- Enable/Disable JWT generation. Default is false. -->
         <EnableJWTGeneration>{{apim.jwt.enable}}</EnableJWTGeneration>
-
+        <EnableX5C>{{apim.jwt.enable_x5c}}</EnableX5C>
         <!-- Name of the security context header to be added to the validated requests. -->
         <JWTHeader>{{apim.jwt.header}}</JWTHeader>
 
@@ -1035,4 +1035,11 @@
         <EnableSubscriptionValidationViaKeyManager>{{apim.jwt_authenitcation.subscription_validation_via_km}}</EnableSubscriptionValidationViaKeyManager>
     </JWTAuthentication>
 
+    <CertificateReLoaderConfiguration>
+         <Period>{{apim.certificate_reloader.period}}</Period>
+     </CertificateReLoaderConfiguration>
+         <MutualSSL>
+             <ClientCertificateHeader>{{apimgt.mutual_ssl.certificate_header}}</ClientCertificateHeader>
+             <EnableClientCertificateValidation>{{apimgt.mutual_ssl.enable_client_validation}}</EnableClientCertificateValidation>
+         </MutualSSL>
 </APIManager>

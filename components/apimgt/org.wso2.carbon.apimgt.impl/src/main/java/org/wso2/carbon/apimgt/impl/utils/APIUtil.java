@@ -201,6 +201,10 @@ import org.wso2.carbon.utils.NetworkUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.xml.sax.SAXException;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateFactory;
+import javax.security.cert.CertificateEncodingException;
+import javax.security.cert.X509Certificate;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9491,6 +9495,13 @@ public final class APIUtil {
      */
     public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws APIManagementException {
         try {
+            boolean enableX5C = false;
+            String x5c = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                    getAPIManagerConfiguration().getFirstProperty(APIConstants.JWT_X5C_ENABLED);
+            if (x5c != null) {
+                enableX5C = Boolean.parseBoolean(x5c);
+            }
+
             //generate the SHA-1 thumbprint of the certificate
             MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
             byte[] der = publicCert.getEncoded();
@@ -9511,7 +9522,24 @@ public final class APIUtil {
 
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64UrlEncodedThumbPrint);
-            jwtHeader.append('\"');
+
+            if (enableX5C) {
+                // If the "EnableX5C" property is true
+                /**
+                 * Sample header
+                 * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
+                 * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256",
+                 * "x5c":"MIdsadasdasd..........Iwq"}
+                 */
+                String base64UrlEncodedpublicCert = com.nimbusds.jose.util.Base64
+                        .encode(publicCert.getEncoded()).toJSONString();
+                jwtHeader.append("\",");
+                jwtHeader.append("\"x5c\":[");
+                jwtHeader.append(base64UrlEncodedpublicCert);
+                jwtHeader.append("]");
+            } else {
+                jwtHeader.append("\"");
+            }
 
             jwtHeader.append('}');
             return jwtHeader.toString();
@@ -9837,4 +9865,38 @@ public final class APIUtil {
         String skipRolesByRegex = config.getFirstProperty(APIConstants.SKIP_ROLES_BY_REGEX);
         return skipRolesByRegex;
     }
+
+    /**
+     * Validate Certificate exist in TrustStore
+     *
+     * @param certificate
+     * @return true if certificate exist in truststore
+     * @throws APIManagementException
+     */
+    public static boolean isCertificateExistsInTrustStore(X509Certificate certificate) throws APIManagementException {
+
+        if (certificate != null) {
+            try {
+                KeyStore trustStore = ServiceReferenceHolder.getInstance().getTrustStore();
+                if (trustStore != null) {
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    byte[] certificateEncoded = certificate.getEncoded();
+                    try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(certificateEncoded)) {
+                        java.security.cert.X509Certificate x509Certificate =
+                                (java.security.cert.X509Certificate) cf.generateCertificate(byteArrayInputStream);
+                        String certificateAlias = trustStore.getCertificateAlias(x509Certificate);
+                        if (certificateAlias != null) {
+                            return true;
+                        }
+                    }
+                }
+            } catch (KeyStoreException | CertificateException | CertificateEncodingException | IOException e) {
+                String msg = "Error in validating certificate existence";
+                log.error(msg, e);
+                throw new APIManagementException(msg, e);
+            }
+        }
+        return false;
+    }
+
 }

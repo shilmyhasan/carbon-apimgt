@@ -29,6 +29,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationServiceImpl;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -44,11 +45,15 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import org.apache.commons.codec.binary.Base64;
+import org.wso2.carbon.user.core.service.RealmService;
 import java.util.HashMap;
 import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest( {AbstractJWTGenerator.class,APIUtil.class,KeyStoreManager.class,CarbonUtils.class})
+@PrepareForTest({ServiceReferenceHolder.class, AbstractJWTGenerator.class, APIUtil.class,
+        KeyStoreManager.class, System.class, CarbonUtils.class})
 public class TokenGenTest {
     private static final Log log = LogFactory.getLog(TokenGenTest.class);
 
@@ -208,7 +213,7 @@ public class TokenGenTest {
 
     @Test
     public void testJWTx5tEncoding() throws Exception {
-        //Read public certificat
+        //Read public certificate
         InputStream inputStream = new FileInputStream("src/test/resources/wso2carbon.jks");
         KeyStore keystore = KeyStore.getInstance("JKS");
         char[] pwd = "wso2carbon".toCharArray();
@@ -229,6 +234,72 @@ public class TokenGenTest {
         //Check if the encoded thumbprint get matched with JWT header's x5t
         Assert.assertTrue(header.contains(encodedThumbprint));
     }
+
+    @Test public void testJWTx5cEnable() throws Exception {
+        //Preparing mocks
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+
+        APIManagerConfigurationService apiManagerConfigurationService = Mockito
+                .mock(APIManagerConfigurationService.class);
+        RealmService realmService = Mockito.mock(org.wso2.carbon.user.core.service.RealmService.class);
+        Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
+        Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
+                .thenReturn(apiManagerConfigurationService);
+        APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+
+        Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.JWT_X5C_ENABLED)).thenReturn("true");
+
+        System.setProperty("x5tEncoding", "base64Url");
+        InputStream inputStream = new FileInputStream("src/test/resources/wso2carbon.jks");
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        char[] pwd = "wso2carbon".toCharArray();
+        keystore.load(inputStream, pwd);
+        Certificate cert = keystore.getCertificate("wso2carbon");
+
+        String header = APIUtil.generateHeader(cert, "SHA256withRSA");
+
+        String x5c = com.nimbusds.jose.util.Base64.encode(cert.getEncoded()).toJSONString();
+        //Check if the encoded pub cert present in JWT
+        Assert.assertTrue("JWT header doest not contain x5c value", header.contains(x5c));
+        Assert.assertTrue("JWT header doest not contain x5c key", header.contains("x5c"));
+    }
+
+    @Test public void testJWTx5cDisable() throws Exception {
+        //Preparing mocks
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+
+        APIManagerConfigurationService apiManagerConfigurationService = Mockito
+                .mock(APIManagerConfigurationService.class);
+        RealmService realmService = Mockito.mock(org.wso2.carbon.user.core.service.RealmService.class);
+        Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
+        Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
+                .thenReturn(apiManagerConfigurationService);
+        APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+
+        Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.JWT_X5C_ENABLED)).thenReturn("false");
+
+        System.setProperty("x5tEncoding", "base64Url");
+        //Read public certificat
+        InputStream inputStream = new FileInputStream("src/test/resources/wso2carbon.jks");
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        char[] pwd = "wso2carbon".toCharArray();
+        keystore.load(inputStream, pwd);
+        Certificate cert = keystore.getCertificate("wso2carbon");
+
+        String header = APIUtil.generateHeader(cert, "SHA256withRSA");
+
+        String x5c = com.nimbusds.jose.util.Base64.encode(cert.getEncoded()).toJSONString();
+        //Check if the encoded pub cert is present in JWT header with x5c property
+        Assert.assertTrue("JWT Header contains x5c value", !header.contains(x5c));
+        Assert.assertTrue("JWT Header contains x5c key", !header.contains("x5c"));
+    }
+
 
     /**
      * Helper method to hexify a byte array.
