@@ -3347,4 +3347,15 @@ public class SQLConstants {
                 "EXPIRY_TIMESTAMP, TENANT_ID, TOKEN_TYPE) VALUES(?,?,?,?,?)";
         public static final String DELETE_REVOKED_JWT = "DELETE FROM AM_REVOKED_JWT WHERE EXPIRY_TIMESTAMP < ?";
     }
+
+    public static final String GET_CONSUMER_KEY_CREATE_MODE_BY_APPLICATION_AND_KEY_SQL =
+            " SELECT " +
+                    "   CONSUMER_KEY, " +
+                    "   CREATE_MODE " +
+                    " FROM " +
+                    "   AM_APPLICATION_KEY_MAPPING " +
+                    " WHERE " +
+                    "   APPLICATION_ID = ? " +
+                    "   AND KEY_TYPE = ? ";
+
 }
