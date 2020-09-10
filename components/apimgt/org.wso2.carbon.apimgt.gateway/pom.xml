@@ -271,6 +271,21 @@
             <artifactId>log4j</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2-client</artifactId>
+            <version>${axis2.wso2.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
     <build>
@@ -384,6 +399,7 @@
                             org.apache.http.*,
                             org.apache.commons.lang3;version="${apache.commons.lang3.version}",
                             org.apache.commons.*,
+                            org.apache.commons.codec.binary.*;version="${commons-codec.version}",
                             org.apache.commons.lang3.*,
                             org.apache.synapse.*,
                             org.apache.neethi.*; version="2.0.4.wso2v4",

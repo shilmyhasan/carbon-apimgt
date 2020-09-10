@@ -81,8 +81,10 @@ public class RegularExpressionProtector extends AbstractMediator {
         }
 
         messageProperty = messageContext.getProperty(APIMgtGatewayConstants.REGEX_PATTERN);
-        if (messageProperty != null && pattern == null) {
-            pattern = Pattern.compile(messageProperty.toString(), Pattern.CASE_INSENSITIVE);
+        if (messageProperty != null) {
+            if (pattern == null) {
+                pattern = Pattern.compile(messageProperty.toString(), Pattern.CASE_INSENSITIVE);
+            }
         } else {
             GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE,
                     "Threat detection key words are missing");
@@ -232,6 +234,9 @@ public class RegularExpressionProtector extends AbstractMediator {
         if (enabledCheckPathParam) {
             String queryParams = (String) axis2MC.getProperty(NhttpConstants.REST_URL_POSTFIX);
             try {
+                if (queryParams == null) {
+                    return false;
+                }
                 parameter = URLDecoder.decode(queryParams, APIMgtGatewayConstants.UTF8);
             } catch (UnsupportedEncodingException e) {
                 String message = "Error occurred while decoding the query/path parameters: " + parameter;

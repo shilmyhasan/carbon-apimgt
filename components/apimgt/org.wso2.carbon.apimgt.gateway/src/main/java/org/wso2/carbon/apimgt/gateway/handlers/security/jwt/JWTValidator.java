@@ -60,6 +60,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -535,8 +536,13 @@ public class JWTValidator {
                 log.error("Scopes not found in the token.");
                 throw new APISecurityException(APISecurityConstants.INVALID_SCOPE, "Scope validation failed");
             }
-            String[] tokenScopes = payload.getStringClaim(APIConstants.JwtTokenConstants.SCOPE)
-                    .split(APIConstants.JwtTokenConstants.SCOPE_DELIMITER);
+            String[] tokenScopes = new String[0];
+            if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) instanceof String) {
+                tokenScopes = String.valueOf(payload.getClaim(APIConstants.JwtTokenConstants.SCOPE))
+                        .split(APIConstants.JwtTokenConstants.SCOPE_DELIMITER);
+            } else if (payload.getClaim(APIConstants.JwtTokenConstants.SCOPE) instanceof List) {
+                tokenScopes = (String[]) ((List) payload.getClaim(APIConstants.JwtTokenConstants.SCOPE)).toArray();
+            }
 
             boolean scopeFound = false;
 

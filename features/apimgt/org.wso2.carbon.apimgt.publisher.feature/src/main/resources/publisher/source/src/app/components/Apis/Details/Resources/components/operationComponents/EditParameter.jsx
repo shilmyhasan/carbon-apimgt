@@ -97,6 +97,7 @@ export default function EditParameter(props) {
      */
     function handelDone() {
         operationsDispatcher({ action: 'parameter', data: { target, verb, value: parameter } });
+        handleClose();
     }
     const isEditing = parameter !== null;
     if (!isEditing) {

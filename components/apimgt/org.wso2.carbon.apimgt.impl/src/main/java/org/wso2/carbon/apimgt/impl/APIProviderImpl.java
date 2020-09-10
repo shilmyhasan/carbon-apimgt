@@ -1269,7 +1269,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 contextCache.remove(oldApi.getContext());
                 contextCache.put(api.getContext(), Boolean.TRUE);
             }
-
+            //update doc visibility
+            List<Documentation> docsList = getAllDocumentation(api.getId());
+            if (docsList != null) {
+                for (Documentation document : docsList) {
+                    updateDocVisibility(api, document);
+                }
+            }
 
         } else {
             // We don't allow API status updates via this method.
@@ -1279,6 +1285,66 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (!failedGateways.isEmpty() &&
                 (!failedGateways.get("UNPUBLISHED").isEmpty() || !failedGateways.get("PUBLISHED").isEmpty())) {
             throw new FaultGatewaysException(failedGateways);
+        }
+    }
+
+    /**
+     * Updates a visibility of the documentation
+     *
+     * @param api               API
+     * @param documentation    Documentation
+     * @throws APIManagementException if failed to update visibility
+     */
+    private void updateDocVisibility(API api, Documentation documentation) throws APIManagementException {
+        try {
+            GenericArtifactManager artifactManager = APIUtil.getArtifactManager(registry,APIConstants.DOCUMENTATION_KEY);
+            if (artifactManager == null) {
+                String errorMessage = "Artifact manager is null when updating documentation of API " +
+                        api.getId().getApiName();
+                throw new APIManagementException(errorMessage);
+            }
+
+            GenericArtifact artifact = artifactManager.getGenericArtifact(documentation.getId());
+            String[] authorizedRoles = new String[0];
+            String visibleRolesList = api.getVisibleRoles();
+            if (visibleRolesList != null) {
+                authorizedRoles = visibleRolesList.split(",");
+            }
+
+            int tenantId;
+            String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil
+                    .replaceEmailDomainBack(api.getId().getProviderName()));
+            try {
+                tenantId = getTenantId(tenantDomain);
+                GenericArtifact updateApiArtifact = APIUtil.createDocArtifactContent(artifact, api.getId(), documentation);
+                artifactManager.updateGenericArtifact(updateApiArtifact);
+                APIUtil.clearResourcePermissions(artifact.getPath(), api.getId(), tenantId);
+
+                APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(), authorizedRoles,
+                        artifact.getPath(), registry);
+
+                String docType = artifact.getAttribute(APIConstants.DOC_SOURCE_TYPE);
+                if (APIConstants.IMPLEMENTATION_TYPE_INLINE.equals(docType) || APIConstants.IMPLEMENTATION_TYPE_MARKDOWN
+                        .equals(docType)) {
+                    String docContentPath = APIUtil.getAPIDocPath(api.getId()) + APIConstants.INLINE_DOCUMENT_CONTENT_DIR
+                            + RegistryConstants.PATH_SEPARATOR + artifact.getAttribute(APIConstants.DOC_NAME);
+                    APIUtil.clearResourcePermissions(docContentPath, api.getId(), tenantId);
+                    APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(), authorizedRoles,
+                            docContentPath, registry);
+                } else if (APIConstants.IMPLEMENTATION_TYPE_FILE.equals(docType)) {
+                    String docFilePath = APIUtil.getDocumentationFilePath(api.getId(),
+                            artifact.getAttribute(APIConstants.DOC_FILE_PATH)
+                                    .split(APIConstants.DOCUMENT_FILE_DIR + RegistryConstants.PATH_SEPARATOR)[1]);
+                    APIUtil.clearResourcePermissions(docFilePath, api.getId(),tenantId);
+                    APIUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(), authorizedRoles,
+                            docFilePath, registry);
+                }
+            } catch (UserStoreException e) {
+                throw new APIManagementException("Error in retrieving Tenant Information while adding api :"
+                        + api.getId().getApiName(), e);
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to update visibility of documentation", e);
         }
     }
 
@@ -2773,6 +2839,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (registry.resourceExists(targetPath)) {
                 apiTargetArtifact = registry.get(targetPath);
             }
+            JSONObject additionalProperties = new JSONObject();
             if (apiTargetArtifact != null) {
                 // Copying all the properties.
                 Properties properties = apiSourceArtifact.getProperties();
@@ -2782,6 +2849,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         String propertyName = (String) propertyNames.nextElement();
                         if (propertyName.startsWith(APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX)) {
                             apiTargetArtifact.setProperty(propertyName, apiSourceArtifact.getProperty(propertyName));
+                            additionalProperties.put(propertyName
+                                            .substring(APIConstants.API_RELATED_CUSTOM_PROPERTIES_PREFIX.length()),
+                                    apiSourceArtifact.getProperty(propertyName));
                         }
                     }
                 }
@@ -2816,6 +2886,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             APIIdentifier newId = new APIIdentifier(api.getId().getProviderName(),
                     api.getId().getApiName(), newVersion);
             API newAPI = getAPI(newId, api.getId(), oldContext);
+
+            //Populate additional properties in the API object
+            if (additionalProperties.size() != 0) {
+                newAPI.setAdditionalProperties(additionalProperties);
+            }
 
             if (api.isDefaultVersion()) {
                 newAPI.setAsDefaultVersion(true);

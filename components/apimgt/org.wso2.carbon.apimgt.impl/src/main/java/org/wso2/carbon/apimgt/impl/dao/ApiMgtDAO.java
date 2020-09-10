@@ -1505,13 +1505,23 @@ public class ApiMgtDAO {
                             if (scopeHashMap.containsKey(scopeKey)) {
                                 // scope already exists append roles.
                                 scope = scopeHashMap.get(scopeKey);
-                                scope.setRoles(scope.getRoles().concat("," + finalResultSet.getString(4)).trim());
+                                String roles = scope.getRoles();
+                                if (roles != null) {
+                                    scope.setRoles(roles.concat("," + finalResultSet.getString(4)).trim());
+                                } else {
+                                    scope.setRoles("");
+                                }
                             } else {
                                 scope = new Scope();
                                 scope.setKey(scopeKey);
                                 scope.setName(finalResultSet.getString(2));
                                 scope.setDescription(finalResultSet.getString(3));
-                                scope.setRoles(finalResultSet.getString(4).trim());
+                                String roles = finalResultSet.getString(4);
+                                if (roles != null) {
+                                    scope.setRoles(roles.trim());
+                                } else {
+                                    scope.setRoles("");
+                                }
                             }
                             scopeHashMap.put(scopeKey, scope);
                         }
@@ -5074,7 +5084,7 @@ public class ApiMgtDAO {
                     KeyManagerHolder.getKeyManagerInstance().deleteMappedApplication(consumerKey);
                     // OAuth app is deleted if only it has been created from API Store. For mapped clients we don't
                     // call delete.
-                    if (!"MAPPED".equals(mode)) {
+                    if (!APIConstants.OAuthAppMode.MAPPED.toString().equals(mode)) {
                         // Adding clients to be deleted.
                         consumerKeys.add(consumerKey);
                     }
@@ -9870,6 +9880,46 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
         return consumerKey;
+    }
+
+    /**
+     * Get consumer key and the create mode of the application
+     *
+     * @param applicationId application ID
+     * @param keyType       key type
+     * @return a map containing consumer key and create mode
+     */
+    public Map<String, String> getConsumerkeyAndCreateModeByApplicationIdAndKeyType(
+            String applicationId, String keyType) throws APIManagementException {
+        Connection conn = null;
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        Map<String, String> values = new HashMap();
+        String consumerKey = null;
+        String createMode = null;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+
+            String sqlQuery = SQLConstants.GET_CONSUMER_KEY_CREATE_MODE_BY_APPLICATION_AND_KEY_SQL;
+
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setInt(1, Integer.parseInt(applicationId));
+            ps.setString(2, keyType);
+            resultSet = ps.executeQuery();
+
+            while (resultSet.next()) {
+                consumerKey = resultSet.getString("CONSUMER_KEY");
+                values.put("CONSUMER_KEY", consumerKey);
+                createMode = resultSet.getString("CREATE_MODE");
+                values.put("CREATE_MODE", createMode);
+            }
+        } catch (SQLException e) {
+            handleException("Failed to get consumer key by applicationId: " + applicationId + "and keyType: " +
+                    keyType, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+        return values;
     }
 
     /**

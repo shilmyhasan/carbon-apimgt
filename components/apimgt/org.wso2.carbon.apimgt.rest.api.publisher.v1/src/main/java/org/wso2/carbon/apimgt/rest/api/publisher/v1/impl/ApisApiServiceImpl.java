@@ -634,6 +634,9 @@ public class ApisApiServiceImpl implements ApisApiService {
                 RestApiUtil.handleBadRequest(ExceptionCodes.NO_RESOURCES_FOUND, log);
             }
             API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName());
+            if (APIConstants.PUBLIC_STORE_VISIBILITY.equals(apiToUpdate.getVisibility())) {
+                apiToUpdate.setVisibleRoles(StringUtils.EMPTY);
+            }
             apiToUpdate.setUUID(originalAPI.getUUID());
             validateScopes(apiToUpdate);
             apiToUpdate.setThumbnailUrl(originalAPI.getThumbnailUrl());
@@ -2023,7 +2026,6 @@ public class ApisApiServiceImpl implements ApisApiService {
                 fileName = seqElement.getAttributeValue(new QName("name"));
                 //Constructing mediation resource path
                 mediationResourcePath = mediationResourcePath + fileName;
-                checkMediationPolicy(apiProvider, mediationResourcePath);
                 if (APIConstants.MEDIATION_SEQUENCE_ELEM.equals(localName)) {
                     ResourceFile contentFile = new ResourceFile(inSequenceStream, fileContentType);
                     //Adding api specific mediation policy
@@ -2074,18 +2076,6 @@ public class ApisApiServiceImpl implements ApisApiService {
         return null;
     }
 
-    /**
-     * Check the existence of the mediation policy
-     *
-     * @param mediationResourcePath mediation config content
-     */
-    public void checkMediationPolicy(APIProvider apiProvider, String mediationResourcePath) throws APIManagementException {
-
-        if (apiProvider.checkIfResourceExists(mediationResourcePath)) {
-            RestApiUtil.handleConflict("Mediation policy already " +
-                    "exists in the given resource path, cannot create new", log);
-        }
-    }
     /**
      * Get API monetization status and monetized tier to billing plan mapping
      *
@@ -2478,6 +2468,10 @@ public class ApisApiServiceImpl implements ApisApiService {
         // Validate and retrieve the OpenAPI definition
         Map validationResponseMap = null;
         try {
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            APIIdentifier apiIdentifier = APIMappingUtil.getAPIIdentifierFromUUID(apiId, tenantDomain);
+            boolean isSoapToRestConvertedAPI = SOAPOperationBindingUtils.isSOAPToRESTApi(apiIdentifier.getApiName(),
+                    apiIdentifier.getVersion(), apiIdentifier.getProviderName());
             //Handle URL and file based definition imports
             if(url != null || fileInputStream != null) {
                 validationResponseMap = validateOpenAPIDefinition(url, fileInputStream, fileDetail, true);
@@ -2486,6 +2480,9 @@ public class ApisApiServiceImpl implements ApisApiService {
                 apiDefinition = validationResponse.getJsonContent();
             }
             String updatedSwagger = updateSwagger(apiId, apiDefinition);
+            if (isSoapToRestConvertedAPI) {
+                SequenceGenerator.generateSequencesFromSwagger(updatedSwagger, apiIdentifier);
+            }
             return Response.ok().entity(updatedSwagger).build();
         } catch (APIManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need

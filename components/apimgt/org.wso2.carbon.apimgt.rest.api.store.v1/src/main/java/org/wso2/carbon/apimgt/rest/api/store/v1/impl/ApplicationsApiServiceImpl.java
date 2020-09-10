@@ -118,7 +118,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
             int applicationCount = apiMgtDAO.getAllApplicationCount(subscriber, groupId, query);
 
             applicationListDTO = ApplicationMappingUtil.fromApplicationsToDTO(applications);
-            ApplicationMappingUtil.setPaginationParams(applicationListDTO, groupId, limit, offset, applicationCount);
+            ApplicationMappingUtil.setPaginationParamsWithSortParams(applicationListDTO, groupId, limit, offset,
+                    applicationCount, sortOrder, sortBy.toLowerCase());
 
             return Response.ok().entity(applicationListDTO).build();
         } catch (APIManagementException e) {

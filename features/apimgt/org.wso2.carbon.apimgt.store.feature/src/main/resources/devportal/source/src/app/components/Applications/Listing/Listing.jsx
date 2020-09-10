@@ -139,8 +139,8 @@ const styles = theme => ({
     },
     appContent: {
         marginTop: theme.spacing(2),
-        maxWidth: '95%',
-        margin: 'auto',
+        maxWidth: '100%',
+        margin: 0,
         maxHeight: theme.spacing(90),
         height: theme.spacing(90),
         overflow: 'scroll',
@@ -148,9 +148,6 @@ const styles = theme => ({
     dialogContainer: {
         width: 1000,
         padding: theme.spacing(2),
-    },
-    fullHeight: {
-        height: '100%',
     },
     container: {
         height: '100%',

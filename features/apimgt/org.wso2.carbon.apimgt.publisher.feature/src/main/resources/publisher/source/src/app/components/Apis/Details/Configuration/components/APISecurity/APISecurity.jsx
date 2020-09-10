@@ -62,13 +62,28 @@ export default function APISecurity(props) {
     const haveMultiLevelSecurity =
         securityScheme.includes(API_SECURITY_MUTUAL_SSL) &&
         (securityScheme.includes(API_SECURITY_BASIC_AUTH) ||
-        securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2) || securityScheme.includes(API_SECURITY_API_KEY));
+            securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2) || securityScheme.includes(API_SECURITY_API_KEY));
     const classes = useStyles();
     const [apiFromContext] = useAPI();
 
     // Check the validation conditions and return an error message
     const Validate = () => {
-        const resourcesWithSecurity = apiFromContext.operations.findIndex(op => op.authType !== 'None') > -1;
+        let resourcesWithSecurity;
+        if (apiFromContext.apiType === 'APIProduct') {
+            const apiList = apiFromContext.apis;
+            for (const apiInProduct in apiList) {
+                if (Object.prototype.hasOwnProperty.call(apiList, apiInProduct)) {
+                    resourcesWithSecurity =
+                        apiList[apiInProduct].operations.findIndex(op => op.authType !== 'None') > -1;
+                    if (resourcesWithSecurity) {
+                        break;
+                    }
+                }
+            }
+        } else {
+            resourcesWithSecurity = apiFromContext.operations.findIndex(op => op.authType !== 'None') > -1;
+        }
+
         if (
             !securityScheme.includes(API_SECURITY_MUTUAL_SSL) &&
             !securityScheme.includes(API_SECURITY_BASIC_AUTH) &&
