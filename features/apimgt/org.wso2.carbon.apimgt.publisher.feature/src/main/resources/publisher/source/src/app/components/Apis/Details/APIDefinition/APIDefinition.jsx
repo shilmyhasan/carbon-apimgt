@@ -36,11 +36,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import yaml from 'js-yaml';
+import YAML from 'js-yaml';
 import Alert from 'AppComponents/Shared/Alert';
 import API from 'AppData/api.js';
 import { doRedirectToLogin } from 'AppComponents/Shared/RedirectToLogin';
-import json2yaml from 'json2yaml';
 import { isRestricted } from 'AppData/AuthManager';
 import ResourceNotFound from '../../../Base/Errors/ResourceNotFound';
 import ImportDefinition from './ImportDefinition';
@@ -136,7 +135,7 @@ class APIDefinition extends React.Component {
                     });
                 } else {
                     this.setState({
-                        swagger: json2yaml.stringify(response.obj),
+                        swagger: YAML.safeDump(YAML.safeLoad(response.data)),
                         format: 'yaml',
                         convertTo: this.getConvertToFormat('yaml'),
                     });
@@ -163,9 +162,9 @@ class APIDefinition extends React.Component {
         const { format, swagger, convertTo } = this.state;
         let formattedString = '';
         if (convertTo === 'json') {
-            formattedString = JSON.stringify(yaml.load(swagger), null, 1);
+            formattedString = JSON.stringify(YAML.load(swagger), null, 1);
         } else {
-            formattedString = json2yaml.stringify(JSON.parse(swagger));
+            formattedString = YAML.safeDump(YAML.safeLoad(swagger));
         }
         this.setState({ swagger: formattedString, format: convertTo, convertTo: format });
     }
@@ -276,7 +275,7 @@ class APIDefinition extends React.Component {
             parsedContent = JSON.parse(swaggerContent);
         } else {
             try {
-                parsedContent = yaml.load(swaggerContent);
+                parsedContent = YAML.load(swaggerContent);
             } catch (err) {
                 console.log(err);
                 Alert.error(intl.formatMessage({
