@@ -16,7 +16,7 @@
  * under the License.
  */
 
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Grid from '@material-ui/core/Grid';
@@ -25,7 +25,7 @@ import Application from 'AppData/Application';
 import { injectIntl } from 'react-intl';
 import API from 'AppData/api';
 import ButtonPanel from './ButtonPanel';
-import Settings from 'AppComponents/Shared/SettingsContext';
+
 
 const generateKeysStep = (props) => {
     const keyStates = {
@@ -37,15 +37,12 @@ const generateKeysStep = (props) => {
     const [tab, setTab] = useState(0);
     const [notFound, setNotFound] = useState(false);
     const [isUserOwner, setIsUserOwner] = useState(false);
-    const settingContext = useContext(Settings);
-    const { appAccessTokenValidity } = settingContext.settings;
 
     const [keyRequest, setKeyRequest] = useState({
         keyType: 'PRODUCTION',
         serverSupportedGrantTypes: [],
         supportedGrantTypes: [],
         callbackUrl: '',
-        validityTime: appAccessTokenValidity,
     });
 
     const {
