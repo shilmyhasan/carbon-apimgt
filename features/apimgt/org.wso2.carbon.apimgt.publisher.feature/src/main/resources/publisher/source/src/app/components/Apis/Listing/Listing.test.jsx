@@ -91,7 +91,7 @@ describe('APIs <Listing/> component tests', () => {
             </MuiThemeProvider>
         );
         const mockedModel = await getMockedModel('APIList');
-        mockedAll.mockReturnValue(Promise.resolve({ body: mockedModel }));
+        mockedAll.mockReturnValue(Promise.resolve({ body: mockedModel.right }));
         mockedHasScopes.mockReturnValue(Promise.resolve(true));
 
         let wrapper = await mountWithIntl(ThemedListing);
@@ -102,16 +102,16 @@ describe('APIs <Listing/> component tests', () => {
             .find(TableView)
             .children()
             .children()
-            .state().apisAndApiProducts).toEqual(mockedModel.list);
+            .state().apisAndApiProducts).toEqual(mockedModel.right.list);
 
         // update the wrapper until the progress/loading icon disappears
         while (wrapper.find('#apim-dual-ring-loader').length > 0) {
             wrapper = await wrapper.update();
         }
 
-        expect(wrapper.contains(mockedModel.list[0].name)).toBeTruthy();
-        expect(wrapper.contains(mockedModel.list[0].version)).toBeTruthy();
-        expect(wrapper.contains(mockedModel.list[0].context)).toBeTruthy();
+        expect(wrapper.contains(mockedModel.right.list[0].name)).toBeTruthy();
+        expect(wrapper.contains(mockedModel.right.list[0].version)).toBeTruthy();
+        expect(wrapper.contains(mockedModel.right.list[0].context)).toBeTruthy();
 
         expect(wrapper.contains('Create API')).toBeTruthy();
     });
