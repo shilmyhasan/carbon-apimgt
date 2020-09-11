@@ -73,7 +73,7 @@ public class APIMgtCacheInvalidationRequestSender implements CacheEntryRemovedLi
 
     public void entryCreated(CacheEntryEvent cacheEntryEvent) throws CacheEntryListenerException {
 
-        send(Util.createCacheInfo(cacheEntryEvent));
+        // We don't need this as only a delete or an update should invalidate the caches.
     }
 
     public void entryRemoved(CacheEntryEvent cacheEntryEvent) throws CacheEntryListenerException {
