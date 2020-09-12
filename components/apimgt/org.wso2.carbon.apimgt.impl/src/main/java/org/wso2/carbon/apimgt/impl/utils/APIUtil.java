@@ -9522,7 +9522,6 @@ public final class APIUtil {
 
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64UrlEncodedThumbPrint);
-            jwtHeader.append("\"");
 
             if (enableX5C) {
                 // If the "EnableX5C" property is true
