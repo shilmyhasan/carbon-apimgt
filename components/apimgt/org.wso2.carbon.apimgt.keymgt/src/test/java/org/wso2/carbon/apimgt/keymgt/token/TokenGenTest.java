@@ -259,7 +259,7 @@ public class TokenGenTest {
         keystore.load(inputStream, pwd);
         Certificate cert = keystore.getCertificate("wso2carbon");
 
-        String header = APIUtil.generateHeader(cert, "SHA256withRSA");
+        String header = APIUtil.generateBackendJWTHeader(cert, "SHA256withRSA");
 
         String x5c = com.nimbusds.jose.util.Base64.encode(cert.getEncoded()).toJSONString();
         //Check if the encoded pub cert present in JWT
@@ -292,7 +292,7 @@ public class TokenGenTest {
         keystore.load(inputStream, pwd);
         Certificate cert = keystore.getCertificate("wso2carbon");
 
-        String header = APIUtil.generateHeader(cert, "SHA256withRSA");
+        String header = APIUtil.generateBackendJWTHeader(cert, "SHA256withRSA");
 
         String x5c = com.nimbusds.jose.util.Base64.encode(cert.getEncoded()).toJSONString();
         //Check if the encoded pub cert is present in JWT header with x5c property
