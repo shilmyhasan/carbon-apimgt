@@ -33,6 +33,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.apimgt.impl.caching.CacheInvalidationService;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.perlog.PerAPILogService;
 import org.wso2.carbon.apimgt.impl.throttling.APIThrottleDataService;
 import org.wso2.carbon.apimgt.impl.token.RevokedTokenService;
 import org.wso2.carbon.apimgt.jms.listener.JMSListenerShutDownService;
@@ -162,6 +163,23 @@ public class JMSListenerComponent implements ServiceListener {
         log.debug("unSetting Revoked Token Service");
         ServiceReferenceHolder.getInstance().setRevokedTokenService(null);
     }
+
+    @Reference(
+            name = "perapi.log.service",
+            service = PerAPILogService.class,
+            cardinality = ReferenceCardinality.MANDATORY,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetPerAPIlogService")
+    protected void setPerAPIlogService(PerAPILogService perAPIlogService) {
+        log.debug("Setting Per API log Service");
+        ServiceReferenceHolder.getInstance().setPerAPILogService(perAPIlogService);
+    }
+
+    protected void unsetPerAPIlogService(PerAPILogService perAPILogService) {
+        log.debug("unSetting Per API log Service");
+        ServiceReferenceHolder.getInstance().setPerAPILogService(null);
+    }
+
     @Reference(
             name = "api.manager.cache.invalidation.service",
             service = CacheInvalidationService.class,

@@ -40,6 +40,7 @@ public class JMSTransportHandler {
     private JMSListener jmsListenerForThrottleDataTopic;
     private JMSListener jmsListenerForTokenRevocationTopic;
     private JMSListener jmsListenerForCacheInvalidationTopic;
+    private JMSListener jmsListenerForPerAPILog;
     private boolean stopIssued = false;
     private static final Object lock = new Object();
 
@@ -126,6 +127,21 @@ public class JMSTransportHandler {
                 + "#" + JMSConstants.TOPIC_CACHE_INVALIDATION, jmsTaskManagerForCacheInvalidationTopic);
         jmsListenerForCacheInvalidationTopic.startListener();
         log.info("Starting jms topic consumer thread for the cacheInvalidation topic...");
+
+        //Listening to perAPIlog topic
+        messageConfig.put(JMSConstants.PARAM_DESTINATION, JMSConstants.PER_API_LOG);
+        JMSTaskManager jmsperlogapi = JMSTaskManagerFactory
+                .createTaskManagerForService(jmsConnectionFactory, ListenerConstants.CONNECTION_FACTORY_NAME,
+                        new NativeWorkerPool(minThreadPoolSize, maxThreadPoolSize, keepAliveTimeInMillis,
+                                jobQueueSize,"JMS Threads",
+                                "JMSThreads" + UUID.randomUUID().toString()), messageConfig);
+        jmsperlogapi.setMessageListener(new JMSMessageListener());
+
+        jmsListenerForPerAPILog = new JMSListener(ListenerConstants.CONNECTION_FACTORY_NAME
+                    + "#" + JMSConstants.PER_API_LOG, jmsperlogapi);
+        jmsListenerForPerAPILog.startListener();
+        log.info("Starting jms topic consumer thread for the perlogapi topic...");
+
     }
 
     public void unSubscribeFromEvents() {
@@ -147,6 +163,9 @@ public class JMSTransportHandler {
                     }
                     if (jmsListenerForCacheInvalidationTopic != null) {
                         jmsListenerForCacheInvalidationTopic.stopListener();
+                    }
+                    if (jmsListenerForPerAPILog != null) {
+                        jmsListenerForPerAPILog.stopListener();
                     }
 
                     log.debug("JMS Listeners Stopped");

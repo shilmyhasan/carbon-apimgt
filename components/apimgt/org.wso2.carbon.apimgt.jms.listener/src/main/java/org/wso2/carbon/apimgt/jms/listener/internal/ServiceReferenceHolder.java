@@ -23,6 +23,7 @@ package org.wso2.carbon.apimgt.jms.listener.internal;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.caching.CacheInvalidationService;
+import org.wso2.carbon.apimgt.impl.perlog.PerAPILogService;
 import org.wso2.carbon.apimgt.impl.throttling.APIThrottleDataService;
 import org.wso2.carbon.apimgt.impl.token.RevokedTokenService;
 
@@ -37,6 +38,7 @@ public class ServiceReferenceHolder {
     private APIManagerConfiguration apimConfiguration;
     private CacheInvalidationService cacheInvalidationService;
     private RevokedTokenService revokedTokenService;
+    private PerAPILogService perAPILogService;
 
     public static ServiceReferenceHolder getInstance() {
         return instance;
@@ -51,6 +53,18 @@ public class ServiceReferenceHolder {
         } else {
             throttleDataService = null;
         }
+    }
+
+    public void setPerAPILogService(PerAPILogService perAPILogService) {
+        if (perAPILogService != null) {
+            this.perAPILogService = perAPILogService;
+        } else {
+            this.perAPILogService = null;
+        }
+    }
+
+    public PerAPILogService getPerAPILogService() {
+        return perAPILogService;
     }
 
     public APIThrottleDataService getAPIThrottleDataService() {
