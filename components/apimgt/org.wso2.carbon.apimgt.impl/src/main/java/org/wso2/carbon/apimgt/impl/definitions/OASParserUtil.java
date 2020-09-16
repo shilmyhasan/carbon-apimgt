@@ -1417,7 +1417,7 @@ public class OASParserUtil {
     }
 
     /**
-     * This method returns extension of custom authorization Header related to micro-gw
+     * This method returns extension of disable security related to micro-gw
      *
      * @param extensions Map<String, Object>
      * @return String
