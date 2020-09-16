@@ -422,18 +422,22 @@ public class APIGatewayManager {
                 if (debugEnabled) {
                     startTime = System.currentTimeMillis();
                 }
-
+                APIIdentifier apiId = new APIIdentifier(apiProductId.getProviderName(), apiProductId.getName(), PRODUCT_VERSION);
+                setClientCertificatesToBeRemoved(apiId, tenantDomain, productAPIDto);
+                setClientCertificatesToBeAdded(apiId, tenantDomain, productAPIDto);
                 //Add the API
 
                 productAPIDto.setApiDefinition(builder.getConfigStringForTemplate(environment));
 
                 for (API api : associatedAPIs) {
                     setCustomSequencesToBeRemoved(api, productAPIDto);
+                    setClientCertificatesToBeRemoved(api, tenantDomain, productAPIDto);
                     APITemplateBuilder apiTemplateBuilder = new APITemplateBuilderImpl(api);
                     addEndpoints(api, apiTemplateBuilder, productAPIDto);
                     setCustomSequencesToBeAdded(api, tenantDomain, productAPIDto);
                     setAPIFaultSequencesToBeAdded(api, tenantDomain, productAPIDto);
                     setSecureVaultProperty(client, api, tenantDomain);
+                    setClientCertificatesToBeAdded(api, tenantDomain, productAPIDto);
                 }
                 client.deployAPI(productAPIDto);
                 if (debugEnabled) {
@@ -451,6 +455,9 @@ public class APIGatewayManager {
                  */
                 failedEnvironmentsMap.put(environmentName, e.getMessage());
                 log.error("Error occurred when publish to gateway " + environmentName, e);
+            } catch (CertificateManagementException ex) {
+                log.error("Error occurred while adding/updating client certificate in " + environmentName, ex);
+                failedEnvironmentsMap.put(environmentName, ex.getMessage());
             }
 
             if (debugEnabled) {
@@ -599,6 +606,7 @@ public class APIGatewayManager {
                         if (!APIStatus.PUBLISHED.getStatus().equals(api.getStatus())) {
                             setEndpointsToBeRemoved(api, productAPIGatewayAPIDTO);
                             setCustomSequencesToBeRemoved(api, productAPIGatewayAPIDTO);
+                            setClientCertificatesToBeRemoved(api, tenantDomain, productAPIGatewayAPIDTO);
                         }
                     }
                     productAPIGatewayAPIDTO.setLocalEntriesToBeRemove(addStringToList(apiProduct.getUuid(),
@@ -613,6 +621,9 @@ public class APIGatewayManager {
                     log.error("Error occurred when removing from gateway " + environmentName,
                             e);
                     failedEnvironmentsMap.put(environmentName, e.getMessage());
+                } catch (CertificateManagementException ex) {
+                    log.error("Error occurred while adding/updating client certificate in " + environmentName, ex);
+                    failedEnvironmentsMap.put(environmentName, ex.getMessage());
                 }
             }
         }
@@ -908,6 +919,32 @@ public class APIGatewayManager {
     }
 
     /**
+     * To deploy client certificate in given API environment.
+     *
+     * @param identifier  Relevant API ID.
+     * @param tenantDomain Tenant domain.
+     * @throws CertificateManagementException Certificate Management Exception.
+     */
+    private void setClientCertificatesToBeAdded(APIIdentifier identifier, String tenantDomain, GatewayAPIDTO gatewayAPIDTO)
+            throws CertificateManagementException {
+        if (!CertificateManagerImpl.getInstance().isClientCertificateBasedAuthenticationConfigured()) {
+            return;
+        }
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+        List<ClientCertificateDTO> clientCertificateDTOList = CertificateMgtDAO.getInstance()
+                .getClientCertificates(tenantId, null, identifier);
+        if (clientCertificateDTOList != null) {
+            for (ClientCertificateDTO clientCertificateDTO : clientCertificateDTOList) {
+                GatewayContentDTO clientCertificate = new GatewayContentDTO();
+                clientCertificate.setName(clientCertificateDTO.getAlias() + "_" + tenantId);
+                clientCertificate.setContent(clientCertificateDTO.getCertificate());
+                gatewayAPIDTO.setClientCertificatesToBeAdd(addGatewayContentToList(clientCertificate,
+                        gatewayAPIDTO.getClientCertificatesToBeAdd()));
+            }
+        }
+    }
+
+    /**
      * To update the database instance with the successfully removed client certificates from teh gateway.
      *
      * @param api          Relevant API related with teh removed certificate.
@@ -953,6 +990,36 @@ public class APIGatewayManager {
         }
         List<String> aliasList = CertificateMgtDAO.getInstance()
                 .getDeletedClientCertificateAlias(api.getId(), tenantId);
+        for (String alias : aliasList) {
+            gatewayAPIDTO.setClientCertificatesToBeRemove(addStringToList(alias + "_" + tenantId,
+                    gatewayAPIDTO.getClientCertificatesToBeRemove()));
+        }
+    }
+
+    /**
+     * To undeploy the client certificates from the gateway environment.
+     *
+     * @param identifier   Relevant API particular certificate is related with.
+     * @param tenantDomain Tenant domain of the API.
+     * @throws CertificateManagementException Certificate Management Exception.
+     */
+    private void setClientCertificatesToBeRemoved(APIIdentifier identifier, String tenantDomain, GatewayAPIDTO gatewayAPIDTO)
+            throws CertificateManagementException {
+
+        if (!CertificateManagerImpl.getInstance().isClientCertificateBasedAuthenticationConfigured()) {
+            return;
+        }
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+        List<ClientCertificateDTO> clientCertificateDTOList = CertificateMgtDAO.getInstance()
+                .getClientCertificates(tenantId, null, identifier);
+        if (clientCertificateDTOList != null) {
+            for (ClientCertificateDTO clientCertificateDTO : clientCertificateDTOList) {
+                gatewayAPIDTO.setClientCertificatesToBeRemove(addStringToList(clientCertificateDTO.getAlias() + "_" +
+                        tenantId, gatewayAPIDTO.getLocalEntriesToBeRemove()));
+            }
+        }
+        List<String> aliasList = CertificateMgtDAO.getInstance()
+                .getDeletedClientCertificateAlias(identifier, tenantId);
         for (String alias : aliasList) {
             gatewayAPIDTO.setClientCertificatesToBeRemove(addStringToList(alias + "_" + tenantId,
                     gatewayAPIDTO.getClientCertificatesToBeRemove()));
