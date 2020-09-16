@@ -1235,6 +1235,8 @@ public class OASParserUtil {
         APIDefinition apiDefinition = getOASParser(swaggerContent);
         //Inject and map mgw throttling extensions to default type
         swaggerContent = apiDefinition.injectMgwThrottlingExtensionsToDefault(swaggerContent);
+        //Process mgw disable security extension
+        swaggerContent = apiDefinition.processDisableSecurityExtension(swaggerContent);
         return apiDefinition.processOtherSchemeScopes(swaggerContent);
     }
 
@@ -1412,6 +1414,21 @@ public class OASParserUtil {
             appSecurityState = Boolean.parseBoolean(String.valueOf(appSecurityTypesNode.get("optional")));
         }
         return appSecurityState;
+    }
+
+    /**
+     * This method returns extension of custom authorization Header related to micro-gw
+     *
+     * @param extensions Map<String, Object>
+     * @return String
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static boolean getDisableSecurity(Map<String, Object> extensions) throws APIManagementException {
+        boolean disableSecurity = false;
+        if (extensions.containsKey(APIConstants.X_WSO2_DISABLE_SECURITY)) {
+            disableSecurity = Boolean.parseBoolean(String.valueOf(extensions.get(APIConstants.X_WSO2_DISABLE_SECURITY)));
+        }
+        return disableSecurity;
     }
 
 }
