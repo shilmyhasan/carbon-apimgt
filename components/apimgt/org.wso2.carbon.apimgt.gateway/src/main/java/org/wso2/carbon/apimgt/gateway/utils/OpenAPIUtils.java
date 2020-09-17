@@ -206,7 +206,8 @@ public class OpenAPIUtils {
             String httpMethod = (String) axis2MessageContext.getProperty(APIConstants.DigestAuthConstants.HTTP_METHOD);
             PathItem path = openAPI.getPaths().get(apiElectedResource);
             if (path == null) {
-                String apiElectedResourceWithSlash = (String) synCtx.getProperty("API_ELECTED_RESOURCE_WITH_SLASH");
+                String apiElectedResourceWithSlash = (String) synCtx
+                        .getProperty(APIConstants.API_ELECTED_RESOURCE_WITH_SLASH);
                 path = openAPI.getPaths().get(apiElectedResourceWithSlash);
             }
             if (path != null) {
@@ -239,7 +240,7 @@ public class OpenAPIUtils {
             String httpMethod = (String) axis2MessageContext.getProperty(APIConstants.DigestAuthConstants.HTTP_METHOD);
             PathItem path = openAPI.getPaths().get(apiElectedResource);
             if (path == null) {
-                String apiElectedResourceWithSlash = (String) synCtx.getProperty("API_ELECTED_RESOURCE_WITH_SLASH");
+                String apiElectedResourceWithSlash = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE_WITH_SLASH);
                 path = openAPI.getPaths().get(apiElectedResourceWithSlash);
             }
 

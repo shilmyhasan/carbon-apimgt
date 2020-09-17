@@ -121,7 +121,7 @@ public class OAuthAuthenticator implements Authenticator {
         String apiElectedResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
         PathItem pathItem = openAPI.getPaths().get(apiElectedResource);
         if (pathItem == null) {
-            synCtx.setProperty("API_ELECTED_RESOURCE_WITH_SLASH", apiElectedResource + "/");
+            synCtx.setProperty(APIConstants.API_ELECTED_RESOURCE_WITH_SLASH, apiElectedResource + "/");
         }
         if (headers != null) {
             requestOrigin = (String) headers.get("Origin");
