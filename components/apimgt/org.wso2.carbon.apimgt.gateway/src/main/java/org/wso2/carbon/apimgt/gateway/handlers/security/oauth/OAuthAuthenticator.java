@@ -213,7 +213,6 @@ public class OAuthAuthenticator implements Authenticator {
             // Find the resource authentication scheme based on the token type
             if (isJwtToken) {
                 // If a JWT token
-//                openAPI = (OpenAPI) synCtx.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT);
                 if (openAPI == null && !APIConstants.GRAPHQL_API.equals(synCtx.getProperty(APIConstants.API_TYPE))) {
                     log.error("Swagger is missing in the gateway. " +
                             "Therefore, JWT authentication cannot be performed.");
