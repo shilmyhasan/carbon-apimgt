@@ -978,7 +978,6 @@ var jagg = jagg || (function () {
         isMultiGroupEnabled:isMultiGroupEnabled,
         isForgotPasswordConfigured:isForgotPasswordConfigured,
         validateForScript:validateForScript,
-        validateForScript:validateForScript,
         startsWith:startsWith
     };
 
