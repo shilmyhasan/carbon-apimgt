@@ -226,6 +226,7 @@ class Details extends Component {
         this.setState((previousState) => ({
             imageUpdate: previousState.imageUpdate + 1,
         }));
+        console.info(this.state.imageUpdate);
     }
 
     /**
@@ -501,6 +502,7 @@ class Details extends Component {
                         isAPIProduct,
                         setAPI: this.setAPI,
                         setImageUpdate: this.setImageUpdate,
+                        imageUpdate,
                         tenantList,
                     }}
                 >
