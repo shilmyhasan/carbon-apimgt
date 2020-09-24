@@ -226,7 +226,6 @@ class Details extends Component {
         this.setState((previousState) => ({
             imageUpdate: previousState.imageUpdate + 1,
         }));
-        console.info(this.state.imageUpdate);
     }
 
     /**
