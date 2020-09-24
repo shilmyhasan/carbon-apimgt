@@ -137,9 +137,7 @@ public class JWTValidator {
         JWSHeader header;
         JWTClaimsSet payload = null;
         boolean isVerified = false;
-        SignedJWT parsedJWTToken = null;
         String tokenIdentifier = "";
-        String jti = null;
 
         String tokenSignature = splitToken[2];
         String apiContext = (String) synCtx.getProperty(RESTConstants.REST_API_CONTEXT);
@@ -147,15 +145,15 @@ public class JWTValidator {
         String httpMethod = (String) ((Axis2MessageContext) synCtx).getAxis2MessageContext().
                 getProperty(Constants.Configuration.HTTP_METHOD);
         String matchingResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
-
+        SignedJWT parsedJWTToken = null;
         try {
             parsedJWTToken = (SignedJWT) JWTParser.parse(jwtToken);
-            jti = parsedJWTToken.getJWTClaimsSet().getStringClaim("jti");
         } catch (ParseException e) {
             log.error("Invalid JWT token. Failed to decode the token.");
             throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                     "Invalid JWT token. Failed to decode the token.", e);
         }
+        String jti = getJWTID(parsedJWTToken);
         if (StringUtils.isNotEmpty(jti)) {
             tokenIdentifier = jti;
         } else {
@@ -213,7 +211,6 @@ public class JWTValidator {
         if (!isVerified) {
             log.debug("Token not found in the caches and revoked jwt token map.");
             try{
-                parsedJWTToken = (SignedJWT) JWTParser.parse(jwtToken);
                 header = parsedJWTToken.getHeader();
                 payload = transformJWTClaims(parsedJWTToken.getJWTClaimsSet());
                 checkCSRF(synCtx, jwtToken, payload);
@@ -619,23 +616,24 @@ public class JWTValidator {
             throws APISecurityException {
 
         String[] splitToken = jwtToken.split("\\.");
-        SignedJWT parsedJWT = null;
         JWTClaimsSet payload = null;
         boolean isVerified = false;
-        SignedJWT parsedJWTToken = null;
         String tokenIdentifier = "";
-        String jti = null;
         String tokenSignature = splitToken[2];
         String tenantDomain = GatewayUtils.getTenantDomain();
         JWTTokenPayloadInfo payloadInfo = null;
+
+        SignedJWT parsedJWTToken = null;
         try {
             parsedJWTToken = (SignedJWT) JWTParser.parse(jwtToken);
-            jti = parsedJWTToken.getJWTClaimsSet().getStringClaim("jti");
         } catch (ParseException e) {
             log.error("Invalid JWT token. Failed to decode the token.");
             throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                     "Invalid JWT token. Failed to decode the token.", e);
         }
+
+        String jti = getJWTID(parsedJWTToken);
+
         if (StringUtils.isNotEmpty(jti)) {
             tokenIdentifier = jti;
         } else {
@@ -692,8 +690,7 @@ public class JWTValidator {
         if (!isVerified) {
             log.debug("Token not found in the caches and revoked jwt token map.");
             try {
-                parsedJWT = (SignedJWT) JWTParser.parse(jwtToken);
-                payload = parsedJWT.getJWTClaimsSet();
+                payload = parsedJWTToken.getJWTClaimsSet();
             } catch (JSONException | IllegalArgumentException | ParseException e) {
                 if (log.isDebugEnabled()) {
                     log.debug("Invalid JWT token. Token: " + GatewayUtils.getMaskedToken(splitToken[0]));
@@ -703,7 +700,7 @@ public class JWTValidator {
                         "Invalid JWT token. Failed to decode the token.", e);
             }
             log.debug("Verifying signature of JWT");
-            isVerified = verifyTokenSignature(parsedJWT, APIConstants.GATEWAY_PUBLIC_CERTIFICATE_ALIAS);
+            isVerified = verifyTokenSignature(parsedJWTToken, APIConstants.GATEWAY_PUBLIC_CERTIFICATE_ALIAS);
             if (isGatewayTokenCacheEnabled) {
                 // Add token to tenant token cache
                 if (isVerified) {
@@ -747,8 +744,7 @@ public class JWTValidator {
                 log.debug("Token payload not found in the cache.");
                 if (payload == null) {
                     try {
-                        parsedJWT = (SignedJWT) JWTParser.parse(jwtToken);
-                        payload = parsedJWT.getJWTClaimsSet();
+                        payload = parsedJWTToken.getJWTClaimsSet();
                     } catch (JSONException | IllegalArgumentException | ParseException e) {
                         if (log.isDebugEnabled()) {
                             log.debug("Token decryption failure when retrieving payload. Token: "
@@ -796,6 +792,20 @@ public class JWTValidator {
                 "Invalid JWT token. Signature verification failed.");
     }
 
+
+    private String getJWTID(SignedJWT parsedJWTToken) throws APISecurityException {
+        if (parsedJWTToken == null) {
+            throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
+                    "Invalid JWT token is provided.");
+        }
+        try {
+            return parsedJWTToken.getJWTClaimsSet().getJWTID();
+        } catch (ParseException e) {
+            log.error("Invalid JWT token. Failed to decode the token.");
+            throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
+                    "Invalid JWT token. Failed to decode the token.", e);
+        }
+    }
     /**
      * Validate scopes bound to the resource of the API being invoked against the scopes specified
      * in the JWT token payload.
