@@ -46,7 +46,6 @@ function GoToEdit(props) {
         displayAddContent= false;
     }
 
-    console.info('printing doc', doc);
     function handleClose() {
         setOpen(false);
     }
