@@ -187,7 +187,8 @@ public class JWTValidator {
                         "Invalid JWT token");
             }
             // Check revoked map.
-            else if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenIdentifier)) {
+            else if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(jti) ||
+                    RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenSignature)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
                             getMaskedToken(splitToken[0]));
@@ -197,7 +198,8 @@ public class JWTValidator {
                         "Invalid JWT token");
             }
         } else {
-            if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenIdentifier)) {
+            if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(jti) ||
+                    RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenSignature)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
                             getMaskedToken(splitToken[0]));
@@ -666,7 +668,8 @@ public class JWTValidator {
                         "Invalid JWT token");
             }
             // Check revoked map.
-            else if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenIdentifier)) {
+            else if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(jti) ||
+                    RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenSignature)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
                             getMaskedToken(splitToken[0]));
@@ -676,7 +679,8 @@ public class JWTValidator {
                         "Invalid JWT token");
             }
         } else {
-            if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenIdentifier)) {
+            if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(jti) ||
+                    RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenSignature)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
                             getMaskedToken(splitToken[0]));
