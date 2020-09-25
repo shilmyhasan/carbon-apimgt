@@ -933,6 +933,15 @@ var jagg = jagg || (function () {
         return content.replace(startPattern, "&lt;script &gt;").replace(endPattern, "&lt;\script&gt;");
     };
 
+    var startsWith = function(path, comparator){
+        for(var i=0;i<comparator.length;i++) {
+            if(path[i] != comparator[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+
     return {
         setUser:setUser,
         getUser:getUser,
@@ -974,7 +983,8 @@ var jagg = jagg || (function () {
         getTenantURLPrefix:getTenantURLPrefix,
         log:log,
         isMultiGroupEnabled:isMultiGroupEnabled,
-        validateForScript:validateForScript
+        validateForScript:validateForScript,
+        startsWith:startsWith
     };
 
 }());
