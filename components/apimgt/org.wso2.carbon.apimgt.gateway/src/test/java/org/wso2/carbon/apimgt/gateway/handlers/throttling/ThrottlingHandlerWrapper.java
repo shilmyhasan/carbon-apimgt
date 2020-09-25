@@ -25,9 +25,7 @@ import org.apache.synapse.commons.throttle.core.AccessInformation;
 import org.apache.synapse.commons.throttle.core.ThrottleContext;
 import org.apache.synapse.commons.throttle.core.ThrottleException;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.throttling.ThrottleDataHolder;
-import org.wso2.carbon.apimgt.gateway.throttling.publisher.ThrottleDataPublisher;
 import org.wso2.carbon.metrics.manager.Timer;
 
 public class ThrottlingHandlerWrapper extends ThrottleHandler {
@@ -42,7 +40,6 @@ public class ThrottlingHandlerWrapper extends ThrottleHandler {
         this.timer = timer;
         this.throttleDataHolder = throttleDataHolder;
         this.throttleConditionEvaluator = throttleConditionEvaluator;
-        ServiceReferenceHolder.getInstance().setThrottleDataPublisher(new ThrottleDataPublisher());
     }
 
     public ThrottlingHandlerWrapper(Timer timer, ThrottleDataHolder throttleDataHolder, ThrottleConditionEvaluator throttleConditionEvaluator, AccessInformation accessInformation) {
@@ -50,7 +47,6 @@ public class ThrottlingHandlerWrapper extends ThrottleHandler {
         this.throttleDataHolder = throttleDataHolder;
         this.throttleConditionEvaluator = throttleConditionEvaluator;
         this.accessInformation = accessInformation;
-        ServiceReferenceHolder.getInstance().setThrottleDataPublisher(new ThrottleDataPublisher());
     }
 
     @Override

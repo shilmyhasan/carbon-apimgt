@@ -24,11 +24,7 @@ import org.wso2.carbon.apimgt.gateway.throttling.ThrottleDataHolder;
 import org.wso2.carbon.apimgt.gateway.throttling.publisher.ThrottleDataPublisher;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
-import org.wso2.carbon.apimgt.impl.caching.CacheInvalidationService;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
-import org.wso2.carbon.apimgt.impl.perlog.PerAPILogService;
-import org.wso2.carbon.apimgt.impl.throttling.APIThrottleDataService;
-import org.wso2.carbon.apimgt.impl.token.RevokedTokenService;
 import org.wso2.carbon.apimgt.tracing.TracingService;
 import org.wso2.carbon.apimgt.tracing.TracingTracer;
 import org.wso2.carbon.base.api.ServerConfigurationService;
@@ -64,12 +60,6 @@ public class ServiceReferenceHolder {
     private Map<String,AbstractAPIMgtGatewayJWTGenerator> apiMgtGatewayJWTGenerators  = new HashMap<>();
     private Map<String, JWTTransformer> jwtTransformerMap = new HashMap<>();
     private TracingTracer tracer;
-    private CacheInvalidationService cacheInvalidationService;
-    private APIThrottleDataService throttleDataService;
-    private RevokedTokenService revokedTokenService;
-
-    private PerAPILogService perAPILogService;
-
     public void setThrottleDataHolder(ThrottleDataHolder throttleDataHolder) {
         this.throttleDataHolder = throttleDataHolder;
     }
@@ -209,6 +199,8 @@ public class ServiceReferenceHolder {
         this.throttleDataPublisher = throttleDataPublisher;
     }
 
+
+
     public Map<String,AbstractAPIMgtGatewayJWTGenerator> getApiMgtGatewayJWTGenerator() {
 
         return apiMgtGatewayJWTGenerators;
@@ -227,43 +219,5 @@ public class ServiceReferenceHolder {
     public void setTracer(TracingTracer tracer) {
 
         this.tracer = tracer;
-    }
-
-    public void setCacheInvalidationService(CacheInvalidationService cacheInvalidationService) {
-        this.cacheInvalidationService = cacheInvalidationService;
-
-    }
-
-    public CacheInvalidationService getCacheInvalidationService() {
-
-        return cacheInvalidationService;
-    }
-
-    public void setAPIThrottleDataService(APIThrottleDataService dataService) {
-        if (dataService != null) {
-            throttleDataService = dataService;
-        } else {
-            throttleDataService = null;
-        }
-    }
-
-    public APIThrottleDataService getAPIThrottleDataService() {
-        return throttleDataService;
-    }
-
-    public void setRevokedTokenService(RevokedTokenService revokedTokenService) {
-        this.revokedTokenService = revokedTokenService;
-    }
-
-    public RevokedTokenService getRevokedTokenService() {
-
-        return revokedTokenService;
-    }
-    public PerAPILogService getPerAPILogService() {
-        return perAPILogService;
-    }
-
-    public void setPerAPILogService(PerAPILogService perAPILogService) {
-        this.perAPILogService = perAPILogService;
     }
 }
