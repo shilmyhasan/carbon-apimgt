@@ -21,11 +21,14 @@ package org.wso2.carbon.apimgt.keymgt.events;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.model.Application;
+import org.wso2.carbon.apimgt.api.model.ApplicationConstants;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.ExpiredJWTCleaner;
 import org.wso2.carbon.identity.oauth.event.AbstractOAuthEventInterceptor;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.ResponseHeader;
 import org.wso2.carbon.identity.oauth2.dto.OAuthRevocationRequestDTO;
 import org.wso2.carbon.identity.oauth2.dto.OAuthRevocationResponseDTO;
@@ -48,7 +51,8 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
         revocationRequestPublisher = RevocationRequestPublisher.getInstance();
     }
     /**
-     * Overridden method to handle the post processing of token revocation
+     * Overridden method to handle the post processing of token revocatio
+     * n
      * Called after revoking a token by oauth client
      *
      * @param revokeRequestDTO requested revoke request object
@@ -61,6 +65,7 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
     public void onPostTokenRevocationByClient(OAuthRevocationRequestDTO revokeRequestDTO,
             OAuthRevocationResponseDTO revokeResponseDTO, AccessTokenDO accessTokenDO,
             RefreshTokenValidationDataDO refreshTokenDO, Map<String, Object> params) {
+        log.debug("onPostTokenRevocationByClient event triggered.");
 
         // If the response header contains RevokedAccessToken header, it implies the token revocation was a success.
         ResponseHeader[] responseHeaders = revokeResponseDTO.getResponseHeaders();
@@ -74,19 +79,8 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
             }
         }
 
-        if(isRevokedAccessTokenHeaderExists) {
-            String revokedToken = revokeRequestDTO.getToken();
-            Long expiryTime = 0L;
-            boolean isJwtToken = false;
-            if (revokedToken.contains(APIConstants.DOT) && APIUtil.isValidJWT(revokedToken)) {
-                 expiryTime = APIUtil.getExpiryifJWT(revokedToken);
-                 isJwtToken = true;
-            }
-            revocationRequestPublisher.publishRevocationEvents(revokedToken, expiryTime, null);
-            if (isJwtToken) {
-                // Persist revoked JWT token to database.
-                persistRevokedJWTSignature(revokedToken, expiryTime);
-            }
+        if (isRevokedAccessTokenHeaderExists) {
+            publishAndPersistEvent(accessTokenDO);
         }
 
     }
@@ -105,20 +99,8 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
             org.wso2.carbon.identity.oauth.dto.OAuthRevocationResponseDTO revokeRespDTO, AccessTokenDO accessTokenDO,
             Map<String, Object> params) {
 
-        if(accessTokenDO != null) { // if accessTokenDO is not null, it implies the revocation was a success
-            String revokedToken = accessTokenDO.getAccessToken();
-            Long expiryTime = 0L;
-            boolean isJwtToken = false;
-            if (revokedToken.contains(APIConstants.DOT) && APIUtil.isValidJWT(revokedToken)) {
-                expiryTime = APIUtil.getExpiryifJWT(revokedToken);
-                isJwtToken = true;
-            }
-            revocationRequestPublisher.publishRevocationEvents(revokedToken, expiryTime, null);
-            if (isJwtToken) {
-                // Persist revoked JWT token to database.
-                persistRevokedJWTSignature(revokedToken, expiryTime);
-            }
-        }
+        log.debug("onPostTokenRevocationByResourceOwner event triggered.");
+        publishAndPersistEvent(accessTokenDO);
     }
 
     /**
@@ -131,14 +113,11 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
         return true;
     }
 
-    private void persistRevokedJWTSignature(String token, Long expiryTime) {
+    private void persistRevokedJWTIdentifier(String token, Long expiryTime, int tenantId) {
 
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
         try {
-            String tokenSignature = APIUtil.getSignatureIfJWT(token);
-            String tenantDomain = APIUtil.getTenantDomainIfJWT(token);
-            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
-            apiMgtDAO.addRevokedJWTSignature(tokenSignature, APIConstants.DEFAULT, expiryTime, tenantId);
+            apiMgtDAO.addRevokedJWTSignature(token, APIConstants.DEFAULT, expiryTime, tenantId);
 
             // Cleanup expired revoked tokens from db.
             Runnable expiredJWTCleaner = new ExpiredJWTCleaner();
@@ -148,6 +127,46 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
             log.error("Unable to add revoked JWT signature to the database");
         }
     }
+    @Override
+    public void onPreTokenRevocationBySystem(AccessTokenDO accessTokenDO, Map<String, Object> params)
+            throws IdentityOAuth2Exception {
+    }
 
+    @Override
+    public void onPostTokenRevocationBySystem(AccessTokenDO accessTokenDO, Map<String, Object> params)
+            throws IdentityOAuth2Exception {
+
+        log.debug("onPostTokenRevocationBySystem event triggered.");
+        publishAndPersistEvent(accessTokenDO);
+    }
+
+    private void publishAndPersistEvent(AccessTokenDO accessTokenDO) {
+
+        if (accessTokenDO != null) {
+
+            long expiryTime = accessTokenDO.getIssuedTime().getTime() + accessTokenDO.getValidityPeriodInMillis();
+            boolean isJwtToken = false;
+            String revokedToken = accessTokenDO.getAccessToken();
+            String consumerKey = accessTokenDO.getConsumerKey();
+            int tenantId = accessTokenDO.getTenantID();
+
+            try {
+                Application application = ApiMgtDAO.getInstance().getApplicationByClientId(consumerKey);
+                    log.debug("Revoking tokens of application : " + application != null ? application.getName() : "");
+                if (application != null & application.getTokenType().equals(APIConstants.TOKEN_TYPE_JWT)) {
+                    log.debug("  isJwtToken  = true");
+                    isJwtToken = true;
+                }
+            } catch (APIManagementException e) {
+                log.warn("Exception occurred while getting application for publishing revoke event.");
+            }
+            revocationRequestPublisher.publishRevocationEvents(revokedToken, expiryTime, null);
+            if (isJwtToken) {
+                // Persist revoked JWT token to database.
+                log.debug("persisting jwt token revocation event.");
+                persistRevokedJWTIdentifier(revokedToken, expiryTime, tenantId);
+            }
+        }
+    }
 
 }
