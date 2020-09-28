@@ -17,7 +17,6 @@
 package org.wso2.carbon.apimgt.gateway.handlers.security.oauth;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.PathItem;
 import org.apache.axis2.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -117,12 +116,7 @@ public class OAuthAuthenticator implements Authenticator {
         TracingSpan keyInfo = null;
         Map headers = (Map) ((Axis2MessageContext) synCtx).getAxis2MessageContext().
                 getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        openAPI = (OpenAPI) synCtx.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT);
-        String apiElectedResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
-        PathItem pathItem = openAPI.getPaths().get(apiElectedResource);
-        if (pathItem == null) {
-            synCtx.setProperty(APIConstants.API_ELECTED_RESOURCE_WITH_SLASH, apiElectedResource + "/");
-        }
+
         if (headers != null) {
             requestOrigin = (String) headers.get("Origin");
 
@@ -164,9 +158,7 @@ public class OAuthAuthenticator implements Authenticator {
         String httpMethod = (String)((Axis2MessageContext) synCtx).getAxis2MessageContext().
                 getProperty(Constants.Configuration.HTTP_METHOD);
         String matchingResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
-        if (pathItem == null) {
-            matchingResource = matchingResource + "/";
-        }
+
         if (Util.tracingEnabled()) {
             TracingSpan keySpan = (TracingSpan) synCtx.getProperty(APIMgtGatewayConstants.KEY_VALIDATION);
             TracingTracer tracer = Util.getGlobalTracer();
@@ -213,6 +205,7 @@ public class OAuthAuthenticator implements Authenticator {
             // Find the resource authentication scheme based on the token type
             if (isJwtToken) {
                 // If a JWT token
+                openAPI = (OpenAPI) synCtx.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT);
                 if (openAPI == null && !APIConstants.GRAPHQL_API.equals(synCtx.getProperty(APIConstants.API_TYPE))) {
                     log.error("Swagger is missing in the gateway. " +
                             "Therefore, JWT authentication cannot be performed.");
