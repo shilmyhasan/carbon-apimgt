@@ -1096,7 +1096,7 @@ public final class APIConstants {
     public static final String API_RESOURCE_CACHE_KEY = "API_RESOURCE_CACHE_KEY";
     public static final String API_ELECTED_RESOURCE = "API_ELECTED_RESOURCE";
     public static final String API_TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
-
+    public static final String API_ELECTED_RESOURCE_WITH_SLASH = "API_ELECTED_RESOURCE_WITH_SLASH";
     // GraphQL related constants
     public static final String API_TYPE = "API_TYPE";
     public static final String HTTP_VERB = "HTTP_VERB";
