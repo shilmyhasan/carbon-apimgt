@@ -153,11 +153,16 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
             log.debug("Token to be invalidated : " + revokedToken);
             try {
                 Application application = ApiMgtDAO.getInstance().getApplicationByClientId(consumerKey);
+                if (application != null) {
                     log.debug("Revoking tokens of application : " + application != null ? application.getName() : "");
-                if (application != null & application.getTokenType().equals(APIConstants.TOKEN_TYPE_JWT)) {
-                    log.debug("  isJwtToken  = true");
-                    prefixedRevokedToken = APIConstants.JWT_TOKEN_PREFIX + revokedToken;
-                    isJwtToken = true;
+
+                    if (application.getTokenType().equals(APIConstants.TOKEN_TYPE_JWT)) {
+                        log.debug("  isJwtToken  = true");
+                        prefixedRevokedToken = APIConstants.JWT_TOKEN_PREFIX + revokedToken;
+                        isJwtToken = true;
+                    }
+                } else {
+                    log.debug("Revoking tokens of application : null");
                 }
             } catch (APIManagementException e) {
                 log.warn("Exception occurred while getting application for publishing revoke event.");
