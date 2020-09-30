@@ -46,12 +46,6 @@ public class RevokedTokenDataImpl implements RevokedTokenService {
             }
             Utils.removeCacheEntryFromGatewayCache(accessToken);
             Utils.putInvalidTokenEntryIntoInvalidTokenCache(accessToken, cachedTenantDomain);
-            //Need to Clear the API Key cache if revoked token is in the JWT format
-            //but the cacheKey should be: tokenIdentifier, apiContext, apiVersion, matchingResource, httpMethod
-            //hence commented.
-//            if (isJwtToken) {
-//                Utils.removeCacheEntryFromGatewayAPiKeyCache(accessToken);
-//            }
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
