@@ -19,6 +19,7 @@ package org.wso2.carbon.apimgt.keymgt.token;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -38,6 +39,10 @@ import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataExcept
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCache;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheEntry;
 import org.wso2.carbon.identity.oauth.cache.AuthorizationGrantCacheKey;
+import org.wso2.carbon.identity.oauth.common.exception.InvalidOAuthClientException;
+import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
+import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
@@ -47,6 +52,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Date;
+import java.util.List;
+import java.util.Arrays;
 
 import static org.apache.commons.collections.MapUtils.isNotEmpty;
 
@@ -65,6 +73,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
         long currentTime = System.currentTimeMillis();
         long expireIn = currentTime + getTTL() * 1000;
 
+        Date currentTimeDate = new Date(currentTime);
         String dialect;
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
@@ -89,10 +98,35 @@ public class JWTGenerator extends AbstractJWTGenerator {
             appAttributes = application.getApplicationAttributes();
             uuid = application.getUUID();
         }
+        String usernameWithoutTenantDomain = MultitenantUtils.getTenantAwareUsername(endUserName);
         Map<String, String> claims = new LinkedHashMap<String, String>(20);
+        OAuthAppDO oAuthAppDO = null;
+        try {
+            oAuthAppDO = OAuth2Util.
+                    getAppInformationByClientId(validationContext.getValidationInfoDTO().getConsumerKey());
+        } catch (IdentityOAuth2Exception e) {
+            log.error("Error occurred while getting JWT Token client ID : "
+                    + validationContext.getValidationInfoDTO().getConsumerKey() + " when getting oAuth App " +
+                    "information", e);
+            throw new APIManagementException("Error occurred while getting JWT Token client ID : "
+                    + validationContext.getValidationInfoDTO().getConsumerKey(), e);
+        } catch (InvalidOAuthClientException e) {
+            log.error("Error occurred while getting JWT Token client ID : "
+                    + validationContext.getValidationInfoDTO().getConsumerKey() + " when getting oAuth App " +
+                    "information", e);
+            throw new APIManagementException("Error occurred while getting JWT Token client ID : "
+                    + validationContext.getValidationInfoDTO().getConsumerKey(), e);
+        }
+        if (oAuthAppDO != null && oAuthAppDO.getAudiences() != null) {
+            String[] audience = oAuthAppDO.getAudiences();
+            String parsedClaims = "[\"" + StringUtils.join(audience , "\",\"") + "\"]";
+            claims.put("aud", parsedClaims);
+        }
 
         claims.put("iss", API_GATEWAY_ID);
         claims.put("exp", String.valueOf(expireIn));
+        claims.put("iat", String.valueOf(currentTime));
+        claims.put("sub", usernameWithoutTenantDomain);
         claims.put(dialect + "/subscriber", subscriber);
         claims.put(dialect + "/applicationid", applicationId);
         claims.put(dialect + "/applicationname", applicationName);
@@ -124,7 +158,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
 
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
-            Map<ClaimMapping, String> customClaimsWithMapping = new HashMap<>();;
+            Map<ClaimMapping, String> customClaimsWithMapping = new HashMap<>();
             Map<String, String> customClaims;
             //fix for https://github.com/wso2/product-apim/issues/4112
             String accessToken = validationContext.getAccessToken();

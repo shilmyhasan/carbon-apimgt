@@ -221,6 +221,7 @@ public class APIMTokenIssuerUtil {
                     apiKeyValidationInfoDTO.setApplicationId(String.valueOf(application.getId()));
                     apiKeyValidationInfoDTO.setType(application.getKeyType());
                     apiKeyValidationInfoDTO.setApplicationTier(application.getTier());
+                    apiKeyValidationInfoDTO.setConsumerKey(clientId);
                     validationContext.setValidationInfoDTO(apiKeyValidationInfoDTO);
                     validationContext.setUser(endUser);
                     validationContext.setAuthorizationCode(jwtAccessTokenIssuerDTO.getAuthCode());
