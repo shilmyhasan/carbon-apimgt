@@ -19,6 +19,9 @@ public class SubscriptionDTO  {
   
   @NotNull
   private String applicationId = null;
+
+  @NotNull
+  private String apiId = null;
   
   @NotNull
   private String apiIdentifier = null;
@@ -83,7 +86,19 @@ public class SubscriptionDTO  {
     this.applicationId = applicationId;
   }
 
-  
+  /**
+   * The UUID of the api
+   **/
+  @ApiModelProperty(required = true, value = "The UUID of the api")
+  @JsonProperty("apiId")
+  public String getAPIId() {
+      return apiId;
+  }
+
+  public void setAPIId(String apiId) {
+      this.apiId= apiId;
+  }
+
   /**
    **/
   @ApiModelProperty(required = true, value = "")
