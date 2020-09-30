@@ -156,7 +156,7 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
                 if (application != null) {
                     log.debug("Revoking tokens of application : " + application != null ? application.getName() : "");
 
-                    if (application.getTokenType().equals(APIConstants.TOKEN_TYPE_JWT)) {
+                    if (APIConstants.TOKEN_TYPE_JWT.equals(application.getTokenType())) {
                         log.debug("  isJwtToken  = true");
                         prefixedRevokedToken = APIConstants.JWT_TOKEN_PREFIX + revokedToken;
                         isJwtToken = true;
