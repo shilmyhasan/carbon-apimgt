@@ -89,7 +89,7 @@ public class SubscriptionDTO  {
   /**
    * The UUID of the api
    **/
-  @ApiModelProperty(required = true, value = "The UUID of the api")
+  @ApiModelProperty(value = "The UUID of the api")
   @JsonProperty("apiId")
   public String getAPIId() {
       return apiId;
