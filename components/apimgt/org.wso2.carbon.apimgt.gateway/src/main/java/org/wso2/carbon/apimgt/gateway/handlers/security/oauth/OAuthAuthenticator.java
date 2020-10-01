@@ -114,13 +114,16 @@ public class OAuthAuthenticator implements Authenticator {
         TracingSpan getClientDomainSpan = null;
         TracingSpan authenticationSchemeSpan = null;
         TracingSpan keyInfo = null;
+        PathItem pathItem = null;
         Map headers = (Map) ((Axis2MessageContext) synCtx).getAxis2MessageContext().
                 getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         openAPI = (OpenAPI) synCtx.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT);
         String apiElectedResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
-        PathItem pathItem = openAPI.getPaths().get(apiElectedResource);
-        if (pathItem == null) {
-            synCtx.setProperty(APIConstants.API_ELECTED_RESOURCE_WITH_SLASH, apiElectedResource + "/");
+        if (openAPI != null && openAPI.getPaths() != null) {
+            pathItem = openAPI.getPaths().get(apiElectedResource);
+            if (pathItem == null) {
+                synCtx.setProperty(APIConstants.API_ELECTED_RESOURCE_WITH_SLASH, apiElectedResource + "/");
+            }
         }
         if (headers != null) {
             requestOrigin = (String) headers.get("Origin");
@@ -163,7 +166,7 @@ public class OAuthAuthenticator implements Authenticator {
         String httpMethod = (String)((Axis2MessageContext) synCtx).getAxis2MessageContext().
                 getProperty(Constants.Configuration.HTTP_METHOD);
         String matchingResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
-        if (pathItem == null) {
+        if (openAPI != null && pathItem == null) {
             matchingResource = matchingResource + "/";
         }
         if (Util.tracingEnabled()) {
