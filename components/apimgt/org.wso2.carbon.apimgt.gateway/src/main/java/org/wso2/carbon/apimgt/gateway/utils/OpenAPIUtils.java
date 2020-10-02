@@ -205,7 +205,11 @@ public class OpenAPIUtils {
                     ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             String httpMethod = (String) axis2MessageContext.getProperty(APIConstants.DigestAuthConstants.HTTP_METHOD);
             PathItem path = openAPI.getPaths().get(apiElectedResource);
-
+            if (path == null) {
+                String apiElectedResourceWithSlash = (String) synCtx
+                        .getProperty(APIConstants.API_ELECTED_RESOURCE_WITH_SLASH);
+                path = openAPI.getPaths().get(apiElectedResourceWithSlash);
+            }
             if (path != null) {
                 switch (httpMethod) {
                     case APIConstants.HTTP_GET:
@@ -235,7 +239,11 @@ public class OpenAPIUtils {
                     ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             String httpMethod = (String) axis2MessageContext.getProperty(APIConstants.DigestAuthConstants.HTTP_METHOD);
             PathItem path = openAPI.getPaths().get(apiElectedResource);
-
+            if (path == null) {
+                String apiElectedResourceWithSlash = (String) synCtx
+                        .getProperty(APIConstants.API_ELECTED_RESOURCE_WITH_SLASH);
+                path = openAPI.getPaths().get(apiElectedResourceWithSlash);
+            }
             if (path != null) {
                 Operation operation = path.readOperationsMap().get(PathItem.HttpMethod.valueOf(httpMethod));
                 return getDefaultSecurityScopes(operation.getSecurity());
