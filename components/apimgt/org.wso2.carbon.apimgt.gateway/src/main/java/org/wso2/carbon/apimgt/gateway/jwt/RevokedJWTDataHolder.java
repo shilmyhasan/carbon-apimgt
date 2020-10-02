@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.apimgt.gateway.jwt;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -65,15 +64,11 @@ public class RevokedJWTDataHolder {
 
     /**
      * Checks whether a given signature is in the map.
-     * @param jwtIdentifier signature to be checked.
+     * @param jwtSignature signature to be checked.
      * @return true if it exists and false otherwise.
      */
-    public static boolean isJWTTokenSignatureExistsInRevokedMap(String jwtIdentifier) {
-        if(StringUtils.isEmpty(jwtIdentifier)) {
-            return false;
-        }
-
-        return revokedJWTMap.containsKey(jwtIdentifier);
+    public static boolean isJWTTokenSignatureExistsInRevokedMap(String jwtSignature) {
+        return revokedJWTMap.containsKey(jwtSignature);
     }
 
     private RevokedJWTDataHolder() {
