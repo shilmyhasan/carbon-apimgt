@@ -1544,6 +1544,7 @@ public final class APIConstants {
     public static final String BLOCK_CONDITION_INVERT = "invert";
     public static final String BLOCK_CONDITION_IP_TYPE = "type";
     public static final String REVOKED_TOKEN_KEY = "revokedToken";
+    public static final String REVOKED_TOKEN_TYPE = "revokedTokenType";
     public static final String REVOKED_TOKEN_EXPIRY_TIME = "expiryTime";
 
     public static final String SEARCH_AND_TAG = "&";

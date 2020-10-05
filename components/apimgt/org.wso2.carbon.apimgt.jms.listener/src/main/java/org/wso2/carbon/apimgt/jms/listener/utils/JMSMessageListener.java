@@ -117,8 +117,12 @@ public class JMSMessageListener implements MessageListener {
                              * revokedToken - Revoked Token which should be removed from the cache
                              * expiryTime - ExpiryTime of the token if token is JWT, otherwise expiry is set to 0
                              */
+                            String tokenType = "";
+                            if (map.containsKey(APIConstants.REVOKED_TOKEN_TYPE)) {
+                                tokenType = (String)map.get(APIConstants.REVOKED_TOKEN_TYPE);
+                            }
                             handleRevokedTokenMessage((String) map.get(APIConstants.REVOKED_TOKEN_KEY),
-                                    (Long) map.get(APIConstants.REVOKED_TOKEN_EXPIRY_TIME));
+                                    (Long) map.get(APIConstants.REVOKED_TOKEN_EXPIRY_TIME), tokenType);
                         }
 
                     } else if (JMSConstants.TOPIC_CACHE_INVALIDATION.equalsIgnoreCase(jmsDestination.getTopicName())) {
@@ -386,7 +390,7 @@ public class JMSMessageListener implements MessageListener {
         }
     }
 
-    private void handleRevokedTokenMessage(String revokedToken, long expiryTime) {
+    private void handleRevokedTokenMessage(String revokedToken, long expiryTime, String tokenType) {
 
         boolean isJwtToken = false;
         if (StringUtils.isEmpty(revokedToken)) {
@@ -394,8 +398,9 @@ public class JMSMessageListener implements MessageListener {
         }
 
         //handle JWT tokens
-        if (revokedToken.contains(APIConstants.DOT) && APIUtil.isValidJWT(revokedToken)) {
-            revokedToken = APIUtil.getSignatureIfJWT(revokedToken); //JWT signature is the cache key
+        if (APIConstants.JWT.equals(tokenType)) {
+            // Add revoked token to revoked JWT map
+
             ServiceReferenceHolder.getInstance().getRevokedTokenService()
                     .addRevokedJWTIntoMap(revokedToken, expiryTime);  // Add revoked
             // token to
