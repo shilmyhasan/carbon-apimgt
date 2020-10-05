@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.oauth2.model.AccessTokenDO;
 import org.wso2.carbon.identity.oauth2.model.RefreshTokenValidationDataDO;
 
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * This class provides an implementation of OAuthEventInterceptor interface in which
@@ -149,16 +150,16 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
             String revokedToken = accessTokenDO.getAccessToken();
             String consumerKey = accessTokenDO.getConsumerKey();
             int tenantId = accessTokenDO.getTenantID();
-            String prefixedRevokedToken =  revokedToken;
             log.debug("Token to be invalidated : " + revokedToken);
+            Properties properties = new  Properties();
+
             try {
                 Application application = ApiMgtDAO.getInstance().getApplicationByClientId(consumerKey);
                 if (application != null) {
-                    log.debug("Revoking tokens of application : " + application != null ? application.getName() : "");
-
+                    log.debug("Revoking tokens of application : " + application.getName());
                     if (APIConstants.TOKEN_TYPE_JWT.equals(application.getTokenType())) {
                         log.debug("  isJwtToken  = true");
-                        prefixedRevokedToken = APIConstants.JWT_TOKEN_PREFIX + revokedToken;
+                        properties.setProperty(APIConstants.REVOKED_TOKEN_TYPE, APIConstants.JWT);
                         isJwtToken = true;
                     }
                 } else {
@@ -167,7 +168,7 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
             } catch (APIManagementException e) {
                 log.warn("Exception occurred while getting application for publishing revoke event.");
             }
-            revocationRequestPublisher.publishRevocationEvents(prefixedRevokedToken, expiryTime, null);
+            revocationRequestPublisher.publishRevocationEvents(revokedToken, expiryTime, properties);
             if (isJwtToken) {
                 // Persist revoked JWT token to database.
                 log.debug("persisting jwt token revocation event.");

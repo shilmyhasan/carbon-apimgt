@@ -531,7 +531,6 @@ public final class APIConstants {
     public static final String DEFAULT_ORGANIZATION_CLAIM_NAME = "http://wso2.org/claims/organization";
     public static final String DEFAULT_TOKEN_TYPE = "DEFAULT";
     public static final String TOKEN_TYPE_JWT = "JWT";
-    public static final String JWT_TOKEN_PREFIX = "JWT:";
 
     public static final String PASSWORD_RESOLVER_IMPL_CLASS = "PasswordResolverImpl";
     public static final String CACHE_INVALIDATION_TYPE = "type";
@@ -1545,6 +1544,7 @@ public final class APIConstants {
     public static final String BLOCK_CONDITION_INVERT = "invert";
     public static final String BLOCK_CONDITION_IP_TYPE = "type";
     public static final String REVOKED_TOKEN_KEY = "revokedToken";
+    public static final String REVOKED_TOKEN_TYPE = "revokedTokenType";
     public static final String REVOKED_TOKEN_EXPIRY_TIME = "expiryTime";
 
     public static final String SEARCH_AND_TAG = "&";
