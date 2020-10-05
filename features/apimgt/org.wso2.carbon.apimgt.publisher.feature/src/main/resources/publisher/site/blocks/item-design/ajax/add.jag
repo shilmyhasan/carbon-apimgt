@@ -50,6 +50,11 @@ var parseSwaggerDefinition = function (swagger) {
     return swaggerJson;
 }
 
+var isSupportedOpenAPIVersion = function (version) {
+    // support for 3.0.x versions
+    return /^3\.0\.\d{1,}$/.test(version);
+}
+
 if(jagg.isCSRFTokenValid())
 (function () {
     response.contentType = "text/plain; charset=UTF-8";
@@ -73,7 +78,7 @@ if(jagg.isCSRFTokenValid())
             var swagger = null;
             var wsdl = null;
             var supportedSwaggerVersion = "2.0";
-            var supportedOpenAPIVersion = "3.0.0";
+            var supportedOpenAPIVersion = "3.0.x";
             var parser = new SwaggerParser();
             var apiDefinitionVersion = request.getParameter("apiDefinitionVersion");
 
@@ -91,7 +96,7 @@ if(jagg.isCSRFTokenValid())
                         //released yet.
                         var apiDefinition = parseSwaggerDefinition(swagger);
                         if (apiDefinition.openapi) {
-                            if (apiDefinition.openapi != supportedOpenAPIVersion) {
+                            if (!isSupportedOpenAPIVersion(apiDefinition.openapi.trim())) {
                                 print({
                                     error: true,
                                     message: "Unsupported OpenAPI version provided. Please re-import with OpenAPI " +
@@ -149,7 +154,7 @@ if(jagg.isCSRFTokenValid())
                         if (apiDefinition.openapi) {
 
                             //Supported Open API Version check
-                            if (apiDefinition.openapi != supportedOpenAPIVersion) {
+                            if (!isSupportedOpenAPIVersion(apiDefinition.openapi.trim())) {
                                 print({
                                     error: true,
                                     message: "Unsupported OpenAPI version provided. Please re-import with OpenAPI " +
