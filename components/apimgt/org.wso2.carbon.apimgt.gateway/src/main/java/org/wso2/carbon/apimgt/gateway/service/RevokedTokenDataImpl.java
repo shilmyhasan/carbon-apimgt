@@ -40,12 +40,14 @@ public class RevokedTokenDataImpl implements RevokedTokenService {
                     MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
             cachedTenantDomain = Utils.getCachedTenantDomain(accessToken);
             if (cachedTenantDomain == null) { //the token is not in cache
-                Utils.putInvalidTokenEntryIntoInvalidTokenCache(accessToken,
-                        MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                 return;
             }
             Utils.removeCacheEntryFromGatewayCache(accessToken);
             Utils.putInvalidTokenEntryIntoInvalidTokenCache(accessToken, cachedTenantDomain);
+            //Clear the API Key cache if revoked token is in the JWT format
+            if (isJwtToken) {
+                Utils.removeCacheEntryFromGatewayAPiKeyCache(accessToken);
+            }
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }

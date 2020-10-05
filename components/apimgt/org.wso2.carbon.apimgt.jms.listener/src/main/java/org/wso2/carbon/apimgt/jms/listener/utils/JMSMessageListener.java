@@ -110,7 +110,8 @@ public class JMSMessageListener implements MessageListener {
                             handleKeyTemplateMessage(map);
                         }
                     } else if (JMSConstants.TOPIC_TOKEN_REVOCATION.equalsIgnoreCase(jmsDestination.getTopicName())) {
-                        if (map.get(APIConstants.REVOKED_TOKEN_KEY) != null) {
+                        if (map.get(APIConstants.REVOKED_TOKEN_KEY) !=
+                                null) {
                             /*
                              * This message contains revoked token data
                              * revokedToken - Revoked Token which should be removed from the cache
@@ -391,15 +392,19 @@ public class JMSMessageListener implements MessageListener {
 
     private void handleRevokedTokenMessage(String revokedToken, long expiryTime, String tokenType) {
 
+        boolean isJwtToken = false;
         if (StringUtils.isEmpty(revokedToken)) {
             return;
         }
-        boolean isJwtToken = false;
+
         //handle JWT tokens
         if (APIConstants.JWT.equals(tokenType)) {
             // Add revoked token to revoked JWT map
+
             ServiceReferenceHolder.getInstance().getRevokedTokenService()
-                    .addRevokedJWTIntoMap(revokedToken, expiryTime);
+                    .addRevokedJWTIntoMap(revokedToken, expiryTime);  // Add revoked
+            // token to
+            // revoked JWT map
             isJwtToken = true;
         }
         ServiceReferenceHolder.getInstance().getRevokedTokenService()
