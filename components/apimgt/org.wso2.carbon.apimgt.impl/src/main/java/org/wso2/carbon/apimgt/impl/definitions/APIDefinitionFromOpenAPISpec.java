@@ -87,6 +87,14 @@ public class APIDefinitionFromOpenAPISpec extends APIDefinition {
                     for (Object o1 : path.keySet()) {
                         String httpVerb = (String) o1;
 
+                        if (APIConstants.SWAGGER_SUMMARY.equals(httpVerb.toLowerCase())
+                                || APIConstants.SWAGGER_DESCRIPTION.equals(httpVerb.toLowerCase())
+                                || httpVerb.startsWith("x-")
+                                || httpVerb.startsWith("X-")) {
+                            // openapi 3.x allow 'summary', 'description' and extensions in PathItem Object.
+                            // which we are not interested at this point
+                            continue;
+                        }
                         //Only continue for supported operations
                         if (APIConstants.SUPPORTED_METHODS.contains(httpVerb.toLowerCase())) {
                             JSONObject operation = (JSONObject) path.get(httpVerb);
