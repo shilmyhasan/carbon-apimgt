@@ -542,7 +542,7 @@ public class GatewayUtils {
         return endpointAddress;
     }
 
-    public static AuthenticationContext generateAuthenticationContext(String tokenSignature, JWTClaimsSet payload,
+    public static AuthenticationContext generateAuthenticationContext(String tokenIdentifier, JWTClaimsSet payload,
                                                                       JSONObject api,
                                                                       APIKeyValidationInfoDTO apiKeyValidationInfoDTO,
                                                                       String apiLevelPolicy, String endUserToken,
@@ -551,7 +551,7 @@ public class GatewayUtils {
 
         AuthenticationContext authContext = new AuthenticationContext();
         authContext.setAuthenticated(true);
-        authContext.setApiKey(tokenSignature);
+        authContext.setApiKey(tokenIdentifier);
         authContext.setUsername(payload.getSubject());
 
         if (apiKeyValidationInfoDTO != null) {
