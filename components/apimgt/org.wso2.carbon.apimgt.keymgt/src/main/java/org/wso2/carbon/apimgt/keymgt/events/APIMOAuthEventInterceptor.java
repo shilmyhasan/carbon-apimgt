@@ -149,43 +149,6 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
             String revokedToken = accessTokenDO.getAccessToken();
             String consumerKey = accessTokenDO.getConsumerKey();
             int tenantId = accessTokenDO.getTenantID();
-
-            try {
-                Application application = ApiMgtDAO.getInstance().getApplicationByClientId(consumerKey);
-                    log.debug("Revoking tokens of application : " + application != null ? application.getName() : "");
-                if (application != null & application.getTokenType().equals(APIConstants.TOKEN_TYPE_JWT)) {
-                    log.debug("  isJwtToken  = true");
-                    isJwtToken = true;
-                }
-            } catch (APIManagementException e) {
-                log.warn("Exception occurred while getting application for publishing revoke event.");
-            }
-            revocationRequestPublisher.publishRevocationEvents(revokedToken, expiryTime, null);
-            if (isJwtToken) {
-                // Persist revoked JWT token to database.
-                log.debug("persisting jwt token revocation event.");
-                persistRevokedJWTIdentifier(revokedToken, expiryTime, tenantId);
-            }
-        }
-    }
-
-    @Override
-    public void onPostTokenRevocationBySystem(AccessTokenDO accessTokenDO, Map<String, Object> params)
-            throws IdentityOAuth2Exception {
-
-        log.debug("onPostTokenRevocationBySystem event triggered.");
-        publishAndPersistEvent(accessTokenDO);
-    }
-
-    private void publishAndPersistEvent(AccessTokenDO accessTokenDO) {
-
-        if (accessTokenDO != null) {
-
-            long expiryTime = accessTokenDO.getIssuedTime().getTime() + accessTokenDO.getValidityPeriodInMillis();
-            boolean isJwtToken = false;
-            String revokedToken = accessTokenDO.getAccessToken();
-            String consumerKey = accessTokenDO.getConsumerKey();
-            int tenantId = accessTokenDO.getTenantID();
             log.debug("Token to be invalidated : " + revokedToken);
             Properties properties = new  Properties();
 
