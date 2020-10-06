@@ -16,13 +16,12 @@ public class SubscriptionDTO  {
   
   
   private String subscriptionId = null;
+
+  private String apiId = null;
   
   @NotNull
   private String applicationId = null;
 
-  @NotNull
-  private String apiId = null;
-  
   @NotNull
   private String apiIdentifier = null;
   
