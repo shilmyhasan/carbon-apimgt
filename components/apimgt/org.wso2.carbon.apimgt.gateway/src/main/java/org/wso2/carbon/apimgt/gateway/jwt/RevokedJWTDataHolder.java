@@ -69,7 +69,7 @@ public class RevokedJWTDataHolder {
      * @return true if it exists and false otherwise.
      */
     public static boolean isJWTTokenSignatureExistsInRevokedMap(String jwtIdentifier) {
-        if(StringUtils.isEmpty(jwtIdentifier)) {
+        if (StringUtils.isEmpty(jwtIdentifier)) {
             return false;
         }
 

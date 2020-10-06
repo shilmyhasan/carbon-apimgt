@@ -144,7 +144,6 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
     private void publishAndPersistEvent(AccessTokenDO accessTokenDO) {
 
         if (accessTokenDO != null) {
-
             long expiryTime = accessTokenDO.getIssuedTime().getTime() + accessTokenDO.getValidityPeriodInMillis();
             boolean isJwtToken = false;
             String revokedToken = accessTokenDO.getAccessToken();
