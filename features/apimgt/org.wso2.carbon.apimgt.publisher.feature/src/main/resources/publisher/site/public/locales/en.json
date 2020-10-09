@@ -620,6 +620,7 @@
   "Apis.Details.Resources.Resources.edit.resources.button": "Edit Resources",
   "Apis.Details.Resources.Resources.something.went.wrong.while.updating.the.api": "Error occurred while updating API",
   "Apis.Details.Resources.components.AddOperation.add.tooltip": "Add new operation",
+  "Apis.Details.Resources.components.AddOperation.option": "OPTIONS",
   "Apis.Details.Resources.components.AddOperation.clear.inputs.tooltip": "Clear inputs",
   "Apis.Details.Resources.components.AddParameter.add.tooltip": "Add new parameter",
   "Apis.Details.Resources.components.AddParameter.clear.inputs.tooltip": "Clear inputs",
