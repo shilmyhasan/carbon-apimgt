@@ -14,7 +14,7 @@ const AppThemes = {
             },
             secondary: {
                 light: '#0066ff',
-                main: '#00ff00',
+                main: '#a2ecf5',
                 // dark: will be calculated from palette.secondary.main,
                 contrastText: '#ffcc00',
             },
