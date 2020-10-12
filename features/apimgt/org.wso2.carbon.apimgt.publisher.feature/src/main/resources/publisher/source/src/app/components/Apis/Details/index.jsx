@@ -63,7 +63,6 @@ import ProductResourcesEdit from './ProductResources/ProductResourcesEdit';
 import Endpoints from './Endpoints/Endpoints';
 import Environments from './Environments/Environments';
 import Subscriptions from './Subscriptions/Subscriptions';
-import Comments from './Comments/Comments';
 import Scope from './Scopes';
 import Security from './Security';
 import APIDefinition from './APIDefinition/APIDefinition';
@@ -723,7 +722,6 @@ class Details extends Component {
                                     component={() => <Subscriptions api={api} updateAPI={this.updateAPI} />}
                                 />
                                 <Route path={Details.subPaths.SECURITY} component={() => <Security api={api} />} />
-                                <Route path={Details.subPaths.COMMENTS} component={() => <Comments api={api} />} />
                                 <Route
                                     path={Details.subPaths.BUSINESS_INFO}
                                     component={() => <BusinessInformation api={api} />}
@@ -787,7 +785,6 @@ Details.subPaths = {
     SUBSCRIPTIONS_PRODUCT: '/api-products/:apiprod_uuid/subscriptions',
     SUBSCRIPTIONS: '/apis/:api_uuid/subscriptions',
     SECURITY: '/apis/:api_uuid/security',
-    COMMENTS: '/apis/:api_uuid/comments',
     BUSINESS_INFO: '/apis/:api_uuid/business info',
     BUSINESS_INFO_PRODUCT: '/api-products/:apiprod_uuid/business info',
     PROPERTIES: '/apis/:api_uuid/properties',
