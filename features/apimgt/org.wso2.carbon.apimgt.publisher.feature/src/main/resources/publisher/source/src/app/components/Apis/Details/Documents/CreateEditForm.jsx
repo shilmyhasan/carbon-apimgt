@@ -455,7 +455,7 @@ class CreateEditForm extends React.Component {
                         <FormControlLabel
                             className={classes.formControlLabel}
                             value='HOWTO'
-                            control={<Radio />}
+                            control={<Radio color='primary' />}
                             label={
                                 <div className={classes.typeTextWrapper}>
                                     <Icon>help_outline</Icon>
@@ -471,7 +471,7 @@ class CreateEditForm extends React.Component {
                         <FormControlLabel
                             className={classes.formControlLabel}
                             value='SAMPLES'
-                            control={<Radio />}
+                            control={<Radio color='primary' />}
                             label={
                                 <div className={classes.typeTextWrapper}>
                                     <Icon>code</Icon>
@@ -487,7 +487,7 @@ class CreateEditForm extends React.Component {
                         <FormControlLabel
                             className={classes.formControlLabel}
                             value='PUBLIC_FORUM'
-                            control={<Radio />}
+                            control={<Radio color='primary' />}
                             label={
                                 <div className={classes.typeTextWrapper}>
                                     <Icon>forum</Icon>
@@ -503,7 +503,7 @@ class CreateEditForm extends React.Component {
                         <FormControlLabel
                             className={classes.formControlLabel}
                             value='SUPPORT_FORUM'
-                            control={<Radio />}
+                            control={<Radio color='primary' />}
                             label={
                                 <div className={classes.typeTextWrapper}>
                                     <Icon>forum</Icon>
@@ -522,7 +522,7 @@ class CreateEditForm extends React.Component {
                         <FormControlLabel
                             className={classes.formControlLabel}
                             value='OTHER'
-                            control={<Radio />}
+                            control={<Radio color='primary' />}
                             label={
                                 <div className={classes.typeTextWrapper}>
                                     <Icon>video_label</Icon>
@@ -585,7 +585,7 @@ class CreateEditForm extends React.Component {
                         <FormControlLabel
                             disabled={this.setDisable('INLINE')}
                             value='INLINE'
-                            control={<Radio />}
+                            control={<Radio color='primary' />}
                             label={
                                 <FormattedMessage
                                     id='Apis.Details.Documents.CreateEditForm.source.inline'
@@ -596,7 +596,7 @@ class CreateEditForm extends React.Component {
                         <FormControlLabel
                             disabled={this.setDisable('MARKDOWN')}
                             value='MARKDOWN'
-                            control={<Radio />}
+                            control={<Radio color='primary'  />}
                             label={
                                 <FormattedMessage
                                     id='Apis.Details.Documents.CreateEditForm.source.markdown'
