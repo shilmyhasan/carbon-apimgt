@@ -320,9 +320,11 @@ public class JWTValidator {
             /*
              * Set api.ut.apiPublisher of the subscribed api to the message context.
              * This is necessary for the functionality of Publisher alerts.
+             * Set API_NAME of the subscribed api to the message context.
              * */
             if (api != null) {
                 synCtx.setProperty(APIMgtGatewayConstants.API_PUBLISHER, api.get("publisher"));
+                synCtx.setProperty("API_NAME", api.get("name"));
             } else {
                 boolean validateSubscriptionViaKM = Boolean.parseBoolean(
                         ServiceReferenceHolder.getInstance().getAPIManagerConfiguration()
