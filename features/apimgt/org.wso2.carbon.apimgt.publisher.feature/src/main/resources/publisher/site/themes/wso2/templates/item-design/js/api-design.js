@@ -188,8 +188,9 @@ function APIDesigner(){
         if (path.charAt(0) != "/")
             path = "/"+path;
 
-        if (path.endsWith("/"))
-            path = path.slice(0,-1)
+        if (path.endsWith("/")) {
+            path = path.slice(0, -1)
+        }
 
     	var resource_exist = false;
         $(".http_verb_select").each(function(){    //added this validation to fix https://wso2.org/jira/browse/APIMANAGER-2671
@@ -273,7 +274,7 @@ APIDesigner.prototype.remove_trailing_slash = function(swagger) {
     var paths = swagger.paths;
     for (var path in paths) {
         if (path.endsWith("/")) {
-            var newkey = path.slice(0,-1);
+            var newkey = path.slice(0, -1);
             swagger.paths[newkey] = swagger.paths[path];
             delete swagger.paths[path];
         }
