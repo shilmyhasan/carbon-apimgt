@@ -540,11 +540,11 @@ public class OAuthAuthenticator implements Authenticator {
 	}
 
     public String getSecurityHeader() {
-        if (this.securityHeader.equals(HttpHeaders.AUTHORIZATION)) {
+        if (this.securityHeader == null) {
             try {
-                String header = APIUtil.getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
-                if (StringUtils.isNotEmpty(header)) {
-                    securityHeader = header;
+                securityHeader = APIUtil.getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
+                if (securityHeader == null) {
+                    securityHeader = HttpHeaders.AUTHORIZATION;
                 }
             } catch (APIManagementException e) {
                 log.error("Error while reading authorization header from APIM configurations", e);
