@@ -84,7 +84,6 @@ public class BasicAuthAuthenticatorTest {
                     }
                     return false;
                 });
-        basicAuthAuthenticator.setBasicAuthCredentialValidator(basicAuthCredentialValidator);
         Mockito.when(messageContext.getProperty(BasicAuthAuthenticator.PUBLISHER_TENANT_DOMAIN)).
                 thenReturn("carbon.super");
     }

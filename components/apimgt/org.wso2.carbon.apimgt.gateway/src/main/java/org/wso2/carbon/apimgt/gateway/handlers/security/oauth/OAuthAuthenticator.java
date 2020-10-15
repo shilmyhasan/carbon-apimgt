@@ -29,6 +29,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.dto.ConditionGroupDTO;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
@@ -41,6 +42,7 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.JWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.tracing.TracingSpan;
 import org.wso2.carbon.apimgt.tracing.TracingTracer;
 import org.wso2.carbon.apimgt.tracing.Util;
@@ -148,13 +150,13 @@ public class OAuthAuthenticator implements Authenticator {
                 if(log.isDebugEnabled()){
                     log.debug("Removing OAuth key from Authorization header");
                 }
-                headers.put(securityHeader, remainingAuthHeader);
+                headers.put(getSecurityHeader(), remainingAuthHeader);
                 remainingAuthHeader = "";
             } else {
                 if(log.isDebugEnabled()){
                     log.debug("Removing Authorization header from headers");
                 }
-                headers.remove(securityHeader);
+                headers.remove(getSecurityHeader());
             }
 
         }
@@ -443,11 +445,11 @@ public class OAuthAuthenticator implements Authenticator {
 
         //From 1.0.7 version of this component onwards remove the OAuth authorization header from
         // the message is configurable. So we dont need to remove headers at this point.
-        String authHeader = (String) headersMap.get(securityHeader);
+        String authHeader = (String) headersMap.get(getSecurityHeader());
         if (authHeader == null) {
             if (log.isDebugEnabled()) {
                 log.debug("OAuth2 Authentication: Expected authorization header with the name '"
-                        .concat(securityHeader).concat("' was not found."));
+                        .concat(getSecurityHeader()).concat("' was not found."));
             }
             return null;
         }
@@ -534,6 +536,13 @@ public class OAuthAuthenticator implements Authenticator {
 	}
 
     public String getSecurityHeader() {
+        if (this.securityHeader == null) {
+            try {
+                securityHeader = APIUtil.getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
+            } catch (APIManagementException e) {
+                log.error("Error while reading authorization header from APIM configurations", e);
+            }
+        }
         return securityHeader;
     }
 
