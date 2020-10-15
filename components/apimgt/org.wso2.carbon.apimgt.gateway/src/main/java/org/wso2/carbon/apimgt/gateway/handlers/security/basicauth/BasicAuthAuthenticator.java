@@ -54,6 +54,7 @@ public class BasicAuthAuthenticator implements Authenticator {
     private final String basicAuthKeyHeaderSegment = "Basic";
     static final String PUBLISHER_TENANT_DOMAIN = "tenant.info.domain";
 
+    private BasicAuthCredentialValidator basicAuthCredentialValidator;
     private String securityHeader;
     private String requestOrigin;
     private OpenAPI openAPI = null;
@@ -228,10 +229,10 @@ public class BasicAuthAuthenticator implements Authenticator {
         }
 
         boolean authenticated = false;
-        BasicAuthCredentialValidator basicAuthCredentialValidator;
-
         try {
-            basicAuthCredentialValidator = new BasicAuthCredentialValidator();
+            if (basicAuthCredentialValidator == null) {
+                basicAuthCredentialValidator = new BasicAuthCredentialValidator();
+            }
             authenticated = basicAuthCredentialValidator.validate(username, password);
         } catch (APISecurityException ex) {
             return new AuthenticationResponse(false, isMandatory, true, ex.getErrorCode(), ex.getMessage());

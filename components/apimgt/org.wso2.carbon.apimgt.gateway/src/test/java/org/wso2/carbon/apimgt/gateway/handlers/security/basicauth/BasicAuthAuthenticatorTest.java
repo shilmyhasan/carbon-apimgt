@@ -37,7 +37,7 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import java.util.TreeMap;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(OpenAPIUtils.class)
+@PrepareForTest({OpenAPIUtils.class, BasicAuthAuthenticator.class, BasicAuthCredentialValidator.class})
 public class BasicAuthAuthenticatorTest {
     private MessageContext messageContext;
     private org.apache.axis2.context.MessageContext axis2MsgCntxt;
@@ -45,7 +45,7 @@ public class BasicAuthAuthenticatorTest {
     private final String CUSTOM_AUTH_HEADER = "AUTH-HEADER";
 
     @Before
-    public void setup() throws APISecurityException {
+    public void setup() throws Exception {
         PowerMockito.mockStatic(OpenAPIUtils.class);
         PowerMockito.when(OpenAPIUtils.getResourceAuthenticationScheme(Mockito.any(), Mockito.any()))
                 .thenReturn(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
@@ -84,6 +84,8 @@ public class BasicAuthAuthenticatorTest {
                     }
                     return false;
                 });
+
+        PowerMockito.whenNew(BasicAuthCredentialValidator.class).withNoArguments().thenReturn(basicAuthCredentialValidator);
         Mockito.when(messageContext.getProperty(BasicAuthAuthenticator.PUBLISHER_TENANT_DOMAIN)).
                 thenReturn("carbon.super");
     }
@@ -137,6 +139,7 @@ public class BasicAuthAuthenticatorTest {
         // encode64(test_username_blocked:test_password)='dGVzdF91c2VybmFtZV9ibG9ja2VkOnRlc3RfcGFzc3dvcmQ='
         transportHeaders.put(CUSTOM_AUTH_HEADER, "Basic dGVzdF91c2VybmFtZV9ibG9ja2VkOnRlc3RfcGFzc3dvcmQ=");
         Mockito.when(axis2MsgCntxt.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS)).thenReturn(transportHeaders);
+
 
         AuthenticationResponse authenticationResponse = basicAuthAuthenticator.authenticate(messageContext);
         Assert.assertFalse(authenticationResponse.isAuthenticated());
