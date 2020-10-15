@@ -267,11 +267,6 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
             isMutualSSLMandatory = true;
         }
 
-        // Retrieve authorization header name
-        if (authorizationHeader == null) {
-            authorizationHeader = HttpHeaders.AUTHORIZATION;
-        }
-
         // Set authenticators
         Authenticator authenticator;
         if (isMutualSSLProtected) {
