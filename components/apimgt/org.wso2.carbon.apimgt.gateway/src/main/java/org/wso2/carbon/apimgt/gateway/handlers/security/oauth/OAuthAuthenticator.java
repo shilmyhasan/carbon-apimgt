@@ -71,6 +71,7 @@ public class OAuthAuthenticator implements Authenticator {
     protected JWTValidator jwtValidator;
 
     private String securityHeader = HttpHeaders.AUTHORIZATION;
+    private SynapseEnvironment  environment = null;
     private String defaultAPIHeader="WSO2_AM_API_DEFAULT_VERSION";
     private String consumerKeyHeaderSegment = "Bearer";
     private String oauthHeaderSplitter = ",";
@@ -97,9 +98,7 @@ public class OAuthAuthenticator implements Authenticator {
     }
 
     public void init(SynapseEnvironment env) {
-        this.keyValidator = new APIKeyValidator(env.getSynapseConfiguration().getAxisConfiguration());
-        this.jwtValidator = new JWTValidator(apiLevelPolicy, this.keyValidator);
-        initOAuthParams();
+        environment = env;
     }
 
     public void destroy() {
@@ -122,6 +121,11 @@ public class OAuthAuthenticator implements Authenticator {
                 getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         openAPI = (OpenAPI) synCtx.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT);
         String apiElectedResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
+
+        this.keyValidator = new APIKeyValidator(environment.getSynapseConfiguration().getAxisConfiguration());
+        this.jwtValidator = new JWTValidator(apiLevelPolicy, this.keyValidator);
+        initOAuthParams();
+
         if (openAPI != null && openAPI.getPaths() != null) {
             pathItem = openAPI.getPaths().get(apiElectedResource);
             if (pathItem == null) {
@@ -536,9 +540,12 @@ public class OAuthAuthenticator implements Authenticator {
 	}
 
     public String getSecurityHeader() {
-        if (this.securityHeader == null) {
+        if (this.securityHeader.equals(HttpHeaders.AUTHORIZATION)) {
             try {
-                securityHeader = APIUtil.getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
+                String header = APIUtil.getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
+                if (StringUtils.isNotEmpty(header)) {
+                    securityHeader = header;
+                }
             } catch (APIManagementException e) {
                 log.error("Error while reading authorization header from APIM configurations", e);
             }
