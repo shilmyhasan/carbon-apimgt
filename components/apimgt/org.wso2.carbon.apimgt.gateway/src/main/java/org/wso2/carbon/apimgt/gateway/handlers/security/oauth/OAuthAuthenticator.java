@@ -71,7 +71,7 @@ public class OAuthAuthenticator implements Authenticator {
     protected JWTValidator jwtValidator;
 
     private String securityHeader = HttpHeaders.AUTHORIZATION;
-    private SynapseEnvironment  environment = null;
+    private SynapseEnvironment environment = null;
     private String defaultAPIHeader="WSO2_AM_API_DEFAULT_VERSION";
     private String consumerKeyHeaderSegment = "Bearer";
     private String oauthHeaderSplitter = ",";

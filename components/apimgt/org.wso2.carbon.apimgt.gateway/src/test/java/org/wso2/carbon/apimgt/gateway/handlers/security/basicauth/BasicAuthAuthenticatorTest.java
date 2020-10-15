@@ -140,7 +140,6 @@ public class BasicAuthAuthenticatorTest {
         transportHeaders.put(CUSTOM_AUTH_HEADER, "Basic dGVzdF91c2VybmFtZV9ibG9ja2VkOnRlc3RfcGFzc3dvcmQ=");
         Mockito.when(axis2MsgCntxt.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS)).thenReturn(transportHeaders);
 
-
         AuthenticationResponse authenticationResponse = basicAuthAuthenticator.authenticate(messageContext);
         Assert.assertFalse(authenticationResponse.isAuthenticated());
         Assert.assertEquals(authenticationResponse.getErrorCode(), APISecurityConstants.INVALID_SCOPE);
