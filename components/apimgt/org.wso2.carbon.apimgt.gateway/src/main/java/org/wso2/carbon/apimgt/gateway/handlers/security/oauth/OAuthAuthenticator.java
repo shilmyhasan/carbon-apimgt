@@ -67,18 +67,19 @@ public class OAuthAuthenticator implements Authenticator {
 
     private static final Log log = LogFactory.getLog(OAuthAuthenticator.class);
 
-    protected APIKeyValidator keyValidator;
-    protected JWTValidator jwtValidator;
+    protected APIKeyValidator keyValidator = null;
+    protected JWTValidator jwtValidator = null;
 
     private String securityHeader = HttpHeaders.AUTHORIZATION;
     private SynapseEnvironment environment = null;
+    private APIManagerConfiguration config = null;
     private String defaultAPIHeader="WSO2_AM_API_DEFAULT_VERSION";
     private String consumerKeyHeaderSegment = "Bearer";
     private String oauthHeaderSplitter = ",";
     private String consumerKeySegmentDelimiter = " ";
     private String securityContextHeader;
-    private boolean removeOAuthHeadersFromOutMessage=true;
-    private boolean removeDefaultAPIHeaderFromOutMessage=true;
+    private boolean removeOAuthHeadersFromOutMessage =  true;
+    private boolean removeDefaultAPIHeaderFromOutMessage = true;
     private boolean isJWTAnOpaqueToken = false;
     private String clientDomainHeader = "referer";
     private String requestOrigin;
@@ -122,9 +123,18 @@ public class OAuthAuthenticator implements Authenticator {
         openAPI = (OpenAPI) synCtx.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT);
         String apiElectedResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
 
-        this.keyValidator = new APIKeyValidator(environment.getSynapseConfiguration().getAxisConfiguration());
-        this.jwtValidator = new JWTValidator(apiLevelPolicy, this.keyValidator);
-        initOAuthParams();
+        if (keyValidator == null) {
+            this.keyValidator = new APIKeyValidator(environment.getSynapseConfiguration().getAxisConfiguration());
+        }
+
+        if (jwtValidator == null) {
+            this.jwtValidator = new JWTValidator(apiLevelPolicy, this.keyValidator);
+        }
+
+        config = getApiManagerConfiguration();
+        removeOAuthHeadersFromOutMessage = isRemoveOAuthHeadersFromOutMessage();
+        isJWTAnOpaqueToken = isJWTAnOpaqueToken();
+        securityContextHeader = getSecurityContextHeader();
 
         if (openAPI != null && openAPI.getPaths() != null) {
             pathItem = openAPI.getPaths().get(apiElectedResource);
@@ -500,23 +510,6 @@ public class OAuthAuthenticator implements Authenticator {
         return result.trim();
     }
 
-    protected void initOAuthParams() {
-        APIManagerConfiguration config = getApiManagerConfiguration();
-        String value = config.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE);
-        if (value != null) {
-            removeOAuthHeadersFromOutMessage = Boolean.parseBoolean(value);
-        }
-        value = config.getFirstProperty(APIConstants.JWT_AS_OPAQUE_TOKEN);
-        if (value != null) {
-            isJWTAnOpaqueToken = Boolean.parseBoolean(value);
-        }
-        JWTConfigurationDto jwtConfigurationDto = config.getJwtConfigurationDto();
-        value = jwtConfigurationDto.getJwtHeader();
-        if (value != null) {
-            setSecurityContextHeader(value);
-        }
-    }
-
     protected APIManagerConfiguration getApiManagerConfiguration() {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
     }
@@ -589,20 +582,41 @@ public class OAuthAuthenticator implements Authenticator {
         this.consumerKeySegmentDelimiter = consumerKeySegmentDelimiter;
     }
 
-    public String getSecurityContextHeader() {
+    private String getSecurityContextHeader() {
+        JWTConfigurationDto jwtConfigurationDto = config.getJwtConfigurationDto();
+        String value = jwtConfigurationDto.getJwtHeader();
+        if (value != null) {
+            setSecurityContextHeader(value);
+        }
         return securityContextHeader;
     }
 
-    public void setSecurityContextHeader(String securityContextHeader) {
+    private void setSecurityContextHeader(String securityContextHeader) {
         this.securityContextHeader = securityContextHeader;
     }
 
-    public boolean isRemoveOAuthHeadersFromOutMessage() {
+    private boolean isRemoveOAuthHeadersFromOutMessage() {
+        String value = config.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE);
+        if (value != null) {
+            setRemoveOAuthHeadersFromOutMessage(Boolean.parseBoolean(value));
+        }
         return removeOAuthHeadersFromOutMessage;
     }
 
-    public void setRemoveOAuthHeadersFromOutMessage(boolean removeOAuthHeadersFromOutMessage) {
+    private void setRemoveOAuthHeadersFromOutMessage(boolean removeOAuthHeadersFromOutMessage) {
         this.removeOAuthHeadersFromOutMessage = removeOAuthHeadersFromOutMessage;
+    }
+
+    private boolean isJWTAnOpaqueToken() {
+        String value = config.getFirstProperty(APIConstants.JWT_AS_OPAQUE_TOKEN);
+        if (value != null) {
+            setIsJWTAnOpaqueToken(Boolean.parseBoolean(value));
+        }
+        return isJWTAnOpaqueToken;
+    }
+
+    private void setIsJWTAnOpaqueToken(boolean isJWTAnOpaqueToken) {
+        this.isJWTAnOpaqueToken = isJWTAnOpaqueToken;
     }
 
     public String getClientDomainHeader() {
