@@ -4690,14 +4690,24 @@ public class ApiMgtDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            if (connection.getMetaData().getDriverName().contains("MS SQL") ||
-                    connection.getMetaData().getDriverName().contains("Microsoft")) {
+            if (connection.getMetaData().getDriverName().contains("MS SQL")
+                    || connection.getMetaData().getDriverName().contains("Microsoft")
+                    || connection.getMetaData().getDriverName().contains("Oracle")) {
                 offset = start + offset;
             }
             // sortColumn, sortOrder variable values has sanitized in jaggery level (applications-list.jag)for security.
             sqlQuery = sqlQuery.replace("$1", sortColumn);
-            sqlQuery = sqlQuery.replace("$2", sortOrder);
-
+            if ("acs".equalsIgnoreCase(sortOrder) || "desc".equalsIgnoreCase(sortOrder)) {
+                sqlQuery = sqlQuery.replace("$2", sortOrder);
+            } else {
+                sqlQuery = sqlQuery.replace("$2", "asc");
+            }
+            if (connection.getMetaData().getDriverName().contains("Oracle") && "CREATED_BY".equals(sortColumn)) {
+                sqlQuery = sqlQuery.replace("$3", "APP.CREATED_BY");
+            } else {
+                sqlQuery = sqlQuery.replace("$3", sortColumn);
+            }
+            
             if (groupingId != null && !"null".equals(groupingId) && !groupingId.isEmpty()) {
                 if (multiGroupAppSharingEnabled) {
                     String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
@@ -4724,6 +4734,12 @@ public class ApiMgtDAO {
                 prepStmt.setString(2, "%" + search + "%");
                 prepStmt.setInt(3, start);
                 prepStmt.setInt(4, offset);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Query: " + sqlQuery);
+                log.debug("Param: " + "Sub:" + subscriber.getName() + " GroupId: " + groupingId + " Search:%" + search
+                        + "% " + "Start:" + start + " Offset:" + offset + " SortColumn:" + sortColumn + " SortOrder:"
+                        + sortOrder);
             }
             rs = prepStmt.executeQuery();
             ArrayList<Application> applicationsList = new ArrayList<Application>();
@@ -4933,6 +4949,9 @@ public class ApiMgtDAO {
         sqlQuery = SQLConstantManagerFactory.getSQlString("GET_APPLICATIONS_BY_TENANT_ID");
         try {
             connection = APIMgtDBUtil.getConnection();
+            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+                offset = start + offset;
+            }
             sqlQuery = sqlQuery.replace("$1", sortColumn);
             sqlQuery = sqlQuery.replace("$2", sortOrder);
             prepStmt = connection.prepareStatement(sqlQuery);
