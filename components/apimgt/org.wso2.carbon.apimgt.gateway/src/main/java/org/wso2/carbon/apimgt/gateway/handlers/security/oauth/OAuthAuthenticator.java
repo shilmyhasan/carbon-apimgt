@@ -29,6 +29,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.dto.ConditionGroupDTO;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
@@ -41,6 +42,7 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.JWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.tracing.TracingSpan;
 import org.wso2.carbon.apimgt.tracing.TracingTracer;
 import org.wso2.carbon.apimgt.tracing.Util;
@@ -65,17 +67,19 @@ public class OAuthAuthenticator implements Authenticator {
 
     private static final Log log = LogFactory.getLog(OAuthAuthenticator.class);
 
-    protected APIKeyValidator keyValidator;
-    protected JWTValidator jwtValidator;
+    protected APIKeyValidator keyValidator = null;
+    protected JWTValidator jwtValidator = null;
 
     private String securityHeader = HttpHeaders.AUTHORIZATION;
+    private SynapseEnvironment environment = null;
+    private APIManagerConfiguration config = null;
     private String defaultAPIHeader="WSO2_AM_API_DEFAULT_VERSION";
     private String consumerKeyHeaderSegment = "Bearer";
     private String oauthHeaderSplitter = ",";
     private String consumerKeySegmentDelimiter = " ";
     private String securityContextHeader;
-    private boolean removeOAuthHeadersFromOutMessage=true;
-    private boolean removeDefaultAPIHeaderFromOutMessage=true;
+    private boolean removeOAuthHeadersFromOutMessage =  true;
+    private boolean removeDefaultAPIHeaderFromOutMessage = true;
     private boolean isJWTAnOpaqueToken = false;
     private String clientDomainHeader = "referer";
     private String requestOrigin;
@@ -95,9 +99,7 @@ public class OAuthAuthenticator implements Authenticator {
     }
 
     public void init(SynapseEnvironment env) {
-        this.keyValidator = new APIKeyValidator(env.getSynapseConfiguration().getAxisConfiguration());
-        this.jwtValidator = new JWTValidator(apiLevelPolicy, this.keyValidator);
-        initOAuthParams();
+        environment = env;
     }
 
     public void destroy() {
@@ -120,6 +122,20 @@ public class OAuthAuthenticator implements Authenticator {
                 getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         openAPI = (OpenAPI) synCtx.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT);
         String apiElectedResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
+
+        if (keyValidator == null) {
+            this.keyValidator = new APIKeyValidator(environment.getSynapseConfiguration().getAxisConfiguration());
+        }
+
+        if (jwtValidator == null) {
+            this.jwtValidator = new JWTValidator(apiLevelPolicy, this.keyValidator);
+        }
+
+        config = getApiManagerConfiguration();
+        removeOAuthHeadersFromOutMessage = isRemoveOAuthHeadersFromOutMessage();
+        isJWTAnOpaqueToken = isJWTAnOpaqueToken();
+        securityContextHeader = getSecurityContextHeader();
+
         if (openAPI != null && openAPI.getPaths() != null) {
             pathItem = openAPI.getPaths().get(apiElectedResource);
             if (pathItem == null) {
@@ -148,13 +164,13 @@ public class OAuthAuthenticator implements Authenticator {
                 if(log.isDebugEnabled()){
                     log.debug("Removing OAuth key from Authorization header");
                 }
-                headers.put(securityHeader, remainingAuthHeader);
+                headers.put(getSecurityHeader(), remainingAuthHeader);
                 remainingAuthHeader = "";
             } else {
                 if(log.isDebugEnabled()){
                     log.debug("Removing Authorization header from headers");
                 }
-                headers.remove(securityHeader);
+                headers.remove(getSecurityHeader());
             }
 
         }
@@ -443,11 +459,11 @@ public class OAuthAuthenticator implements Authenticator {
 
         //From 1.0.7 version of this component onwards remove the OAuth authorization header from
         // the message is configurable. So we dont need to remove headers at this point.
-        String authHeader = (String) headersMap.get(securityHeader);
+        String authHeader = (String) headersMap.get(getSecurityHeader());
         if (authHeader == null) {
             if (log.isDebugEnabled()) {
                 log.debug("OAuth2 Authentication: Expected authorization header with the name '"
-                        .concat(securityHeader).concat("' was not found."));
+                        .concat(getSecurityHeader()).concat("' was not found."));
             }
             return null;
         }
@@ -494,23 +510,6 @@ public class OAuthAuthenticator implements Authenticator {
         return result.trim();
     }
 
-    protected void initOAuthParams() {
-        APIManagerConfiguration config = getApiManagerConfiguration();
-        String value = config.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE);
-        if (value != null) {
-            removeOAuthHeadersFromOutMessage = Boolean.parseBoolean(value);
-        }
-        value = config.getFirstProperty(APIConstants.JWT_AS_OPAQUE_TOKEN);
-        if (value != null) {
-            isJWTAnOpaqueToken = Boolean.parseBoolean(value);
-        }
-        JWTConfigurationDto jwtConfigurationDto = config.getJwtConfigurationDto();
-        value = jwtConfigurationDto.getJwtHeader();
-        if (value != null) {
-            setSecurityContextHeader(value);
-        }
-    }
-
     protected APIManagerConfiguration getApiManagerConfiguration() {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
     }
@@ -534,6 +533,16 @@ public class OAuthAuthenticator implements Authenticator {
 	}
 
     public String getSecurityHeader() {
+        if (this.securityHeader == null) {
+            try {
+                securityHeader = APIUtil.getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
+                if (securityHeader == null) {
+                    securityHeader = HttpHeaders.AUTHORIZATION;
+                }
+            } catch (APIManagementException e) {
+                log.error("Error while reading authorization header from APIM configurations", e);
+            }
+        }
         return securityHeader;
     }
 
@@ -573,20 +582,41 @@ public class OAuthAuthenticator implements Authenticator {
         this.consumerKeySegmentDelimiter = consumerKeySegmentDelimiter;
     }
 
-    public String getSecurityContextHeader() {
+    private String getSecurityContextHeader() {
+        JWTConfigurationDto jwtConfigurationDto = config.getJwtConfigurationDto();
+        String value = jwtConfigurationDto.getJwtHeader();
+        if (value != null) {
+            setSecurityContextHeader(value);
+        }
         return securityContextHeader;
     }
 
-    public void setSecurityContextHeader(String securityContextHeader) {
+    private void setSecurityContextHeader(String securityContextHeader) {
         this.securityContextHeader = securityContextHeader;
     }
 
-    public boolean isRemoveOAuthHeadersFromOutMessage() {
+    private boolean isRemoveOAuthHeadersFromOutMessage() {
+        String value = config.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE);
+        if (value != null) {
+            setRemoveOAuthHeadersFromOutMessage(Boolean.parseBoolean(value));
+        }
         return removeOAuthHeadersFromOutMessage;
     }
 
-    public void setRemoveOAuthHeadersFromOutMessage(boolean removeOAuthHeadersFromOutMessage) {
+    private void setRemoveOAuthHeadersFromOutMessage(boolean removeOAuthHeadersFromOutMessage) {
         this.removeOAuthHeadersFromOutMessage = removeOAuthHeadersFromOutMessage;
+    }
+
+    private boolean isJWTAnOpaqueToken() {
+        String value = config.getFirstProperty(APIConstants.JWT_AS_OPAQUE_TOKEN);
+        if (value != null) {
+            setIsJWTAnOpaqueToken(Boolean.parseBoolean(value));
+        }
+        return isJWTAnOpaqueToken;
+    }
+
+    private void setIsJWTAnOpaqueToken(boolean isJWTAnOpaqueToken) {
+        this.isJWTAnOpaqueToken = isJWTAnOpaqueToken;
     }
 
     public String getClientDomainHeader() {
