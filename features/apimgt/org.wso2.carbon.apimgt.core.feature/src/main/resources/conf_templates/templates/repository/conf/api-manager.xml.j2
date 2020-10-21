@@ -392,7 +392,7 @@
     <!--APIKeyManager>
         <KeyManagerClientImpl>org.wso2.carbon.apimgt.impl.AMDefaultKeyManagerImpl</KeyManagerClientImpl>
         <Configuration>
-            <ServerURL>{{apim.auth_manager.service_url}}</ServerURL>
+            <ServerURL>https://localhost:${mgt.transport.https.port}${carbon.context}services/</ServerURL>
             <Username>${admin.username}</Username>
             <Password>${admin.password}</Password>
             <TokenURL>https://${carbon.local.ip}:${https.nio.port}/token</TokenURL>
@@ -655,10 +655,6 @@
                 <HTTPMethods>GET,HEAD</HTTPMethods>
             </WhiteListedURI>
             <WhiteListedURI>
-                 <URI>/api/am/store/{version}/apis/{apiId}/subscription-policies</URI>
-                 <HTTPMethods>GET,HEAD</HTTPMethods>
-            </WhiteListedURI>
-            <WhiteListedURI>
                  <URI>/api/am/store/{version}/apis/{apiId}/graphql-schema</URI>
                  <HTTPMethods>GET</HTTPMethods>
             </WhiteListedURI>
@@ -701,6 +697,10 @@
             <WhiteListedURI>
                 <URI>/api/am/store/{version}/api-products/{apiId}/documents/{documentId}/content</URI>
                 <HTTPMethods>GET,HEAD</HTTPMethods>
+            </WhiteListedURI>
+            <WhiteListedURI>
+                 <URI>/api/am/store/{version}/apis/{apiId}/subscription-policies</URI>
+                 <HTTPMethods>GET,HEAD</HTTPMethods>
             </WhiteListedURI>
             <WhiteListedURI>
                 <URI>/api/am/store/{version}/api-products/{apiId}/thumbnail</URI>
@@ -1157,14 +1157,27 @@
         <Enabled>{{apim.cache_invalidation.enabled}}</Enabled>
         <Domain>{{apim.cache_invalidation.domain}}</Domain>
         <Stream>{{apim.cache.invalidation.stream}}</Stream>
-        <Username>{{apim.cache_invalidation.username}}</Username>
+        {% if apim.cache_invalidation.username is defined %}
+         <Username>{{apim.cache_invalidation.username}}</Username>
+        {%- else -%}
+         <Username>{{apim.throttling.receiver_username}}</Username>
+        {%- endif -%}
+        {% if apim.cache_invalidation.password is defined %}
         <Password>{{apim.cache_invalidation.password}}</Password>
+        {%- else -%}
+        <Password>{{apim.throttling.receiver_password}}</Password>
+        {%- endif -%}
         <Topic>{{apim.cache_invalidation.topic_name}}</Topic>
         <ExcludedCaches>
           {%- for cache in apim.cache_invalidation.excluded_caches -%}
           <Cache>{{cache}}</Cache>
           {% endfor %}
          </ExcludedCaches>
+        <IncludedCaches>
+          {%- for cache in apim.cache_invalidation.included_caches -%}
+          <Cache>{{cache}}</Cache>
+          {% endfor %}
+         </IncludedCaches>
         {% if apim.cache_invalidation.url_group is defined %}
         <ReceiverUrlGroup>
         {%- for group in apim.cache_invalidation.url_group -%}
