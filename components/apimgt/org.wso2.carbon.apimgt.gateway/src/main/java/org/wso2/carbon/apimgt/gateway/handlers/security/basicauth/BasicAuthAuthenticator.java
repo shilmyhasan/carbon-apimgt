@@ -398,10 +398,12 @@ public class BasicAuthAuthenticator implements Authenticator {
     }
 
     public String getSecurityHeader() {
-        try {
-            securityHeader = APIUtil.getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
-        } catch (APIManagementException e) {
-            log.error("Error while reading authorization header from APIM configurations", e);
+        if (this.securityHeader == null) {
+            try {
+                securityHeader = APIUtil.getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
+            } catch (APIManagementException e) {
+                log.error("Error while reading authorization header from APIM configurations", e);
+            }
         }
         return securityHeader;
     }
