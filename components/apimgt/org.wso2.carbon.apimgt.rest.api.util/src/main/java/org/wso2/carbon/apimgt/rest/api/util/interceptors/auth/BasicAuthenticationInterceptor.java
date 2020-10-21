@@ -18,18 +18,11 @@
 
 package org.wso2.carbon.apimgt.rest.api.util.interceptors.auth;
 
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.interceptor.security.AuthenticationException;
-import org.wso2.carbon.apimgt.impl.APIConstants;
-import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
-import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -42,7 +35,6 @@ import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.AnonymousSessionUtil;
 import org.wso2.carbon.registry.core.service.RegistryService;
-import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -55,7 +47,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.net.URL;
 import java.util.Set;
 
 /**
@@ -130,30 +121,13 @@ public class BasicAuthenticationInterceptor extends AbstractPhaseInterceptor {
                 log.error("Authentication failed: invalid domain or unactivated tenant login");
                 return false;
             }
-            APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
-                    .getAPIManagerConfiguration();
-            String url = config.getFirstProperty(APIConstants.AUTH_MANAGER_URL);
-            AuthenticationAdminStub authAdminStub = new AuthenticationAdminStub(null, url +
-                    RestApiConstants.AUTHENTICATION_ADMIN_SERVICE_ENDPOINT);
-            ServiceClient client = authAdminStub._getServiceClient();
-            Options options = client.getOptions();
-            options.setManageSession(true);
-            String host = new URL(url).getHost();
             //if authenticated
-            if (authAdminStub.login(username, password, host)) {
+            if (userRealm.getUserStoreManager()
+                    .authenticate(MultitenantUtils.getTenantAwareUsername(username), password)) {
                 //set the correct tenant info for downstream code.
-                ServiceContext serviceContext = authAdminStub._getServiceClient().getLastOperationContext()
-                        .getServiceContext();
-                String sessionCookie = (String) serviceContext.getProperty(HTTPConstants.COOKIE_STRING);
-                String domainAwareUserName = APIUtil.getLoggedInUserInfo(sessionCookie, url).getUserName();
-                domainAwareUserName = APIUtil.setDomainNameToUppercase(domainAwareUserName);
-                if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                    domainAwareUserName = domainAwareUserName + "@" + tenantDomain;
-                }
-                RestApiUtil.setThreadLocalRequestedTenant(MultitenantUtils.getTenantAwareUsername(domainAwareUserName));
                 carbonContext.setTenantDomain(tenantDomain);
                 carbonContext.setTenantId(tenantId);
-                carbonContext.setUsername(domainAwareUserName);
+                carbonContext.setUsername(username);
                 if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
                     APIUtil.loadTenantConfigBlockingMode(tenantDomain);
                 }
@@ -162,8 +136,6 @@ public class BasicAuthenticationInterceptor extends AbstractPhaseInterceptor {
                 log.error("Authentication failed: Invalid credentials");
             }
         } catch (UserStoreException | CarbonException e) {
-            log.error("Error occurred while authenticating user: " + username, e);
-        } catch (Exception e) {
             log.error("Error occurred while authenticating user: " + username, e);
         }
         return false;
