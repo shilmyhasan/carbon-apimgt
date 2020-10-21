@@ -506,12 +506,9 @@ public class ApiKeyAuthenticator implements Authenticator {
     }
 
     public String getContextHeader() {
-        if (this.contextHeader == null) {
-            APIManagerConfiguration apimConf = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
-            JWTConfigurationDto jwtConfigDto = apimConf.getJwtConfigurationDto();
-            contextHeader = jwtConfigDto.getJwtHeader();
-        }
-        return contextHeader;
+        APIManagerConfiguration apimConf = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+        JWTConfigurationDto jwtConfigDto = apimConf.getJwtConfigurationDto();
+        return jwtConfigDto.getJwtHeader();
     }
 
     public void setContextHeader(String contextHeader) {
