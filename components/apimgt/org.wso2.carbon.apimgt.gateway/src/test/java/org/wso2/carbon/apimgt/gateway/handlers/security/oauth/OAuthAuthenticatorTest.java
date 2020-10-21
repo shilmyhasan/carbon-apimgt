@@ -45,7 +45,6 @@ public class OAuthAuthenticatorTest {
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE))
                 .thenReturn("true");
         Mockito.when(apiManagerConfiguration.getJwtConfigurationDto()).thenReturn(new JWTConfigurationDto());
-        oauthAuthenticator.initOAuthParams();
     }
 
 
