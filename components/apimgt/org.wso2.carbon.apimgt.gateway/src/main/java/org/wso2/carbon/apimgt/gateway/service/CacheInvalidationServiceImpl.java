@@ -175,7 +175,6 @@ public class CacheInvalidationServiceImpl implements CacheInvalidationService {
                     //cachePut(accessToken, tenantDomain)
                     cachedObjects.put(accessToken, cacheEntry.toString());
                     gatewayCache.remove(accessToken);
-                    invalidGatewayCache.put(accessToken, cacheEntry.toString());
                 }
             }
         } finally {
