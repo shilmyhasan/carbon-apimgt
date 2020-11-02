@@ -440,29 +440,32 @@ public class APIKeyValidator {
         Set<ResourceInfoDTO> apiResources = apiInfoDTO.getResources();
         if (apiResources != null) {
             VerbInfoDTO matchingHttpVerb = getMatchingHttpVerb(apiResources,resourceString,httpMethod);
-            if (isGatewayAPIResourceValidationEnabled) {
-                verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
-                String synchronizeResourceKey = resourceCacheKey + "APIKeyValidator";
-                if (verb == null) {
-                    synchronized(synchronizeResourceKey.intern()) {
-                        verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
-                        if (verb == null) {
-                            //Store verb in cache
-                            getResourceCache().put(resourceCacheKey, matchingHttpVerb);
+            if (matchingHttpVerb != null) {
+                if (isGatewayAPIResourceValidationEnabled) {
+                    verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
+                    String synchronizeResourceKey = resourceCacheKey + "APIKeyValidator";
+                    if (verb == null) {
+                        synchronized(synchronizeResourceKey.intern()) {
+                            verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
+                            if (verb == null) {
+                                //Store verb in cache
+                                getResourceCache().put(resourceCacheKey, matchingHttpVerb);
+                            }
                         }
+
+                        //Set cache key in the message context so that it can be used by the subsequent handlers.
+                        synCtx.setProperty(APIConstants.API_RESOURCE_CACHE_KEY, resourceCacheKey);
                     }
 
-                    //Set cache key in the message context so that it can be used by the subsequent handlers.
-                    synCtx.setProperty(APIConstants.API_RESOURCE_CACHE_KEY, resourceCacheKey);
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Putting resource object in cache with key: " + resourceCacheKey);
+                    }
+                    matchingHttpVerb.setRequestKey(resourceCacheKey);
                 }
-
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Putting resource object in cache with key: " + resourceCacheKey);
-                }
-                matchingHttpVerb.setRequestKey(resourceCacheKey);
+                return matchingHttpVerb;
             }
-            return matchingHttpVerb;
+
         }
 
         return null;
