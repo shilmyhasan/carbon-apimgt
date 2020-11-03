@@ -414,15 +414,15 @@ public class APIKeyValidator {
         }
 
         String apiCacheKey = APIUtil.getAPIInfoDTOCacheKey(apiContext, apiVersion);
-        String synchronizeApiKey = apiCacheKey + "APIKeyValidator";
+        final String synchronizeApiKey = apiCacheKey + "APIKeyValidator";
         APIInfoDTO apiInfoDTO = null;
 
         if (isGatewayAPIResourceValidationEnabled) {
             apiInfoDTO = (APIInfoDTO) getResourceCache().get(apiCacheKey);
+            //Cache miss
             if (apiInfoDTO == null) {
                 synchronized(synchronizeApiKey.intern()) {
                     apiInfoDTO = (APIInfoDTO) getResourceCache().get(apiCacheKey);
-                    //Cache miss
                     if (apiInfoDTO == null) {
                         if (log.isDebugEnabled()) {
                             log.debug("Could not find API object in cache for key: " + apiCacheKey);
@@ -444,7 +444,7 @@ public class APIKeyValidator {
                 matchingHttpVerb.setRequestKey(resourceCacheKey);
                 if (isGatewayAPIResourceValidationEnabled) {
                     verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
-                    String synchronizeResourceKey = resourceCacheKey + "APIKeyValidator";
+                    final String synchronizeResourceKey = resourceCacheKey + "APIKeyValidator";
                     if (verb == null) {
                         synchronized(synchronizeResourceKey.intern()) {
                             verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
