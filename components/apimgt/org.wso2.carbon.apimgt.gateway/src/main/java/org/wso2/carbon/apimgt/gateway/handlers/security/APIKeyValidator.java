@@ -441,6 +441,7 @@ public class APIKeyValidator {
         if (apiResources != null) {
             VerbInfoDTO matchingHttpVerb = getMatchingHttpVerb(apiResources,resourceString,httpMethod);
             if (matchingHttpVerb != null) {
+                matchingHttpVerb.setRequestKey(resourceCacheKey);
                 if (isGatewayAPIResourceValidationEnabled) {
                     verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
                     String synchronizeResourceKey = resourceCacheKey + "APIKeyValidator";
@@ -461,7 +462,6 @@ public class APIKeyValidator {
                     if (log.isDebugEnabled()) {
                         log.debug("Putting resource object in cache with key: " + resourceCacheKey);
                     }
-                    matchingHttpVerb.setRequestKey(resourceCacheKey);
                 }
                 return matchingHttpVerb;
             }
