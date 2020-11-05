@@ -289,7 +289,7 @@ public class ApiMgtDAO {
      */
     public String validateGrantTypes(String requestedGrantTypes) {
         OAuthAdminService oAuthAdminService = new OAuthAdminService();
-        List<String> allowedGrantTypes = new ArrayList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
+        List<String> allowedGrantTypes = Arrays.asList(oAuthAdminService.getAllowedGrantTypes());
         List<String> validGrantTypes = new ArrayList<>();
         String[] requestGrants = requestedGrantTypes.split("\\s");
 
