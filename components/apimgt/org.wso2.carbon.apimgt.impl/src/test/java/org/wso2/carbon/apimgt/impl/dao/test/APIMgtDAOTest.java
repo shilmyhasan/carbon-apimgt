@@ -84,6 +84,7 @@ import org.wso2.carbon.apimgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.identity.core.util.IdentityConfigParser;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.identity.oauth.OAuthAdminService;
 
 import java.io.File;
 import java.io.IOException;
@@ -939,7 +940,6 @@ public class APIMgtDAOTest {
         assertEquals(oAuthApplicationInfo.getClientSecret(), "getOAuthApplication");
         assertEquals(oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_NAME),
                 "admin-app1-Production");
-        assertEquals(oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_GRANT), "client_credentials");
         Subscriber subscriber = apiMgtDAO.getOwnerForConsumerApp("getOAuthApplication");
         assertEquals(subscriber.getTenantId(), -1234);
         assertEquals(subscriber.getName(), "getOAuthApplication");
@@ -1307,6 +1307,24 @@ public class APIMgtDAOTest {
         String apiProviderWSO2TenantResult = apiMgtDAO.getAPIProviderByNameAndVersion(apiName, apiVersion, "wso2.test");
         Assert.assertEquals(apiProviderWSO2Tenant, apiProviderWSO2TenantResult);
 
+    }
+
+    @Test
+    public void testValidateGrantTypesOfOAuthApplication() throws Exception {
+        //assert allowed grant types
+        OAuthAdminService oAuthAdminService = new OAuthAdminService();
+        assertEquals(String.join(" ", oAuthAdminService.getAllowedGrantTypes())
+                , "");
+
+        //assert details of oauth application after validation
+        OAuthApplicationInfo oAuthApplicationInfo = apiMgtDAO.getOAuthApplication("getOAuthApplication");
+        assertEquals(oAuthApplicationInfo.getCallBackURL(), "http://localhost");
+        assertEquals(oAuthApplicationInfo.getClientId(), "getOAuthApplication");
+        assertEquals(oAuthApplicationInfo.getClientSecret(), "getOAuthApplication");
+        assertEquals(oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_NAME),
+                "admin-app1-Production");
+        assertEquals(oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_GRANT), "");
+        Subscriber subscriber = apiMgtDAO.getOwnerForConsumerApp("getOAuthApplication" );
     }
 
     private void deleteSubscriber(int subscriberId) throws APIManagementException {
