@@ -291,7 +291,7 @@ public class ApiMgtDAO {
         String[] requestGrants = requestedGrantTypes.split("\\s");
 
         for (String requestedGrant : requestGrants) {
-            if (org.apache.commons.lang.StringUtils.isBlank(requestedGrant)) {
+            if (StringUtils.isBlank(requestedGrant)) {
                 continue;
             }
 
