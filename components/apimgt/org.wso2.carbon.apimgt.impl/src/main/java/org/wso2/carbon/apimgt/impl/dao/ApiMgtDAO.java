@@ -103,6 +103,7 @@ import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
+import org.wso2.carbon.identity.oauth.OAuthAdminService;
 import org.wso2.carbon.user.core.util.UserCoreUtil;
 import org.wso2.carbon.utils.DBUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -280,6 +281,31 @@ public class ApiMgtDAO {
         }
     }
 
+    /**
+     * Validate grant types of application with the authorized grant types of toml configuration
+     *
+     * @param requestedGrantTypes String of requested grant types
+     * @return String
+     */
+    public String validateGrantTypes(String requestedGrantTypes) {
+        OAuthAdminService oAuthAdminService = new OAuthAdminService();
+        List<String> allowedGrantTypes = Arrays.asList(oAuthAdminService.getAllowedGrantTypes());
+        List<String> validGrantTypes = new ArrayList<>();
+        String[] requestGrants = requestedGrantTypes.split("\\s");
+
+        for (String requestedGrant : requestGrants) {
+            if (org.apache.commons.lang.StringUtils.isBlank(requestedGrant)) {
+                continue;
+            }
+
+            if (allowedGrantTypes.contains(requestedGrant)) {
+                validGrantTypes.add(requestedGrant);
+            }
+        }
+
+        return String.join(" ",validGrantTypes);
+    }
+
     public OAuthApplicationInfo getOAuthApplication(String consumerKey) throws APIManagementException {
         OAuthApplicationInfo oAuthApplicationInfo = new OAuthApplicationInfo();
         Connection conn = null;
@@ -299,7 +325,7 @@ public class ApiMgtDAO {
                 oAuthApplicationInfo.addParameter(ApplicationConstants.OAUTH_REDIRECT_URIS, rs.getString
                         ("CALLBACK_URL"));
                 oAuthApplicationInfo.addParameter(ApplicationConstants.OAUTH_CLIENT_NAME, rs.getString("APP_NAME"));
-                oAuthApplicationInfo.addParameter(ApplicationConstants.OAUTH_CLIENT_GRANT, rs.getString("GRANT_TYPES"));
+                oAuthApplicationInfo.addParameter(ApplicationConstants.OAUTH_CLIENT_GRANT, validateGrantTypes(rs.getString("GRANT_TYPES")));
             }
         } catch (SQLException e) {
             handleException("Error while executing SQL for getting OAuth application info", e);
