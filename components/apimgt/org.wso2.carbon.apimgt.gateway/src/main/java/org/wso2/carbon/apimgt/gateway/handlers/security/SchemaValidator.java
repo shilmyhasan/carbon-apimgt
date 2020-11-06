@@ -240,6 +240,12 @@ public class SchemaValidator extends AbstractHandler {
      */
     private JSONObject getMessageContent(MessageContext messageContext) {
         JSONObject payloadObject = null;
+        org.apache.axis2.context.MessageContext axis2Context = ((Axis2MessageContext) messageContext)
+                .getAxis2MessageContext();
+        if (JsonUtil.hasAJsonPayload(axis2Context)) {
+            String jsonString = JsonUtil.jsonPayloadToString(axis2Context);
+            payloadObject = new JSONObject(jsonString);
+        }
         if (messageContext.getEnvelope().getBody() != null) {
             Object objFirstElement = messageContext.getEnvelope().getBody().getFirstElement();
             if (objFirstElement != null) {
