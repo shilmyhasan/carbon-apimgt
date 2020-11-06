@@ -249,8 +249,7 @@ public class SchemaValidator extends AbstractHandler {
         if (JsonUtil.hasAJsonPayload(axis2Context)) {
             String jsonString = JsonUtil.jsonPayloadToString(axis2Context);
             payloadObject = new JSONObject(jsonString);
-        }
-        if (messageContext.getEnvelope().getBody() != null) {
+        } else if (messageContext.getEnvelope().getBody() != null) {
             Object objFirstElement = messageContext.getEnvelope().getBody().getFirstElement();
             if (objFirstElement != null) {
                 OMElement xmlResponse = messageContext.getEnvelope().getBody().getFirstElement();
