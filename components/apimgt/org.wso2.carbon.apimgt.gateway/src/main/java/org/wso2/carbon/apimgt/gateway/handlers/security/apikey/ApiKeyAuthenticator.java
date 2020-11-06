@@ -71,29 +71,21 @@ import javax.cache.Cache;
 public class ApiKeyAuthenticator implements Authenticator {
 
     private static final Log log = LogFactory.getLog(ApiKeyAuthenticator.class);
-    private AbstractAPIMgtGatewayJWTGenerator apiMgtGatewayJWTGenerator;
-    private JWTConfigurationDto jwtConfigurationDto;
-    private boolean isGatewayTokenCacheEnabled;
-    private static boolean gatewayApiKeyCacheInit = false;
+    private AbstractAPIMgtGatewayJWTGenerator apiMgtGatewayJWTGenerator = null;
+    private JWTConfigurationDto jwtConfigurationDto = null;
+    private Boolean isGatewayTokenCacheEnabled = null;
     private static boolean gatewayApiKeyKeyCacheInit = false;
     private static boolean gatewayInvalidApiKeyCacheInit = false;
     private String contextHeader = null;
     private String securityParam;
     private String apiLevelPolicy;
     private boolean isMandatory;
-    private boolean jwtGenerationEnabled;
+    private Boolean jwtGenerationEnabled = null;
 
     public ApiKeyAuthenticator(String authorizationHeader, String apiLevelPolicy, boolean isApiKeyMandatory) {
         this.securityParam = authorizationHeader;
         this.apiLevelPolicy = apiLevelPolicy;
-        this.isGatewayTokenCacheEnabled = GatewayUtils.isGatewayTokenCacheEnabled();
         this.isMandatory = isApiKeyMandatory;
-        jwtConfigurationDto =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getJwtConfigurationDto();
-        jwtGenerationEnabled  = jwtConfigurationDto.isEnabled();
-        this.apiMgtGatewayJWTGenerator =
-                ServiceReferenceHolder.getInstance().getApiMgtGatewayJWTGenerator()
-                        .get(jwtConfigurationDto.getGatewayJWTGeneratorImpl());
     }
 
     @Override
@@ -116,6 +108,21 @@ public class ApiKeyAuthenticator implements Authenticator {
             // Extract apikey from the request while removing it from the msg context.
             String apiKey = extractApiKey(synCtx);
             JWTTokenPayloadInfo payloadInfo = null;
+
+            if (jwtConfigurationDto == null) {
+                jwtConfigurationDto =
+                        ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getJwtConfigurationDto();
+            }
+
+            if (jwtGenerationEnabled == null) {
+                jwtGenerationEnabled = jwtConfigurationDto.isEnabled();
+            }
+
+
+            if (apiMgtGatewayJWTGenerator == null) {
+                apiMgtGatewayJWTGenerator = ServiceReferenceHolder.getInstance().getApiMgtGatewayJWTGenerator()
+                                .get(jwtConfigurationDto.getGatewayJWTGeneratorImpl());
+            }
 
             String splitToken[] = apiKey.split("\\.");
             JWSHeader decodedHeader;
@@ -192,6 +199,10 @@ public class ApiKeyAuthenticator implements Authenticator {
             boolean isVerified = false;
 
             // Validate from cache
+            if (isGatewayTokenCacheEnabled == null) {
+                isGatewayTokenCacheEnabled = GatewayUtils.isGatewayTokenCacheEnabled();
+            }
+
             if (isGatewayTokenCacheEnabled) {
                 String cacheToken = (String) getGatewayApiKeyCache().get(tokenSignature);
                 if (cacheToken != null) {
