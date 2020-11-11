@@ -30,6 +30,7 @@ import org.wso2.carbon.apimgt.impl.token.ClaimsRetriever;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.MethodStats;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
+import org.wso2.carbon.apimgt.keymgt.util.APIMTokenIssuerUtil;
 import org.wso2.carbon.claim.mgt.ClaimManagementException;
 import org.wso2.carbon.claim.mgt.ClaimManagerHandler;
 import org.wso2.carbon.identity.application.common.model.Claim;
@@ -124,7 +125,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
         }
 
         claims.put("iss", API_GATEWAY_ID);
-        claims.put("exp", String.valueOf(expireIn));
+        claims.put("exp", String.valueOf(APIMTokenIssuerUtil.getJWTTokenExpireTime(expireIn, validationContext.getValidityPeriod())));
         claims.put("iat", String.valueOf(currentTime));
         claims.put("sub", usernameWithoutTenantDomain);
         claims.put(dialect + "/subscriber", subscriber);
