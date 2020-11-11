@@ -225,6 +225,7 @@ public class APIMTokenIssuerUtil {
                     validationContext.setValidationInfoDTO(apiKeyValidationInfoDTO);
                     validationContext.setUser(endUser);
                     validationContext.setAuthorizationCode(jwtAccessTokenIssuerDTO.getAuthCode());
+                    validationContext.setValidityPeriod(jwtTokenInfoDTO.getExpirationTime());
                     jwtTokenInfoDTO.setBackendJwt(jwtGenerator.generateToken(validationContext));
                 }
             }
@@ -277,6 +278,14 @@ public class APIMTokenIssuerUtil {
             return Integer.MAX_VALUE;
         } else {
             return validityPeriod;
+        }
+    }
+
+    public static long getJWTTokenExpireTime(long expiresIn, Long validityPeriod) {
+        if (validityPeriod != null) {
+            return System.currentTimeMillis() + (validityPeriod + 120) * 1000;
+        } else {
+            return expiresIn;
         }
     }
 }
