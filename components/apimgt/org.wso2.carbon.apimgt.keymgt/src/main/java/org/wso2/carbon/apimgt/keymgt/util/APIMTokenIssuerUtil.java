@@ -283,7 +283,7 @@ public class APIMTokenIssuerUtil {
 
     public static long getJWTTokenExpireTime(long expiresIn, Long validityPeriod) {
         if (validityPeriod != null) {
-            return expiresIn + (validityPeriod + 120) * 1000;
+            return System.currentTimeMillis() + (validityPeriod + 120) * 1000;
         } else {
             return expiresIn;
         }
