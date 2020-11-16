@@ -414,41 +414,70 @@ public class APIKeyValidator {
         }
 
         String apiCacheKey = APIUtil.getAPIInfoDTOCacheKey(apiContext, apiVersion);
+        final String synchronizeApiKey = apiCacheKey + "APIKeyValidator";
         APIInfoDTO apiInfoDTO = null;
 
         if (isGatewayAPIResourceValidationEnabled) {
             apiInfoDTO = (APIInfoDTO) getResourceCache().get(apiCacheKey);
-        }
-
-        //Cache miss
-        if (apiInfoDTO == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Could not find API object in cache for key: " + apiCacheKey);
-            }
-            apiInfoDTO = doGetAPIInfo(apiContext, apiVersion);
-
-            if (isGatewayAPIResourceValidationEnabled) {
-                getResourceCache().put(apiCacheKey, apiInfoDTO);
-            }
-        }
-        if (apiInfoDTO.getResources() != null) {
-            for (ResourceInfoDTO resourceInfoDTO : apiInfoDTO.getResources()) {
-                if (isResourcePathMatching(resourceString, resourceInfoDTO)) {
-                    for (VerbInfoDTO verbDTO : resourceInfoDTO.getHttpVerbs()) {
-                        if (verbDTO.getHttpVerb().equals(httpMethod)) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Putting resource object in cache with key: " + resourceCacheKey);
-                            }
-                            verbDTO.setRequestKey(resourceCacheKey);
-
-                            if (isGatewayAPIResourceValidationEnabled) {
-                                //Store verb in cache
-                                getResourceCache().put(resourceCacheKey, verbDTO);
-                                //Set cache key in the message context so that it can be used by the subsequent handlers.
-                                synCtx.setProperty(APIConstants.API_RESOURCE_CACHE_KEY, resourceCacheKey);
-                            }
-                            return verbDTO;
+            //Cache miss
+            if (apiInfoDTO == null) {
+                synchronized(synchronizeApiKey.intern()) {
+                    apiInfoDTO = (APIInfoDTO) getResourceCache().get(apiCacheKey);
+                    if (apiInfoDTO == null) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Could not find API object in cache for key: " + apiCacheKey);
                         }
+                        apiInfoDTO = doGetAPIInfo(apiContext, apiVersion);
+
+                        getResourceCache().put(apiCacheKey, apiInfoDTO);
+                    }
+                }
+            }
+        } else {
+            apiInfoDTO = doGetAPIInfo(apiContext, apiVersion);
+        }
+
+        Set<ResourceInfoDTO> apiResources = apiInfoDTO.getResources();
+        if (apiResources != null) {
+            VerbInfoDTO matchingHttpVerb = getMatchingHttpVerb(apiResources,resourceString,httpMethod);
+            if (matchingHttpVerb != null) {
+                matchingHttpVerb.setRequestKey(resourceCacheKey);
+                if (isGatewayAPIResourceValidationEnabled) {
+                    verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
+                    final String synchronizeResourceKey = resourceCacheKey + "APIKeyValidator";
+                    if (verb == null) {
+                        synchronized(synchronizeResourceKey.intern()) {
+                            verb = (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
+                            if (verb == null) {
+                                //Store verb in cache
+                                getResourceCache().put(resourceCacheKey, matchingHttpVerb);
+                            }
+                        }
+
+                        //Set cache key in the message context so that it can be used by the subsequent handlers.
+                        synCtx.setProperty(APIConstants.API_RESOURCE_CACHE_KEY, resourceCacheKey);
+                    }
+
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Putting resource object in cache with key: " + resourceCacheKey);
+                    }
+                }
+                return matchingHttpVerb;
+            }
+
+        }
+
+        return null;
+    }
+
+    private VerbInfoDTO getMatchingHttpVerb(Set<ResourceInfoDTO> apiResources, String resourceString,
+                                             String httpMethod) {
+        for (ResourceInfoDTO resourceInfoDTO : apiResources) {
+            if (isResourcePathMatching(resourceString, resourceInfoDTO)) {
+                for (VerbInfoDTO verbDTO : resourceInfoDTO.getHttpVerbs()) {
+                    if (verbDTO.getHttpVerb().equals(httpMethod)) {
+                        return verbDTO;
                     }
                 }
             }
