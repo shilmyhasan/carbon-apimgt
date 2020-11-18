@@ -1993,7 +1993,7 @@ public class APIMappingUtil {
         }
     }
 
-    public static APIProduct fromDTOtoAPIProduct(APIProductDTO dto, String provider)
+    public static APIProduct fromDTOtoAPIProduct(APIProductDTO dto, String provider, APIProvider apiProvider)
             throws APIManagementException {
         APIProduct product = new APIProduct();
         APIProductIdentifier id = new APIProductIdentifier(APIUtil.replaceEmailDomain(provider), dto.getName(), APIConstants.API_PRODUCT_VERSION); //todo: replace this with dto.getVersion
@@ -2008,6 +2008,12 @@ public class APIMappingUtil {
         }
 
         context = context.startsWith("/") ? context : ("/" + context);
+        //Check whether the context already exists
+        if (apiProvider.isContextExist(context)) {
+            RestApiUtil.handleBadRequest("Error occurred while adding API. API with the context " + context
+                    + " already exists.", log);
+        }
+
         String providerDomain = MultitenantUtils.getTenantDomain(provider);
         if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(providerDomain) &&
                 dto.getId() == null) {
