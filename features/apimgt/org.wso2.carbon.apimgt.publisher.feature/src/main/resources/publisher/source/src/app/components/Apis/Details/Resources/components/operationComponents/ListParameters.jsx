@@ -152,6 +152,13 @@ export default function ListParameters(props) {
                                                     <IconButton
                                                         onClick={() => setEditingParameter(parameter)}
                                                         fontSize='small'
+                                                        aria-label={(
+                                                            <FormattedMessage
+                                                                id={'Apis.Details.Resources.components.'
+                                                                + 'operationComponents.label.edit'}
+                                                                defaultMessage='Edit'
+                                                            />
+                                                        )}
                                                     >
                                                         <EditIcon fontSize='small' />
                                                     </IconButton>
@@ -172,6 +179,13 @@ export default function ListParameters(props) {
                                                         data: { target, verb, value: paramCopy },
                                                     })}
                                                     fontSize='small'
+                                                    aria-label={(
+                                                        <FormattedMessage
+                                                            id={'Apis.Details.Resources.components.operationComponents'
+                                                            + '.ListParameter.label.delete'}
+                                                            defaultMessage='Delete'
+                                                        />
+                                                    )}
                                                 >
                                                     <DeleteIcon fontSize='small' />
                                                 </IconButton>

@@ -41,6 +41,12 @@ export default function Tags(props) {
     return (
         <React.Fragment style={{ marginTop: 10 }}>
             <ChipInput
+                InputProps={{
+                    id: 'chip-tags',
+                }}
+                InputLabelProps={{
+                    for: 'chip-tags',
+                }}
                 fullWidth
                 variant='outlined'
                 label={(

@@ -34,12 +34,12 @@ const styles = (theme) => ({
         display: 'flex',
     },
     backIcon: {
-        color: theme.palette.primary.main,
+        color: theme.palette.primary.extra || theme.palette.primary.main,
         fontSize: 56,
         cursor: 'pointer',
     },
     backText: {
-        color: theme.palette.primary.main,
+        color: theme.palette.primary.extra || theme.palette.primary.main,
         cursor: 'pointer',
         fontFamily: theme.typography.fontFamily,
     },

@@ -292,7 +292,7 @@ export default function EditParameter(props) {
                         </FormControl>
                     </Grid>
                     <Grid item>
-                        <FormControl component='fieldset'>
+                        <FormControl component='fieldset' className={classes.formControl}>
                             <FormControlLabel
                                 control={(
                                     <Checkbox

@@ -67,6 +67,9 @@ const useStyles = makeStyles((theme) => ({
         overflow: 'hidden',
         textOverflow: 'ellipsis',
     },
+    editApiLink: {
+        color: theme.palette.primary.extra || theme.palette.primary.main,
+    },
 }));
 
 /**
@@ -206,7 +209,11 @@ function Endpoints(props) {
                         )}
                     <Box width='100%' textAlign='right' m={1}>
                         <Link to={'/apis/' + api.id + '/endpoints'}>
-                            <Typography style={{ marginLeft: '10px' }} color='primary' variant='caption'>
+                            <Typography
+                                style={{ marginLeft: '10px' }}
+                                className={classes.editApiLink}
+                                variant='caption'
+                            >
                                 <FormattedMessage
                                     id='Apis.Details.Configuration.Configuration.Endpoints.edit.api.endpoints'
                                     defaultMessage='Edit API Endpoints'
