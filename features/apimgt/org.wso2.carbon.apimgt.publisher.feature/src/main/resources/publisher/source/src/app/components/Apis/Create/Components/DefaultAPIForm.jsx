@@ -33,7 +33,7 @@ import SelectPolicies from './SelectPolicies';
 
 const useStyles = makeStyles((theme) => ({
     mandatoryStar: {
-        color: '#930c0c',
+        color: theme.palette.error.main,
         marginLeft: theme.spacing(0.1),
     },
     helperTextContext: {
