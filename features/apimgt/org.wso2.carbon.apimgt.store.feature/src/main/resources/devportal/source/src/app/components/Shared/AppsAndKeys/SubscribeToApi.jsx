@@ -165,13 +165,14 @@ const subscribeToApi = (props) => {
             <Grid item xs={12} md={renderSmall ? 12 : 6}>
                 {appSelected && (
                     <FormControl className={classNames(classes.FormControl, { [classes.smallDisplay]: renderSmall })}>
-                        <InputLabel shrink htmlFor='age-label-placeholder' className={classes.quotaHelp}>
+                        <InputLabel shrink htmlFor='app-label-placeholder' className={classes.quotaHelp}>
                             <FormattedMessage
                                 id='Shared.AppsAndKeys.SubscribeToApi.application'
                                 defaultMessage='Application'
                             />
                         </InputLabel>
                         <Select
+                            aria-describedby='application-helper-text'
                             value={appSelected}
                             onChange={e => handleChange('application', e)}
                             input={<Input name='appSelected' id='app-label-placeholder' />}
@@ -185,7 +186,7 @@ const subscribeToApi = (props) => {
                                 </MenuItem>
                             ))}
                         </Select>
-                        <FormHelperText>
+                        <FormHelperText id='application-helper-text'>
                             <FormattedMessage
                                 id='Shared.AppsAndKeys.SubscribeToApi.select.an.application.to.subscribe'
                                 defaultMessage='Select an Application to subscribe'
@@ -208,6 +209,7 @@ const subscribeToApi = (props) => {
                         </InputLabel>
                         <Select
                             value={policySelected}
+                            aria-describedby='policies-helper-text'
                             onChange={e => handleChange('throttlingPolicy', e)}
                             input={<Input name='policySelected' id='policy-label-placeholder' />}
                             displayEmpty
@@ -245,7 +247,7 @@ const subscribeToApi = (props) => {
                                 </MenuItem>
                             ))}
                         </Select>
-                        <FormHelperText>
+                        <FormHelperText id='policies-helper-text'>
                             <FormattedMessage
                                 id='Shared.AppsAndKeys.SubscribeToApi.available.policies'
                                 defaultMessage='Available Policies -'

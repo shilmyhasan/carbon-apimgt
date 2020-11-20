@@ -323,7 +323,7 @@ const Alerts = (props) => {
                         {!supportedAlerts ?
                             <CircularProgress /> :
                             <React.Fragment>
-                                <Typography variant='h6' className={classes.manageAlertHeading}>
+                                <Typography variant='h6' component='h2' className={classes.manageAlertHeading}>
                                     <FormattedMessage
                                         id='Settings.Alerts.Alerts.subscribe.to.alerts.heading'
                                         defaultMessage='Manage Alert Subscriptions'
@@ -352,7 +352,7 @@ const Alerts = (props) => {
                                                     />
                                                 </ListItemIcon>
                                                 <ListItemText
-                                                    id={alert.id}
+                                                    id={alert.name}
                                                     primary={alertIdMapping[alert.id].name}
                                                     secondary={alertIdMapping[alert.id].description}
                                                     className={classes.listItem}
@@ -374,6 +374,7 @@ const Alerts = (props) => {
                                 </List>
                                 <ChipInput
                                     label='Emails'
+                                    id='email-address'
                                     variant='outlined'
                                     className={classes.chipInput}
                                     value={emails}

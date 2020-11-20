@@ -119,6 +119,7 @@ const ApplicationCreate = (props) => {
     return (
         <form noValidate autoComplete='off' className={classes.applicationForm}>
             <TextField
+                id='application-name'
                 classes={{
                     root: classes.mandatoryStarText,
                 }}
@@ -211,6 +212,7 @@ const ApplicationCreate = (props) => {
             </TextField>
 
             <TextField
+                id='application-description'
                 margin='normal'
                 variant='outlined'
                 fullWidth
@@ -235,6 +237,7 @@ const ApplicationCreate = (props) => {
                 Object.entries(allAppAttributes).map((item) => (
                     item[1].hidden !== 'true' ? (
                         <TextField
+                            id={item[1].attribute}
                             classes={{
                                 root: classes.mandatoryStarText,
                             }}

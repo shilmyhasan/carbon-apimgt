@@ -23,7 +23,7 @@ const SelectAppPanel = (props) => {
                     <Box>
                         <TextField
                             fullWidth
-                            id='outlined-select-currency'
+                            id='select-application'
                             select
                             label={(
                                 <FormattedMessage
@@ -61,7 +61,7 @@ const SelectAppPanel = (props) => {
                         <Box ml={2}>
                             <TextField
                                 fullWidth
-                                id='outlined-select-currency'
+                                id='select-key-type'
                                 select
                                 label={(
                                     <FormattedMessage
