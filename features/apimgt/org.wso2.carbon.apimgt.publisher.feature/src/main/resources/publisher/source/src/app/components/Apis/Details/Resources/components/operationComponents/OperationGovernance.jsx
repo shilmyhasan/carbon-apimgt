@@ -32,6 +32,7 @@ import HelpOutline from '@material-ui/icons/HelpOutline';
 import LaunchIcon from '@material-ui/icons/Launch';
 import { Link } from 'react-router-dom';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { useTheme } from '@material-ui/core/styles';
 import { useIntl, FormattedMessage } from 'react-intl';
 import { getOperationScopes } from '../../operationUtils';
 
@@ -48,6 +49,7 @@ export default function OperationGovernance(props) {
     } = props;
     const isOperationRateLimiting = api.apiThrottlingPolicy === null;
     const intl = useIntl();
+    const theme = useTheme();
 
     return (
         <>
@@ -250,7 +252,10 @@ export default function OperationGovernance(props) {
                                     {scope.name}
                                 </MenuItem>
                             )) : (
-                                <Link to={`/apis/${api.id}/scopes/create`} target='_blank'>
+                                <Link
+                                    to={`/apis/${api.id}/scopes/create`}
+                                    target='_blank'
+                                >
                                     <MenuItem
                                         key='Create New Scope'
                                         value='Create New Scope'
@@ -270,7 +275,15 @@ export default function OperationGovernance(props) {
             <Grid item md={5} style={{ marginTop: '14px' }}>
                 { operation['x-auth-type'] && operation['x-auth-type'].toLowerCase() !== 'none' ? !disableUpdate && (
                     <Link to={`/apis/${api.id}/scopes/create`} target='_blank'>
-                        <Typography style={{ marginLeft: '10px' }} color='primary' display='inline' variant='caption'>
+                        <Typography
+                            style={{
+                                marginLeft: '10px',
+                                color: theme.palette.primary.extra
+                                    || theme.palette.primary.main,
+                            }}
+                            display='inline'
+                            variant='caption'
+                        >
                             <FormattedMessage
                                 id={'Apis.Details.Resources.components.operationComponents.'
                                 + 'OperationGovernance.operation.scope.create.new.scope'}

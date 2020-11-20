@@ -55,6 +55,9 @@ const useStyles = makeStyles((theme) => ({
         display: 'inline-flex',
         lineHeight: 1.5,
     },
+    showSwitchCaption: {
+        display: theme.custom.showSwitchCaption || 'none',
+    },
 }));
 
 /**
@@ -74,7 +77,6 @@ export default function CORSConfiguration(props) {
     const isAllowAllOrigins = corsConfiguration.accessControlAllowOrigins[0] === '*'
         && corsConfiguration.accessControlAllowOrigins.length === 1;
     const classes = useStyles();
-
     return (
         <ExpansionPanel className={classes.expansionPanel}>
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
@@ -100,15 +102,29 @@ export default function CORSConfiguration(props) {
                 <FormControlLabel
                     className={classes.actionSpace}
                     control={(
-                        <Switch
-                            disabled={isRestricted(['apim:api_create'], apiFromContext)}
-                            checked={corsConfiguration.corsConfigurationEnabled}
-                            onChange={({ target: { checked } }) => configDispatcher({
-                                action: 'corsConfigurationEnabled',
-                                value: checked,
-                            })}
-                            color='primary'
-                        />
+                        <>
+                            <span className={classes.showSwitchCaption}>
+                                <FormattedMessage
+                                    id='Apis.Details.Configuration.components.CORSConfiguration.disable'
+                                    defaultMessage='Disable'
+                                />
+                            </span>
+                            <Switch
+                                disabled={isRestricted(['apim:api_create'], apiFromContext)}
+                                checked={corsConfiguration.corsConfigurationEnabled}
+                                onChange={({ target: { checked } }) => configDispatcher({
+                                    action: 'corsConfigurationEnabled',
+                                    value: checked,
+                                })}
+                                color='primary'
+                            />
+                            <span className={classes.showSwitchCaption}>
+                                <FormattedMessage
+                                    id='Apis.Details.Configuration.components.CORSConfiguration.enable'
+                                    defaultMessage='Enable'
+                                />
+                            </span>
+                        </>
                     )}
                 />
             </ExpansionPanelSummary>

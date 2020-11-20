@@ -815,7 +815,16 @@ class APISecurityAudit extends Component {
                                                                     </>
                                                                 )}
                                                             >
-                                                                <Button className={classes.helpButton}>
+                                                                <Button
+                                                                    className={classes.helpButton}
+                                                                    aria-label={(
+                                                                        <FormattedMessage
+                                                                            id={'Apis.Details.APIDefinition.'
+                                                                            + 'AuditApi.help.area.label'}
+                                                                            defaultMessage='Help'
+                                                                        />
+                                                                    )}
+                                                                >
                                                                     <HelpOutline className={classes.helpIcon} />
                                                                 </Button>
                                                             </Tooltip>
@@ -1094,7 +1103,16 @@ class APISecurityAudit extends Component {
                                                             </>
                                                         )}
                                                     >
-                                                        <Button className={classes.helpButton}>
+                                                        <Button
+                                                            className={classes.helpButton}
+                                                            aria-label={(
+                                                                <FormattedMessage
+                                                                    id={'Apis.Details.APIDefinition.'
+                                                                    + 'AuditApi.help.area.label'}
+                                                                    defaultMessage='Help'
+                                                                />
+                                                            )}
+                                                        >
                                                             <HelpOutline className={classes.helpIcon} />
                                                         </Button>
                                                     </Tooltip>
@@ -1221,7 +1239,16 @@ class APISecurityAudit extends Component {
                                                             </>
                                                         )}
                                                     >
-                                                        <Button className={classes.helpButton}>
+                                                        <Button
+                                                            className={classes.helpButton}
+                                                            aria-label={(
+                                                                <FormattedMessage
+                                                                    id={'Apis.Details.APIDefinition.'
+                                                                    + 'AuditApi.help.area.label'}
+                                                                    defaultMessage='Help'
+                                                                />
+                                                            )}
+                                                        >
                                                             <HelpOutline className={classes.helpIcon} />
                                                         </Button>
                                                     </Tooltip>

@@ -80,7 +80,15 @@ function Configuration(props) {
                                     </>
                                 )}
                             >
-                                <Button className={parentClasses.helpButton}>
+                                <Button
+                                    className={parentClasses.helpButton}
+                                    aria-label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.NewOverview.MetaData.help.area.label'
+                                            defaultMessage='Help'
+                                        />
+                                    )}
+                                >
                                     <HelpOutline className={parentClasses.helpIcon} />
                                 </Button>
                             </Tooltip>
@@ -132,7 +140,15 @@ function Configuration(props) {
                                     </>
                                 )}
                             >
-                                <Button className={parentClasses.helpButton}>
+                                <Button
+                                    className={parentClasses.helpButton}
+                                    aria-label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.NewOverview.MetaData.help.area.label'
+                                            defaultMessage='Help'
+                                        />
+                                    )}
+                                >
                                     <HelpOutline className={parentClasses.helpIcon} />
                                 </Button>
                             </Tooltip>
@@ -194,7 +210,15 @@ function Configuration(props) {
                                     </>
                                 )}
                             >
-                                <Button className={parentClasses.helpButton}>
+                                <Button
+                                    className={parentClasses.helpButton}
+                                    aria-label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.NewOverview.MetaData.help.area.label'
+                                            defaultMessage='Help'
+                                        />
+                                    )}
+                                >
                                     <HelpOutline className={parentClasses.helpIcon} />
                                 </Button>
                             </Tooltip>
@@ -270,7 +294,15 @@ function Configuration(props) {
                                     </>
                                 )}
                             >
-                                <Button className={parentClasses.helpButton}>
+                                <Button
+                                    className={parentClasses.helpButton}
+                                    aria-label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.NewOverview.MetaData.help.area.label'
+                                            defaultMessage='Help'
+                                        />
+                                    )}
+                                >
                                     <HelpOutline className={parentClasses.helpIcon} />
                                 </Button>
                             </Tooltip>

@@ -65,7 +65,17 @@ function RequestBody(props) {
                 <TableCell align='left'>
                     {hideParameterEdit && (
                         <Tooltip title='Edit'>
-                            <IconButton onClick={() => {}} fontSize='small'>
+                            <IconButton
+                                onClick={() => {}}
+                                fontSize='small'
+                                aria-label={(
+                                    <FormattedMessage
+                                        id={'Apis.Details.Resources.components.operationComponents'
+                                    + '.ListParameter.label.edit'}
+                                        defaultMessage='Edit'
+                                    />
+                                )}
+                            >
                                 <EditIcon fontSize='small' />
                             </IconButton>
                         </Tooltip>
@@ -95,6 +105,13 @@ function RequestBody(props) {
                                 });
                             }}
                             fontSize='small'
+                            aria-label={(
+                                <FormattedMessage
+                                    id={'Apis.Details.Resources.components.operationComponents'
+                                    + '.ListParameter.label.delete'}
+                                    defaultMessage='Delete'
+                                />
+                            )}
                         >
                             <DeleteIcon fontSize='small' />
                         </IconButton>

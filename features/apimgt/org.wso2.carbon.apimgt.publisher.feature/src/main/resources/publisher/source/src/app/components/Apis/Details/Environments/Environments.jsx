@@ -121,7 +121,7 @@ export default function Environments() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell />
+                            <TableCell component='td' />
                             <TableCell align='left'>Name</TableCell>
                             <TableCell align='left'>Type</TableCell>
                             <TableCell align='left'>Server URL</TableCell>
@@ -159,6 +159,7 @@ export default function Environments() {
                                         }
                                         name={row.name}
                                         color='primary'
+                                        inputProps={{ 'aria-label': 'Checkbox A' }}
                                     />
                                 </TableCell>
                                 <TableCell component='th' scope='row'>

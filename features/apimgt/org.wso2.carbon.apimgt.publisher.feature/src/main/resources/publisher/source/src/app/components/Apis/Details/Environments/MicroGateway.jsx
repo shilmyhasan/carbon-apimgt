@@ -115,6 +115,7 @@ export default function MicroGateway(props) {
                                             }
                                             name={row.name}
                                             color='primary'
+                                            inputProps={{ 'aria-label': 'Checkbox A' }}
                                         />
                                     </TableCell>
                                     <TableCell component='th' scope='row' align='left'>

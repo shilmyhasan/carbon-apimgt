@@ -36,6 +36,9 @@ const styles = (theme) => ({
         maxHeight: '250px',
         overflowY: 'auto',
     },
+    subHeading: {
+        color: theme.palette.primary.extra || theme.palette.primary.main,
+    },
 });
 
 /**
@@ -113,7 +116,6 @@ function Operations(props) {
                             <Link to={'/apis/' + api.id + '/operations'}>
                                 <Typography
                                     className={classes.subHeading}
-                                    color='primary'
                                     display='inline'
                                     variant='caption'
                                 >
