@@ -103,6 +103,10 @@ const styles = theme => ({
         padding: '15px 10px 0 18px',
         lineHeight: '22px',
     },
+    ariaLabel: {
+        width: 0,
+        height: 0,
+    }
 });
 
 /**
@@ -311,6 +315,7 @@ class HeaderSearch extends React.Component {
                 />
                 <Tooltip
                     interactive
+                    id='searchTooltip'
                     placement='top'
                     classes={{
                         tooltip: classes.InfoToolTip,
@@ -398,7 +403,7 @@ class HeaderSearch extends React.Component {
                         </React.Fragment>
                     }
                 >
-                    <IconButton className={classes.infoButton} >
+                    <IconButton className={classes.infoButton} aria-label='Search Options'>
                         <InfoIcon />
                     </IconButton>
                 </Tooltip>

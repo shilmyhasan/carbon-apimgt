@@ -330,12 +330,16 @@ class CommonListing extends React.Component {
                             <CustomIcon strokeColor={strokeColorMain} width={42} height={42} icon='api' />
                         </div>
                         <div className={classes.mainTitleWrapper} id='mainTitleWrapper'>
-                            <Typography variant='h4' className={classes.mainTitle}>
+                            <Typography variant='h4' component='h1' className={classes.mainTitle}>
                                 <FormattedMessage defaultMessage='APIs' id='Apis.Listing.Listing.apis.main' />
                             </Typography>
                         </div>
                         {this.showToggle && (<div className={classes.buttonRight} id='listGridWrapper'>
-                            <IconButton className={classes.button} onClick={() => this.setListType('list')}>
+                            <IconButton
+                                aria-label='List View'
+                                className={classes.button}
+                                onClick={() => this.setListType('list')}
+                            >
                                 <Icon
                                     className={classNames(
                                         { [classes.iconSelected]: listType === 'list' },
@@ -345,7 +349,11 @@ class CommonListing extends React.Component {
                                     list
                                 </Icon>
                             </IconButton>
-                            <IconButton className={classes.button} onClick={() => this.setListType('grid')}>
+                            <IconButton
+                                aria-label='Grid view'
+                                className={classes.button}
+                                onClick={() => this.setListType('grid')}
+                            >
                                 <Icon
                                     className={classNames(
                                         { [classes.iconSelected]: listType === 'grid' },
