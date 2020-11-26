@@ -360,7 +360,7 @@ class InfoBar extends React.Component {
                     )}
                     <div style={{ marginLeft: theme.spacing(1) }}>
                         <Link to={'/apis/' + api.id + '/overview'} className={classes.linkTitle}>
-                            <Typography variant='h4'>{api.name}</Typography>
+                            <Typography variant='h4' component='h1'>{api.name}</Typography>
                         </Link>
                         <Typography variant='caption' gutterBottom align='left'>
                             {this.getProvider(api)}
@@ -606,7 +606,7 @@ class InfoBar extends React.Component {
                     </Collapse>
                 )}
                 <div className={classes.infoContentBottom}>
-                    <a className={classes.expandWrapper} onClick={this.toggleOverview}>
+                    <Button className={classes.expandWrapper} onClick={this.toggleOverview}>
                         <div className={classes.buttonView}>
                             {showOverview ? (
                                 <Typography className={classes.buttonOverviewText}>
@@ -619,7 +619,7 @@ class InfoBar extends React.Component {
                             )}
                             {showOverview ? <Icon>arrow_drop_up</Icon> : <Icon>arrow_drop_down</Icon>}
                         </div>
-                    </a>
+                    </Button>
                 </div>
             </div>
         );

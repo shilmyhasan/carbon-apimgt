@@ -389,7 +389,7 @@ class Credentials extends React.Component {
                                 resourcePath={resourcePaths.SUBSCRIPTIONS}
                                 resourceMethod={resourceMethods.POST}
                             >
-                                <Typography variant='h5'>
+                                <Typography variant='h5' component='h2'>
                                     <FormattedMessage
                                         id={'Apis.Details.Credentials.Credentials.' +
                                         'subscribe.to.application'}
@@ -543,7 +543,7 @@ class Credentials extends React.Component {
                 <Grid item md={12} lg={11}>
                     <Grid container spacing={5}>
                         <Grid item md={12}>
-                            <Typography onClick={this.handleExpandClick} variant='h4' className={classes.titleSub}>
+                            <Typography onClick={this.handleExpandClick} variant='h4' component='h1' className={classes.titleSub}>
                                 <FormattedMessage
                                     id='Apis.Details.Credentials.Credentials.api.credentials'
                                     defaultMessage='Subscriptions'

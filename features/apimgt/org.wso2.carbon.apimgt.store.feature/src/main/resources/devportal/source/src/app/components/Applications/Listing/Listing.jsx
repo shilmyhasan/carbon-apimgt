@@ -407,7 +407,7 @@ class Listing extends Component {
                             <CustomIcon strokeColor={strokeColorMain} width={42} height={42} icon='applications' />
                         </div>
                         <div className={classes.mainTitleWrapper}>
-                            <Typography variant='h4' className={classes.mainTitle}>
+                            <Typography variant='h4' component='h1' className={classes.mainTitle}>
                                 <FormattedMessage
                                     id='Applications.Listing.Listing.applications'
                                     defaultMessage='Applications'
@@ -455,6 +455,7 @@ class Listing extends Component {
                                 <Grid item xs>
                                     <TextField
                                         fullWidth
+                                        aria-label="Search application by name"
                                         placeholder="Search application by name"
                                         InputProps={{
                                             disableUnderline: true,

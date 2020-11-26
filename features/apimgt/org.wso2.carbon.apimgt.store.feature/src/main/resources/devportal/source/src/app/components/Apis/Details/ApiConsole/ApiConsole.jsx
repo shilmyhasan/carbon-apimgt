@@ -421,7 +421,7 @@ class ApiConsole extends React.Component {
 
         return (
             <>
-                <Typography variant='h4' className={classes.titleSub}>
+                <Typography variant='h4' component='h2' className={classes.titleSub}>
                     <FormattedMessage id='Apis.Details.ApiConsole.ApiConsole.title' defaultMessage='Try Out' />
                 </Typography>
                 <Paper className={classes.paper}>
@@ -476,6 +476,7 @@ class ApiConsole extends React.Component {
                                         && (
                                             <TextField
                                                 fullWidth
+                                                id='environment'
                                                 select
                                                 label={(
                                                     <FormattedMessage
@@ -542,6 +543,7 @@ class ApiConsole extends React.Component {
                                                 <>
                                                     <TextField
                                                         margin='normal'
+                                                        id='username'
                                                         variant='outlined'
                                                         className={classes.usernameField}
                                                         label={
@@ -553,6 +555,7 @@ class ApiConsole extends React.Component {
                                                     />
                                                     <TextField
                                                         margin='normal'
+                                                        id='input-password'
                                                         variant='outlined'
                                                         className={classes.passwordField}
                                                         label={
@@ -566,6 +569,7 @@ class ApiConsole extends React.Component {
                                             ) : (
                                                 <TextField
                                                     fullWidth
+                                                    id='access-token'
                                                     margin='normal'
                                                     variant='outlined'
                                                     label={(

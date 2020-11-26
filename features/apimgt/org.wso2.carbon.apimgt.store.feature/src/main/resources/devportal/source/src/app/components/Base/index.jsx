@@ -151,6 +151,10 @@ const styles = (theme) => {
         listRoot: {
             padding: 0,
         },
+        listRootInline: {
+            padding: 0,
+            display: 'flex',
+        },
         listItemTextRoot: {
             padding: 0,
         },
@@ -385,7 +389,7 @@ class Layout extends React.Component {
                                         <Icon className={classes.menuIcon}>menu</Icon>
                                     </IconButton>
                                 </Hidden>
-                                <Link to='/' id='logoLink'>
+                                <Link to='/' id='logoLink' aria-label='Go to home page'>
                                     <img
                                         alt={(
                                             <FormattedMessage
@@ -471,7 +475,7 @@ class Layout extends React.Component {
                                 {user ? (
                                     <>
                                         <div className={classes.linkWrapper}>
-                                            <List className={classes.listRoot}>
+                                            <List className={classes.listRoot} component='nav'>
                                                 <Link to='/settings' id='settingsLink' className={classNames({ [classes.selected]: selected === 'settings', [classes.links]: true })}>
                                                     <ListItem button>
                                                         <ListItemIcon classes={{ root: classes.listIconRoot }}>
@@ -506,7 +510,7 @@ class Layout extends React.Component {
                                                 buttonRef={(node) => {
                                                     this.anchorEl = node;
                                                 }}
-                                                aria-owns={open ? 'menu-list-grow' : null}
+                                                aria-owns={this.openUserMenu ? 'menu-list-grow' : null}
                                                 aria-haspopup='true'
                                                 onClick={this.handleToggleUserMenu}
                                                 className={classes.userLink}
