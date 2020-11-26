@@ -89,17 +89,32 @@ public class APIKeyMgtServiceComponent {
             } else {
                 log.debug("Token Revocation Notifier Feature is disabled.");
             }
-            // registering logout token revoke listener
-            try {
-                SessionDataPublisherImpl dataPublisher = new SessionDataPublisherImpl();
-                ctxt.getBundleContext().registerService(AuthenticationDataPublisher.class.getName(), dataPublisher, null);
-                log.debug("SessionDataPublisherImpl bundle is activated");
-            } catch (Throwable e) {
-                log.error("SessionDataPublisherImpl bundle activation Failed", e);
-            }
+
             // loading white listed scopes
             List<String> whitelist = null;
-            APIManagerConfigurationService configurationService = org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService();
+            APIManagerConfigurationService configurationService =
+                    org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()
+                            .getAPIManagerConfigurationService();
+            boolean accessTokenBindingEnable;
+
+            String firstProperty = configurationService.getAPIManagerConfiguration()
+                    .getFirstProperty(APIConstants.AccessTokenBinding.ACCESS_TOKEN_BINDING_ENABLED);
+            if (firstProperty != null) {
+                accessTokenBindingEnable = Boolean.parseBoolean(firstProperty);
+            } else {
+                accessTokenBindingEnable = false;
+            }
+            if (!accessTokenBindingEnable) {
+                // registering logout token revoke listener
+                try {
+                    SessionDataPublisherImpl dataPublisher = new SessionDataPublisherImpl();
+                    ctxt.getBundleContext()
+                            .registerService(AuthenticationDataPublisher.class.getName(), dataPublisher, null);
+                    log.debug("SessionDataPublisherImpl bundle is activated");
+                } catch (Throwable e) {
+                    log.error("SessionDataPublisherImpl bundle activation Failed", e);
+                }
+            }
             if (configurationService != null) {
                 // Read scope whitelist from Configuration.
                 whitelist = configurationService.getAPIManagerConfiguration().getProperty(APIConstants.WHITELISTED_SCOPES);
