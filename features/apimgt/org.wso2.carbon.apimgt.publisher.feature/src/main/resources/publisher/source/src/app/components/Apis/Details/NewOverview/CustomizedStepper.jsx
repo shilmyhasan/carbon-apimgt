@@ -193,6 +193,9 @@ const useStyles = makeStyles((theme) => ({
     stepIcon: {
         fontSize: theme.custom.overviewStepper.iconSize,
     },
+    viewInStoreLauncher: {
+        color: theme.palette.primary.extra || theme.palette.primary.main,
+    },
 }));
 
 /**
@@ -278,7 +281,6 @@ export default function CustomizedSteppers() {
                             >
                                 <Typography
                                     variant='h6'
-                                    color='primary'
                                 >
                                     <FormattedMessage
                                         id='Apis.Details.components.APIDetailsTopMenu.view.in.portal'
@@ -426,7 +428,15 @@ export default function CustomizedSteppers() {
                                                 defaultMessage='Endpoint'
                                             />
                                         </Typography>
-                                        <Link to={'/apis/' + api.id + '/endpoints'}>
+                                        <Link
+                                            to={'/apis/' + api.id + '/endpoints'}
+                                            aria-label={(
+                                                <FormattedMessage
+                                                    id='Apis.Details.Overview.CustomizedStepper.go'
+                                                    defaultMessage='Go'
+                                                />
+                                            )}
+                                        >
                                             <LaunchIcon
                                                 style={{ marginLeft: '5px' }}
                                                 color='primary'
@@ -451,7 +461,15 @@ export default function CustomizedSteppers() {
                                                 defaultMessage=' Business plans'
                                             />
                                         </Typography>
-                                        <Link to={'/apis/' + api.id + '/subscriptions'}>
+                                        <Link
+                                            to={'/apis/' + api.id + '/subscriptions'}
+                                            aria-label={(
+                                                <FormattedMessage
+                                                    id='Apis.Details.Overview.CustomizedStepper.go'
+                                                    defaultMessage='Go'
+                                                />
+                                            )}
+                                        >
                                             <LaunchIcon
                                                 style={{ marginLeft: '5px' }}
                                                 color='primary'

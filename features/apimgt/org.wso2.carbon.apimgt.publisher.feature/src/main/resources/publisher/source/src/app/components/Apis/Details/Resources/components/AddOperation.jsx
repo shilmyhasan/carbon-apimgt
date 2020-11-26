@@ -313,7 +313,16 @@ function AddOperation(props) {
                             interactive
                         >
                             <span>
-                                <IconButton onClick={clearInputs} size='small'>
+                                <IconButton
+                                    onClick={clearInputs}
+                                    size='small'
+                                    aria-label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.Resources.components.AddOperation.list.label'
+                                            defaultMessage='Clear'
+                                        />
+                                    )}
+                                >
                                     <ClearIcon />
                                 </IconButton>
                             </span>

@@ -290,6 +290,9 @@ export default function DefaultAPIForm(props) {
                             validate('name', value);
                         },
                     }}
+                    InputLabelProps={{
+                        for: 'itest-id-apiname-input',
+                    }}
                     margin='normal'
                     variant='outlined'
                 />
@@ -333,6 +336,9 @@ export default function DefaultAPIForm(props) {
                                     classes={{ root: classes.helperTextContext }}
                                     margin='normal'
                                     variant='outlined'
+                                    InputLabelProps={{
+                                        for: 'itest-id-apicontext-input',
+                                    }}
                                 />
                             </Grid>
                             <Grid item md={4} xs={6}>
@@ -360,6 +366,9 @@ export default function DefaultAPIForm(props) {
                                     helperText={validity.version && validity.version.message}
                                     margin='normal'
                                     variant='outlined'
+                                    InputLabelProps={{
+                                        for: 'itest-id-apiversion-input',
+                                    }}
                                 />
                             </Grid>
                         </>
@@ -383,6 +392,7 @@ export default function DefaultAPIForm(props) {
                                     value={api.context}
                                     onChange={onChange}
                                     InputProps={{
+                                        id: 'itest-id-apicontext-input',
                                         onBlur: ({ target: { value } }) => {
                                             validate('context', value);
                                         },
@@ -400,6 +410,9 @@ export default function DefaultAPIForm(props) {
                                     }
                                     margin='normal'
                                     variant='outlined'
+                                    InputLabelProps={{
+                                        for: 'itest-id-apicontext-input',
+                                    }}
                                 />
                             </Grid>
                         </>
@@ -463,6 +476,10 @@ export default function DefaultAPIForm(props) {
                                     )}
                                 </InputAdornment>
                             ),
+                            id: 'itest-id-apiendpoint-input',
+                        }}
+                        InputLabelProps={{
+                            for: 'itest-id-apiendpoint-input',
                         }}
                     />
                 )}
@@ -478,7 +495,7 @@ export default function DefaultAPIForm(props) {
             <Grid container direction='row' justify='flex-end' alignItems='center'>
                 <Grid item>
                     <Typography variant='caption' display='block' gutterBottom>
-                        <sup style={{ color: 'red' }}>*</sup>
+                        <sup style={{ color: '#930c0c' }}>*</sup>
                         {' '}
 Mandatory fields
                     </Typography>

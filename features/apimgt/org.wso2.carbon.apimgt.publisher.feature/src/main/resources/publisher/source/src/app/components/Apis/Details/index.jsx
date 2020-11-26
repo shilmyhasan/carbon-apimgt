@@ -35,7 +35,7 @@ import SubscriptionsIcon from '@material-ui/icons/RssFeed';
 import MonetizationIcon from '@material-ui/icons/LocalAtm';
 import StoreIcon from '@material-ui/icons/Store';
 import { withStyles } from '@material-ui/core/styles';
-import { injectIntl, defineMessages } from 'react-intl';
+import { injectIntl, defineMessages, FormattedMessage } from 'react-intl';
 import {
     Redirect, Route, Switch, Link, matchPath,
 } from 'react-router-dom';
@@ -505,7 +505,15 @@ class Details extends Component {
                     }}
                 >
                     <div className={classes.LeftMenu}>
-                        <Link to={'/' + (isAPIProduct ? 'api-products' : 'apis') + '/'}>
+                        <Link
+                            to={'/' + (isAPIProduct ? 'api-products' : 'apis') + '/'}
+                            aria-label={(
+                                <FormattedMessage
+                                    id='Apis.Details.index.back.to.list'
+                                    defaultMessage='Back to List'
+                                />
+                            )}
+                        >
                             <div className={classes.leftLInkMain}>
                                 <CustomIcon
                                     width={leftMenuIconMainSize}

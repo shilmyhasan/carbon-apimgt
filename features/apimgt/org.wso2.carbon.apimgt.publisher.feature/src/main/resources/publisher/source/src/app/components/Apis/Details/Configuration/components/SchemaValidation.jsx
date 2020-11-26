@@ -55,6 +55,9 @@ const styles = (theme) => ({
         padding: theme.spacing(0, 3),
         marginBottom: theme.spacing(3),
     },
+    showSwitchCaption: {
+        display: theme.custom.showSwitchCaption || 'none',
+    },
 });
 
 /**
@@ -144,17 +147,33 @@ class SchemaValidation extends React.Component {
                         <FormControlLabel
                             className={classes.actionSpace}
                             control={(
-                                <Switch
-                                    disabled={isRestricted(['apim:api_create'], apiFromContext)}
-                                    checked={
-                                        api.enableSchemaValidation === undefined ? false : api.enableSchemaValidation
-                                    }
-                                    onChange={({ target: { checked } }) => configDispatcher({
-                                        action: 'enableSchemaValidation',
-                                        value: checked,
-                                    })}
-                                    color='primary'
-                                />
+                                <>
+                                    <span className={classes.showSwitchCaption}>
+                                        <FormattedMessage
+                                            id='Apis.Details.Configuration.components.schema.validation.disable'
+                                            defaultMessage='Disable'
+                                        />
+                                    </span>
+                                    <Switch
+                                        disabled={isRestricted(['apim:api_create'], apiFromContext)}
+                                        checked={
+                                            api.enableSchemaValidation === undefined
+                                                ? false
+                                                : api.enableSchemaValidation
+                                        }
+                                        onChange={({ target: { checked } }) => configDispatcher({
+                                            action: 'enableSchemaValidation',
+                                            value: checked,
+                                        })}
+                                        color='primary'
+                                    />
+                                    <span className={classes.showSwitchCaption}>
+                                        <FormattedMessage
+                                            id='Apis.Details.Configuration.components.schema.validation.disable'
+                                            defaultMessage='Disable'
+                                        />
+                                    </span>
+                                </>
                             )}
                         />
                     </Grid>

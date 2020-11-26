@@ -46,6 +46,7 @@ function RenderMethodBase(props) {
             style={{
                 backgroundColor: chipColor, color: chipTextColor, height: 20, marginRight: 5,
             }}
+            role='presentation'
         />
     );
 }
@@ -58,7 +59,7 @@ RenderMethodBase.propTypes = {
 
 const RenderMethod = withTheme(RenderMethodBase);
 
-const styles = {
+const styles = (theme) => ({
     root: {
         display: 'flex',
         flexDirection: 'row',
@@ -72,7 +73,10 @@ const styles = {
         maxHeight: '125px',
         overflowY: 'auto',
     },
-};
+    subHeading: {
+        color: theme.palette.primary.extra || theme.palette.primary.main,
+    },
+});
 
 class Resources extends React.Component {
     constructor(props) {
@@ -166,7 +170,6 @@ class Resources extends React.Component {
                     <Link to={'/apis/' + api.id + '/resources'}>
                         <Typography
                             className={classes.subHeading}
-                            color='primary'
                             display='inline'
                             variant='caption'
                         >

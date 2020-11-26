@@ -209,6 +209,10 @@ function GenericEndpoint(props) {
                             ) : (<div />)}
                         </InputAdornment>
                     ),
+                    id: `endpoint-url-${name}`,
+                }}
+                InputLabelProps={{
+                    for: `endpoint-url-${name}`,
                 }}
             />
         </div>

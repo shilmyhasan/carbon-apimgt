@@ -151,8 +151,12 @@ export default function MaxBackendTps(props) {
                                     }}
                                     value={api.maxTps !== null ? api.maxTps.production : ''}
                                     disabled={isRestricted(['apim:api_create'], api)}
+                                    InputLabelProps={{
+                                        for: 'max-production-tps',
+                                    }}
                                     InputProps={{
                                         endAdornment: <InputAdornment position='end'>TPS</InputAdornment>,
+                                        id: 'max-production-tps',
                                     }}
                                 />
                             </Grid>
@@ -169,8 +173,12 @@ export default function MaxBackendTps(props) {
                                     }}
                                     value={api.maxTps !== null ? api.maxTps.sandbox : ''}
                                     disabled={isRestricted(['apim:api_create'], api)}
+                                    InputLabelProps={{
+                                        for: 'max-sandbox-tps',
+                                    }}
                                     InputProps={{
                                         endAdornment: <InputAdornment position='end'>TPS</InputAdornment>,
+                                        id: 'max-sandbox-tps',
                                     }}
                                 />
                                 <FormHelperText>

@@ -9,6 +9,7 @@ const AppThemes = {
             primary: {
                 // light: will be calculated from palette.primary.main,
                 main: '#15b8cf',
+                extra: '#0d7584',
                 // dark: will be calculated from palette.primary.main,
                 // contrastText: will be calculated to contrast with palette.primary.main
             },
@@ -28,6 +29,9 @@ const AppThemes = {
                 drawer: '#1a1f2f',
                 activeMenuItem: '#254061',
             },
+            error: {
+                main: '#d32f2f',
+            },
         },
         typography: {
             fontFamily: '"Open Sans", "Helvetica", "Arial", sans-serif',
@@ -38,6 +42,10 @@ const AppThemes = {
             },
             h4: {
                 fontSize: '1.3rem',
+            },
+            caption: {
+                fontSize: '0.70rem',
+                color: '#666',
             },
         },
         zIndex: {
@@ -67,7 +75,7 @@ const AppThemes = {
                 get: '#61affe',
                 post: '#49cc90',
                 put: '#fca130',
-                delete: '#f93e3e',
+                delete: '#830d0d',
                 options: '#0d5aa7',
                 patch: '#50e3c2',
                 head: '#9012fe',
@@ -119,6 +127,17 @@ const AppThemes = {
             title: {
                 prefix: '[Publisher]',
                 sufix: 'WSO2 APIM',
+            },
+            showSwitchCaption: false,
+        },
+        overrides: {
+            MuiOutlinedInput: {
+                root: {
+                    borderColor: '#444',
+                },
+                notchedOutline: {
+                    borderColor: '#444',
+                },
             },
         },
     },

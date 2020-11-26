@@ -41,15 +41,19 @@ import {
 } from 'AppComponents/Apis/Details/Resources/components/operationComponents/parameterUtils';
 
 const useStyles = makeStyles(() => ({
+    labelStyle: {
+        color: '#222',
+    },
     formControl: {
         minWidth: 120,
+        color: '#222',
     },
     parameterContainer: {
         alignItems: 'center',
         justifyContent: 'space-between',
     },
     checkBox: {
-        color: '#7c7c7c',
+        color: '#222',
     },
 }));
 
@@ -250,7 +254,12 @@ function AddParameter(props) {
             </Grid>
             <Grid item xs={2} md={2}>
                 <TextField
-                    id='parameter-name'
+                    InputLabelProps={{
+                        for: `parameter-name-${verb}-${target.replace(/\W/g, '')}`,
+                    }}
+                    InputProps={{
+                        id: `parameter-name-${verb}-${target.replace(/\W/g, '')}`,
+                    }}
                     label={newParameter.in === 'body'
                         ? iff(specVersion === '2.0',
                             <FormattedMessage
@@ -324,6 +333,7 @@ function AddParameter(props) {
                 <FormControl component='fieldset' className={classes.formControl}>
                     <FormControlLabel
                         className={classes.checkBox}
+                        classes={{ label: classes.labelStyle }}
                         control={(
                             <Checkbox
                                 checked={newParameter.required}
@@ -395,7 +405,16 @@ function AddParameter(props) {
                         interactive
                     >
                         <span>
-                            <IconButton onClick={clearInputs} size='small'>
+                            <IconButton
+                                onClick={clearInputs}
+                                size='small'
+                                aria-label={(
+                                    <FormattedMessage
+                                        id='Apis.Details.Resources.components.AddParameter.clear.label'
+                                        defaultMessage='Clear'
+                                    />
+                                )}
+                            >
                                 <ClearIcon />
                             </IconButton>
                         </span>

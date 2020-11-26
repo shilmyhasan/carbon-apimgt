@@ -57,6 +57,9 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(0, 3),
     },
+    showSwitchCaption: {
+        display: theme.custom.showSwitchCaption || 'none',
+    },
 }));
 
 /**
@@ -101,15 +104,29 @@ export default function ResponseCaching(props) {
                     <FormControlLabel
                         className={classes.actionSpace}
                         control={(
-                            <Switch
-                                disabled={isRestricted(['apim:api_create'], apiFromContext)}
-                                checked={api.responseCachingEnabled}
-                                onChange={({ target: { checked } }) => configDispatcher({
-                                    action: 'responseCachingEnabled',
-                                    value: checked,
-                                })}
-                                color='primary'
-                            />
+                            <>
+                                <span className={classes.showSwitchCaption}>
+                                    <FormattedMessage
+                                        id='Apis.Details.Configuration.components.ResponseCaching.disable'
+                                        defaultMessage='Disable'
+                                    />
+                                </span>
+                                <Switch
+                                    disabled={isRestricted(['apim:api_create'], apiFromContext)}
+                                    checked={api.responseCachingEnabled}
+                                    onChange={({ target: { checked } }) => configDispatcher({
+                                        action: 'responseCachingEnabled',
+                                        value: checked,
+                                    })}
+                                    color='primary'
+                                />
+                                <span className={classes.showSwitchCaption}>
+                                    <FormattedMessage
+                                        id='Apis.Details.Configuration.components.ResponseCaching.enable'
+                                        defaultMessage='Enable'
+                                    />
+                                </span>
+                            </>
                         )}
                     />
                 </ExpansionPanelSummary>

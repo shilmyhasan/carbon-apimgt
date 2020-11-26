@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { isRestricted } from 'AppData/AuthManager';
 import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import {
     Button,
@@ -115,7 +115,7 @@ function Certificates(props) {
     const [uploadCertificateOpen, setUploadCertificateOpen] = useState(false);
     const classes = useStyles();
     const [apiFromContext] = useAPI();
-
+    const theme = useTheme();
 
     /**
      * Show the selected certificate details in a popover.
@@ -218,7 +218,13 @@ delete
                     ) : (
                         <ListItem>
                             <ListItemAvatar>
-                                <Icon color='primary'>info</Icon>
+                                <Icon style={{
+                                    color: theme.palette.primary.extra
+                                    || theme.palette.primary.main,
+                                }}
+                                >
+info
+                                </Icon>
                             </ListItemAvatar>
                             <ListItemText>You do not have any certificates uploaded</ListItemText>
                         </ListItem>

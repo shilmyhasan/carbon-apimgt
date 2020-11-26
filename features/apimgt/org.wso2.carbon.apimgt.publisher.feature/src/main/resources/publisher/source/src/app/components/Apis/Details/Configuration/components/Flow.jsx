@@ -95,7 +95,7 @@ function InFlow(props) {
                     <Grid item md={12} style={{ position: 'relative', display: 'inline-flex' }}>
                         <Typography className={classes.subHeading} variant='h6'>
                             <FormattedMessage
-                                id='Apis.Details.MediationPolicies.Mediation'
+                                id='Apis.Details.Configuration.components.Flow.message.mediation'
                                 defaultMessage='Message Mediation'
                             />
                         </Typography>
@@ -107,6 +107,12 @@ function InFlow(props) {
                             )}
                         </Typography>
                         <Button
+                            aria-label={(
+                                <FormattedMessage
+                                    id='Apis.Details.Configuration.components.Flow.edit'
+                                    defaultMessage='Edit'
+                                />
+                            )}
                             className={classes.editIcon}
                             size='small'
                             onClick={startEditing}

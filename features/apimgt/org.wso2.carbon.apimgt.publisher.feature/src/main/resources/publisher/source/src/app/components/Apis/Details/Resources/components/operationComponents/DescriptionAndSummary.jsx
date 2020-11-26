@@ -62,11 +62,16 @@ Description
                             { action: 'description', data: { target, verb, value } },
                         )
                     }
+                    InputLabelProps={{
+                        for: `description${target}${verb}`,
+                    }}
+                    InputProps={{
+                        id: `description${target}${verb}`,
+                    }}
                 />
             </Grid>
             <Grid item md={5}>
                 <TextField
-                    id='operation_summary'
                     label='Summary'
                     margin='dense'
                     variant='outlined'
@@ -78,6 +83,12 @@ Description
                     onChange={({ target: { value } }) => operationsDispatcher(
                         { action: 'summary', data: { target, verb, value } },
                     )}
+                    InputLabelProps={{
+                        for: `summary${target}${verb}`,
+                    }}
+                    InputProps={{
+                        id: `summary${target}${verb}`,
+                    }}
                 />
             </Grid>
             <Grid item md={1} />
