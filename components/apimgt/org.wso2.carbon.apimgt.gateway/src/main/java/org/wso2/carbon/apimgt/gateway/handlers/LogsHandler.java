@@ -155,7 +155,7 @@ public class LogsHandler extends AbstractSynapseHandler {
             // default API would have the property LoggedResponse as true.
             String defaultAPI = (String) messageContext.getProperty("DefaultAPI");
             if ("true".equals(defaultAPI)) {
-                return true;
+                log.debug("Default API is invoked");
             } else {
                 try {
                     long responseTime = getResponseTime(messageContext);
