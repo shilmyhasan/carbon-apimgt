@@ -84,11 +84,10 @@ public class LogsHandler extends AbstractSynapseHandler {
         if (isEnabled()) {
             try {
                 apiTo = LogUtils.getTo(messageContext);
-                return true;
             } catch (Exception e) {
                 log.error(REQUEST_EVENT_PUBLICATION_ERROR + e.getMessage(), e);
+                return false;
             }
-            return false;
         }
         return true;
     }
@@ -123,11 +122,10 @@ public class LogsHandler extends AbstractSynapseHandler {
                 apiRestReqFullPath = LogUtils.getRestReqFullPath(messageContext);
                 apiMsgUUID = (String) messageContext.getMessageID();
                 apiRsrcCacheKey = LogUtils.getResourceCacheKey(messageContext);
-                return true;
             } catch (Exception e) {
                 log.error(REQUEST_EVENT_PUBLICATION_ERROR + e.getMessage(), e);
+                return false;
             }
-            return false;
         }
         return true;
     }
@@ -158,12 +156,11 @@ public class LogsHandler extends AbstractSynapseHandler {
                             + "|" + applIdHeader + "|" + uuIdHeader + "|" + requestSize
                             + "|" + responseSize + "|" + apiResponseSC + "|"
                             + applicationName + "|" + apiConsumerKey + "|" + responseTime);
-                    return true;
                 } catch (Exception e) {
                     log.error(RESPONSE_EVENT_PUBLICATION_ERROR + e.getMessage(), e);
+                    return false;
                 }
             }
-            return false;
         }
         return true;
     }
