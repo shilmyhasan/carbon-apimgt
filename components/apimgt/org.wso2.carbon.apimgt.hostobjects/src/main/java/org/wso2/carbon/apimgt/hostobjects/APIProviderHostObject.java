@@ -3577,8 +3577,13 @@ public class APIProviderHostObject extends ScriptableObject {
                 return contextExist.toString();
             }
             APIProvider apiProvider = getAPIProvider(thisObj);
+            //Adding slash at the beginning of the context and removing the version template if it is at the end
+            String contextWithSlash = context.startsWith("/") ? context : ("/" + context);
+            if (contextWithSlash.endsWith("/" + APIConstants.VERSION_PLACEHOLDER)) {
+                contextWithSlash = contextWithSlash.replace("/" + APIConstants.VERSION_PLACEHOLDER, "");
+            }
             try {
-                contextExist = apiProvider.isDuplicateContextTemplate(context);
+                contextExist = apiProvider.isDuplicateContextTemplate(contextWithSlash);
             } catch (APIManagementException e) {
                 handleException("Error while checking whether context exists", e);
             }
