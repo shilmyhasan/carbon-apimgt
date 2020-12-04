@@ -176,6 +176,7 @@ class CommentAdd extends React.Component {
                             id='standard-multiline-flexible'
                             autoFocus
                             multiline
+                            rows='4'
                             label={intl.formatMessage({
                                 defaultMessage: 'Comment',
                                 id: 'Apis.Details.Comments.CommentAdd.comment',
