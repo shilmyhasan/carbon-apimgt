@@ -94,6 +94,9 @@ const styles = (theme) => ({
             paddingTop: theme.spacing(1),
             paddingBottom: theme.spacing(1),
         },
+        '& th:last-child': {
+            textAlign: 'right',
+        },
 
     },
     expansion: {
@@ -515,7 +518,13 @@ class Credentials extends React.Component {
                                                 defaultMessage='Application Status'
                                             />
                                         </th>
-                                        <th className={classes.th} />
+                                        <th className={classes.th}>
+                                            <FormattedMessage
+                                                id={'Apis.Details.Credentials.Credentials.'
+                                                + 'api.credentials.subscribed.apps.action'}
+                                                defaultMessage='Actions'
+                                            />
+                                        </th>
                                     </tr>
                                     {subscribedApplications.map((app, index) => (
                                         <SubscriptionTableRow

@@ -472,7 +472,7 @@ class Subscriptions extends React.Component {
                         className={classes.subscribePop}
                     >
                         <MuiDialogTitle disableTypography className={classes.dialogTitle}>
-                            <Typography variant='h6'>
+                            <Typography id='simple-dialog-title' variant='h6'>
                                 <FormattedMessage
                                     id='Applications.Details.Subscriptions.subscription.management.add'
                                     defaultMessage='Subscribe APIs'
