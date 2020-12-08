@@ -22,6 +22,10 @@ import com.google.gson.Gson;
 import io.swagger.models.Swagger;
 import io.swagger.parser.SwaggerParser;
 import io.swagger.parser.util.SwaggerDeserializationResult;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -91,17 +95,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import io.swagger.models.Path;
-import io.swagger.models.Swagger;
 import io.swagger.util.Json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -914,24 +912,33 @@ public class ApisApiServiceImpl extends ApisApiService {
     private String validateSwaggerDefinition(String apiDefinition) {
         try {
             if (apiDefinition == null) {
-                RestApiUtil.handleBadRequest("Parameter: \"apiDefinition\" cannot be null", log);
+                RestApiUtil.handleBadRequest("Parameter: API Definition cannot be null", log);
             }
-            Swagger swagger = new SwaggerParser().parse(apiDefinition);
-            Map<String, Path> paths = swagger.getPaths();
             List<String> modifiableResources = new ArrayList<>();
-            for (String key : paths.keySet()) {
+            JSONParser parser = new JSONParser();
+            JSONObject apiDefinitionJson = (JSONObject) parser.parse(apiDefinition);
+            Map <String, JSONObject> pathMap = (Map<String, JSONObject>) apiDefinitionJson.get(APIConstants.SWAGGER_PATHS);
+            Map <String, JSONObject> clonePathMap = new HashMap<>();
+            apiDefinitionJson.remove(APIConstants.SWAGGER_PATHS);
+            Iterator it = pathMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry resource = (Map.Entry)it.next();
+                String key = (String) resource.getKey();
+                JSONObject resourceDefinition = (JSONObject) resource.getValue();
                 if (key.endsWith("/")) {
-                    modifiableResources.add(key);
+                    clonePathMap.put(key.substring(0, key.length()-1), resourceDefinition);
+                } else {
+                    clonePathMap.put(key, resourceDefinition);
                 }
+                it.remove();
             }
-            for (String modifiableResource : modifiableResources) {
-                String newResource = modifiableResource.substring(0, modifiableResource.length() - 1);
-                paths.put(newResource, paths.remove(modifiableResource));
-            }
-            swagger.setPaths(paths);
-            return Json.mapper().writeValueAsString(swagger);
+            apiDefinitionJson.put(APIConstants.SWAGGER_PATHS, clonePathMap);
+            return Json.mapper().writeValueAsString(apiDefinitionJson);
+        } catch (ParseException e) {
+            String errorMessage = "Error while validating the api Definiton";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (JsonProcessingException e) {
-            String errorMessage = "Error while validating the swagger definition";
+            String errorMessage = "Error while validating the api Definiton";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
