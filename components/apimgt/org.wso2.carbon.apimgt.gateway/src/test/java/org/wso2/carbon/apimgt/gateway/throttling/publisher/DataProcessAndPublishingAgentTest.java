@@ -307,9 +307,6 @@ public class DataProcessAndPublishingAgentTest {
         headers.put(APIMgtGatewayConstants.X_FORWARDED_FOR, "192.168.1.1:80");
         Mockito.when(axis2MsgCntxt.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS))
                 .thenReturn(headers);
-        VerbInfoDTO verbInfoDTO = new VerbInfoDTO();
-        verbInfoDTO.setContentAware(false);
-        Mockito.when(messageContext.getProperty(APIConstants.VERB_INFO_DTO)).thenReturn(verbInfoDTO);
         dataProcessAndPublishingAgent.setDataReference(applicationLevelThrottleKey, applicationLevelTier,
                 apiLevelThrottleKey, null, subscriptionLevelThrottleKey, subscriptionLevelTier,
                 resourceLevelThrottleKey, resourceLevelTier, authorizedUser, apiContext, apiVersion, appTenant,
