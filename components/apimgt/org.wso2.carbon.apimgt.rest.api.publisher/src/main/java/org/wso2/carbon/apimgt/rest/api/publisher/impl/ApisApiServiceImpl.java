@@ -917,7 +917,8 @@ public class ApisApiServiceImpl extends ApisApiService {
             }
             JSONParser parser = new JSONParser();
             JSONObject apiDefinitionJson = (JSONObject) parser.parse(apiDefinition);
-            Map <String, JSONObject> pathMap = (Map<String, JSONObject>) apiDefinitionJson.get(APIConstants.SWAGGER_PATHS);
+            Map <String, JSONObject> pathMap = (Map<String, JSONObject>) apiDefinitionJson
+                    .get(APIConstants.SWAGGER_PATHS);
             Map <String, JSONObject> clonePathMap = new HashMap<>();
             apiDefinitionJson.remove(APIConstants.SWAGGER_PATHS);
             Iterator it = pathMap.entrySet().iterator();
@@ -935,7 +936,7 @@ public class ApisApiServiceImpl extends ApisApiService {
             apiDefinitionJson.put(APIConstants.SWAGGER_PATHS, clonePathMap);
             return Json.mapper().writeValueAsString(apiDefinitionJson);
         } catch (ParseException | JsonProcessingException e) {
-            String errorMessage = "Error while validating the swagger Definiton";
+            String errorMessage = "Error while validating the swagger Definition";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
