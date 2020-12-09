@@ -151,6 +151,10 @@ function APIDesigner(){
         var path = $("#resource_url_pattern").val();
         if(path.charAt(0) != "/")
             path = "/"+path;
+
+        if (path.endsWith("/")) {
+            path = path.slice(0, -1)
+        }
         
     	var resource_exist = false;
         $(".http_verb_select").each(function(){    //added this validation to fix https://wso2.org/jira/browse/APIMANAGER-2671
@@ -242,6 +246,18 @@ function APIDesigner(){
     isAPIUpdateValid();
     
 }
+
+APIDesigner.prototype.remove_trailing_slash = function(swagger) {
+    var paths = swagger.paths;
+    for (var path in paths) {
+        if (path.endsWith("/")) {
+            var newkey = path.slice(0, -1);
+            swagger.paths[newkey] = swagger.paths[path];
+            delete swagger.paths[path];
+        }
+    }
+    return swagger;
+};
 
 APIDesigner.prototype.check_if_resource_exist = function(path, method){
 
@@ -611,7 +627,8 @@ APIDesigner.prototype.load_api_document = function(api_document){
 
 APIDesigner.prototype.load_swagger_editor_content = function (){
     if(this.api_doc != ""){
-        var swagYaml = jsyaml.safeDump(this.api_doc);
+        var swagger = jQuery.extend(true, {}, this.api_doc);
+        var swagYaml = jsyaml.safeDump(this.remove_trailing_slash(swagger));
         window.localStorage.setItem(SWAGGER_CONTENT, swagYaml);
         window.localStorage.setItem(SWAGGER_CONTENT_CACHE, swagYaml);
     }
@@ -620,7 +637,7 @@ APIDesigner.prototype.load_swagger_editor_content = function (){
 APIDesigner.prototype.render_scopes = function(){
     if($('#scopes-template').length){    
         context = {
-            "api_doc" : this.api_doc
+            "doc" : this.api_doc
         }
         var output = Handlebars.partials['scopes-template'](context);
         $('#scopes_view').html(output);
@@ -628,7 +645,7 @@ APIDesigner.prototype.render_scopes = function(){
 };
 
 APIDesigner.prototype.transform = function(api_doc){
-    var swagger = jQuery.extend(true, {}, this.api_doc);
+    var swagger = jQuery.extend(true, {}, api_doc);
     for(var pathkey in swagger.paths){
         var path = swagger.paths[pathkey];
         var parameters = path.parameters;
@@ -638,7 +655,7 @@ APIDesigner.prototype.transform = function(api_doc){
             verb.path = pathkey;
         }
     }
-    return swagger;
+    return this.remove_trailing_slash(swagger);
 }
 
 APIDesigner.prototype.setApiLevelPolicy = function(isAPILevel){
@@ -766,8 +783,9 @@ APIDesigner.prototype.render_additionalProperties = function () {
 };
 
 APIDesigner.prototype.render_resources = function(){
+    var json = jsyaml.safeLoad(window.localStorage.getItem(SWAGGER_CONTENT));
     context = {
-        "doc" : this.transform(this.api_doc),
+        "doc" : this.transform(json),
         "verbs" :VERBS,
         "has_resources" : this.has_resources()
     }
@@ -1390,4 +1408,3 @@ var disableForm = function(){
     $('#swaggerEditor').unbind('click');
 
 }
-
