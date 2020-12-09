@@ -194,7 +194,7 @@ public class APIMTokenIssuer extends OauthTokenIssuerImpl {
             log.error(errorMsg + clientId, e);
             throw new OAuthSystemException(errorMsg + clientId, e);
         }
-        
+
         if (log.isDebugEnabled()) {
             long end_time = System.nanoTime();
             long output = end_time - start_time;
@@ -215,7 +215,7 @@ public class APIMTokenIssuer extends OauthTokenIssuerImpl {
                 }
                 long validityPeriod = APIMTokenIssuerUtil.getAccessTokenLifeTimeInSeconds(oAuthAppDO);
 
-                String[] scopeList = oauthAuthzMsgCtx.getAuthorizationReqDTO().getScopes();
+                String[] scopeList = oauthAuthzMsgCtx.getApprovedScope();
                 AuthenticatedUser endUser = oauthAuthzMsgCtx.getAuthorizationReqDTO().getUser();
 
                 JWTAccessTokenIssuerDTO jwtAccessTokenIssuerDTO = new JWTAccessTokenIssuerDTO();
