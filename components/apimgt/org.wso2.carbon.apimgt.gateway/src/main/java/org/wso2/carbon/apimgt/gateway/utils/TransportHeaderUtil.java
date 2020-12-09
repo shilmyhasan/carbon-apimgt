@@ -45,7 +45,6 @@ public class TransportHeaderUtil {
      * @return list of parsed headers from the given header object
      */
     public static List<String> populateStandardHeaders(String standardHeadersStr) {
-
         List<String> standardHeaders = new ArrayList<String>();
         if (StringUtils.isNotEmpty(standardHeadersStr)) {
             String[] headerList = standardHeadersStr.trim().split(",");
