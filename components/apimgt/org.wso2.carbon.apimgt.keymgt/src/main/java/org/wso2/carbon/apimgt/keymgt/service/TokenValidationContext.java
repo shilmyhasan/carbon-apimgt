@@ -46,6 +46,15 @@ public class TokenValidationContext {
     private AccessTokenInfo tokenInfo;
     private AuthenticatedUser user;
     private String authorizationCode;
+    private Long validityPeriod;
+
+    public Long getValidityPeriod() {
+        return validityPeriod;
+    }
+
+    public void setValidityPeriod(Long validityPeriod) {
+        this.validityPeriod = validityPeriod;
+    }
 
     public AccessTokenInfo getTokenInfo() {
         return tokenInfo;
