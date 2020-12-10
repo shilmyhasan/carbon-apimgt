@@ -195,6 +195,10 @@ public class ApisApiServiceImpl extends ApisApiService {
                     RestApiUtil.handleBadRequest(errorMessage, log);
                 }
             }
+            if (body.getContext() == null) {
+                RestApiUtil.handleBadRequest("Parameter: \"context\" cannot be null", log);
+            }
+
             if (body.getContext().endsWith("/")) {
                 RestApiUtil.handleBadRequest("Context cannot end with '/' character", log);
             }
@@ -230,12 +234,19 @@ public class ApisApiServiceImpl extends ApisApiService {
 
             //Get all existing versions of  api been adding
             List<String> apiVersions = apiProvider.getApiVersionsMatchingApiName(body.getName(), provider);
+
+            //Adding slash at the beginning of the context and removing the version template if it is at the end
+            String contextWithSlash = body.getContext().startsWith("/") ? body.getContext() : ("/" + body.getContext());
+            if (contextWithSlash.endsWith("/" + RestApiConstants.API_VERSION_PARAM)) {
+                contextWithSlash = contextWithSlash.replace("/" + RestApiConstants.API_VERSION_PARAM, "");
+            }
+
             if (apiVersions.size() > 0) {
                 //If any previous version exists
                 for (String version : apiVersions) {
                     if (version.equalsIgnoreCase(body.getVersion())) {
                         //If version already exists
-                        if (apiProvider.isDuplicateContextTemplate(body.getContext())) {
+                        if (apiProvider.isDuplicateContextTemplate(contextWithSlash)) {
                             RestApiUtil.handleResourceAlreadyExistsError("Error occurred while " +
                                     "adding the API. A duplicate API already exists for "
                                     + body.getName() + "-" + body.getVersion(), log);
@@ -248,7 +259,7 @@ public class ApisApiServiceImpl extends ApisApiService {
                 }
             } else {
                 //If no any previous version exists
-                if (apiProvider.isDuplicateContextTemplate(body.getContext())) {
+                if (apiProvider.isDuplicateContextTemplate(contextWithSlash)) {
                     RestApiUtil.handleBadRequest("Error occurred while adding the API. A duplicate API context " +
                                     "already exists for " + body.getContext(), log);
                 }
