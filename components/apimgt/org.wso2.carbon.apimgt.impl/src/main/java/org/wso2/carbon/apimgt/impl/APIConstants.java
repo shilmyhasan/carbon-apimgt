@@ -1688,6 +1688,11 @@ public final class APIConstants {
         public static final String WORKFLOW_DCR_EP_PASSWORD = "DCREndPointPassword";
 
     }
+    public static class AccessTokenBinding {
+
+        public static final String ACCESS_TOKEN_BINDING = "AccessTokenBinding";
+        public static final String ACCESS_TOKEN_BINDING_ENABLED = ACCESS_TOKEN_BINDING + ".Enabled";
+    }
 
     public static class JwtTokenConstants {
         public static final String APPLICATION = "application";
@@ -1805,6 +1810,7 @@ public final class APIConstants {
 
     public static final String APPLICATION_GZIP = "application/gzip";
     public static final String APPLICATION_ZIP = "application/zip";
+    public static final String APPLICATION_X_ZIP_COMPRESSED = "application/x-zip-compressed";
     public static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
     public static final String JSON_FILENAME_EXTENSION = ".json";
     public static final String JSON_GZIP_FILENAME_EXTENSION = ".json.gz";

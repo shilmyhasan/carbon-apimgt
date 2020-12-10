@@ -55,12 +55,13 @@ const useStyles = makeStyles((theme) => ({
  */
 export default function Environments() {
     const classes = useStyles();
-    const { api, updateAPI } = useContext(APIContext);
+    const { api, updateAPI, isAPIProduct } = useContext(APIContext);
     const { settings } = useAppContext();
     const [gatewayEnvironments, setGatewayEnvironments] = useState([...api.gatewayEnvironments]);
-    const [selectedMgLabel, setSelectedMgLabel] = useState([...api.labels]);
+    const [selectedMgLabel, setSelectedMgLabel] = isAPIProduct ? [] : useState([...api.labels]);
 
     const [isUpdating, setUpdating] = useState(false);
+    const [isPublishing, setPublishing] = useState(false);
 
     /**
      *
@@ -84,6 +85,30 @@ export default function Environments() {
             .finally(() => setUpdating(false));
     }
 
+
+    /**
+     *
+     * Handle the Environments publish button action
+     */
+    function addEnvironmentsAndPublish() {
+        setPublishing(true);
+        updateAPI({
+            gatewayEnvironments,
+            labels: selectedMgLabel,
+            state: 'PUBLISHED',
+        })
+            .then(() => Alert.info('API Product Update Successfully'))
+            .catch((error) => {
+                if (error.response) {
+                    Alert.error(error.response.body.description);
+                } else {
+                    Alert.error('Something went wrong while updating the environments');
+                }
+                console.error(error);
+            })
+            .finally(() => setPublishing(false));
+    }
+
     return (
         <>
             <Typography variant='h4' gutterBottom>
@@ -96,7 +121,7 @@ export default function Environments() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell />
+                            <TableCell component='td' />
                             <TableCell align='left'>Name</TableCell>
                             <TableCell align='left'>Type</TableCell>
                             <TableCell align='left'>Server URL</TableCell>
@@ -134,6 +159,7 @@ export default function Environments() {
                                         }
                                         name={row.name}
                                         color='primary'
+                                        inputProps={{ 'aria-label': 'Checkbox A' }}
                                     />
                                 </TableCell>
                                 <TableCell component='th' scope='row'>
@@ -159,7 +185,7 @@ export default function Environments() {
                 </Table>
             </Paper>
 
-            {!api.isWebSocket()
+            {(!api.isWebSocket() && !isAPIProduct)
                 && (
                     <MicroGateway
                         selectedMgLabel={selectedMgLabel}
@@ -190,6 +216,24 @@ export default function Environments() {
                         {isUpdating && <CircularProgress size={20} />}
                     </Button>
                 </Grid>
+                {isAPIProduct && (
+                    <Grid item>
+                        <Button
+                            className={classes.saveButton}
+                            disabled={isRestricted(['apim:api_publish'], api) || isPublishing}
+                            type='submit'
+                            variant='contained'
+                            color='primary'
+                            onClick={addEnvironmentsAndPublish}
+                        >
+                            <FormattedMessage
+                                id='Apis.Details.Environments.Environments.publish'
+                                defaultMessage='Publish'
+                            />
+                            {isPublishing && <CircularProgress size={20} />}
+                        </Button>
+                    </Grid>
+                )}
                 <Grid item>
                     <Link to={'/apis/' + api.id + '/overview'}>
                         <Button className={classes.saveButton}>

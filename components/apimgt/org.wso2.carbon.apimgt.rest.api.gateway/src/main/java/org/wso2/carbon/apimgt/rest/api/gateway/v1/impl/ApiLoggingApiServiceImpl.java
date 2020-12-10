@@ -55,6 +55,7 @@ public class ApiLoggingApiServiceImpl implements ApiLoggingApiService {
             perAPILogService.publishLogAPIData("", APIConstants.APILogHandler.DELETE_ALL);
             return Response.status(204).build();
         }
+        context = GatewayAPIUtils.contextTemplateValidation(context);
         String logLevel = perAPILogService.getLogData(context);
         if (logLevel != null) {
             perAPILogService.publishLogAPIData(context, APIConstants.APILogHandler.DELETE);
@@ -71,6 +72,7 @@ public class ApiLoggingApiServiceImpl implements ApiLoggingApiService {
         List<APIDTO> apidtos = new ArrayList<>();
         if (context != null) {
             //If only a single API detail is needed
+            context = GatewayAPIUtils.contextTemplateValidation(context);
             String logLevel = perAPILogService.getLogData(context);
             if (logLevel != null) {
                 APIDTO apidto = new APIDTO();
@@ -102,10 +104,11 @@ public class ApiLoggingApiServiceImpl implements ApiLoggingApiService {
             for (int i = 0; i < payload.getApis().size(); i++) {
                 APIDTO apidto = payload.getApis().get(i);
                 apidto.setContext(GatewayAPIUtils.contextTemplateValidation(apidto.getContext()));
-                if (GatewayAPIUtils.validateLogLevel(logLevel)) {
+                if (GatewayAPIUtils.validateLogLevel(apidto.getLogLevel())) {
                     perAPILogService.publishLogAPIData(apidto.getContext(), apidto.getLogLevel());
                 } else {
-                    throw new APIManagementException("The input log level is incorrect: Input log level : " + logLevel,
+                    throw new APIManagementException(
+                            "The input log level is incorrect: Input log level : " + apidto.getLogLevel(),
                             ExceptionCodes.from(ExceptionCodes.LOGGING_API_INCORRECT_LOG_LEVEL));
                 }
             }

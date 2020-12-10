@@ -4716,14 +4716,23 @@ public class ApiMgtDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            if (connection.getMetaData().getDriverName().contains("MS SQL") ||
-                    connection.getMetaData().getDriverName().contains("Microsoft")) {
+            String driverName = connection.getMetaData().getDriverName();
+            if (driverName.contains("MS SQL") || driverName.contains("Microsoft") || driverName.contains("Oracle")) {
                 offset = start + offset;
             }
             // sortColumn, sortOrder variable values has sanitized in jaggery level (applications-list.jag)for security.
             sqlQuery = sqlQuery.replace("$1", sortColumn);
-            sqlQuery = sqlQuery.replace("$2", sortOrder);
-
+            if ("acs".equalsIgnoreCase(sortOrder) || "desc".equalsIgnoreCase(sortOrder)) {
+                sqlQuery = sqlQuery.replace("$2", sortOrder);
+            } else {
+                sqlQuery = sqlQuery.replace("$2", "asc");
+            }
+            if (driverName.contains("Oracle") && "CREATED_BY".equals(sortColumn)) {
+                sqlQuery = sqlQuery.replace("$3", "APP.CREATED_BY");
+            } else {
+                sqlQuery = sqlQuery.replace("$3", sortColumn);
+            }
+            
             if (groupingId != null && !"null".equals(groupingId) && !groupingId.isEmpty()) {
                 if (multiGroupAppSharingEnabled) {
                     String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
@@ -4750,6 +4759,12 @@ public class ApiMgtDAO {
                 prepStmt.setString(2, "%" + search + "%");
                 prepStmt.setInt(3, start);
                 prepStmt.setInt(4, offset);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Query: " + sqlQuery);
+                log.debug("Param: " + "Sub:" + subscriber.getName() + " GroupId: " + groupingId + " Search:%" + search
+                        + "% " + "Start:" + start + " Offset:" + offset + " SortColumn:" + sortColumn + " SortOrder:"
+                        + sortOrder);
             }
             rs = prepStmt.executeQuery();
             ArrayList<Application> applicationsList = new ArrayList<Application>();
@@ -4959,6 +4974,9 @@ public class ApiMgtDAO {
         sqlQuery = SQLConstantManagerFactory.getSQlString("GET_APPLICATIONS_BY_TENANT_ID");
         try {
             connection = APIMgtDBUtil.getConnection();
+            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+                offset = start + offset;
+            }
             sqlQuery = sqlQuery.replace("$1", sortColumn);
             sqlQuery = sqlQuery.replace("$2", sortOrder);
             prepStmt = connection.prepareStatement(sqlQuery);
@@ -8028,6 +8046,7 @@ public class ApiMgtDAO {
         PreparedStatement prepStmt = null;
 
         String sql = SQLConstants.GET_API_CONTEXT_SQL;
+
         try {
             connection = APIMgtDBUtil.getConnection();
             prepStmt = connection.prepareStatement(sql);
@@ -13658,7 +13677,7 @@ public class ApiMgtDAO {
     /**
      * Get Subscribed APIs for an App.
      *
-     * @param applicationName id of the application name
+     * @param applicationID of the application name
      * @return APISubscriptionInfoDTO[]
      * @throws APIManagementException if failed to get Subscribed APIs
      */
@@ -14204,8 +14223,10 @@ public class ApiMgtDAO {
                     while (rs.next()) {
                         ResourcePath resourcePath = new ResourcePath();
                         resourcePath.setId(rs.getInt("URL_MAPPING_ID"));
-                        resourcePath.setResourcePath(rs.getString("HTTP_METHOD"));
-                        resourcePath.setHttpVerb(rs.getString("URL_PATTERN"));
+                        //Set the URL pattern as the resource path
+                        resourcePath.setResourcePath(rs.getString("URL_PATTERN"));
+                        //Set the HTTP method as the HTTPVerb
+                        resourcePath.setHttpVerb(rs.getString("HTTP_METHOD"));
                         resourcePathList.add(resourcePath);
                     }
                 }
@@ -14665,7 +14686,7 @@ public class ApiMgtDAO {
      * Persist revoked jwt signatures to database.
      *
      * @param jwtSignature signature of jwt token.
-     * @param tenantDomain tenant domain of the jwt subject.
+     * @param tenantId tenant domain of the jwt subject.
      * @param expiryTime   expiry time of the token.
      */
     public void addRevokedJWTSignature(String jwtSignature, String type ,

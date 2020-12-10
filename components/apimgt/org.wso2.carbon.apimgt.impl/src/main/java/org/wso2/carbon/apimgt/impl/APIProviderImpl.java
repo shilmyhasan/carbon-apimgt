@@ -7387,20 +7387,35 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         }
 
-        Map<String, Map<String, String>> failedGateways = new ConcurrentHashMap<String, Map<String, String>>();
+        APIProduct oldApi = getAPIProduct(product.getId());
 
-        if (resources.size() > 0) {
-            Map<String, String> failedToPublishEnvironments = publishToGateway(product);
-            if (!failedToPublishEnvironments.isEmpty()) {
-                Set<String> publishedEnvironments = new HashSet<String>(product.getEnvironments());
-                publishedEnvironments.removeAll(failedToPublishEnvironments.keySet());
-                product.setEnvironments(publishedEnvironments);
-                failedGateways.put("PUBLISHED", failedToPublishEnvironments);
-                failedGateways.put("UNPUBLISHED", Collections.<String, String>emptyMap());
-            }
+        Set<String> environmentsToPublish = new HashSet<String>(product.getEnvironments());
+        Set<String> environmentsToRemove = new HashSet<String>(oldApi.getEnvironments());
+        Set<String> environmentsRemoved = new HashSet<String>(oldApi.getEnvironments());
+        if (!environmentsToPublish.isEmpty() && !environmentsToRemove.isEmpty()) {
+            // this block will sort what gateways have to remove and published
+            environmentsRemoved.retainAll(environmentsToPublish);
+            environmentsToRemove.removeAll(environmentsRemoved);
         }
 
-        APIProduct oldApi = getAPIProduct(product.getId());
+
+        Map<String, Map<String, String>> failedGateways = new ConcurrentHashMap<String, Map<String, String>>();
+
+        if (resources.size() > 0 && "PUBLISHED".equals(product.getState())) {
+            Map<String, String> failedToPublishEnvironments = publishToGateway(product);
+            product.setEnvironments(environmentsToRemove);
+            Map<String, String> failedToRemoveEnvironments = removeFromGateway(product);
+            if (!failedToPublishEnvironments.isEmpty()) {
+                environmentsToPublish.removeAll(failedToPublishEnvironments.keySet());
+            }
+            if (!failedToRemoveEnvironments.isEmpty()) {
+                environmentsToPublish.addAll(failedToRemoveEnvironments.keySet());
+            }
+            product.setEnvironments(environmentsToPublish);
+            failedGateways.put("PUBLISHED", failedToPublishEnvironments);
+            failedGateways.put("UNPUBLISHED", failedToRemoveEnvironments);
+        }
+
         Gson gson = new Gson();
         Map<String, String> oldMonetizationProperties = gson.fromJson(oldApi.getMonetizationProperties().toString(),
                 HashMap.class);

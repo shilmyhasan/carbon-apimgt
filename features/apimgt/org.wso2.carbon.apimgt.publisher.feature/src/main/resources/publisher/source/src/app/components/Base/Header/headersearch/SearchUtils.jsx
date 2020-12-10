@@ -44,7 +44,7 @@ import SearchParser from './SearchParser';
  */
 function renderInput(inputProps) {
     const {
-        classes, ref, isLoading, onChange, ...other
+        classes, ref, isLoading, onChange, placeholder, ...other
     } = inputProps; // `isLoading` has destructured here to prevent passing unintended prop to TextField
     let loadingAdorment = null;
     if (isLoading) {
@@ -57,6 +57,7 @@ function renderInput(inputProps) {
     return (
         <TextField
             id='searchQuery'
+            label={placeholder}
             InputProps={{
                 inputRef: ref,
                 className: classes.input,

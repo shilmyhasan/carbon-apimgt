@@ -21,6 +21,7 @@ import Box from '@material-ui/core/Box';
 import LaunchIcon from '@material-ui/icons/Launch';
 import { Link } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
+import { useTheme } from '@material-ui/core/styles';
 
 /**
  *
@@ -31,10 +32,20 @@ import Typography from '@material-ui/core/Typography';
  */
 export default function GoToDefinitionLink(props) {
     const { api, message } = props;
+    const theme = useTheme();
+
     return (
         <Box m={1}>
             <Link to={`/apis/${api.id}/api definition`}>
-                <Typography style={{ marginLeft: '10px' }} color='primary' display='inline' variant='caption'>
+                <Typography
+                    style={{
+                        marginLeft: '10px',
+                        color: theme.palette.primary.extra
+                                    || theme.palette.primary.main,
+                    }}
+                    display='inline'
+                    variant='caption'
+                >
                     {message}
                     <LaunchIcon style={{ marginLeft: '2px' }} fontSize='small' />
                 </Typography>

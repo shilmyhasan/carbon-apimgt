@@ -1993,7 +1993,7 @@ public class APIMappingUtil {
         }
     }
 
-    public static APIProduct fromDTOtoAPIProduct(APIProductDTO dto, String provider)
+    public static APIProduct fromDTOtoAPIProduct(APIProductDTO dto, String provider, APIProvider apiProvider)
             throws APIManagementException {
         APIProduct product = new APIProduct();
         APIProductIdentifier id = new APIProductIdentifier(APIUtil.replaceEmailDomain(provider), dto.getName(), APIConstants.API_PRODUCT_VERSION); //todo: replace this with dto.getVersion
@@ -2008,6 +2008,7 @@ public class APIMappingUtil {
         }
 
         context = context.startsWith("/") ? context : ("/" + context);
+
         String providerDomain = MultitenantUtils.getTenantDomain(provider);
         if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(providerDomain) &&
                 dto.getId() == null) {
@@ -2046,7 +2047,11 @@ public class APIMappingUtil {
             product.setTechnicalOwnerEmail(dto.getBusinessInformation().getTechnicalOwnerEmail());
         }
 
-        product.setState(APIStatus.PUBLISHED.toString());
+        if (dto.getState() != null && StringUtils.isNotEmpty(dto.getState().value())) {
+            product.setState(dto.getState().value());
+        } else {
+            product.setState(APIStatus.PUBLISHED.toString());
+        }
         Set<Tier> apiTiers = new HashSet<>();
         List<String> tiersFromDTO = dto.getPolicies();
 

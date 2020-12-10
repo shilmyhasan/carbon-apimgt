@@ -179,6 +179,12 @@ function TopMenu(props) {
                             className={classes.button}
                             disabled={data.length === 0}
                             onClick={() => setListType('list')}
+                            aria-label={(
+                                <FormattedMessage
+                                    id='Apis.Listing.components.TopMenu.list.label'
+                                    defaultMessage='List View'
+                                />
+                            )}
                         >
                             <List color={listType === 'list' ? 'primary' : 'default'} />
                         </IconButton>
@@ -186,6 +192,12 @@ function TopMenu(props) {
                             className={classes.button}
                             disabled={data.length === 0}
                             onClick={() => setListType('grid')}
+                            aria-label={(
+                                <FormattedMessage
+                                    id='Apis.Listing.components.TopMenu.grid.label'
+                                    defaultMessage='Grid View'
+                                />
+                            )}
                         >
                             <GridOn color={listType === 'grid' ? 'primary' : 'default'} />
                         </IconButton>
