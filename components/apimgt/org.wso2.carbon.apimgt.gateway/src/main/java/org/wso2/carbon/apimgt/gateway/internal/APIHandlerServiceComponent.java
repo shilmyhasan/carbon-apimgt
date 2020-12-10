@@ -40,23 +40,15 @@ import org.wso2.carbon.apimgt.gateway.handlers.security.keys.APIKeyValidatorClie
 import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTMapCleaner;
 import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTTokensRetriever;
 import org.wso2.carbon.apimgt.gateway.listeners.ServerStartupListener;
-import org.wso2.carbon.apimgt.gateway.perlogging.PerAPILogger;
-import org.wso2.carbon.apimgt.gateway.service.APIThrottleDataServiceImpl;
-import org.wso2.carbon.apimgt.gateway.service.CacheInvalidationServiceImpl;
 import org.wso2.carbon.apimgt.gateway.service.RevokedTokenDataImpl;
-import org.wso2.carbon.apimgt.gateway.throttling.ThrottleDataHolder;
-import org.wso2.carbon.apimgt.gateway.throttling.publisher.ThrottleDataPublisher;
 import org.wso2.carbon.apimgt.gateway.throttling.util.BlockingConditionRetriever;
 import org.wso2.carbon.apimgt.gateway.throttling.util.KeyTemplateRetriever;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationServiceImpl;
-import org.wso2.carbon.apimgt.impl.caching.CacheInvalidationService;
 import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.JWTConfigurationDto;
-import org.wso2.carbon.apimgt.impl.perlog.PerAPILogService;
-import org.wso2.carbon.apimgt.impl.throttling.APIThrottleDataService;
 import org.wso2.carbon.apimgt.impl.token.RevokedTokenService;
 import org.wso2.carbon.apimgt.tracing.TracingService;
 import org.wso2.carbon.base.ServerConfiguration;
@@ -77,7 +69,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 @Component(
-         name = "org.wso2.carbon.apimgt.handlers", 
+         name = "org.wso2.carbon.apimgt.handlers",
          immediate = true)
 public class APIHandlerServiceComponent {
 
@@ -114,7 +106,8 @@ public class APIHandlerServiceComponent {
                 TenantServiceCreator listener = new TenantServiceCreator();
                 bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
                 if (configuration.getThrottleProperties().isEnabled()) {
-                    bundleContext.registerService(ServerStartupObserver.class.getName(), new ServerStartupListener(), null);
+                    bundleContext.registerService(ServerStartupObserver.class.getName(),
+                            new ServerStartupListener(bundleContext), null);
                     // start web service throttle data retriever as separate thread and start it.
                     if (configuration.getThrottleProperties().getBlockCondition().isEnabled()) {
                         BlockingConditionRetriever webServiceThrottleDataRetriever = new BlockingConditionRetriever();
@@ -188,10 +181,10 @@ public class APIHandlerServiceComponent {
     }
 
     @Reference(
-             name = "configuration.context.service", 
-             service = org.wso2.carbon.utils.ConfigurationContextService.class, 
-             cardinality = ReferenceCardinality.MANDATORY, 
-             policy = ReferencePolicy.DYNAMIC, 
+             name = "configuration.context.service",
+             service = org.wso2.carbon.utils.ConfigurationContextService.class,
+             cardinality = ReferenceCardinality.MANDATORY,
+             policy = ReferencePolicy.DYNAMIC,
              unbind = "unsetConfigurationContextService")
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
         if (log.isDebugEnabled()) {
@@ -213,10 +206,10 @@ public class APIHandlerServiceComponent {
      * @param serverConfigurationService Instance of {@link ServerConfigurationService}
      */
     @Reference(
-             name = "server.configuration.service", 
-             service = org.wso2.carbon.base.api.ServerConfigurationService.class, 
-             cardinality = ReferenceCardinality.MANDATORY, 
-             policy = ReferencePolicy.DYNAMIC, 
+             name = "server.configuration.service",
+             service = org.wso2.carbon.base.api.ServerConfigurationService.class,
+             cardinality = ReferenceCardinality.MANDATORY,
+             policy = ReferencePolicy.DYNAMIC,
              unbind = "unsetServerConfigurationService")
     protected void setServerConfigurationService(ServerConfigurationService serverConfigurationService) {
         if (log.isDebugEnabled()) {
@@ -239,10 +232,10 @@ public class APIHandlerServiceComponent {
     }
 
     @Reference(
-             name = "api.manager.config.service", 
-             service = org.wso2.carbon.apimgt.impl.APIManagerConfigurationService.class, 
-             cardinality = ReferenceCardinality.MANDATORY, 
-             policy = ReferencePolicy.DYNAMIC, 
+             name = "api.manager.config.service",
+             service = org.wso2.carbon.apimgt.impl.APIManagerConfigurationService.class,
+             cardinality = ReferenceCardinality.MANDATORY,
+             policy = ReferencePolicy.DYNAMIC,
              unbind = "unsetAPIManagerConfigurationService")
     protected void setAPIManagerConfigurationService(APIManagerConfigurationService amcService) {
         if (log.isDebugEnabled()) {
@@ -273,10 +266,10 @@ public class APIHandlerServiceComponent {
     }
 
     @Reference(
-             name = "org.wso2.carbon.apimgt.tracing", 
-             service = org.wso2.carbon.apimgt.tracing.TracingService.class, 
-             cardinality = ReferenceCardinality.MANDATORY, 
-             policy = ReferencePolicy.DYNAMIC, 
+             name = "org.wso2.carbon.apimgt.tracing",
+             service = org.wso2.carbon.apimgt.tracing.TracingService.class,
+             cardinality = ReferenceCardinality.MANDATORY,
+             policy = ReferencePolicy.DYNAMIC,
              unbind = "unsetTracingService")
     protected void setTracingService(TracingService tracingService) {
         ServiceReferenceHolder.getInstance().setTracingService(tracingService);

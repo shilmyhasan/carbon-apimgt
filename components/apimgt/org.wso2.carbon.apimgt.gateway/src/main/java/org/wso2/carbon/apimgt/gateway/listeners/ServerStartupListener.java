@@ -20,15 +20,13 @@ package org.wso2.carbon.apimgt.gateway.listeners;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
-import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTTokensRetriever;
 import org.wso2.carbon.apimgt.gateway.perlogging.PerAPILogger;
 import org.wso2.carbon.apimgt.gateway.service.APIThrottleDataServiceImpl;
 import org.wso2.carbon.apimgt.gateway.service.CacheInvalidationServiceImpl;
 import org.wso2.carbon.apimgt.gateway.throttling.ThrottleDataHolder;
 import org.wso2.carbon.apimgt.gateway.throttling.publisher.ThrottleDataPublisher;
-import org.wso2.carbon.apimgt.gateway.throttling.util.BlockingConditionRetriever;
-import org.wso2.carbon.apimgt.gateway.throttling.util.KeyTemplateRetriever;
 import org.wso2.carbon.apimgt.impl.caching.CacheInvalidationService;
 import org.wso2.carbon.apimgt.impl.perlog.PerAPILogService;
 import org.wso2.carbon.apimgt.impl.throttling.APIThrottleDataService;
@@ -37,6 +35,11 @@ import org.wso2.carbon.core.ServerStartupObserver;
 public class ServerStartupListener implements ServerStartupObserver {
 
     private static final Log log = LogFactory.getLog(ServerStartupListener.class);
+    private BundleContext bundleContext;
+
+    public ServerStartupListener(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
 
     @Override
     public void completingServerStartup() {
@@ -57,6 +60,10 @@ public class ServerStartupListener implements ServerStartupObserver {
         ServiceReferenceHolder.getInstance().setAPIThrottleDataService(throttleDataServiceImpl);
         ServiceReferenceHolder.getInstance().setPerAPILogService(perAPILogService);
         ServiceReferenceHolder.getInstance().setThrottleDataHolder(throttleDataHolder);
+
+        bundleContext.registerService(APIThrottleDataService.class.getName(), throttleDataServiceImpl, null);
+        bundleContext.registerService(CacheInvalidationService.class.getName(), cacheInvalidationService, null);
+        bundleContext.registerService(PerAPILogService.class.getName(), perAPILogService, null);
         log.debug("APIThrottleDataService Registered...");
     }
 }
