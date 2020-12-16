@@ -39,6 +39,7 @@ public class Application {
     private String status;
     private String groupId;
     private Boolean isBlackListed;
+    private String owner;
 
     /**Holds workflow status**/
     private String applicationWorkFlowStatus; 
@@ -190,6 +191,12 @@ public class Application {
 	public void setIsBlackListed(Boolean isBlackListed) {
 		this.isBlackListed = isBlackListed;
 	}
-    
-    
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 }

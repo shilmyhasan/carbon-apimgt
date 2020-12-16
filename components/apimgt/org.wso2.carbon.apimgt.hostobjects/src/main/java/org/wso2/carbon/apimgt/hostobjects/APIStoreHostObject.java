@@ -2637,6 +2637,41 @@ public class APIStoreHostObject extends ScriptableObject {
         return myn;
     }
 
+    public static NativeArray jsFunction_getLightWeightAPISubscriptions(Context cx, Scriptable thisObj,
+                                                                        Object[] args, Function funObj)
+            throws ScriptException, APIManagementException {
+
+        NativeArray myn = new NativeArray(0);
+        if (args != null && 5 <= args.length) {
+            String providerName = (String) args[0];
+            String apiName = (String) args[1];
+            String version = (String) args[2];
+            String user = (String) args[3];
+            String groupingId = (String) args[4];
+
+            APIIdentifier apiIdentifier = new APIIdentifier(APIUtil.replaceEmailDomain(providerName), apiName, version);
+            Subscriber subscriber = new Subscriber(user);
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            Set<SubscribedAPI> apis = apiConsumer.getLightWeightSubscribedIdentifiers(subscriber, apiIdentifier,
+                    groupingId);
+            int i = 0;
+            if (apis != null) {
+                for (SubscribedAPI api : apis) {
+                    NativeObject row = new NativeObject();
+                    row.put("application", row, api.getApplication().getName());
+                    row.put("applicationId", row, api.getApplication().getId());
+
+                    if(APIUtil.isMultiGroupSharingEnabled()){
+                        row.put("owner", row, api.getApplication().getOwner());
+                    }
+
+                    myn.put(i++, myn, row);
+                }
+            }
+        }
+        return myn;
+    }
+
     private static APIKey getKey(SubscribedAPI api, String keyType) {
         List<APIKey> apiKeys = api.getKeys();
         return getKeyOfType(apiKeys, keyType);

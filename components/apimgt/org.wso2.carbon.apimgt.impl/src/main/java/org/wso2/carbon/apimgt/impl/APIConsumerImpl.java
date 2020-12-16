@@ -2100,6 +2100,31 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return subscribedAPIs;
     }
 
+    private Set<SubscribedAPI> getLightWeightSubscribedAPIs(Subscriber subscriber, String groupingId) throws
+            APIManagementException {
+        Set<SubscribedAPI> originalSubscribedAPIs;
+        Set<SubscribedAPI> subscribedAPIs = new HashSet<SubscribedAPI>();
+        try {
+            originalSubscribedAPIs = apiMgtDAO.getSubscribedAPIs(subscriber, groupingId);
+            if (originalSubscribedAPIs != null && !originalSubscribedAPIs.isEmpty()) {
+                Map<String, Tier> tiers = APIUtil.getTiers(tenantId);
+                for (SubscribedAPI subscribedApi : originalSubscribedAPIs) {
+                    Application application = subscribedApi.getApplication();
+                    if (application != null) {
+                        int applicationId = application.getId();
+                    }
+                    Tier tier = tiers.get(subscribedApi.getTier().getName());
+                    subscribedApi.getTier().setDisplayName(tier != null ? tier.getDisplayName() : subscribedApi
+                            .getTier().getName());
+                    subscribedAPIs.add(subscribedApi);
+                }
+            }
+        } catch (APIManagementException e) {
+            handleException("Failed to get APIs of " + subscriber.getName(), e);
+        }
+        return subscribedAPIs;
+    }
+
     @Override
     public Set<SubscribedAPI> getSubscribedAPIs(Subscriber subscriber, String applicationName, String groupingId)
             throws APIManagementException {
@@ -3238,6 +3263,12 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 		return apiMgtDAO.getApplications(subscriber, groupingId);
 	}
 
+    @Override
+    public Application[] getLightWeightApplications(Subscriber subscriber, String groupingId) throws
+            APIManagementException {
+        return apiMgtDAO.getLightWeightApplications(subscriber, groupingId);
+    }
+
     /**
      * @param userId Subscriber name.
      * @param applicationName of the Application.
@@ -3426,4 +3457,19 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
         return false;
     }
+
+    @Override
+    public Set<SubscribedAPI> getLightWeightSubscribedIdentifiers(Subscriber subscriber, APIIdentifier apiIdentifier,
+                                                                  String groupingId) throws APIManagementException {
+        Set<SubscribedAPI> subscribedAPISet = new HashSet<SubscribedAPI>();
+        Set<SubscribedAPI> subscribedAPIs = getLightWeightSubscribedAPIs(subscriber, groupingId);
+        for (SubscribedAPI api : subscribedAPIs) {
+            if (api.getApiId().equals(apiIdentifier)) {
+                subscribedAPISet.add(api);
+            }
+        }
+        return subscribedAPISet;
+    }
+
+
 }

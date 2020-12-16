@@ -2527,6 +2527,9 @@ public class SQLConstants {
     public static final String GET_API_PROVIDER_WITH_NAME_VERSION_FOR_GIVEN_TENANT =
             "SELECT API.API_PROVIDER FROM AM_API API WHERE API.API_NAME = ? AND API.API_VERSION = ? AND API.CONTEXT LIKE ? ";
 
+    public static final String GET_GROUP_ID_SQL =
+            "SELECT GROUP_ID  FROM AM_APPLICATION_GROUP_MAPPING WHERE APPLICATION_ID = ?";
+
     /** Throttle related constants**/
 
     public static class ThrottleSQLConstants{
