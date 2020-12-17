@@ -258,6 +258,8 @@ public final class APIConstants {
     
     public static final String API_OVERVIEW_SUBSCRIPTION_AVAILABILITY = "overview_subscriptionAvailability";
     public static final String API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS = "overview_tenants";
+    public static final String KEY_SUFFIX = "_KEY";
+    public static final String JSON_GRANT_TYPES = "grant_types";
     
     public static final String API_OVERVIEW_DESTINATION_BASED_STATS_ENABLED = "overview_destinationStatsEnabled";
     

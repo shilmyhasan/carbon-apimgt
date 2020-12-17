@@ -2411,7 +2411,7 @@ public class ApiMgtDAO {
         return oAuthApplication;
     }
 
-    private APIKey getKeyStatusOfApplication(String keyType, int applicationId) throws APIManagementException {
+    public APIKey getKeyStatusOfApplication(String keyType, int applicationId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
