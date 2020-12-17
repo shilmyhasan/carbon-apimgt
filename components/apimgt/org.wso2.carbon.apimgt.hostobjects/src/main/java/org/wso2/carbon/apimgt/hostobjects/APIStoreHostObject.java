@@ -2661,7 +2661,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     row.put("application", row, api.getApplication().getName());
                     row.put("applicationId", row, api.getApplication().getId());
 
-                    if(APIUtil.isMultiGroupSharingEnabled()){
+                    if (APIUtil.isMultiGroupSharingEnabled()) {
                         row.put("owner", row, api.getApplication().getOwner());
                     }
 
@@ -2681,7 +2681,7 @@ public class APIStoreHostObject extends ScriptableObject {
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
             Set<APIKey> keys = apiConsumer.getApplicationKeysOfApplication(applicationId);
             int i = 0;
-            for(APIKey key : keys){
+            for (APIKey key : keys) {
                 NativeObject row = new NativeObject();
                 row.put(key.getType()+APIConstants.KEY_SUFFIX, row, key.getAccessToken());
                 myn.put(i++, myn, row);

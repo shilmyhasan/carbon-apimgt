@@ -2110,9 +2110,6 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 Map<String, Tier> tiers = APIUtil.getTiers(tenantId);
                 for (SubscribedAPI subscribedApi : originalSubscribedAPIs) {
                     Application application = subscribedApi.getApplication();
-                    if (application != null) {
-                        int applicationId = application.getId();
-                    }
                     Tier tier = tiers.get(subscribedApi.getTier().getName());
                     subscribedApi.getTier().setDisplayName(tier != null ? tier.getDisplayName() : subscribedApi
                             .getTier().getName());
@@ -3472,8 +3469,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     public Set<APIKey> getApplicationKeysOfApplication(int applicationId) throws APIManagementException {
-        Set<APIKey> apikeys = getApplicationKeys(applicationId);
-        return apikeys;
+        return  getApplicationKeys(applicationId);
     }
 
     /**

@@ -6111,7 +6111,7 @@ public final class APIUtil {
      * Used in application sharing
      * @return returns true if ENABLE_MULTIPLE_GROUPID is set to True
      */
-    public static boolean isMultiGroupSharingEnabled(){
+    public static boolean isMultiGroupSharingEnabled() {
 
         APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();

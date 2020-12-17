@@ -644,7 +644,8 @@ public interface APIConsumer extends APIManager {
 
     boolean isMonetizationEnabled(String tenantDomain) throws APIManagementException;
 
-    Set<SubscribedAPI> getLightWeightSubscribedIdentifiers(Subscriber subscriber, APIIdentifier apiIdentifier, String groupingId) throws APIManagementException;
+    Set<SubscribedAPI> getLightWeightSubscribedIdentifiers(Subscriber subscriber, APIIdentifier apiIdentifier,
+                                                           String groupingId) throws APIManagementException;
 
     Set<APIKey> getApplicationKeysOfApplication(int applicationId) throws APIManagementException;
 

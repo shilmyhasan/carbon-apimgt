@@ -6633,7 +6633,7 @@ public class ApiMgtDAO {
             whereClause = "   AND " + " SUB.USER_ID = ?";
         }
 
-        if (groupingId != null && !"null".equals(groupingId) && !groupingId.isEmpty()) {
+        if (!groupingId.isEmpty()) {
             sqlQuery += whereClauseWithGroupId;
         } else {
             sqlQuery += whereClause;
@@ -6654,7 +6654,7 @@ public class ApiMgtDAO {
                         + "concat(concat(x.USER_ID,':'),x.name))";
             }
 
-            if (groupingId != null && !"null".equals(groupingId) && !groupingId.isEmpty()) {
+            if (!groupingId.isEmpty()) {
                 if (multiGroupIdEnabled) {
                     String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
                     String groupIDArray[] = groupingId.split(",");
