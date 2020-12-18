@@ -2672,6 +2672,45 @@ public class APIStoreHostObject extends ScriptableObject {
         return myn;
     }
 
+    public static NativeArray jsFunction_getLightWeightApplications(Context cx, Scriptable thisObj, Object[] args,
+                                                                    Function funObj)
+            throws ScriptException, APIManagementException {
+
+        NativeArray myn = new NativeArray(0);
+        if (args != null && isStringArray(args)) {
+            String username = args[0].toString();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            Application[] applications;
+            String groupId = "";
+            if (args.length > 1 && args[1] != null) {
+                groupId = args[1].toString();
+            }
+            applications = apiConsumer.getLightWeightApplications(new Subscriber(username), groupId);
+            Subscriber subscriber = new Subscriber(username);
+
+            if (applications != null) {
+                int i = 0;
+                for (Application application : applications) {
+                    int subscriptionCount = apiConsumer.getSubscriptionCount(subscriber, application.getName(),
+                            groupId);
+                    NativeObject row = new NativeObject();
+                    row.put("name", row, application.getName());
+                    row.put("tier", row, application.getTier());
+                    row.put("id", row, application.getId());
+                    row.put("callbackUrl", row, application.getCallbackUrl());
+                    row.put("status", row, application.getStatus());
+                    row.put("description", row, application.getDescription());
+                    row.put("apiCount", row, subscriptionCount);
+                    row.put("groupId", row, application.getGroupId());
+                    row.put("isBlacklisted", row, application.getIsBlackListed());
+                    row.put("owner", row, application.getOwner());
+                    myn.put(i++, myn, row);
+                }
+            }
+        }
+        return myn;
+    }
+
     public static NativeArray jsFunction_getApplicationKeysOfApplication(Context cx, Scriptable thisObj,
                                                                          Object[] args, Function funObj) throws APIManagementException {
         NativeArray myn = new NativeArray(0);
