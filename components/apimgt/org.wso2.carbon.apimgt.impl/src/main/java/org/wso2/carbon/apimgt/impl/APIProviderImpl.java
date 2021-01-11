@@ -217,7 +217,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     private static final Log log = LogFactory.getLog(APIProviderImpl.class);
 
     private final String userNameWithoutChange;
-    private final CertificateManager certificateManager;
+    private CertificateManager certificateManager;
 
     public APIProviderImpl(String username) throws APIManagementException {
         super(username);
@@ -697,7 +697,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         attributeBuilder.append(String.format(APIConstants.THROTTLE_POLICY_ATTRIBUTE_TEMPLATE,
                 APIConstants.THROTTLE_TIER_QUOTA_ACTION_ATTRIBUTE,
-                tier.isStopOnQuotaReached(),
+                String.valueOf(tier.isStopOnQuotaReached()),
                 APIConstants.THROTTLE_TIER_QUOTA_ACTION_ATTRIBUTE));
 
         // Note: We assume that the unit time is in milliseconds.
@@ -1691,7 +1691,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             api.setEnvironments(publishedEnvironments);
                             updateApiArtifact(api, true, false);
                             failedGateways.clear();
-                            failedGateways.put("UNPUBLISHED", Collections.emptyMap());
+                            failedGateways.put("UNPUBLISHED", Collections.<String, String>emptyMap());
                             failedGateways.put("PUBLISHED", failedToPublishEnvironments);
                         }
                     } else { // API Status : RETIRED or CREATED
@@ -1707,7 +1707,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             failedGateways.clear();
 
                             failedGateways.put("UNPUBLISHED", failedToRemoveEnvironments);
-                            failedGateways.put("PUBLISHED", Collections.emptyMap());
+                            failedGateways.put("PUBLISHED", Collections.<String, String>emptyMap());
                         }
                     }
                 }
@@ -1852,7 +1852,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                 api.setEnvironments(publishedEnvironments);
                                 updateApiArtifact(api, true, false);
                                 failedGateways.clear();
-                                failedGateways.put("UNPUBLISHED", Collections.emptyMap());
+                                failedGateways.put("UNPUBLISHED", Collections.<String, String>emptyMap());
                                 failedGateways.put("PUBLISHED", failedToPublishEnvironments);
 
                             }
@@ -1869,7 +1869,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                 updateApiArtifact(api, true, false);
                                 failedGateways.clear();
                                 failedGateways.put("UNPUBLISHED", failedToRemoveEnvironments);
-                                failedGateways.put("PUBLISHED", Collections.emptyMap());
+                                failedGateways.put("PUBLISHED", Collections.<String, String>emptyMap());
 
                             }
                         }
@@ -2533,7 +2533,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             vtb.addHandler("org.wso2.carbon.apimgt.gateway.handlers.analytics.APIMgtUsageHandler"
-                    , Collections.emptyMap());
+                    , Collections.<String, String>emptyMap());
 
             properties = new HashMap<String, String>();
             properties.put("configKey", "gov:" + APIConstants.GA_CONFIGURATION_LOCATION);
@@ -2545,10 +2545,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (extensionHandlerPosition != null && "top".equalsIgnoreCase(extensionHandlerPosition)) {
                 vtb.addHandlerPriority(
                         "org.wso2.carbon.apimgt.gateway.handlers.ext.APIManagerExtensionHandler",
-                        Collections.emptyMap(), 0);
+                        Collections.<String, String>emptyMap(), 0);
             } else {
                 vtb.addHandler("org.wso2.carbon.apimgt.gateway.handlers.ext.APIManagerExtensionHandler",
-                        Collections.emptyMap());
+                        Collections.<String, String>emptyMap());
             }
 
 
@@ -2667,8 +2667,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         authProperties.put("apiType", APIConstants.ApiTypes.PRODUCT_API.name());
-        // Set the api provider name as a property to the Authentication handler
-        authProperties.put(APIConstants.PROVIDER_KEY, apiProduct.getId().getProviderName());
         vtb.addHandler("org.wso2.carbon.apimgt.gateway.handlers.security.APIAuthenticationHandler",
                 authProperties);
         Map<String, String> properties = new HashMap<String, String>();
@@ -2696,7 +2694,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         vtb.addHandler("org.wso2.carbon.apimgt.gateway.handlers.analytics.APIMgtUsageHandler"
-                , Collections.emptyMap());
+                , Collections.<String, String>emptyMap());
 
         properties = new HashMap<String, String>();
         properties.put("configKey", "gov:" + APIConstants.GA_CONFIGURATION_LOCATION);
@@ -2708,10 +2706,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (extensionHandlerPosition != null && "top".equalsIgnoreCase(extensionHandlerPosition)) {
             vtb.addHandlerPriority(
                     "org.wso2.carbon.apimgt.gateway.handlers.ext.APIManagerExtensionHandler",
-                    Collections.emptyMap(), 0);
+                    Collections.<String, String>emptyMap(), 0);
         } else {
             vtb.addHandler("org.wso2.carbon.apimgt.gateway.handlers.ext.APIManagerExtensionHandler",
-                    Collections.emptyMap());
+                    Collections.<String, String>emptyMap());
         }
 
         return vtb;
@@ -2955,7 +2953,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 newAPI.setAdditionalProperties(additionProperties);
             }
 
-            newAPI.setAsDefaultVersion(api.isDefaultVersion());
+            if (api.isDefaultVersion()) {
+                newAPI.setAsDefaultVersion(true);
+            } else {
+                newAPI.setAsDefaultVersion(false);
+            }
 
             for (Documentation doc : docs) {
                 /* copying the file in registry for new api */
@@ -3404,7 +3406,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 // /t/tenanatdoman/registry/resource/_system/governance section
                 // to set permissions.
                 int startIndex = docFilePath.indexOf("governance") + "governance".length();
-                String filePath = docFilePath.substring(startIndex);
+                String filePath = docFilePath.substring(startIndex, docFilePath.length());
                 APIUtil.setResourcePermissions(api.getId().getProviderName(), visibility, authorizedRoles, filePath,
                         registry);
                 registry.addAssociation(artifact.getPath(), filePath, APIConstants.DOCUMENTATION_FILE_ASSOCIATION);
@@ -3605,7 +3607,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 //The docFilePatch comes as /t/tenanatdoman/registry/resource/_system/governance/apimgt/applicationdata..
                 //We need to remove the /t/tenanatdoman/registry/resource/_system/governance section to set permissions.
                 int startIndex = docFilePath.indexOf("governance") + "governance".length();
-                String filePath = docFilePath.substring(startIndex);
+                String filePath = docFilePath.substring(startIndex, docFilePath.length());
                 APIUtil.setResourcePermissions(api.getId().getProviderName(),visibility, authorizedRoles, filePath, registry);
                 registry.addAssociation(artifact.getPath(), filePath, APIConstants.DOCUMENTATION_FILE_ASSOCIATION);
             }
@@ -7202,7 +7204,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 publishedEnvironments.removeAll(failedToPublishEnvironments.keySet());
                 product.setEnvironments(publishedEnvironments);
                 failedGateways.put("PUBLISHED", failedToPublishEnvironments);
-                failedGateways.put("UNPUBLISHED", Collections.emptyMap());
+                failedGateways.put("UNPUBLISHED", Collections.<String,String>emptyMap());
             }
         }
 
@@ -7472,7 +7474,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             publishedEnvironments.removeAll(failedToPublishEnvironments.keySet());
             product.setEnvironments(publishedEnvironments);
             failedGateways.put("PUBLISHED", failedToPublishEnvironments);
-            failedGateways.put("UNPUBLISHED", Collections.emptyMap());
+            failedGateways.put("UNPUBLISHED", Collections.<String, String>emptyMap());
         }
 
         if (!failedGateways.isEmpty() &&
@@ -7766,7 +7768,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 //The docFilePatch comes as /t/tenanatdoman/registry/resource/_system/governance/apimgt/applicationdata..
                 //We need to remove the /t/tenanatdoman/registry/resource/_system/governance section to set permissions.
                 int startIndex = docFilePath.indexOf("governance") + "governance".length();
-                String filePath = docFilePath.substring(startIndex);
+                String filePath = docFilePath.substring(startIndex, docFilePath.length());
                 APIUtil.setResourcePermissions(product.getId().getProviderName(),visibility, authorizedRoles, filePath, registry);
                 registry.addAssociation(artifact.getPath(), filePath, APIConstants.DOCUMENTATION_FILE_ASSOCIATION);
             }
@@ -7826,7 +7828,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 // /t/tenanatdoman/registry/resource/_system/governance section
                 // to set permissions.
                 int startIndex = docFilePath.indexOf("governance") + "governance".length();
-                String filePath = docFilePath.substring(startIndex);
+                String filePath = docFilePath.substring(startIndex, docFilePath.length());
                 APIUtil.setResourcePermissions(product.getId().getProviderName(), visibility, authorizedRoles, filePath,
                         registry);
             }
