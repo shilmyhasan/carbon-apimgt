@@ -93,6 +93,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
     private String apiLevelPolicy;
     private String certificateInformation;
     private String apiUUID;
+    private String provider;
     private String apiType = String.valueOf(APIConstants.ApiTypes.API); // Default API Type
     private OpenAPI openAPI;
 
@@ -102,6 +103,14 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
 
     public void setApiUUID(String apiUUID) {
         this.apiUUID = apiUUID;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
     /**
@@ -644,14 +653,9 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         String apiVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API);
 
         String apiPublisher = (String) messageContext.getProperty(APIMgtGatewayConstants.API_PUBLISHER);
-        //if publisher is null,extract the publisher from the api_version
+        //if publisher is null, get the provider from the AuthenticationHandler property
         if (apiPublisher == null) {
-            int ind = apiVersion.indexOf("--");
-            apiPublisher = apiVersion.substring(0, ind);
-            if (apiPublisher.contains(APIConstants.EMAIL_DOMAIN_SEPARATOR_REPLACEMENT)) {
-                apiPublisher = apiPublisher
-                        .replace(APIConstants.EMAIL_DOMAIN_SEPARATOR_REPLACEMENT, APIConstants.EMAIL_DOMAIN_SEPARATOR);
-            }
+            apiPublisher = provider;
         }
         int index = apiVersion.indexOf("--");
 
