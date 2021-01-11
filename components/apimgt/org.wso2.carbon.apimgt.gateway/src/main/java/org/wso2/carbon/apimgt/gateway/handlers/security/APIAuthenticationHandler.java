@@ -654,16 +654,19 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
 
         String apiPublisher = (String) messageContext.getProperty(APIMgtGatewayConstants.API_PUBLISHER);
         //if publisher and the configured provider is null,extract the publisher from the api_version
-        if (apiPublisher == null && provider == null) {
-            int ind = apiVersion.indexOf("--");
-            apiPublisher = apiVersion.substring(0, ind);
-            if (apiPublisher.contains(APIConstants.EMAIL_DOMAIN_SEPARATOR_REPLACEMENT)) {
-                apiPublisher = apiPublisher
-                        .replace(APIConstants.EMAIL_DOMAIN_SEPARATOR_REPLACEMENT, APIConstants.EMAIL_DOMAIN_SEPARATOR);
+        if (apiPublisher == null) {
+            if (provider == null) {
+                int ind = apiVersion.indexOf("--");
+                apiPublisher = apiVersion.substring(0, ind);
+                if (apiPublisher.contains(APIConstants.EMAIL_DOMAIN_SEPARATOR_REPLACEMENT)) {
+                    apiPublisher = apiPublisher
+                            .replace(APIConstants.EMAIL_DOMAIN_SEPARATOR_REPLACEMENT,
+                                    APIConstants.EMAIL_DOMAIN_SEPARATOR);
+                }
+            } else {
+                // If provider defined, set the provider as the apiPublisher
+                apiPublisher = provider;
             }
-        } else {
-            // If provider defined, set the provider as the apiPublisher
-            apiPublisher = provider;
         }
         int index = apiVersion.indexOf("--");
 
