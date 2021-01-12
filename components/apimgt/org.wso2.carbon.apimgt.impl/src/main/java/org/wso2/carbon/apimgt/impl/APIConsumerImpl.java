@@ -1348,7 +1348,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     @Override
-    public String generateApiKey(Application application, String userName, long validityPeriod) throws APIManagementException {
+    public String generateApiKey(Application application, String userName, long validityPeriod,
+            String permittedIP, String permittedReferer) throws APIManagementException {
 
         JwtTokenInfoDTO jwtTokenInfoDTO = APIUtil.getJwtTokenInfoDTO(application, userName,
                 MultitenantUtils.getTenantDomain(userName));
@@ -1364,6 +1365,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         jwtTokenInfoDTO.setSubscriber(userName);
         jwtTokenInfoDTO.setExpirationTime(validityPeriod);
         jwtTokenInfoDTO.setKeyType(application.getKeyType());
+        jwtTokenInfoDTO.setPermittedIP(permittedIP);
+        jwtTokenInfoDTO.setPermittedReferer(permittedReferer);
 
         ApiKeyGenerator apiKeyGenerator = loadApiKeyGenerator();
         return apiKeyGenerator.generateToken(jwtTokenInfoDTO);
