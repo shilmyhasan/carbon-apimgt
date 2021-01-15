@@ -93,6 +93,10 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
     @Override
     public OAuthApplicationInfo createApplication(OAuthAppRequest oauthAppRequest) throws APIManagementException {
 
+        String isSpecialCharSupportStr =
+                getConfigurationElementValue(APIConstants.OAUTH_APP_NAME_ALLOW_NON_ENGLISH_CHARACTERS);
+        boolean isSpecialCharSupport = Boolean.parseBoolean(isSpecialCharSupportStr);
+
         // OAuthApplications are created by calling to APIKeyMgtSubscriber Service
         OAuthApplicationInfo oAuthApplicationInfo = oauthAppRequest.getOAuthApplicationInfo();
 
@@ -102,12 +106,21 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         String applicationName = oAuthApplicationInfo.getClientName();
         String keyType = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.APP_KEY_TYPE);
         String callBackURL = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.APP_CALLBACK_URL);
+
+        String oauthClientName;
+        if (isSpecialCharSupport) {
+            oauthClientName = APIUtil.getApplicationUUID(applicationName, userId);
+        } else {
+            oauthClientName = applicationName;
+        }
+
         if (keyType != null) {
-            applicationName = applicationName + '_' + keyType;
+            oauthClientName = oauthClientName + '_' + keyType;
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Trying to create OAuth application :" + applicationName);
+            log.debug("Trying to create OAuth application : " + oauthClientName + " for application: " + applicationName
+                    + " and key type: " + keyType);
         }
 
         String tokenScope = (String) oAuthApplicationInfo.getParameter("tokenScope");
@@ -121,17 +134,20 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                     new org.wso2.carbon.apimgt.api.model.xsd.OAuthApplicationInfo();
             applicationToCreate.setIsSaasApplication(oAuthApplicationInfo.getIsSaasApplication());
             applicationToCreate.setCallBackURL(callBackURL);
-            applicationToCreate.setClientName(applicationName);
+            applicationToCreate.setClientName(oauthClientName);
             applicationToCreate.setAppOwner(userId);
             applicationToCreate.setJsonString(oAuthApplicationInfo.getJsonString());
             applicationToCreate.setTokenType(oAuthApplicationInfo.getTokenType());
             info = createOAuthApplicationbyApplicationInfo(applicationToCreate);
         } catch (Exception e) {
-            handleException("Can not create OAuth application  : " + applicationName, e);
-        } 
+            handleException(
+                    "Can not create OAuth application  : " + oauthClientName + " for application: " + applicationName
+                            + " and key type: " + keyType, e);
+        }
 
         if (info == null || info.getJsonString() == null) {
-            handleException("OAuth app does not contains required data  : " + applicationName,
+            handleException(
+                    "OAuth app does not contains required data for " + applicationName + " and key type: " + keyType,
                     new APIManagementException("OAuth app does not contains required data"));
         }
 
@@ -172,6 +188,9 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
     public OAuthApplicationInfo updateApplication(OAuthAppRequest appInfoDTO) throws APIManagementException {
         OAuthApplicationInfo oAuthApplicationInfo = appInfoDTO.getOAuthApplicationInfo();
 
+        String isSpecialCharSupportStr =
+                getConfigurationElementValue(APIConstants.OAUTH_APP_NAME_ALLOW_NON_ENGLISH_CHARACTERS);
+        boolean isSpecialCharSupport = Boolean.parseBoolean(isSpecialCharSupportStr);
         try {
 
             String userId = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_USERNAME);
@@ -183,8 +202,15 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
             String applicationName = oAuthApplicationInfo.getClientName();
             String keyType = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.APP_KEY_TYPE);
 
+            String oauthClientName;
+            if (isSpecialCharSupport) {
+                oauthClientName = APIUtil.getApplicationUUID(applicationName, userId);
+            } else {
+                oauthClientName = applicationName;
+            }
+
             if (keyType != null) {
-                applicationName = applicationName + "_" + keyType;
+                oauthClientName = oauthClientName + '_' + keyType;
             }
             log.debug("Updating OAuth Client with ID : " + oAuthApplicationInfo.getClientId());
 
@@ -193,10 +219,10 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
             }
 
             if (log.isDebugEnabled() && applicationName != null) {
-                log.debug("Client Name : " + applicationName);
+                log.debug("Client Name : " + oauthClientName);
             }
             org.wso2.carbon.apimgt.api.model.xsd.OAuthApplicationInfo applicationInfo = updateOAuthApplication(userId,
-                            applicationName, oAuthApplicationInfo.getCallBackURL(),oAuthApplicationInfo.getClientId(), 
+                    oauthClientName, oAuthApplicationInfo.getCallBackURL(),oAuthApplicationInfo.getClientId(),
                             grantTypes);
             OAuthApplicationInfo newAppInfo = new OAuthApplicationInfo();
             newAppInfo.setClientId(applicationInfo.getClientId());

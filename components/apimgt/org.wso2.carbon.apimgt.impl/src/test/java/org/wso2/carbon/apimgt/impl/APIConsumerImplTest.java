@@ -33,6 +33,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.ApplicationNameWithInvalidCharactersException;
 import org.wso2.carbon.apimgt.api.WorkflowStatus;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
@@ -108,6 +109,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.wso2.carbon.base.CarbonBaseConstants.CARBON_HOME;
@@ -840,6 +842,37 @@ public class APIConsumerImplTest {
         Mockito.when(apiMgtDAO.addApplication(application, "userID")).thenReturn(1);
         assertEquals(1, apiConsumer.addApplication(application, "userID"));
     }
+
+    @Test
+    public void testAddApplicationWithSpecialCharacter() throws APIManagementException {
+        APIConsumerImpl apiConsumer = new APIConsumerImplWrapper(apiMgtDAO);
+        Application application = Mockito.mock(Application.class);
+        Mockito.when(application.getName()).thenReturn("app");
+        PowerMockito.when(APIUtil.isApplicationExist("userID", "app", "1")).
+                thenReturn(false);
+        Mockito.when(apiMgtDAO.addApplication(application, "userID")).thenReturn(1);
+        assertEquals(1, apiConsumer.addApplication(application, "userID"));
+
+        APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.OAUTH_APP_NAME_ALLOW_NON_ENGLISH_CHARACTERS))
+                .thenReturn("true");
+
+        APIConsumerImplWrapper apiConsumerImplWrapper = new APIConsumerImplWrapper(apiMgtDAO);
+        apiConsumerImplWrapper.setApiManagerConfiguration(apiManagerConfiguration);
+        apiConsumer = apiConsumerImplWrapper;
+        Application disallowApplication = Mockito.mock(Application.class);
+        String specialCharAppName = "ÅÄÖÅÄÖ!@#";
+        Mockito.when(disallowApplication.getName()).thenReturn(specialCharAppName);
+        PowerMockito.when(APIUtil.isApplicationExist("userID", specialCharAppName, "1")).
+                thenReturn(false);
+        try {
+            apiConsumer.addApplication(disallowApplication, "userID");
+        } catch (ApplicationNameWithInvalidCharactersException e) {
+            fail("Application with special character should be allowed.");
+        }
+
+    }
+
     @Test
     public void testGetScopesBySubscribedAPIs() throws APIManagementException {
         APIConsumerImpl apiConsumer = new APIConsumerImplWrapper(apiMgtDAO);
