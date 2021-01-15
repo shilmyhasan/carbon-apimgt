@@ -432,6 +432,17 @@ public interface APIConsumer extends APIManager {
 
     /**
      * Returns a list of applications for a given subscriber
+     *
+     * @param subscriber Subscriber
+     * @param groupingId the groupId to which the applications must belong.
+     * @return Applications
+     * @throws APIManagementException if failed to applications for given subscriber
+     */
+
+    Application[] getLightWeightApplications(Subscriber subscriber, String groupingId) throws APIManagementException;
+
+    /**
+     * Returns a list of applications for a given subscriber
      *  @param subscriber Subscriber
      * @param search
      * @param start
@@ -632,5 +643,10 @@ public interface APIConsumer extends APIManager {
 	JSONObject resumeWorkflow(Object[] args);
 
     boolean isMonetizationEnabled(String tenantDomain) throws APIManagementException;
+
+    Set<SubscribedAPI> getLightWeightSubscribedIdentifiers(Subscriber subscriber, APIIdentifier apiIdentifier,
+                                                           String groupingId) throws APIManagementException;
+
+    Set<APIKey> getApplicationKeysOfApplication(int applicationId) throws APIManagementException;
 
 }

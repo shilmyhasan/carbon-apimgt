@@ -6106,4 +6106,15 @@ public final class APIUtil {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIAnalyticsConfiguration().
                 getDasReceiverServerPassword();
     }
+
+    /**
+     * Used in application sharing
+     * @return returns true if ENABLE_MULTIPLE_GROUPID is set to True
+     */
+    public static boolean isMultiGroupSharingEnabled() {
+
+        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        return JavaUtils.isTrueExplicitly(config.getFirstProperty(APIConstants.ENABLE_MULTIPLE_GROUPID));
+    }
 }

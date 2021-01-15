@@ -258,6 +258,8 @@ public final class APIConstants {
     
     public static final String API_OVERVIEW_SUBSCRIPTION_AVAILABILITY = "overview_subscriptionAvailability";
     public static final String API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS = "overview_tenants";
+    public static final String KEY_SUFFIX = "_KEY";
+    public static final String JSON_GRANT_TYPES = "grant_types";
     
     public static final String API_OVERVIEW_DESTINATION_BASED_STATS_ENABLED = "overview_destinationStatsEnabled";
     
@@ -894,7 +896,7 @@ public final class APIConstants {
     public static final String TENANTCOUNT_CACHEKEY = "apiProviderCacheKey";
     
     public static final String API_STORE_GROUP_EXTRACTOR_IMPLEMENTATION = API_STORE + "GroupingExtractor";
-
+    public static final String ENABLE_MULTIPLE_GROUPID = API_STORE + "EnableMultipleGroupId";
     public static final String API_CUSTOM_SEQUENCES_FOLDER_LOCATION =
             "repository" + File.separator + "resources" + File.separator + "customsequences";
     public static final String API_CUSTOM_SEQUENCE_TYPE_IN = "in";

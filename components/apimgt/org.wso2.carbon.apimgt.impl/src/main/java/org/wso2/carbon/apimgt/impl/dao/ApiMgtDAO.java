@@ -142,6 +142,7 @@ public class ApiMgtDAO {
     private static final Log log = LogFactory.getLog(ApiMgtDAO.class);
 
     private boolean forceCaseInsensitiveComparisons = false;
+    private boolean multiGroupIdEnabled = false;
 
     private ApiMgtDAO() {
         APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
@@ -152,6 +153,7 @@ public class ApiMgtDAO {
         if (caseSensitiveComparison != null) {
             forceCaseInsensitiveComparisons = Boolean.parseBoolean(caseSensitiveComparison);
         }
+        multiGroupIdEnabled = APIUtil.isMultiGroupSharingEnabled();
     }
 
     /**
@@ -2409,7 +2411,7 @@ public class ApiMgtDAO {
         return oAuthApplication;
     }
 
-    private APIKey getKeyStatusOfApplication(String keyType, int applicationId) throws APIManagementException {
+    public APIKey getKeyStatusOfApplication(String keyType, int applicationId) throws APIManagementException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -6576,6 +6578,125 @@ public class ApiMgtDAO {
             });
             applications = applicationsList.toArray(new Application[applicationsList.size()]);
 
+        } catch (SQLException e) {
+            handleException("Error when reading the application information from" + " the persistence store.", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return applications;
+    }
+
+    /**
+     * Returns all the applications associated with given subscriber and group id.
+     *
+     * @param subscriber The subscriber.
+     * @param groupingId The groupId to which the applications must belong.
+     * @return Application[] Array of applications.
+     * @throws APIManagementException
+     */
+    public Application[] getLightWeightApplications(Subscriber subscriber, String groupingId) throws
+            APIManagementException {
+
+        Connection connection = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        Application[] applications = null;
+        String sqlQuery = SQLConstants.GET_APPLICATIONS_PREFIX;
+
+        String whereClauseWithGroupId;
+        String whereClauseWithMultiGroupId;
+
+        if (forceCaseInsensitiveComparisons) {
+            if (multiGroupIdEnabled) {
+                whereClauseWithGroupId = " AND ( (APP.APPLICATION_ID IN (SELECT APPLICATION_ID  FROM " +
+                        "AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID IN ($params) AND TENANT = ?)) " +
+                        "OR (LOWER(SUB.USER_ID) = LOWER(?)))";
+            } else {
+                whereClauseWithGroupId = "   AND " + "     (GROUP_ID= ? " + "      OR "
+                        + "     ((GROUP_ID='' OR GROUP_ID IS NULL) AND LOWER(SUB.USER_ID) = LOWER(?))) ";
+            }
+        } else {
+            if (multiGroupIdEnabled) {
+                whereClauseWithGroupId = " AND ( (APP.APPLICATION_ID IN (SELECT APPLICATION_ID " +
+                        "FROM AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID IN ($params) AND TENANT = ?))  " +
+                        "OR  ( SUB.USER_ID = ? )) ";
+            } else {
+                whereClauseWithGroupId = "   AND " + "     (GROUP_ID= ? " + "      OR "
+                        + "     ((GROUP_ID='' OR GROUP_ID IS NULL) AND SUB.USER_ID=?))";
+            }
+        }
+
+        String whereClause;
+        if (forceCaseInsensitiveComparisons) {
+            whereClause = "   AND " + " LOWER(SUB.USER_ID) = LOWER(?)";
+        } else {
+            whereClause = "   AND " + " SUB.USER_ID = ?";
+        }
+
+        if (!groupingId.isEmpty()) {
+            sqlQuery += whereClauseWithGroupId;
+        } else {
+            sqlQuery += whereClause;
+        }
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            String blockingFilerSql = null;
+            if (connection.getMetaData().getDriverName().contains("MS SQL") ||
+                    connection.getMetaData().getDriverName().contains("Microsoft")) {
+                sqlQuery = sqlQuery.replaceAll("NAME", "cast(NAME as varchar(100)) " +
+                        "collate SQL_Latin1_General_CP1_CI_AS as NAME");
+                blockingFilerSql = " select distinct x.*,bl.ENABLED from ( " + sqlQuery + " )x left join " +
+                        "AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = (x.USER_ID + ':') + x" +
+                        ".name)";
+            } else {
+                blockingFilerSql = " select distinct x.*,bl.ENABLED from ( " + sqlQuery
+                        + " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = "
+                        + "concat(concat(x.USER_ID,':'),x.name))";
+            }
+
+            if (!groupingId.isEmpty()) {
+                if (multiGroupIdEnabled) {
+                    String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
+                    String groupIDArray[] = groupingId.split(",");
+                    int paramIndex = groupIDArray.length;
+                    prepStmt = fillQueryParams(connection, blockingFilerSql, groupIDArray, 1);
+                    prepStmt.setString(++paramIndex, tenantDomain);
+                    prepStmt.setString(++paramIndex, subscriber.getName());
+                } else {
+                    prepStmt = connection.prepareStatement(blockingFilerSql);
+                    prepStmt.setString(1, groupingId);
+                    prepStmt.setString(2, subscriber.getName());
+                }
+            } else {
+                prepStmt = connection.prepareStatement(blockingFilerSql);
+                prepStmt.setString(1, subscriber.getName());
+            }
+            rs = prepStmt.executeQuery();
+            ArrayList<Application> applicationsList = new ArrayList<Application>();
+            Application application;
+            while (rs.next()) {
+                application = new Application(rs.getString("NAME"), subscriber);
+                application.setId(rs.getInt("APPLICATION_ID"));
+                application.setTier(rs.getString("APPLICATION_TIER"));
+                application.setCallbackUrl(rs.getString("CALLBACK_URL"));
+                application.setDescription(rs.getString("DESCRIPTION"));
+                application.setStatus(rs.getString("APPLICATION_STATUS"));
+                application.setGroupId(rs.getString("GROUP_ID"));
+                application.setUUID(rs.getString("UUID"));
+                application.setIsBlackListed(rs.getBoolean("ENABLED"));
+
+                if (multiGroupIdEnabled) {
+                    application.setGroupId(getGroupId(application.getId()));
+                    application.setOwner(rs.getString("CREATED_BY"));
+                }
+                applicationsList.add(application);
+            }
+            Collections.sort(applicationsList, new Comparator<Application>() {
+                public int compare(Application o1, Application o2) {
+                    return o1.getName().compareToIgnoreCase(o2.getName());
+                }
+            });
+            applications = applicationsList.toArray(new Application[applicationsList.size()]);
         } catch (SQLException e) {
             handleException("Error when reading the application information from" + " the persistence store.", e);
         } finally {
@@ -11195,5 +11316,84 @@ public class ApiMgtDAO {
         }
 
         return accessTokens;
+    }
+
+    /**
+     * Returns a Prepared statement after setting all the dynamic parameters. Dynamic parameters will be added in
+     * the place of $params in query string
+     *
+     * @param conn               connection which will be used to create a prepared statement
+     * @param query              dynamic query string which will be modified.
+     * @param params             list of parameters
+     * @param startingParamIndex index from which the parameter numbering will start.
+     * @throws SQLException
+     */
+    public PreparedStatement fillQueryParams(Connection conn, String query, String params[], int startingParamIndex)
+            throws SQLException {
+
+        String paramString = "";
+
+        for (int i = 1; i <= params.length; i++) {
+            if (i == params.length) {
+                paramString = paramString + "?";
+            } else {
+                paramString = paramString + "?,";
+            }
+        }
+
+        query = query.replace("$params", paramString);
+
+        if (log.isDebugEnabled()) {
+            log.info("Prepared statement query :" + query);
+        }
+
+        PreparedStatement preparedStatement = conn.prepareStatement(query);
+        for (int i = 0; i < params.length; i++) {
+            preparedStatement.setString(startingParamIndex, params[i]);
+            startingParamIndex++;
+        }
+        return preparedStatement;
+    }
+
+    /**
+     * Fetches all the groups for a given application and creates a single string separated by comma
+     *
+     * @param applicationId
+     * @return comma separated group Id String
+     * @throws APIManagementException
+     */
+    private String getGroupId(int applicationId) throws APIManagementException {
+
+        String grpId = "";
+        ArrayList<String> grpIdList = new ArrayList<String>();
+        PreparedStatement preparedStatement = null;
+        Connection conn = null;
+        ResultSet resultSet = null;
+        String sqlQuery = SQLConstants.GET_GROUP_ID_SQL;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            preparedStatement = conn.prepareStatement(sqlQuery);
+            preparedStatement.setInt(1, applicationId);
+            resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                grpIdList.add(resultSet.getString("GROUP_ID"));
+            }
+
+            for (int i = 0; i < grpIdList.size(); i++) {
+                if (i == grpIdList.size() - 1) {
+                    grpId = grpId + grpIdList.get(i);
+                } else {
+                    grpId = grpId + grpIdList.get(i) + ",";
+                }
+            }
+
+        } catch (SQLException e) {
+            handleException("Failed to Retrieve GroupId for application " + applicationId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, conn, resultSet);
+        }
+        return grpId;
     }
 }
