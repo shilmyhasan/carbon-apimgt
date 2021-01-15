@@ -97,8 +97,9 @@ public class ThrottlingPolicyMappingUtil {
                             paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
                             paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT));
         }
-        PaginationDTO paginationDTO = CommonMappingUtil
-                .getPaginationDTO(limit, offset, size, paginatedNext, paginatedPrevious);
+        PaginationDTO paginationDTO = new PaginationDTO();
+        paginationDTO.setNext(paginatedNext);
+        paginationDTO.setPrevious(paginatedPrevious);
         tierListDTO.setPagination(paginationDTO);
     }
 
