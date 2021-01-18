@@ -67,10 +67,13 @@ https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.0.53
 
     We need to build following additional Repos before building support-6.6.163 branch:
 
-    1. carbon4-kernel/core/javax.cache - support-4.6.0
-https://github.com/wso2-support/carbon4-kernel/tree/support-4.6.0/core/javax.cache
+    1. carbon-kernel/core/javax.cache - support-4.6.0
+https://github.com/wso2-support/carbon-kernel/tree/support-4.6.0/core/javax.cache
     2. carbon-identity-framework - support-5.17.5
 https://github.com/wso2-support/carbon-identity-framework/tree/support-5.17.5
     3. identity-inbound-auth-oauth - support-6.4.2
 https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.4.2
 - [Support-6.7.206](https://github.com/wso2-support/carbon-apimgt/tree/support-6.7.206) - APIM 3.2.0
+
+    1. carbon-kernel/core/javax.cache - support-4.6.0
+https://github.com/wso2-support/carbon-kernel/tree/support-4.6.0/core/javax.cache
