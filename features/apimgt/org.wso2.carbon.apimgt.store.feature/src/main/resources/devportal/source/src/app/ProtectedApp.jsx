@@ -22,6 +22,7 @@ import { addLocaleData, IntlProvider } from 'react-intl';
 import Settings from 'Settings';
 import Tenants from 'AppData/Tenants';
 import SettingsContext from 'AppComponents/Shared/SettingsContext';
+import RedirectToLogin from 'AppComponents/Login/RedirectToLogin';
 import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import API from './data/api';
@@ -46,7 +47,6 @@ const language = (navigator.languages && navigator.languages[0])
  * Render protected application paths
  */
 export default class ProtectedApp extends Component {
-    static contextType = SettingsContext;
 
     /**
      *  constructor
@@ -210,18 +210,18 @@ export default class ProtectedApp extends Component {
         const {
             userResolved, tenantList, notEnoughPermission, tenantResolved,
         } = this.state;
-        const { tenantDomain } = this.context;
+        const { tenantDomain, settings } = this.context;
         if (!userResolved) {
             return <Loading />;
         }
         const { scopesFound, messages } = this.state;
         const isUserFound = AuthManager.getUser();
         let isAuthenticated = false;
-        if (scopesFound && isUserFound) {
+        if (scopesFound && isUserFound ) {
             isAuthenticated = true;
         }
         if (notEnoughPermission) {
-            return <LoginDenied />;
+            return <LoginDenied IsAnonymousModeEnabled={settings.IsAnonymousModeEnabled}/>;
         }
 
         // Waiting till the tenant list is retrieved
@@ -234,6 +234,11 @@ export default class ProtectedApp extends Component {
         if (tenantList.length > 0 && (tenantDomain === 'INVALID' || (!isAuthenticated && tenantDomain === null))) {
             return <TenantListing tenantList={tenantList} />;
         }
+
+        if (!isAuthenticated && !settings.IsAnonymousModeEnabled && !sessionStorage.getItem(CONSTS.ISLOGINPERMITTED)) {
+            return <RedirectToLogin />;
+        }
+
         /**
          * Note: AuthManager.getUser() method is a passive check, which simply
          * check the user availability in browser storage,
@@ -249,6 +254,7 @@ export default class ProtectedApp extends Component {
         );
     }
 }
+ProtectedApp.contextType = SettingsContext;
 ProtectedApp.propTypes = {
     location: PropTypes.shape({
         search: PropTypes.string.isRequired,

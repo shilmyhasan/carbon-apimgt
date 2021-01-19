@@ -964,4 +964,12 @@ public interface APIConsumer extends APIManager {
     Set<APIKey> getApplicationKeysOfApplication(int applicationId) throws APIManagementException;
 
     void revokeAPIKey(String apiKey, long expiryTime, String tenantDomain) throws APIManagementException;
+
+    /**
+     * Checks whether the DevPortal Anonymous Mode is enabled.
+     *
+     * @param tenantDomain       tenant domain
+     * @throws APIManagementException if an error occurs while reading configs
+     */
+    boolean isDevPortalAnonymousEnabled(String tenantDomain) throws APIManagementException;
 }
