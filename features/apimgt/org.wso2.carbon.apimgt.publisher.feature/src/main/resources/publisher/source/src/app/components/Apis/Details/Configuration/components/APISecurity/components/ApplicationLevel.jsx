@@ -100,22 +100,15 @@ export default function ApplicationLevel(props) {
         hasResourceWithSecurity = apiFromContext.operations.findIndex((op) => op.authType !== 'None') > -1;
     }
 
-    if (hasResourceWithSecurity) {
-        mandatoryValue = 'optional';
-        // If not Oauth2, Basic auth or ApiKey security is selected, no mandatory values should be pre-selected
-        if (!(securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2) || securityScheme.includes(API_SECURITY_BASIC_AUTH)
-            || securityScheme.includes(API_SECURITY_API_KEY))) {
-            mandatoryValue = null;
-        } else if (!securityScheme.includes(API_SECURITY_MUTUAL_SSL)) {
-            mandatoryValue = API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY;
-        } else if (securityScheme.includes(API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY)) {
-            mandatoryValue = API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY;
-        }
-    } else if (securityScheme.length > 0) {
-        configDispatcher({
-            action: 'securityScheme',
-            event: { checked: false, value: DEFAULT_API_SECURITY_OAUTH2 },
-        });
+    mandatoryValue = 'optional';
+    // If not Oauth2, Basic auth or ApiKey security is selected, no mandatory values should be pre-selected
+    if (!(securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2) || securityScheme.includes(API_SECURITY_BASIC_AUTH)
+        || securityScheme.includes(API_SECURITY_API_KEY))) {
+        mandatoryValue = null;
+    } else if (!securityScheme.includes(API_SECURITY_MUTUAL_SSL)) {
+        mandatoryValue = API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY;
+    } else if (securityScheme.includes(API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY)) {
+        mandatoryValue = API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY;
     }
 
     return (
@@ -155,8 +148,7 @@ export default function ApplicationLevel(props) {
                             <FormControlLabel
                                 control={(
                                     <Checkbox
-                                        disabled={isRestricted(['apim:api_create'], apiFromContext)
-                                        || !hasResourceWithSecurity}
+                                        disabled={isRestricted(['apim:api_create'], apiFromContext)}
                                         checked={securityScheme.includes(DEFAULT_API_SECURITY_OAUTH2)}
                                         onChange={({ target: { checked, value } }) => configDispatcher({
                                             action: 'securityScheme',
@@ -171,8 +163,7 @@ export default function ApplicationLevel(props) {
                             <FormControlLabel
                                 control={(
                                     <Checkbox
-                                        disabled={isRestricted(['apim:api_create'], apiFromContext)
-                                        || !hasResourceWithSecurity}
+                                        disabled={isRestricted(['apim:api_create'], apiFromContext)}
                                         checked={securityScheme.includes(API_SECURITY_BASIC_AUTH)}
                                         onChange={({ target: { checked, value } }) => configDispatcher({
                                             action: 'securityScheme',
@@ -188,8 +179,7 @@ export default function ApplicationLevel(props) {
                                 control={(
                                     <Checkbox
                                         checked={securityScheme.includes(API_SECURITY_API_KEY)}
-                                        disabled={isRestricted(['apim:api_create'], apiFromContext)
-                                        || !hasResourceWithSecurity}
+                                        disabled={isRestricted(['apim:api_create'], apiFromContext)}
                                         onChange={({ target: { checked, value } }) => configDispatcher({
                                             action: 'securityScheme',
                                             event: { checked, value },
