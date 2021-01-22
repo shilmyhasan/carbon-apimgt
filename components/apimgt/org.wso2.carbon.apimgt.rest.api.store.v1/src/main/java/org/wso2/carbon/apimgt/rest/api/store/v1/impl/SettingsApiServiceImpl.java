@@ -51,8 +51,7 @@ public class SettingsApiServiceImpl implements SettingsApiService {
         try {
             String username = RestApiUtil.getLoggedInUsername();
             String requestedTenantDomain = RestApiUtil.getRequestedTenantDomain(xWSO2Tenant);
-            APIConsumer apiConsumer = RestApiUtil.getConsumer(username);
-            boolean anonymousEnabled = apiConsumer.isDevPortalAnonymousEnabled(requestedTenantDomain);
+            boolean anonymousEnabled = RestApiUtil.isDevPortalAnonymousEnabled(requestedTenantDomain);
             boolean isUserAvailable = false;
             if (!APIConstants.WSO2_ANONYMOUS_USER.equalsIgnoreCase(username)) {
                 isUserAvailable = true;

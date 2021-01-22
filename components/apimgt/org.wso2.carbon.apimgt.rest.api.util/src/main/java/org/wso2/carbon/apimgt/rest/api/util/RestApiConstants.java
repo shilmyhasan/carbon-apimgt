@@ -32,6 +32,7 @@ public final class RestApiConstants {
     public static final String APPLICATION_ZIP = "application/zip";
     public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
     public static final String AUTHENTICATION_REQUIRED = "authentication_required";
+    public static final String MESSAGE_BASE_PATH = "org.apache.cxf.message.Message.BASE_PATH";
 
     public static final String REQUEST_AUTHENTICATION_SCHEME = "request_authentication_scheme";
     public static final String OAUTH2_AUTHENTICATION = "oauth2";
@@ -123,11 +124,14 @@ public final class RestApiConstants {
     public static final String RESOURCE_PATH_PRODUCT_DOCUMENT_CONTENT = RESOURCE_PATH_PRODUCT_DOCUMENTS_DOCUMENT_ID + "/content";
     public static final String RESOURCE_PATH_RESOURCE_PATHS = "/resource-paths";
     public static final String RESOURCE_PATH_COMMENTS = "/comments";
+    public static final String RESOURCE_PATH_SWAGGER= "/swagger.yaml";
     public static final String REST_API_STORE_VERSION_0 ="v0.15";
     public static final String REST_API_STORE_VERSION_1 ="v1";
     public static final String REST_API_STORE_CONTEXT="/api/am/store/";
     public static final String REST_API_STORE_CONTEXT_FULL_0 = REST_API_STORE_CONTEXT + REST_API_STORE_VERSION_0;
     public static final String REST_API_STORE_CONTEXT_FULL_1 = REST_API_STORE_CONTEXT + REST_API_STORE_VERSION_1;
+    public static final String REST_API_STORE_RESOURCE_PATH_SETTINGS = "/settings";
+    public static final String REST_API_STORE_RESOURCE_PATH_TENANTS = "/tenants";
     public static final String REST_API_PUBLISHER_VERSION_0 ="v0.15";
     public static final String REST_API_PUBLISHER_VERSION_1 = "v1";
     public static final String REST_API_PUBLISHER_CONTEXT = "/api/am/publisher/";

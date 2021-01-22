@@ -235,6 +235,8 @@ export default class ProtectedApp extends Component {
             return <TenantListing tenantList={tenantList} />;
         }
 
+        // Check whether the whether isAuthenticated is not needed and anonymous mode of the devportal is disabled and
+        // the session storage does not consist the constant to permit the login
         if (!isAuthenticated && !settings.IsAnonymousModeEnabled && !sessionStorage.getItem(CONSTS.ISLOGINPERMITTED)) {
             return <RedirectToLogin />;
         }
