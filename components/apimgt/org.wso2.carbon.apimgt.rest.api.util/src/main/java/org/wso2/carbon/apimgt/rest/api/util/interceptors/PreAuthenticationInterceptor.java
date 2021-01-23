@@ -63,13 +63,20 @@ public class PreAuthenticationInterceptor extends AbstractPhaseInterceptor {
         try {
             whiteListedResourcePathsMap = RestApiUtil.getWhiteListedURIsToMethodsMap();
             Enumeration<URITemplate> uriTemplateSet = whiteListedResourcePathsMap.keys();
-            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            ArrayList requestedTenantDomain = (ArrayList) ((TreeMap) (message.get(Message.PROTOCOL_HEADERS))).get("x-wso2-tenant");
+            String tenantDomain = null;
+            if (requestedTenantDomain != null) {
+                tenantDomain = RestApiUtil.getRequestedTenantDomain(requestedTenantDomain.get(0).toString());
+            }
+            if (StringUtils.isEmpty(tenantDomain)) {
+                tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            }
             while (uriTemplateSet.hasMoreElements()) {
                 URITemplate uriTemplate = uriTemplateSet.nextElement();
                 if (uriTemplate.matches(path, new HashMap<String, String>())) {
                     List<String> whiteListedVerbs = whiteListedResourcePathsMap.get(uriTemplate);
                     if (whiteListedVerbs.contains(httpMethod)) {
-                        if (StringUtils.startsWith((String) message.get(RestApiConstants.MESSAGE_BASE_PATH),
+                        if (StringUtils.startsWith((String) message.get(Message.BASE_PATH),
                                 RestApiConstants.REST_API_STORE_CONTEXT_FULL_1)) {
                             // Authentication will be skipped for /swagger.yaml, /settings, /tenants resources of
                             // the store REST API
