@@ -2394,6 +2394,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (clientCertificateObject != null) {
                 authProperties.put(APIConstants.CERTIFICATE_INFORMATION, clientCertificateObject.toString());
             }
+            authProperties.put(APIConstants.PROVIDER_KEY, api.getId().getProviderName());
+
             //Get RemoveHeaderFromOutMessage from tenant registry or api-manager.xml
             String removeHeaderFromOutMessage = APIUtil
                     .getOAuthConfiguration(tenantId, APIConstants.REMOVE_OAUTH_HEADER_FROM_OUT_MESSAGE);
@@ -2560,6 +2562,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (clientCertificateObject != null) {
             authProperties.put(APIConstants.CERTIFICATE_INFORMATION, clientCertificateObject.toString());
         }
+        authProperties.put(APIConstants.PROVIDER_KEY, apiProduct.getId().getProviderName());
 
         //Get RemoveHeaderFromOutMessage from tenant registry or api-manager.xml
         String removeHeaderFromOutMessage = APIUtil
