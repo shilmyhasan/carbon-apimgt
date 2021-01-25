@@ -63,7 +63,8 @@ public class PreAuthenticationInterceptor extends AbstractPhaseInterceptor {
         try {
             whiteListedResourcePathsMap = RestApiUtil.getWhiteListedURIsToMethodsMap();
             Enumeration<URITemplate> uriTemplateSet = whiteListedResourcePathsMap.keys();
-            ArrayList requestedTenantDomain = (ArrayList) ((TreeMap) (message.get(Message.PROTOCOL_HEADERS))).get("x-wso2-tenant");
+            ArrayList requestedTenantDomain = (ArrayList) ((TreeMap) (message.get(Message.PROTOCOL_HEADERS)))
+                    .get(RestApiConstants.HEADER_X_WSO2_TENANT);
             String tenantDomain = null;
             if (requestedTenantDomain != null) {
                 tenantDomain = RestApiUtil.getRequestedTenantDomain(requestedTenantDomain.get(0).toString());
