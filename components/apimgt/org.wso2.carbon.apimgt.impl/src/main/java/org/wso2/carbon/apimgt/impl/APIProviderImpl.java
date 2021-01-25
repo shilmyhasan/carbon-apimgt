@@ -8047,9 +8047,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             uriTemplates = oasParser.getURITemplates(apiDefinition);
         } catch (APIManagementException e) {
             // catch APIManagementException inside again to capture validation error
-            log.error("Swagger validation error");
+            RestApiUtil.handleBadRequest(e.getMessage(), log);
         }
-        if(uriTemplates == null || uriTemplates.isEmpty()) {
+        if (uriTemplates == null || uriTemplates.isEmpty()) {
             log.error("No resources found");
         }
 
