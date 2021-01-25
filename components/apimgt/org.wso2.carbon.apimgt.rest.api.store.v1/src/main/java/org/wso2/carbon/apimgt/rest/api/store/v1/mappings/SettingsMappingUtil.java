@@ -42,10 +42,12 @@ public class SettingsMappingUtil {
 
     private static final Log log = LogFactory.getLog(SettingsMappingUtil.class);
 
-    public SettingsDTO fromSettingstoDTO(Boolean isUserAvailable) throws APIManagementException {
+    public SettingsDTO fromSettingstoDTO(Boolean isUserAvailable, Boolean anonymousEnabled)
+            throws APIManagementException {
         SettingsDTO settingsDTO = new SettingsDTO();
         String appAccessTokenValidityPeriod = String.valueOf(IdentityConfigParser.getInstance()
                 .getConfiguration().get("OAuth.AccessTokenDefaultValidityPeriod"));
+        settingsDTO.setIsAnonymousModeEnabled(anonymousEnabled);
         if (isUserAvailable) {
             settingsDTO.setGrantTypes(APIUtil.getGrantTypes());
             settingsDTO.setScopes(GetScopeList());

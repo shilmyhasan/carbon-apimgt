@@ -255,6 +255,7 @@
   "Base.index.settings.caption": "Settings",
   "Base.index.sign.in": "Sign-in",
   "LandingPage.Contact.submit": "Submit",
+  "LoginDenied.message": "You don't have sufficient privileges to access the Developer Portal.",
   "Login.LoginBase.api.store": "API Dev Portal",
   "Login.LoginForm.dont.have.account": "Don't have an account?",
   "Login.LoginForm.forgot.password": "Forgot Password",

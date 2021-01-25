@@ -54,6 +54,7 @@ import org.wso2.carbon.apimgt.impl.importexport.CertificateDetail;
 import org.wso2.carbon.apimgt.impl.importexport.ExportFormat;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.wsdl.util.SOAPToRESTConstants;
 import org.wso2.carbon.registry.api.Collection;
 import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.api.RegistryException;
@@ -227,11 +228,11 @@ public class APIExportUtil {
      */
     private static void exportSOAPToRESTMediation(String archivePath, APIIdentifier apiIdentifier, Registry registry)
             throws APIImportExportException {
-        String soapToRestBaseUrl = "/apimgt/applicationdata/provider" + RegistryConstants.PATH_SEPARATOR +
-                apiIdentifier.getProviderName() + RegistryConstants.PATH_SEPARATOR +
-                apiIdentifier.getApiName() + RegistryConstants.PATH_SEPARATOR +
-                apiIdentifier.getVersion() + RegistryConstants.PATH_SEPARATOR +
-                "soap_to_rest";
+        String soapToRestBaseUrl =
+                "/apimgt/applicationdata/provider" + RegistryConstants.PATH_SEPARATOR + apiIdentifier.getProviderName()
+                        + RegistryConstants.PATH_SEPARATOR + apiIdentifier.getApiName()
+                        + RegistryConstants.PATH_SEPARATOR + apiIdentifier.getVersion()
+                        + RegistryConstants.PATH_SEPARATOR + SOAPToRESTConstants.SequenceGen.SOAP_TO_REST;
 
         InputStream inputStream = null;
         OutputStream outputStream = null;
