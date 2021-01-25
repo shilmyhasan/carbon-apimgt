@@ -8049,7 +8049,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             // catch APIManagementException inside again to capture validation error
             RestApiUtil.handleBadRequest(e.getMessage(), log);
         }
-        if(uriTemplates == null || uriTemplates.isEmpty()) {
+        if (uriTemplates == null || uriTemplates.isEmpty()) {
             log.error("No resources found");
         }
 
