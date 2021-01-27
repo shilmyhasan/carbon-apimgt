@@ -303,7 +303,7 @@ public class ApiMgtDAO {
             }
         }
 
-        return String.join(" ",validGrantTypes);
+        return String.join(" ", validGrantTypes);
     }
 
     public OAuthApplicationInfo getOAuthApplication(String consumerKey) throws APIManagementException {
