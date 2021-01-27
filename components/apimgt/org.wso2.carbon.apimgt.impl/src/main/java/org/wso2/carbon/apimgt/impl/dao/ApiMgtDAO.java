@@ -294,12 +294,10 @@ public class ApiMgtDAO {
             if (StringUtils.isBlank(requestedGrant)) {
                 continue;
             }
-
             if (allowedGrantTypes.contains(requestedGrant)) {
                 validGrantTypes.add(requestedGrant);
             }
         }
-
         return String.join(" ",validGrantTypes);
     }
 
