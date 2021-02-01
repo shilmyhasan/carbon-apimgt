@@ -409,7 +409,15 @@ public class OASParserUtil {
                         for (String refKey : refCategoryEntry.getValue()) {
                             Parameter parameter = parameters.get(refKey);
                             Content content = parameter.getContent();
-                            extractReferenceFromContent(content, context);
+                            if (content != null) {
+                                extractReferenceFromContent(content, context);
+                            } else {
+                                String ref = parameter.get$ref();
+                                if (ref != null) {
+                                    extractReferenceWithoutSchema(ref, context);
+                                }
+                            }
+
                         }
                     }
                 }
@@ -597,8 +605,15 @@ public class OASParserUtil {
         if (parameters != null) {
             for (Parameter parameter : parameters) {
                 Content content = parameter.getContent();
+                if (content != null) {
+                    extractReferenceFromContent(content, context);
+                } else {
+                    String ref = parameter.get$ref();
+                    if (ref != null) {
+                        extractReferenceWithoutSchema(ref, context);
+                    }
+                }
 
-                extractReferenceFromContent(content, context);
             }
         }
     }
@@ -610,6 +625,12 @@ public class OASParserUtil {
 
                 extractReferenceFromSchema(schema, context);
             }
+        }
+    }
+
+    private static void extractReferenceWithoutSchema(String reference, SwaggerUpdateContext context) {
+        if (reference != null) {
+            addToReferenceObjectMap(reference, context);
         }
     }
 
