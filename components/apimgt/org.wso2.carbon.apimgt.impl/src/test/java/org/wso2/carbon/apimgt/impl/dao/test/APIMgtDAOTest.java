@@ -1313,8 +1313,7 @@ public class APIMgtDAOTest {
     public void testValidateGrantTypesOfOAuthApplication() throws Exception {
         //assert allowed grant types
         OAuthAdminService oAuthAdminService = new OAuthAdminService();
-        assertEquals(String.join(" ", oAuthAdminService.getAllowedGrantTypes())
-                , "");
+        assertEquals(String.join(" ", oAuthAdminService.getAllowedGrantTypes()), "");
 
         //assert details of oauth application after validation
         OAuthApplicationInfo oAuthApplicationInfo = apiMgtDAO.getOAuthApplication("getOAuthApplication");
@@ -1324,7 +1323,7 @@ public class APIMgtDAOTest {
         assertEquals(oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_NAME),
                 "admin-app1-Production");
         assertEquals(oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_GRANT), "");
-        Subscriber subscriber = apiMgtDAO.getOwnerForConsumerApp("getOAuthApplication" );
+        Subscriber subscriber = apiMgtDAO.getOwnerForConsumerApp("getOAuthApplication");
     }
 
     private void deleteSubscriber(int subscriberId) throws APIManagementException {
