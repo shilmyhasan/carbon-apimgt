@@ -326,7 +326,7 @@ APIDesigner.prototype.check_if_resource_path_exist = function(path){
 
         var keyWithoutTailingSlash = key;
         if (key.lastIndexOf('/') == key.length -1) {
-            keyWithoutTailingSlash = key.substring(0, key.length -1);
+            keyWithoutTailingSlash = key.substring(0, key.length - 1);
         }
 
         if(keyWithoutTailingSlash.toLowerCase() == path.toLowerCase()){

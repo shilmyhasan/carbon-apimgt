@@ -928,7 +928,7 @@ public class ApisApiServiceImpl extends ApisApiService {
                 JSONObject resourceDefinition = (JSONObject) resource.getValue();
 
                 if (key.length() > 1 && key.endsWith("/")) {
-                    key = key.substring(0, key.length()-1);
+                    key = key.substring(0, key.length() - 1);
                 }
 
                 if (clonePathMap.containsKey(key)) {
