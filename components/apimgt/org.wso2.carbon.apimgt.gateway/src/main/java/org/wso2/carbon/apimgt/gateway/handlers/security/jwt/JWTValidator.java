@@ -275,7 +275,7 @@ public class JWTValidator {
              * */
             if (api != null) {
                 synCtx.setProperty(APIMgtGatewayConstants.API_PUBLISHER, api.get("publisher"));
-                synCtx.setProperty("API_NAME", api.get("name"));
+                synCtx.setProperty(APIMgtGatewayConstants.API_NAME, api.get("name"));
             } else {
                 boolean validateSubscriptionViaKM = Boolean.parseBoolean(
                         ServiceReferenceHolder.getInstance().getAPIManagerConfiguration()
