@@ -2720,7 +2720,7 @@ public abstract class AbstractAPIManager implements APIManager {
                     if (limitAttributes) {
                         resultAPI = APIUtil.getAPI(artifact);
                     } else {
-                        if(reducedPublisherAPIInfo) {
+                        if (reducedPublisherAPIInfo) {
                             resultAPI = APIUtil.getReducedPublisherAPIForListing(artifact, registry);
                         } else {
                             resultAPI = APIUtil.getAPI(artifact, registry);
