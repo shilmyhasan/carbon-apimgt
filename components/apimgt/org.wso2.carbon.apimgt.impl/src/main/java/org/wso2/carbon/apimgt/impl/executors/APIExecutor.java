@@ -124,8 +124,9 @@ public class APIExecutor implements Execution {
             if (APIConstants.API_PRODUCT.equals(type)) {
                 executed = true;
             } else {
-                API api = APIUtil.getAPI(apiArtifact);
-                return changeLifeCycle(context, api, apiResource, registry, apiProvider, apiArtifact, targetState);
+                API api = APIUtil.getAPIForPublishing(apiArtifact, registry);
+                return changeLifeCycle(context, api, apiResource, registry, apiProvider, apiArtifact, targetState,
+                        artifactManager);
             }
         } catch (RegistryException e) {
             log.error("Failed to get the generic artifact while executing APIExecutor. ", e);
@@ -148,7 +149,8 @@ public class APIExecutor implements Execution {
     }
     
     private boolean changeLifeCycle(RequestContext context, API api, Resource apiResource, Registry registry,
-                                    APIProvider apiProvider, GenericArtifact apiArtifact, String targetState)
+            APIProvider apiProvider, GenericArtifact apiArtifact, String targetState,
+            GenericArtifactManager artifactManager)
             throws APIManagementException, FaultGatewaysException, RegistryException {
         boolean executed;
 
@@ -179,7 +181,8 @@ public class APIExecutor implements Execution {
             }
 
             //push the state change to gateway
-            Map<String, String> failedGateways = apiProvider.propergateAPIStatusChangeToGateways(api.getId(), newStatus);
+            Map<String, String> failedGateways = apiProvider
+                    .propergateAPIStatusChangeToGateways(api, api.getId(), newStatus);
 
             if (log.isDebugEnabled()) {
                 String logMessage = "Publish changed status to the Gateway. API Name: " + api.getId().getApiName()
@@ -188,8 +191,12 @@ public class APIExecutor implements Execution {
                 log.debug(logMessage);
             }
 
+            // set api status to old as propergateAPIStatusChangeToGateways() method call will change api status
+            // to newStatus and this modified api is sent back to updateAPIforStateChange() method
+            api.setStatus(oldStatus);
             //update api related information for state change
-            executed = apiProvider.updateAPIforStateChange(api.getId(), newStatus, failedGateways);
+            executed = apiProvider
+                    .updateAPIforStateChange(api, api.getId(), newStatus, failedGateways, artifactManager, apiArtifact);
 
             // Setting resource again to the context as it's updated within updateAPIStatus method
             String apiPath = APIUtil.getAPIPath(api.getId());
