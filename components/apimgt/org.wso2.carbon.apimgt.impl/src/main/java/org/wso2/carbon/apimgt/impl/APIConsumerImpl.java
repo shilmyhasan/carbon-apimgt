@@ -3352,10 +3352,10 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             application.setApplicationAttributes(null);
         }
 
-        String regex = "^[a-zA-Z0-9 ._-]*$";
+        String regex = "[~!#$;%^&*+={}|<>,'/\" \\\\]";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(application.getName());
-        if (!matcher.find()) {
+        if (matcher.find()) {
             handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
         }
 
@@ -3374,7 +3374,10 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         appLogObject.put(APIConstants.AuditLogConstants.TIER, application.getTier());
         appLogObject.put(APIConstants.AuditLogConstants.CALLBACK, application.getCallbackUrl());
         appLogObject.put(APIConstants.AuditLogConstants.GROUPS, application.getGroupId());
-        appLogObject.put(APIConstants.AuditLogConstants.OWNER, application.getSubscriber().getName());
+        Subscriber subscriber = application.getSubscriber();
+        if (subscriber != null) {
+            appLogObject.put(APIConstants.AuditLogConstants.OWNER, application.getSubscriber().getName());
+        }
 
         APIUtil.logAuditMessage(APIConstants.AuditLogConstants.APPLICATION, appLogObject.toString(),
                 APIConstants.AuditLogConstants.CREATED, this.username);
@@ -3475,14 +3478,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleApplicationNameContainSpacesException("Application name " +
                     "cannot contain leading or trailing white spaces");
         }
-
-        String regex = "^[a-zA-Z0-9 ._-]*$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(application.getName());
-        if (!matcher.find()) {
-            handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
-        }
-
+       
         Subscriber subscriber = application.getSubscriber();
 
         JSONArray applicationAttributesFromConfig = getAppAttributesFromConfig(subscriber.getName());
@@ -3547,6 +3543,13 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             application.setApplicationAttributes(validateApplicationAttributes(applicationAttributes, configAttributes));
         } else {
             application.setApplicationAttributes(null);
+        }
+
+        String regex = "[~!#$;%^&*+={}|<>,'/\" \\\\]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(application.getName());
+        if (matcher.find()) {
+            handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
         }
 
         apiMgtDAO.updateApplication(application);
