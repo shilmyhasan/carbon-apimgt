@@ -456,7 +456,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public List<SubscribedAPI> getAPIUsageByAPIId(APIIdentifier apiId) throws APIManagementException {
         APIIdentifier apiIdEmailReplaced = new APIIdentifier(APIUtil.replaceEmailDomain(apiId.getProviderName()),
                 apiId.getApiName(), apiId.getVersion());
-        UserApplicationAPIUsage[] allApiResult = apiMgtDAO.getAllAPIUsageByProvider(apiId.getProviderName());
+        UserApplicationAPIUsage[] allApiResult = apiMgtDAO.getAllAPIUsageByProviderAndApiId(apiId.getProviderName(), apiId);
         List<SubscribedAPI> subscribedAPIs = new ArrayList<SubscribedAPI>();
         for (UserApplicationAPIUsage usage : allApiResult) {
             for (SubscribedAPI apiSubscription : usage.getApiSubscriptions()) {
@@ -2488,6 +2488,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (clientCertificateObject != null) {
                 authProperties.put(APIConstants.CERTIFICATE_INFORMATION, clientCertificateObject.toString());
             }
+            authProperties.put(APIConstants.PROVIDER_KEY, api.getId().getProviderName());
             //Get RemoveHeaderFromOutMessage from tenant registry or api-manager.xml
             String removeHeaderFromOutMessage = APIUtil
                     .getOAuthConfiguration(tenantId, APIConstants.REMOVE_OAUTH_HEADER_FROM_OUT_MESSAGE);
@@ -2654,6 +2655,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (clientCertificateObject != null) {
             authProperties.put(APIConstants.CERTIFICATE_INFORMATION, clientCertificateObject.toString());
         }
+        authProperties.put(APIConstants.PROVIDER_KEY, apiProduct.getId().getProviderName());
 
         //Get RemoveHeaderFromOutMessage from tenant registry or api-manager.xml
         String removeHeaderFromOutMessage = APIUtil
@@ -8047,9 +8049,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             uriTemplates = oasParser.getURITemplates(apiDefinition);
         } catch (APIManagementException e) {
             // catch APIManagementException inside again to capture validation error
-            log.error("Swagger validation error");
+            handleException("Failed to get URL templates for API : " + apiId.getApiName(), e);
         }
-        if(uriTemplates == null || uriTemplates.isEmpty()) {
+        if (uriTemplates == null || uriTemplates.isEmpty()) {
             log.error("No resources found");
         }
 

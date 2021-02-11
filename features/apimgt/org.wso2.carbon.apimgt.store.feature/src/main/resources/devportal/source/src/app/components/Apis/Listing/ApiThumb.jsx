@@ -381,7 +381,7 @@ class ApiThumb extends React.Component {
                                         gutterBottom
                                         align='right'
                                         className={classes.context}
-                                        Component='div'
+                                        component='div'
                                     >
                                         <FormattedMessage defaultMessage='Context' id='Apis.Listing.ApiThumb.context' />
                                     </Typography>
@@ -410,6 +410,7 @@ class ApiThumb extends React.Component {
                                 <Typography
                                     variant='subtitle1'
                                     gutterBottom
+                                    component='div'
                                     align='right'
                                     className={classes.chipWrapper}
                                 >

@@ -90,6 +90,7 @@ import static org.wso2.carbon.apimgt.impl.APIConstants.APPLICATION_XML_MEDIA_TYP
 public class OAS3Parser extends APIDefinition {
     private static final Log log = LogFactory.getLog(OAS3Parser.class);
     static final String OPENAPI_SECURITY_SCHEMA_KEY = "default";
+    static final String OPENAPI_DEFAULT_AUTHORIZATION_URL = "https://test.com";
     private List<String> otherSchemes;
 
     private List<String> getOtherSchemes() {
@@ -441,7 +442,7 @@ public class OAS3Parser extends APIDefinition {
 
         info.setVersion(swaggerData.getVersion());
         openAPI.setInfo(info);
-        updateSwaggerSecurityDefinition(openAPI, swaggerData, "https://test.com");
+        updateSwaggerSecurityDefinition(openAPI, swaggerData, OPENAPI_DEFAULT_AUTHORIZATION_URL);
         updateLegacyScopesFromSwagger(openAPI, swaggerData);
         if (APIConstants.GRAPHQL_API.equals(swaggerData.getTransportType())) {
             modifyGraphQLSwagger(openAPI);
@@ -521,9 +522,9 @@ public class OAS3Parser extends APIDefinition {
                 addOrUpdatePathToSwagger(openAPI, resource);
             }
         }
-        updateSwaggerSecurityDefinition(openAPI, swaggerData, "https://test.com");
+        updateSwaggerSecurityDefinition(openAPI, swaggerData, OPENAPI_DEFAULT_AUTHORIZATION_URL);
         updateLegacyScopesFromSwagger(openAPI, swaggerData);
-        
+
         if (StringUtils.isEmpty(openAPI.getInfo().getTitle())) {
             openAPI.getInfo().setTitle(swaggerData.getTitle());
         }
@@ -1292,7 +1293,6 @@ public class OAS3Parser extends APIDefinition {
      */
     private boolean isDefaultGiven(String swaggerContent) throws APIManagementException {
         OpenAPI openAPI = getOpenAPI(swaggerContent);
-
         Components components = openAPI.getComponents();
         if (components == null) {
             return false;
@@ -1374,7 +1374,7 @@ public class OAS3Parser extends APIDefinition {
                 //Populating the default security scheme with default values
                 OAuthFlows newDefaultFlows = new OAuthFlows();
                 OAuthFlow newDefaultFlow = new OAuthFlow();
-                newDefaultFlow.setAuthorizationUrl("https://test.com");
+                newDefaultFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
                 Scopes newDefaultScopes = new Scopes();
                 newDefaultFlow.setScopes(newDefaultScopes);
                 newDefaultFlows.setImplicit(newDefaultFlow);
@@ -1421,7 +1421,6 @@ public class OAS3Parser extends APIDefinition {
                         defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowPassword, defaultTypeFlow);
                         defaultTypeFlows.setImplicit(defaultTypeFlow);
                     }
-
                     defaultType.setFlows(defaultTypeFlows);
                 }
             }
@@ -1555,21 +1554,8 @@ public class OAS3Parser extends APIDefinition {
         Boolean isOptional = OASParserUtil.getAppSecurityStateFromSwagger(extensions);
         if (!applicationSecurity.isEmpty()) {
             String securityList = api.getApiSecurity();
-            securityList = securityList == null ? "" : securityList;
-            for (String securityType : applicationSecurity) {
-                if (APIConstants.DEFAULT_API_SECURITY_OAUTH2.equals(securityType) && !securityList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
-                    securityList = securityList + "," + APIConstants.DEFAULT_API_SECURITY_OAUTH2;
-                }
-                if (APIConstants.API_SECURITY_BASIC_AUTH.equals(securityType) && !securityList.contains(APIConstants.API_SECURITY_BASIC_AUTH)) {
-                    securityList = securityList + "," + APIConstants.API_SECURITY_BASIC_AUTH;
-                }
-                if (APIConstants.API_SECURITY_API_KEY.equals(securityType) && !securityList.contains(APIConstants.API_SECURITY_API_KEY)) {
-                    securityList = securityList + "," + APIConstants.API_SECURITY_API_KEY;
-                }
-            }
-            if (!(isOptional || securityList.contains(APIConstants.MANDATORY))) {
-                securityList = securityList + "," + APIConstants.MANDATORY;
-            }
+            securityList = OASParserUtil
+                    .preprocessApplicationSecurityTypes(applicationSecurity, isOptional, securityList);
             api.setApiSecurity(securityList);
         }
         //Setup mutualSSL configuration
@@ -1579,11 +1565,13 @@ public class OAS3Parser extends APIDefinition {
             if (StringUtils.isBlank(securityList)) {
                 securityList = APIConstants.DEFAULT_API_SECURITY_OAUTH2;
             }
-            if (APIConstants.OPTIONAL.equals(mutualSSL) && !securityList.contains(APIConstants.API_SECURITY_MUTUAL_SSL)) {
+            if (APIConstants.OPTIONAL.equals(mutualSSL) && !securityList
+                    .contains(APIConstants.API_SECURITY_MUTUAL_SSL)) {
                 securityList = securityList + "," + APIConstants.API_SECURITY_MUTUAL_SSL;
-            } else if (APIConstants.MANDATORY.equals(mutualSSL) && !securityList.contains(APIConstants.API_SECURITY_MUTUAL_SSL_MANDATORY)) {
-                securityList = securityList + "," + APIConstants.API_SECURITY_MUTUAL_SSL + "," +
-                        APIConstants.API_SECURITY_MUTUAL_SSL_MANDATORY;
+            } else if (APIConstants.MANDATORY.equals(mutualSSL) && !securityList
+                    .contains(APIConstants.API_SECURITY_MUTUAL_SSL_MANDATORY)) {
+                securityList = securityList + "," + APIConstants.API_SECURITY_MUTUAL_SSL + ","
+                        + APIConstants.API_SECURITY_MUTUAL_SSL_MANDATORY;
             }
             api.setApiSecurity(securityList);
         }
@@ -1612,7 +1600,6 @@ public class OAS3Parser extends APIDefinition {
         if (StringUtils.isNotBlank(throttleTier)) {
             api.setApiLevelPolicy(throttleTier);
         }
-
         return api;
     }
 
@@ -1649,9 +1636,11 @@ public class OAS3Parser extends APIDefinition {
                     if (extensionsAreEmpty) {
                         operation.setExtensions(resourceExtensions);
                     }
-                } else if (resourceExtensions != null && resourceExtensions.containsKey(APIConstants.X_WSO2_DISABLE_SECURITY)) {
+                } else if (resourceExtensions != null && resourceExtensions
+                        .containsKey(APIConstants.X_WSO2_DISABLE_SECURITY)) {
                     //Check Disable Security is enabled in resource level
-                    boolean resourceLevelDisableSecurity = Boolean.parseBoolean(String.valueOf(resourceExtensions.get(APIConstants.X_WSO2_DISABLE_SECURITY)));
+                    boolean resourceLevelDisableSecurity = Boolean
+                            .parseBoolean(String.valueOf(resourceExtensions.get(APIConstants.X_WSO2_DISABLE_SECURITY)));
                     if (resourceLevelDisableSecurity) {
                         resourceExtensions.put(APIConstants.SWAGGER_X_AUTH_TYPE, "None");
                     }
@@ -1660,5 +1649,4 @@ public class OAS3Parser extends APIDefinition {
         }
         return Json.pretty(openAPI);
     }
-
 }
