@@ -160,27 +160,27 @@ function GeneralConfiguration(props) {
 
     // Get the certificates from backend.
     useEffect(() => {
-        API.getEndpointCertificates()
-            .then((resp) => {
-                const { certificates } = resp.obj;
-                const endpoints = endpointsToList(epConfig);
-                const aliases = [];
-                const filteredCertificates = certificates.filter((cert) => {
-                    aliases.push(cert.alias);
-                    for (const endpoint of endpoints) {
-                        if (endpoint && endpoint.url.indexOf(cert.endpoint) !== -1) {
-                            return true;
+        const endpointCertificatesList = [];
+        const aliases = [];
+
+        const endpoints = endpointsToList(epConfig);
+        for (const ep of endpoints) {
+            if (ep && ep.url) {
+                API.getEndpointCertificates(ep.url)
+                    .then((response) => {
+                        const { certificates } = response.obj;
+                        for (const cert of certificates) {
+                            endpointCertificatesList.push(cert);
+                            aliases.push(cert.alias);
                         }
-                    }
-                    return false;
-                });
-                setEndpointCertificates(filteredCertificates);
-                setAliasList(aliases);
-            })
-            .catch((err) => {
-                console.error(err);
-                setEndpointCertificates([]);
-            });
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            }
+        }
+        setEndpointCertificates(endpointCertificatesList);
+        setAliasList(aliases);
     }, []);
 
     return (
