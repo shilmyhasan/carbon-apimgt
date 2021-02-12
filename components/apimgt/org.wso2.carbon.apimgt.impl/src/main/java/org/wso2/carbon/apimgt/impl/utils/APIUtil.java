@@ -8140,6 +8140,7 @@ public final class APIUtil {
                     BandwidthLimit bandwidthLimit = (BandwidthLimit) limit;
                     tier.setRequestsPerMin(bandwidthLimit.getDataAmount());
                     tier.setRequestCount(bandwidthLimit.getDataAmount());
+                    tier.setBandwidthDataUnit(bandwidthLimit.getDataUnit());
                 }
                 if (PolicyConstants.POLICY_LEVEL_SUB.equalsIgnoreCase(policyLevel)) {
                     tier.setTierPlan(((SubscriptionPolicy) policy).getBillingPlan());
