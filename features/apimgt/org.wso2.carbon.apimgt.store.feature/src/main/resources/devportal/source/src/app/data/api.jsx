@@ -239,9 +239,9 @@ export default class API extends Resource {
      * @returns {promise} With given callback attached to the success chain else API invoke promise.
      * @deprecated Use Application.all method instead
      */
-    getAllApplications(callback = null) {
+    getAllApplications(callback = null, limit = 25) {
         const promiseGet = this.client.then((client) => {
-            return client.apis.Applications.get_applications({}, this._requestMetaData());
+            return client.apis.Applications.get_applications({limit}, this._requestMetaData());
         });
         if (callback) {
             return promiseGet.then(callback);
@@ -480,9 +480,13 @@ export default class API extends Resource {
         }
     }
 
-    generateApiKey(applicationId, keyType, validityPeriod) {
+    generateApiKey(applicationId, keyType, validityPeriod, restrictions) {
         const promiseGet = this.client.then((client) => {
-            const payload = { applicationId, keyType, body: { validityPeriod } };
+            const payload = { applicationId, keyType,
+                body: {
+                    validityPeriod: validityPeriod,
+                    additionalProperties: restrictions
+                } };
             return client.apis['API Keys'].post_applications__applicationId__api_keys__keyType__generate(
                 payload,
                 this._requestMetaData(),

@@ -2967,8 +2967,7 @@ public abstract class AbstractAPIManager implements APIManager {
                     APIProduct apiProduct;
                     if (apiArtifactId != null) {
                         GenericArtifact apiArtifact = apiArtifactManager.getGenericArtifact(apiArtifactId);
-                        if (apiArtifact.getAttribute(APIConstants.API_OVERVIEW_TYPE).
-                                equals(APIConstants.API_PRODUCT)) {
+                        if (APIConstants.API_PRODUCT.equals(apiArtifact.getAttribute(APIConstants.API_OVERVIEW_TYPE))) {
                             apiProduct = APIUtil.getAPIProduct(apiArtifact, registry);
                             apiProductSet.add(apiProduct);
                         } else {

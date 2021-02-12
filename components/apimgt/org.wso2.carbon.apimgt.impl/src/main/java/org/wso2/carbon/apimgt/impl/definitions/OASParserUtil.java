@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.swagger.annotations.Api;
 import io.swagger.models.Path;
 import io.swagger.models.RefModel;
 import io.swagger.models.RefPath;
@@ -409,7 +410,15 @@ public class OASParserUtil {
                         for (String refKey : refCategoryEntry.getValue()) {
                             Parameter parameter = parameters.get(refKey);
                             Content content = parameter.getContent();
-                            extractReferenceFromContent(content, context);
+                            if (content != null) {
+                                extractReferenceFromContent(content, context);
+                            } else {
+                                String ref = parameter.get$ref();
+                                if (ref != null) {
+                                    extractReferenceWithoutSchema(ref, context);
+                                }
+                            }
+
                         }
                     }
                 }
@@ -597,8 +606,15 @@ public class OASParserUtil {
         if (parameters != null) {
             for (Parameter parameter : parameters) {
                 Content content = parameter.getContent();
+                if (content != null) {
+                    extractReferenceFromContent(content, context);
+                } else {
+                    String ref = parameter.get$ref();
+                    if (ref != null) {
+                        extractReferenceWithoutSchema(ref, context);
+                    }
+                }
 
-                extractReferenceFromContent(content, context);
             }
         }
     }
@@ -610,6 +626,12 @@ public class OASParserUtil {
 
                 extractReferenceFromSchema(schema, context);
             }
+        }
+    }
+
+    private static void extractReferenceWithoutSchema(String reference, SwaggerUpdateContext context) {
+        if (reference != null) {
+            addToReferenceObjectMap(reference, context);
         }
     }
 
@@ -1384,7 +1406,7 @@ public class OASParserUtil {
      * This method returns extension of application security types related to micro-gw
      *
      * @param extensions Map<String, Object>
-     * @return String
+     * @return application security types as List<String>
      * @throws APIManagementException throws if an error occurred
      */
     public static List<String> getApplicationSecurityTypes(Map<String, Object> extensions) throws APIManagementException {
@@ -1393,9 +1415,43 @@ public class OASParserUtil {
         if (extensions.containsKey(APIConstants.X_WSO2_APP_SECURITY)) {
             Object applicationSecurityTypes = extensions.get(APIConstants.X_WSO2_APP_SECURITY);
             ObjectNode appSecurityTypesNode = mapper.convertValue(applicationSecurityTypes, ObjectNode.class);
-            appSecurityTypes = mapper.convertValue(appSecurityTypesNode.get("security-types"), ArrayList.class);
+            appSecurityTypes = mapper
+                    .convertValue(appSecurityTypesNode.get(APIConstants.WSO2_APP_SECURITY_TYPES), ArrayList.class);
         }
         return appSecurityTypes;
+    }
+
+    /**
+     * This method returns string of application security types related to micro-gw to add api after validation
+     *
+     * @param applicationSecurity List<String> of Application security types
+     * @param isOptional          Boolean value to check Application security is optional or not
+     * @param securityList        String of API security types
+     * @return application security types as String after validation
+     * @throws APIManagementException throws if an error occurred
+     */
+    public static String preprocessApplicationSecurityTypes(List<String> applicationSecurity, boolean isOptional,
+            String securityList) throws APIManagementException {
+
+        securityList = securityList == null ? "" : securityList;
+        for (String securityType : applicationSecurity) {
+            if (APIConstants.DEFAULT_API_SECURITY_OAUTH2.equals(securityType) && !securityList
+                    .contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
+                securityList = securityList + "," + APIConstants.DEFAULT_API_SECURITY_OAUTH2;
+            }
+            if (APIConstants.API_SECURITY_BASIC_AUTH.equals(securityType) && !securityList
+                    .contains(APIConstants.API_SECURITY_BASIC_AUTH)) {
+                securityList = securityList + "," + APIConstants.API_SECURITY_BASIC_AUTH;
+            }
+            if (APIConstants.API_SECURITY_API_KEY.equals(securityType) && !securityList
+                    .contains(APIConstants.API_SECURITY_API_KEY)) {
+                securityList = securityList + "," + APIConstants.API_SECURITY_API_KEY;
+            }
+        }
+        if (!(isOptional || securityList.contains(APIConstants.MANDATORY))) {
+            securityList = securityList + "," + APIConstants.MANDATORY;
+        }
+        return securityList;
     }
 
     /**
@@ -1430,5 +1486,4 @@ public class OASParserUtil {
         }
         return disableSecurity;
     }
-
 }

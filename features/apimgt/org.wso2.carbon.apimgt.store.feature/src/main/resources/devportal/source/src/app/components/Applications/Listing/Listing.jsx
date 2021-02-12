@@ -455,7 +455,8 @@ class Listing extends Component {
                                 <Grid item xs>
                                     <TextField
                                         fullWidth
-                                        aria-label="Search application by name"
+                                        id='search-label'
+                                        label='Search'
                                         placeholder="Search application by name"
                                         InputProps={{
                                             disableUnderline: true,
@@ -475,7 +476,7 @@ class Listing extends Component {
                                     </Tooltip>)}
                                 </Grid>
                                 <Grid item>
-                                    <Button variant="contained" className={classes.addUser} onClick={this.filterApps}>
+                                    <Button id='search-btn' variant="contained" className={classes.addUser} onClick={this.filterApps}>
                                         <FormattedMessage
                                             id='Applications.Listing.Listing.applications.search'
                                             defaultMessage='Search'

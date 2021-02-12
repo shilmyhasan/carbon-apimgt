@@ -186,7 +186,14 @@ public class DefaultKeyValidationHandler extends AbstractKeyValidationHandler {
         }
 
         String resourceList = validationContext.getMatchingResource();
-        List<String> resourceArray = new ArrayList<>(Arrays.asList(resourceList.split(",")));
+        List<String> resourceArray;
+        if ((validationContext.getHttpVerb().equalsIgnoreCase(APIConstants.GRAPHQL_QUERY))
+                || (validationContext.getHttpVerb().equalsIgnoreCase(APIConstants.GRAPHQL_MUTATION))
+                || (validationContext.getHttpVerb().equalsIgnoreCase(APIConstants.GRAPHQL_SUBSCRIPTION))) {
+            resourceArray = new ArrayList<>(Arrays.asList(resourceList.split(",")));
+        } else {
+            resourceArray = new ArrayList<>(Arrays.asList(resourceList));
+        }
         Set<OAuth2ScopeValidator> oAuth2ScopeValidators = new HashSet<> (OAuthServerConfiguration.getInstance().
                 getOAuth2ScopeValidators());
         //validate scope for filtered validators from db
