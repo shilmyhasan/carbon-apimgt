@@ -166,7 +166,9 @@ function GeneralConfiguration(props) {
         const endpoints = endpointsToList(epConfig);
         for (const ep of endpoints) {
             if (ep && ep.url) {
-                API.getEndpointCertificates(ep.url)
+                const params = {};
+                params.endpoint = ep.url;
+                API.getEndpointCertificates(params)
                     .then((response) => {
                         const { certificates } = response.obj;
                         for (const cert of certificates) {
