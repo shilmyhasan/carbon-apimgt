@@ -1817,20 +1817,6 @@ class API extends Resource {
     }
 
     /**
-     * Get endpoint certificates for the specified endpoint
-     *
-     * @param {string} endpoint The endpoint for which the certificate should be retrieved
-     */
-    /*static getEndpointCertificates(endpoint) {
-        const apiClient = new APIClientFactory().getAPIClient(Utils.getCurrentEnvironment()).client;
-        return apiClient.then(client => {
-            return client.apis['Endpoint Certificates'].get_endpoint_certificates({
-                endpoint
-            });
-        });
-    }*/
-
-    /**
      * Upload endpoint certificate.
      *
      * @param {any} certificateFile The certificate file to be uploaded.
