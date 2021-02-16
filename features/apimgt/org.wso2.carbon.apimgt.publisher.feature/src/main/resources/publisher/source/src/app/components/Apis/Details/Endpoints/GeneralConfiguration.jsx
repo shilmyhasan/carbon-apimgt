@@ -163,7 +163,17 @@ function GeneralConfiguration(props) {
         const endpointCertificatesList = [];
         const aliases = [];
 
-        const endpoints = endpointsToList(epConfig);
+        let endpoints = endpointsToList(epConfig);
+        const filteredEndpoints = [];
+        const epLookup = [];
+        for (const ep of endpoints) {
+            if (!epLookup.includes(ep.url)) {
+                filteredEndpoints.push(ep);
+                epLookup.push(ep.url);
+            }
+        }
+        endpoints = filteredEndpoints;
+
         for (const ep of endpoints) {
             if (ep && ep.url) {
                 const params = {};
