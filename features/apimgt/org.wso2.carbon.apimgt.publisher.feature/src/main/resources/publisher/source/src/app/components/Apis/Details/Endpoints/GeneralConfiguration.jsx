@@ -174,7 +174,6 @@ function GeneralConfiguration(props) {
         }
         endpoints = filteredEndpoints;
 
-        console.log(endpoints);
         for (const ep of endpoints) {
             if (ep && ep.url) {
                 const params = {};
