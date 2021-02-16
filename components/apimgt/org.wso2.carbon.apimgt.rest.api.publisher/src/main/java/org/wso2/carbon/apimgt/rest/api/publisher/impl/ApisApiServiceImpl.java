@@ -926,8 +926,16 @@ public class ApisApiServiceImpl extends ApisApiService {
                 Map.Entry resource = (Map.Entry)it.next();
                 String key = (String) resource.getKey();
                 JSONObject resourceDefinition = (JSONObject) resource.getValue();
-                if (key.endsWith("/")) {
-                    clonePathMap.put(key.substring(0, key.length()-1), resourceDefinition);
+
+                if (key.length() > 1 && key.endsWith("/")) {
+                    key = key.substring(0, key.length() - 1);
+                }
+
+                if (clonePathMap.containsKey(key)) {
+                    //In case the resource path already exists in map, update the resource definition with the new verb
+                    JSONObject updatedDefinition = clonePathMap.get(key);
+                    updatedDefinition.putAll(resourceDefinition);
+                    clonePathMap.put(key, updatedDefinition);
                 } else {
                     clonePathMap.put(key, resourceDefinition);
                 }
@@ -941,7 +949,6 @@ public class ApisApiServiceImpl extends ApisApiService {
         }
         return null;
     }
-
 
     /**
      * This method is used to assign micro gateway labels to the DTO
