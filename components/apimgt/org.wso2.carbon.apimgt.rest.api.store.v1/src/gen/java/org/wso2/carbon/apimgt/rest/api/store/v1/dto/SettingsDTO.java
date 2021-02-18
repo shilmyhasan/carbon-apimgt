@@ -24,6 +24,7 @@ public class SettingsDTO   {
     private String apiGatewayEndpoint = null;
     private Boolean enableEmailUsername = false;
     private String appAccessTokenValidity = "3600";
+    private Boolean isAnonymousModeEnabled = true;
 
   /**
    **/
@@ -144,6 +145,23 @@ public class SettingsDTO   {
     this.appAccessTokenValidity = appAccessTokenValidity;
   }
 
+  /**
+   **/
+  public SettingsDTO isAnonymousModeEnabled(Boolean isAnonymousModeEnabled) {
+    this.isAnonymousModeEnabled = isAnonymousModeEnabled;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("IsAnonymousModeEnabled")
+  public Boolean isIsAnonymousModeEnabled() {
+    return isAnonymousModeEnabled;
+  }
+  public void setIsAnonymousModeEnabled(Boolean isAnonymousModeEnabled) {
+    this.isAnonymousModeEnabled = isAnonymousModeEnabled;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -160,12 +178,13 @@ public class SettingsDTO   {
         Objects.equals(mapExistingAuthApps, settings.mapExistingAuthApps) &&
         Objects.equals(apiGatewayEndpoint, settings.apiGatewayEndpoint) &&
         Objects.equals(enableEmailUsername, settings.enableEmailUsername) &&
-        Objects.equals(appAccessTokenValidity, settings.appAccessTokenValidity);
+        Objects.equals(appAccessTokenValidity, settings.appAccessTokenValidity) &&
+        Objects.equals(isAnonymousModeEnabled, settings.isAnonymousModeEnabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, enableEmailUsername, appAccessTokenValidity);
+    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, enableEmailUsername, appAccessTokenValidity, isAnonymousModeEnabled);
   }
 
   @Override
@@ -180,6 +199,7 @@ public class SettingsDTO   {
     sb.append("    apiGatewayEndpoint: ").append(toIndentedString(apiGatewayEndpoint)).append("\n");
     sb.append("    enableEmailUsername: ").append(toIndentedString(enableEmailUsername)).append("\n");
     sb.append("    appAccessTokenValidity: ").append(toIndentedString(appAccessTokenValidity)).append("\n");
+    sb.append("    isAnonymousModeEnabled: ").append(toIndentedString(isAnonymousModeEnabled)).append("\n");
     sb.append("}");
     return sb.toString();
   }
