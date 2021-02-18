@@ -113,6 +113,7 @@ public final class APIConstants {
     public static final String API_TENANT_CONF_DEFAULT_ROLES_CREATOR_ROLE = "CreatorRole";
     public static final String API_TENANT_CONF_DEFAULT_ROLES_SUBSCRIBER_ROLE = "SubscriberRole";
     public static final String ANALYTICS_ROLE = "Internal/analytics";
+    public static final String API_TENANT_CONF_ENABLE_ANONYMOUS_MODE = "EnableAnonymous";
 
     public static final String API_TENANT_CONF_IS_UNLIMITED_TIER_PAID = "IsUnlimitedTierPaid";
 
@@ -469,6 +470,7 @@ public final class APIConstants {
     public static final String DEFAULT_ORGANIZATION_CLAIM_NAME = "http://wso2.org/claims/organization";
     public static final String DEFAULT_TOKEN_TYPE = "DEFAULT";
     public static final String TOKEN_TYPE_JWT = "JWT";
+    public static final String ACCOUNT_LOCKED_CLAIM = "http://wso2.org/claims/identity/accountLocked";
 
     public static final String PASSWORD_RESOLVER_IMPL_CLASS = "PasswordResolverImpl";
 
@@ -639,6 +641,7 @@ public final class APIConstants {
     public static final String API_STORE_API_KEY_GENERATOR_IMPL = API_STORE + "ApiKeyGeneratorImpl";
     public static final String API_STORE_API_KEY_SIGN_KEY_STORE = API_STORE + "APIKeyKeystore";
     public static final String WSO2_ANONYMOUS_USER = "wso2.anonymous.user";
+    public static final String API_DEVPORTAL_ANONYMOUS_MODE = API_STORE + "EnableAnonymousMode";
 
     public static final String API_PUBLISHER = "APIPublisher.";
     public static final String SHOW_API_PUBLISHER_URL_FROM_STORE = API_PUBLISHER + "DisplayURL";
@@ -1207,8 +1210,8 @@ public final class APIConstants {
     public static final String SWAGGER_IS_MISSING_MSG = "swagger is missing";
     public static final String OPENAPI_IS_MISSING_MSG = "openapi is missing";
     public static final String SWAGGER_X_SCOPES_BINDINGS = "x-scopes-bindings";
-    public static final String SWAGGER_X_SCOPES_NAME= "display-name";
-    public static final String SWAGGER_X_SCOPES_MAPPINGS= "x-scopes-mappings";
+    public static final String SWAGGER_X_SCOPES_NAME = "display-name";
+    public static final String SWAGGER_X_SCOPES_MAPPINGS = "x-scopes-mappings";
 
     //swagger v1.2 constants
     public static final String SWAGGER_RESOURCES = "resources";
@@ -1677,6 +1680,7 @@ public final class APIConstants {
 
     public static final String APPLICATION_GZIP = "application/gzip";
     public static final String APPLICATION_ZIP = "application/zip";
+    public static final String APPLICATION_X_ZIP_COMPRESSED = "application/x-zip-compressed";
     public static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
     public static final String JSON_FILENAME_EXTENSION = ".json";
     public static final String JSON_GZIP_FILENAME_EXTENSION = ".json.gz";

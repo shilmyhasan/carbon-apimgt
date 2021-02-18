@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityUtils;
 import org.wso2.carbon.apimgt.gateway.handlers.security.keys.APIKeyValidatorClientPool;
+import org.wso2.carbon.apimgt.gateway.listeners.ServerStartupListener;
 import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTMapCleaner;
 import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTTokensRetriever;
 import org.wso2.carbon.apimgt.gateway.service.APIThrottleDataService;
@@ -46,6 +47,7 @@ import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.tracing.TracingService;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.base.api.ServerConfigurationService;
+import org.wso2.carbon.core.ServerStartupObserver;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -85,6 +87,7 @@ public class APIHandlerServiceComponent {
                 // Register Tenant service creator to deploy tenant specific common synapse configurations
                 TenantServiceCreator listener = new TenantServiceCreator();
                 bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
+                bundleContext.registerService(ServerStartupObserver.class.getName(), new ServerStartupListener(), null);
                 if (configuration.getThrottleProperties().isEnabled()) {
                     ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
                     APIThrottleDataServiceImpl throttleDataServiceImpl = new APIThrottleDataServiceImpl();

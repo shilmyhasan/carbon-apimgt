@@ -127,6 +127,7 @@ import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import javax.cache.Cache;
 import javax.cache.Caching;
 import javax.wsdl.Definition;
 import java.io.File;

@@ -293,7 +293,7 @@ public class DataProcessAndPublishingAgentTest {
     }
 
     @Test
-    public void testIgnoreClientPortFromXForwardedForHeader() throws Exception{
+    public void testIgnoreClientPortFromXForwardedForHeader() throws Exception {
         ThrottleProperties throttleProperties = new ThrottleProperties();
         throttleProperties.setEnabled(true);
         DataProcessAndPublishingAgent dataProcessAndPublishingAgent = new DataProcessAndPublishingAgentWrapper

@@ -1010,6 +1010,10 @@ public class APIProviderHostObject extends ScriptableObject {
                             + APIConstants.WSDL_ARCHIVES_TEMP_FOLDER + File.separator + UUID.randomUUID().toString();
                     String wsdlFilePath = path + File.separator + APIConstants.WSDL_FILE
                             + APIConstants.WSDL_FILE_EXTENSION;
+                    // Append an additional '/' if not found before the prefix
+                    if (!wsdlFilePath.startsWith("/")) {
+                        wsdlFilePath = "/" + wsdlFilePath;
+                    }
                     APIFileUtil.extractSingleWSDLFile(wsdlFile.getInputStream(), path, wsdlFilePath);
                     api.setWsdlUrl(APIConstants.FILE_URI_PREFIX + wsdlFilePath);
                 } else {

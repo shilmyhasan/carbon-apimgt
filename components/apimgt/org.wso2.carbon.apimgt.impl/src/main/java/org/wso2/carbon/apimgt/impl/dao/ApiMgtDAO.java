@@ -144,7 +144,6 @@ import java.util.regex.Pattern;
 public class ApiMgtDAO {
     private static final Log log = LogFactory.getLog(ApiMgtDAO.class);
     private static ApiMgtDAO INSTANCE = null;
-    private static final String STRING_SEPARATOR = "\\s";
 
     private boolean forceCaseInsensitiveComparisons = false;
     private boolean multiGroupAppSharingEnabled = false;
@@ -289,18 +288,17 @@ public class ApiMgtDAO {
         OAuthAdminService oAuthAdminService = new OAuthAdminService();
         List<String> allowedGrantTypes = Arrays.asList(oAuthAdminService.getAllowedGrantTypes());
         List<String> validGrantTypes = new ArrayList<>();
-        String[] requestGrants = requestedGrantTypes.split(STRING_SEPARATOR);
+        String[] requestGrants = requestedGrantTypes.split("\\s");
 
         for (String requestedGrant : requestGrants) {
             if (StringUtils.isBlank(requestedGrant)) {
                 continue;
             }
-
             if (allowedGrantTypes.contains(requestedGrant)) {
                 validGrantTypes.add(requestedGrant);
             }
         }
-        return String.join(" ", validGrantTypes);
+        return String.join(" ",validGrantTypes);
     }
 
     public OAuthApplicationInfo getOAuthApplication(String consumerKey) throws APIManagementException {

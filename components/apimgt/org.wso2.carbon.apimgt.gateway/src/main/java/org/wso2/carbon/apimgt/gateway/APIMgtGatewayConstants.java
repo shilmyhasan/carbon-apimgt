@@ -32,6 +32,7 @@ public class APIMgtGatewayConstants {
     public static final String HTTP_METHOD = "api.ut.HTTP_METHOD";
     public static final String HOST_NAME = "api.ut.hostName";
     public static final String API_PUBLISHER = "api.ut.apiPublisher";
+    public static final String API_NAME = "API_NAME";
     public static final String OPEN_API_OBJECT = "OPEN_API_OBJECT";
     public static final String OPEN_API_STRING = "OPEN_API_STRING";
     public static final String APPLICATION_NAME = "api.ut.application.name";

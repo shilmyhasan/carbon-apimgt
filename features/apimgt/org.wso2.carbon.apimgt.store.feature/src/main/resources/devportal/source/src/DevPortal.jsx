@@ -59,6 +59,7 @@ class DevPortal extends React.Component {
             settings: null,
             tenantDomain: null,
             theme: null,
+            isNonAnonymous: false,
         };
         this.setTenantTheme = this.setTenantTheme.bind(this);
         this.setSettings = this.setSettings.bind(this);
@@ -73,6 +74,9 @@ class DevPortal extends React.Component {
         promisedSettings
             .then((response) => {
                 this.setSettings(response.body);
+                if (!this.state.settings.IsAnonymousModeEnabled) {
+                    this.setState({ isNonAnonymous: true });
+                }
             }).catch((error) => {
                 console.error(
                     'Error while receiving settings : ',

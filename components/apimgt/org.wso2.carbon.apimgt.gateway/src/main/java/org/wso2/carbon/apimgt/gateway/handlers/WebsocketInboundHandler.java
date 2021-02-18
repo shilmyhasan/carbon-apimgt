@@ -17,13 +17,19 @@
  */
 package org.wso2.carbon.apimgt.gateway.handlers;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -76,13 +82,15 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
 	private String token;
 
 	public WebsocketInboundHandler() {
-        if (throttleDataPublisher == null) {
-            // The publisher initializes in the first request only
-            synchronized (this) {
-                throttleDataPublisher = new ThrottleDataPublisher();
-            }
-        }
         initializeDataPublisher();
+    }
+
+    /**
+     * This method will initialize data publisher and this data publisher will be used to push events to central policy
+     * server.
+     */
+    public static void initThrottleDataPublisher() {
+        throttleDataPublisher = new ThrottleDataPublisher();
     }
 
     private void initializeDataPublisher() {
@@ -188,7 +196,12 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                 gaUtils.publishGATrackingData(gaData, req.headers().get(HttpHeaders.USER_AGENT),
                         headers.get(HttpHeaders.AUTHORIZATION));
             } else {
-                ctx.writeAndFlush(new TextWebSocketFrame(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS_MESSAGE));
+                String errorMessage = APISecurityConstants.API_AUTH_INVALID_CREDENTIALS_MESSAGE;
+                FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                        HttpResponseStatus.UNAUTHORIZED, Unpooled.copiedBuffer(errorMessage, CharsetUtil.UTF_8));
+                httpResponse.headers().set("content-type", "text/plain; charset=UTF-8");
+                httpResponse.headers().set("content-length", httpResponse.content().readableBytes());
+                ctx.writeAndFlush(httpResponse);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         APISecurityConstants.API_AUTH_INVALID_CREDENTIALS_MESSAGE);
             }
@@ -413,6 +426,11 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                     new org.wso2.carbon.databridge.commons.Event(
                             "org.wso2.throttle.request.stream:1.0.0", System.currentTimeMillis(), null,
                             null, objects);
+            if (throttleDataPublisher == null) {
+                log.error("Cannot publish events to traffic manager because ThrottleDataPublisher " +
+                        "has not been initialised");
+                return true;
+            }
             throttleDataPublisher.getDataPublisher().tryPublish(event);
         }
         return true;
