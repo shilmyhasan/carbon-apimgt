@@ -57,6 +57,7 @@ public enum PolicyLevelEnum {
     private String displayName = null;
     private Map<String, String> attributes = new HashMap<>();
     private Long requestCount = null;
+    private String dataUnit = null;
     private Long unitTime = null;
     private String timeUnit = null;
     private Integer rateLimitCount = null;
@@ -239,6 +240,24 @@ public enum TierPlanEnum {
   }
 
   /**
+   * Unit of data allowed to be transfered. Allowed values are \&quot;KB\&quot;, \&quot;MB\&quot; and \&quot;GB\&quot; 
+   **/
+  public ThrottlingPolicyDTO dataUnit(String dataUnit) {
+    this.dataUnit = dataUnit;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "KB", value = "Unit of data allowed to be transfered. Allowed values are \"KB\", \"MB\" and \"GB\" ")
+  @JsonProperty("dataUnit")
+  public String getDataUnit() {
+    return dataUnit;
+  }
+  public void setDataUnit(String dataUnit) {
+    this.dataUnit = dataUnit;
+  }
+
+  /**
    **/
   public ThrottlingPolicyDTO unitTime(Long unitTime) {
     this.unitTime = unitTime;
@@ -399,6 +418,7 @@ public enum TierPlanEnum {
         Objects.equals(displayName, throttlingPolicy.displayName) &&
         Objects.equals(attributes, throttlingPolicy.attributes) &&
         Objects.equals(requestCount, throttlingPolicy.requestCount) &&
+        Objects.equals(dataUnit, throttlingPolicy.dataUnit) &&
         Objects.equals(unitTime, throttlingPolicy.unitTime) &&
         Objects.equals(timeUnit, throttlingPolicy.timeUnit) &&
         Objects.equals(rateLimitCount, throttlingPolicy.rateLimitCount) &&
@@ -411,7 +431,7 @@ public enum TierPlanEnum {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, description, policyLevel, displayName, attributes, requestCount, unitTime, timeUnit, rateLimitCount, rateLimitTimeUnit, quotaPolicyType, tierPlan, stopOnQuotaReach, monetizationProperties);
+    return Objects.hash(name, description, policyLevel, displayName, attributes, requestCount, dataUnit, unitTime, timeUnit, rateLimitCount, rateLimitTimeUnit, quotaPolicyType, tierPlan, stopOnQuotaReach, monetizationProperties);
   }
 
   @Override
@@ -425,6 +445,7 @@ public enum TierPlanEnum {
     sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
     sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
     sb.append("    requestCount: ").append(toIndentedString(requestCount)).append("\n");
+    sb.append("    dataUnit: ").append(toIndentedString(dataUnit)).append("\n");
     sb.append("    unitTime: ").append(toIndentedString(unitTime)).append("\n");
     sb.append("    timeUnit: ").append(toIndentedString(timeUnit)).append("\n");
     sb.append("    rateLimitCount: ").append(toIndentedString(rateLimitCount)).append("\n");
