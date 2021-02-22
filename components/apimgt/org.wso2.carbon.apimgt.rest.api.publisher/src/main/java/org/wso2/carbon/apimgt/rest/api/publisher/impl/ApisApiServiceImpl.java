@@ -206,6 +206,9 @@ public class ApisApiServiceImpl extends ApisApiService {
     public Response apisPost(APIDetailedDTO body, String contentType){
         URI createdApiUri;
         APIDetailedDTO createdApiDTO;
+        String context = body.getContext();
+        // Make sure context starts with "/". ex: /pizzaProduct
+        context = context.startsWith("/") ? context : ("/" + context);
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String username = RestApiUtil.getLoggedInUsername();
@@ -289,10 +292,10 @@ public class ApisApiServiceImpl extends ApisApiService {
                 for (String version : apiVersions) {
                     if (version.equalsIgnoreCase(body.getVersion())) {
                         //If version already exists
-                        if (apiProvider.isDuplicateContextTemplate(body.getContext())) {
+                        if (apiProvider.isDuplicateContextTemplate(context)) {
                             RestApiUtil.handleResourceAlreadyExistsError("Error occurred while " +
                                     "adding the API. A duplicate API already exists for "
-                                    + body.getName() + "-" + body.getVersion(), log);
+                                    + context, log);
                         } else {
                             RestApiUtil.handleBadRequest("Error occurred while adding API. API with name " +
                                     body.getName() + " already exists with different " +
@@ -302,9 +305,9 @@ public class ApisApiServiceImpl extends ApisApiService {
                 }
             } else {
                 //If no any previous version exists
-                if (apiProvider.isDuplicateContextTemplate(body.getContext())) {
+                if (apiProvider.isDuplicateContextTemplate(context)) {
                     RestApiUtil.handleBadRequest("Error occurred while adding the API. A duplicate API context " +
-                                    "already exists for " + body.getContext(), log);
+                                    "already exists for " + context, log);
                 }
             }
 

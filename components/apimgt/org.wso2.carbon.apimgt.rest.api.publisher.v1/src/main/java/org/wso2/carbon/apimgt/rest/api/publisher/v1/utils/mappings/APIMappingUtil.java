@@ -1862,7 +1862,7 @@ public class APIMappingUtil {
         }
     }
 
-    public static APIProduct fromDTOtoAPIProduct(APIProductDTO dto, String provider)
+    public static APIProduct fromDTOtoAPIProduct(APIProductDTO dto, String provider, APIProvider apiProvider)
             throws APIManagementException {
         APIProduct product = new APIProduct();
         APIProductIdentifier id = new APIProductIdentifier(APIUtil.replaceEmailDomain(provider), dto.getName(), APIConstants.API_PRODUCT_VERSION); //todo: replace this with dto.getVersion
