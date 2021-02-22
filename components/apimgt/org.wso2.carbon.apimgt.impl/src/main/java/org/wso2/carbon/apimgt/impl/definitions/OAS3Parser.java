@@ -18,9 +18,7 @@
  */
 
 package org.wso2.carbon.apimgt.impl.definitions;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.oas.inflector.examples.ExampleBuilder;
 import io.swagger.oas.inflector.examples.XmlExampleSerializer;
 import io.swagger.oas.inflector.examples.models.Example;
@@ -1317,13 +1315,33 @@ public class OAS3Parser extends APIDefinition {
      */
     @Override
     public String processOtherSchemeScopes(String swaggerContent) throws APIManagementException {
+        OpenAPI openAPI = getOpenAPI(swaggerContent);
         if (!isDefaultGiven(swaggerContent)) {
-            OpenAPI openAPI = getOpenAPI(swaggerContent);
             openAPI = injectOtherScopesToDefaultScheme(openAPI);
             openAPI = injectOtherResourceScopesToDefaultScheme(openAPI);
-            return Json.pretty(openAPI);
+        } else {
+            Components components = openAPI.getComponents();
+            if (components != null) {
+                Map<String, SecurityScheme> securitySchemes = components.getSecuritySchemes();
+                if (securitySchemes != null) {
+                    SecurityScheme defaultSecurityScheme = openAPI.getComponents().getSecuritySchemes()
+                            .get(OPENAPI_SECURITY_SCHEMA_KEY);
+                    if (defaultSecurityScheme != null) {
+                        OAuthFlow oAuthFlow = defaultSecurityScheme.getFlows().getImplicit();
+                        String authUrl = oAuthFlow.getAuthorizationUrl();
+                        if (StringUtils.isBlank(authUrl)) {
+                            oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
+                        }
+                        Scopes scopes = oAuthFlow.getScopes();
+                        if (scopes == null) {
+                            Scopes newScopes = new Scopes();
+                            oAuthFlow.setScopes(newScopes);
+                        }
+                    }
+                }
+            }
         }
-        return swaggerContent;
+        return Json.pretty(openAPI);
     }
 
     /**
