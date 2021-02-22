@@ -505,7 +505,8 @@ class ApiTableView extends React.Component {
                     if (artifact.type === 'DOC') {
                         return <DocThumb doc={artifact} />;
                     } else {
-                        return <ApiThumb api={artifact} />;
+                        return <tr key={rowIndex}><td><ApiThumb api={artifact} customHeight={theme.custom.thumbnail.height}
+                                                                customWidth={theme.custom.thumbnail.width} /></td></tr>;
                     }
                 }
                 return <span />;

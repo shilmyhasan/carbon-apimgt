@@ -37,7 +37,7 @@ import ThumbnailView from './ThumbnailView';
 const styles = theme => ({
     card: {
         margin: theme.spacing.unit * (3 / 2),
-        maxWidth: theme.spacing.unit * 32,
+        maxWidth: theme.custom.thumbnail.width,
         transition: 'box-shadow 0.3s ease-in-out',
     },
     providerText: {
@@ -210,7 +210,9 @@ class APIThumb extends Component {
      * @memberof APIThumb
      */
     render() {
-        const { classes, api, isAPIProduct } = this.props;
+        const {
+            classes, api, isAPIProduct, theme,
+        } = this.props;
         const { isHover, loading } = this.state;
         let overviewPath = '';
         if (api.apiType) {
@@ -237,7 +239,14 @@ class APIThumb extends Component {
                 raised={isHover}
                 className={classes.card}
             >
-                <CardMedia src='None' component={ThumbnailView} height={140} title='Thumbnail' api={api} />
+                <CardMedia
+                    src='None'
+                    component={ThumbnailView}
+                    height={theme.custom.thumbnail.height}
+                    width={theme.custom.thumbnail.width}
+                    title='Thumbnail'
+                    api={api}
+                />
                 <CardContent className={classes.apiDetails}>
                     <div className={classes.textWrapper}>
                         <Link to={overviewPath}>
@@ -312,6 +321,7 @@ APIThumb.propTypes = {
     }).isRequired,
     updateData: PropTypes.func.isRequired,
     isAPIProduct: PropTypes.bool.isRequired,
+    theme: PropTypes.shape({}).isRequired,
 };
 
-export default injectIntl(withStyles(styles)(APIThumb));
+export default injectIntl(withStyles(styles, { withTheme: true })(APIThumb));
