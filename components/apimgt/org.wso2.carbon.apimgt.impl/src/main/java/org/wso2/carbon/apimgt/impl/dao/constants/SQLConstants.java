@@ -2701,7 +2701,7 @@ public class SQLConstants {
     public static final String GET_ACTIVE_TOKENS_OF_USER_SUFFIX =
             "   IOAT" +
             " WHERE" +
-            "   LOWER(IOAT.AUTHZ_USER) = ?" +
+            "   IOAT.AUTHZ_USER = ?" +
             "   AND IOAT.TENANT_ID = ?" +
             "   AND IOAT.TOKEN_STATE = 'ACTIVE'" +
             "   AND LOWER(IOAT.USER_DOMAIN) = ?";
