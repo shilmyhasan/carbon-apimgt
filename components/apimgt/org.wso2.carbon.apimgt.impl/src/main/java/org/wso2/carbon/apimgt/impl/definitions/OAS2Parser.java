@@ -577,6 +577,8 @@ public class OAS2Parser extends APIDefinition {
             }
             oAuth2Definition.setVendorExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
             oAuth2Definition.setVendorExtension(APIConstants.SWAGGER_X_SCOPES_MAPPINGS, scopeMappings);
+        } else {
+            oAuth2Definition.addScope(null, null);
         }
         swagger.addSecurityDefinition(APIConstants.SWAGGER_APIM_DEFAULT_SECURITY, oAuth2Definition);
         if (swagger.getSecurity() == null) {
