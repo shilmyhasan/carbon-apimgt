@@ -281,7 +281,7 @@ class ApiTableView extends React.Component {
      * @memberof ApiTableView
      */
     render() {
-        const { intl, gridView } = this.props;
+        const {intl, gridView, theme} = this.props;
         const { loading } = this.state;
         const columns = [
             {
