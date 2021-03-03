@@ -32,6 +32,7 @@ import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -350,22 +352,28 @@ public class FileBasedApplicationImportExportManager extends ApplicationImportEx
      * @param archiveFilePath path of the zip archive
      * @param destination     extract location
      * @return name of the extracted zip archive
-     * @throws IOException if an error occurs while extracting the archive
+     * @throws APIManagementException if an error occurs while extracting the archive
      */
-    private String extractArchive(String archiveFilePath, String destination)
-            throws IOException, APIManagementException {
+    public static String extractArchive(String archiveFilePath, String destination)
+            throws APIManagementException {
+        int bufferSize = 512;
+        long sizeLimit = 0x6400000; // Max size of unzipped data, 100MB
+        int maxEntryCount = 1024;
         String archiveName = null;
 
-        try (ZipFile zip = new ZipFile(new File(archiveFilePath))) {
-            Enumeration zipFileEntries = zip.entries();
-            int index = 0;
+        try {
+            FileInputStream fis = new FileInputStream(archiveFilePath);
+            ZipInputStream zis = new ZipInputStream(new BufferedInputStream(fis));
+            ZipEntry entry;
+            int entries = 0;
+            long total = 0;
+
             // Process each entry
-            while (zipFileEntries.hasMoreElements()) {
-                // grab a zip file entry
-                ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
+            while ((entry = zis.getNextEntry()) != null) {
                 String currentEntry = entry.getName();
+                int index = 0;
                 //This index variable is used to get the extracted folder name; that is root directory
-                if (index == 0) {
+                if (index == 0 && currentEntry.indexOf('/') != -1) {
                     archiveName = currentEntry.substring(0, currentEntry.indexOf('/'));
                     --index;
                 }
@@ -378,20 +386,40 @@ public class FileBasedApplicationImportExportManager extends ApplicationImportEx
                     log.error(errorMessage);
                     throw new APIManagementException(errorMessage);
                 }
+                if (entry.isDirectory()) {
+                    log.debug("Creating directory " + destinationFile.getAbsolutePath());
+                    destinationFile.mkdir();
+                    continue;
+                }
                 // create the parent directory structure
                 if (destinationParent.mkdirs()) {
                     log.debug("Creation of folder is successful. Directory Name : " + destinationParent.getName());
                 }
-                if (!entry.isDirectory()) {
-                    try (InputStream zipInputStream = zip.getInputStream(entry);
-                         BufferedInputStream inputStream = new BufferedInputStream(zipInputStream);
-                         // write the current file to the destination
-                         FileOutputStream outputStream = new FileOutputStream(destinationFile)) {
-                        IOUtils.copy(inputStream, outputStream);
-                    }
+
+                int count;
+                byte[] data = new byte[bufferSize];
+                FileOutputStream fos = new FileOutputStream(destinationFile);
+                BufferedOutputStream dest = new BufferedOutputStream(fos, bufferSize);
+                while (total + bufferSize <= sizeLimit && (count = zis.read(data, 0, bufferSize)) != -1) {
+                    dest.write(data, 0, count);
+                    total += count;
+                }
+                dest.flush();
+                dest.close();
+                zis.closeEntry();
+                entries++;
+                if (entries > maxEntryCount) {
+                    throw new APIManagementException("Too many files to unzip.");
+                }
+                if (total + bufferSize > sizeLimit) {
+                    throw new APIManagementException("File being unzipped is too big.");
                 }
             }
             return archiveName;
+        } catch (IOException e) {
+            String errorMsg = "Failed to extract archive file: " + archiveFilePath + " to destination: " + destination;
+            log.error(errorMsg, e);
+            throw new APIManagementException(errorMsg, e);
         }
     }
 }
