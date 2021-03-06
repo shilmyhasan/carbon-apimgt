@@ -38,8 +38,10 @@ import org.wso2.carbon.user.core.util.UserCoreUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class represents the functions related to an scope issuer which
@@ -207,11 +209,13 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
         for (Iterator<Map.Entry<ClaimMapping, String>> iterator = userAttributes.entrySet().iterator(); iterator
                 .hasNext(); ) {
             Map.Entry<ClaimMapping, String> entry = iterator.next();
-            if (roleClaim.equals(entry.getKey().getLocalClaim().getClaimUri()) && StringUtils
-                    .isNotBlank(entry.getValue())) {
-                return entry.getValue().replace("\\/", "/").
-                        replace("[", "").replace("]", "").
-                        replace("\"", "").split(FrameworkUtils.getMultiAttributeSeparator());
+            if (entry.getKey().getLocalClaim() != null) {
+                if (roleClaim.equals(entry.getKey().getLocalClaim().getClaimUri()) && StringUtils
+                        .isNotBlank(entry.getValue())) {
+                    return entry.getValue().replace("\\/", "/").
+                            replace("[", "").replace("]", "").
+                            replace("\"", "").split(FrameworkUtils.getMultiAttributeSeparator());
+                }
             }
         }
         return null;
@@ -229,6 +233,10 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
         String username = authenticatedUser.getUserName();
         String userStoreDomain = authenticatedUser.getUserStoreDomain();
         RealmService realmService = getRealmService();
+
+        Map<ClaimMapping, String> userAttributes = authenticatedUser.getUserAttributes();
+        String[] fedUserRoles = getRolesFromUserAttribute(userAttributes, ResourceConstants.ROLE_ATTRIBUTE_NAME);
+
         try {
             int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
             // If tenant Id is not set in the tokenReqContext, deriving it from username.
@@ -237,7 +245,18 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             }
             UserStoreManager userStoreManager = realmService.getTenantUserRealm(tenantId).getUserStoreManager();
             String endUsernameWithDomain = addDomainToName(username, userStoreDomain);
-            userRoles = userStoreManager.getRoleListOfUser(endUsernameWithDomain);
+            String[] tempUserRoles = userStoreManager.getRoleListOfUser(endUsernameWithDomain);
+
+            if (fedUserRoles != null && tempUserRoles != null) {
+                Set<String> Rolelist = new LinkedHashSet<String>();
+                Rolelist.addAll(Arrays.asList(fedUserRoles));
+                Rolelist.addAll(Arrays.asList(tempUserRoles));
+                userRoles = Rolelist.toArray(new String[Rolelist.size()]);
+            } else if (fedUserRoles != null) {
+                userRoles = fedUserRoles;
+            } else if (tempUserRoles != null) {
+                userRoles = tempUserRoles;
+            }
 
         } catch (UserStoreException e) {
             //Log and return since we do not want to stop issuing the token in case of scope validation failures.
