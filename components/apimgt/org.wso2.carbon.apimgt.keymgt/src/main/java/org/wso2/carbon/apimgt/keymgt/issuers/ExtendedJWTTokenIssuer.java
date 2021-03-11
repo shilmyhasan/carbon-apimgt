@@ -43,6 +43,7 @@ public class ExtendedJWTTokenIssuer extends JWTTokenIssuer {
      * @return lifetime in milli seconds
      * @throws IdentityOAuth2Exception
      */
+    @Override
     public long getAccessTokenLifeTimeInMillis(OAuthTokenReqMessageContext tokenReqMessageContext,
             OAuthAppDO oAuthAppDO, String consumerKey) throws IdentityOAuth2Exception {
         long lifetimeInMillis;
