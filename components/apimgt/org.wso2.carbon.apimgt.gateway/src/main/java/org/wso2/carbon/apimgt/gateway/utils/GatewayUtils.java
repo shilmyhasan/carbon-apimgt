@@ -491,7 +491,7 @@ public class GatewayUtils {
         if (apiKeyValidationInfoDTO != null) {
             authContext.setApiTier(apiKeyValidationInfoDTO.getApiTier());
             authContext.setKeyType(apiKeyValidationInfoDTO.getType());
-            authContext.setUsername(apiKeyValidationInfoDTO.getEndUserName());
+            authContext.setUsername(payload.getSubject());
             authContext.setApplicationId(apiKeyValidationInfoDTO.getApplicationId());
             authContext.setApplicationName(apiKeyValidationInfoDTO.getApplicationName());
             authContext.setApplicationTier(apiKeyValidationInfoDTO.getApplicationTier());
