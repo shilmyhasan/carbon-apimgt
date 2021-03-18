@@ -77,17 +77,15 @@ public class SequenceUtils {
             }
             if (!registry.resourceExists(resourcePath)) {
                 regResource = registry.newResource();
-            } else {
-                regResource = registry.get(resourcePath);
+                regResource.setContent(sequence);
+                regResource.addProperty(SOAPToRESTConstants.METHOD, method);
+                if (regResource.getProperty(SOAPToRESTConstants.Template.RESOURCE_PATH) != null) {
+                    regResource.removeProperty(SOAPToRESTConstants.Template.RESOURCE_PATH);
+                }
+                regResource.addProperty(SOAPToRESTConstants.Template.RESOURCE_PATH, apiResourceName);
+                regResource.setMediaType("text/xml");
+                registry.put(resourcePath, regResource);
             }
-            regResource.setContent(sequence);
-            regResource.addProperty(SOAPToRESTConstants.METHOD, method);
-            if (regResource.getProperty(SOAPToRESTConstants.Template.RESOURCE_PATH) != null) {
-                regResource.removeProperty(SOAPToRESTConstants.Template.RESOURCE_PATH);
-            }
-            regResource.addProperty(SOAPToRESTConstants.Template.RESOURCE_PATH, apiResourceName);
-            regResource.setMediaType("text/xml");
-            registry.put(resourcePath, regResource);
         } catch (RegistryException e) {
             handleException("Error occurred while accessing the registry to save api sequence", e);
         } catch (org.wso2.carbon.registry.api.RegistryException e) {
