@@ -2880,7 +2880,9 @@ public class ApisApiServiceImpl implements ApisApiService {
         APIDefinition oasParser = response.getParser();
         String apiDefinition = response.getJsonContent();
         apiDefinition = OASParserUtil.preProcess(apiDefinition);
-        SequenceGenerator.generateSequencesFromSwagger(apiDefinition, existingAPI.getId());
+        if (existingAPI.getType().equals(APIConstants.API_TYPE_SOAPTOREST)) {
+            SequenceGenerator.generateSequencesFromSwagger(apiDefinition, existingAPI.getId());
+        }
         Set<URITemplate> uriTemplates = null;
         try {
             uriTemplates = oasParser.getURITemplates(apiDefinition);
