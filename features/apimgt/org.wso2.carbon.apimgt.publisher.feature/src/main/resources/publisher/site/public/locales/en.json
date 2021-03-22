@@ -358,6 +358,7 @@
   "Apis.Details.Endpoints.GenericEndpoint.service.url.input": "Service URL",
   "Apis.Details.Endpoints.LoadBalanceConfig.algorithm": "Algorithm",
   "Apis.Details.Endpoints.LoadBalanceConfig.class.name.for.algorithm": "Class Name for Algorithm",
+  "Apis.Details.Endpoints.LoadBalanceConfig.failover": "Enable Failover",
   "Apis.Details.Endpoints.LoadBalanceConfig.session.management": "Session Management",
   "Apis.Details.Endpoints.LoadBalanceConfig.session.timeout": "Session Timeout (Millis)",
   "Apis.Details.Endpoints.LoadbalanceFailoverConfig.endpoint.type": "Endpoint Type",

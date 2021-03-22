@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an 'AS IS' BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANffY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -72,7 +72,7 @@ function getEndpointTemplateByType(endpointType, isAddressEndpoint, currentEndpo
         tmpEndpointConfig.sandbox_endpoints =
             Array.isArray(currentEndpointConfig.sandbox_endpoints) ?
                 currentEndpointConfig.sandbox_endpoints[0] : currentEndpointConfig.sandbox_endpoints;
-        tmpEndpointConfig.failOver = 'True';
+        tmpEndpointConfig.failOver = true;
     } else if (endpointType === 'load_balance') {
         tmpEndpointConfig.endpoint_type = endpointType;
         tmpEndpointConfig.algoClassName = 'org.apache.synapse.endpoints.algorithms.RoundRobin';
@@ -88,7 +88,7 @@ function getEndpointTemplateByType(endpointType, isAddressEndpoint, currentEndpo
                 Array.isArray(currentEndpointConfig.sandbox_endpoints) ?
                     currentEndpointConfig.sandbox_endpoints : [currentEndpointConfig.sandbox_endpoints];
         }
-        tmpEndpointConfig.failOver = 'False';
+        tmpEndpointConfig.failOver = false;
     } else {
         tmpEndpointConfig.endpoint_type = isAddressEndpoint === true ? 'address' : 'http';
         tmpEndpointConfig.production_endpoints = Array.isArray(currentEndpointConfig.production_endpoints) ?
@@ -96,7 +96,7 @@ function getEndpointTemplateByType(endpointType, isAddressEndpoint, currentEndpo
         tmpEndpointConfig.sandbox_endpoints =
             Array.isArray(currentEndpointConfig.sandbox_endpoints) ?
                 currentEndpointConfig.sandbox_endpoints[0] : currentEndpointConfig.sandbox_endpoints;
-        tmpEndpointConfig.failOver = 'False';
+        tmpEndpointConfig.failOver = false;
     }
     return tmpEndpointConfig;
 }
@@ -147,7 +147,7 @@ function getEndpointConfigByImpl(implementationType) {
         tmpEndpointConfig.endpoint_type = 'http';
         tmpEndpointConfig.production_endpoints = { url: '' };
         tmpEndpointConfig.sandbox_endpoints = { url: '' };
-        tmpEndpointConfig.failOver = 'False';
+        tmpEndpointConfig.failOver = false;
     }
     return tmpEndpointConfig;
 }
@@ -169,11 +169,11 @@ function createEndpointConfig(endpointType) {
     switch (endpointType) {
         case 'http':
             tmpEndpointConfig.endpoint_type = 'http';
-            tmpEndpointConfig.failOver = 'False';
+            tmpEndpointConfig.failOver = false;
             break;
         case 'address':
             tmpEndpointConfig.endpoint_type = 'address';
-            tmpEndpointConfig.failOver = 'False';
+            tmpEndpointConfig.failOver = false;
             break;
         case 'prototyped':
             tmpEndpointConfig.implementation_status = 'prototyped';
@@ -190,7 +190,7 @@ function createEndpointConfig(endpointType) {
             tmpEndpointConfig.endpoint_type = 'default';
             tmpEndpointConfig.production_endpoints = { url: 'default' };
             tmpEndpointConfig.sandbox_endpoints = { url: 'default' };
-            tmpEndpointConfig.failOver = 'False';
+            tmpEndpointConfig.failOver = false;
             break;
     }
     return tmpEndpointConfig;
