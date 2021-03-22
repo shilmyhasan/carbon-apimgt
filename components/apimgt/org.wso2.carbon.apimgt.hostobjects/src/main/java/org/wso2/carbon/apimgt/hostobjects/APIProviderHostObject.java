@@ -137,6 +137,8 @@ public class APIProviderHostObject extends ScriptableObject {
     private String username;
     private static String VERSION_PARAM="{version}";
     private static String ICON_PATH = "tmp/icon";
+    private static final String EXT_HTML = "html";
+    private static final String EXT_HTM = "htm";
 
     private APIProvider apiProvider;
 
@@ -3347,7 +3349,7 @@ public class APIProviderHostObject extends ScriptableObject {
                 if (extension.contains("exe")) {
                     throw new APIManagementException("File type .exe is not supported!");
                 }
-                if ((extension.contains("html") || (extension.contains("htm")))) {
+                if ((extension.contains(EXT_HTML) || (extension.contains(EXT_HTM)))) {
                     throw new APIManagementException("File type .html is not supported!");
                 }
                 String contentType = (String) args[10];
@@ -4036,7 +4038,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     if (extension.contains("exe")) {
                         throw new APIManagementException("File type .exe is not supported!");
                     }
-                    if ((extension.contains("html") || (extension.contains("htm")))) {
+                    if ((extension.contains(EXT_HTML) || (extension.contains(EXT_HTM)))) {
                         throw new APIManagementException("File type .html is not supported!");
                     }
                     ResourceFile resourceFile = new ResourceFile(fileHostObject.getInputStream(),
