@@ -3694,6 +3694,9 @@
           "items": {
             "$ref": "#/definitions/ApplicationInfo"
           }
+        },
+        "pagination": {
+          "$ref": "#/definitions/Pagination"
         }
       }
     },
@@ -3959,6 +3962,31 @@
           "type": "string",
           "description": "media-type of the file",
           "example": "image/jpeg"
+        }
+      }
+    },
+    "Pagination": {
+      "title": "Pagination",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "example": 0
+        },
+        "limit": {
+          "type": "integer",
+          "example": 1
+        },
+        "total": {
+          "type": "integer",
+          "example": 10
+        },
+        "next": {
+          "type": "string",
+          "description": "Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n"
+        },
+        "previous": {
+          "type": "string",
+          "description": "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n"
         }
       }
     }
