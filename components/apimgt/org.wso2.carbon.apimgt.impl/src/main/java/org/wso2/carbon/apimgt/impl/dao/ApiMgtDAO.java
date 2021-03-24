@@ -5017,8 +5017,8 @@ public class ApiMgtDAO {
     /**
      * Returns applications within a tenant domain with pagination
      * @param tenantId   The tenantId.
-     * @param start      The start index.
-     * @param offset     The offset.
+     * @param offset     The start index.
+     * @param limit      The limit for the count.
      * @param searchOwner     The search string.
      * @param searchApplication     The search string.
      * @param sortOrder  The sort order.
@@ -5026,7 +5026,7 @@ public class ApiMgtDAO {
      * @return Application[] The array of applications.
      * @throws APIManagementException
      */
-    public List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int start, int offset,
+    public List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int offset, int limit,
                                                                      String searchOwner, String searchApplication,
                                                                      String sortColumn, String sortOrder)
             throws APIManagementException {
@@ -5039,7 +5039,7 @@ public class ApiMgtDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
             if (connection.getMetaData().getDriverName().contains("Oracle")) {
-                offset = start + offset;
+                offset = offset + limit;
             }
             sqlQuery = sqlQuery.replace("$1", sortColumn);
             sqlQuery = sqlQuery.replace("$2", sortOrder);
@@ -5047,8 +5047,8 @@ public class ApiMgtDAO {
             prepStmt.setInt(1, tenantId);
             prepStmt.setString(2, "%" + searchOwner + "%");
             prepStmt.setString(3, "%" + searchApplication + "%");
-            prepStmt.setInt(4, start);
-            prepStmt.setInt(5, offset);
+            prepStmt.setInt(4, offset);
+            prepStmt.setInt(5, limit);
             rs = prepStmt.executeQuery();
             Application application;
             while (rs.next()) {
