@@ -3,7 +3,6 @@ package org.wso2.carbon.apimgt.rest.api.admin.dto;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.ApplicationInfoDTO;
-import org.wso2.carbon.apimgt.rest.api.admin.dto.PaginationDTO;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
@@ -29,9 +28,6 @@ public class ApplicationListDTO  {
   
   
   private List<ApplicationInfoDTO> list = new ArrayList<ApplicationInfoDTO>();
-  
-  
-  private PaginationDTO pagination = null;
 
   
   /**
@@ -85,18 +81,6 @@ public class ApplicationListDTO  {
   }
 
   
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("pagination")
-  public PaginationDTO getPagination() {
-    return pagination;
-  }
-  public void setPagination(PaginationDTO pagination) {
-    this.pagination = pagination;
-  }
-
-  
 
   @Override
   public String toString()  {
@@ -107,7 +91,6 @@ public class ApplicationListDTO  {
     sb.append("  next: ").append(next).append("\n");
     sb.append("  previous: ").append(previous).append("\n");
     sb.append("  list: ").append(list).append("\n");
-    sb.append("  pagination: ").append(pagination).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

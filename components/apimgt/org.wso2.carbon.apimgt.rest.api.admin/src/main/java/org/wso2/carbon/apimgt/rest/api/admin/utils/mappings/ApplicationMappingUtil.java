@@ -23,7 +23,6 @@ import org.wso2.carbon.apimgt.api.model.Subscriber;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.ApplicationInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.ApplicationListDTO;
-import org.wso2.carbon.apimgt.rest.api.admin.dto.PaginationDTO;
 import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 
@@ -33,36 +32,7 @@ import java.util.Map;
 
 public class ApplicationMappingUtil {
 
-    /**
-     * Maps Applications to ApplicationDto
-     *
-     * @param applications          Applications to be mapped
-     * @return applicationListDTO   mapped ApplicationDtos
-     */
-    public static ApplicationListDTO fromApplicationsToDTO(Application[] applications) {
-        ApplicationListDTO applicationListDTO = new ApplicationListDTO();
-        List<ApplicationInfoDTO> applicationInfoDTOs = applicationListDTO.getList();
-        if (applicationInfoDTOs == null) {
-            applicationInfoDTOs = new ArrayList<>();
-            applicationListDTO.setList(applicationInfoDTOs);
-        }
-        for (Application application : applications) {
-            applicationInfoDTOs.add(fromApplicationToInfoDTO(application));
-        }
-        applicationListDTO.setCount(applicationInfoDTOs.size());
-        return applicationListDTO;
-    }
-
-    /**
-     * Maps Applications to ApplicationDto with pagination
-     *
-     * @param applications          Applications to be mapped
-     * @param limit                 max number of objects returned
-     * @param offset                starting index
-     * @return applicationListDTO   mapped ApplicationDtos
-     */
-    public static ApplicationListDTO fromApplicationsToDTOWithPagination(Application[] applications, int limit,
-                                                                         int offset) {
+    public static ApplicationListDTO fromApplicationsToDTO(Application[] applications, int limit, int offset) {
         ApplicationListDTO applicationListDTO = new ApplicationListDTO();
         List<ApplicationInfoDTO> applicationInfoDTOs = applicationListDTO.getList();
         if (applicationInfoDTOs == null) {
@@ -90,7 +60,7 @@ public class ApplicationMappingUtil {
      * @param size               max offset
      */
     public static void setPaginationParams(ApplicationListDTO applicationListDTO, int limit, int offset,
-            int size) {
+                                           int size) {
 
         Map<String, Integer> paginatedParams = RestApiUtil.getPaginationParams(offset, limit, size);
 
@@ -108,13 +78,6 @@ public class ApplicationMappingUtil {
                     .getApplicationPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
                             paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT));
         }
-        PaginationDTO paginationDTO = new PaginationDTO();
-        paginationDTO.setLimit(limit);
-        paginationDTO.setOffset(offset);
-        paginationDTO.setTotal(size);
-        paginationDTO.setNext(paginatedNext);
-        paginationDTO.setPrevious(paginatedPrevious);
-        applicationListDTO.setPagination(paginationDTO);
         applicationListDTO.setNext(paginatedNext);
         applicationListDTO.setPrevious(paginatedPrevious);
     }
