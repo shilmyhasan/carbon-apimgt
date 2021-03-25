@@ -388,7 +388,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             if (publicCert == null) {
                 throw new APIManagementException("Error in obtaining keystore for tenantDomain = " + tenantDomain);
             } else {
-                return APIUtil.generateHeader(publicCert, signatureAlgorithm);
+                return APIUtil.generateBackendJWTHeader(publicCert, signatureAlgorithm);
             }
         } catch (KeyStoreException e) {
             String error = "Error in obtaining tenant's keystore";
