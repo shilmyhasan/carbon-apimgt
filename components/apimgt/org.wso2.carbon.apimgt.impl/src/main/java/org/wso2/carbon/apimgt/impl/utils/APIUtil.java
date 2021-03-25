@@ -33,6 +33,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
+import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -9811,15 +9812,15 @@ public final class APIUtil {
      */
     public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws APIManagementException {
         try {
-            //generate the SHA-1 thumbprint of the certificate
-            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
+            //generate the SHA-256 thumbprint of the certificate
+            MessageDigest digestValue = MessageDigest.getInstance(APIConstants.SHA_256);
             byte[] der = publicCert.getEncoded();
             digestValue.update(der);
             byte[] digestInBytes = digestValue.digest();
             String publicCertThumbprint = hexify(digestInBytes);
             String base64UrlEncodedThumbPrint;
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+            base64UrlEncodedThumbPrint = new String(new Base64(0, null, true).encode(
+                    publicCertThumbprint.getBytes(Charsets.UTF_8)), Charsets.UTF_8);
             StringBuilder jwtHeader = new StringBuilder();
             //Sample header
             //{"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10"}
@@ -9843,15 +9844,15 @@ public final class APIUtil {
 
     public static String generateBackendJWTHeader(Certificate publicCert, String signatureAlgorithm) throws APIManagementException {
         try {
-            //generate the SHA-1 thumbprint of the certificate
-            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
+            //generate the SHA-256 thumbprint of the certificate
+            MessageDigest digestValue = MessageDigest.getInstance(APIConstants.SHA_256);
             byte[] der = publicCert.getEncoded();
             digestValue.update(der);
             byte[] digestInBytes = digestValue.digest();
             String publicCertThumbprint = hexify(digestInBytes);
             String base64UrlEncodedThumbPrint;
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+            base64UrlEncodedThumbPrint = new String(new Base64(0, null, true).encode(
+                    publicCertThumbprint.getBytes(Charsets.UTF_8)), Charsets.UTF_8);
             StringBuilder jwtHeader = new StringBuilder();
             /**
              * Sample header
