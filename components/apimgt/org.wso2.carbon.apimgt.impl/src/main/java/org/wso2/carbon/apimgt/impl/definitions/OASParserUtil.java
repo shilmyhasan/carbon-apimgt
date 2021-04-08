@@ -685,6 +685,8 @@ public class OASParserUtil {
                                 references.add(sc.get$ref());
                             }
                         }
+                    } else {
+                        log.error("Unidentified Schema");
                     }
                 }
             }
@@ -727,6 +729,8 @@ public class OASParserUtil {
                         for (Schema sc : cs.getOneOf()) {
                             references.add(sc.get$ref());
                         }
+                    } else {
+                        log.error("Unidentified Schema");
                     }
                 }
             }
