@@ -686,7 +686,7 @@ public class OASParserUtil {
                             }
                         }
                     } else {
-                        log.error("Unidentified Schema");
+                        log.error("Unidentified schema. The schema is not available in the API definition.");
                     }
                 }
             }
@@ -730,7 +730,7 @@ public class OASParserUtil {
                             references.add(sc.get$ref());
                         }
                     } else {
-                        log.error("Unidentified Schema");
+                        log.error("Unidentified schema. The schema is not available in the API definition.");
                     }
                 }
             }
