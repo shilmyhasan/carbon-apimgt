@@ -132,7 +132,7 @@ public class SubscriptionMappingUtil {
         Map<String, Integer> paginatedParams = RestApiUtil.getPaginationParams(offset, limit, size);
 
         if (paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET) != null) {
-            if (apiId != null){
+            if (apiId != null) {
                 paginatedPrevious = RestApiUtil
                         .getSubscriptionPaginatedURLForAPIId(
                                 paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
