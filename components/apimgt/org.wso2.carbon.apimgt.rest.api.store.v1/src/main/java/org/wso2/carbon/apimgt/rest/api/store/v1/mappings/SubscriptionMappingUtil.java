@@ -147,7 +147,7 @@ public class SubscriptionMappingUtil {
         }
 
         if (paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET) != null) {
-            if(apiId != null) {
+            if (apiId != null) {
                 paginatedNext = RestApiUtil
                         .getSubscriptionPaginatedURLForAPIId(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
                                 paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), apiId, groupId);
