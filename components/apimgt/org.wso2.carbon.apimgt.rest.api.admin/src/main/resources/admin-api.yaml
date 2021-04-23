@@ -1809,6 +1809,13 @@ paths:
                users only at a migration process.
           required: false
           type: string
+        - name: applicationName
+          in: query
+          description: |
+               Sending the application name will search for this application and send back results with a similar
+               application name. Adding single quotes wrapping the name will search for the name explicitly.
+          required: false
+          type: string
       tags:
         - Application (Collection)
       responses:
@@ -1818,6 +1825,59 @@ paths:
             Application list returned.
           schema:
             $ref: '#/definitions/ApplicationList'
+          headers:
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
+        304:
+          description: |
+            Not Modified.
+            Empty body because the client has already the latest version of the requested resource (Will be supported in future).
+        400:
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        406:
+          description: |
+            Not Acceptable.
+            The requested media type is not supported.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+######################################################
+# The "Application Collection" resource APIs
+######################################################
+  /applications/{applicationId}:
+
+#-----------------------------------------------------
+# Retrieve a list of all applications of a certain subscriber
+#-----------------------------------------------------
+    get:
+      x-scope: apim:app_owner_change
+      x-wso2-request: |
+        GET https://localhost:9443/api/am/admin/v0.16/applications
+        Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8
+      x-wso2-curl: "curl -k -H \"Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8\" \"https://localhost:9443/api/am/admin/v0.16/applications\""
+      x-wso2-response: "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"groupId\": \"\",\n         \"owner\": \"admin\",\n           \"applicationId\": \"367a2361-8db5-4140-8133-c6c8dc7fa0c4\",\n         \"status\": \"APPROVED\",\n         \"name\": \"app1\"\n      },\n            {\n         \"groupId\": \"\",\n         \"owner\": \"admin\",\n             \"applicationId\": \"896658a0-b4ee-4535-bbfa-806c894a4015\",\n          \"status\": \"APPROVED\",\n         \"name\": \"DefaultApplication\"\n      }\n   ],\n   \"count\": 2,\n   \"next\": \"\"\n}"
+      summary: |
+        Retrieve/Search applications by application id
+      description: |
+        This operation can be used to retrieve an application by providing the application id.
+      parameters:
+        - $ref: '#/parameters/applicationId'
+      tags:
+        - Application (Individual)
+      responses:
+        200:
+          description: |
+            OK.
+            Application info returned.
+          schema:
+            $ref: '#/definitions/ApplicationInfo'
           headers:
             Content-Type:
               description: |

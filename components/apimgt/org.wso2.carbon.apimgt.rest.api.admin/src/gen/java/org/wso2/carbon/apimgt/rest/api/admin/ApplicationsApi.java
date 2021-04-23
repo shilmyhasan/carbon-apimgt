@@ -7,6 +7,7 @@ import org.wso2.carbon.apimgt.rest.api.admin.factories.ApplicationsApiServiceFac
 import io.swagger.annotations.ApiParam;
 
 import org.wso2.carbon.apimgt.rest.api.admin.dto.ErrorDTO;
+import org.wso2.carbon.apimgt.rest.api.admin.dto.ApplicationInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.ApplicationListDTO;
 
 import java.util.List;
@@ -46,6 +47,24 @@ public class ApplicationsApi  {
     return delegate.applicationsApplicationIdChangeOwnerPost(owner,applicationId);
     }
     @GET
+    @Path("/{applicationId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Retrieve/Search applications by application id\n", notes = "This operation can be used to retrieve an application by providing the application id.\n", response = ApplicationInfoDTO.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nApplication info returned.\n"),
+        
+        @io.swagger.annotations.ApiResponse(code = 304, message = "Not Modified.\nEmpty body because the client has already the latest version of the requested resource (Will be supported in future).\n"),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error.\n"),
+        
+        @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable.\nThe requested media type is not supported.\n") })
+
+    public Response applicationsApplicationIdGet(@ApiParam(value = "Application UUID\n",required=true ) @PathParam("applicationId")  String applicationId)
+    {
+    return delegate.applicationsApplicationIdGet(applicationId);
+    }
+    @GET
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
@@ -64,9 +83,10 @@ public class ApplicationsApi  {
     @ApiParam(value = "Starting point within the complete list of items qualified.\n", defaultValue="0") @QueryParam("offset")  Integer offset,
     @ApiParam(value = "Media types acceptable for the response. Default is application/json.\n"  , defaultValue="application/json")@HeaderParam("Accept") String accept,
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource (Will be supported in future).\n"  )@HeaderParam("If-None-Match") String ifNoneMatch,
-    @ApiParam(value = "Tenant domain of the applications to get. This has to be specified only if require to get applications of\nanother tenant other than the requester's tenant. So, if not specified, the default will be set as the\nrequester's tenant domain. This cross tenant Application access is allowed only for super tenant admin\nusers only at a migration process.\n") @QueryParam("tenantDomain")  String tenantDomain)
+    @ApiParam(value = "Tenant domain of the applications to get. This has to be specified only if require to get applications of\nanother tenant other than the requester's tenant. So, if not specified, the default will be set as the\nrequester's tenant domain. This cross tenant Application access is allowed only for super tenant admin\nusers only at a migration process.\n") @QueryParam("tenantDomain")  String tenantDomain,
+    @ApiParam(value = "Sending the application name will search for this application and send back results with a similar\napplication name. Adding single quotes wrapping the name will search for the name explicitly.\n") @QueryParam("applicationName")  String applicationName)
     {
-    return delegate.applicationsGet(user,limit,offset,accept,ifNoneMatch,tenantDomain);
+    return delegate.applicationsGet(user,limit,offset,accept,ifNoneMatch,tenantDomain,applicationName);
     }
 }
 

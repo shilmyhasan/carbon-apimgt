@@ -5045,8 +5045,23 @@ public class ApiMgtDAO {
             sqlQuery = sqlQuery.replace("$2", sortOrder);
             prepStmt = connection.prepareStatement(sqlQuery);
             prepStmt.setInt(1, tenantId);
-            prepStmt.setString(2, "%" + searchOwner + "%");
-            prepStmt.setString(3, "%" + searchApplication + "%");
+            boolean ownerEmpty = true;
+            boolean appEmpty = true;
+
+            if (StringUtils.isNotEmpty(searchOwner)) {
+                searchOwner = "%" + searchOwner + "%";
+                ownerEmpty = false;
+            }
+            if (StringUtils.isNotEmpty(searchApplication)) {
+                searchApplication = "%" + searchApplication + "%";
+                appEmpty = false;
+            }
+            if (ownerEmpty && appEmpty) {
+                searchOwner = "%%";
+                searchApplication = "%%";
+            }
+            prepStmt.setString(2, searchOwner);
+            prepStmt.setString(3, searchApplication);
             prepStmt.setInt(4, offset);
             prepStmt.setInt(5, limit);
             rs = prepStmt.executeQuery();
@@ -5085,8 +5100,23 @@ public class ApiMgtDAO {
             sqlQuery = SQLConstants.GET_APPLICATIONS_COUNT;
             prepStmt = connection.prepareStatement(sqlQuery);
             prepStmt.setInt(1, tenantId);
-            prepStmt.setString(2, "%" + searchOwner + "%");
-            prepStmt.setString(3, "%" + searchApplication + "%");
+            boolean ownerEmpty = true;
+            boolean appEmpty = true;
+
+            if (StringUtils.isNotEmpty(searchOwner)) {
+                searchOwner = "%" + searchOwner + "%";
+                ownerEmpty = false;
+            }
+            if (StringUtils.isNotEmpty(searchApplication)) {
+                searchApplication = "%" + searchApplication + "%";
+                appEmpty = false;
+            }
+            if (ownerEmpty && appEmpty) {
+                searchOwner = "%%";
+                searchApplication = "%%";
+            }
+            prepStmt.setString(2, searchOwner);
+            prepStmt.setString(3, searchApplication);
             resultSet = prepStmt.executeQuery();
             int applicationCount = 0;
             if (resultSet != null) {
