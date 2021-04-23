@@ -2123,6 +2123,7 @@ paths:
     get:
       x-scope: apim:api_import_export
       produces:
+        - application/json
         - application/zip
       x-wso2-curl: "curl -k -H \"Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8\" -X GET https://localhost:9443/api/am/admin/v0.15/export/api?name=PizzaShackAPI&version=1.0.0&providerName=admin > exportAPI.zip"
       x-wso2-request: |
