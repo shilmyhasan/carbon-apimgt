@@ -75,6 +75,7 @@ import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.apimgt.tracing.TracingTracer;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -958,5 +959,9 @@ public class GatewayUtils {
         if (endpoint != null){
             Util.setTag(tracingSpan, APIMgtGatewayConstants.SPAN_ENDPOINT, (String) endpoint);
         }
+    }
+
+    public static TracingTracer getTracingTracer() {
+        return ServiceReferenceHolder.getInstance().getTracer();
     }
 }
