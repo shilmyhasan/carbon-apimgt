@@ -14,6 +14,7 @@
     <bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer"/>
     <jaxrs:server id="services" address="/">
         <jaxrs:serviceBeans>
+            <bean class="org.wso2.carbon.apimgt.rest.api.admin.SwaggerJsonApi"/>
             <bean class="org.wso2.carbon.apimgt.rest.api.admin.ApiCategoriesApi"/>
             <bean class="org.wso2.carbon.apimgt.rest.api.admin.ApplicationsApi"/>
             <bean class="org.wso2.carbon.apimgt.rest.api.admin.BotDataApi"/>
