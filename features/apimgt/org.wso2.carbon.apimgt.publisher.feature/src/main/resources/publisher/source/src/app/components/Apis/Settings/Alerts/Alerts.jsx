@@ -417,7 +417,7 @@ const Alerts = (props) => {
                         </>
                     )}
             </Paper>
-            <Dialog open={openDialog.open}>
+            <Dialog fullWidth maxWidth='md' open={openDialog.open}>
                 <DialogTitle>
                     <FormattedMessage
                         id='Settings.Alerts.Alerts.configure.alert'
