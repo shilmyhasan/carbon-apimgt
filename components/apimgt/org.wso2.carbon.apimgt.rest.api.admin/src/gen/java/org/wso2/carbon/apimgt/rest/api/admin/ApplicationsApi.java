@@ -1,5 +1,6 @@
 package org.wso2.carbon.apimgt.rest.api.admin;
 
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.*;
 import org.wso2.carbon.apimgt.rest.api.admin.ApplicationsApiService;
 import org.wso2.carbon.apimgt.rest.api.admin.factories.ApplicationsApiServiceFactory;
@@ -60,8 +61,7 @@ public class ApplicationsApi  {
         
         @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable.\nThe requested media type is not supported.\n") })
 
-    public Response applicationsApplicationIdGet(@ApiParam(value = "Application UUID\n",required=true ) @PathParam("applicationId")  String applicationId)
-    {
+    public Response applicationsApplicationIdGet(@ApiParam(value = "Application UUID\n",required=true ) @PathParam("applicationId")  String applicationId) throws APIManagementException {
     return delegate.applicationsApplicationIdGet(applicationId);
     }
     @GET
