@@ -1,6 +1,5 @@
 package org.wso2.carbon.apimgt.rest.api.admin;
 
-import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.*;
 import org.wso2.carbon.apimgt.rest.api.admin.ApplicationsApiService;
 import org.wso2.carbon.apimgt.rest.api.admin.factories.ApplicationsApiServiceFactory;
@@ -55,13 +54,16 @@ public class ApplicationsApi  {
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nApplication info returned.\n"),
         
-        @io.swagger.annotations.ApiResponse(code = 304, message = "Not Modified.\nEmpty body because the client has already the latest version of the requested resource (Will be supported in future).\n"),
-        
         @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error.\n"),
         
-        @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable.\nThe requested media type is not supported.\n") })
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nRequested Application does not exist.\n"),
+        
+        @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable.\nThe requested media type is not supported.\n"),
+        
+        @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.\nError in fetching Application.\n") })
 
-    public Response applicationsApplicationIdGet(@ApiParam(value = "Application UUID\n",required=true ) @PathParam("applicationId")  String applicationId) throws APIManagementException {
+    public Response applicationsApplicationIdGet(@ApiParam(value = "Application UUID\n",required=true ) @PathParam("applicationId")  String applicationId)
+    {
     return delegate.applicationsApplicationIdGet(applicationId);
     }
     @GET

@@ -48,17 +48,22 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
     }
 
     @Override
-    public Response applicationsApplicationIdGet(String applicationId) throws APIManagementException {
-        String username = RestApiUtil.getLoggedInUsername();
-        APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
-        Application application = apiConsumer.getLightweightApplicationByUUID(applicationId);
-        if (application == null) {
-            RestApiUtil.handleResourceNotFoundError(
-                    "Application with UUID: " + applicationId + " not found.", log);
+    public Response applicationsApplicationIdGet(String applicationId) {
+        try {
+            String username = RestApiUtil.getLoggedInUsername();
+            APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
+            Application application = apiConsumer.getLightweightApplicationByUUID(applicationId);
+            if (application == null) {
+                RestApiUtil.handleResourceNotFoundError(
+                        "Application with UUID: " + applicationId + " not found.", log);
+                return null;
+            }
+            ApplicationInfoDTO applicationInfoDTO = ApplicationMappingUtil.fromApplicationToInfoDTO(application);
+            return Response.ok().entity(applicationInfoDTO).build();
+        } catch (APIManagementException e) {
+            RestApiUtil.handleInternalServerError("Error while retrieving application " + applicationId, e, log);
             return null;
         }
-        ApplicationInfoDTO applicationInfoDTO = ApplicationMappingUtil.fromApplicationToInfoDTO(application);
-        return Response.ok().entity(applicationInfoDTO).build();
     }
 
     @Override

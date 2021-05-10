@@ -1,6 +1,5 @@
 package org.wso2.carbon.apimgt.rest.api.admin;
 
-import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.rest.api.admin.*;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.*;
 
@@ -17,7 +16,7 @@ import javax.ws.rs.core.Response;
 
 public abstract class ApplicationsApiService {
     public abstract Response applicationsApplicationIdChangeOwnerPost(String owner,String applicationId);
-    public abstract Response applicationsApplicationIdGet(String applicationId) throws APIManagementException;
+    public abstract Response applicationsApplicationIdGet(String applicationId);
     public abstract Response applicationsGet(String user,Integer limit,Integer offset,String accept,String ifNoneMatch,String tenantDomain,String applicationName);
 }
 
