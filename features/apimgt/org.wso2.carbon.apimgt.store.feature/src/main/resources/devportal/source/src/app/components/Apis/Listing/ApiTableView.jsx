@@ -406,7 +406,7 @@ class ApiTableView extends React.Component {
                     customBodyRender: (value, tableMeta) => {
                         if (tableMeta.rowData) {
                             if (
-                                tableMeta.rowData[9].businessOwner
+                                tableMeta.rowData[9] && tableMeta.rowData[9].businessOwner
                             ) {
                                 return (
                                     <>

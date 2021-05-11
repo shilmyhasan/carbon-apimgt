@@ -22,6 +22,7 @@ const AppConfig = {
             timeout: 4000, // Defines the timeout for the above periodical session status check
         },
         mediationPolicyCount: 50,
+        alertMaxAPIGetLimit: 5000,
     },
 };
 
