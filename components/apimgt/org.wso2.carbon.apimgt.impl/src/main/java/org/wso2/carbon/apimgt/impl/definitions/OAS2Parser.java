@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.impl.definitions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.swagger.models.Contact;
@@ -57,6 +58,7 @@ import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIProduct;
 import org.wso2.carbon.apimgt.api.model.Scope;
+import io.swagger.parser.util.DeserializationUtils;
 import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
@@ -432,8 +434,12 @@ public class OAS2Parser extends APIDefinition {
                     info.getTitle(), info.getVersion(), swagger.getBasePath(), info.getDescription());
             validationResponse.setParser(this);
             if (returnJsonContent) {
-                validationResponse.setJsonContent(OASParserUtil.getSwaggerJsonString(parseAttemptForV2.getSwagger()));
-            }
+                if (!apiDefinition.trim().startsWith("{")) { // not a json (it is yaml)
+                    JsonNode jsonNode = DeserializationUtils.readYamlTree(apiDefinition);
+                    validationResponse.setJsonContent(jsonNode.toString());
+                } else {
+                    validationResponse.setJsonContent(apiDefinition);
+                }            }
         }
         return validationResponse;
     }
