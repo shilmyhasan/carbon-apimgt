@@ -184,7 +184,7 @@ public class APIMWSDLReader {
                         soapProcessor.getWsdlInfo());
                 wsdlValidationResponse.setWsdlArchiveInfo(wsdlArchiveInfo);
                 wsdlValidationResponse.setWsdlInfo(soapProcessor.getWsdlInfo());
-                wsdlValidationResponse.setWsdlProcessor(processor);
+                wsdlValidationResponse.setWsdlProcessor(soapProcessor);
             }
             return wsdlValidationResponse;
         } catch (APIManagementException e) {
