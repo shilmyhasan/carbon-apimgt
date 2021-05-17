@@ -2470,23 +2470,27 @@ public class ApisApiServiceImpl implements ApisApiService {
     public Response apisApiIdSwaggerPut(String apiId, String apiDefinition, String url, InputStream fileInputStream,
             Attachment fileDetail, String ifMatch, MessageContext messageContext) {
 
-        // Validate and retrieve the OpenAPI definition
-        Map validationResponseMap = null;
         try {
-            APIDefinitionValidationResponse validationResponse;
+            String updatedSwagger;
 
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
             APIIdentifier apiIdentifier = APIMappingUtil.getAPIIdentifierFromUUID(apiId, tenantDomain);
-            boolean isSoapToRestConvertedAPI = SOAPOperationBindingUtils.isSOAPToRESTApi(apiIdentifier.getApiName(),
-                    apiIdentifier.getVersion(), apiIdentifier.getProviderName());
+            boolean isSoapToRestConvertedAPI = SOAPOperationBindingUtils
+                    .isSOAPToRESTApi(apiIdentifier.getApiName(), apiIdentifier.getVersion(),
+                            apiIdentifier.getProviderName());
             //Handle URL and file based definition imports
-            validationResponseMap = validateOpenAPIDefinition(url, fileInputStream, fileDetail, true);
-            validationResponse = (APIDefinitionValidationResponse) validationResponseMap
-                    .get(RestApiConstants.RETURN_MODEL);
-            if (!validationResponse.isValid()) {
-                RestApiUtil.handleBadRequest(validationResponse.getErrorItems(), log);
+            if (url != null || fileInputStream != null) {
+                // Validate and retrieve the OpenAPI definition
+                Map validationResponseMap = validateOpenAPIDefinition(url, fileInputStream, fileDetail, true);
+                APIDefinitionValidationResponse validationResponse = (APIDefinitionValidationResponse) validationResponseMap
+                        .get(RestApiConstants.RETURN_MODEL);
+                if (!validationResponse.isValid()) {
+                    RestApiUtil.handleBadRequest(validationResponse.getErrorItems(), log);
+                }
+                updatedSwagger = updateSwagger(apiId, validationResponse);
+            } else {
+                updatedSwagger = updateSwagger(apiId, apiDefinition);
             }
-            String updatedSwagger = updateSwagger(apiId, validationResponse);
             if (isSoapToRestConvertedAPI) {
                 SequenceGenerator.generateSequencesFromSwagger(updatedSwagger, apiIdentifier);
             }

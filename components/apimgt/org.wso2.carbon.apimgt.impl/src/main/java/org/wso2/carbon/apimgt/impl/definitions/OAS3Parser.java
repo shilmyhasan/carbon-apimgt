@@ -418,7 +418,8 @@ public class OAS3Parser extends APIDefinition {
                     validationResponse.setJsonContent(jsonNode.toString());
                 } else {
                     validationResponse.setJsonContent(apiDefinition);
-                }            }
+                }
+            }
         }
         return validationResponse;
     }
