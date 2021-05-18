@@ -2475,9 +2475,8 @@ public class ApisApiServiceImpl implements ApisApiService {
 
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
             APIIdentifier apiIdentifier = APIMappingUtil.getAPIIdentifierFromUUID(apiId, tenantDomain);
-            boolean isSoapToRestConvertedAPI = SOAPOperationBindingUtils
-                    .isSOAPToRESTApi(apiIdentifier.getApiName(), apiIdentifier.getVersion(),
-                            apiIdentifier.getProviderName());
+            boolean isSoapToRestConvertedAPI = SOAPOperationBindingUtils.isSOAPToRESTApi(apiIdentifier.getApiName(),
+                    apiIdentifier.getVersion(), apiIdentifier.getProviderName());
             //Handle URL and file based definition imports
             if (url != null || fileInputStream != null) {
                 // Validate and retrieve the OpenAPI definition
@@ -3580,7 +3579,6 @@ public class ApisApiServiceImpl implements ApisApiService {
     private Map validateOpenAPIDefinition(String url, InputStream fileInputStream, Attachment fileDetail,
            Boolean returnContent) throws APIManagementException {
         //validate inputs
-
         handleInvalidParams(fileInputStream, fileDetail, url);
 
         OpenAPIDefinitionValidationResponseDTO responseDTO;
