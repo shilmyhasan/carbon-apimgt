@@ -270,7 +270,7 @@ function APIDesigner(){
 APIDesigner.prototype.remove_trailing_slash = function(swagger) {
     var paths = swagger.paths;
     for (var path in paths) {
-        if (path.endsWith("/")) {
+        if (path.length > 1 && path.endsWith("/")) {
             var newkey = path.slice(0, -1);
             swagger.paths[newkey] = swagger.paths[path];
             delete swagger.paths[path];
