@@ -23,6 +23,9 @@ const AppConfig = {
         },
         mediationPolicyCount: 50,
         alertMaxAPIGetLimit: 5000,
+        markdown: {
+            skipHtml: true,
+        },
     },
 };
 
