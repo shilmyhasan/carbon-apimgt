@@ -15,6 +15,9 @@ const Settings = {
             enabled: true, // If enabled, user will be logged out from the App when logged out from the IDP (eg: SSO logout from a different App).
             timeout: 4000, // Defines the timeout for the above periodical session status check
         },
+        markdown: {
+            skipHtml: true,
+        },
     },
     grantTypes: {
         authorization_code: 'Code',
