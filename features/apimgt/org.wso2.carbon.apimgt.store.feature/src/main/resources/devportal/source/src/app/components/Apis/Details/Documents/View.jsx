@@ -28,6 +28,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { ApiContext } from '../ApiContext';
 import API from 'AppData/api';
 import Alert from '../../../Shared/Alert';
+import { app } from 'Settings';
 
 const styles = theme => ({
     root: {
@@ -78,6 +79,7 @@ function View(props) {
     const { api } = useContext(ApiContext);
     const [code, setCode] = useState('');
     const restAPI = new API();
+    const skipHtml = Settings.app.markdown.skipHtml;
 
     useEffect(() => {
         if (doc.sourceType === 'MARKDOWN' || doc.sourceType === 'INLINE') loadContentForDoc();
@@ -169,7 +171,7 @@ function View(props) {
                 </Typography>
             )}
 
-            {doc.sourceType === 'MARKDOWN' && <ReactMarkdown escapeHtml={false} source={code} />}
+            {doc.sourceType === 'MARKDOWN' && <ReactMarkdown escapeHtml={skipHtml} source={code} />}
             {doc.sourceType === 'INLINE' && <ReactSafeHtml html={code} />}
             {doc.sourceType === 'URL' && (
                 <a className={classes.displayURL} href={doc.sourceUrl} target='_blank'>
