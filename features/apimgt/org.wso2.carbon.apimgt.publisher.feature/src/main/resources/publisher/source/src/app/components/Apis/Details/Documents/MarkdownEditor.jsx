@@ -33,7 +33,6 @@ import Api from 'AppData/api';
 import Alert from 'AppComponents/Shared/Alert';
 import APIContext from 'AppComponents/Apis/Details/components/ApiContext';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { app } from 'Settings';
 
 const MonacoEditor = lazy(() => import('react-monaco-editor'));
 const ReactMarkdown = lazy(() => import('react-markdown'));

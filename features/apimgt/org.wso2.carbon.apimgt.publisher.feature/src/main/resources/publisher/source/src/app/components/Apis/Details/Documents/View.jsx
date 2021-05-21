@@ -36,7 +36,6 @@ import API from 'AppData/api';
 import APIProduct from 'AppData/APIProduct';
 import APIContext from 'AppComponents/Apis/Details/components/ApiContext';
 import Utils from 'AppData/Utils';
-import { app } from 'Settings';
 
 const ReactMarkdown = lazy(() => import('react-markdown'));
 
