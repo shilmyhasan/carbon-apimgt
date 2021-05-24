@@ -1541,6 +1541,13 @@ public class ApisApiServiceImpl extends ApisApiService {
                 if (!documentation.getSourceType().equals(Documentation.DocumentSourceType.FILE)) {
                     RestApiUtil.handleBadRequest("Source type of document " + documentId + " is not FILE", log);
                 }
+                String filename = fileDetail.getContentDisposition().getFilename();
+                if (filename.endsWith(".pdf") || filename.endsWith(".txt") || filename.endsWith(".doc") || filename
+                                                .endsWith(".docx")) {
+                    RestApiPublisherUtils.attachFileToDocument(apiId, documentation, inputStream, fileDetail);
+                } else {
+                    RestApiUtil.handleBadRequest("Unsupported extension type of document file: " + filename, log);
+                }
                 RestApiPublisherUtils.attachFileToDocument(apiId, documentation, inputStream, fileDetail);
             } else if (inlineContent != null) {
                 if (!documentation.getSourceType().equals(Documentation.DocumentSourceType.INLINE)) {
