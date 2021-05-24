@@ -10,6 +10,9 @@ const Settings = {
         },
         subscriptionLimit: 1000,
         subscribeApplicationLimit: 5000,
+        markdown: {
+            skipHtml: true,
+        },
     },
     grantTypes: {
         authorization_code: 'Code',

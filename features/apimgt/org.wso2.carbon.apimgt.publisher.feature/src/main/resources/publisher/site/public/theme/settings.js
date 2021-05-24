@@ -8,5 +8,8 @@ const Settings = {
         origin: {
             host: 'localhost',
         },
+        markdown: {
+            skipHtml: true,
+        },
     },
 };

@@ -108,6 +108,7 @@ function View(props) {
     const [code, setCode] = useState('');
     const [doc, setDoc] = useState(null);
     const restAPI = isAPIProduct ? new APIProduct() : new API();
+    const skipHtml = Settings.app.markdown.skipHtml;
 
     useEffect(() => {
         const docPromise = restAPI.getDocument(api.id, documentId);
@@ -234,7 +235,7 @@ function View(props) {
                     <Paper className={classes.paper}>
                         {doc.sourceType === 'MARKDOWN' && (
                             <Suspense fallback={<CircularProgress />}>
-                                <ReactMarkdown escapeHtml={false} source={code} />
+                                <ReactMarkdown escapeHtml={skipHtml} source={code} />
                             </Suspense>
                         )}
                         {doc.sourceType === 'INLINE' && <ReactSafeHtml html={code} />}

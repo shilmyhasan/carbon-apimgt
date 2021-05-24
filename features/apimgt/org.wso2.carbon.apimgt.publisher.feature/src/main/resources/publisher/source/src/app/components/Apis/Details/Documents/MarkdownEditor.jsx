@@ -75,6 +75,7 @@ function MarkdownEditor(props) {
     const { api, isAPIProduct } = useContext(APIContext);
     const [isUpdating, setIsUpdating] = useState(false);
     const [open, setOpen] = useState(showAtOnce);
+    const skipHtml = Settings.app.markdown.skipHtml;
     const [code, setCode] = useState(
         intl.formatMessage({
             id: 'documents.markdown.editor.default',
@@ -196,7 +197,7 @@ function MarkdownEditor(props) {
                         <Grid item xs={6}>
                             <div className={classes.markdownViewWrapper}>
                                 <Suspense fallback={<CircularProgress />}>
-                                    <ReactMarkdown escapeHtml={false} source={code} />
+                                    <ReactMarkdown escapeHtml={skipHtml} source={code} />
                                 </Suspense>
                             </div>
                         </Grid>
