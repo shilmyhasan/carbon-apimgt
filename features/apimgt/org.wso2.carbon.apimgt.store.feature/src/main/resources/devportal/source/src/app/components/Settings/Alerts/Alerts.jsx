@@ -265,7 +265,11 @@ const Alerts = (props) => {
      * */
     const handleSubscribe = () => {
         setInProgress({ subscribing: true });
-        const alertsToSubscribe = { alerts: subscribedAlerts, emailList: emails };
+        const copyOfSubscribedAlerts = [...subscribedAlerts];
+        for (const subscribedAlert of copyOfSubscribedAlerts) {
+            subscribedAlert.configuration = [];
+        }
+        const alertsToSubscribe = { alerts: copyOfSubscribedAlerts, emailList: emails };
         api.subscribeAlerts(alertsToSubscribe).then(() => {
             Alert.success(intl.formatMessage({
                 id: 'Settings.Alerts.Alerts.subscribe.success.msg',
