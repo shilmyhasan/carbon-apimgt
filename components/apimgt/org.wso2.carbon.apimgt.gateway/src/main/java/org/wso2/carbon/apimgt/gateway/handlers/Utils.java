@@ -56,6 +56,7 @@ import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import javax.security.cert.CertificateEncodingException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -498,5 +499,17 @@ public class Utils {
             }
         }
         return propertyMap;
+    }
+
+    public static String getEncodedClientCertificate(X509Certificate certificate) throws CertificateEncodingException {
+        byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
+        if (isClientCertificateEncoded()) {
+            String base64EncodedString = APIConstants.BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n").
+                            concat(APIConstants.END_CERTIFICATE_STRING);
+            return Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
+        } else {
+            return APIConstants.BEGIN_CERTIFICATE_STRING_SPACE.concat(new String(encoded)).concat(" ").
+                            concat(APIConstants.END_CERTIFICATE_STRING);
+        }
     }
 }
