@@ -68,9 +68,15 @@ const RenderMethod = withTheme(RenderMethodBase);
 const styles = theme => ({
     root: {
         display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
         marginBottom: 10,
+    },
+    child: {
+        display: 'flex',
+        flexDirection: 'fow',
+        alignItems: 'center',
+        paddingBottom: 5,
     },
     heading: {
         marginRight: 20,
@@ -147,11 +153,10 @@ class Resources extends React.Component {
 
         return (
             <div className={classes.root}>
-                <div className={classes.contentWrapper}>
                     {Object.keys(paths).map((key) => {
                         const path = paths[key];
                         return (
-                            <div className={classes.root} key={key}>
+                            <div className={classes.child} key={key}>
                                 <Typography className={classes.heading} variant='body1'>
                                     {key}
                                 </Typography>
@@ -163,7 +168,6 @@ class Resources extends React.Component {
                             </div>
                         );
                     })}
-                </div>
             </div>
         );
     }
