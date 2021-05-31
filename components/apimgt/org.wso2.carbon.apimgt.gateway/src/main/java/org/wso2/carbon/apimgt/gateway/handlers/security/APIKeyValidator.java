@@ -760,6 +760,26 @@ public class APIKeyValidator {
 
     public APIKeyValidationInfoDTO validateSubscription(String context, String version, String consumerKey)
             throws APISecurityException {
+
+        if (isGatewayTokenCacheEnabled()) {
+            String cacheKey = context.concat(":").concat(version).concat(":").concat(consumerKey);
+            if (getGatewayKeyCache().containsKey(cacheKey)) {
+                return (APIKeyValidationInfoDTO) getGatewayKeyCache().get(cacheKey);
+            } else {
+                String syncKey = cacheKey.concat(this.getClass().getName());
+                synchronized (syncKey.intern()) {
+                    if (getGatewayKeyCache().containsKey(cacheKey)) {
+                        return (APIKeyValidationInfoDTO) getGatewayKeyCache().get(cacheKey);
+                    }
+                    APIKeyValidationInfoDTO subscriptionValidationInfo = dataStore.validateSubscription(context,
+                            version, consumerKey);
+                    if (subscriptionValidationInfo != null) {
+                        getGatewayKeyCache().put(cacheKey, subscriptionValidationInfo);
+                        return subscriptionValidationInfo;
+                    }
+                }
+            }
+        }
         return dataStore.validateSubscription(context, version, consumerKey);
     }
 }
