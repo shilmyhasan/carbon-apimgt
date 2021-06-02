@@ -2306,7 +2306,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             	}
         	}
             else if ("subcontext".equalsIgnoreCase(searchType)) {
-                result = APIUtil.searchAPIsByURLPattern(userRegistry, searchTerm, start,end);
+                result = APIUtil.searchAPIsByURLPattern(userRegistry, searchTerm, start,end);               ;
 
             }else {
             	result=searchPaginatedAPIs(userRegistry, searchTerm, searchType,start,end,isLazyLoad);
