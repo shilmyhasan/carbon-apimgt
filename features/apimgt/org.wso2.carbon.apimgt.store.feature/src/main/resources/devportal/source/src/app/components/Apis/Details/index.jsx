@@ -287,6 +287,18 @@ class Details extends React.Component {
      *
      * @memberof Details
      */
+    componentDidUpdate() {
+        if (this.props.match.params.api_uuid !== this.api_uuid) {
+            this.api_uuid = this.props.match.params.api_uuid;
+            this.updateSubscriptionData();
+        }
+    }
+
+    /**
+     *
+     *
+     * @memberof Details
+     */
     componentDidMount() {
         this.updateSubscriptionData();
     }
