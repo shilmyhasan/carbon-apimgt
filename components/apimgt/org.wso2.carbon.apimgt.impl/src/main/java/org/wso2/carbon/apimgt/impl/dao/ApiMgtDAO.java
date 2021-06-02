@@ -843,7 +843,7 @@ public class ApiMgtDAO {
         try {
             conn = APIMgtDBUtil.getConnection();
             conn.setAutoCommit(false);
-            
+
             Identifier identifier;
 
             //Query to check if this subscription already exists
@@ -945,7 +945,7 @@ public class ApiMgtDAO {
         }
         return subscriptionId;
     }
-    
+
     /**
      * Removes the subscription entry from AM_SUBSCRIPTIONS for identifier.
      *
@@ -1210,7 +1210,7 @@ public class ApiMgtDAO {
 
                 int applicationId = resultSet.getInt("APPLICATION_ID");
                 Application application = getApplicationById(applicationId);
-                
+
                 if (APIConstants.API_PRODUCT.equals(resultSet.getString("API_TYPE"))) {
                     APIProductIdentifier apiProductIdentifier = new APIProductIdentifier(
                             APIUtil.replaceEmailDomain(resultSet.getString("API_PROVIDER")),
@@ -1223,7 +1223,7 @@ public class ApiMgtDAO {
                             resultSet.getString("API_NAME"), resultSet.getString("API_VERSION"));
                     subscribedAPI = new SubscribedAPI(application.getSubscriber(), apiIdentifier);
                 }
-                
+
                 subscribedAPI.setUUID(resultSet.getString("UUID"));
                 subscribedAPI.setSubscriptionId(resultSet.getInt("SUBSCRIPTION_ID"));
                 subscribedAPI.setSubStatus(resultSet.getString("SUB_STATUS"));
@@ -4458,6 +4458,66 @@ public class ApiMgtDAO {
         return false;
     }
 
+    public boolean isApplicationGroupCombinationExists(String appName, String username, String groupId) throws APIManagementException {
+        if (username == null) {
+            return false;
+        }
+
+        Subscriber subscriber = getSubscriber(username);
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        int appId = 0;
+
+        String sqlQuery = SQLConstants.GET_APPLICATION_ID_PREFIX;
+
+        String whereClauseWithGroupId = " AND APP.GROUP_ID = ?";
+
+        String whereClauseWithMultiGroupId = " AND (APP.APPLICATION_ID IN (SELECT APPLICATION_ID  FROM " +
+                "AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID IN ($params) AND TENANT = ?))";
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+
+            if (!StringUtils.isEmpty(groupId)) {
+                if (multiGroupAppSharingEnabled) {
+                    sqlQuery += whereClauseWithMultiGroupId;
+                    String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
+                    String[] grpIdArray = groupId.split(",");
+                    int noOfParams = grpIdArray.length;
+                    preparedStatement = fillQueryParams(connection, sqlQuery, grpIdArray, 2);
+                    preparedStatement.setString(1, appName);
+                    int paramIndex = noOfParams + 1;
+                    preparedStatement.setString(++paramIndex, tenantDomain);
+                } else {
+                    sqlQuery += whereClauseWithGroupId;
+                    preparedStatement = connection.prepareStatement(sqlQuery);
+                    preparedStatement.setString(1, appName);
+                    preparedStatement.setString(2, groupId);
+                }
+            }
+
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                appId = resultSet.getInt("APPLICATION_ID");
+            }
+
+            if (appId > 0) {
+                return true;
+            }
+
+        } catch (SQLException e) {
+            handleException("Error while getting the id  of " + appName + " from the persistence store.", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, resultSet);
+        }
+        return false;
+
+    }
+
     /**
      * Check whether the new user has an application
      *
@@ -4796,7 +4856,7 @@ public class ApiMgtDAO {
             } else {
                 sqlQuery = sqlQuery.replace("$3", sortColumn);
             }
-            
+
             if (groupingId != null && !"null".equals(groupingId) && !groupingId.isEmpty()) {
                 if (multiGroupAppSharingEnabled) {
                     String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
@@ -7405,9 +7465,9 @@ public class ApiMgtDAO {
         }
         return id;
     }
-    
+
     /**
-     * Get product Id from the product name and the provider. 
+     * Get product Id from the product name and the provider.
      * @param product product identifier
      * @throws APIManagementException exception
      */
@@ -8439,7 +8499,7 @@ public class ApiMgtDAO {
             } else if (identifier instanceof APIProductIdentifier) {
                 id = ((APIProductIdentifier) identifier).getProductId();
             }
-            
+
             conn = APIMgtDBUtil.getConnection();
             if (conn.getMetaData().getDriverName().contains("PostgreSQL")) {
                 sqlQuery = postgreSQL;
@@ -9800,7 +9860,7 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(ps, null, null);
         }
     }
-    
+
     /**
      * Check the given api name is already available in the api table under given tenant domain
      *
@@ -14259,7 +14319,7 @@ public class ApiMgtDAO {
         }
         return application;
     }
-    
+
     /**
      * Retrieve URI Templates for the given API
      * @param api API
@@ -14284,22 +14344,22 @@ public class ApiMgtDAO {
                 URITemplate template = new URITemplate();
                 String urlPattern = rs.getString("URL_PATTERN");
                 String httpMethod = rs.getString("HTTP_METHOD");
-                
+
                 template.setHTTPVerb(httpMethod);
                 template.setResourceURI(urlPattern);
                 template.setId(rs.getInt("URL_MAPPING_ID"));
 
                 //TODO populate others if needed
-                
+
                 templatesMap.put(httpMethod + ":" + urlPattern, template);
             }
-           
+
         } catch (SQLException e) {
             handleException("Error while obtaining details of the URI Template for api " + api.getId() , e);
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
         }
-        
+
         return templatesMap;
     }
 
@@ -14344,7 +14404,7 @@ public class ApiMgtDAO {
         int productId = 0;
         int scopeId = 0;
         try {
-            connection = APIMgtDBUtil.getConnection();   
+            connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             String queryAddAPIProduct = SQLConstants.ADD_API_PRODUCT;
             prepStmtAddAPIProduct = connection.prepareStatement(queryAddAPIProduct, new String[]{"api_id"});
@@ -14538,7 +14598,7 @@ public class ApiMgtDAO {
         }
         return productId;
     }
-    
+
     public void updateAPIProduct(APIProduct product, String username) throws APIManagementException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -15015,7 +15075,7 @@ public class ApiMgtDAO {
         }
         return userID;
     }
-    
+
     /**
      * Get names of the tiers which has bandwidth as the quota type
      * @param tenantId id of the tenant

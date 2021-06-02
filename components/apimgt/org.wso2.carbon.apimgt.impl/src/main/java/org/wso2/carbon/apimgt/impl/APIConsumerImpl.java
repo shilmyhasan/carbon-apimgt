@@ -162,6 +162,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
@@ -2305,7 +2306,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             	}
         	}
             else if ("subcontext".equalsIgnoreCase(searchType)) {
-                result = APIUtil.searchAPIsByURLPattern(userRegistry, searchTerm, start,end);               ;
+                result = APIUtil.searchAPIsByURLPattern(userRegistry, searchTerm, start,end);
 
             }else {
             	result=searchPaginatedAPIs(userRegistry, searchTerm, searchType,start,end,isLazyLoad);
@@ -3483,6 +3484,23 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
         }
 
+        String processedIds;
+
+        if (!existingApp.getName().equals(application.getName())) {
+            processedIds = application.getGroupId();
+        } else {
+            processedIds = processGroupIds(existingApp.getGroupId(), application.getGroupId());
+        }
+
+        if (    application.getGroupId()!= null &&
+                APIUtil.isApplicationGroupCombinationExist(
+                application.getSubscriber().getName(),
+                application.getName(),
+                processedIds)) {
+            handleResourceAlreadyExistsException(
+                    "A duplicate application already exists by the name - " + application.getName());
+        }
+
         Subscriber subscriber = application.getSubscriber();
 
         JSONArray applicationAttributesFromConfig = getAppAttributesFromConfig(subscriber.getName());
@@ -3578,6 +3596,21 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             Thread recommendationThread = new Thread(extractor);
             recommendationThread.start();
         }
+    }
+
+    private String processGroupIds(String existing, String updated) {
+        if (updated == null || updated.isEmpty()) {
+            return updated;
+        }
+
+        List<String> existingList = existing == null || existing.isEmpty() ?
+                new ArrayList<>() : Arrays.asList(existing.split(","));
+        List<String> updatedList = Arrays.asList(updated.split(","));
+
+        updatedList = updatedList.stream().filter(item -> !existingList.contains(item)).collect(Collectors.toList());
+
+        updated = String.join(",", updatedList);
+        return updated;
     }
 
     /**
