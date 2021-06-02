@@ -897,6 +897,8 @@ public class WSDL11SOAPOperationExtractor extends WSDL11ProcessorImpl {
             return new DateTimeProperty();
         case "decimal":
             return new DecimalProperty();
+        case "anytype":
+            return new ObjectProperty();
         default:
             return new RefProperty();
         }
