@@ -1791,12 +1791,13 @@ class API extends Resource {
      * @returns {Promise}
      *
      */
-    static policies(policyLevel) {
+    static policies(policyLevel, limit = 80) {
         const apiClient = new APIClientFactory().getAPIClient(Utils.getCurrentEnvironment()).client;
         return apiClient.then(client => {
             return client.apis['Throttling Policies'].getAllThrottlingPolicies(
                 {
                     policyLevel: policyLevel,
+                    limit,
                 },
                 this._requestMetaData(),
             );
