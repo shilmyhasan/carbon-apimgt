@@ -28,21 +28,25 @@ import org.apache.synapse.rest.RESTConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.util.Base64;
 import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.api.dto.ConditionGroupDTO;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
-import org.wso2.carbon.apimgt.gateway.handlers.security.*;
+import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
+import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
+import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityUtils;
+import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationContext;
+import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationResponse;
+import org.wso2.carbon.apimgt.gateway.handlers.security.Authenticator;
 import org.wso2.carbon.apimgt.gateway.utils.OpenAPIUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * An API consumer authenticator which authenticates user requests using
@@ -58,6 +62,7 @@ public class BasicAuthAuthenticator implements Authenticator {
     private String securityHeader;
     private String requestOrigin;
     private OpenAPI openAPI = null;
+    private String apiLevelPolicy;
     private boolean isMandatory;
 
     /**
@@ -65,9 +70,11 @@ public class BasicAuthAuthenticator implements Authenticator {
      *
      * @param authorizationHeader the Authorization header
      */
-    public BasicAuthAuthenticator(String authorizationHeader, boolean isMandatory) {
+    public BasicAuthAuthenticator(String authorizationHeader, boolean isMandatory, String apiLevelPolicy) {
+
         this.securityHeader = authorizationHeader;
         this.isMandatory = isMandatory;
+        this.apiLevelPolicy = apiLevelPolicy;
     }
 
     /**
@@ -202,9 +209,10 @@ public class BasicAuthAuthenticator implements Authenticator {
             authContext.setApplicationName(null);
             authContext.setApplicationId(clientIP); //Set clientIp as application ID in unauthenticated scenario
             authContext.setConsumerKey(null);
+            authContext.setApiTier(apiLevelPolicy);
             APISecurityUtils.setAuthenticationContext(synCtx, authContext, null);
 
-            if (log.isDebugEnabled()) {;
+            if (log.isDebugEnabled()) {
                 log.debug("Basic Authentication: Authentication succeeded by ignoring auth headers for API resource: "
                         .concat(matchingResource));
             }
@@ -272,6 +280,7 @@ public class BasicAuthAuthenticator implements Authenticator {
                     authContext.setApplicationName(APIConstants.BASIC_AUTH_APPLICATION_NAME);
                     authContext.setApplicationId(username); //Set username as application ID in basic auth scenario
                     authContext.setConsumerKey(null);
+                    authContext.setApiTier(apiLevelPolicy);
                     APISecurityUtils.setAuthenticationContext(synCtx, authContext, null);
                 }
                 log.debug("Basic Authentication: Scope validation passed");
