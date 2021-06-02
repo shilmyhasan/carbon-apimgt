@@ -57,7 +57,7 @@ public class BasicAuthAuthenticatorTest {
         Mockito.when((messageContext.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT)))
                 .thenReturn(Mockito.mock(OpenAPI.class));
 
-        basicAuthAuthenticator = new BasicAuthAuthenticator(CUSTOM_AUTH_HEADER, true);
+        basicAuthAuthenticator = new BasicAuthAuthenticator(CUSTOM_AUTH_HEADER, true,"Unlimited");
         BasicAuthCredentialValidator basicAuthCredentialValidator = Mockito.mock(BasicAuthCredentialValidator.class);
 
         Mockito.when(basicAuthCredentialValidator.validate(Mockito.anyString(), Mockito.anyString()))
