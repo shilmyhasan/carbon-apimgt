@@ -23,7 +23,7 @@ const AppConfig = {
         },
         mediationPolicyCount: 50,
         alertMaxAPIGetLimit: 5000,
-        // throttlingPolicyLimit: 80,   // Uncomment to change the limit /api/am/publisher/v1/throttling-policies/api?limit=80
+        throttlingPolicyLimit: 80,   // Uncomment to change the limit /api/am/publisher/v1/throttling-policies/api?limit=80
         markdown: {
             skipHtml: true,
         },
