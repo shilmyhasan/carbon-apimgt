@@ -409,8 +409,7 @@ export default function Resources(props) {
                 });
         }
         // Fetch API level throttling policies only when the page get mounted for the first time `componentDidMount`
-        const limit = Configurations.app && Configurations.app.throttlingPolicyLimit
-            ? Configurations.app.throttlingPolicyLimit : 80;
+        const limit = Configurations.app.throttlingPolicyLimit;
         API.policies('api', limit).then((response) => {
             setOperationRateLimits(response.body.list);
         });
