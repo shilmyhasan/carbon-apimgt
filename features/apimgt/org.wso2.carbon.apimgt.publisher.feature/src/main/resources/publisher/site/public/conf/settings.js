@@ -23,6 +23,7 @@ const AppConfig = {
         },
         mediationPolicyCount: 50,
         alertMaxAPIGetLimit: 5000,
+        throttlingPolicyLimit: 80,
         markdown: {
             skipHtml: true,
         },
