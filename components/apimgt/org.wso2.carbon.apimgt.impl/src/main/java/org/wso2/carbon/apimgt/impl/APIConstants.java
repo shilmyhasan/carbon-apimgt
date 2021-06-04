@@ -172,7 +172,7 @@ public final class APIConstants {
     public static final String WSDL_FILE = "wsdlFile";
     public static final String UPDATED_WSDL_ZIP = "updated.zip";
     public static final String FILE_URI_PREFIX = "file://";
-    
+
     public static final String API_DOC_RESOURCE_NAME = "api-doc.json";
 
     public static final String API_DOC_1_2_RESOURCE_NAME = "/api-doc";
@@ -340,7 +340,7 @@ public final class APIConstants {
     public static final String IDENTITY_OAUTH2_FIELD_TIME_CREATED = "TIME_CREATED";
     public static final String IDENTITY_OAUTH2_FIELD_VALIDITY_PERIOD = "VALIDITY_PERIOD";
     public static final String IDENTITY_OAUTH2_FIELD_USER_DOMAIN = "USER_DOMAIN";
-    
+
     public static final String DOT = ".";
     public static final String EXP = "exp";
     public static final String JWT = "JWT";
@@ -1507,7 +1507,13 @@ public final class APIConstants {
     public static final String CORRELATION_LOGGER = "correlation";
     public static final String LOG_ALL_METHODS = "logAllMethods";
     public static final String AM_ACTIVITY_ID = "activityid";
-    
+
+    /**
+     * Constants for message track logging
+     * */
+    public static final String MESSAGE_TRACK_LOGGER = "MessageTracker";
+    public static final String ENABLE_MESSAGE_TRACKING_LOGS = "enableMessageTrackingLogs";
+
     public static final String WSO2_ANONYMOUS_USER = "wso2.anonymous.user";
 
     public static class CertificateReLoaderConfiguration {
