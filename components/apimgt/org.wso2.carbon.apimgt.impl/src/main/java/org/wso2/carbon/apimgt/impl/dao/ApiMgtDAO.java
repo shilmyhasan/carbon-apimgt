@@ -4472,8 +4472,7 @@ public class ApiMgtDAO {
         String whereClauseWithMultiGroupId = " AND (APP.APPLICATION_ID IN (SELECT APPLICATION_ID  FROM " +
                 "AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID IN ($params) AND TENANT = ?))";
 
-        try(Connection connection = APIMgtDBUtil.getConnection();
-        ) {
+        try(Connection connection = APIMgtDBUtil.getConnection();) {
             if (!StringUtils.isEmpty(groupId)) {
                 if (multiGroupAppSharingEnabled) {
                     sqlQuery += whereClauseWithMultiGroupId;
