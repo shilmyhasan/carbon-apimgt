@@ -49,7 +49,13 @@ public class MutualSSLCertificateHandler extends AbstractHandler {
             X509Certificate clientCertificate = Utils.getClientCertificate(axis2MsgContext);
             headers.remove(Utils.getClientCertificateHeader());
             if (clientCertificate != null) {
-                headers.put(Utils.getClientCertificateHeader(), Utils.getEncodedClientCertificate(clientCertificate));
+                byte[] encoded = Base64.encodeBase64(clientCertificate.getEncoded());
+                String base64EncodedString =
+                        APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING
+                                .concat(new String(encoded)).concat("\n")
+                                .concat(APIMgtGatewayConstants.END_CERTIFICATE_STRING);
+                base64EncodedString = Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
+                headers.put(Utils.getClientCertificateHeader(), base64EncodedString);
             }
         } catch (APIManagementException | CertificateEncodingException e) {
             log.error("Error while converting client certificate", e);
