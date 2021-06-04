@@ -3603,13 +3603,16 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             return updated;
         }
 
-        List<String> existingList = existing == null || existing.isEmpty() ?
-                new ArrayList<>() : Arrays.asList(existing.split(","));
-        List<String> updatedList = Arrays.asList(updated.split(","));
+        Set<String> existingSet = new HashSet<>();
+        if (existing != null && !existing.isEmpty()) {
+            existingSet.addAll(Arrays.asList(existing.split(",")));
+        }
+        Set<String> updatedSet = new HashSet<>();
+        updatedSet.addAll(Arrays.asList(updated.split(",")));
 
-        updatedList = updatedList.stream().filter(item -> !existingList.contains(item)).collect(Collectors.toList());
+        updatedSet.removeAll(existingSet);
 
-        updated = String.join(",", updatedList);
+        updated = String.join(",", updatedSet);
         return updated;
     }
 
