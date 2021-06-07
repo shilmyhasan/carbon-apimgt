@@ -162,6 +162,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
@@ -3483,6 +3484,20 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
         }
 
+        String processedIds;
+
+        if (!existingApp.getName().equals(application.getName())) {
+            processedIds = application.getGroupId();
+        } else {
+            processedIds = processGroupIds(existingApp.getGroupId(), application.getGroupId());
+        }
+
+        if (application.getGroupId()!= null &&
+            APIUtil.isApplicationGroupCombinationExist(application.getSubscriber().getName(), application.getName(),
+            processedIds)) {
+            handleResourceAlreadyExistsException("A duplicate application already exists by the name - "
+                    + application.getName()); }
+
         Subscriber subscriber = application.getSubscriber();
 
         JSONArray applicationAttributesFromConfig = getAppAttributesFromConfig(subscriber.getName());
@@ -3578,6 +3593,24 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             Thread recommendationThread = new Thread(extractor);
             recommendationThread.start();
         }
+    }
+
+    private String processGroupIds(String existing, String updated) {
+        if (updated == null || updated.isEmpty()) {
+            return updated;
+        }
+
+        Set<String> existingSet = new HashSet<>();
+        if (existing != null && !existing.isEmpty()) {
+            existingSet.addAll(Arrays.asList(existing.split(",")));
+        }
+        Set<String> updatedSet = new HashSet<>();
+        updatedSet.addAll(Arrays.asList(updated.split(",")));
+
+        updatedSet.removeAll(existingSet);
+
+        updated = String.join(",", updatedSet);
+        return updated;
     }
 
     /**
