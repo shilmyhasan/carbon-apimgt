@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.apimgt.impl;
 
+import com.google.common.collect.FluentIterable;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -537,7 +539,9 @@ public final class APIConstants {
     public static final String CACHE_INVALIDATION_TYPE = "type";
     public static final String GATEWAY_JWKS_CACHE = "JWKS_CACHE";
     public static final String BLOCKING_CONDITION_ID = "id";
-
+    public static final String BEGIN_CERTIFICATE_STRING = "-----BEGIN CERTIFICATE-----\n";
+    public static final String BEGIN_CERTIFICATE_STRING_SPACE = "-----BEGIN CERTIFICATE----- ";
+    public static final String END_CERTIFICATE_STRING = "-----END CERTIFICATE-----";
     public static class TokenStatus {
         public static final String ACTIVE = "ACTIVE";
         public static final String BLOCKED = "BLOCKED";
