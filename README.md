@@ -77,3 +77,4 @@ https://github.com/wso2-support/identity-inbound-auth-oauth/tree/support-6.4.2
 
     1. carbon-kernel/core/javax.cache - support-4.6.0
 https://github.com/wso2-support/carbon-kernel/tree/support-4.6.0/core/javax.cache
+- [Support-9.0.174.x-full](https://github.com/wso2-support/carbon-apimgt/tree/support-9.0.174.x-full) - APIM 4.0.0
