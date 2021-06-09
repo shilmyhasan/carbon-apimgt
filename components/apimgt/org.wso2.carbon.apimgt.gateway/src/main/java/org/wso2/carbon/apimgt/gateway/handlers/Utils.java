@@ -47,8 +47,6 @@ import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
-import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
-import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
@@ -69,6 +67,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.cache.Caching;
+import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.CertificateException;
 import javax.security.cert.X509Certificate;
 import javax.xml.namespace.QName;
@@ -498,5 +497,17 @@ public class Utils {
             }
         }
         return propertyMap;
+    }
+
+    public static String getEncodedClientCertificate(X509Certificate certificate) throws CertificateEncodingException {
+
+        byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
+        if (isClientCertificateEncoded()) {
+            String base64EncodedString = APIConstants.BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n"
+            ).concat(APIConstants.END_CERTIFICATE_STRING);
+            return Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
+        } else {
+            return APIConstants.BEGIN_CERTIFICATE_STRING_SPACE.concat(new String(encoded)).concat(" ").concat(APIConstants.END_CERTIFICATE_STRING);
+        }
     }
 }
