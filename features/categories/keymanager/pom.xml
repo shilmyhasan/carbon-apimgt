@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.wso2.carbon.apimgt</groupId>
         <artifactId>feature-categories</artifactId>
-        <version>6.6.163.38-SNAPSHOT</version>
+        <version>6.6.163.38</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
