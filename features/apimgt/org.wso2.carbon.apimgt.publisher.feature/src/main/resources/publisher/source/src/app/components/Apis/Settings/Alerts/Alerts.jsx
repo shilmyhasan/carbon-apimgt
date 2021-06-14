@@ -202,7 +202,9 @@ const Alerts = (props) => {
      * @param {string} email The email address that is being added.
      * */
     const handleAddEmail = (email) => {
-        setEmailsList(email);
+        const newEmail = [...emails];
+        newEmail.push(email);
+        setEmailsList(newEmail);
     };
 
     /**
@@ -211,10 +213,7 @@ const Alerts = (props) => {
      * @param {string} email : The email that is being deleted.
      * */
     const handleEmailDeletion = (email) => {
-        const newEmails = emails.filter((oldEmail) => {
-            return oldEmail !== email;
-        });
-        setEmailsList(newEmails);
+        setEmailsList([...emails].filter((oldEmail) => oldEmail !== email));
     };
 
     useEffect(() => {
@@ -369,7 +368,7 @@ const Alerts = (props) => {
                                             helperText={'Email address to receive alerts of selected'
                                                 + ' Alert types. Type email'
                                                 + ' address and press Enter to add'}
-                                            onChange={(chip) => {
+                                            onAdd={(chip) => {
                                                 handleAddEmail(chip);
                                             }}
                                             onDelete={(chip) => {
@@ -417,7 +416,7 @@ const Alerts = (props) => {
                         </>
                     )}
             </Paper>
-            <Dialog fullWidth maxWidth='md' open={openDialog.open}>
+            <Dialog open={openDialog.open}>
                 <DialogTitle>
                     <FormattedMessage
                         id='Settings.Alerts.Alerts.configure.alert'
