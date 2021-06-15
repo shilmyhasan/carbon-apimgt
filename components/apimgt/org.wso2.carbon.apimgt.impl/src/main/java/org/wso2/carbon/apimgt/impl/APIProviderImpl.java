@@ -1305,19 +1305,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             //If gateway(s) exist, remove resource paths saved on the cache.
 
-            if (gatewayExists && !oldApi.getUriTemplates().equals(api.getUriTemplates())) {
-                Set<URITemplate> resourceVerbs = api.getUriTemplates();
-
-
-                    if (resourceVerbs != null) {
-                            invalidateResourceCache(api.getContext(), api.getId().getVersion(),resourceVerbs);
-                            if (log.isDebugEnabled()) {
-                                log.debug("Calling invalidation cache");
-                            }
-                    }
-
+            if (gatewayExists) {
+                invalidateResourceCache(api.getContext(), api.getId().getVersion(), Collections.EMPTY_SET);
             }
-
 
             // update apiContext cache
             if (APIUtil.isAPIManagementEnabled()) {
