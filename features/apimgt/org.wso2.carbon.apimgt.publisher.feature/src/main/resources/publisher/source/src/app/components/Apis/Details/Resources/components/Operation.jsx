@@ -65,6 +65,7 @@ function Operation(props) {
         resourcePoliciesDispatcher,
         target,
         verb,
+        resolvedSpec,
     } = props;
     const [isExpanded, setIsExpanded] = useState(false);
     const useStyles = makeStyles((theme) => {
@@ -239,6 +240,7 @@ function Operation(props) {
                                 spec={spec}
                                 target={target}
                                 verb={verb}
+                                resolvedSpec={resolvedSpec}
                             />
                         )}
                         {resourcePolicy && (
@@ -286,6 +288,7 @@ Operation.propTypes = {
     spec: PropTypes.shape({}).isRequired,
     highlight: PropTypes.bool,
     operationRateLimits: PropTypes.arrayOf(PropTypes.shape({})),
+    resolvedSpec: PropTypes.shape({}).isRequired,
 };
 
 export default React.memo(Operation);

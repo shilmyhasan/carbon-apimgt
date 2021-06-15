@@ -74,16 +74,6 @@ export default function SpecErrors(props) {
                                             color: 'error',
                                         }}
                                         inset
-                                        secondary={
-                                            <React.Fragment>
-                                                <Typography component='span' variant='body2' color='textPrimary'>
-                                                    In - {error.pointer}
-                                                </Typography>
-                                                <Typography variant='caption' display='block' gutterBottom>
-                                                    Full Path - {error.fullPath.join('.')}
-                                                </Typography>
-                                            </React.Fragment>
-                                        }
                                     />
                                 </ListItem>
                             </Fragment>

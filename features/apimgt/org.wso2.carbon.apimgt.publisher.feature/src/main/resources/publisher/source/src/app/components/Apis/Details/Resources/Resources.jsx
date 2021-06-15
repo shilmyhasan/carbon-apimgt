@@ -27,7 +27,9 @@ import Banner from 'AppComponents/Shared/Banner';
 import API from 'AppData/api';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PropTypes from 'prop-types';
+import SwaggerParser from 'swagger-parser';
 import { isRestricted } from 'AppData/AuthManager';
+import CONSTS from 'AppData/Constants';
 import Operation from './components/Operation';
 import GroupOfOperations from './components/GroupOfOperations';
 import SpecErrors from './components/SpecErrors';
@@ -58,10 +60,10 @@ export default function Resources(props) {
     const [api, updateAPI] = useAPI();
     const [pageError, setPageError] = useState(false);
     const [operationRateLimits, setOperationRateLimits] = useState([]);
-    const [specErrors] = useState([]);
     const [markedOperations, setSelectedOperation] = useState({});
     const [openAPISpec, setOpenAPISpec] = useState({});
     const [apiThrottlingPolicy, setApiThrottlingPolicy] = useState(api.apiThrottlingPolicy);
+    const [resolvedSpec, setResolvedSpec] = useState({ spec: {}, errors: [] });
 
     /**
      *
@@ -228,6 +230,24 @@ export default function Resources(props) {
      * @returns
      */
     function resolveAndUpdateSpec(rawSpec) {
+        /*
+        * Deep copying the spec.
+        * Otherwise it will resolved to the original parameter passed (rawSpec) to the validate method.
+        * We will not alter the provided spec.
+        */
+        const specCopy = cloneDeep(rawSpec);
+        /*
+        * Used SwaggerParser.validate() because we can get the errors as well.
+        */
+        SwaggerParser.validate(specCopy, (err, result) => {
+            setResolvedSpec(() => {
+                const errors = err ? [err] : [];
+                return {
+                    spec: result,
+                    errors,
+                };
+            });
+        });
         operationsDispatcher({ action: 'init', data: rawSpec.paths });
         setOpenAPISpec(rawSpec);
     }
@@ -363,7 +383,7 @@ export default function Resources(props) {
 
     // Note: Make sure not to use any hooks after/within this condition , because it returns conditionally
     // If you do so, You will probably get `Rendered more hooks than during the previous render.` exception
-    if (!pageError && isEmpty(openAPISpec)) {
+    if ((!pageError && isEmpty(openAPISpec)) || (resolvedSpec.errors.length === 0 && isEmpty(resolvedSpec.spec))) {
         return (
             <Grid container direction='row' justify='center' alignItems='center'>
                 <Grid item>
@@ -394,7 +414,7 @@ export default function Resources(props) {
                     <AddOperation operationsDispatcher={operationsDispatcher} />
                 </Grid>
             )}
-            {specErrors.length > 0 && <SpecErrors specErrors={specErrors} />}
+            {resolvedSpec.errors.length > 0 && <SpecErrors specErrors={resolvedSpec.errors} />}
             <Grid item md={12}>
                 <Paper>
                     {!disableMultiSelect && (
@@ -415,7 +435,7 @@ export default function Resources(props) {
                                     alignItems='stretch'
                                 >
                                     {Object.entries(verbObject).map(([verb, operation]) => {
-                                        return (
+                                        return CONSTS.HTTP_METHODS.includes(verb) ? (
                                             <Grid key={`${target}/${verb}`} item>
                                                 <Operation
                                                     target={target}
@@ -440,9 +460,10 @@ export default function Resources(props) {
                                                     }
                                                     disableMultiSelect={disableMultiSelect}
                                                     {...operationProps}
+                                                    resolvedSpec={resolvedSpec.spec}
                                                 />
                                             </Grid>
-                                        );
+                                        ) : null;
                                     })}
                                 </Grid>
                             </GroupOfOperations>
