@@ -48,13 +48,13 @@ function RequestBody(props) {
                 {operation.requestBody.required
                     ? (
                         <FormattedMessage
-                            id={'Apis.Details.Resources.components.operationComponents.ListParameter.yes'}
+                            id='Apis.Details.Resources.components.operationComponents.ListParameter.yes'
                             defaultMessage='Yes'
                         />
                     )
                     : (
                         <FormattedMessage
-                            id={'Apis.Details.Resources.components.operationComponents.ListParameter.no'}
+                            id='Apis.Details.Resources.components.operationComponents.ListParameter.no'
                             defaultMessage='No'
                         />
                     )}
@@ -70,7 +70,7 @@ function RequestBody(props) {
                     )}
                     <Tooltip title={(
                         <FormattedMessage
-                            id={'Apis.Details.Resources.components.operationComponents.ListParameter.delete'}
+                            id='Apis.Details.Resources.components.operationComponents.ListParameter.delete'
                             defaultMessage='Delete'
                         />
                     )}

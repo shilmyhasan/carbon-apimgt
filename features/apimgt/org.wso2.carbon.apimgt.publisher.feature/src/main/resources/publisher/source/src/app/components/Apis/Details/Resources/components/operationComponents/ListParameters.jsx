@@ -79,21 +79,20 @@ export default function ListParameters(props) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {operation.parameters
-                        && operation.parameters.map((parameter, index) => {
-                            const isRefParam = isRef(parameter);
-                            const paramCopy = isRefParam ? resolvedSpec.paths[target][verb].parameters[index] : parameter;
-                            return (
-                                <TableRow key={paramCopy.name}>
-                                    <TableCell align='left'>{capitalizeFirstLetter(paramCopy.in)}</TableCell>
-                                    <TableCell align='left'>{paramCopy.name}</TableCell>
+                    {operation.parameters && operation.parameters.map((parameter, index) => {
+                        const isRefParam = isRef(parameter);
+                        const paramCopy = isRefParam ? resolvedSpec.paths[target][verb].parameters[index] : parameter;
+                        return (
+                            <TableRow key={paramCopy.name}>
+                                <TableCell align='left'>{capitalizeFirstLetter(paramCopy.in)}</TableCell>
+                                <TableCell align='left'>{paramCopy.name}</TableCell>
                                 <TableCell align='left'>
-                                        {capitalizeFirstLetter(paramCopy.schema ? paramCopy.schema.type : paramCopy.type)}
+                                    {capitalizeFirstLetter(paramCopy.schema ? paramCopy.schema.type : paramCopy.type)}
                                 </TableCell>
-                                    <TableCell align='left'>{paramCopy.required ? 'Yes' : 'No'}</TableCell>
+                                <TableCell align='left'>{paramCopy.required ? 'Yes' : 'No'}</TableCell>
                                 {!disableUpdate && (
                                     <TableCell align='left'>
-                                            {!isRefParam && (
+                                        {!isRefParam && (
                                             <Tooltip title='Edit'>
                                                 <IconButton
                                                     onClick={() => setEditingParameter(parameter)}
@@ -120,11 +119,11 @@ export default function ListParameters(props) {
                                     </TableCell>
                                 )}
                             </TableRow>
-                            );
-                        })}
+                        );
+                    })}
                     {operation.requestBody && (isRef(operation.requestBody)
-                        ? Object.entries(resolvedSpec.paths[target][verb].requestBody.content).map(
-                            ([contentType, content]) => {
+                        ? Object.entries(resolvedSpec.paths[target][verb].requestBody.content)
+                            .map(([contentType, content]) => {
                                 return (
                                     <RequestBody
                                         contentType={contentType}
@@ -137,8 +136,7 @@ export default function ListParameters(props) {
                                         verb={verb}
                                     />
                                 );
-                            },
-                        ) : Object.entries(operation.requestBody.content).map(([contentType, content]) => {
+                            }) : Object.entries(operation.requestBody.content).map(([contentType, content]) => {
                             return (
                                 <RequestBody
                                     contentType={contentType}
