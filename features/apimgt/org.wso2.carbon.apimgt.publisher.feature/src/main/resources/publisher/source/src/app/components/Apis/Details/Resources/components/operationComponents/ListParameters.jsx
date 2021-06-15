@@ -29,6 +29,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import { capitalizeFirstLetter } from 'AppData/stringFormatter';
+import { isRef } from 'AppComponents/Apis/Details/Resources/operationUtils';
+import RequestBody from 'AppComponents/Apis/Details/Resources/components/operationComponents/RequestBody';
 import EditParameter from './EditParameter';
 
 const useStyles = makeStyles({
@@ -50,7 +52,7 @@ const useStyles = makeStyles({
  */
 export default function ListParameters(props) {
     const {
-        operation, operationsDispatcher, target, verb, disableUpdate, hideParameterEdit,
+        operation, operationsDispatcher, target, verb, disableUpdate, hideParameterEdit, resolvedSpec,
     } = props;
     const classes = useStyles();
     const [editingParameter, setEditingParameter] = useState(null);
@@ -77,18 +79,21 @@ export default function ListParameters(props) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {operation.parameters &&
-                        operation.parameters.map(parameter => (
-                            <TableRow key={parameter.name}>
-                                <TableCell align='left'>{capitalizeFirstLetter(parameter.in)}</TableCell>
-                                <TableCell align='left'>{parameter.name}</TableCell>
+                    {operation.parameters
+                        && operation.parameters.map((parameter, index) => {
+                            const isRefParam = isRef(parameter);
+                            const paramCopy = isRefParam ? resolvedSpec.paths[target][verb].parameters[index] : parameter;
+                            return (
+                                <TableRow key={paramCopy.name}>
+                                    <TableCell align='left'>{capitalizeFirstLetter(paramCopy.in)}</TableCell>
+                                    <TableCell align='left'>{paramCopy.name}</TableCell>
                                 <TableCell align='left'>
-                                    {capitalizeFirstLetter(parameter.schema ? parameter.schema.type : parameter.type)}
+                                        {capitalizeFirstLetter(paramCopy.schema ? paramCopy.schema.type : paramCopy.type)}
                                 </TableCell>
-                                <TableCell align='left'>{parameter.required ? 'Yes' : 'No'}</TableCell>
+                                    <TableCell align='left'>{paramCopy.required ? 'Yes' : 'No'}</TableCell>
                                 {!disableUpdate && (
                                     <TableCell align='left'>
-                                        {!hideParameterEdit && (
+                                            {!isRefParam && (
                                             <Tooltip title='Edit'>
                                                 <IconButton
                                                     onClick={() => setEditingParameter(parameter)}
@@ -104,7 +109,7 @@ export default function ListParameters(props) {
                                                 onClick={() =>
                                                     operationsDispatcher({
                                                         action: 'deleteParameter',
-                                                        data: { target, verb, value: parameter },
+                                                        data: { target, verb, value: paramCopy },
                                                     })
                                                 }
                                                 fontSize='small'
@@ -115,49 +120,38 @@ export default function ListParameters(props) {
                                     </TableCell>
                                 )}
                             </TableRow>
-                        ))}
-                    {operation.requestBody &&
-                        Object.entries(operation.requestBody.content).map(([contentType, content]) => (
-                            <TableRow key={contentType}>
-                                <TableCell>Body</TableCell>
-                                <TableCell align='left'>{contentType}</TableCell>
-                                <TableCell align='left'>{content.schema.type}</TableCell>
-                                <TableCell align='left'>{content.required ? 'Yes' : 'No'}</TableCell>
-                                {!disableUpdate && (
-                                    <TableCell align='left'>
-                                        {!hideParameterEdit && (
-                                            <Tooltip title='Edit'>
-                                                <IconButton onClick={() => {}} fontSize='small'>
-                                                    <EditIcon fontSize='small' />
-                                                </IconButton>
-                                            </Tooltip>
-                                        )}
-                                        <Tooltip title='Delete'>
-                                            <IconButton
-                                                disabled={disableUpdate}
-                                                onClick={() => {
-                                                    operationsDispatcher({
-                                                        action: 'requestBody',
-                                                        data: {
-                                                            target,
-                                                            verb,
-                                                            value: {
-                                                                description: '',
-                                                                required: false,
-                                                                content: {},
-                                                            },
-                                                        },
-                                                    });
-                                                }}
-                                                fontSize='small'
-                                            >
-                                                <DeleteIcon fontSize='small' />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
-                                )}
-                            </TableRow>
-                        ))}
+                            );
+                        })}
+                    {operation.requestBody && (isRef(operation.requestBody)
+                        ? Object.entries(resolvedSpec.paths[target][verb].requestBody.content).map(
+                            ([contentType, content]) => {
+                                return (
+                                    <RequestBody
+                                        contentType={contentType}
+                                        content={content}
+                                        operation={operation}
+                                        disableUpdate={disableUpdate}
+                                        hideParameterEdit={hideParameterEdit}
+                                        operationsDispatcher={operationsDispatcher}
+                                        target={target}
+                                        verb={verb}
+                                    />
+                                );
+                            },
+                        ) : Object.entries(operation.requestBody.content).map(([contentType, content]) => {
+                            return (
+                                <RequestBody
+                                    contentType={contentType}
+                                    content={content}
+                                    operation={operation}
+                                    disableUpdate={disableUpdate}
+                                    hideParameterEdit={hideParameterEdit}
+                                    operationsDispatcher={operationsDispatcher}
+                                    target={target}
+                                    verb={verb}
+                                />
+                            );
+                        }))}
                 </TableBody>
             </Table>
         </Fragment>
@@ -176,4 +170,5 @@ ListParameters.propTypes = {
     target: PropTypes.string.isRequired,
     verb: PropTypes.string.isRequired,
     disableUpdate: PropTypes.bool,
+    resolvedSpec: PropTypes.shape({}).isRequired,
 };
