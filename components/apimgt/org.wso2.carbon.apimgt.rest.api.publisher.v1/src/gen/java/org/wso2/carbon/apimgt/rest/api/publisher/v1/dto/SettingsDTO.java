@@ -25,6 +25,8 @@ public class SettingsDTO   {
     private List<MonetizationAttributeDTO> monetizationAttributes = new ArrayList<>();
     private Object securityAuditProperties = null;
     private Boolean externalStoresEnabled = null;
+    private String defaultAdvancePolicy = null;
+    private String defaultSubscriptionPolicy = null;
 
   /**
    * Store URL
@@ -130,6 +132,42 @@ public class SettingsDTO   {
     this.externalStoresEnabled = externalStoresEnabled;
   }
 
+  /**
+   * Default Advance Policy.
+   **/
+  public SettingsDTO defaultAdvancePolicy(String defaultAdvancePolicy) {
+    this.defaultAdvancePolicy = defaultAdvancePolicy;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "Default Advance Policy.")
+  @JsonProperty("defaultAdvancePolicy")
+  public String getDefaultAdvancePolicy() {
+    return defaultAdvancePolicy;
+  }
+  public void setDefaultAdvancePolicy(String defaultAdvancePolicy) {
+    this.defaultAdvancePolicy = defaultAdvancePolicy;
+  }
+
+  /**
+   * Default Subscription Policy.
+   **/
+  public SettingsDTO defaultSubscriptionPolicy(String defaultSubscriptionPolicy) {
+    this.defaultSubscriptionPolicy = defaultSubscriptionPolicy;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "Default Subscription Policy.")
+  @JsonProperty("defaultSubscriptionPolicy")
+  public String getDefaultSubscriptionPolicy() {
+    return defaultSubscriptionPolicy;
+  }
+  public void setDefaultSubscriptionPolicy(String defaultSubscriptionPolicy) {
+    this.defaultSubscriptionPolicy = defaultSubscriptionPolicy;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -145,12 +183,14 @@ public class SettingsDTO   {
         Objects.equals(scopes, settings.scopes) &&
         Objects.equals(monetizationAttributes, settings.monetizationAttributes) &&
         Objects.equals(securityAuditProperties, settings.securityAuditProperties) &&
-        Objects.equals(externalStoresEnabled, settings.externalStoresEnabled);
+        Objects.equals(externalStoresEnabled, settings.externalStoresEnabled) &&
+        Objects.equals(defaultAdvancePolicy, settings.defaultAdvancePolicy) &&
+        Objects.equals(defaultSubscriptionPolicy, settings.defaultSubscriptionPolicy);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(storeUrl, environment, scopes, monetizationAttributes, securityAuditProperties, externalStoresEnabled);
+    return Objects.hash(storeUrl, environment, scopes, monetizationAttributes, securityAuditProperties, externalStoresEnabled, defaultAdvancePolicy, defaultSubscriptionPolicy);
   }
 
   @Override
@@ -164,6 +204,8 @@ public class SettingsDTO   {
     sb.append("    monetizationAttributes: ").append(toIndentedString(monetizationAttributes)).append("\n");
     sb.append("    securityAuditProperties: ").append(toIndentedString(securityAuditProperties)).append("\n");
     sb.append("    externalStoresEnabled: ").append(toIndentedString(externalStoresEnabled)).append("\n");
+    sb.append("    defaultAdvancePolicy: ").append(toIndentedString(defaultAdvancePolicy)).append("\n");
+    sb.append("    defaultSubscriptionPolicy: ").append(toIndentedString(defaultSubscriptionPolicy)).append("\n");
     sb.append("}");
     return sb.toString();
   }
