@@ -10867,9 +10867,10 @@ public final class APIUtil {
         return null;
     }
 
-    public static boolean checkPolicyConfiguredAsDefault(String policyName, String policyLevel, String tenantDomain)
+    public static boolean checkPolicyConfiguredAsDefault(String policyName, String policyLevel, String provider)
             throws APIManagementException {
 
+        String tenantDomain = MultitenantUtils.getTenantDomain(provider);
         String configKey = null;
         if (PolicyConstants.POLICY_LEVEL_API.equalsIgnoreCase(policyLevel)) {
             configKey = APIConstants.API_TENANT_CONF_DEFAULT_API_TIER;
@@ -10885,6 +10886,27 @@ public final class APIUtil {
         }
         return false;
     }
+
+//    public static boolean checkPolicyConfiguredAsDefault(String policyName, String policyLevel, String provider)
+//            throws APIManagementException {
+//
+//        String tenantDomain = MultitenantUtils.getTenantDomain(provider);
+//
+//        String configKey = null;
+//        if (PolicyConstants.POLICY_LEVEL_API.equalsIgnoreCase(policyLevel)) {
+//            configKey = APIConstants.API_TENANT_CONF_DEFAULT_API_TIER;
+//        } else if (PolicyConstants.POLICY_LEVEL_SUB.equalsIgnoreCase(policyLevel)) {
+//            configKey = APIConstants.API_TENANT_CONF_DEFAULT_SUBSCRIPTION_TIER;
+//        } else if (PolicyConstants.POLICY_LEVEL_APP.equalsIgnoreCase(policyLevel)) {
+//            configKey = APIConstants.API_TENANT_CONF_DEFAULT_APPLICATION_TIER;
+//        }
+//        if (StringUtils.isNotEmpty(configKey)) {
+//            String defaultPolicyValue = getTenantConfigPropertyValue(configKey,
+//                    getTenantIdFromTenantDomain(tenantDomain));
+//            return StringUtils.equalsIgnoreCase(defaultPolicyValue, policyName);
+//        }
+//        return false;
+//    }
 
 
     private static String getTenantConfigPropertyValue(String propertyName, int tenantId)

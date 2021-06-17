@@ -243,7 +243,7 @@ public class ThrottlingApiServiceImpl extends ThrottlingApiService {
                 throw new APIManagementException(message);
             }
             if (APIUtil.checkPolicyConfiguredAsDefault(existingPolicy.getPolicyName(),
-                    PolicyConstants.POLICY_LEVEL_API, tenantDomain)) {
+                    PolicyConstants.POLICY_LEVEL_API, username)) {
                 String message = "Policy " + policyId + " configured as the Default Policy.";
                 log.error(message);
                 throw new APIManagementException(message);
@@ -439,7 +439,7 @@ public class ThrottlingApiServiceImpl extends ThrottlingApiService {
                 throw new APIManagementException(message);
             }
             if (APIUtil.checkPolicyConfiguredAsDefault(existingPolicy.getPolicyName(),
-                    PolicyConstants.POLICY_LEVEL_APP, RestApiUtil.getLoggedInUserTenantDomain())) {
+                    PolicyConstants.POLICY_LEVEL_APP, username)) {
                 String message = "Policy " + policyId + " configured as the Default Policy.";
                 log.error(message);
                 throw new APIManagementException(message);
@@ -640,7 +640,7 @@ public class ThrottlingApiServiceImpl extends ThrottlingApiService {
                 throw new APIManagementException(message);
             }
             if (APIUtil.checkPolicyConfiguredAsDefault(existingPolicy.getPolicyName(),
-                    PolicyConstants.POLICY_LEVEL_SUB, RestApiUtil.getLoggedInUserTenantDomain())) {
+                    PolicyConstants.POLICY_LEVEL_SUB, username)) {
                 String message = "Policy " + policyId + " configured as the Default Policy.";
                 log.error(message);
                 throw new APIManagementException(message);
