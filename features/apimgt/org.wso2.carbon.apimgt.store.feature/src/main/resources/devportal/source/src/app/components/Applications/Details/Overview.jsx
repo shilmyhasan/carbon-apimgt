@@ -84,6 +84,10 @@ const useStyles = makeStyles((theme) => ({
     actionPanel: {
         justifyContent: 'flex-start',
     },
+    disabledTier: {
+        color: '#999999',
+        fontWeight: '400',
+    }
 }));
 
 /**
@@ -95,6 +99,7 @@ function Overview(props) {
     const classes = useStyles();
     const [application, setApplication] = useState(null);
     const [tierDescription, setTierDescription] = useState(null);
+    const [tierDisabled, setTierDisabled] = useState(false);
     const [notFound, setNotFound] = useState(false);
     const { match: { params: { applicationId } } } = props;
     useEffect(() => {
@@ -103,11 +108,14 @@ function Overview(props) {
         const promisedApplication = client.getApplication(applicationId);
         promisedApplication
             .then((response) => {
-                const promisedTier = client.getTierByName(response.obj.throttlingPolicy, 'application');
                 const app = response.obj;
+                setApplication(app);
+                const promisedTier = client.getTierByName(response.obj.throttlingPolicy, 'application');
                 promisedTier.then((tierResponse) => {
                     setTierDescription(tierResponse.obj.description);
-                    setApplication(app);
+                }).catch((error) => {
+                    setTierDisabled(true);
+                    setTierDescription('Tier is disabled.');
                 });
             }).catch((error) => {
                 if (process.env.NODE_ENV !== 'production') {
@@ -172,7 +180,7 @@ function Overview(props) {
                                             <TableCell>
                                                 {application.throttlingPolicy}
                                                 {' '}
-                                                {`(${tierDescription})`}
+                                                <span className= {tierDisabled ? classes.disabledTier: ""}>{`(${tierDescription})`}</span>
                                             </TableCell>
                                         )}
                                 </TableRow>
