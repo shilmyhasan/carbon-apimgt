@@ -480,13 +480,13 @@ public class GatewayUtils {
         return endpointAddress;
     }
 
-    public static AuthenticationContext generateAuthenticationContext(String tokenSignature, JWTClaimsSet payload, JSONObject api,
+    public static AuthenticationContext generateAuthenticationContext(String tokenIdentifier, JWTClaimsSet payload, JSONObject api,
                                                                       APIKeyValidationInfoDTO apiKeyValidationInfoDTO,
                                                                       String apiLevelPolicy, boolean isOauth)
             throws java.text.ParseException {
         AuthenticationContext authContext = new AuthenticationContext();
         authContext.setAuthenticated(true);
-        authContext.setApiKey(tokenSignature);
+        authContext.setApiKey(tokenIdentifier);
 
         if (apiKeyValidationInfoDTO != null) {
             authContext.setApiTier(apiKeyValidationInfoDTO.getApiTier());

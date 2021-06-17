@@ -52,7 +52,7 @@ import java.util.Properties;
  */
 public class TokenRevocationNotifierImpl implements TokenRevocationNotifier {
 
-    private static final Log log = LogFactory.getLog(APIMOAuthEventInterceptor.class);
+    private static final Log log = LogFactory.getLog(TokenRevocationNotifierImpl.class);
     private final String DEFAULT_TTL = "3600";
 
     /**
@@ -65,8 +65,12 @@ public class TokenRevocationNotifierImpl implements TokenRevocationNotifier {
     public void sendMessageOnRealtime(String revokedToken, Properties properties) {
         //Variables related to Realtime Notifier
         String realtimeNotifierTTL = properties.getProperty("ttl", DEFAULT_TTL);
-        long expiryTimeForJWT = Long.parseLong(properties.getProperty("expiryTime"));
-        Object[] objects = new Object[] { revokedToken, realtimeNotifierTTL, expiryTimeForJWT};
+        long expiryTimeForJWT = Long.parseLong(properties.getProperty(APIConstants.REVOKED_TOKEN_EXPIRY_TIME));
+        String tokenType = "";
+        if (properties.containsKey(APIConstants.REVOKED_TOKEN_TYPE)) {
+            tokenType = properties.getProperty(APIConstants.REVOKED_TOKEN_TYPE);
+        }
+        Object[] objects = new Object[] { revokedToken, realtimeNotifierTTL, expiryTimeForJWT, tokenType };
         Event tokenRevocationMessage = new Event(APIConstants.TOKEN_REVOCATION_STREAM_ID, System.currentTimeMillis(),
                 null, null, objects);
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
