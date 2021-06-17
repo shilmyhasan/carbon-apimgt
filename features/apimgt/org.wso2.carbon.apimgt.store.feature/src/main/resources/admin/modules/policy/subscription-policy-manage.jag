@@ -8,7 +8,7 @@ var deleteSubscriptionPolicy = function (policyName) {
         var apiProvider = new APIProviderImpl(provider);
 	    var hasSubscription = apiProvider.hasAttachments(provider,policyName, "sub");
 	    var utils = Packages.org.wso2.carbon.apimgt.impl.utils.APIUtil;
-        var isDefaultPolicy = utils.checkPolicyConfiguredAsDefault(policyName, "sub", provider)
+        var isDefaultPolicy = utils.checkPolicyConfiguredAsDefault(policyName, "sub", provider);
 
         if(hasSubscription){
             return {
