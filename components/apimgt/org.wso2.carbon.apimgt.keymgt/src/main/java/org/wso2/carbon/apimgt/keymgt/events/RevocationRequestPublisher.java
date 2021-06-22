@@ -19,6 +19,7 @@ package org.wso2.carbon.apimgt.keymgt.events;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.keymgt.token.TokenRevocationNotifier;
 
@@ -62,7 +63,13 @@ public class RevocationRequestPublisher {
     }
 
     public void publishRevocationEvents(String token, long expiryTime, Properties properties) {
-        realtimeNotifierProperties.setProperty("expiryTime", Long.toString(expiryTime));
+
+        realtimeNotifierProperties.setProperty(APIConstants.REVOKED_TOKEN_EXPIRY_TIME, Long.toString(expiryTime));
+        if (properties.containsKey(APIConstants.REVOKED_TOKEN_TYPE)) {
+            realtimeNotifierProperties.setProperty(APIConstants.REVOKED_TOKEN_TYPE,
+                    properties.getProperty(APIConstants.REVOKED_TOKEN_TYPE));
+        }
+
         if (realtimeNotifierEnabled) {
             log.debug("Realtime message sending is enabled");
             tokenRevocationNotifier.sendMessageOnRealtime(token, realtimeNotifierProperties);

@@ -23,6 +23,8 @@ import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.events.RevocationRequestPublisher;
 
+import java.util.Properties;
+
 /**
  * API Key revocation service implementation
  */
@@ -48,8 +50,9 @@ public class APIKeyRevokeServiceImpl implements APIKeyRevokeService {
         if (APIUtil.isValidJWT(token)) {
             String splitToken[] = token.split("\\.");
             dao.addRevokedJWTSignature(splitToken[2], APIConstants.API_KEY_AUTH_TYPE, expiryTime, tenantId);
-            revocationRequestPublisher.publishRevocationEvents(token, expiryTime, null);
-        }
+            Properties properties = new Properties();
+            properties.setProperty(APIConstants.REVOKED_TOKEN_TYPE, APIConstants.JWT);
+            revocationRequestPublisher.publishRevocationEvents(token, expiryTime, properties);        }
     }
 
 }
