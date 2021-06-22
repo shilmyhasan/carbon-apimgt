@@ -783,6 +783,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         validateApiInfo(api);
         String tenantDomain = MultitenantUtils
                 .getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+        validateAndUpdateURITemplates(api, tenantId);
         validateResourceThrottlingTiers(api, tenantDomain);
 
         RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
@@ -1221,6 +1222,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 throw new APIManagementException(
                         "Error in retrieving Tenant Information while updating api :" + api.getId().getApiName(), e);
             }
+            validateAndUpdateURITemplates(api, tenantId);
             validateResourceThrottlingTiers(api, tenantDomain);
 
             //get product resource mappings on API before updating the API. Update uri templates on api will remove all
@@ -8109,5 +8111,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         }
         return removedReusedResources;
+    }
+
+    private void validateAndUpdateURITemplates(API api, int tenantId) throws APIManagementException {
+        if (api.getUriTemplates() != null) {
+            for (URITemplate uriTemplate : api.getUriTemplates()) {
+                if (StringUtils.isEmpty(api.getApiLevelPolicy())) {
+                    // API level policy not attached.
+                    if (StringUtils.isEmpty(uriTemplate.getThrottlingTier())) {
+                        uriTemplate.setThrottlingTier(APIUtil.getDefaultAPILevelPolicy(tenantId));
+                    }
+                } else {
+                    uriTemplate.setThrottlingTier(api.getApiLevelPolicy());
+                }
+            }
+        }
     }
 }

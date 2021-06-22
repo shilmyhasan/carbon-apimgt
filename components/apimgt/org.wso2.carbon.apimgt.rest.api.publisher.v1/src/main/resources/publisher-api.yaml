@@ -9450,6 +9450,12 @@ definitions:
         description: |
           Is External Stores configuration enabled
         example: true
+      defaultAdvancePolicy:
+        type: string
+        description: Default Advance Policy.
+      defaultSubscriptionPolicy:
+        type: string
+        description: Default Subscription Policy.
 
   #-----------------------------------------------------
   # The SecurityAuditAttribute resource

@@ -315,6 +315,8 @@ public class ApisApiServiceImpl implements ApisApiService {
     private API prepareToCreateAPIByDTO(APIDTO body) throws APIManagementException {
         APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
         String username = RestApiUtil.getLoggedInUsername();
+        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
         List<String> apiSecuritySchemes = body.getSecurityScheme();//todo check list vs string
         String context = body.getContext();
         //Make sure context starts with "/". ex: /pizza
@@ -433,7 +435,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                     "Specified policy " + body.getApiThrottlingPolicy() + " is invalid", log);
         }
 
-        API apiToAdd = APIMappingUtil.fromDTOtoAPI(body, provider);
+        API apiToAdd = APIMappingUtil.fromDTOtoAPI(body, provider, tenantId);
         //Overriding some properties:
         //only allow CREATED as the stating state for the new api if not status is PROTOTYPED
         if (!APIConstants.PROTOTYPED.equals(apiToAdd.getStatus())) {
@@ -508,12 +510,13 @@ public class ApisApiServiceImpl implements ApisApiService {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
             APIIdentifier apiIdentifier = APIMappingUtil.getAPIIdentifierFromUUID(apiId,
                     tenantDomain);
 
             API originalAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
             List<APIOperationsDTO> operationArray = extractGraphQLOperationList(schemaDefinition);
-            Set<URITemplate> uriTemplates = APIMappingUtil.getURITemplates(originalAPI, operationArray);
+            Set<URITemplate> uriTemplates = APIMappingUtil.getURITemplates(originalAPI, operationArray, tenantId);
             originalAPI.setUriTemplates(uriTemplates);
 
             apiProvider.saveGraphqlSchemaDefinition(originalAPI, schemaDefinition);
@@ -551,6 +554,7 @@ public class ApisApiServiceImpl implements ApisApiService {
         try {
             String username = RestApiUtil.getLoggedInUsername();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
             APIProvider apiProvider = RestApiUtil.getProvider(username);
             API originalAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
             APIIdentifier apiIdentifier = originalAPI.getId();
@@ -613,6 +617,18 @@ public class ApisApiServiceImpl implements ApisApiService {
             }
             //validation for tiers
             List<String> tiersFromDTO = body.getPolicies();
+            //check whether there are subscriptions of the removed policies
+            List<SubscribedAPI> apiUsages = apiProvider.getAPIUsageByAPIId(apiIdentifier);
+            for (SubscribedAPI subscription : apiUsages) {
+                String tierName = subscription.getTier().getName();
+                if (!tiersFromDTO.contains(tierName)) {
+                    if (APIConstants.UNLIMITED_TIER.equalsIgnoreCase(tierName) && !APIUtil.isEnabledUnlimitedTier()) {
+                        continue;
+                    }
+                    RestApiUtil.handleBadRequest("Subscriptions are available under " + tierName + " tier. " +
+                            "Please unsubscribe before removing the tier.", log);
+                }
+            }
             String originalStatus = originalAPI.getStatus();
             if (apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) ||
                     apiSecurity.contains(APIConstants.API_SECURITY_API_KEY)) {
@@ -655,7 +671,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             if (!isWSAPI && (body.getOperations() == null || body.getOperations().isEmpty())) {
                 RestApiUtil.handleBadRequest(ExceptionCodes.NO_RESOURCES_FOUND, log);
             }
-            API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName());
+            API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName(), tenantId);
             if (APIConstants.PUBLIC_STORE_VISIBILITY.equals(apiToUpdate.getVisibility())) {
                 apiToUpdate.setVisibleRoles(StringUtils.EMPTY);
             }
@@ -2926,6 +2942,7 @@ public class ApisApiServiceImpl implements ApisApiService {
         validateScopes(existingAPI);
 
         //Update API is called to update URITemplates and scopes of the API
+        apiProvider.updateAPI(existingAPI);
         SwaggerData swaggerData = new SwaggerData(existingAPI);
         String updatedApiDefinition = oasParser.populateCustomManagementInfo(apiDefinition, swaggerData);
         apiProvider.saveSwagger20Definition(existingAPI.getId(), updatedApiDefinition);

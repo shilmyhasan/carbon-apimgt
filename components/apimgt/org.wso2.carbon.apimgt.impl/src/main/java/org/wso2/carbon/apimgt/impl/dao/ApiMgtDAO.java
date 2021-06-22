@@ -6441,15 +6441,7 @@ public class ApiMgtDAO {
                 prepStmt.setString(2, uriTemplate.getHTTPVerb());
                 prepStmt.setString(3, uriTemplate.getAuthType());
                 prepStmt.setString(4, uriTemplate.getUriTemplate());
-                //If API policy is available then set it for all the resources.
-                if (StringUtils.isEmpty(api.getApiLevelPolicy())) {
-                    prepStmt.setString(5, (StringUtils.isEmpty(uriTemplate.getThrottlingTier())) ?
-                            APIConstants.UNLIMITED_TIER :
-                            uriTemplate.getThrottlingTier());
-                } else {
-                    prepStmt.setString(5,
-                            (StringUtils.isEmpty(api.getApiLevelPolicy())) ? APIConstants.UNLIMITED_TIER : api.getApiLevelPolicy());
-                }
+                prepStmt.setString(5, uriTemplate.getThrottlingTier());
                 InputStream is;
                 if (uriTemplate.getMediationScript() != null) {
                     is = new ByteArrayInputStream(uriTemplate.getMediationScript().getBytes(Charset.defaultCharset()));

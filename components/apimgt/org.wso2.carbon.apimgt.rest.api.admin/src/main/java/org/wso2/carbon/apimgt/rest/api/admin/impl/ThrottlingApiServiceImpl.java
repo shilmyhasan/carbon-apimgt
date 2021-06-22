@@ -33,6 +33,7 @@ import org.wso2.carbon.apimgt.api.model.policy.Policy;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.admin.ThrottlingApiService;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.AdvancedThrottlePolicyDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.AdvancedThrottlePolicyListDTO;
@@ -229,6 +230,7 @@ public class ThrottlingApiServiceImpl extends ThrottlingApiService {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
 
             //This will give PolicyNotFoundException if there's no policy exists with UUID
             APIPolicy existingPolicy = apiProvider.getAPIPolicyByUUID(policyId);
@@ -237,6 +239,12 @@ public class ThrottlingApiServiceImpl extends ThrottlingApiService {
             }
             if (apiProvider.hasAttachments(username, existingPolicy.getPolicyName(), PolicyConstants.POLICY_LEVEL_API)) {
                 String message = "Policy " + policyId + " already attached to API/Resource";
+                log.error(message);
+                throw new APIManagementException(message);
+            }
+            if (APIUtil.checkPolicyConfiguredAsDefault(existingPolicy.getPolicyName(),
+                    PolicyConstants.POLICY_LEVEL_API, username)) {
+                String message = "Policy " + policyId + " configured as the Default Policy.";
                 log.error(message);
                 throw new APIManagementException(message);
             }
@@ -427,6 +435,12 @@ public class ThrottlingApiServiceImpl extends ThrottlingApiService {
             }
             if (apiProvider.hasAttachments(username, existingPolicy.getPolicyName(), PolicyConstants.POLICY_LEVEL_APP)) {
                 String message = "Policy " + policyId + " already attached to an application";
+                log.error(message);
+                throw new APIManagementException(message);
+            }
+            if (APIUtil.checkPolicyConfiguredAsDefault(existingPolicy.getPolicyName(),
+                    PolicyConstants.POLICY_LEVEL_APP, username)) {
+                String message = "Policy " + policyId + " configured as the Default Policy.";
                 log.error(message);
                 throw new APIManagementException(message);
             }
@@ -622,6 +636,12 @@ public class ThrottlingApiServiceImpl extends ThrottlingApiService {
             }
             if (apiProvider.hasAttachments(username, existingPolicy.getPolicyName(), PolicyConstants.POLICY_LEVEL_SUB)) {
                 String message = "Policy " + policyId + " already has subscriptions";
+                log.error(message);
+                throw new APIManagementException(message);
+            }
+            if (APIUtil.checkPolicyConfiguredAsDefault(existingPolicy.getPolicyName(),
+                    PolicyConstants.POLICY_LEVEL_SUB, username)) {
+                String message = "Policy " + policyId + " configured as the Default Policy.";
                 log.error(message);
                 throw new APIManagementException(message);
             }

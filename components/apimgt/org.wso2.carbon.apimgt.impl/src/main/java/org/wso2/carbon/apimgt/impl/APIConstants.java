@@ -126,6 +126,9 @@ public final class APIConstants {
     public static final String ANALYTICS_ROLE = "Internal/analytics";
 
     public static final String API_TENANT_CONF_IS_UNLIMITED_TIER_PAID = "IsUnlimitedTierPaid";
+    public static final String API_TENANT_CONF_DEFAULT_API_TIER = "DefaultAPILevelTier";
+    public static final String API_TENANT_CONF_DEFAULT_APPLICATION_TIER = "DefaultApplicationLevelTier";
+    public static final String API_TENANT_CONF_DEFAULT_SUBSCRIPTION_TIER = "DefaultSubscriptionLevelTier";
 
     public static final String API_TENANT_CONF_EXPOSE_ENDPOINT_PASSWORD = "ExposeEndpointPassword";
 

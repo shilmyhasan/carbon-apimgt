@@ -126,7 +126,7 @@ public class APIMappingUtil {
 
     private static final Log log = LogFactory.getLog(APIMappingUtil.class);
 
-    public static API fromDTOtoAPI(APIDTO dto, String provider) throws APIManagementException {
+    public static API fromDTOtoAPI(APIDTO dto, String provider, int tenantId) throws APIManagementException {
 
         String providerEmailDomainReplaced = APIUtil.replaceEmailDomain(provider);
 
@@ -218,7 +218,7 @@ public class APIMappingUtil {
         model.setScopes(scopes);
 
         //URI Templates
-        Set<URITemplate> uriTemplates = getURITemplates(model, dto.getOperations());
+        Set<URITemplate> uriTemplates = getURITemplates(model, dto.getOperations(), tenantId);
         model.setUriTemplates(uriTemplates);
 
         if (dto.getTags() != null) {
@@ -1222,14 +1222,14 @@ public class APIMappingUtil {
      * @return URI Templates
      * @throws APIManagementException
      */
-    public static Set<URITemplate> getURITemplates(API model, List<APIOperationsDTO> operations)
+    public static Set<URITemplate> getURITemplates(API model, List<APIOperationsDTO> operations, int tenantId)
             throws APIManagementException {
 
         boolean isHttpVerbDefined = false;
         Set<URITemplate> uriTemplates = new LinkedHashSet<>();
 
         if (operations == null || operations.isEmpty()) {
-            operations = getDefaultOperationsList(model.getType());
+            operations = getDefaultOperationsList(model.getType(), tenantId);
         }
 
         for (APIOperationsDTO operation : operations) {
@@ -1766,7 +1766,8 @@ public class APIMappingUtil {
      *
      * @return a default operations list
      */
-    private static List<APIOperationsDTO> getDefaultOperationsList(String apiType) {
+    private static List<APIOperationsDTO> getDefaultOperationsList(String apiType, int tenantId)
+            throws APIManagementException {
 
         List<APIOperationsDTO> operationsDTOs = new ArrayList<>();
         String[] supportedMethods = null;
@@ -1783,7 +1784,7 @@ public class APIMappingUtil {
             APIOperationsDTO operationsDTO = new APIOperationsDTO();
             operationsDTO.setTarget("/*");
             operationsDTO.setVerb(verb);
-            operationsDTO.setThrottlingPolicy(APIConstants.UNLIMITED_TIER);
+            operationsDTO.setThrottlingPolicy(APIUtil.getDefaultAPILevelPolicy(tenantId));
             operationsDTO.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
             operationsDTOs.add(operationsDTO);
         }
