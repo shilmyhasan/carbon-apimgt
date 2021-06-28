@@ -66,6 +66,7 @@ import java.io.FileInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -175,6 +176,20 @@ public class APIMWSDLReader {
         try {
             WSDLProcessor processor = getWSDLProcessor(finalPath);
             wsdlValidationResponse = new WSDLValidationResponse();
+            File initialFile = new File(wsdlFilePath);
+            InputStream targetStream = null;
+            try {
+                targetStream = new FileInputStream(initialFile);
+            } catch (FileNotFoundException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Cannot find the wsdl in the defined path: " + wsdlFilePath + " " + e);
+                }
+            }
+            if (targetStream != null) {
+                wsdlValidationResponse.setFileInputStream(targetStream);
+            } else {
+                wsdlValidationResponse.setFileInputStream(inputStream);
+            }
             if (processor.hasError()) {
                 wsdlValidationResponse.setValid(false);
                 wsdlValidationResponse.setError(processor.getError());

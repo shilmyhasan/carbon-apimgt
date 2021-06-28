@@ -21,7 +21,7 @@ package org.wso2.carbon.apimgt.impl.wsdl.model;
 import org.wso2.carbon.apimgt.api.ErrorHandler;
 import org.wso2.carbon.apimgt.impl.wsdl.WSDLProcessor;
 
-import java.util.ArrayList;
+import java.io.InputStream;
 
 public class WSDLValidationResponse {
 
@@ -30,6 +30,7 @@ public class WSDLValidationResponse {
     private WSDLArchiveInfo wsdlArchiveInfo;
     private WSDLProcessor wsdlProcessor;
     private ErrorHandler error;
+    private InputStream fileInputStream;
 
     public WSDLInfo getWsdlInfo() {
         return wsdlInfo;
@@ -59,6 +60,8 @@ public class WSDLValidationResponse {
         this.wsdlInfo = wsdlInfo;
     }
 
+    public void setFileInputStream(InputStream inputstream) { this.fileInputStream = inputstream; }
+
     public void setError(ErrorHandler error) {
         this.error = error;
     }
@@ -69,5 +72,9 @@ public class WSDLValidationResponse {
 
     public WSDLProcessor getWsdlProcessor() {
         return wsdlProcessor;
+    }
+
+    public InputStream getFileInputStream() {
+        return fileInputStream;
     }
 }
