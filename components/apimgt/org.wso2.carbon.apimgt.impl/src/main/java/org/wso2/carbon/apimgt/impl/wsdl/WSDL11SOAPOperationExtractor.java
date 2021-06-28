@@ -55,6 +55,7 @@ import org.wso2.carbon.apimgt.impl.wsdl.util.SwaggerFieldsExcludeStrategy;
 import org.wso2.carbon.apimgt.impl.utils.APIMWSDLReader;
 import org.wso2.carbon.utils.CarbonUtils;
 import javax.wsdl.extensions.schema.SchemaImport;
+import javax.wsdl.extensions.schema.SchemaReference;
 import javax.wsdl.extensions.soap12.SOAP12Operation;
 
 import javax.wsdl.Binding;
@@ -86,6 +87,7 @@ import java.util.HashSet;
 import java.util.Collection;
 import java.util.Vector;
 import java.util.Set;
+import java.util.Iterator;
 
 import static org.wso2.carbon.apimgt.impl.wsdl.util.SOAPToRESTConstants.ATTRIBUTE_NODE_NAME;
 import static org.wso2.carbon.apimgt.impl.wsdl.util.SOAPToRESTConstants.ATTR_CONTENT_KEYWORD;
@@ -267,6 +269,20 @@ public class WSDL11SOAPOperationExtractor extends WSDL11ProcessorImpl {
                         }
                     } else {
                         log.info("No any imported schemas found in the given wsdl.");
+                    }
+                    List schemaIncludes = schema.getIncludes();
+                    for (Iterator iter = schemaIncludes.iterator(); iter.hasNext(); ) {
+                        SchemaReference schemaInclude = (SchemaReference) iter.next();
+                        Schema schemaImp = schemaInclude.getReferencedSchema();
+                        String schemaLoc = schemaInclude.getSchemaLocationURI();
+                        if (schemaImp != null && schemaImp.getElement() != null) {
+                            if (schemaImp.getElement().hasChildNodes()) {
+                                schemaNodeList
+                                        .addAll(SOAPOperationBindingUtils.list(schemaImp.getElement().getChildNodes()));
+                            } else {
+                                log.warn("The referenced schema : " + schemaLoc + " doesn't have any defined types");
+                            }
+                        }
                     }
 
                     if (log.isDebugEnabled()) {
