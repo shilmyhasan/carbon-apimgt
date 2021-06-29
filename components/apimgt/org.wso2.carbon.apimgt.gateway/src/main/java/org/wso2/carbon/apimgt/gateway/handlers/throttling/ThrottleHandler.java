@@ -56,7 +56,6 @@ import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityUtils;
 import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationContext;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.throttling.ThrottleDataHolder;
-import org.wso2.carbon.apimgt.gateway.throttling.publisher.ThrottleDataPublisher;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.ConditionDto;
@@ -70,7 +69,6 @@ import org.wso2.carbon.metrics.manager.Level;
 import org.wso2.carbon.metrics.manager.MetricManager;
 import org.wso2.carbon.metrics.manager.Timer;
 
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -359,13 +357,8 @@ public class ThrottleHandler extends AbstractHandler implements ManagedLifecycle
                     //if resource level not throttled then move to subscription level
                     if (!isResourceLevelThrottled) {
                         //Subscription Level Throttling
-                        if (authContext.getProductName() != null && authContext.getProductProvider() != null) {
-                            subscriptionLevelThrottleKey =
-                                    authContext.getApplicationId() + ":" + authContext.getProductName() + ":"
-                                            + authContext.getProductProvider();
-                        } else {
-                            subscriptionLevelThrottleKey = authContext.getApplicationId() + ":" + apiContext + ":" + apiVersion;
-                        }
+                        subscriptionLevelThrottleKey = getSubscriptionLevelThrottleKey(subscriptionLevelTier,
+                                authContext, apiContext, apiVersion);
                         isSubscriptionLevelThrottled = getThrottleDataHolder().
                                 isThrottled(subscriptionLevelThrottleKey);
                         if (!isSubscriptionLevelThrottled && authContext.getSpikeArrestLimit() > 0) {
@@ -479,6 +472,33 @@ public class ThrottleHandler extends AbstractHandler implements ManagedLifecycle
 
         //if we need to publish throttled level or some other information we can do it here. Just before return.
         return isThrottled;
+    }
+
+    private String getSubscriptionLevelThrottleKey(String subscriptionLevelTier, AuthenticationContext authContext,
+                                                   String apiContext, String apiVersion) {
+
+        String subscriptionLevelThrottleKey;
+        if (authContext.getProductName() != null && authContext.getProductProvider() != null) {
+            if (GatewayUtils.isImmediateSubscriptionUpdateEnabled()) {
+                subscriptionLevelThrottleKey =
+                        authContext.getApplicationId() + ":" + authContext.getProductName() + ":"
+                                + authContext.getProductProvider() + ":" + subscriptionLevelTier;
+            } else {
+                subscriptionLevelThrottleKey = authContext.getApplicationId() + ":" + authContext.getProductName() +
+                        ":" + authContext.getProductProvider();
+            }
+
+        } else {
+            if (GatewayUtils.isImmediateSubscriptionUpdateEnabled()) {
+                subscriptionLevelThrottleKey =
+                        authContext.getApplicationId() + ":" + apiContext + ":" + apiVersion + ":" + subscriptionLevelTier;
+            } else {
+                subscriptionLevelThrottleKey =
+                        authContext.getApplicationId() + ":" + apiContext + ":" + apiVersion;
+            }
+
+        }
+        return subscriptionLevelThrottleKey;
     }
 
     protected ThrottleConditionEvaluator getThrottleConditionEvaluator() {

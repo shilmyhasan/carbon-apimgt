@@ -27,13 +27,19 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.dto.ConditionGroupDTO;
 import org.wso2.carbon.apimgt.gateway.TestUtils;
 import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationContext;
+import org.wso2.carbon.apimgt.gateway.handlers.security.jwt.JWTValidator;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.throttling.ThrottleDataHolder;
 import org.wso2.carbon.apimgt.gateway.throttling.publisher.ThrottleDataPublisher;
+import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.metrics.manager.Timer;
@@ -44,6 +50,8 @@ import java.util.List;
 /**
  * Test cases for for ThrottleHandler
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({GatewayUtils.class})
 public class ThrottleHandlerTest {
     private Timer timer;
     private Timer.Context context;
@@ -85,7 +93,8 @@ public class ThrottleHandlerTest {
 
         apiLevelThrottleKey = apiContext + ":" + apiVersion;
         resourceLevelThrottleKey = apiContext + "/" + apiVersion + resourceUri + ":" + httpVerb;
-
+        PowerMockito.mockStatic(GatewayUtils.class);
+        PowerMockito.when(GatewayUtils.isImmediateSubscriptionUpdateEnabled()).thenReturn(false);
     }
 
     @Test

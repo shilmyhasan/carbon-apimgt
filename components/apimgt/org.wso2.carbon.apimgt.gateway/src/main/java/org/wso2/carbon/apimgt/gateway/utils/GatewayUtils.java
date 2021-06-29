@@ -66,6 +66,7 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.tracing.TracingSpan;
+import org.wso2.carbon.apimgt.tracing.TracingTracer;
 import org.wso2.carbon.apimgt.tracing.Util;
 import org.wso2.carbon.apimgt.usage.publisher.DataPublisherUtil;
 import org.wso2.carbon.apimgt.usage.publisher.dto.ExecutionTimeDTO;
@@ -75,7 +76,6 @@ import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.carbon.apimgt.tracing.TracingTracer;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -83,9 +83,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Collection;
 import java.util.HashMap;
@@ -93,7 +91,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -963,5 +960,14 @@ public class GatewayUtils {
 
     public static TracingTracer getTracingTracer() {
         return ServiceReferenceHolder.getInstance().getTracer();
+    }
+
+    public static boolean isImmediateSubscriptionUpdateEnabled() {
+
+        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+        if (config != null && config.getThrottleProperties() != null) {
+            return config.getThrottleProperties().isEnableImmediateSubscriptionUpdate();
+        }
+        return false;
     }
 }
