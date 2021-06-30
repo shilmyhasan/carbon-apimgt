@@ -1630,6 +1630,7 @@ public final class APIConstants {
         public static final String EVALUATED_CONDITIONS = "evaluatedConditions";
         public static final String TRUE = "true";
         public static final String ADD = "add";
+        public static final String ENABLE_IMMEDIATE_SUBSCRIPTION_POLICY_UPDATE = "EnableImmediateSubscriptionUpdate";
     }
 
     /**
