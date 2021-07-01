@@ -127,7 +127,6 @@ public class APIMWSDLReader {
         if (log.isDebugEnabled()) {
             log.debug("Successfully extracted WSDL archive. Location: " + extractedLocation);
         }
-        APIFileUtil.extractSingleWSDLFile(inputStream, path, extractedLocation);
         String finalPath = APIConstants.FILE_URI_PREFIX + extractedLocation;
         APIMWSDLReader wsdlReader = new APIMWSDLReader(finalPath);
         WSDL11SOAPOperationExtractor soapProcessor = APIMWSDLReader.getWSDLSOAPOperationExtractor(path, wsdlReader);
