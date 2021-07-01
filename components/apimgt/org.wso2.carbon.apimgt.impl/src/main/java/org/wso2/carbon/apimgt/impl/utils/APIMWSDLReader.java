@@ -73,10 +73,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class is used to read the WSDL file using WSDL4J library.
@@ -130,6 +127,10 @@ public class APIMWSDLReader {
         if (log.isDebugEnabled()) {
             log.debug("Successfully extracted WSDL archive. Location: " + extractedLocation);
         }
+        APIFileUtil.extractSingleWSDLFile(inputStream, path, extractedLocation);
+        String finalPath = APIConstants.FILE_URI_PREFIX + extractedLocation;
+        APIMWSDLReader wsdlReader = new APIMWSDLReader(finalPath);
+        WSDL11SOAPOperationExtractor soapProcessor = APIMWSDLReader.getWSDLSOAPOperationExtractor(path, wsdlReader);
         WSDLProcessor processor;
         try {
             processor = getWSDLProcessor(extractedLocation);
@@ -138,6 +139,20 @@ public class APIMWSDLReader {
         }
 
         WSDLValidationResponse wsdlValidationResponse = new WSDLValidationResponse();
+        File initialFile = new File(extractedLocation);
+        InputStream targetStream = null;
+        try {
+            targetStream = new FileInputStream(initialFile);
+        } catch (FileNotFoundException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot find the wsdl in the defined path: " + extractedLocation + " " + e);
+            }
+        }
+        if (targetStream != null) {
+            wsdlValidationResponse.setFileInputStream(targetStream);
+        } else {
+            wsdlValidationResponse.setFileInputStream(inputStream);
+        }
         if (processor.hasError()) {
             wsdlValidationResponse.setValid(false);
             wsdlValidationResponse.setError(processor.getError());
@@ -147,7 +162,7 @@ public class APIMWSDLReader {
                     processor.getWsdlInfo());
             wsdlValidationResponse.setWsdlArchiveInfo(wsdlArchiveInfo);
             wsdlValidationResponse.setWsdlInfo(processor.getWsdlInfo());
-            wsdlValidationResponse.setWsdlProcessor(processor);
+            wsdlValidationResponse.setWsdlProcessor(soapProcessor);
         }
         return wsdlValidationResponse;
     }
