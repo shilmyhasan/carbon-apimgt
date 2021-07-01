@@ -1788,11 +1788,11 @@ class API extends Resource {
      * Get the available policies information by tier level.
      * @param {String} policyLevel List API or Application or Resource type policies.parameter should be one
      * of api, application, subscription and resource
-     * @param limit
+     * @param limit {Int}
      * @returns {Promise}
      *
      */
-    static policies(policyLevel, limit ) {
+    static policies(policyLevel, limit) {
         const apiClient = new APIClientFactory().getAPIClient(Utils.getCurrentEnvironment()).client;
         return apiClient.then(client => {
             return client.apis['Throttling Policies'].getAllThrottlingPolicies(
