@@ -87,8 +87,6 @@ import static org.wso2.carbon.apimgt.impl.APIConstants.APPLICATION_XML_MEDIA_TYP
  */
 public class OAS3Parser extends APIDefinition {
     private static final Log log = LogFactory.getLog(OAS3Parser.class);
-    static final String OPENAPI_SECURITY_SCHEMA_KEY = "default";
-    static final String OPENAPI_DEFAULT_AUTHORIZATION_URL = "https://test.com";
     private List<String> otherSchemes;
 
     private List<String> getOtherSchemes() {
@@ -227,7 +225,7 @@ public class OAS3Parser extends APIDefinition {
         OAuthFlows oAuthFlows;
         OAuthFlow implicitFlow;
         if (comp != null && (securitySchemeMap = comp.getSecuritySchemes()) != null &&
-                (securityScheme = securitySchemeMap.get(OPENAPI_SECURITY_SCHEMA_KEY)) != null &&
+                (securityScheme = securitySchemeMap.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY)) != null &&
                 (oAuthFlows = securityScheme.getFlows()) != null &&
                 (implicitFlow = oAuthFlows.getImplicit()) != null && implicitFlow.getScopes() == null) {
             implicitFlow.setScopes(new Scopes());
@@ -318,7 +316,7 @@ public class OAS3Parser extends APIDefinition {
                     template.setHTTPVerb(entry.getKey().name().toUpperCase());
                     template.setHttpVerbs(entry.getKey().name().toUpperCase());
                     template.setUriTemplate(pathKey);
-                    List<String> opScopes = getScopeOfOperations(OPENAPI_SECURITY_SCHEMA_KEY, operation);
+                    List<String> opScopes = getScopeOfOperations(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, operation);
                     if (!opScopes.isEmpty()) {
                         if (opScopes.size() == 1) {
                             String firstScope = opScopes.get(0);
@@ -376,7 +374,7 @@ public class OAS3Parser extends APIDefinition {
         OAuthFlow oAuthFlow;
         Scopes scopes;
         if (openAPI.getComponents() != null && (securitySchemes = openAPI.getComponents().getSecuritySchemes()) != null
-                && (securityScheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY)) != null
+                && (securityScheme = securitySchemes.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY)) != null
                 && (oAuthFlows = securityScheme.getFlows()) != null
                 && (oAuthFlow = oAuthFlows.getImplicit()) != null
                 && (scopes = oAuthFlow.getScopes()) != null) {
@@ -440,7 +438,7 @@ public class OAS3Parser extends APIDefinition {
 
         info.setVersion(swaggerData.getVersion());
         openAPI.setInfo(info);
-        updateSwaggerSecurityDefinition(openAPI, swaggerData, OPENAPI_DEFAULT_AUTHORIZATION_URL);
+        updateSwaggerSecurityDefinition(openAPI, swaggerData, APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
         updateLegacyScopesFromSwagger(openAPI, swaggerData);
         if (APIConstants.GRAPHQL_API.equals(swaggerData.getTransportType())) {
             modifyGraphQLSwagger(openAPI);
@@ -520,7 +518,7 @@ public class OAS3Parser extends APIDefinition {
                 addOrUpdatePathToSwagger(openAPI, resource);
             }
         }
-        updateSwaggerSecurityDefinition(openAPI, swaggerData, OPENAPI_DEFAULT_AUTHORIZATION_URL);
+        updateSwaggerSecurityDefinition(openAPI, swaggerData, APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
         updateLegacyScopesFromSwagger(openAPI, swaggerData);
 
         if (StringUtils.isEmpty(openAPI.getInfo().getTitle())) {
@@ -710,14 +708,14 @@ public class OAS3Parser extends APIDefinition {
             securitySchemes = new HashMap<>();
             openAPI.getComponents().setSecuritySchemes(securitySchemes);
         }
-        SecurityScheme securityScheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
+        SecurityScheme securityScheme = securitySchemes.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
         if (securityScheme == null) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.OAUTH2);
-            securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
+            securitySchemes.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
             List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
             SecurityRequirement secReq = new SecurityRequirement();
-            secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
+            secReq.addList(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
             security.add(secReq);
             openAPI.setSecurity(security);
         }
@@ -733,6 +731,10 @@ public class OAS3Parser extends APIDefinition {
         }
         if (oAuthFlow.getScopes() == null) {
             oAuthFlow.setScopes(new Scopes());
+        }
+
+        if (StringUtils.isBlank(oAuthFlow.getAuthorizationUrl())) {
+            oAuthFlow.setAuthorizationUrl(APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
         }
 
         if (api.getAuthorizationHeader() != null) {
@@ -867,14 +869,14 @@ public class OAS3Parser extends APIDefinition {
             securitySchemes = new HashMap<>();
             openAPI.getComponents().setSecuritySchemes(securitySchemes);
         }
-        SecurityScheme securityScheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
+        SecurityScheme securityScheme = securitySchemes.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
         if (securityScheme == null) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.OAUTH2);
-            securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
+            securitySchemes.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
             List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
             SecurityRequirement secReq = new SecurityRequirement();
-            secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
+            secReq.addList(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
             security.add(secReq);
             openAPI.setSecurity(security);
         }
@@ -1023,12 +1025,12 @@ public class OAS3Parser extends APIDefinition {
             operation.setSecurity(security);
         }
         for (Map<String, List<String>> requirement : security) {
-            if (requirement.get(OPENAPI_SECURITY_SCHEMA_KEY) != null) {
+            if (requirement.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY) != null) {
 
                 if (resource.getScope() == null) {
-                    requirement.put(OPENAPI_SECURITY_SCHEMA_KEY, Collections.EMPTY_LIST);
+                    requirement.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, Collections.EMPTY_LIST);
                 } else {
-                    requirement.put(OPENAPI_SECURITY_SCHEMA_KEY, Arrays.asList(resource.getScope().getKey()));
+                    requirement.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, Arrays.asList(resource.getScope().getKey()));
                 }
                 return;
             }
@@ -1036,9 +1038,9 @@ public class OAS3Parser extends APIDefinition {
         // if oauth2SchemeKey not present, add a new
         SecurityRequirement defaultRequirement = new SecurityRequirement();
         if (resource.getScope() == null) {
-            defaultRequirement.put(OPENAPI_SECURITY_SCHEMA_KEY, Collections.EMPTY_LIST);
+            defaultRequirement.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, Collections.EMPTY_LIST);
         } else {
-            defaultRequirement.put(OPENAPI_SECURITY_SCHEMA_KEY, Arrays.asList(resource.getScope().getKey()));
+            defaultRequirement.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, Arrays.asList(resource.getScope().getKey()));
         }
         security.add(defaultRequirement);
     }
@@ -1171,9 +1173,9 @@ public class OAS3Parser extends APIDefinition {
                             operation.setSecurity(security);
                         }
                         for (Map<String, List<String>> requirement : security) {
-                            if (requirement.get(OPENAPI_SECURITY_SCHEMA_KEY) == null || !requirement
-                                    .get(OPENAPI_SECURITY_SCHEMA_KEY).contains(scope)) {
-                                requirement.put(OPENAPI_SECURITY_SCHEMA_KEY, Collections.singletonList(scope));
+                            if (requirement.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY) == null || !requirement
+                                    .get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY).contains(scope)) {
+                                requirement.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, Collections.singletonList(scope));
                             }
                         }
                     }
@@ -1299,7 +1301,7 @@ public class OAS3Parser extends APIDefinition {
         if (securitySchemes == null) {
             return false;
         }
-        SecurityScheme checkDefault = openAPI.getComponents().getSecuritySchemes().get(OPENAPI_SECURITY_SCHEMA_KEY);
+        SecurityScheme checkDefault = openAPI.getComponents().getSecuritySchemes().get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
         if (checkDefault == null) {
             return false;
         }
@@ -1325,12 +1327,12 @@ public class OAS3Parser extends APIDefinition {
                 Map<String, SecurityScheme> securitySchemes = components.getSecuritySchemes();
                 if (securitySchemes != null) {
                     SecurityScheme defaultSecurityScheme = openAPI.getComponents().getSecuritySchemes()
-                            .get(OPENAPI_SECURITY_SCHEMA_KEY);
+                            .get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
                     if (defaultSecurityScheme != null) {
                         OAuthFlow oAuthFlow = defaultSecurityScheme.getFlows().getImplicit();
                         String authUrl = oAuthFlow.getAuthorizationUrl();
                         if (StringUtils.isBlank(authUrl)) {
-                            oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
+                            oAuthFlow.setAuthorizationUrl(APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
                         }
                         Scopes scopes = oAuthFlow.getScopes();
                         if (scopes == null) {
@@ -1379,72 +1381,79 @@ public class OAS3Parser extends APIDefinition {
      * @throws APIManagementException if failed to get objects from openAPI
      */
     private OpenAPI injectOtherScopesToDefaultScheme(OpenAPI openAPI) throws APIManagementException {
-        Map<String, SecurityScheme> securitySchemes = null;
-        Components component = openAPI.getComponents();
         List<String> otherSetOfSchemes = new ArrayList<>();
-
-        if (openAPI.getComponents() != null && (securitySchemes = openAPI.getComponents().getSecuritySchemes()) != null) {
-            //If there is no default type schemes set a one
-            SecurityScheme newDefault = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
-            if (newDefault == null) {
-                newDefault = new SecurityScheme();
-                newDefault.setType(SecurityScheme.Type.OAUTH2);
-                //Populating the default security scheme with default values
-                OAuthFlows newDefaultFlows = new OAuthFlows();
-                OAuthFlow newDefaultFlow = new OAuthFlow();
-                newDefaultFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
-                Scopes newDefaultScopes = new Scopes();
-                newDefaultFlow.setScopes(newDefaultScopes);
-                newDefaultFlows.setImplicit(newDefaultFlow);
-                newDefault.setFlows(newDefaultFlows);
-                securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, newDefault);
-            }
-            for (Map.Entry<String, SecurityScheme> entry : securitySchemes.entrySet()) {
-                if (!OPENAPI_SECURITY_SCHEMA_KEY.equals(entry.getKey()) && "oauth2".equals(entry.getValue().getType().toString())) {
-                    otherSetOfSchemes.add(entry.getKey());
-                    //Check for default one
-                    SecurityScheme defaultType = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
-                    OAuthFlows defaultTypeFlows = defaultType.getFlows();
-                    if (defaultTypeFlows == null) {
-                        defaultTypeFlows = new OAuthFlows();
-                    }
-                    OAuthFlow defaultTypeFlow = defaultTypeFlows.getImplicit();
-                    if (defaultTypeFlow == null) {
-                        defaultTypeFlow = new OAuthFlow();
-                    }
-
-                    SecurityScheme noneDefaultType = entry.getValue();
-                    OAuthFlows noneDefaultTypeFlows = noneDefaultType.getFlows();
-                    //Get Implicit Flows
-                    OAuthFlow noneDefaultTypeFlowImplicit = noneDefaultTypeFlows.getImplicit();
-                    if (noneDefaultTypeFlowImplicit != null) {
-                        defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowImplicit, defaultTypeFlow);
-                        defaultTypeFlows.setImplicit(defaultTypeFlow);
-                    }
-                    //Get AuthorizationCode Flow
-                    OAuthFlow noneDefaultTypeFlowAuthorizationCode = noneDefaultTypeFlows.getAuthorizationCode();
-                    if (noneDefaultTypeFlowAuthorizationCode != null) {
-                        defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowAuthorizationCode, defaultTypeFlow);
-                        defaultTypeFlows.setImplicit(defaultTypeFlow);
-                    }
-                    //Get ClientCredentials Flow
-                    OAuthFlow noneDefaultTypeFlowClientCredentials = noneDefaultTypeFlows.getClientCredentials();
-                    if (noneDefaultTypeFlowClientCredentials != null) {
-                        defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowClientCredentials, defaultTypeFlow);
-                        defaultTypeFlows.setImplicit(defaultTypeFlow);
-                    }
-                    //Get Password Flow
-                    OAuthFlow noneDefaultTypeFlowPassword = noneDefaultTypeFlows.getPassword();
-                    if (noneDefaultTypeFlowPassword != null) {
-                        defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowPassword, defaultTypeFlow);
-                        defaultTypeFlows.setImplicit(defaultTypeFlow);
-                    }
-                    defaultType.setFlows(defaultTypeFlows);
-                }
-            }
-            component.setSecuritySchemes(securitySchemes);
-            openAPI.setComponents(component);
+        if (openAPI.getComponents() == null) {
+            openAPI.setComponents(new Components());
         }
+        Map<String, SecurityScheme> securitySchemes = openAPI.getComponents().getSecuritySchemes();
+        if (securitySchemes == null) {
+            securitySchemes = new HashMap<>();
+            openAPI.getComponents().setSecuritySchemes(securitySchemes);
+        }
+        //If there is no default type schemes, set a one
+        SecurityScheme newDefault = securitySchemes.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
+        if (newDefault == null) {
+            newDefault = new SecurityScheme();
+            newDefault.setType(SecurityScheme.Type.OAUTH2);
+            //Populating the default security scheme with default values
+            OAuthFlows newDefaultFlows = new OAuthFlows();
+            OAuthFlow newDefaultFlow = new OAuthFlow();
+            newDefaultFlow.setAuthorizationUrl(APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
+            Scopes newDefaultScopes = new Scopes();
+            newDefaultFlow.setScopes(newDefaultScopes);
+            newDefaultFlows.setImplicit(newDefaultFlow);
+            newDefault.setFlows(newDefaultFlows);
+            securitySchemes.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, newDefault);
+            List<SecurityRequirement> security = new ArrayList<>();
+            SecurityRequirement secReq = new SecurityRequirement();
+            secReq.addList(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<>());
+            security.add(secReq);
+            openAPI.setSecurity(security);
+        }
+        for (Map.Entry<String, SecurityScheme> entry : securitySchemes.entrySet()) {
+            if (!APIConstants.OPENAPI_SECURITY_SCHEMA_KEY.equals(entry.getKey()) && "oauth2".equals(entry.getValue().getType().toString())) {
+                otherSetOfSchemes.add(entry.getKey());
+                //Check for default one
+                SecurityScheme defaultType = securitySchemes.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
+                OAuthFlows defaultTypeFlows = defaultType.getFlows();
+                if (defaultTypeFlows == null) {
+                    defaultTypeFlows = new OAuthFlows();
+                }
+                OAuthFlow defaultTypeFlow = defaultTypeFlows.getImplicit();
+                if (defaultTypeFlow == null) {
+                    defaultTypeFlow = new OAuthFlow();
+                }
+
+                SecurityScheme noneDefaultType = entry.getValue();
+                OAuthFlows noneDefaultTypeFlows = noneDefaultType.getFlows();
+                //Get Implicit Flows
+                OAuthFlow noneDefaultTypeFlowImplicit = noneDefaultTypeFlows.getImplicit();
+                if (noneDefaultTypeFlowImplicit != null) {
+                    defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowImplicit, defaultTypeFlow);
+                    defaultTypeFlows.setImplicit(defaultTypeFlow);
+                }
+                //Get AuthorizationCode Flow
+                OAuthFlow noneDefaultTypeFlowAuthorizationCode = noneDefaultTypeFlows.getAuthorizationCode();
+                if (noneDefaultTypeFlowAuthorizationCode != null) {
+                    defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowAuthorizationCode, defaultTypeFlow);
+                    defaultTypeFlows.setImplicit(defaultTypeFlow);
+                }
+                //Get ClientCredentials Flow
+                OAuthFlow noneDefaultTypeFlowClientCredentials = noneDefaultTypeFlows.getClientCredentials();
+                if (noneDefaultTypeFlowClientCredentials != null) {
+                    defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowClientCredentials, defaultTypeFlow);
+                    defaultTypeFlows.setImplicit(defaultTypeFlow);
+                }
+                //Get Password Flow
+                OAuthFlow noneDefaultTypeFlowPassword = noneDefaultTypeFlows.getPassword();
+                if (noneDefaultTypeFlowPassword != null) {
+                    defaultTypeFlow = extractAndInjectScopesFromFlow(noneDefaultTypeFlowPassword, defaultTypeFlow);
+                    defaultTypeFlows.setImplicit(defaultTypeFlow);
+                }
+                defaultType.setFlows(defaultTypeFlows);
+            }
+        }
+        openAPI.getComponents().setSecuritySchemes(securitySchemes);
         setOtherSchemes(otherSetOfSchemes);
         return openAPI;
     }
@@ -1515,14 +1524,15 @@ public class OAS3Parser extends APIDefinition {
                 }
                 if (APIConstants.SUPPORTED_METHODS.contains(httpMethod.name().toLowerCase())) {
                     List<String> opScopesDefault = new ArrayList<>();
-                    List<String> opScopesDefaultInstance = getScopeOfOperations(OPENAPI_SECURITY_SCHEMA_KEY, operation);
+                    List<String> opScopesDefaultInstance =
+                            getScopeOfOperations(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, operation);
                     if (opScopesDefaultInstance != null) {
                         opScopesDefault.addAll(opScopesDefaultInstance);
                     }
-                    updatedDefaultSecurityRequirement.put(OPENAPI_SECURITY_SCHEMA_KEY, opScopesDefault);
+                    updatedDefaultSecurityRequirement.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, opScopesDefault);
                     for (Map<String, List<String>> input : securityRequirements) {
                         for (String scheme : schemes) {
-                            if (!OPENAPI_SECURITY_SCHEMA_KEY.equals(scheme)) {
+                            if (!APIConstants.OPENAPI_SECURITY_SCHEMA_KEY.equals(scheme)) {
                                 List<String> opScopesOthers = getScopeOfOperations(scheme, operation);
                                 if (opScopesOthers != null) {
                                     for (String scope : opScopesOthers) {
@@ -1532,7 +1542,8 @@ public class OAS3Parser extends APIDefinition {
                                     }
                                 }
                             }
-                            updatedDefaultSecurityRequirement.put(OPENAPI_SECURITY_SCHEMA_KEY, opScopesDefault);
+                            updatedDefaultSecurityRequirement.put(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY,
+                                    opScopesDefault);
                         }
                     }
                     securityRequirements.add(updatedDefaultSecurityRequirement);

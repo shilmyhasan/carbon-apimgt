@@ -4,6 +4,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.parser.OpenAPIV3Parser;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
@@ -11,9 +12,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.wso2.carbon.apimgt.api.APIDefinition;
-import org.wso2.carbon.apimgt.api.model.API;
-import org.wso2.carbon.apimgt.api.model.APIIdentifier;
-import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
@@ -24,6 +22,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.hasItems;
 
 public class OAS3ParserTest extends OASTestBase {
     private OAS3Parser oas3Parser = new OAS3Parser();
@@ -165,6 +166,23 @@ public class OAS3ParserTest extends OASTestBase {
         expectedTemplates.add(getUriTemplate("GET", "Application", "/item"));
         Set<URITemplate> actualTemplates = oas3Parser.getURITemplates(openApi);
         Assert.assertEquals(actualTemplates, expectedTemplates);
+    }
+
+    @Test
+    public void testProcessOtherSchemeScopes() throws Exception {
+        String relativePath = "definitions" + File.separator + "oas3" + File.separator + "oas3_non_security.json";
+        String swaggerContent = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        swaggerContent = oas3Parser.processOtherSchemeScopes(swaggerContent);
+        OpenAPI openAPI = oas3Parser.getOpenAPI(swaggerContent);
+        SecurityScheme defaultSecScheme = openAPI.getComponents().getSecuritySchemes().get("default");
+        Assert.assertNotNull(defaultSecScheme);
+        Assert.assertEquals(defaultSecScheme.getType(),SecurityScheme.Type.OAUTH2);
+        Assert.assertEquals(defaultSecScheme.getFlows().getImplicit().getAuthorizationUrl(),"https://test.com");
+        Assert.assertNull(defaultSecScheme.getFlows().getImplicit().getScopes());
+        Assert.assertNotNull(openAPI.getSecurity());
+        SecurityRequirement secReq = new SecurityRequirement();
+        secReq.addList("default", new ArrayList<>());
+        Assert.assertThat(openAPI.getSecurity(), hasItems(secReq));
     }
 
 }
