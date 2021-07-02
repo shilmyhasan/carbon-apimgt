@@ -137,7 +137,6 @@ public class APIMWSDLReader {
         }
 
         WSDLValidationResponse wsdlValidationResponse = new WSDLValidationResponse();
-        retrieveContentFromInitialFile(inputStream, extractedLocation, wsdlValidationResponse);
 
         if (processor.hasError()) {
             wsdlValidationResponse.setValid(false);
@@ -172,51 +171,21 @@ public class APIMWSDLReader {
         }
         APIFileUtil.extractSingleWSDLFile(inputStream, path, wsdlFilePath);
         String finalPath = APIConstants.FILE_URI_PREFIX + wsdlFilePath;
-        APIMWSDLReader wsdlReader = new APIMWSDLReader(finalPath);
-        WSDL11SOAPOperationExtractor soapProcessor = APIMWSDLReader.getWSDLSOAPOperationExtractor(path, wsdlReader);
         try {
             WSDLProcessor processor = getWSDLProcessor(finalPath);
             wsdlValidationResponse = new WSDLValidationResponse();
-            retrieveContentFromInitialFile(inputStream, wsdlFilePath, wsdlValidationResponse);
 
             if (processor.hasError()) {
                 wsdlValidationResponse.setValid(false);
                 wsdlValidationResponse.setError(processor.getError());
             } else {
                 wsdlValidationResponse.setValid(true);
-                WSDLArchiveInfo wsdlArchiveInfo = new WSDLArchiveInfo(path, APIConstants.WSDL_ARCHIVE_ZIP_FILE,
-                        soapProcessor.getWsdlInfo());
-                wsdlValidationResponse.setWsdlArchiveInfo(wsdlArchiveInfo);
-                wsdlValidationResponse.setWsdlInfo(soapProcessor.getWsdlInfo());
-                wsdlValidationResponse.setWsdlProcessor(soapProcessor);
+                wsdlValidationResponse.setWsdlInfo(processor.getWsdlInfo());
+                wsdlValidationResponse.setWsdlProcessor(processor);
             }
             return wsdlValidationResponse;
         } catch (APIManagementException e) {
             return handleExceptionDuringValidation(e);
-        }
-    }
-
-    /**
-     * Writes WSDL definition as a byte array to the validation response
-     *
-     * @param inputStream            file input stream
-     * @param filePath               file path of WSDL
-     * @param wsdlValidationResponse validation information response
-     */
-    public static void retrieveContentFromInitialFile(InputStream inputStream, String filePath, WSDLValidationResponse wsdlValidationResponse) {
-        File initialFile = new File(filePath);
-        InputStream targetStream = null;
-        try {
-            targetStream = new FileInputStream(initialFile);
-        } catch (FileNotFoundException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Cannot find the wsdl in the defined path: " + filePath + " " + e);
-            }
-        }
-        if (targetStream != null) {
-            wsdlValidationResponse.setFileInputStream(targetStream);
-        } else {
-            wsdlValidationResponse.setFileInputStream(inputStream);
         }
     }
 
@@ -297,7 +266,7 @@ public class APIMWSDLReader {
         if (wsdlPath.endsWith(".wsdl") || wsdlPath.endsWith("?wsdl")) {
             wsdlReader = new APIMWSDLReader(wsdlPath);
             wsdlContent = wsdlReader.getWSDL();
-            getWSDLProcessor(wsdlContent);
+            return getWSDLProcessor(wsdlContent);
         } else {
             try {
                 if (wsdl11Processor.canProcess(wsdlPath)) {
@@ -315,7 +284,6 @@ public class APIMWSDLReader {
                 throw new APIManagementException("Error while instantiating wsdl processor class", e);
             }
         }
-        return wsdl11Processor;
     }
 
     /**

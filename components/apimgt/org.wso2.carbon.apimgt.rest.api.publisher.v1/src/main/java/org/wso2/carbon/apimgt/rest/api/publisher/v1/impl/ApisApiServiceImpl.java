@@ -3407,7 +3407,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             apiToAdd.setWsdlUrl(url);
             API createdApi = null;
             if (isSoapAPI) {
-                createdApi = importSOAPAPI(validationResponse.getFileInputStream(), fileDetail, url, apiToAdd);
+                createdApi = importSOAPAPI(validationResponse.getWsdlProcessor().getWSDL(), fileDetail, url, apiToAdd);
             } else if (isSoapToRestConvertedAPI) {
                 String wsdlArchiveExtractedPath = null;
                 if (validationResponse.getWsdlArchiveInfo() != null) {
@@ -3447,19 +3447,19 @@ public class ApisApiServiceImpl implements ApisApiService {
             RestApiUtil.handleBadRequest(validationResponse.getError(), log);
         }
 
-        if (validationResponse.getFileInputStream() != null) {
-            if (validationResponse.getFileInputStream().markSupported()) {
+        if (fileInputStream != null) {
+            if (fileInputStream.markSupported()) {
                 // For uploading the WSDL below will require re-reading from the input stream hence resetting
                 try {
-                    validationResponse.getFileInputStream().reset();
+                    fileInputStream.reset();
                 } catch (IOException e) {
                     throw new APIManagementException("Error occurred while trying to reset the content stream of the " +
                             "WSDL", e);
                 }
             } else {
-                log.warn("Marking is not supported in 'fileInputStream' InputStream type: " + validationResponse
-                        .getFileInputStream().getClass() + ". Skipping validating WSDL to avoid re-reading from the "
-                        + "input stream.");
+                log.warn("Marking is not supported in 'fileInputStream' InputStream type: "
+                        + fileInputStream.getClass() + ". Skipping validating WSDL to avoid re-reading from the " +
+                        "input stream.");
             }
         }
         return validationResponse;
@@ -3619,7 +3619,7 @@ public class ApisApiServiceImpl implements ApisApiService {
     public Response updateWSDLOfAPI(String apiId, InputStream fileInputStream, Attachment fileDetail, String url,
            String ifMatch, MessageContext messageContext) throws APIManagementException {
 
-        WSDLValidationResponse validationResponse = validateWSDLAndReset(fileInputStream, fileDetail, url);
+        validateWSDLAndReset(fileInputStream, fileDetail, url);
         APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
         String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         API api = apiProvider.getAPIbyUUID(apiId, tenantDomain);
@@ -3631,10 +3631,9 @@ public class ApisApiServiceImpl implements ApisApiService {
             ResourceFile wsdlResource;
             if (APIConstants.APPLICATION_ZIP.equals(fileDetail.getContentType().toString()) ||
                     APIConstants.APPLICATION_X_ZIP_COMPRESSED.equals(fileDetail.getContentType().toString())) {
-                wsdlResource = new ResourceFile(validationResponse.getFileInputStream(), APIConstants.APPLICATION_ZIP);
+                wsdlResource = new ResourceFile(fileInputStream, APIConstants.APPLICATION_ZIP);
             } else {
-                wsdlResource = new ResourceFile(validationResponse.getFileInputStream(),
-                        fileDetail.getContentType().toString());
+                wsdlResource = new ResourceFile(fileInputStream, fileDetail.getContentType().toString());
             }
             api.setWsdlResource(wsdlResource);
             api.setWsdlUrl(null);
