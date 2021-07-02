@@ -1374,13 +1374,12 @@ public class OAS3Parser extends APIDefinition {
     }
 
     /**
-     * This method injects the oauth scopes from other schemes into default scheme
+     * This method injects the oauth scopes from other schemes into default scheme.
      *
      * @param openAPI - OpenApi object
      * @return OpenAPI
-     * @throws APIManagementException if failed to get objects from openAPI
      */
-    private OpenAPI injectOtherScopesToDefaultScheme(OpenAPI openAPI) throws APIManagementException {
+    private OpenAPI injectOtherScopesToDefaultScheme(OpenAPI openAPI) {
         List<String> otherSetOfSchemes = new ArrayList<>();
         if (openAPI.getComponents() == null) {
             openAPI.setComponents(new Components());

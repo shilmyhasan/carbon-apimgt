@@ -1278,11 +1278,10 @@ public class OAS2Parser extends APIDefinition {
     }
 
     /**
-     * This method injects the oauth scopes from other schemes into default scheme
+     * This method injects the oauth scopes from other schemes into default scheme.
      *
      * @param swagger - Swagger object
      * @return Swagger
-     * @throws APIManagementException if failed to get objects from openAPI
      */
     private Swagger injectOtherScopesToDefaultScheme(Swagger swagger) {
         //Get security definitions from swagger
