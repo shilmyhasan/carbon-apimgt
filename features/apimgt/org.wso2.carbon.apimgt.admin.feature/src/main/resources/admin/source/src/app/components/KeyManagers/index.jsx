@@ -9,6 +9,7 @@ import AddEditKeyManager from './AddEditKeyManager';
  * @returns {JSX} Header AppBar components.
  */
 function KeyManagers() {
+    console.log('this is a test')
     return (
         <Switch>
             <Route exact path='/settings/key-managers' component={ListKeyManagers} />

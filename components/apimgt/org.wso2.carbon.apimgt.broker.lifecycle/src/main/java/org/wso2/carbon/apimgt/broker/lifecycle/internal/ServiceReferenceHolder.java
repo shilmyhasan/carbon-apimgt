@@ -58,9 +58,11 @@ public class ServiceReferenceHolder {
 
     public JMSListenerShutDownService getListenerShutdownService() {
         return listenerShutdownService;
+        
     }
 
     public void setListenerShutdownService(JMSListenerShutDownService listenerShutdownService) {
         this.listenerShutdownService = listenerShutdownService;
+
     }
 }

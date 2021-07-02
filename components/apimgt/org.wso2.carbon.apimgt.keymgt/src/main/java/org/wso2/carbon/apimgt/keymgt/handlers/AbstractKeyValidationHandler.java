@@ -61,6 +61,7 @@ public abstract class AbstractKeyValidationHandler implements KeyValidationHandl
         if (validationContext.isCacheHit()) {
             return true;
         }
+        
 
         APIKeyValidationInfoDTO dto = validationContext.getValidationInfoDTO();
 

@@ -81,6 +81,8 @@ public class APIDefinitionValidationResponse {
         private String description;
         private List<String> endpoints;
 
+        
+
         public String getOpenAPIVersion() {
             return openAPIVersion;
         }

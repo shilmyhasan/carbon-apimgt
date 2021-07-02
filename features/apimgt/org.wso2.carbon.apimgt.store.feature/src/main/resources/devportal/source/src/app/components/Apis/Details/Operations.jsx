@@ -36,6 +36,7 @@ import Api from 'AppData/api';
  * @returns
  */
 function RenderMethodBase(props) {
+    console.log('this is a test')
     const { theme, method } = props;
     let chipColor = theme.custom.operationChipColor
         ? theme.custom.operationChipColor[method]

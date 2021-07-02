@@ -24,6 +24,7 @@ public class ThrottlingRunTimeException extends RuntimeException {
 
     public ThrottlingRunTimeException() {
         super();
+        
     }
 
     public ThrottlingRunTimeException(String message) {
