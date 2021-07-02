@@ -178,11 +178,12 @@ public class OAS2ParserTest extends OASTestBase {
                 "UTF-8");
         swaggerContent = oas2Parser.processOtherSchemeScopes(swaggerContent);
         Swagger swagger = oas2Parser.getSwagger(swaggerContent);
-        SecuritySchemeDefinition schemeDefinition = swagger.getSecurityDefinitions().get("default");
+        SecuritySchemeDefinition schemeDefinition = swagger.getSecurityDefinitions()
+                .get(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY);
         Assert.assertNotNull(schemeDefinition);
         OAuth2Definition oAuth2Definition = (OAuth2Definition) schemeDefinition;
-        Assert.assertEquals(oAuth2Definition.getAuthorizationUrl(),"https://test.com");
-        Assert.assertEquals(oAuth2Definition.getFlow(),"implicit");
+        Assert.assertEquals(oAuth2Definition.getAuthorizationUrl(),APIConstants.SWAGGER_DEFAULT_AUTHORIZATION_URL);
+        Assert.assertEquals(oAuth2Definition.getFlow(),APIConstants.SWAGGER_SECURITY_OAUTH2_IMPLICIT);
         Assert.assertEquals(oAuth2Definition.getDescription(),"");
         SecurityRequirement securityRequirement = new SecurityRequirement();
         securityRequirement.setRequirements(APIConstants.SWAGGER_APIM_DEFAULT_SECURITY, new ArrayList<>());

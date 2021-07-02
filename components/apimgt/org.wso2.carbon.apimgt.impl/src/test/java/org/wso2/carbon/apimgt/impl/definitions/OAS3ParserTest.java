@@ -23,7 +23,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.hasItems;
 
 public class OAS3ParserTest extends OASTestBase {
@@ -174,14 +173,16 @@ public class OAS3ParserTest extends OASTestBase {
         String swaggerContent = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
         swaggerContent = oas3Parser.processOtherSchemeScopes(swaggerContent);
         OpenAPI openAPI = oas3Parser.getOpenAPI(swaggerContent);
-        SecurityScheme defaultSecScheme = openAPI.getComponents().getSecuritySchemes().get("default");
+        SecurityScheme defaultSecScheme = openAPI.getComponents().getSecuritySchemes()
+                .get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
         Assert.assertNotNull(defaultSecScheme);
         Assert.assertEquals(defaultSecScheme.getType(),SecurityScheme.Type.OAUTH2);
-        Assert.assertEquals(defaultSecScheme.getFlows().getImplicit().getAuthorizationUrl(),"https://test.com");
+        Assert.assertEquals(defaultSecScheme.getFlows().getImplicit().getAuthorizationUrl(),
+                APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
         Assert.assertNull(defaultSecScheme.getFlows().getImplicit().getScopes());
         Assert.assertNotNull(openAPI.getSecurity());
         SecurityRequirement secReq = new SecurityRequirement();
-        secReq.addList("default", new ArrayList<>());
+        secReq.addList(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<>());
         Assert.assertThat(openAPI.getSecurity(), hasItems(secReq));
     }
 
