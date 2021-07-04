@@ -37,5 +37,6 @@ public interface LoginPostExecutor {
      */
     default public boolean isMultiGrpAppSharing() {
         return false;
+        
     }
 }

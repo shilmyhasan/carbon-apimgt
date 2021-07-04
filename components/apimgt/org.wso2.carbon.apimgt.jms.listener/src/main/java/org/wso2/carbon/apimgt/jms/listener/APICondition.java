@@ -15,5 +15,6 @@ public class APICondition {
 
     public String getName() {
         return name;
+        
     }
 }

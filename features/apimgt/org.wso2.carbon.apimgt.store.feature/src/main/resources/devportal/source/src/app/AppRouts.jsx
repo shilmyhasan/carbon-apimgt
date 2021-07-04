@@ -36,6 +36,7 @@ const Details = lazy(() => import('AppComponents/Applications/Details/index' /* 
  * @returns {*}
  */
 function getRedirectingPath(theme) {
+    console.log('this is a test')
     if (theme.custom.landingPage.active) {
         return '/home';
     } else if (
@@ -55,6 +56,7 @@ function getRedirectingPath(theme) {
  * @returns {*}
  */
 function AppRouts(props) {
+    console.log('this is a test')
     const { isAuthenticated, isUserFound, theme } = props;
     return (
         <Suspense fallback={<Progress />}>

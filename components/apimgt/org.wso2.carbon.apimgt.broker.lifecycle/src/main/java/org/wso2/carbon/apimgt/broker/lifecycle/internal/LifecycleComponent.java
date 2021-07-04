@@ -76,6 +76,7 @@ public class LifecycleComponent {
     public void unsetQpidService(QpidService qpidService) {
         log.debug("Un Setting QpidService...");
         ServiceReferenceHolder.getInstance().setQpidService(null);
+
     }
 
     @Reference(
@@ -92,6 +93,7 @@ public class LifecycleComponent {
     public void unsetShutDownService(JMSListenerShutDownService shutDownService) {
         log.debug("Setting JMS Listener Shutdown Service");
         ServiceReferenceHolder.getInstance().setListenerShutdownService(null);
+        
     }
 }
 

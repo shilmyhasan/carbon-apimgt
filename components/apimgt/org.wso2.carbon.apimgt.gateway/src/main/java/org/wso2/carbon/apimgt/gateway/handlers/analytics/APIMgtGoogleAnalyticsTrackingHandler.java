@@ -75,6 +75,7 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
     @Override
 	public boolean handleRequest(MessageContext msgCtx) {
         TracingSpan span = null;
+        
         TracingTracer tracer = null;
         Map<String, String> tracerSpecificCarrier = new HashMap<>();
         if (Util.tracingEnabled()) {

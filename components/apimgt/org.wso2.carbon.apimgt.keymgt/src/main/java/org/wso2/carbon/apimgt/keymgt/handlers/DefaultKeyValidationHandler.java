@@ -71,6 +71,7 @@ public class DefaultKeyValidationHandler extends AbstractKeyValidationHandler {
                 return true;
             }
         }
+        
         if (StringUtils.isEmpty(validationContext.getAccessToken())) {
             APIKeyValidationInfoDTO infoDTO = validationContext.getValidationInfoDTO();
             infoDTO.setAuthorized(false);

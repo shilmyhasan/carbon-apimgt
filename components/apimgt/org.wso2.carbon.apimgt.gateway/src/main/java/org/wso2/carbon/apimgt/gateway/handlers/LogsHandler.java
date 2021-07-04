@@ -82,6 +82,7 @@ public class LogsHandler extends AbstractSynapseHandler {
 
     public boolean handleRequestInFlow(MessageContext messageContext) {
         if (isEnabled()) {
+            
             try {
                 apiTo = LogUtils.getTo(messageContext);
                 return true;

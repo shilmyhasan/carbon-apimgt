@@ -52,6 +52,7 @@ public class APIMgtFaultHandler extends APIMgtCommonExecutionPublisher {
         if (publisher == null) {
             initDataPublisher();
         }
+        
         try {
             if (!enabled) {
                 return true;
