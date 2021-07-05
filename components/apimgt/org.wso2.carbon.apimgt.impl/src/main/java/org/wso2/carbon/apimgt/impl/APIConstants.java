@@ -1306,11 +1306,15 @@ public final class APIConstants {
     public static final String SWAGGER_SECURITY_DEFINITIONS = "securityDefinitions";
     public static final String SWAGGER_APIM_DEFAULT_SECURITY = "default";
     public static final String SWAGGER_APIM_RESTAPI_SECURITY = "OAuth2Security";
+    public static final String SWAGGER_SECURITY_SCHEMA_KEY = "default";
+    public static final String SWAGGER_DEFAULT_AUTHORIZATION_URL = "https://test.com";
     public static final String OPEN_API_V3 = "3.0.x";
     public static final String OPEN_API = "openapi";
     public static final String OPEN_API_VERSION_REGEX = "3\\.0\\.\\d{1,}";
     public static final String SWAGGER_IS_MISSING_MSG = "swagger is missing";
     public static final String OPENAPI_IS_MISSING_MSG = "openapi is missing";
+    public static final String OPENAPI_SECURITY_SCHEMA_KEY = "default";
+    public static final String OPENAPI_DEFAULT_AUTHORIZATION_URL = "https://test.com";
     public static final String SWAGGER_X_SCOPES_BINDINGS = "x-scopes-bindings";
 
     //swagger v1.2 constants

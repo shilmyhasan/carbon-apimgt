@@ -275,7 +275,7 @@ public class OASParserUtil {
         Scopes scopes = new Scopes();
         if (destOpenAPI.getComponents() != null &&
                 (securitySchemes = destOpenAPI.getComponents().getSecuritySchemes()) != null &&
-                (securityScheme = securitySchemes.get(OAS3Parser.OPENAPI_SECURITY_SCHEMA_KEY)) != null &&
+                (securityScheme = securitySchemes.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY)) != null &&
                 (oAuthFlow = securityScheme.getFlows().getImplicit()) != null) {
 
             Map<String, String> scopeBindings = new HashMap<>();
@@ -552,7 +552,7 @@ public class OASParserUtil {
         List<SecurityRequirement> srcOperationSecurity = srcOperation.getSecurity();
         if (srcOperationSecurity != null) {
             for (SecurityRequirement requirement : srcOperationSecurity) {
-                List<String> scopes = requirement.get(OAS3Parser.OPENAPI_SECURITY_SCHEMA_KEY);
+                List<String> scopes = requirement.get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
                 if (scopes != null) {
                     for (String scopeKey : scopes) {
                         for (Scope scope : allScopes) {
