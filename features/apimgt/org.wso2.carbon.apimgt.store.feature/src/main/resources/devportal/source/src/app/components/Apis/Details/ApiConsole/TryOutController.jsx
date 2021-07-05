@@ -104,7 +104,7 @@ const styles = makeStyles((theme) => ({
  * @extends {Component}
  */
 function TryOutController(props) {
-    console.log('this is a test')
+    console.log('this is a test');
     const {
         securitySchemeType, selectedEnvironment, environments, containerMngEnvironments, labels,
         productionAccessToken, sandboxAccessToken, selectedKeyType, setKeys, setSelectedKeyType,

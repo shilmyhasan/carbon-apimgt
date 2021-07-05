@@ -130,7 +130,7 @@ const residentKeyManagerName = 'Resident Key Manager';
  * @returns {Promise}
  */
 function reducer(state, newValue) {
-    console.log('this is a test')
+    console.log('this is a test');
     const { field, value } = newValue;
     switch (field) {
         case 'name':

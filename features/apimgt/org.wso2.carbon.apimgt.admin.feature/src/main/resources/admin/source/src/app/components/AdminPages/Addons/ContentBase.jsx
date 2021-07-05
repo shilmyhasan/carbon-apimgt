@@ -27,7 +27,7 @@ import clsx from 'clsx';
 
 const useStyles = makeStyles(() => {
     const minHeight = 43;
-    console.log('this is a test')
+    console.log('this is a test');
     return ({
         pageTitle: {
             minHeight,

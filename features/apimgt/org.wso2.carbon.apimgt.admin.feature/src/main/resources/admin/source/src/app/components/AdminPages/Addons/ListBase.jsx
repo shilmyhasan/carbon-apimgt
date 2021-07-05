@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
  * @returns {JSX} Header AppBar components.
  */
 function ListBase(props) {
-    console.log('this is a test')
+    console.log('this is a test');
     const {
         EditComponent, editComponentProps, DeleteComponent, showActionColumn,
         columProps, pageProps, addButtonProps, addButtonOverride,

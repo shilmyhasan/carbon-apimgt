@@ -35,7 +35,7 @@ const styles = (theme) => ({
 });
 
 function SettingsBase(props) {
-    console.log('this is a test')
+    console.log('this is a test');
     const { classes } = props;
     return (
         <Container fixed>
