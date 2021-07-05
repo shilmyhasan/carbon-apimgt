@@ -54,7 +54,7 @@ export default function ApiCreateGraphQL(props) {
      * @returns
      */
     function apiInputsReducer(currentState, inputAction) {
-        console.log('this is a test')
+        console.log('this is a test');
         const { action, value } = inputAction;
         switch (action) {
             case 'type':

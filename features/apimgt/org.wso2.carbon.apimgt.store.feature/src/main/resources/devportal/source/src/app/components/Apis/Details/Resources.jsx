@@ -34,7 +34,7 @@ import { ApiContext } from './ApiContext';
  * @returns
  */
 function RenderMethodBase(props) {
-    console.log('this is a test')
+    console.log('this is a test');
     const { theme, method } = props;
     let chipColor = theme.custom.resourceChipColors ? theme.custom.resourceChipColors[method] : null;
     let chipTextColor = '#000000';

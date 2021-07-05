@@ -34,7 +34,7 @@ const styles = (theme) => ({
  * @return {any} dds
  * */
 function Settings(props) {
-    console.log('this is a test')
+    console.log('this is a test');
     const { classes } = props;
     return (
         <div className={classes.settingsRoot}>

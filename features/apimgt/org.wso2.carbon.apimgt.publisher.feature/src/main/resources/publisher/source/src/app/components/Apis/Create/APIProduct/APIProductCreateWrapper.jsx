@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
  * @returns
  */
 export default function ApiProductCreateWrapper(props) {
-    console.log('this is a test')
+    console.log('this is a test');
 
     const { history } = props;
     const [wizardStep, setWizardStep] = useState(0);
