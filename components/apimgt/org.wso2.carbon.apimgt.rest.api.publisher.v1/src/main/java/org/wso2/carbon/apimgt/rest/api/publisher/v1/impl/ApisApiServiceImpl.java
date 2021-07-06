@@ -3347,8 +3347,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             String filename = fileDetail.getContentDisposition().getFilename();
             try {
                 if (filename.endsWith(".zip")) {
-                    validationResponse =
-                            APIMWSDLReader.extractAndValidateWSDLArchive(fileInputStream);
+                    validationResponse = APIMWSDLReader.extractAndValidateWSDLArchive(fileInputStream);
                 } else if (filename.endsWith(".wsdl")) {
                     validationResponse = APIMWSDLReader.validateWSDLFile(fileInputStream);
                 } else {
@@ -3408,14 +3407,14 @@ public class ApisApiServiceImpl implements ApisApiService {
             apiToAdd.setWsdlUrl(url);
             API createdApi = null;
             if (isSoapAPI) {
-                createdApi = importSOAPAPI(fileInputStream, fileDetail, url, apiToAdd);
+                createdApi = importSOAPAPI(validationResponse.getWsdlProcessor().getWSDL(), fileDetail, url, apiToAdd);
             } else if (isSoapToRestConvertedAPI) {
                 String wsdlArchiveExtractedPath = null;
                 if (validationResponse.getWsdlArchiveInfo() != null) {
                     wsdlArchiveExtractedPath = validationResponse.getWsdlArchiveInfo().getLocation()
                             + File.separator + APIConstants.API_WSDL_EXTRACTED_DIRECTORY;
                 }
-                createdApi = importSOAPToRESTAPI(fileInputStream, fileDetail, url, wsdlArchiveExtractedPath, apiToAdd);
+                createdApi = importSOAPToRESTAPI(fileDetail, url, wsdlArchiveExtractedPath, apiToAdd);
             } else {
                 RestApiUtil.handleBadRequest("Invalid implementationType parameter", log);
             }
@@ -3533,13 +3532,12 @@ public class ApisApiServiceImpl implements ApisApiService {
     /**
      * Import an API from WSDL as a SOAP-to-REST API
      *
-     * @param fileInputStream file data as input stream
      * @param fileDetail file details
      * @param url URL of the WSDL
      * @param apiToAdd API object to be added to the system (which is not added yet)
      * @return API added api
      */
-    private API importSOAPToRESTAPI(InputStream fileInputStream, Attachment fileDetail, String url,
+    private API importSOAPToRESTAPI( Attachment fileDetail, String url,
             String wsdlArchiveExtractedPath, API apiToAdd) throws APIManagementException {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
@@ -3552,7 +3550,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             String swaggerStr = "";
             if (StringUtils.isNotBlank(url)) {
                 swaggerStr = SOAPOperationBindingUtils.getSoapOperationMappingForUrl(url);
-            } else if (fileInputStream != null) {
+            } else {
                 String filename = fileDetail.getContentDisposition().getFilename();
                 if (filename.endsWith(".zip")) {
                     swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
