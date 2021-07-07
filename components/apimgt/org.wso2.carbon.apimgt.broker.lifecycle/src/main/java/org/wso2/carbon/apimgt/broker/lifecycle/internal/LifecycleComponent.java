@@ -93,5 +93,7 @@ public class LifecycleComponent {
         log.debug("Setting JMS Listener Shutdown Service");
         ServiceReferenceHolder.getInstance().setListenerShutdownService(null);
     }
+         
+    // Dummy changes to test hotfix creation
 }
 
