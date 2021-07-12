@@ -275,7 +275,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public void deleteSwaggerLocalEntry(API api) {
         if (log.isDebugEnabled()) {
-            log.debug("Deleting the local entry for API: " + api.getId().toString());
+            log.debug("Deleting the local entry for the API: " + api.getId().toString());
         }
         Map<String, Environment> environments;
         APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
