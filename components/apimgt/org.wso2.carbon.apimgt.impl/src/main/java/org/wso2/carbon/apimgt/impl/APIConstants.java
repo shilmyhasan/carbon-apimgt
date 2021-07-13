@@ -520,6 +520,7 @@ public final class APIConstants {
 
     public static final String DEVICE_SCOPE_PATTERN = "^device_.*";
     public static final String OPEN_ID_SCOPE_NAME = "openid";
+    public static final String OPEN_ID_ROLE_CLAIM_URI = "http://wso2.org/oidc/claim";
     public static final String API_KEY_MANGER_VALIDATIONHANDLER_CLASS_NAME = API_KEY_VALIDATOR
             + "KeyValidationHandlerClassName";
 
