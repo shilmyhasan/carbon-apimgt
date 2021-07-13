@@ -410,6 +410,14 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
             return tokenInfo;
         }
 
+        try {
+            AuthenticatedUser user = OAuth2Util.getAccessTokenDOfromTokenIdentifier(accessToken).getAuthzUser();
+            tokenInfo.setFederatedUser(user.isFederatedUser());
+        } catch (IdentityOAuth2Exception e) {
+            // The flow can continue without identifying whether user is federated
+            log.warn("Error while identifying if the user is federated or not", e);
+        }
+
         tokenInfo.setTokenValid(responseDTO.isValid());
         tokenInfo.setEndUserName(responseDTO.getAuthorizedUser());
         tokenInfo.setConsumerKey(clientApplicationDTO.getConsumerKey());

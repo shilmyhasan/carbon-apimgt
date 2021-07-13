@@ -146,8 +146,8 @@ public class DefaultKeyValidationHandler extends AbstractKeyValidationHandler {
         AuthenticatedUser user = new AuthenticatedUser();
         user.setUserName(apiKeyValidationInfoDTO.getEndUserName());
 
-        if (user.getUserName() != null && APIConstants.FEDERATED_USER
-                .equalsIgnoreCase(IdentityUtil.extractDomainFromName(user.getUserName()))) {
+        if ((user.getUserName() != null && APIConstants.FEDERATED_USER.equalsIgnoreCase(IdentityUtil
+                .extractDomainFromName(user.getUserName()))) || validationContext.getTokenInfo().isFederatedUser()) {
             user.setFederatedUser(true);
         }
 
