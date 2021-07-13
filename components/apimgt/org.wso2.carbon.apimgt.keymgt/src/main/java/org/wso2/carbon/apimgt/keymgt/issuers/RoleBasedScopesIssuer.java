@@ -22,14 +22,22 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opensaml.saml2.core.Assertion;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.keymgt.handlers.ResourceConstants;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
+import org.wso2.carbon.identity.application.common.model.ClaimConfig;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementServiceImpl;
+import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
+import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.oauth.callback.OAuthCallback;
 import org.wso2.carbon.identity.oauth.common.GrantType;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
+import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -81,7 +89,7 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             if (isAppScopesEmpty(appScopes, clientId)) {
                 return getAllowedScopes(whiteListedScopes, Arrays.asList(requestedScopes));
             }
-            String[] userRoles = getUserRoles(authenticatedUser);
+            String[] userRoles = getUserRoles(authenticatedUser, requestedScopes, clientId);
             authorizedScopes = getAuthorizedScopes(userRoles, requestedScopes, appScopes, whiteListedScopes);
         }
         return authorizedScopes;
@@ -129,7 +137,7 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
                     userRoles = new String[0];
                 }
             } else {
-                userRoles = getUserRoles(authenticatedUser);
+                userRoles = getUserRoles(authenticatedUser, requestedScopes, clientId);
             }
             authorizedScopes = getAuthorizedScopes(userRoles, requestedScopes, appScopes, whiteListedScopes);
         }
@@ -227,7 +235,7 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
      * @param authenticatedUser Authenticated user
      * @return roles list
      */
-    private String[] getUserRoles(AuthenticatedUser authenticatedUser) {
+    private String[] getUserRoles(AuthenticatedUser authenticatedUser, String[] requestedScopes, String clientId) {
         String[] userRoles = null;
         String tenantDomain = authenticatedUser.getTenantDomain();
         String username = authenticatedUser.getUserName();
@@ -235,7 +243,8 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
         RealmService realmService = getRealmService();
 
         Map<ClaimMapping, String> userAttributes = authenticatedUser.getUserAttributes();
-        String[] fedUserRoles = getRolesFromUserAttribute(userAttributes, ResourceConstants.ROLE_ATTRIBUTE_NAME);
+        String[] fedUserRoles = getRolesFromUserAttribute(userAttributes, getRoleClaimURI(tenantDomain,
+                requestedScopes, clientId));
 
         try {
             int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
@@ -284,5 +293,52 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
      */
     protected String[] getRolesFromAssertion(Assertion assertion) {
         return APIKeyMgtUtil.getRolesFromAssertion(assertion);
+    }
+
+    private String getRoleClaimURI(String tenantDomain, String[] requestedScopes, String clientId) {
+
+        if (Arrays.asList(requestedScopes).contains(APIConstants.OPEN_ID_SCOPE_NAME)) {
+            return getOIDCMappedLocalClaimURI(tenantDomain);
+        } else {
+            return getSPMappedLocalRoleClaimURI(clientId, tenantDomain);
+        }
+    }
+
+    private String getSPMappedLocalRoleClaimURI(String clientId, String tenantDomain) {
+
+        try {
+            ServiceProvider serviceProvider = OAuth2Util.getServiceProvider(clientId, tenantDomain);
+            ClaimConfig claimConfig = serviceProvider.getClaimConfig();
+            if (claimConfig != null && !claimConfig.isLocalClaimDialect()) {
+                for (ClaimMapping claimMapping : claimConfig.getClaimMappings()) {
+                    if (claimMapping.getLocalClaim() != null) {
+                        if (ResourceConstants.ROLE_ATTRIBUTE_NAME.equals(claimMapping.getLocalClaim().getClaimUri()) &&
+                                claimMapping.getRemoteClaim() != null) {
+                            return claimMapping.getRemoteClaim().getClaimUri();
+                        }
+                    }
+                }
+            }
+        } catch (IdentityOAuth2Exception e) {
+            log.warn("Error while retrieving the service provider with client Id - " + clientId);
+        }
+        return ResourceConstants.ROLE_ATTRIBUTE_NAME;
+    }
+
+    private String getOIDCMappedLocalClaimURI(String tenantDomain) {
+
+        try {
+            ClaimMetadataManagementServiceImpl claimMetadataService = new ClaimMetadataManagementServiceImpl();
+            List<ExternalClaim> externalClaims = claimMetadataService
+                    .getExternalClaims(APIConstants.OPEN_ID_ROLE_CLAIM_URI, tenantDomain);
+            for (ExternalClaim claim : externalClaims) {
+                if (ResourceConstants.ROLE_ATTRIBUTE_NAME.equals(claim.getMappedLocalClaim())) {
+                    return claim.getClaimURI();
+                }
+            }
+        } catch (ClaimMetadataException e) {
+            log.warn("Error while retrieving OIDC claim mapping");
+        }
+        return ResourceConstants.ROLE_ATTRIBUTE_NAME;
     }
 }

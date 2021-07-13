@@ -19,28 +19,48 @@
 package org.wso2.carbon.apimgt.keymgt.issuers;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.keymgt.handlers.ResourceConstants;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
+import org.wso2.carbon.identity.application.common.model.Claim;
+import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.oauth.callback.OAuthCallback;
 import org.wso2.carbon.identity.oauth.common.GrantType;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
+import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.common.DefaultRealm;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tenant.TenantManager;
-import org.wso2.carbon.user.api.UserStoreException;
 
-import javax.cache.Cache;
-import javax.cache.CacheManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.cache.Cache;
+import javax.cache.CacheManager;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.powermock.api.mockito.PowerMockito.when;
+import static org.wso2.carbon.identity.core.util.IdentityCoreConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT;
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({OAuth2Util.class, RoleBasedScopesIssuer.class, FrameworkUtils.class})
+@SuppressStaticInitializationFor("org.wso2.carbon.identity.oauth2.util.OAuth2Util")
 public class RoleBasedScopesIssuerTestCase {
 
     private ApiMgtDAO apiMgtDAO = Mockito.mock(ApiMgtDAO.class);
@@ -50,6 +70,14 @@ public class RoleBasedScopesIssuerTestCase {
     private Cache cache = Mockito.mock(Cache.class);
     private DefaultRealm defaultRealm = Mockito.mock(DefaultRealm.class);
     private AbstractUserStoreManager abstractUserStoreManager = Mockito.mock(AbstractUserStoreManager.class);
+
+    @Before
+    public void init() throws Exception  {
+        PowerMockito.mockStatic(OAuth2Util.class);
+        PowerMockito.mockStatic(FrameworkUtils.class);
+        PowerMockito.when(OAuth2Util.getServiceProvider("clientId", "carbon.super"))
+                .thenReturn(new ServiceProvider());
+    }
 
     @Test
     public void testGetPrefix() throws Exception {
@@ -94,9 +122,9 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopes() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
@@ -128,15 +156,15 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesWhenRestAPIScopesOfCurrentTenantIsNotNull() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("api_view", "api_view");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -162,14 +190,14 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesWhenAppScopesIsEmpty() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         Map<String, String> restAPIScopes = new HashMap<String, String>();
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -195,15 +223,15 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesWhenTenantISZero() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(0);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(0);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("api_view", "api_view");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -229,15 +257,15 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesWhenTenantISMinusOne() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("api_view", "api_view");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -263,15 +291,15 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesForGrantType() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("api_view", "api_view");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -299,16 +327,16 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesForGrantTypeWhenSAML2NotEnabled() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
-        Mockito.when(abstractUserStoreManager.getRoleListOfUser(Mockito.anyString())).thenReturn(new String[]{});
+        Mockito.when(abstractUserStoreManager.getRoleListOfUser(anyString())).thenReturn(new String[]{});
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("api_view", "api_view");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -336,12 +364,12 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesForUserStoreException() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.doThrow(UserStoreException.class).when(tenantManager).getTenantId(Mockito.anyString());
+        Mockito.doThrow(UserStoreException.class).when(tenantManager).getTenantId(anyString());
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("api_view", "api_view");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -367,17 +395,17 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesForRoles() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
-        Mockito.when(abstractUserStoreManager.getRoleListOfUser(Mockito.anyString())).thenReturn
+        Mockito.when(abstractUserStoreManager.getRoleListOfUser(anyString())).thenReturn
                 (new String[]{"api_view"});
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("api_view", "api_view");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -403,17 +431,17 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesForRolesWhenRestAPIScopesNotNull() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
-        Mockito.when(abstractUserStoreManager.getRoleListOfUser(Mockito.anyString())).thenReturn
+        Mockito.when(abstractUserStoreManager.getRoleListOfUser(anyString())).thenReturn
                 (new String[]{"api_view"});
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("", "");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -439,17 +467,17 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesForAppScopes() throws Exception {
 
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
                 .thenReturn(defaultRealm);
-        Mockito.when(abstractUserStoreManager.getRoleListOfUser(Mockito.anyString())).thenReturn
+        Mockito.when(abstractUserStoreManager.getRoleListOfUser(anyString())).thenReturn
                 (new String[]{"api_view"});
-        Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
+        Mockito. when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         Map<String, String> restAPIScopes = new HashMap<String, String>();
         restAPIScopes.put("api_view", "api_view");
-        Mockito.when(cache.get(Mockito.anyString())).thenReturn(restAPIScopes);
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
 
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
@@ -474,7 +502,7 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesHandleException() throws Exception {
 
-        Mockito.doThrow(APIManagementException.class).when(apiMgtDAO).getScopeRolesOfApplication(Mockito.anyString());
+        Mockito.doThrow(APIManagementException.class).when(apiMgtDAO).getScopeRolesOfApplication(anyString());
         OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
         tokenDTO.setClientId("clientId");
         OAuthTokenReqMessageContext tokReqMsgCtx = new OAuthTokenReqMessageContext(tokenDTO);
@@ -496,9 +524,9 @@ public class RoleBasedScopesIssuerTestCase {
     @Test
     public void testGetScopesOfRolesWithSpacesAndCases() throws Exception {
         AbstractUserStoreManager abstractUserStoreManager = Mockito.mock(AbstractUserStoreManager.class);
-        Mockito.when(cacheManager.getCache(Mockito.anyString())).thenReturn(cache);
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getTenantId(Mockito.anyString())).thenReturn(-1234);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
         Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt())).thenReturn(defaultRealm);
         Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
         String[] roles = { "CaseRole", "space role" };
@@ -528,5 +556,75 @@ public class RoleBasedScopesIssuerTestCase {
 
         List<String> returnedScopes = roleBasedScopesIssuer.getScopes(tokReqMsgCtx, whiteListedScopes);
         Assert.assertEquals(3, returnedScopes.size());
+    }
+
+    @Test
+    public void testGetScopesForRolesWithOpenIDScope() throws Exception {
+
+        final String tenantDomain = "carbon.super";
+        final String clientId = "clientId";
+        final String scope = "scope";
+        Mockito.when(cacheManager.getCache(anyString())).thenReturn(cache);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
+        Mockito.when(tenantManager.getTenantId(anyString())).thenReturn(-1234);
+        Mockito.when(realmService.getTenantUserRealm(Mockito.anyInt()))
+                .thenReturn(defaultRealm);
+        Mockito.when(abstractUserStoreManager.getRoleListOfUser(anyString())).thenReturn
+                (new String[]{"api_view"});
+        Mockito.when(defaultRealm.getUserStoreManager()).thenReturn(abstractUserStoreManager);
+        Map<String, String> restAPIScopes = new HashMap<String, String>();
+        restAPIScopes.put("api_view", "api_view");
+        Mockito.when(cache.get(anyString())).thenReturn(restAPIScopes);
+
+        OAuth2AccessTokenReqDTO tokenDTO = new OAuth2AccessTokenReqDTO();
+        tokenDTO.setClientId(clientId);
+        OAuthTokenReqMessageContext tokReqMsgCtx = new OAuthTokenReqMessageContext(tokenDTO);
+        tokReqMsgCtx.setScope(new String[]{scope, "openid"});
+        AuthenticatedUser authenticatedUser = new AuthenticatedUser();
+        authenticatedUser.setTenantDomain(tenantDomain);
+        authenticatedUser.setUserName("admin");
+        authenticatedUser.setUserStoreDomain("admin.user.store.domain");
+        authenticatedUser.setFederatedUser(true);
+
+        Map<ClaimMapping, String> userAttributes = new HashMap<ClaimMapping, String>();
+        userAttributes.put(buildClaimMapping(), "localRole");
+
+        authenticatedUser.setUserAttributes(userAttributes);
+        tokReqMsgCtx.setAuthorizedUser(authenticatedUser);
+
+        OAuthCallback oAuthCallback = new OAuthCallback(authenticatedUser, "admin", OAuthCallback.
+                OAuthCallbackType.SCOPE_VALIDATION_AUTHZ);
+        oAuthCallback.setRequestedScope(new String[]{"openid", scope});
+
+        RoleBasedScopesIssuer roleBasedScopesIssuer = new RoleBasedScopesIssuerWrapper(cacheManager, realmService,
+                apiMgtDAO);
+
+        ApiMgtDAO apiMgtDAO = Mockito.mock(ApiMgtDAO.class);
+        Map<String, String> appScopes = new HashMap<String, String>();
+        appScopes.put(scope, "localRole");
+        Mockito.when(apiMgtDAO.getScopeRolesOfApplication(clientId)).thenReturn(appScopes);
+
+        RoleBasedScopesIssuer spy = PowerMockito.spy(roleBasedScopesIssuer);
+        PowerMockito.doReturn("role").when(spy, "getOIDCMappedLocalClaimURI", anyString());
+        PowerMockito.doReturn(appScopes).when(spy, "getAppScopes", anyString(), any(AuthenticatedUser.class));
+
+        when(FrameworkUtils.getMultiAttributeSeparator()).thenReturn(MULTI_ATTRIBUTE_SEPARATOR_DEFAULT);
+
+        ArrayList<String> whiteListedScopes = new ArrayList<String>();
+        whiteListedScopes.add("openid");
+
+        List<String> scopes = spy.getScopes(oAuthCallback, whiteListedScopes);
+        Assert.assertEquals(2, scopes.size());
+        Assert.assertTrue(scopes.contains(scope));
+    }
+
+    private ClaimMapping buildClaimMapping() {
+
+        ClaimMapping claimMapping = new ClaimMapping();
+        Claim claim = new Claim();
+        claim.setClaimUri("role");
+        claimMapping.setRemoteClaim(claim);
+        claimMapping.setLocalClaim(claim);
+        return claimMapping;
     }
 }
