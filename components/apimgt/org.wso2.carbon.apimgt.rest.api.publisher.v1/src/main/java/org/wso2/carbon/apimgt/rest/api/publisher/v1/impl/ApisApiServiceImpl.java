@@ -3414,7 +3414,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                     wsdlArchiveExtractedPath = validationResponse.getWsdlArchiveInfo().getLocation()
                             + File.separator + APIConstants.API_WSDL_EXTRACTED_DIRECTORY;
                 }
-                createdApi = importSOAPToRESTAPI(fileDetail, url, wsdlArchiveExtractedPath, apiToAdd);
+                createdApi = importSOAPToRESTAPI(fileInputStream, fileDetail, url, wsdlArchiveExtractedPath, apiToAdd);
             } else {
                 RestApiUtil.handleBadRequest("Invalid implementationType parameter", log);
             }
@@ -3532,13 +3532,14 @@ public class ApisApiServiceImpl implements ApisApiService {
     /**
      * Import an API from WSDL as a SOAP-to-REST API
      *
+     * @param fileInputStream file data as input stream
      * @param fileDetail file details
      * @param url URL of the WSDL
      * @param apiToAdd API object to be added to the system (which is not added yet)
      * @return API added api
      */
-    private API importSOAPToRESTAPI( Attachment fileDetail, String url,
-            String wsdlArchiveExtractedPath, API apiToAdd) throws APIManagementException {
+    private API importSOAPToRESTAPI(InputStream fileInputStream, Attachment fileDetail, String url,
+                                    String wsdlArchiveExtractedPath, API apiToAdd) throws APIManagementException {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             //adding the api
@@ -3550,14 +3551,13 @@ public class ApisApiServiceImpl implements ApisApiService {
             String swaggerStr = "";
             if (StringUtils.isNotBlank(url)) {
                 swaggerStr = SOAPOperationBindingUtils.getSoapOperationMappingForUrl(url);
-            } else {
+            } else if (fileInputStream != null) {
                 String filename = fileDetail.getContentDisposition().getFilename();
                 if (filename.endsWith(".zip")) {
-                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
+                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath);
                 } else if (filename.endsWith(".wsdl")) {
-                    wsdlArchiveExtractedPath = wsdlArchiveExtractedPath.substring(0,
-                            wsdlArchiveExtractedPath.lastIndexOf('/'));
-                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
+                    byte[] wsdlContent = APIUtil.toByteArray(fileInputStream);
+                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlContent);
                 } else {
                     throw new APIManagementException(ExceptionCodes.UNSUPPORTED_WSDL_FILE_EXTENSION);
                 }
@@ -3565,7 +3565,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             String updatedSwagger = updateSwagger(createdApi.getUUID(), swaggerStr);
             SequenceGenerator.generateSequencesFromSwagger(updatedSwagger, apiToAdd.getId());
             return createdApi;
-        } catch (FaultGatewaysException  e) {
+        } catch (FaultGatewaysException | IOException e) {
             throw new APIManagementException("Error while importing WSDL to create a SOAP-to-REST API", e);
         }
     }
