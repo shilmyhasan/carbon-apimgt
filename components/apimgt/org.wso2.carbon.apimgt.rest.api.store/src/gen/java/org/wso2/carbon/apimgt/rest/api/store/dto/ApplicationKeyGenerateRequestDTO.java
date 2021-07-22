@@ -33,7 +33,10 @@ public class ApplicationKeyGenerateRequestDTO  {
   
   @NotNull
   private List<String> accessAllowDomains = new ArrayList<String>();
-  
+
+  private String clientId = null;
+
+  private String clientSecret = null;
   
   private List<String> scopes = new ArrayList<String>();
 
@@ -140,6 +143,30 @@ public class ApplicationKeyGenerateRequestDTO  {
     this.scopes = scopes;
   }
 
+  /**
+   * Client Id
+   **/
+  @ApiModelProperty(value = "Client Id")
+  @JsonProperty("clientId")
+  public String getClientId() {
+    return clientId;
+  }
+  public void setClientId(String clientId) {
+    this.clientId = clientId;
+  }
+
+
+  /**
+   * Client Secret
+   **/
+  @ApiModelProperty(value = "Client Secret")
+  @JsonProperty("clientSecret")
+  public String getClientSecret() {
+    return clientSecret;
+  }
+  public void setClientSecret(String clientSecret) {
+    this.clientSecret = clientSecret;
+  }
   
 
   @Override
@@ -153,6 +180,8 @@ public class ApplicationKeyGenerateRequestDTO  {
     sb.append("  callbackUrl: ").append(callbackUrl).append("\n");
     sb.append("  accessAllowDomains: ").append(accessAllowDomains).append("\n");
     sb.append("  scopes: ").append(scopes).append("\n");
+    sb.append("  clientId: ").append(clientId).append("\n");
+    sb.append("  clientSecret: ").append(clientSecret).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
