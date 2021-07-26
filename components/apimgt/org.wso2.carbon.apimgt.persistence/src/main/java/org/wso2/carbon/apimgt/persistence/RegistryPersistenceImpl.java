@@ -131,6 +131,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 public class RegistryPersistenceImpl implements APIPersistence {
 
+    // Test line for check hotfix.
+    
     private static final Log log = LogFactory.getLog(RegistryPersistenceImpl.class);
     private Properties properties;
     
