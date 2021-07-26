@@ -52,6 +52,7 @@ import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationContext;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.threatprotection.utils.ThreatProtectorConstants;
+import org.wso2.carbon.apimgt.gateway.throttling.ThrottleDataHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
@@ -602,6 +603,25 @@ public class GatewayUtils {
                     break;
                 }
             }
+            if (isAPIKeySubscriptionValidationEnabled()) {
+                JSONObject application;
+                String appOwner = null;
+                String appName = null;
+                if (payload.getClaim(APIConstants.JwtTokenConstants.APPLICATION) != null) {
+                    application = (JSONObject) payload.getClaim(APIConstants.JwtTokenConstants.APPLICATION);
+                    appOwner = application.getAsString(APIConstants.JwtTokenConstants.APPLICATION_OWNER);
+                    appName = application.getAsString(APIConstants.JwtTokenConstants.APPLICATION_NAME);
+                }
+                if (appOwner != null && appName != null) {
+                    String appId = appOwner + "-" + appName;
+                    String subscriptionRemovedConditionKey =
+                            apiContext + ":" + apiVersion + ":" + appId + ":" + APIConstants.SUB_REMOVED;
+                    ThrottleDataHolder throttleDataHolder = ServiceReferenceHolder.getInstance().getThrottleDataHolder();
+                    if (throttleDataHolder != null && throttleDataHolder.isSubscriptionRemoved(subscriptionRemovedConditionKey)) {
+                        api = null;
+                    }
+                }
+            }
             if (api == null) {
                 if (log.isDebugEnabled()) {
                     log.debug("User is not subscribed to access the API: " + apiContext +
@@ -733,6 +753,18 @@ public class GatewayUtils {
                     "Use default configuration.", e);
         }
         return true;
+    }
+
+    public static boolean isAPIKeySubscriptionValidationEnabled() {
+        try {
+            APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+            String subscriptionValidationEnabled = config.getFirstProperty(APIConstants.API_KEY_SUBSCRIPTION_VALIDATION_ENABLED);
+            return Boolean.parseBoolean(subscriptionValidationEnabled);
+        } catch (Exception e) {
+            log.error("Did not found valid API Key Subscription Validation Enabled configuration. " +
+                    "Use default configuration.", e);
+        }
+        return false;
     }
 
     /**
