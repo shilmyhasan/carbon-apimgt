@@ -36,7 +36,6 @@ public class PublisherAPIInfo {
     private String thumbnail; // thumbnail is not required for normal ApiGet
     private String createdTime;
     private Date updatedTime;
-    private String description;
 
     public String getApiName() {
         return apiName;
@@ -110,18 +109,10 @@ public class PublisherAPIInfo {
 
     public void setUpdatedTime(Date updatedTime) { this.updatedTime = updatedTime; }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     @Override
     public String toString() {
-        return "PublisherAPIInfo [id=" + id + ", apiName=" + apiName + ", description=" + description + ", version=" +
-                version + ", providerName=" + providerName + ", context=" + context + ", status=" + status + ", type="
-                + type + ", thumbnail=" + thumbnail + "]";
+        return "PublisherAPIInfo [id=" + id + ", apiName=" + apiName + ", version=" + version + ", providerName="
+                + providerName + ", context=" + context + ", status=" + status + ", type=" + type + ", thumbnail="
+                + thumbnail + "]";
     }
 }
