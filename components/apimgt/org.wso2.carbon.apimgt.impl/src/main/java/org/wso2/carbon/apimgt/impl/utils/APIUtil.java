@@ -4985,6 +4985,19 @@ public final class APIUtil {
         return true;
     }
 
+    public static boolean isAPIKeySubscriptionValidationEnabled() {
+        try {
+            APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
+                    .getAPIManagerConfiguration();
+            String subscriptionValidationEnabled = config.getFirstProperty(APIConstants.API_KEY_SUBSCRIPTION_VALIDATION_ENABLED);
+            return Boolean.parseBoolean(subscriptionValidationEnabled);
+        } catch (Exception e) {
+            log.error("Did not find valid API Key Subscription Validation Enabled configuration. " +
+                    "Use default configuration.", e);
+        }
+        return false;
+    }
+
     /**
      * Returns whether Product REST APIs' token cache is enabled
      *

@@ -57,6 +57,7 @@ import org.wso2.carbon.apimgt.api.model.ApiTypeWrapper;
 import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.ApplicationConstants;
 import org.wso2.carbon.apimgt.api.model.ApplicationKeysDTO;
+import org.wso2.carbon.apimgt.api.model.BlockConditionsDTO;
 import org.wso2.carbon.apimgt.api.model.Comment;
 import org.wso2.carbon.apimgt.api.model.Documentation;
 import org.wso2.carbon.apimgt.api.model.Identifier;
@@ -83,6 +84,7 @@ import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.JwtTokenInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.SubscriptionWorkflowDTO;
 import org.wso2.carbon.apimgt.impl.dto.TierPermissionDTO;
+import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -109,6 +111,7 @@ import org.wso2.carbon.apimgt.impl.wsdl.WSDLProcessor;
 import org.wso2.carbon.apimgt.impl.wsdl.model.WSDLArchiveInfo;
 import org.wso2.carbon.apimgt.impl.wsdl.model.WSDLValidationResponse;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
@@ -158,6 +161,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -2937,6 +2941,15 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 invalidateCachedKeys(applicationId);
             }
 
+            if (APIUtil.isAPIKeySubscriptionValidationEnabled()) {
+                Application application = getApplicationById(applicationId);
+                String appId = application.getOwner() + "-" + application.getName();
+                String subscriptionRemovedConditionKey =
+                        apiContext + ":" + identifier.getVersion() + ":" + appId + ":" + APIConstants.SUB_REMOVED;
+                //delete existing block conditions if there are any
+                deleteSubscriptionBlockCondition(subscriptionRemovedConditionKey);
+            }
+
             //to handle on-the-fly subscription rejection (and removal of subscription entry from the database)
             //the response should have {"Status":"REJECTED"} in the json payload for this to work.
             boolean subscriptionRejected = false;
@@ -3029,6 +3042,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
         boolean isTenantFlowStarted = false;
         APIIdentifier apiIdentifier = null;
+        String context = null;
         APIProductIdentifier apiProdIdentifier = null;
         if (identifier instanceof APIIdentifier) {
             apiIdentifier = (APIIdentifier) identifier;
@@ -3069,7 +3083,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             workflowDTO.setApiProvider(identifier.getProviderName());
             API api = null;
             APIProduct product = null;
-            String context = null;
+
             if (apiIdentifier != null) {
                 api = getAPI(apiIdentifier);
                 context = api.getContext();
@@ -3164,11 +3178,96 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         if (APIUtil.isAPIGatewayKeyCacheEnabled()) {
             invalidateCachedKeys(applicationId);
         }
+
+        if (APIUtil.isAPIKeySubscriptionValidationEnabled()) {
+            Application application = getApplicationById(applicationId);
+            String appId = application.getOwner() + "-" + application.getName();
+            String subscriptionRemovedConditionKey =
+                    context + ":" + identifier.getVersion() + ":" + appId + ":" + APIConstants.SUB_REMOVED;
+            //delete existing block conditions
+            deleteSubscriptionBlockCondition(subscriptionRemovedConditionKey);
+            //add new block condition
+            addBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION, subscriptionRemovedConditionKey);
+        }
+
         if (log.isDebugEnabled()) {
             String logMessage = "Subscription removed from app " + applicationName + " by " + userId + " For Id: "
                     + identifier.toString();
             log.debug(logMessage);
         }
+    }
+
+    public String addBlockCondition(String conditionType, String conditionValue) throws APIManagementException {
+
+        if (APIConstants.BLOCKING_CONDITIONS_USER.equals(conditionType)) {
+            conditionValue = MultitenantUtils.getTenantAwareUsername(conditionValue);
+            conditionValue = conditionValue + "@" + tenantDomain;
+        }
+        BlockConditionsDTO blockConditionsDTO = new BlockConditionsDTO();
+        blockConditionsDTO.setConditionType(conditionType);
+        blockConditionsDTO.setConditionValue(conditionValue);
+        blockConditionsDTO.setTenantDomain(tenantDomain);
+        blockConditionsDTO.setEnabled(true);
+        blockConditionsDTO.setUUID(UUID.randomUUID().toString());
+        BlockConditionsDTO createdBlockConditionsDto = apiMgtDAO.addBlockConditions(blockConditionsDTO);
+
+        if (createdBlockConditionsDto != null) {
+            publishBlockingEvent(createdBlockConditionsDto, "true");
+        }
+
+        return createdBlockConditionsDto.getUUID();
+    }
+
+    public void deleteSubscriptionBlockCondition(String conditionValue)
+            throws APIManagementException {
+        BlockConditionsDTO blockCondition = apiMgtDAO.getSubscriptionBlockCondition(conditionValue, tenantDomain);
+        if (blockCondition != null) {
+            deleteBlockConditionByUUID(blockCondition.getUUID());
+        }
+    }
+
+    public boolean deleteBlockConditionByUUID(String uuid) throws APIManagementException {
+        boolean deleteState = false;
+        BlockConditionsDTO blockCondition = apiMgtDAO.getBlockConditionByUUID(uuid);
+        if (blockCondition != null) {
+            deleteState = apiMgtDAO.deleteBlockCondition(blockCondition.getConditionId());
+            if (deleteState) {
+                unpublishBlockCondition(blockCondition);
+            }
+        }
+        return deleteState;
+    }
+
+    /**
+     * Publishes the changes on blocking conditions.
+     * @param blockConditionsDTO Blockcondition Dto event
+     */
+    private void publishBlockingEvent(BlockConditionsDTO blockConditionsDTO, String state) {
+        Object[] objects = new Object[]{blockConditionsDTO.getConditionId(), blockConditionsDTO.getConditionType(),
+                blockConditionsDTO.getConditionValue(),state, tenantDomain};
+        Event blockingMessage = new Event(APIConstants.BLOCKING_CONDITIONS_STREAM_ID, System.currentTimeMillis(),
+                null, null, objects);
+        ThrottleProperties throttleProperties = getAPIManagerConfiguration().getThrottleProperties();
+
+        if (throttleProperties.getDataPublisher() != null && throttleProperties.getDataPublisher().isEnabled()) {
+            APIUtil.publishEvent(APIConstants.BLOCKING_EVENT_PUBLISHER, Collections.EMPTY_MAP, blockingMessage);
+        }
+    }
+
+    /**
+     * Unpublish a blocking condition.
+     *
+     * @param blockCondition Block Condition object
+     */
+    private void unpublishBlockCondition(BlockConditionsDTO blockCondition) {
+        String blockingConditionType = blockCondition.getConditionType();
+        String blockingConditionValue = blockCondition.getConditionValue();
+        if (APIConstants.BLOCKING_CONDITIONS_USER.equalsIgnoreCase(blockingConditionType)) {
+            blockingConditionValue = MultitenantUtils.getTenantAwareUsername(blockingConditionValue);
+            blockingConditionValue = blockingConditionValue + "@" + tenantDomain;
+            blockCondition.setConditionValue(blockingConditionValue);
+        }
+        publishBlockingEvent(blockCondition, "delete");
     }
 
     @Override

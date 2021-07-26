@@ -375,6 +375,9 @@
         <!-- Define JWT access token generator class -->
         <JWTAccessTokenGenerator>{{apim.key_manager.jwt_access_token_generator}}</JWTAccessTokenGenerator>
         {% endif %}
+        {% if apim.key_manager.enable_apikey_subscription_validation is defined %}
+        <EnableAPIKeySubscriptionValidation>{{apim.key_manager.enable_apikey_subscription_validation}}</EnableAPIKeySubscriptionValidation>
+        {% endif %}
     </APIKeyValidator>
 
     <!-- Uncomment this section only if you are going to have an instance other than KeyValidator as your KeyManager.
