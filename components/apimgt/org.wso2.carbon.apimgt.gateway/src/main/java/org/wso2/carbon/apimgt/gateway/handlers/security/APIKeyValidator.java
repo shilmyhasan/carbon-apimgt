@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.apimgt.gateway.handlers.security;
 
-
 import org.apache.axis2.Constants;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
@@ -38,24 +37,24 @@ import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.APIInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.ResourceInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import javax.cache.Cache;
-import javax.cache.Caching;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.regex.Pattern;
 import java.util.Set;
+import java.util.regex.Pattern;
+import javax.cache.Cache;
+import javax.cache.Caching;
 
 /**
  * This class is used to validate a given API key against a given API context and a version.
@@ -139,11 +138,14 @@ public class APIKeyValidator {
      * @throws APISecurityException If an error occurs while accessing backend services
      */
     public APIKeyValidationInfoDTO getKeyValidationInfo(String context, String apiKey,
-                                                        String apiVersion, String authenticationScheme, String clientDomain,
-                                                        String matchingResource, String httpVerb, boolean defaultVersionInvoked) throws APISecurityException {
+                                                        String apiVersion, String authenticationScheme,
+                                                        String clientDomain,
+                                                        String matchingResource, String httpVerb,
+                                                        boolean defaultVersionInvoked) throws APISecurityException {
 
         String prefixedVersion = apiVersion;
         String jti = null;
+        String tokenIdentifier;
         //Check if client has invoked the default version API.
         if (defaultVersionInvoked) {
             //Prefix the version so that it looks like _default_1.0 (_default_<version>)).
@@ -151,42 +153,19 @@ public class APIKeyValidator {
             prefixedVersion = APIConstants.DEFAULT_VERSION_PREFIX + prefixedVersion;
         }
 
-        if (apiKey.split(Pattern.quote(".")).length == 3) {
-            jti = GatewayUtils.getJTIFromJWT(apiKey.split(Pattern.quote("."))[1]);
-        }
+        tokenIdentifier = getTokenIdentifier(apiKey);
         String cacheKey = APIUtil.getAccessTokenCacheKey(apiKey, context, prefixedVersion, matchingResource,
                 httpVerb, authenticationScheme);
         //If Gateway key caching is enabled.
         if (gatewayKeyCacheEnabled) {
             //Get the access token from the first level cache.
-            String cachedToken = (String) getGatewayTokenCache().get(apiKey);
-            String cachedJTI = null;
-            if (jti != null) {
-                cachedJTI = (String) getGatewayTokenCache().get(jti);
-            }
+            String cachedToken = (String) getGatewayTokenCache().get(tokenIdentifier);
 
             //If the access token exists in the first level cache.
             if (cachedToken != null) {
                 APIKeyValidationInfoDTO info = (APIKeyValidationInfoDTO) getGatewayKeyCache().get(cacheKey);
 
                 if (info != null) {
-                    // Check if JWT is revoked using JTI
-                    if (jti != null && cachedJTI == null) {
-                        // Update the relevant caches
-                        getGatewayKeyCache().remove(cacheKey);
-                        getGatewayTokenCache().remove(apiKey);
-                        getInvalidTokenCache().put(apiKey, cachedToken);
-                        String revokedJTI = (String) getInvalidTokenCache().get(jti);
-                        if (revokedJTI != null) {
-                            // Token is revoked/invalid or expired
-                            APIKeyValidationInfoDTO apiKeyValidationInfoDTO = new APIKeyValidationInfoDTO();
-                            apiKeyValidationInfoDTO.setAuthorized(false);
-                            apiKeyValidationInfoDTO.setValidationStatus(APIConstants.KeyValidationStatus
-                                    .API_AUTH_INVALID_CREDENTIALS);
-                            return apiKeyValidationInfoDTO;
-                        }
-                    }
-
                     if (APIUtil.isAccessTokenExpired(info)) {
                         log.info("Invalid OAuth Token : Access Token " + apiKey + " expired.");
                         info.setAuthorized(false);
@@ -196,24 +175,18 @@ public class APIKeyValidator {
                         //Remove from the first level token cache as well.
                         getGatewayTokenCache().remove(apiKey);
                         // Put into invalid token cache
-                        getInvalidTokenCache().put(apiKey, cachedToken);
-
-                        if (jti != null) {
-                            // Support revocation with JTI
-                            getGatewayTokenCache().remove(jti);
-                            getInvalidTokenCache().put(jti, cachedToken);
+                        synchronized (tokenIdentifier.concat(":").concat("InvalidGatewayToken_TENANT").intern()) {
+                            if (getInvalidTokenCache().get(tokenIdentifier) == null) {
+                                getInvalidTokenCache().put(tokenIdentifier, cachedToken);
+                            }
                         }
                     }
                     return info;
                 }
             } else {
                 // Check token available in invalidToken Cache
-                String revokedCachedToken = (String) getInvalidTokenCache().get(apiKey);
-                String revokedTokenJTI = null;
-                if (jti != null) {
-                    revokedTokenJTI = (String) getInvalidTokenCache().get(jti);
-                }
-                if (revokedCachedToken != null || revokedTokenJTI != null) {
+                String revokedCachedToken = (String) getInvalidTokenCache().get(tokenIdentifier);
+                if (revokedCachedToken != null) {
                     // Token is revoked/invalid or expired
                     APIKeyValidationInfoDTO apiKeyValidationInfoDTO = new APIKeyValidationInfoDTO();
                     apiKeyValidationInfoDTO.setAuthorized(false);
@@ -224,25 +197,36 @@ public class APIKeyValidator {
             }
         }
 
-        APIKeyValidationInfoDTO info = doGetKeyValidationInfo(context, prefixedVersion, apiKey, authenticationScheme, clientDomain,
-                matchingResource, httpVerb);
+        APIKeyValidationInfoDTO info = doGetKeyValidationInfo(context, prefixedVersion, apiKey, authenticationScheme,
+                clientDomain, matchingResource, httpVerb);
         if (info != null) {
             if (gatewayKeyCacheEnabled) {
                 //Get the tenant domain of the API that is being invoked.
                 String tenantDomain = getTenantDomain();
 
-                if (info.getValidationStatus() == APIConstants.KeyValidationStatus.API_AUTH_INVALID_CREDENTIALS) {
-                    // if Token is not valid token (expired,invalid,revoked) put into invalid token cache
-                    getInvalidTokenCache().put(apiKey, tenantDomain);
-                    if (jti != null) {
-                        getInvalidTokenCache().put(jti, tenantDomain);
+                if (info.getValidationStatus() != APIConstants.KeyValidationStatus.API_AUTH_INVALID_CREDENTIALS) {
+                    // Add into 1st level cache and Key cache
+                    if (getGatewayTokenCache().get(tokenIdentifier) == null) {
+                        synchronized (tokenIdentifier.concat("GatewayToken").intern()) {
+                            if (getGatewayTokenCache().get(tokenIdentifier) == null) {
+                                getGatewayTokenCache().put(tokenIdentifier, tenantDomain);
+                            }
+                        }
+                    }
+                    if (getGatewayKeyCache().get(cacheKey) == null) {
+                        synchronized (cacheKey.concat("GatewayKeyCache").intern()) {
+                            if (getGatewayKeyCache().get(cacheKey) == null) {
+                                getGatewayKeyCache().put(cacheKey, info);
+                            }
+                        }
                     }
                 } else {
-                    // Add into 1st level cache and Key cache
-                    getGatewayTokenCache().put(apiKey, tenantDomain);
-                    getGatewayKeyCache().put(cacheKey, info);
-                    if (jti != null) {
-                        getGatewayTokenCache().put(jti, tenantDomain);
+                    if (getInvalidTokenCache().get(tokenIdentifier) == null) {
+                        synchronized (tokenIdentifier.concat("InvalidGatewayToken_TENANT").intern()) {
+                            if (getInvalidTokenCache().get(tokenIdentifier) == null) {
+                                getInvalidTokenCache().put(tokenIdentifier, tenantDomain);
+                            }
+                        }
                     }
                 }
 
@@ -257,16 +241,23 @@ public class APIKeyValidator {
                                 .API_AUTH_INVALID_CREDENTIALS) {
                             // if Token is not valid token (expired,invalid,revoked) put into invalid token cache in
                             // tenant cache
-                            getInvalidTokenCache().put(apiKey, tenantDomain);
-                            if (jti != null) {
-                                getInvalidTokenCache().put(jti, tenantDomain);
+                            if (getInvalidTokenCache().get(tokenIdentifier) == null) {
+                                synchronized (tokenIdentifier.concat("InvalidGatewayToken_SUPER").intern()) {
+                                    if (getInvalidTokenCache().get(tokenIdentifier) == null) {
+                                        getInvalidTokenCache().put(tokenIdentifier, tenantDomain);
+                                    }
+                                }
                             }
                         } else {
                             // add into to tenant token cache
-                            getGatewayTokenCache().put(apiKey, tenantDomain);
-                            if (jti != null) {
-                                getGatewayTokenCache().put(jti, tenantDomain);
+                            if (getGatewayTokenCache().get(tokenIdentifier) == null) {
+                                synchronized (tokenIdentifier.concat("GatewayToken_SUPER").intern()) {
+                                    if (getGatewayTokenCache().get(tokenIdentifier) == null) {
+                                        getGatewayTokenCache().put(tokenIdentifier, tenantDomain);
+                                    }
+                                }
                             }
+
                         }
                     } finally {
                         endTenantFlow();
@@ -281,7 +272,6 @@ public class APIKeyValidator {
             throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
                     warnMsg);
         }
-
 
     }
 
@@ -462,42 +452,64 @@ public class APIKeyValidator {
             }
         }
 
-        String apiCacheKey = APIUtil.getAPIInfoDTOCacheKey(apiContext, apiVersion);
-        APIInfoDTO apiInfoDTO = null;
+        APIInfoDTO apiInfoDTO;
 
         if (isGatewayAPIResourceValidationEnabled) {
-            apiInfoDTO = (APIInfoDTO) getResourceCache().get(apiCacheKey);
-        }
-
-        //Cache miss
-        if (apiInfoDTO == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Could not find API object in cache for key: " + apiCacheKey);
-            }
+            apiInfoDTO = getSynchronizedAPIInfo(apiContext, apiVersion);
+        } else {
             apiInfoDTO = doGetAPIInfo(apiContext, apiVersion);
-
-            if (isGatewayAPIResourceValidationEnabled) {
-                getResourceCache().put(apiCacheKey, apiInfoDTO);
-            }
         }
         if (apiInfoDTO.getResources() != null) {
-            for (ResourceInfoDTO resourceInfoDTO : apiInfoDTO.getResources()) {
-                if (isResourcePathMatching(resourceString, resourceInfoDTO)) {
-                    for (VerbInfoDTO verbDTO : resourceInfoDTO.getHttpVerbs()) {
-                        if (verbDTO.getHttpVerb().equals(httpMethod)) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Putting resource object in cache with key: " + resourceCacheKey);
+            if (!isGatewayAPIResourceValidationEnabled) {
+                VerbInfoDTO verbDTO = getVerbInfoDTO(synCtx, resourceCacheKey, resourceString, httpMethod,
+                        apiInfoDTO);
+                if (verbDTO != null) {
+                    return verbDTO;
+                }
+            } else {
+                if (getResourceCache().get(resourceCacheKey) != null) {
+                    synCtx.setProperty(APIConstants.API_RESOURCE_CACHE_KEY, resourceCacheKey);
+                    return (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
+                } else {
+                    String syncKey = resourceCacheKey.concat(":").concat(this.getClass().getName());
+                    synchronized (syncKey.intern()) {
+                        if (getResourceCache().get(resourceCacheKey) != null) {
+                            synCtx.setProperty(APIConstants.API_RESOURCE_CACHE_KEY, resourceCacheKey);
+                            return (VerbInfoDTO) getResourceCache().get(resourceCacheKey);
+                        } else {
+                            VerbInfoDTO verbDTO = getVerbInfoDTO(synCtx, resourceCacheKey, resourceString, httpMethod,
+                                    apiInfoDTO);
+                            if (verbDTO != null) {
+                                return verbDTO;
                             }
-                            verbDTO.setRequestKey(resourceCacheKey);
-
-                            if (isGatewayAPIResourceValidationEnabled) {
-                                //Store verb in cache
-                                getResourceCache().put(resourceCacheKey, verbDTO);
-                                //Set cache key in the message context so that it can be used by the subsequent handlers.
-                                synCtx.setProperty(APIConstants.API_RESOURCE_CACHE_KEY, resourceCacheKey);
-                            }
-                            return verbDTO;
                         }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private VerbInfoDTO getVerbInfoDTO(MessageContext synCtx, String resourceCacheKey, String resourceString,
+                                       String httpMethod, APIInfoDTO apiInfoDTO) {
+
+        for (ResourceInfoDTO resourceInfoDTO : apiInfoDTO.getResources()) {
+            if (isResourcePathMatching(resourceString, resourceInfoDTO)) {
+                for (VerbInfoDTO verbDTO : resourceInfoDTO.getHttpVerbs()) {
+                    if (verbDTO.getHttpVerb().equals(httpMethod)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Putting resource object in cache with key: " + resourceCacheKey);
+                        }
+                        verbDTO.setRequestKey(resourceCacheKey);
+
+                        if (isGatewayAPIResourceValidationEnabled) {
+                            //Store verb in cache
+                            getResourceCache().put(resourceCacheKey, verbDTO);
+                            //Set cache key in the message context so that it can be used by the
+                            // subsequent handlers.
+                            synCtx.setProperty(APIConstants.API_RESOURCE_CACHE_KEY, resourceCacheKey);
+                        }
+                        return verbDTO;
                     }
                 }
             }
@@ -603,7 +615,7 @@ public class APIKeyValidator {
         if ("/".equals(requestPath)) {
             String requestCacheKey = context + '/' + apiVersion + requestPath + ':' + httpMethod;
 
-            //Get decision from cache.
+            //Get decision from cache.version
             VerbInfoDTO matchingVerb = null;
             if (isGatewayAPIResourceValidationEnabled) {
                 matchingVerb = (VerbInfoDTO) getResourceCache().get(requestCacheKey);
@@ -696,5 +708,38 @@ public class APIKeyValidator {
 
     protected void setGatewayAPIResourceValidationEnabled(boolean gatewayAPIResourceValidationEnabled) {
         isGatewayAPIResourceValidationEnabled = gatewayAPIResourceValidationEnabled;
+    }
+
+    private APIInfoDTO getSynchronizedAPIInfo(String context, String version) throws APISecurityException {
+
+        String apiCacheKey = APIUtil.getAPIInfoDTOCacheKey(context, version);
+        APIInfoDTO apiInfoDTO;
+        Object apiInfoDTOObject = getResourceCache().get(apiCacheKey);
+        String syncKey = apiCacheKey.concat(":").concat(this.getClass().getName());
+        if (apiInfoDTOObject == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Could not find API object in cache for key: " + apiCacheKey);
+            }
+            synchronized (syncKey.intern()) {
+                apiInfoDTOObject = getResourceCache().get(apiCacheKey);
+                if (apiInfoDTOObject != null) {
+                    return (APIInfoDTO) apiInfoDTOObject;
+                }
+                apiInfoDTO = doGetAPIInfo(context, version);
+                getResourceCache().put(apiCacheKey, apiInfoDTO);
+                return apiInfoDTO;
+            }
+        } else {
+            apiInfoDTO = (APIInfoDTO) apiInfoDTOObject;
+        }
+        return apiInfoDTO;
+    }
+
+    private String getTokenIdentifier(String accessToken) {
+
+        if (accessToken.split(Pattern.quote(".")).length == 3) {
+            return GatewayUtils.getJTIFromJWT(accessToken.split(Pattern.quote("."))[1]);
+        }
+        return accessToken;
     }
 }
