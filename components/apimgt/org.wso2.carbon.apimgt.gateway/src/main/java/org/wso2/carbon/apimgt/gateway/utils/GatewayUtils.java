@@ -44,18 +44,17 @@ import org.wso2.carbon.mediation.registry.RegistryServiceHolder;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -467,4 +466,18 @@ public class GatewayUtils {
         }
         return endpointAddress;
     }
+
+    public static String getTokenIdentifier(String accessToken) {
+
+        if (accessToken.split(Pattern.quote(".")).length == 3) {
+            String jtiFromJWT = GatewayUtils.getJTIFromJWT(accessToken.split(Pattern.quote("."))[1]);
+            if (StringUtils.isNotEmpty(jtiFromJWT)) {
+                return jtiFromJWT;
+            } else {
+                return accessToken;
+            }
+        }
+        return accessToken;
+    }
+
 }

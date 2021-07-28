@@ -144,7 +144,10 @@ public class APIKeyValidator {
                                                         boolean defaultVersionInvoked) throws APISecurityException {
 
         String prefixedVersion = apiVersion;
+
+        // This is the access token itself in Reference token mode and the JTI claim in the JWT mode.
         String tokenIdentifier;
+
         //Check if client has invoked the default version API.
         if (defaultVersionInvoked) {
             //Prefix the version so that it looks like _default_1.0 (_default_<version>)).
@@ -152,7 +155,7 @@ public class APIKeyValidator {
             prefixedVersion = APIConstants.DEFAULT_VERSION_PREFIX + prefixedVersion;
         }
 
-        tokenIdentifier = getTokenIdentifier(apiKey);
+        tokenIdentifier = GatewayUtils.getTokenIdentifier(apiKey);
         String cacheKey = APIUtil.getAccessTokenCacheKey(apiKey, context, prefixedVersion, matchingResource,
                 httpVerb, authenticationScheme);
         //If Gateway key caching is enabled.
@@ -736,11 +739,4 @@ public class APIKeyValidator {
         return apiInfoDTO;
     }
 
-    private String getTokenIdentifier(String accessToken) {
-
-        if (accessToken.split(Pattern.quote(".")).length == 3) {
-            return GatewayUtils.getJTIFromJWT(accessToken.split(Pattern.quote("."))[1]);
-        }
-        return accessToken;
-    }
 }
