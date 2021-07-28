@@ -8,10 +8,11 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
-import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -55,27 +56,29 @@ public class APIManagerCacheExtensionHandler extends AbstractHandler {
         String revokedToken = (String) transportHeaders.get(APIMgtGatewayConstants.REVOKED_ACCESS_TOKEN);
         String renewedToken = (String) transportHeaders.get(APIMgtGatewayConstants.DEACTIVATED_ACCESS_TOKEN);
         if (revokedToken != null) {
-
+            String tokenIdentifier = GatewayUtils.getTokenIdentifier(revokedToken);
             //Find the actual tenant domain on which the access token was cached. It is stored as a reference in
             //the super tenant cache.
-            String cachedTenantDomain = getCachedTenantDomain(revokedToken);
+            String cachedTenantDomain = getCachedTenantDomain(tokenIdentifier);
 
             //Remove the super tenant cache entry.
-            removeCacheEntryFromGatewayCache(revokedToken);
-            putInvalidTokenEntryIntoInvalidTokenCache(revokedToken, cachedTenantDomain);
+            removeCacheEntryFromGatewayCache(tokenIdentifier);
+            putInvalidTokenEntryIntoInvalidTokenCache(tokenIdentifier, cachedTenantDomain);
             //Remove token from tenant cache.
-            removeTokenFromTenantTokenCache(revokedToken, cachedTenantDomain);
-            putInvalidTokenIntoTenantInvalidTokenCache(revokedToken, cachedTenantDomain);
+            removeTokenFromTenantTokenCache(tokenIdentifier, cachedTenantDomain);
+            putInvalidTokenIntoTenantInvalidTokenCache(tokenIdentifier, cachedTenantDomain);
         }
 
         if (renewedToken != null) {
+            String tokenIdentifier = GatewayUtils.getTokenIdentifier(renewedToken);
+
             //Find the actual tenant domain on which the access token was cached. It is stored as a reference in
             //the super tenant cache.
-            String cachedTenantDomain = getCachedTenantDomain(renewedToken);
+            String cachedTenantDomain = getCachedTenantDomain(tokenIdentifier);
             //Remove the super tenant cache entry.
-            removeCacheEntryFromGatewayCache(renewedToken);
+            removeCacheEntryFromGatewayCache(tokenIdentifier);
             //Remove token from tenant cache.
-            removeTokenFromTenantTokenCache(renewedToken, cachedTenantDomain);
+            removeTokenFromTenantTokenCache(tokenIdentifier, cachedTenantDomain);
         }
     }
 
