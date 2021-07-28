@@ -144,7 +144,6 @@ public class APIKeyValidator {
                                                         boolean defaultVersionInvoked) throws APISecurityException {
 
         String prefixedVersion = apiVersion;
-        String jti = null;
         String tokenIdentifier;
         //Check if client has invoked the default version API.
         if (defaultVersionInvoked) {
@@ -175,9 +174,11 @@ public class APIKeyValidator {
                         //Remove from the first level token cache as well.
                         getGatewayTokenCache().remove(apiKey);
                         // Put into invalid token cache
-                        synchronized (tokenIdentifier.concat(":").concat("InvalidGatewayToken_TENANT").intern()) {
-                            if (getInvalidTokenCache().get(tokenIdentifier) == null) {
-                                getInvalidTokenCache().put(tokenIdentifier, cachedToken);
+                        if (getInvalidTokenCache().get(tokenIdentifier) == null) {
+                            synchronized (tokenIdentifier.concat(":").concat("InvalidGatewayToken_TENANT").intern()) {
+                                if (getInvalidTokenCache().get(tokenIdentifier) == null) {
+                                    getInvalidTokenCache().put(tokenIdentifier, cachedToken);
+                                }
                             }
                         }
                     }

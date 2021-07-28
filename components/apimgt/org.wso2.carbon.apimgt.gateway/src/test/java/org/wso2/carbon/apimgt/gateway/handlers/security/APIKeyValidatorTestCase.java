@@ -1073,7 +1073,7 @@ public class APIKeyValidatorTestCase {
             apiKeyValidator.getKeyValidationInfo(context, apiKey, apiVersion, authenticationScheme, clientDomain,
                     matchingResource, httpVerb, defaultVersionInvoked);
             Mockito.verify(tokenCache, Mockito.times(1)).get(Mockito.anyString());
-            Mockito.verify(invalidTokenCache, Mockito.times(1)).get(Mockito.anyString());
+            Mockito.verify(invalidTokenCache, Mockito.times(2)).get(Mockito.anyString());
             Mockito.verify(keyCache, Mockito.times(1)).get(Mockito.anyString());
             Mockito.verify(tokenCache, Mockito.times(0)).put(Mockito.anyString(), Mockito.anyString());
             Mockito.verify(keyCache, Mockito.times(0)).put(Mockito.any(APIKeyValidationInfoDTO.class), Mockito
