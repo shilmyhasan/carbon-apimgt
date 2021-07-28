@@ -380,6 +380,7 @@ public class JWTValidator {
 
         String[] splitToken = jwtToken.split("\\.");
 
+        JWSHeader header;
         JWTClaimsSet payload = null;
         boolean isVerified = false;
         String tokenIdentifier = "";
@@ -456,6 +457,7 @@ public class JWTValidator {
         if (!isVerified) {
             log.debug("Token not found in the caches and revoked jwt token map.");
             try {
+                header = parsedJWTToken.getHeader();
                 payload = parsedJWTToken.getJWTClaimsSet();
             } catch (JSONException | IllegalArgumentException | ParseException e) {
                 if (log.isDebugEnabled()) {
@@ -466,7 +468,11 @@ public class JWTValidator {
                         "Invalid JWT token. Failed to decode the token.", e);
             }
             log.debug("Verifying signature of JWT");
-            isVerified = verifyTokenSignature(parsedJWTToken, APIConstants.GATEWAY_PUBLIC_CERTIFICATE_ALIAS);
+            String certificateAlias = APIConstants.GATEWAY_PUBLIC_CERTIFICATE_ALIAS;
+            if (header.getKeyID() != null) {
+                certificateAlias = header.getKeyID();
+            }
+            isVerified = verifyTokenSignature(parsedJWTToken, certificateAlias);
             if (isGatewayTokenCacheEnabled) {
                 // Add token to tenant token cache
                 if (isVerified) {

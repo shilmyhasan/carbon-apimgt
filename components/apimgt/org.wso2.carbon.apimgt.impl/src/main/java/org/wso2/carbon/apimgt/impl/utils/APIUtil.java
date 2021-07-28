@@ -9756,8 +9756,7 @@ public final class APIUtil {
             org.json.JSONObject decodedHeader = new org.json.JSONObject(new String(java.util.Base64.getUrlDecoder()
                     .decode(token.split("\\.")[0])));
             // Check if the decoded header contains type as 'JWT'.
-            if (APIConstants.JWT.equals(decodedHeader.getString(APIConstants.JwtTokenConstants.TOKEN_TYPE))
-                    && (StringUtils.countMatches(token, APIConstants.DOT) == 2)) {
+            if (StringUtils.countMatches(token, APIConstants.DOT) == 2) {
                 isJwtToken = true;
             } else {
                 if (log.isDebugEnabled()) {
