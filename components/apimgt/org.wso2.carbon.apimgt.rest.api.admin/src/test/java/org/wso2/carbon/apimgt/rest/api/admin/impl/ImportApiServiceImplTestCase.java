@@ -31,6 +31,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.API;
+import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.Subscriber;
@@ -53,7 +55,7 @@ import java.util.TreeSet;
 import javax.ws.rs.core.Response;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({RestApiUtil.class, ServiceReferenceHolder.class})
+@PrepareForTest({RestApiUtil.class, ServiceReferenceHolder.class, APIUtil.class})
 public class ImportApiServiceImplTestCase {
     private final String USER = "admin";
     private ImportApiService importApiService;
@@ -100,15 +102,21 @@ public class ImportApiServiceImplTestCase {
         api.addAvailableTiers(tierSet);
         apiSet.add(api);
         matchedAPIs.put("apis", apiSet);
-        Subscriber subscriber = new Subscriber("admin");
-        Mockito.when(apiConsumer.getSubscriber("admin")).thenReturn(subscriber);
+        Subscriber subscriber = new Subscriber(USER);
+        Mockito.when(apiConsumer.getSubscriber(USER)).thenReturn(subscriber);
         Mockito.when(apiConsumer.addApplication(Mockito.any(Application.class), Mockito.anyString())).thenReturn(1);
         PowerMockito.when(RestApiUtil.isTenantAvailable("carbon.super")).thenReturn(true);
+        PowerMockito.mockStatic(APIUtil.class);
+        PowerMockito.when(APIUtil.isApplicationExist(USER, "sampleApp", null))
+                .thenReturn(false);
+        PowerMockito.when(APIUtil.replaceEmailDomainBack(USER)).thenReturn(USER);
+        PowerMockito.when(APIUtil.getSingleSearchCriteria("sampleAPI")).thenReturn("*sampleAPI*");
+        PowerMockito.when(APIUtil.getSingleSearchCriteria("version:1.0.0")).thenReturn("*&version=*1.0.0*");
         Mockito.when(apiConsumer.searchPaginatedAPIs("name=*sampleAPI*&version=*1.0.0*",
                 "carbon.super", 0, Integer.MAX_VALUE, false)).thenReturn(matchedAPIs);
         Mockito.when(apiConsumer.getApplicationById(1)).thenReturn(new Application(1));
         Response response = importApiService.importApplicationsPost(fis, fileInfo, true,
-                false, "admin");
+                false, "admin", true, false);
         Assert.assertEquals(response.getStatus(), 207);
     }
 
@@ -125,6 +133,19 @@ public class ImportApiServiceImplTestCase {
         FileInputStream fis;
         fis = new FileInputStream(file);
         Attachment fileInfo = Mockito.mock(Attachment.class);
+
+        StringBuilder searchQuery = null;
+        String[] searchCriteria = {"sampleAPI", "version:" + "1.0.0"};
+        for (int i = 0; i < searchCriteria.length; i++) {
+            if (i == 0) {
+                searchQuery = new StringBuilder(APIUtil.getSingleSearchCriteria(searchCriteria[i]));
+                System.out.println(searchQuery);
+            } else {
+                searchQuery.append(APIConstants.SEARCH_AND_TAG)
+                        .append(APIUtil.getSingleSearchCriteria(searchCriteria[i]));
+                System.out.println(searchQuery);
+            }
+        }
         PowerMockito.mockStatic(RestApiUtil.class);
         PowerMockito.when(RestApiUtil.getLoggedInUsername()).thenReturn(USER);
         PowerMockito.when(RestApiUtil.getConsumer(USER)).thenReturn(apiConsumer);
@@ -137,11 +158,17 @@ public class ImportApiServiceImplTestCase {
         Mockito.when(apiConsumer.getSubscriber("admin")).thenReturn(subscriber);
         Mockito.when(apiConsumer.addApplication(Mockito.any(Application.class), Mockito.anyString())).thenReturn(1);
         PowerMockito.when(RestApiUtil.isTenantAvailable("carbon.super")).thenReturn(true);
+        PowerMockito.mockStatic(APIUtil.class);
+        PowerMockito.when(APIUtil.isApplicationExist(USER, "sampleApp", null))
+                .thenReturn(false);
         Mockito.when(apiConsumer.searchPaginatedAPIs("name=*sampleAPI*&version=*1.0.0*",
                 "carbon.super", 0, Integer.MAX_VALUE, false)).thenReturn(matchedAPIs);
         Mockito.when(apiConsumer.getApplicationById(1)).thenReturn(new Application(1));
+        PowerMockito.when(APIUtil.replaceEmailDomainBack(USER)).thenReturn(USER);
+        PowerMockito.when(APIUtil.getSingleSearchCriteria("sampleAPI")).thenReturn("*sampleAPI*");
+        PowerMockito.when(APIUtil.getSingleSearchCriteria("version:1.0.0")).thenReturn("*&version=*1.0.0*");
         Response response = importApiService.importApplicationsPost(fis, fileInfo, true,
-                false, "admin");
+                false, "admin", true, false);
         Assert.assertEquals(response.getStatus(), 207);
     }
 
@@ -164,8 +191,11 @@ public class ImportApiServiceImplTestCase {
         Mockito.when(apiConsumer.getSubscriber("admin")).thenReturn(subscriber);
         Mockito.when(apiConsumer.addApplication(Mockito.any(Application.class), Mockito.anyString()))
                 .thenThrow(APIManagementException.class);
+        PowerMockito.mockStatic(APIUtil.class);
+        PowerMockito.when(APIUtil.isApplicationExist(USER, "sampleApp", null))
+                .thenReturn(true);
         Response response = importApiService.importApplicationsPost(fis, null, false,
-                false, null);
+                false, "admin", true, false);
 
         Assert.assertNull("Error while importing Application", response);
     }
@@ -186,7 +216,7 @@ public class ImportApiServiceImplTestCase {
         FileInputStream fis;
         fis = new FileInputStream(file);
         Response response = importApiService.importApplicationsPost(fis, null, false,
-                false, "admin@hr.lk");
+                false, "admin@hr.lk", true, false);
         Assert.assertEquals(response.getStatus(), 403);
     }
 

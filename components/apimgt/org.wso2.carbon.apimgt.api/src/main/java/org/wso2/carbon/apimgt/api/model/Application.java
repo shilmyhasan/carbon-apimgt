@@ -154,6 +154,10 @@ public class Application {
         oauthApps.put(keyType, oAuthApplication);
     }
 
+    public void clearOAuthApps() {
+        oauthApps.clear();
+    }
+
     public int getId() {
         return id;
     }
@@ -259,4 +263,9 @@ public class Application {
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
+
+    public void updateSubscriber(Subscriber subscriber) {
+        this.subscriber = subscriber;
+    }
+
 }

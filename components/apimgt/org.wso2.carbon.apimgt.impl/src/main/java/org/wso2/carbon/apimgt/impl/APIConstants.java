@@ -1411,6 +1411,8 @@ public final class APIConstants {
     public static final String JSON_GRANT_TYPES = "grant_types";
     public static final String JSON_USERNAME = "username";
     public static final String REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA = "[~!@#;%^*()+={}|<>\"\',\\[\\]&/$\\\\]";
+    public static final String JSON_CLIENT_ID = "client_id";
+    public static final String JSON_CLIENT_SECRET = "client_secret";
 
     /**
      * Publisher Access Control related registry properties and values.
@@ -1469,6 +1471,7 @@ public final class APIConstants {
     public static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
     public static final String JSON_FILENAME_EXTENSION = ".json";
     public static final String JSON_GZIP_FILENAME_EXTENSION = ".json.gz";
+    public static final String MIGRATION_MODE = "migrationMode";
 
     /**
      * Constants for correlation logging
