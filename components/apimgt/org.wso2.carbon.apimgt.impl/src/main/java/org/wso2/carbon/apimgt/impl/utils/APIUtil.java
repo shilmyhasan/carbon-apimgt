@@ -35,6 +35,7 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -7862,5 +7863,32 @@ public final class APIUtil {
         }
         return false;
     }
-    
+
+    /**
+     * Check whether the file type is supported.
+     * @param file name
+     * @return true if supported
+     */
+    public static boolean isSupportedFileType(String filename) {
+        if (log.isDebugEnabled()) {
+            log.debug("File name " + filename);
+        }
+        if (StringUtils.isEmpty(filename)) {
+            return false;
+        }
+        String fileType = FilenameUtils.getExtension(filename);
+        List<String> list = null;
+        APIManagerConfiguration apiManagerConfiguration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String supportedTypes = apiManagerConfiguration
+                .getFirstProperty(APIConstants.API_PUBLISHER_SUPPORTED_DOC_TYPES);
+        if (!StringUtils.isEmpty(supportedTypes)) {
+            String[] definedTypesArr = supportedTypes.trim().split("\\s*,\\s*");
+            list = Arrays.asList(definedTypesArr);
+        } else {
+            String[] defaultType = { "pdf", "txt", "doc", "docx", "xls", "xlsx", "odt", "ods" };
+            list = Arrays.asList(defaultType);
+        }
+        return list.contains(fileType.toLowerCase());
+    }
 }
