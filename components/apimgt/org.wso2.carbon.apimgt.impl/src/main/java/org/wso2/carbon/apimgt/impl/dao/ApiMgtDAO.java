@@ -6863,8 +6863,8 @@ public class ApiMgtDAO {
 
             if (scopesChanged(api, templates)) {
                 updateScopes(api, tenantId);
-                updateURLTemplates(api);
             }
+            updateURLTemplates(api);
         } catch (SQLException e) {
             handleException("Error while updating the API: " + api.getId() + " in the database", e);
         } finally {
