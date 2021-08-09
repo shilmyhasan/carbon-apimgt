@@ -2056,7 +2056,6 @@ public class APIUtilTest {
 
         fileName = "test1";
         Assert.assertFalse("File without a type should not be allowed", APIUtil.isSupportedFileType(fileName));
-
     }
 
     @Test
