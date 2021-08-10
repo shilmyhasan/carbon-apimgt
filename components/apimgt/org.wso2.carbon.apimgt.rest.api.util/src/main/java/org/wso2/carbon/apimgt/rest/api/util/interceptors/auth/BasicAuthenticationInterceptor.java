@@ -26,18 +26,17 @@ import org.apache.cxf.interceptor.security.AuthenticationException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.wso2.carbon.CarbonException;
 import org.wso2.carbon.apimgt.api.model.Scope;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.RealmUtil;
 import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.core.util.AnonymousSessionUtil;
-import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.core.UserRealm;
-import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.util.UserCoreUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.uri.template.URITemplateException;
@@ -47,6 +46,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.URL;
 import java.util.Set;
 
 /**
@@ -108,35 +108,38 @@ public class BasicAuthenticationInterceptor extends AbstractPhaseInterceptor {
      */
     private boolean authenticate(Message inMessage, String username, String password) {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
-        RegistryService registryService =
-                (RegistryService) carbonContext.getOSGiService(RegistryService.class, null);
-        String tenantDomain = MultitenantUtils.getTenantDomain(username);
-        int tenantId;
         UserRealm userRealm;
+        String tenantDomain = MultitenantUtils.getTenantDomain(username);
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
         try {
-            tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
-            userRealm = AnonymousSessionUtil.getRealmByTenantDomain(registryService, realmService, tenantDomain);
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+            userRealm = RealmUtil.getTenantUserRealm(tenantId);
             if (userRealm == null) {
                 log.error("Authentication failed: invalid domain or unactivated tenant login");
                 return false;
             }
-            //if authenticated
-            if (userRealm.getUserStoreManager()
-                    .authenticate(MultitenantUtils.getTenantAwareUsername(username), password)) {
-                //set the correct tenant info for downstream code.
+
+            UserStoreManager userStoreManager = userRealm.getUserStoreManager();
+            boolean isAuthenticated = userStoreManager.authenticate(MultitenantUtils.
+                    getTenantAwareUsername(username), password);
+            if (isAuthenticated) {
+                String domain = UserCoreUtil.getDomainFromThreadLocal();
+                String domainAwareUserName = UserCoreUtil.addDomainToName(username, domain);
+                RestApiUtil.setThreadLocalRequestedTenant(MultitenantUtils.getTenantAwareUsername(username));
                 carbonContext.setTenantDomain(tenantDomain);
                 carbonContext.setTenantId(tenantId);
-                carbonContext.setUsername(username);
+                carbonContext.setUsername(domainAwareUserName);
                 if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
                     APIUtil.loadTenantConfigBlockingMode(tenantDomain);
                 }
                 return validateRoles(inMessage, userRealm, tenantDomain, username);
-            } else {
-                log.error("Authentication failed: Invalid credentials");
             }
-        } catch (UserStoreException | CarbonException e) {
+        } catch (UserStoreException e) {
             log.error("Error occurred while authenticating user: " + username, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
         }
         return false;
     }
