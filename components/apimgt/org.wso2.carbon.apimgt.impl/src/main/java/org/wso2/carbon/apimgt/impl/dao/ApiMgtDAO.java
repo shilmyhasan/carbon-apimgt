@@ -5919,12 +5919,15 @@ public class ApiMgtDAO {
         }
         PreparedStatement prepStmt = null;
         PreparedStatement scopePrepStmt = null;
+        PreparedStatement existingScopePrepStmt = null;
 
         String query = SQLConstants.ADD_URL_MAPPING_SQL;
         String scopeQuery = SQLConstants.ADD_OAUTH2_RESOURCE_SCOPE_SQL;
+        String existingScopeQuery = SQLConstants.GET_EXISTING_RESOURCE_SCOPE;
         try {
             prepStmt = connection.prepareStatement(query);
             scopePrepStmt = connection.prepareStatement(scopeQuery);
+            existingScopePrepStmt = connection.prepareStatement(existingScopeQuery);
 
             Iterator<URITemplate> uriTemplateIterator = api.getUriTemplates().iterator();
             URITemplate uriTemplate;
@@ -5962,7 +5965,9 @@ public class ApiMgtDAO {
                 }
                 prepStmt.addBatch();
                 if (uriTemplate.getScope() != null) {
-                    scopePrepStmt.setString(1, APIUtil.getResourceKey(api, uriTemplate));
+                    String resourceKey = APIUtil.getResourceKey(api, uriTemplate);
+
+                    scopePrepStmt.setString(1, resourceKey);
 
                     if (uriTemplate.getScope().getId() == 0) {
                         String scopeKey = uriTemplate.getScope().getKey();
@@ -5974,10 +5979,14 @@ public class ApiMgtDAO {
                         }
                     }
 
-                    scopePrepStmt.setInt(2, uriTemplate.getScope().getId());
-                    scopePrepStmt.setInt(3, APIUtil.getTenantId(APIUtil.replaceEmailDomainBack(api.getId()
-                            .getProviderName())));
-                    scopePrepStmt.addBatch();
+                    existingScopePrepStmt.setString(1, resourceKey);
+                    ResultSet existingScopeResultSet = existingScopePrepStmt.executeQuery();
+                    if (!existingScopeResultSet.next()) {
+                        scopePrepStmt.setInt(2, uriTemplate.getScope().getId());
+                        scopePrepStmt.setInt(3, APIUtil.getTenantId(APIUtil.replaceEmailDomainBack(api.getId()
+                                .getProviderName())));
+                        scopePrepStmt.addBatch();
+                    }
                 }
             }
             prepStmt.executeBatch();
@@ -5991,6 +6000,8 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(scopePrepStmt, null, null);
         }
     }
+
+
 
     /**
      * Fetches an Application with OAuth Apps, by name.
@@ -6865,6 +6876,10 @@ public class ApiMgtDAO {
                 updateScopes(api, tenantId);
             }
             updateURLTemplates(api);
+
+            // THIS WORKS
+//            updateScopes(api, tenantId);
+//            updateURLTemplates(api);
         } catch (SQLException e) {
             handleException("Error while updating the API: " + api.getId() + " in the database", e);
         } finally {
