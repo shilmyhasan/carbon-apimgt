@@ -6000,9 +6000,6 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(scopePrepStmt, null, null);
         }
     }
-
-
-
     /**
      * Fetches an Application with OAuth Apps, by name.
      *
