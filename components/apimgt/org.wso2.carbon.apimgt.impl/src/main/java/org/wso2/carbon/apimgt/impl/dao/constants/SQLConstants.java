@@ -1827,9 +1827,6 @@ public class SQLConstants {
     public static final String ADD_OAUTH2_RESOURCE_SCOPE_SQL =
             "INSERT INTO IDN_OAUTH2_RESOURCE_SCOPE (RESOURCE_PATH,SCOPE_ID,TENANT_ID) VALUES (?,?,?)";
 
-    public static final String GET_EXISTING_RESOURCE_SCOPE =
-            "SELECT RESOURCE_PATH,SCOPE_ID,TENANT_ID FROM IDN_OAUTH2_RESOURCE_SCOPE WHERE RESOURCE_PATH = ?";
-
     public static final String GET_APPLICATION_BY_NAME_PREFIX =
             " SELECT " +
             "   APP.APPLICATION_ID," +
