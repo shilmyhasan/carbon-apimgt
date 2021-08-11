@@ -2,7 +2,7 @@
     <parent>
         <artifactId>apimgt</artifactId>
         <groupId>org.wso2.carbon.apimgt</groupId>
-        <version>6.4.50.29-FISGLOBALSUB-hotfix-1-SNAPSHOT</version>
+        <version>6.4.50.29-FISGLOBALSUB-hotfix-2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
