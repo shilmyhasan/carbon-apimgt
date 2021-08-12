@@ -5991,7 +5991,6 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(scopePrepStmt, null, null);
         }
     }
-
     /**
      * Fetches an Application with OAuth Apps, by name.
      *
@@ -6863,8 +6862,8 @@ public class ApiMgtDAO {
 
             if (scopesChanged(api, templates)) {
                 updateScopes(api, tenantId);
+                updateURLTemplates(api);
             }
-            updateURLTemplates(api);
         } catch (SQLException e) {
             handleException("Error while updating the API: " + api.getId() + " in the database", e);
         } finally {
@@ -6880,30 +6879,47 @@ public class ApiMgtDAO {
         if (newAPI.getUriTemplates().size() != oldTemplates.size()) {
             return true;
         }
+
+        boolean isDiffFound = false;
         for (URITemplate template : newAPI.getUriTemplates()) {
+            boolean isMatchFound = false;
             for (URITemplate templateOld : oldTemplates) {
-                if (template.getUriTemplate().equals(templateOld.getUriTemplate())
-                && template.getHTTPVerb().equals(templateOld.getHTTPVerb())) {
-                    Scope oldScope = templateOld.getScope();
-                    Scope newScope = template.getScope();
-
-                    if ((oldScope == null && newScope != null) || (oldScope != null && newScope == null) ) {
-                        return true;
-                    }
-
-                    if (oldScope != null && newScope != null) {
-                        if (!oldScope.getName().equals(newScope.getName())) {
-                            return true;
-                        }
-
-                        List<String> roleListOld = APIUtil.getRolesList(oldScope.getRoles());
-                        List<String> roleListNew = APIUtil.getRolesList(newScope.getRoles());
-
-                        if (!roleListOld.containsAll(roleListNew)) {
-                            return true;
-                        }
-                    }
+                if (isURITemplatesEqual(template, templateOld)) {
+                    isMatchFound = true;
+                    break;
                 }
+            }
+            if (!isMatchFound) {
+                isDiffFound = true;
+                break;
+            }
+        }
+
+        return isDiffFound;
+    }
+
+    private boolean isURITemplatesEqual(URITemplate template1, URITemplate template2) {
+        if (template1.getUriTemplate().equals(template2.getUriTemplate())
+                && template1.getHTTPVerb().equals(template2.getHTTPVerb())) {
+            Scope scope1 = template1.getScope();
+            Scope scope2 = template2.getScope();
+
+            if ((scope1 == null && scope2 != null) || (scope1 != null && scope2 == null)) {
+                return false;
+            }
+
+            if (scope1 == null) {
+                return true;
+            }
+
+            if (!scope1.getName().equals(scope2.getName())) {
+                return false;
+            }
+
+            List<String> roleList1 = APIUtil.getRolesList(scope1.getRoles());
+            List<String> roleList2 = APIUtil.getRolesList(scope2.getRoles());
+            if (roleList1.containsAll(roleList2) && roleList2.containsAll(roleList1)) {
+                return true;
             }
         }
         return false;
