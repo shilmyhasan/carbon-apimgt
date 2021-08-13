@@ -1544,6 +1544,7 @@
         <imp.pkg.version.io.swagger.parser>[2.1.6, 3.0.0)</imp.pkg.version.io.swagger.parser>
         <imp.pkg.version.org.apache.commons.codec>[1.4.0, 2.0.0)</imp.pkg.version.org.apache.commons.codec>
         <imp.pkg.version.org.apache.commons.lang3>[3.4.0, 3.5.0)</imp.pkg.version.org.apache.commons.lang3>
+        <org.json.version.range>[3.0.0,4.0.0)</org.json.version.range>
 
         <carbon.throttle.module.version>4.2.1</carbon.throttle.module.version>
 
