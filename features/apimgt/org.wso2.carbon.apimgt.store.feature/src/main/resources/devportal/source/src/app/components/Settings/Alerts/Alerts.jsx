@@ -222,7 +222,7 @@ const Alerts = (props) => {
      * @param {string} email The email address that is being added.
      * */
     const handleAddEmail = (email) => {
-        setEmailsList(email);
+        setEmailsList([...emails, ...email]);
     };
 
     /**

@@ -461,8 +461,7 @@ class TokenManager extends React.Component {
                 <FormattedMessage
                     defaultMessage='Error with application keys.'
                     id='Shared.AppsAndKeys.TokenManager.application.delete.error'
-                />
-            </Box>;
+        /></Box>;
         }
         // todo replace use of localStorage with useContext
         // const settingsData = localStorage.getItem('settings');
