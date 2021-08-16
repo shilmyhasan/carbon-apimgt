@@ -25,7 +25,7 @@ var apiLevelPolicy = {
 };
 
 const SWAGGER_CONTENT = "swagger-editor-content"
-const SWAGGER_CONTENT_CACHE = "swagger-editor-content-cache"
+var swaggerContentCache;
 
 Handlebars.registerHelper('countKeys', function(value){
     return Object.keys(value).length * 2 + 1;
@@ -765,8 +765,9 @@ APIDesigner.prototype.load_swagger_editor_content = function (){
     if(this.api_doc != ""){
         var swagger = jQuery.extend(true, {}, this.api_doc);
         var swagYaml = jsyaml.safeDump(this.remove_trailing_slash(swagger));
+        //Load swagger definition into cache
+        swaggerContentCache = swagYaml;
         window.localStorage.setItem(SWAGGER_CONTENT, swagYaml);
-        window.localStorage.setItem(SWAGGER_CONTENT_CACHE, swagYaml);
     }
 };
 
@@ -1259,8 +1260,8 @@ APIDesigner.prototype.close_swagger_editor = function(){
     $('#swaggerEditer').append($('.swagger_editer_header'));
     $('.tempNav').remove();
     $("#swaggerEditer").fadeOut("fast");
-    var swagYaml = window.localStorage.getItem(SWAGGER_CONTENT_CACHE);
-    window.localStorage.setItem(SWAGGER_CONTENT, swagYaml);
+    //Discarding unsaved changes
+    window.localStorage.setItem(SWAGGER_CONTENT, swaggerContentCache);
 
 };
 
