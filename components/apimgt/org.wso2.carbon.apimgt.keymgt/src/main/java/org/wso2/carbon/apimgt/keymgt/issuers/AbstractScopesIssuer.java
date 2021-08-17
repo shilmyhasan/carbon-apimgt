@@ -97,6 +97,27 @@ public abstract class AbstractScopesIssuer {
     }
 
     /**
+     * Get the set of default scopes. If a requested scope is matches with the patterns specified in the whitelist,
+     * then such scopes will be issued without further validation. If the scope list is empty,
+     * return without default scope.
+     *
+     * @param requestedScopes - The set of requested scopes
+     * @return - The subset of scopes that are allowed
+     */
+    public List<String> getAllowedScopesWithoutDefaultScope(List<String> scopeSkipList, List<String> requestedScopes) {
+        List<String> authorizedScopes = new ArrayList<String>();
+
+        //Iterate the requested scopes list.
+        for (String scope : requestedScopes) {
+            if (isWhiteListedScope(scopeSkipList, scope)) {
+                authorizedScopes.add(scope);
+            }
+        }
+
+        return authorizedScopes;
+    }
+
+    /**
      * Determines if the scope is specified in the whitelist.
      *
      * @param scope - The scope key to check

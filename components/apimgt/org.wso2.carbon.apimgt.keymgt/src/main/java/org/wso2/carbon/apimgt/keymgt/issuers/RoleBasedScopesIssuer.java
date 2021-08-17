@@ -18,6 +18,7 @@
 package org.wso2.carbon.apimgt.keymgt.issuers;
 
 import org.apache.axis2.util.JavaUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,6 +103,10 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
 
         List<String> authorizedScopes = null;
         String[] requestedScopes = tokReqMsgCtx.getScope();
+        authorizedScopes = getAllowedScopesWithoutDefaultScope(whiteListedScopes, Arrays.asList(requestedScopes));
+        if (requestedScopes.length == authorizedScopes.size()) {
+            return authorizedScopes;
+        }
         String clientId = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getClientId();
         AuthenticatedUser authenticatedUser = tokReqMsgCtx.getAuthorizedUser();
 
