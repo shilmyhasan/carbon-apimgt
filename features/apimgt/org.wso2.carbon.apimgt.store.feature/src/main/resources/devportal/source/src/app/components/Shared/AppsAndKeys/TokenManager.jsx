@@ -455,12 +455,13 @@ class TokenManager extends React.Component {
         if (key && (key.keyState === this.keyStates.CREATED || key.keyState === this.keyStates.REJECTED)) {
             return <WaitingForApproval keyState={key.keyState} states={this.keyStates} />;
         }
+
         if (keys.size > 0 && key && (key.consumerKey && !key.consumerSecret)) {
             return <Box className={classes.errorBox}>
                 <ErrorOutlineIcon />
                 <FormattedMessage
-                    defaultMessage='Error with application keys.'
-                    id='Shared.AppsAndKeys.TokenManager.application.delete.error'
+            defaultMessage='Error with application keys.'
+            id='Shared.AppsAndKeys.TokenManager.application.delete.error'
         /></Box>;
         }
         // todo replace use of localStorage with useContext
