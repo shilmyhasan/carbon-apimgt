@@ -97,7 +97,6 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
                     return Response.status(Response.Status.FORBIDDEN).entity(errorMsg).build();
                 }
                 APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(user);
-
                 APIAdmin apiAdmin = new APIAdminImpl();
                 int tenantId = APIUtil.getTenantId(user);
                 // If no user is passed, get the applications for the tenant (not only for the user)

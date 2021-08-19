@@ -2206,7 +2206,6 @@ public final class APIUtil {
      *
      * @return Origin string of the external IDP
      */
-
     public static String getExternalIDPOrigin() throws APIManagementException {
 
         APIManagerConfiguration config = ServiceReferenceHolder.getInstance().

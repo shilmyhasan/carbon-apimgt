@@ -90,7 +90,7 @@ public class ApplicationMappingUtil {
      * @param size               max offset
      */
     public static void setPaginationParams(ApplicationListDTO applicationListDTO, int limit, int offset,
-                                           int size) {
+            int size) {
 
         Map<String, Integer> paginatedParams = RestApiUtil.getPaginationParams(offset, limit, size);
 
