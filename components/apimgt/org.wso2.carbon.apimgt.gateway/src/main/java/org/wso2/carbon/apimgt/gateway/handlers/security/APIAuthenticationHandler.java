@@ -256,7 +256,6 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
             if (requestURIObject != null) {
                 requestURI = requestURIObject.toString();
             }
-
             if (APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE.equals(errorMessage)) {
                 log.error("API authentication failure due to "
                         + APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE, e);
