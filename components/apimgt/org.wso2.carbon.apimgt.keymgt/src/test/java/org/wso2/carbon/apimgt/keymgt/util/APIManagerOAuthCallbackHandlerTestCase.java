@@ -20,13 +20,31 @@ package org.wso2.carbon.apimgt.keymgt.util;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.keymgt.ScopesIssuer;
+import org.wso2.carbon.apimgt.keymgt.issuers.AbstractScopesIssuer;
+import org.wso2.carbon.apimgt.keymgt.issuers.RoleBasedScopesIssuer;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.oauth.callback.OAuthCallback;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.security.auth.callback.Callback;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Arrays;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest( {APIKeyMgtDataHolder.class})
 public class APIManagerOAuthCallbackHandlerTestCase {
 
     @Test
@@ -66,6 +84,12 @@ public class APIManagerOAuthCallbackHandlerTestCase {
                 OAuthCallbackType.SCOPE_VALIDATION_AUTHZ);
         Callback[] callbacks = {oAuthCallback};
         APIManagerOAuthCallbackHandler handler = new APIManagerOAuthCallbackHandler();
+        PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
+        AbstractScopesIssuer mockIssuer = Mockito.mock(AbstractScopesIssuer.class);
+        Map<String, AbstractScopesIssuer> scopesIssuerMap = new HashMap<String, AbstractScopesIssuer>();
+        scopesIssuerMap.put("wso2", mockIssuer);
+        BDDMockito.given(APIKeyMgtDataHolder.getScopesIssuers()).willReturn(scopesIssuerMap);
+        ScopesIssuer.loadInstance(Collections.<String>emptyList());
         handler.handle(callbacks);
 
         String[] scopes = oAuthCallback.getApprovedScope();
@@ -79,10 +103,19 @@ public class APIManagerOAuthCallbackHandlerTestCase {
 
         OAuthCallback oAuthCallback = new OAuthCallback(new AuthenticatedUser(), "client", OAuthCallback.
                 OAuthCallbackType.SCOPE_VALIDATION_AUTHZ);
-        String[] scopesList = {"default", "test"};
+        String[] scopesList = {"wso2:default", "wso2:test"};
+        List<String> authorizedScopes = Arrays.asList(scopesList);
+        List<String> whiteListScopes = new ArrayList<>();
         oAuthCallback.setRequestedScope(scopesList);
         Callback[] callbacks = {oAuthCallback};
         APIManagerOAuthCallbackHandler handler = new APIManagerOAuthCallbackHandler();
+        PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
+        RoleBasedScopesIssuer mockIssuer = Mockito.mock(RoleBasedScopesIssuer.class);
+        Map<String, AbstractScopesIssuer> scopesIssuerMap = new HashMap<String, AbstractScopesIssuer>();
+        scopesIssuerMap.put("wso2", mockIssuer);
+        BDDMockito.given(APIKeyMgtDataHolder.getScopesIssuers()).willReturn(scopesIssuerMap);
+        ScopesIssuer.loadInstance(whiteListScopes);
+        Mockito.when(mockIssuer.getScopes(oAuthCallback,whiteListScopes)).thenReturn(authorizedScopes);
         handler.handle(callbacks);
 
         String[] scopes = oAuthCallback.getApprovedScope();
@@ -119,6 +152,14 @@ public class APIManagerOAuthCallbackHandlerTestCase {
         APIManagerOAuthCallbackHandler handler = new APIManagerOAuthCallbackHandler();
         handler.handle(callbacks);
 
+        PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
+        AbstractScopesIssuer mockIssuer = Mockito.mock(AbstractScopesIssuer.class);
+        Map<String, AbstractScopesIssuer> scopesIssuerMap = new HashMap<String, AbstractScopesIssuer>();
+        scopesIssuerMap.put("wso2", mockIssuer);
+        BDDMockito.given(APIKeyMgtDataHolder.getScopesIssuers()).willReturn(scopesIssuerMap);
+        ScopesIssuer.loadInstance(Collections.<String>emptyList());
+
+        handler.handle(callbacks);
         String[] scopes = oAuthCallback.getApprovedScope();
         Assert.assertEquals(2, scopes.length);
         Arrays.sort(scopes);
