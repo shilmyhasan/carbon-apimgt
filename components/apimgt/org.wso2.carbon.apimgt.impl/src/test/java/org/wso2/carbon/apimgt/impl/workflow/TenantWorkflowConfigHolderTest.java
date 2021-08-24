@@ -136,9 +136,6 @@ public class TenantWorkflowConfigHolderTest {
         }
     }
 
-//   TODO: Modify the below test to check for the availability of the simple workflow when the customized
-//    workflow is not found.
-
     @Test
     public void testFailureToLoadTenantWFConfigWhenWFExecutorClassNotFound() throws Exception {
         //Workflow executor is an non existing class so that ClassNotFoundException will be thrown
