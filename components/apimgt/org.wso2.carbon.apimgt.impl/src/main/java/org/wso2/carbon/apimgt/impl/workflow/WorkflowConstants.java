@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.apimgt.impl.workflow;
 
-import org.apache.axiom.om.OMElement;
-
 public class WorkflowConstants {
 
     public static final String WF_TYPE_AM_USER_SIGNUP = "AM_USER_SIGNUP";
