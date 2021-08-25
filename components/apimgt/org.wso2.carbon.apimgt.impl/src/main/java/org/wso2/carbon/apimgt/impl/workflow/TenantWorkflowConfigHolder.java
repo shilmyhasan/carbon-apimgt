@@ -76,7 +76,8 @@ public class TenantWorkflowConfigHolder implements Serializable {
             Registry registry = ServiceReferenceHolder.getInstance().
                     getRegistryService().getGovernanceSystemRegistry(tenantId);
             Resource resource = registry.get(APIConstants.WORKFLOW_EXECUTOR_LOCATION);
-
+            Class clazz;
+            WorkflowExecutor workFlowExecutor;
             in = resource.getContentStream();
 
             StAXOMBuilder builder = new StAXOMBuilder(in);
@@ -89,59 +90,87 @@ public class TenantWorkflowConfigHolder implements Serializable {
             OMElement workflowElem = workflowExtensionsElem.getFirstChildWithName(
                     new QName(WorkflowConstants.APPLICATION_CREATION));
             String executorClass = workflowElem.getAttributeValue(new QName(WorkflowConstants.EXECUTOR));
-            Class clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
-            WorkflowExecutor workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
-            loadProperties(workflowElem, workFlowExecutor);
+           try {
+                clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
+                workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
+                loadProperties(workflowElem, workFlowExecutor);
+            } catch (ClassNotFoundException e) {
+                workFlowExecutor = new ApplicationCreationSimpleWorkflowExecutor();
+            }
             workflowExecutorMap.put(WorkflowConstants.WF_TYPE_AM_APPLICATION_CREATION, workFlowExecutor);
 
             workflowElem = workflowExtensionsElem.getFirstChildWithName(
                     new QName(WorkflowConstants.PRODUCTION_APPLICATION_REGISTRATION));
             executorClass = workflowElem.getAttributeValue(new QName(WorkflowConstants.EXECUTOR));
-            clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
-            workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
-            loadProperties(workflowElem, workFlowExecutor);
+            try {
+                clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
+                workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
+                loadProperties(workflowElem, workFlowExecutor);
+            } catch (ClassNotFoundException e) {
+                workFlowExecutor = new ApplicationRegistrationSimpleWorkflowExecutor();
+            }
             workflowExecutorMap.put(WorkflowConstants.WF_TYPE_AM_APPLICATION_REGISTRATION_PRODUCTION, workFlowExecutor);
 
             workflowElem = workflowExtensionsElem.getFirstChildWithName(
                     new QName(WorkflowConstants.SANDBOX_APPLICATION_REGISTRATION));
             executorClass = workflowElem.getAttributeValue(new QName(WorkflowConstants.EXECUTOR));
-            clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
-            workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
-            loadProperties(workflowElem, workFlowExecutor);
+            try {
+                clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
+                workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
+                loadProperties(workflowElem, workFlowExecutor);
+            } catch (ClassNotFoundException e) {
+                workFlowExecutor = new ApplicationRegistrationSimpleWorkflowExecutor();
+            }
             workflowExecutorMap.put(WorkflowConstants.WF_TYPE_AM_APPLICATION_REGISTRATION_SANDBOX, workFlowExecutor);
 
             workflowElem = workflowExtensionsElem.getFirstChildWithName(
                     new QName(WorkflowConstants.USER_SIGN_UP));
             executorClass = workflowElem.getAttributeValue(new QName(WorkflowConstants.EXECUTOR));
-            clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
-            workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
-            loadProperties(workflowElem, workFlowExecutor);
+            try {
+                clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
+                workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
+                loadProperties(workflowElem, workFlowExecutor);
+            } catch (ClassNotFoundException e) {
+                workFlowExecutor = new UserSignUpSimpleWorkflowExecutor();
+            }
             workflowExecutorMap.put(WorkflowConstants.WF_TYPE_AM_USER_SIGNUP, workFlowExecutor);
 
             workflowElem = workflowExtensionsElem.getFirstChildWithName(
                     new QName(WorkflowConstants.SUBSCRIPTION_CREATION));
             executorClass = workflowElem.getAttributeValue(new QName(WorkflowConstants.EXECUTOR));
-            clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
-            workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
-            loadProperties(workflowElem, workFlowExecutor);
+            try {
+                clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
+                workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
+                loadProperties(workflowElem, workFlowExecutor);
+            } catch (ClassNotFoundException e) {
+                workFlowExecutor = new SubscriptionCreationSimpleWorkflowExecutor();
+            }
             workflowExecutorMap.put(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION, workFlowExecutor);
 
             workflowElem = workflowExtensionsElem.getFirstChildWithName(
                     new QName(WorkflowConstants.SUBSCRIPTION_DELETION));
             executorClass = workflowElem.getAttributeValue(new QName(WorkflowConstants.EXECUTOR));
-            clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
-            workFlowExecutor = (WorkflowExecutor) clazz.newInstance();
-            loadProperties(workflowElem, workFlowExecutor);
+            try {
+                clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
+                workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
+                loadProperties(workflowElem, workFlowExecutor);
+            } catch (ClassNotFoundException e) {
+                workFlowExecutor = new SubscriptionDeletionSimpleWorkflowExecutor();
+            }
             workflowExecutorMap.put(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION, workFlowExecutor);
 
             workflowElem = workflowExtensionsElem.getFirstChildWithName(
                     new QName(WorkflowConstants.APPLICATION_DELETION));
             executorClass = workflowElem.getAttributeValue(new QName(WorkflowConstants.EXECUTOR));
-            clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
-            workFlowExecutor = (WorkflowExecutor) clazz.newInstance();
-            loadProperties(workflowElem, workFlowExecutor);
+            try {
+                clazz = TenantWorkflowConfigHolder.class.getClassLoader().loadClass(executorClass);
+                workFlowExecutor = (WorkflowExecutor)clazz.newInstance();
+                loadProperties(workflowElem, workFlowExecutor);
+            } catch (ClassNotFoundException e) {
+                workFlowExecutor = new ApplicationDeletionSimpleWorkflowExecutor();
+            }
             workflowExecutorMap.put(WorkflowConstants.WF_TYPE_AM_APPLICATION_DELETION, workFlowExecutor);
-            
+
             workflowElem = workflowExtensionsElem.getFirstChildWithName(new QName(WorkflowConstants.API_STATE_CHANGE));
             if (workflowElem == null) {
                 // TO handle migrated environment, create the default simple workflow executor
