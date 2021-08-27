@@ -59,10 +59,16 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.models.Path;
+import io.swagger.models.Swagger;
+import io.swagger.parser.SwaggerParser;
+import io.swagger.util.Json;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -139,6 +145,8 @@ public class ApisApiServiceImpl extends ApisApiService {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String username = RestApiUtil.getLoggedInUsername();
 
+            String swaggerJson = validateSwaggerDefinition(body.getApiDefinition());
+
             if (body.getContext().endsWith("/")) {
                 RestApiUtil.handleBadRequest("Context cannot end with '/' character", log);
             }
@@ -194,7 +202,7 @@ public class ApisApiServiceImpl extends ApisApiService {
 
             //adding the api
             apiProvider.addAPI(apiToAdd);
-            apiProvider.saveSwagger20Definition(apiToAdd.getId(), body.getApiDefinition());
+            apiProvider.saveSwagger20Definition(apiToAdd.getId(), swaggerJson);
             APIIdentifier createdApiId = apiToAdd.getId();
             //Retrieve the newly added API to send in the response payload
             API createdApi = apiProvider.getAPI(createdApiId);
@@ -391,7 +399,9 @@ public class ApisApiServiceImpl extends ApisApiService {
             }
             API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName());
             apiProvider.updateAPI(apiToUpdate);
-            apiProvider.saveSwagger20Definition(apiToUpdate.getId(), body.getApiDefinition());
+            String swaggerJson = validateSwaggerDefinition(body.getApiDefinition());
+
+            apiProvider.saveSwagger20Definition(apiToUpdate.getId(), swaggerJson);
             API updatedApi = apiProvider.getAPI(apiIdentifier);
             updatedApiDTO = APIMappingUtil.fromAPItoDTO(updatedApi);
             return Response.ok().entity(updatedApiDTO).build();
@@ -405,6 +415,38 @@ public class ApisApiServiceImpl extends ApisApiService {
             }
         } catch (FaultGatewaysException e) {
             String errorMessage = "Error while updating API : " + apiId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return null;
+    }
+
+    /**
+     * This method is used to validate and remove trailing slashes in resources
+     *
+     * @param apiDefinition
+     * @return apiDefinition with modified resources
+     */
+    private String validateSwaggerDefinition(String apiDefinition) {
+        try {
+            if (apiDefinition == null) {
+                RestApiUtil.handleBadRequest("Parameter: \"apiDefinition\" cannot be null", log);
+            }
+            Swagger swagger = new SwaggerParser().parse(apiDefinition);
+            Map<String, Path> paths = swagger.getPaths();
+            List<String> modifiableResources = new ArrayList<>();
+            for (String key : paths.keySet()) {
+                if (key.endsWith("/")) {
+                    modifiableResources.add(key);
+                }
+            }
+            for (String modifiableResource : modifiableResources) {
+                String newResource = modifiableResource.substring(0, modifiableResource.length() - 1);
+                paths.put(newResource, paths.remove(modifiableResource));
+            }
+            swagger.setPaths(paths);
+            return Json.mapper().writeValueAsString(swagger);
+        } catch (JsonProcessingException e) {
+            String errorMessage = "Error while validating the swagger definition";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
@@ -975,6 +1017,7 @@ public class ApisApiServiceImpl extends ApisApiService {
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
             //this will fail if user does not have access to the API or the API does not exist
             APIIdentifier apiIdentifier  = APIMappingUtil.getAPIIdentifierFromApiIdOrUUID(apiId, tenantDomain);
+            apiDefinition = validateSwaggerDefinition(apiDefinition);
             apiProvider.saveSwagger20Definition(apiIdentifier, apiDefinition);
             //retrieves the updated swagger definition
             String apiSwagger = apiProvider.getSwagger20Definition(apiIdentifier);
