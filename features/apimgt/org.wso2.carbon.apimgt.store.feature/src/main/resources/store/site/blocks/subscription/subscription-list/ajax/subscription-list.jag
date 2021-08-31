@@ -328,9 +328,9 @@ include("/jagg/jagg.jag");
             };
         }
         print(obj);
-    } else if(action == "getApplicationKeysByAppId") {
+    } else if (action == "getApplicationKeysByAppId") {
               if (!user) {
-                  if(!ssoEnabled){
+                  if (!ssoEnabled) {
                       print({
                           error:true,
                           message:msg.error.loginRequired(action)
