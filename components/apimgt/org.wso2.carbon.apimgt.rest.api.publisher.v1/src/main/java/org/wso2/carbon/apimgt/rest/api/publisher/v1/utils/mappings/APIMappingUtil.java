@@ -126,7 +126,7 @@ public class APIMappingUtil {
 
     private static final Log log = LogFactory.getLog(APIMappingUtil.class);
 
-    public static API fromDTOtoAPI(APIDTO dto, String provider) throws APIManagementException {
+    public static API fromDTOtoAPI(APIDTO dto, String provider, int tenantId) throws APIManagementException {
 
         String providerEmailDomainReplaced = APIUtil.replaceEmailDomain(provider);
 
@@ -218,7 +218,7 @@ public class APIMappingUtil {
         model.setScopes(scopes);
 
         //URI Templates
-        Set<URITemplate> uriTemplates = getURITemplates(model, dto.getOperations());
+        Set<URITemplate> uriTemplates = getURITemplates(model, dto.getOperations(), tenantId);
         model.setUriTemplates(uriTemplates);
 
         if (dto.getTags() != null) {
@@ -872,7 +872,10 @@ public class APIMappingUtil {
         if (!APIDTO.TypeEnum.WS.toString().equals(model.getType())) {
             List<APIOperationsDTO> apiOperationsDTO;
             String apiSwaggerDefinition = apiProvider.getOpenAPIDefinition(model.getId());
-            apiOperationsDTO = getOperationsFromAPI(model);
+            //We will fetch operations from the swagger definition and not from the AM_API_URL_MAPPING table: table
+            //entries may have API level throttling tiers listed in case API level throttling is selected for the API.
+            //This will lead the x-throttling-tiers of API definition to get overwritten. (wso2/product-apim#11240)
+            apiOperationsDTO = getOperationsFromSwaggerDef(model, apiSwaggerDefinition);
             dto.setOperations(apiOperationsDTO);
             List<ScopeDTO> scopeDTOS = getScopesFromSwagger(apiSwaggerDefinition);
             dto.setScopes(scopeDTOS);
@@ -1219,14 +1222,14 @@ public class APIMappingUtil {
      * @return URI Templates
      * @throws APIManagementException
      */
-    public static Set<URITemplate> getURITemplates(API model, List<APIOperationsDTO> operations)
+    public static Set<URITemplate> getURITemplates(API model, List<APIOperationsDTO> operations, int tenantId)
             throws APIManagementException {
 
         boolean isHttpVerbDefined = false;
         Set<URITemplate> uriTemplates = new LinkedHashSet<>();
 
         if (operations == null || operations.isEmpty()) {
-            operations = getDefaultOperationsList(model.getType());
+            operations = getDefaultOperationsList(model.getType(), tenantId);
         }
 
         for (APIOperationsDTO operation : operations) {
@@ -1687,18 +1690,29 @@ public class APIMappingUtil {
     }
 
     /**
-     * Returns a set of operations from a API
+     * Returns a set of operations from a given swagger definition
      *
      * @param api               API object
+     * @param swaggerDefinition Swagger definition
      * @return a set of operations from a given swagger definition
+     * @throws APIManagementException error while trying to retrieve URI templates of the given API
      */
-    private static List<APIOperationsDTO> getOperationsFromAPI(API api) {
-        Set<URITemplate> uriTemplates = api.getUriTemplates();
+    private static List<APIOperationsDTO> getOperationsFromSwaggerDef(API api, String swaggerDefinition)
+            throws APIManagementException {
+        APIDefinition apiDefinition = OASParserUtil.getOASParser(swaggerDefinition);
+        Set<URITemplate> uriTemplates;
+        if (APIConstants.GRAPHQL_API.equals(api.getType())) {
+            uriTemplates = api.getUriTemplates();
+        } else {
+            uriTemplates = apiDefinition.getURITemplates(swaggerDefinition);
+        }
 
         List<APIOperationsDTO> operationsDTOList = new ArrayList<>();
-        for (URITemplate uriTemplate : uriTemplates) {
-            APIOperationsDTO operationsDTO = getOperationFromURITemplate(uriTemplate);
-            operationsDTOList.add(operationsDTO);
+        if (!StringUtils.isEmpty(swaggerDefinition)) {
+            for (URITemplate uriTemplate : uriTemplates) {
+                APIOperationsDTO operationsDTO = getOperationFromURITemplate(uriTemplate);
+                operationsDTOList.add(operationsDTO);
+            }
         }
 
         return operationsDTOList;
@@ -1752,7 +1766,8 @@ public class APIMappingUtil {
      *
      * @return a default operations list
      */
-    private static List<APIOperationsDTO> getDefaultOperationsList(String apiType) {
+    private static List<APIOperationsDTO> getDefaultOperationsList(String apiType, int tenantId)
+            throws APIManagementException {
 
         List<APIOperationsDTO> operationsDTOs = new ArrayList<>();
         String[] supportedMethods = null;
@@ -1769,7 +1784,7 @@ public class APIMappingUtil {
             APIOperationsDTO operationsDTO = new APIOperationsDTO();
             operationsDTO.setTarget("/*");
             operationsDTO.setVerb(verb);
-            operationsDTO.setThrottlingPolicy(APIConstants.UNLIMITED_TIER);
+            operationsDTO.setThrottlingPolicy(APIUtil.getDefaultAPILevelPolicy(tenantId));
             operationsDTO.setAuthType(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
             operationsDTOs.add(operationsDTO);
         }

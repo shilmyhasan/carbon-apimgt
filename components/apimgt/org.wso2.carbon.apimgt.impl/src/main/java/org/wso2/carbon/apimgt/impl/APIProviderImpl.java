@@ -100,8 +100,8 @@ import org.wso2.carbon.apimgt.impl.certificatemgt.ResponseCode;
 import org.wso2.carbon.apimgt.impl.clients.RegistryCacheInvalidationClient;
 import org.wso2.carbon.apimgt.impl.clients.TierCacheInvalidationClient;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
-import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.definitions.GraphQLSchemaDefinition;
+import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.TierPermissionDTO;
@@ -127,6 +127,7 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.apimgt.impl.utils.CertificateMgtUtils;
+import org.wso2.carbon.apimgt.impl.utils.LocalEntryAdminClient;
 import org.wso2.carbon.apimgt.impl.workflow.APIStateWorkflowDTO;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowConstants;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowException;
@@ -135,7 +136,6 @@ import org.wso2.carbon.apimgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
-import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
 import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
@@ -164,7 +164,6 @@ import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-import org.wso2.carbon.apimgt.impl.utils.LocalEntryAdminClient;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -783,6 +782,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         validateApiInfo(api);
         String tenantDomain = MultitenantUtils
                 .getTenantDomain(APIUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+        validateAndUpdateURITemplates(api, tenantId);
         validateResourceThrottlingTiers(api, tenantDomain);
 
         RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
@@ -1221,6 +1221,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 throw new APIManagementException(
                         "Error in retrieving Tenant Information while updating api :" + api.getId().getApiName(), e);
             }
+            validateAndUpdateURITemplates(api, tenantId);
             validateResourceThrottlingTiers(api, tenantDomain);
 
             //get product resource mappings on API before updating the API. Update uri templates on api will remove all
@@ -1305,19 +1306,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             //If gateway(s) exist, remove resource paths saved on the cache.
 
-            if (gatewayExists && !oldApi.getUriTemplates().equals(api.getUriTemplates())) {
-                Set<URITemplate> resourceVerbs = api.getUriTemplates();
-
-
-                    if (resourceVerbs != null) {
-                            invalidateResourceCache(api.getContext(), api.getId().getVersion(),resourceVerbs);
-                            if (log.isDebugEnabled()) {
-                                log.debug("Calling invalidation cache");
-                            }
-                    }
-
+            if (gatewayExists) {
+                invalidateResourceCache(api.getContext(), api.getId().getVersion(), Collections.EMPTY_SET);
             }
-
 
             // update apiContext cache
             if (APIUtil.isAPIManagementEnabled()) {
@@ -7468,6 +7459,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
         }
+        invalidateResourceCache(product.getContext(), product.getId().getVersion(), Collections.EMPTY_SET);
 
         //todo : check whether permissions need to be updated and pass it along
         updateApiProductArtifact(product, true, true);
@@ -8118,5 +8110,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         }
         return removedReusedResources;
+    }
+
+    private void validateAndUpdateURITemplates(API api, int tenantId) throws APIManagementException {
+        if (api.getUriTemplates() != null) {
+            for (URITemplate uriTemplate : api.getUriTemplates()) {
+                if (StringUtils.isEmpty(api.getApiLevelPolicy())) {
+                    // API level policy not attached.
+                    if (StringUtils.isEmpty(uriTemplate.getThrottlingTier())) {
+                        uriTemplate.setThrottlingTier(APIUtil.getDefaultAPILevelPolicy(tenantId));
+                    }
+                } else {
+                    uriTemplate.setThrottlingTier(api.getApiLevelPolicy());
+                }
+            }
+        }
     }
 }

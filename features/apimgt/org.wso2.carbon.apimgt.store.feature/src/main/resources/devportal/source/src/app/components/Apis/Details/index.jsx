@@ -216,8 +216,8 @@ class Details extends React.Component {
                 });
             const user = AuthManager.getUser();
             if (user != null) {
-                existingSubscriptions = restApi.getSubscriptions(this.api_uuid, null);
                 const subscriptionLimit = Settings.app.subscribeApplicationLimit || 5000;
+                existingSubscriptions = restApi.getSubscriptions(this.api_uuid, null, subscriptionLimit);
                 promisedApplications = restApi.getAllApplications(null, subscriptionLimit);
 
                 Promise.all([existingSubscriptions, promisedApplications])
@@ -280,6 +280,18 @@ class Details extends React.Component {
         };
         this.setDetailsAPI = this.setDetailsAPI.bind(this);
         this.api_uuid = this.props.match.params.api_uuid;
+    }
+
+    /**
+     *
+     *
+     * @memberof Details
+     */
+    componentDidUpdate() {
+        if (this.props.match.params.api_uuid !== this.api_uuid) {
+            this.api_uuid = this.props.match.params.api_uuid;
+            this.updateSubscriptionData();
+        }
     }
 
     /**

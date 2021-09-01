@@ -41,6 +41,8 @@ import InlineMessage from 'AppComponents/Shared/InlineMessage';
 import base64url from 'base64url';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import Alert from 'AppComponents/Shared/Alert';
+import Configurations from 'Config';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const alertPropertyMap = {
     AbnormalResponseTime: 'thresholdResponseTime',
@@ -84,7 +86,7 @@ const AlertConfiguration = (props) => {
     const [alertConfiguration, setAlertConfiguration] = useState([]);
     const [apis, setApis] = useState();
     const [selectedAPIName, setSelectedAPIName] = useState();
-    const [apiNames, setAPINames] = useState(new Set());
+    const [apiNames, setAPINames] = useState();
     const [apiVersions, setAPIVersions] = useState([]);
     const [selectedAPIVersion, setSelectedAPIVersion] = useState();
     const [value, setValue] = useState(300);
@@ -93,18 +95,17 @@ const AlertConfiguration = (props) => {
 
     useEffect(() => {
         const alertConfigPromise = api.getAlertConfigurations(alertType);
-        const apisPromise = api.all();
+        const apisPromise = api.all({ limit: Configurations.app.alertMaxAPIGetLimit });
         const apiProductsPromise = api.allProducts();
         Promise.all([alertConfigPromise, apisPromise, apiProductsPromise])
             .then((response) => {
                 let apisList = response[1].body.list;
                 const productsList = response[2].body.list;
                 apisList = apisList.concat(productsList);
-                const apiNamesSet = new Set();
-                apisList.forEach((tmpApi) => {
-                    apiNamesSet.add(tmpApi.name);
+                const apiNameList = apisList.map((apiResp) => {
+                    return { label: apiResp.name };
                 });
-                setAPINames(apiNamesSet);
+                setAPINames(apiNameList);
                 setApis(apisList);
                 setAlertConfiguration(response[0].body);
             })
@@ -213,41 +214,34 @@ const AlertConfiguration = (props) => {
                 <Collapse in={collapseOpen} className={classes.configWrapper}>
                     <Grid container spacing={1}>
                         <Grid item xs>
-                            <TextField
-                                id='outlined-select-api-name'
-                                select
-                                fullWidth
-                                required
-                                label={(
-                                    <FormattedMessage
-                                        id='Apis.Settings.Alerts.AlertConfiguration.api.name.label'
-                                        defaultMessage='API Name'
-                                    />
-                                )}
+                            <Autocomplete
+                                id='combo-box-demo'
+                                options={apiNames}
+                                getOptionLabel={(option) => option.label}
                                 className={classes.textField}
                                 value={selectedAPIName}
-                                onChange={(event) => handleAPINameSelect(event.target.value)}
-                                SelectProps={{
-                                    MenuProps: {
-                                        className: classes.menu,
-                                    },
-                                }}
-                                helperText={(
-                                    <FormattedMessage
-                                        id='Apis.Settings.Alerts.AlertConfiguration.select.api.helper'
-                                        defaultMessage='Select the API Name'
+                                onChange={(event, { label }) => handleAPINameSelect(label)}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        fullWidth
+                                        required
+                                        label={(
+                                            <FormattedMessage
+                                                id='Settings.Alerts.AlertConfiguration.api.name.label'
+                                                defaultMessage='API Name'
+                                            />
+                                        )}
+                                        helperText={(
+                                            <FormattedMessage
+                                                id='Settings.Alerts.AlertConfiguration.select.api.helper'
+                                                defaultMessage='Select the API Name'
+                                            />
+                                        )}
+                                        variant='outlined'
                                     />
                                 )}
-                                variant='outlined'
-                            >
-                                {apiNames && Array.from(apiNames).map((name) => {
-                                    return (
-                                        <MenuItem key={name} value={name}>
-                                            {name}
-                                        </MenuItem>
-                                    );
-                                })}
-                            </TextField>
+                            />
                         </Grid>
                         <Grid item xs>
                             <TextField

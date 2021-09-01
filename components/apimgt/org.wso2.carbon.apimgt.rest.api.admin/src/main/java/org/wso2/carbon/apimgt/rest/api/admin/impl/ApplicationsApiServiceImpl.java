@@ -7,11 +7,13 @@ import org.wso2.carbon.apimgt.api.APIAdmin;
 import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.Application;
+import org.wso2.carbon.apimgt.api.model.Subscriber;
 import org.wso2.carbon.apimgt.impl.APIAdminImpl;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerFactory;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.admin.ApplicationsApiService;
+import org.wso2.carbon.apimgt.rest.api.admin.dto.ApplicationInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.dto.ApplicationListDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.utils.mappings.ApplicationMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
@@ -19,6 +21,7 @@ import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
+
 public class ApplicationsApiServiceImpl extends ApplicationsApiService {
 
     private static final Log log = LogFactory.getLog(ApplicationsApiServiceImpl.class);
@@ -45,11 +48,34 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
     }
 
     @Override
+    public Response applicationsApplicationIdGet(String applicationId) {
+        try {
+            String username = RestApiUtil.getLoggedInUsername();
+            APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
+            Application application = apiConsumer.getLightweightApplicationByUUID(applicationId);
+            if (application == null) {
+                RestApiUtil.handleResourceNotFoundError(
+                        "Application with UUID: " + applicationId + " not found.", log);
+                return null;
+            }
+            ApplicationInfoDTO applicationInfoDTO = ApplicationMappingUtil.fromApplicationToInfoDTO(application);
+            return Response.ok().entity(applicationInfoDTO).build();
+        } catch (APIManagementException e) {
+            RestApiUtil.handleInternalServerError("Error while retrieving application " + applicationId, e, log);
+            return null;
+        }
+    }
+
+    @Override
     public Response applicationsGet(String user, Integer limit, Integer offset, String accept, String ifNoneMatch,
-                                    String appTenantDomain) {
+                                    String appTenantDomain, String applicationName) {
 
         // To store the initial value of the user (specially if it is null or empty)
         String givenUser = user;
+
+        if (applicationName == null) {
+            applicationName = "";
+        }
 
         // if no username provided user associated with access token will be used
         if (user == null || StringUtils.isEmpty(user)) {
@@ -58,8 +84,9 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
 
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
+        int applicationCount = 0;
 
-        ApplicationListDTO applicationListDTO;
+        ApplicationListDTO applicationListDTO = null;
         try {
             Application[] allMatchedApps;
             boolean migrationMode = Boolean.getBoolean(RestApiConstants.MIGRATION_MODE);
@@ -70,17 +97,20 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
                     return Response.status(Response.Status.FORBIDDEN).entity(errorMsg).build();
                 }
                 APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(user);
-
+                APIAdmin apiAdmin = new APIAdminImpl();
+                int tenantId = APIUtil.getTenantId(user);
                 // If no user is passed, get the applications for the tenant (not only for the user)
                 if (givenUser == null || StringUtils.isEmpty(givenUser)) {
-                    APIAdmin apiAdmin = new APIAdminImpl();
-                    int tenantId = APIUtil.getTenantId(user);
-                    allMatchedApps = apiAdmin.getApplicationsByTenantIdWithPagination(tenantId, 0, limit,
-                            "", "", APIConstants.APPLICATION_NAME,
+                    allMatchedApps = apiAdmin.getApplicationsByTenantIdWithPagination(tenantId, offset, limit,
+                            "", applicationName, APIConstants.APPLICATION_NAME,
                             RestApiConstants.DEFAULT_SORT_ORDER).toArray(new Application[0]);
+                    applicationCount = apiAdmin.getApplicationsCount(tenantId, "", applicationName);
                 } else {
-                    allMatchedApps = apiConsumer.getApplicationsByOwner(user);
+                    allMatchedApps = apiConsumer.getApplicationsWithPagination(new Subscriber(user), "", offset,
+                            limit, applicationName, APIConstants.APPLICATION_NAME, RestApiConstants.DEFAULT_SORT_ORDER);
+                    applicationCount = apiAdmin.getApplicationsCount(tenantId, user, applicationName);
                 }
+                applicationListDTO = ApplicationMappingUtil.fromApplicationsToDTO(allMatchedApps);
             } else { // flow at migration process
                 if (StringUtils.isEmpty(appTenantDomain)) {
                     appTenantDomain = MultitenantUtils.getTenantDomain(user);
@@ -88,11 +118,12 @@ public class ApplicationsApiServiceImpl extends ApplicationsApiService {
                 RestApiUtil.handleMigrationSpecificPermissionViolations(appTenantDomain, RestApiUtil.getLoggedInUsername());
                 APIAdmin apiAdmin = new APIAdminImpl();
                 allMatchedApps = apiAdmin.getAllApplicationsOfTenantForMigration(appTenantDomain);
+                applicationCount = allMatchedApps.length;
+                //allMatchedApps are already sorted to application name
+                applicationListDTO = ApplicationMappingUtil.fromApplicationsToDTOWithPagination(allMatchedApps,
+                        limit, offset);
             }
-            //allMatchedApps are already sorted to application name
-            applicationListDTO = ApplicationMappingUtil.fromApplicationsToDTO(allMatchedApps, limit, offset);
-            ApplicationMappingUtil.setPaginationParams(applicationListDTO, limit, offset,
-                    allMatchedApps.length);
+            ApplicationMappingUtil.setPaginationParams(applicationListDTO, limit, offset, applicationCount);
 
             return Response.ok().entity(applicationListDTO).build();
         } catch (APIManagementException e) {

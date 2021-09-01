@@ -120,7 +120,11 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
 
                 subscriptionListDTO = SubscriptionMappingUtil
                         .fromSubscriptionListToDTO(subscribedAPIList, limit, offset);
-                
+
+                //to retrieve pagination parameter
+                SubscriptionMappingUtil.setPaginationParams(subscriptionListDTO, apiId, null, "", limit,
+                        offset, subscribedAPIList.size());
+
                 return Response.ok().entity(subscriptionListDTO).build();
             } else if (!StringUtils.isEmpty(applicationId)) {
                 Application application = apiConsumer.getApplicationByUUID(applicationId);
@@ -140,6 +144,11 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
                 
                 subscriptionListDTO = SubscriptionMappingUtil.fromSubscriptionListToDTO(subscribedAPIList, limit,
                         offset);
+
+                //to retrieve pagination parameter
+                SubscriptionMappingUtil.setPaginationParams(subscriptionListDTO, null, applicationId, groupId,
+                        limit, offset, subscribedAPIList.size());
+
                 return Response.ok().entity(subscriptionListDTO).build();
 
             } else {

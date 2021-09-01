@@ -28,14 +28,18 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.api.dto.ConditionGroupDTO;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
+import org.wso2.carbon.apimgt.gateway.handlers.security.APIKeyValidator;
+import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
+import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
+import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityUtils;
+import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationContext;
+import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationResponse;
+import org.wso2.carbon.apimgt.gateway.handlers.security.Authenticator;
 import org.wso2.carbon.apimgt.gateway.handlers.security.jwt.JWTValidator;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
-import org.wso2.carbon.apimgt.gateway.handlers.security.*;
 import org.wso2.carbon.apimgt.gateway.utils.OpenAPIUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
@@ -52,10 +56,10 @@ import org.wso2.carbon.metrics.manager.Timer;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.HashMap;
 
 /**
  * An API consumer authenticator which authenticates user requests using
@@ -299,7 +303,7 @@ public class OAuthAuthenticator implements Authenticator {
             String clientIP = null;
             org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) synCtx).
                     getAxis2MessageContext();
-            TreeMap<String, String> transportHeaderMap = (TreeMap<String, String>)
+            Map<String, String> transportHeaderMap = (Map<String, String>)
                                                          axis2MessageContext.getProperty
                                                                  (org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
@@ -415,7 +419,11 @@ public class OAuthAuthenticator implements Authenticator {
             authContext.setApplicationTier(info.getApplicationTier());
             authContext.setSubscriber(info.getSubscriber());
             authContext.setConsumerKey(info.getConsumerKey());
-            authContext.setApiTier(info.getApiTier());
+            if (StringUtils.isNotEmpty(apiLevelPolicy)) {
+                authContext.setApiTier(apiLevelPolicy);
+            } else {
+                authContext.setApiTier(info.getApiTier());
+            }
             authContext.setThrottlingDataList(info.getThrottlingDataList());
             authContext.setSubscriberTenantDomain(info.getSubscriberTenantDomain());
             authContext.setSpikeArrestLimit(info.getSpikeArrestLimit());

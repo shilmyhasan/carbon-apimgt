@@ -843,7 +843,7 @@ public class ApiMgtDAO {
         try {
             conn = APIMgtDBUtil.getConnection();
             conn.setAutoCommit(false);
-            
+
             Identifier identifier;
 
             //Query to check if this subscription already exists
@@ -945,7 +945,7 @@ public class ApiMgtDAO {
         }
         return subscriptionId;
     }
-    
+
     /**
      * Removes the subscription entry from AM_SUBSCRIPTIONS for identifier.
      *
@@ -1210,7 +1210,7 @@ public class ApiMgtDAO {
 
                 int applicationId = resultSet.getInt("APPLICATION_ID");
                 Application application = getApplicationById(applicationId);
-                
+
                 if (APIConstants.API_PRODUCT.equals(resultSet.getString("API_TYPE"))) {
                     APIProductIdentifier apiProductIdentifier = new APIProductIdentifier(
                             APIUtil.replaceEmailDomain(resultSet.getString("API_PROVIDER")),
@@ -1223,7 +1223,7 @@ public class ApiMgtDAO {
                             resultSet.getString("API_NAME"), resultSet.getString("API_VERSION"));
                     subscribedAPI = new SubscribedAPI(application.getSubscriber(), apiIdentifier);
                 }
-                
+
                 subscribedAPI.setUUID(resultSet.getString("UUID"));
                 subscribedAPI.setSubscriptionId(resultSet.getInt("SUBSCRIPTION_ID"));
                 subscribedAPI.setSubStatus(resultSet.getString("SUB_STATUS"));
@@ -4458,6 +4458,68 @@ public class ApiMgtDAO {
         return false;
     }
 
+    public boolean isApplicationGroupCombinationExists(String appName, String username, String groupId) throws APIManagementException {
+        if (username == null) {
+            return false;
+        }
+
+        Subscriber subscriber = getSubscriber(username);
+
+        int appId = 0;
+
+        String sqlQuery = SQLConstants.GET_APPLICATION_ID_PREFIX;
+        String whereClauseWithGroupId = " AND APP.GROUP_ID = ?";
+        String whereClauseWithMultiGroupId = " AND (APP.APPLICATION_ID IN (SELECT APPLICATION_ID  FROM " +
+                "AM_APPLICATION_GROUP_MAPPING WHERE GROUP_ID IN ($params) AND TENANT = ?))";
+
+        try(Connection connection = APIMgtDBUtil.getConnection();) {
+            if (!StringUtils.isEmpty(groupId)) {
+                if (multiGroupAppSharingEnabled) {
+                    sqlQuery += whereClauseWithMultiGroupId;
+                    String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
+                    String[] grpIdArray = groupId.split(",");
+                    int noOfParams = grpIdArray.length;
+                    try (PreparedStatement preparedStatement = fillQueryParams(connection, sqlQuery, grpIdArray, 2);){
+                        preparedStatement.setString(1, appName);
+                        int paramIndex = noOfParams + 1;
+                        preparedStatement.setString(++paramIndex, tenantDomain);
+
+                        try (ResultSet resultSet = preparedStatement.executeQuery();) {
+                            if (resultSet.next()) {
+                                appId = resultSet.getInt("APPLICATION_ID");
+                            }
+
+                            if (appId > 0) {
+                                return true;
+                            }
+                        }
+                    }
+                } else {
+                    sqlQuery += whereClauseWithGroupId;
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery);) {
+                        preparedStatement.setString(1, appName);
+                        preparedStatement.setString(2, groupId);
+
+                        try (ResultSet resultSet = preparedStatement.executeQuery();) {
+                            if (resultSet.next()) {
+                                appId = resultSet.getInt("APPLICATION_ID");
+                            }
+
+                            if (appId > 0) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            handleException("Error while getting the id  of " + appName + " from the persistence store.", e);
+        }
+        return false;
+
+    }
+
     /**
      * Check whether the new user has an application
      *
@@ -4539,31 +4601,6 @@ public class ApiMgtDAO {
         }
         return appId;
     }
-
-    public String getApplicationUUID(String appName, String username) throws APIManagementException {
-        if (username == null) {
-            return null;
-        }
-        Subscriber subscriber = getSubscriber(username);
-        String applicationUUID = null;
-
-        String sql = "SELECT UUID FROM AM_APPLICATION WHERE NAME = ? AND SUBSCRIBER_ID  = ?";
-
-        try (Connection connection = APIMgtDBUtil.getConnection();
-             PreparedStatement prepStmt = connection.prepareStatement(sql)) {
-            prepStmt.setString(1, appName);
-            prepStmt.setInt(2, subscriber.getId());
-            try (ResultSet rs = prepStmt.executeQuery()) {
-                if (rs.next()) {
-                    applicationUUID = rs.getString("UUID");
-                }
-            }
-        } catch (SQLException e) {
-            handleException("Error when getting the application id from" + " the persistence store.", e);
-        }
-        return applicationUUID;
-    }
-
 
     /**
      * Find the name of the application by Id
@@ -4821,7 +4858,7 @@ public class ApiMgtDAO {
             } else {
                 sqlQuery = sqlQuery.replace("$3", sortColumn);
             }
-            
+
             if (groupingId != null && !"null".equals(groupingId) && !groupingId.isEmpty()) {
                 if (multiGroupAppSharingEnabled) {
                     String tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
@@ -5042,8 +5079,8 @@ public class ApiMgtDAO {
     /**
      * Returns applications within a tenant domain with pagination
      * @param tenantId   The tenantId.
-     * @param start      The start index.
-     * @param offset     The offset.
+     * @param offset     The start index.
+     * @param limit      The limit for the count.
      * @param searchOwner     The search string.
      * @param searchApplication     The search string.
      * @param sortOrder  The sort order.
@@ -5051,7 +5088,7 @@ public class ApiMgtDAO {
      * @return Application[] The array of applications.
      * @throws APIManagementException
      */
-    public List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int start, int offset,
+    public List<Application> getApplicationsByTenantIdWithPagination(int tenantId, int offset, int limit,
                                                                      String searchOwner, String searchApplication,
                                                                      String sortColumn, String sortOrder)
             throws APIManagementException {
@@ -5064,16 +5101,31 @@ public class ApiMgtDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
             if (connection.getMetaData().getDriverName().contains("Oracle")) {
-                offset = start + offset;
+                offset = offset + limit;
             }
             sqlQuery = sqlQuery.replace("$1", sortColumn);
             sqlQuery = sqlQuery.replace("$2", sortOrder);
             prepStmt = connection.prepareStatement(sqlQuery);
             prepStmt.setInt(1, tenantId);
-            prepStmt.setString(2, "%" + searchOwner + "%");
-            prepStmt.setString(3, "%" + searchApplication + "%");
-            prepStmt.setInt(4, start);
-            prepStmt.setInt(5, offset);
+            boolean ownerEmpty = true;
+            boolean appEmpty = true;
+
+            if (StringUtils.isNotEmpty(searchOwner)) {
+                searchOwner = "%" + searchOwner + "%";
+                ownerEmpty = false;
+            }
+            if (StringUtils.isNotEmpty(searchApplication)) {
+                searchApplication = "%" + searchApplication + "%";
+                appEmpty = false;
+            }
+            if (ownerEmpty && appEmpty) {
+                searchOwner = "%%";
+                searchApplication = "%%";
+            }
+            prepStmt.setString(2, searchOwner);
+            prepStmt.setString(3, searchApplication);
+            prepStmt.setInt(4, offset);
+            prepStmt.setInt(5, limit);
             rs = prepStmt.executeQuery();
             Application application;
             while (rs.next()) {
@@ -5110,8 +5162,23 @@ public class ApiMgtDAO {
             sqlQuery = SQLConstants.GET_APPLICATIONS_COUNT;
             prepStmt = connection.prepareStatement(sqlQuery);
             prepStmt.setInt(1, tenantId);
-            prepStmt.setString(2, "%" + searchOwner + "%");
-            prepStmt.setString(3, "%" + searchApplication + "%");
+            boolean ownerEmpty = true;
+            boolean appEmpty = true;
+
+            if (StringUtils.isNotEmpty(searchOwner)) {
+                searchOwner = "%" + searchOwner + "%";
+                ownerEmpty = false;
+            }
+            if (StringUtils.isNotEmpty(searchApplication)) {
+                searchApplication = "%" + searchApplication + "%";
+                appEmpty = false;
+            }
+            if (ownerEmpty && appEmpty) {
+                searchOwner = "%%";
+                searchApplication = "%%";
+            }
+            prepStmt.setString(2, searchOwner);
+            prepStmt.setString(3, searchApplication);
             resultSet = prepStmt.executeQuery();
             int applicationCount = 0;
             if (resultSet != null) {
@@ -6374,15 +6441,7 @@ public class ApiMgtDAO {
                 prepStmt.setString(2, uriTemplate.getHTTPVerb());
                 prepStmt.setString(3, uriTemplate.getAuthType());
                 prepStmt.setString(4, uriTemplate.getUriTemplate());
-                //If API policy is available then set it for all the resources.
-                if (StringUtils.isEmpty(api.getApiLevelPolicy())) {
-                    prepStmt.setString(5, (StringUtils.isEmpty(uriTemplate.getThrottlingTier())) ?
-                            APIConstants.UNLIMITED_TIER :
-                            uriTemplate.getThrottlingTier());
-                } else {
-                    prepStmt.setString(5,
-                            (StringUtils.isEmpty(api.getApiLevelPolicy())) ? APIConstants.UNLIMITED_TIER : api.getApiLevelPolicy());
-                }
+                prepStmt.setString(5, uriTemplate.getThrottlingTier());
                 InputStream is;
                 if (uriTemplate.getMediationScript() != null) {
                     is = new ByteArrayInputStream(uriTemplate.getMediationScript().getBytes(Charset.defaultCharset()));
@@ -7400,9 +7459,9 @@ public class ApiMgtDAO {
         }
         return id;
     }
-    
+
     /**
-     * Get product Id from the product name and the provider. 
+     * Get product Id from the product name and the provider.
      * @param product product identifier
      * @throws APIManagementException exception
      */
@@ -8434,7 +8493,7 @@ public class ApiMgtDAO {
             } else if (identifier instanceof APIProductIdentifier) {
                 id = ((APIProductIdentifier) identifier).getProductId();
             }
-            
+
             conn = APIMgtDBUtil.getConnection();
             if (conn.getMetaData().getDriverName().contains("PostgreSQL")) {
                 sqlQuery = postgreSQL;
@@ -9795,7 +9854,7 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(ps, null, null);
         }
     }
-    
+
     /**
      * Check the given api name is already available in the api table under given tenant domain
      *
@@ -12706,7 +12765,7 @@ public class ApiMgtDAO {
                     String apiContext = conditionsArray[0];
                     String applicationIdentifier = conditionsArray[2];
 
-                    String[] app = applicationIdentifier.split("-");
+                    String[] app = applicationIdentifier.split("-", 2);
                     String appOwner = app[0];
                     String appName = app[1];
 
@@ -14254,7 +14313,7 @@ public class ApiMgtDAO {
         }
         return application;
     }
-    
+
     /**
      * Retrieve URI Templates for the given API
      * @param api API
@@ -14279,22 +14338,22 @@ public class ApiMgtDAO {
                 URITemplate template = new URITemplate();
                 String urlPattern = rs.getString("URL_PATTERN");
                 String httpMethod = rs.getString("HTTP_METHOD");
-                
+
                 template.setHTTPVerb(httpMethod);
                 template.setResourceURI(urlPattern);
                 template.setId(rs.getInt("URL_MAPPING_ID"));
 
                 //TODO populate others if needed
-                
+
                 templatesMap.put(httpMethod + ":" + urlPattern, template);
             }
-           
+
         } catch (SQLException e) {
             handleException("Error while obtaining details of the URI Template for api " + api.getId() , e);
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
         }
-        
+
         return templatesMap;
     }
 
@@ -14339,7 +14398,7 @@ public class ApiMgtDAO {
         int productId = 0;
         int scopeId = 0;
         try {
-            connection = APIMgtDBUtil.getConnection();   
+            connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             String queryAddAPIProduct = SQLConstants.ADD_API_PRODUCT;
             prepStmtAddAPIProduct = connection.prepareStatement(queryAddAPIProduct, new String[]{"api_id"});
@@ -14533,7 +14592,7 @@ public class ApiMgtDAO {
         }
         return productId;
     }
-    
+
     public void updateAPIProduct(APIProduct product, String username) throws APIManagementException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -15010,7 +15069,7 @@ public class ApiMgtDAO {
         }
         return userID;
     }
-    
+
     /**
      * Get names of the tiers which has bandwidth as the quota type
      * @param tenantId id of the tenant

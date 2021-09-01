@@ -168,6 +168,9 @@ public final class RestApiConstants {
             RESOURCE_PATH_APPLICATIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId="
                     + GROUPID_PARAM;
 
+    public static final String ADMIN_APPLICATIONS_GET_PAGINATION_URL =
+            RESOURCE_PATH_APPLICATIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM;
+
     public static final String APPLICATIONS_GET_PAGINATION_URL_WITH_SORTBY_SORTORDER  =
             RESOURCE_PATH_APPLICATIONS + "?sortBy=" + SORTBY_PARAM + "&sortOrder=" + SORTORDER_PARAM +
                     "&limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId=" + GROUPID_PARAM;

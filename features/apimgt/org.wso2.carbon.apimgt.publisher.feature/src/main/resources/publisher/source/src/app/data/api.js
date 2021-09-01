@@ -19,6 +19,7 @@ import APIClientFactory from './APIClientFactory';
 import Utils from './Utils';
 import Resource from './Resource';
 import cloneDeep from 'lodash.clonedeep';
+import Configurations from 'Config';
 
 /**
  * An abstract representation of an API
@@ -1787,15 +1788,17 @@ class API extends Resource {
      * Get the available policies information by tier level.
      * @param {String} policyLevel List API or Application or Resource type policies.parameter should be one
      * of api, application, subscription and resource
+     * @param limit {Int}
      * @returns {Promise}
      *
      */
-    static policies(policyLevel) {
+    static policies(policyLevel, limit) {
         const apiClient = new APIClientFactory().getAPIClient(Utils.getCurrentEnvironment()).client;
         return apiClient.then(client => {
             return client.apis['Throttling Policies'].getAllThrottlingPolicies(
                 {
                     policyLevel: policyLevel,
+                    limit,
                 },
                 this._requestMetaData(),
             );
@@ -1952,10 +1955,12 @@ class API extends Resource {
      */
     static getMediationPolicies(apiId) {
         const restApiClient = new APIClientFactory().getAPIClient(Utils.getCurrentEnvironment()).client;
+        const limit = Configurations.app.mediationPolicyCount;
         return restApiClient.then(client => {
             return client.apis['API Mediation Policies'].apisApiIdMediationPoliciesGet(
                 {
                     apiId: apiId,
+                    limit: limit,
                 },
                 this._requestMetaData(),
             );
@@ -2076,8 +2081,9 @@ class API extends Resource {
      */
     static getGlobalMediationPolicies() {
         const restApiClient = new APIClientFactory().getAPIClient(Utils.getCurrentEnvironment()).client;
+        const limit = Configurations.app.mediationPolicyCount;
         return restApiClient.then(client => {
-            return client.apis['Global Mediation Policies'].getAllGlobalMediationPolicies({}, this._requestMetaData());
+            return client.apis['Global Mediation Policies'].getAllGlobalMediationPolicies( {limit}, this._requestMetaData());
         });
     }
 

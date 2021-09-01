@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.keymgt.handlers;
 import org.wso2.carbon.apimgt.keymgt.ScopesIssuer;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
+import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.model.RequestParameter;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
@@ -48,6 +49,10 @@ public class ExtendedClientCredentialsGrantHandler extends ClientCredentialsGran
             if (VALIDITY_PERIOD.equals(parameter.getKey()) 
                     && parameter.getValue() != null && parameter.getValue().length > 0) {
                 validityPeriod = Long.parseLong(parameter.getValue()[0]);
+                if (validityPeriod == OAuthConstants.UNASSIGNED_VALIDITY_PERIOD) {
+                    // Setting a different -ve value if the set value is -1 (-1 will be ignored by TokenValidator)
+                    validityPeriod = ResourceConstants.DEFAULT_UNLIMITED_VALIDITY_PERIOD;
+                }
                 //set validity time
                 tokReqMsgCtx.setValidityPeriod(validityPeriod);
             }

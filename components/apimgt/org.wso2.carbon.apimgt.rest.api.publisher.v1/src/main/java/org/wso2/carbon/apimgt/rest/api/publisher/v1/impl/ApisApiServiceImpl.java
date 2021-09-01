@@ -315,6 +315,8 @@ public class ApisApiServiceImpl implements ApisApiService {
     private API prepareToCreateAPIByDTO(APIDTO body) throws APIManagementException {
         APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
         String username = RestApiUtil.getLoggedInUsername();
+        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
         List<String> apiSecuritySchemes = body.getSecurityScheme();//todo check list vs string
         String context = body.getContext();
         //Make sure context starts with "/". ex: /pizza
@@ -433,7 +435,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                     "Specified policy " + body.getApiThrottlingPolicy() + " is invalid", log);
         }
 
-        API apiToAdd = APIMappingUtil.fromDTOtoAPI(body, provider);
+        API apiToAdd = APIMappingUtil.fromDTOtoAPI(body, provider, tenantId);
         //Overriding some properties:
         //only allow CREATED as the stating state for the new api if not status is PROTOTYPED
         if (!APIConstants.PROTOTYPED.equals(apiToAdd.getStatus())) {
@@ -508,12 +510,13 @@ public class ApisApiServiceImpl implements ApisApiService {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
             APIIdentifier apiIdentifier = APIMappingUtil.getAPIIdentifierFromUUID(apiId,
                     tenantDomain);
 
             API originalAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
             List<APIOperationsDTO> operationArray = extractGraphQLOperationList(schemaDefinition);
-            Set<URITemplate> uriTemplates = APIMappingUtil.getURITemplates(originalAPI, operationArray);
+            Set<URITemplate> uriTemplates = APIMappingUtil.getURITemplates(originalAPI, operationArray, tenantId);
             originalAPI.setUriTemplates(uriTemplates);
 
             apiProvider.saveGraphqlSchemaDefinition(originalAPI, schemaDefinition);
@@ -551,6 +554,7 @@ public class ApisApiServiceImpl implements ApisApiService {
         try {
             String username = RestApiUtil.getLoggedInUsername();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
             APIProvider apiProvider = RestApiUtil.getProvider(username);
             API originalAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
             APIIdentifier apiIdentifier = originalAPI.getId();
@@ -613,6 +617,18 @@ public class ApisApiServiceImpl implements ApisApiService {
             }
             //validation for tiers
             List<String> tiersFromDTO = body.getPolicies();
+            //check whether there are subscriptions of the removed policies
+            List<SubscribedAPI> apiUsages = apiProvider.getAPIUsageByAPIId(apiIdentifier);
+            for (SubscribedAPI subscription : apiUsages) {
+                String tierName = subscription.getTier().getName();
+                if (!tiersFromDTO.contains(tierName)) {
+                    if (APIConstants.UNLIMITED_TIER.equalsIgnoreCase(tierName) && !APIUtil.isEnabledUnlimitedTier()) {
+                        continue;
+                    }
+                    RestApiUtil.handleBadRequest("Subscriptions are available under " + tierName + " tier. " +
+                            "Please unsubscribe before removing the tier.", log);
+                }
+            }
             String originalStatus = originalAPI.getStatus();
             if (apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) ||
                     apiSecurity.contains(APIConstants.API_SECURITY_API_KEY)) {
@@ -655,7 +671,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             if (!isWSAPI && (body.getOperations() == null || body.getOperations().isEmpty())) {
                 RestApiUtil.handleBadRequest(ExceptionCodes.NO_RESOURCES_FOUND, log);
             }
-            API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName());
+            API apiToUpdate = APIMappingUtil.fromDTOtoAPI(body, apiIdentifier.getProviderName(), tenantId);
             if (APIConstants.PUBLIC_STORE_VISIBILITY.equals(apiToUpdate.getVisibility())) {
                 apiToUpdate.setVisibleRoles(StringUtils.EMPTY);
             }
@@ -1563,7 +1579,13 @@ public class ApisApiServiceImpl implements ApisApiService {
                 if (!documentation.getSourceType().equals(Documentation.DocumentSourceType.FILE)) {
                     RestApiUtil.handleBadRequest("Source type of document " + documentId + " is not FILE", log);
                 }
-                RestApiPublisherUtils.attachFileToDocument(apiId, documentation, inputStream, fileDetail);
+                String filename = fileDetail.getContentDisposition().getFilename();
+                if (filename.endsWith(".pdf") || filename.endsWith(".txt") || filename.endsWith(".doc")
+                        || filename.endsWith(".docx")) {
+                    RestApiPublisherUtils.attachFileToDocument(apiId, documentation, inputStream, fileDetail);
+                } else {
+                    RestApiUtil.handleBadRequest("Unsupported extension type of document file: " + filename, log);
+                }
             } else if (inlineContent != null) {
                 if (!documentation.getSourceType().equals(Documentation.DocumentSourceType.INLINE) &&
                         !documentation.getSourceType().equals(Documentation.DocumentSourceType.MARKDOWN)) {
@@ -2880,6 +2902,9 @@ public class ApisApiServiceImpl implements ApisApiService {
         APIDefinition oasParser = response.getParser();
         String apiDefinition = response.getJsonContent();
         apiDefinition = OASParserUtil.preProcess(apiDefinition);
+        if (existingAPI.getType().equals(APIConstants.API_TYPE_SOAPTOREST)) {
+            SequenceGenerator.generateSequencesFromSwagger(apiDefinition, existingAPI.getId());
+        }
         Set<URITemplate> uriTemplates = null;
         try {
             uriTemplates = oasParser.getURITemplates(apiDefinition);
@@ -2917,6 +2942,7 @@ public class ApisApiServiceImpl implements ApisApiService {
         validateScopes(existingAPI);
 
         //Update API is called to update URITemplates and scopes of the API
+        apiProvider.updateAPI(existingAPI);
         SwaggerData swaggerData = new SwaggerData(existingAPI);
         String updatedApiDefinition = oasParser.populateCustomManagementInfo(apiDefinition, swaggerData);
         apiProvider.saveSwagger20Definition(existingAPI.getId(), updatedApiDefinition);
@@ -3321,8 +3347,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             String filename = fileDetail.getContentDisposition().getFilename();
             try {
                 if (filename.endsWith(".zip")) {
-                    validationResponse =
-                            APIMWSDLReader.extractAndValidateWSDLArchive(fileInputStream);
+                    validationResponse = APIMWSDLReader.extractAndValidateWSDLArchive(fileInputStream);
                 } else if (filename.endsWith(".wsdl")) {
                     validationResponse = APIMWSDLReader.validateWSDLFile(fileInputStream);
                 } else {
@@ -3382,14 +3407,15 @@ public class ApisApiServiceImpl implements ApisApiService {
             apiToAdd.setWsdlUrl(url);
             API createdApi = null;
             if (isSoapAPI) {
-                createdApi = importSOAPAPI(fileInputStream, fileDetail, url, apiToAdd);
+                createdApi = importSOAPAPI(validationResponse.getWsdlProcessor().getWSDL(), fileDetail, url, apiToAdd);
             } else if (isSoapToRestConvertedAPI) {
                 String wsdlArchiveExtractedPath = null;
                 if (validationResponse.getWsdlArchiveInfo() != null) {
                     wsdlArchiveExtractedPath = validationResponse.getWsdlArchiveInfo().getLocation()
                             + File.separator + APIConstants.API_WSDL_EXTRACTED_DIRECTORY;
                 }
-                createdApi = importSOAPToRESTAPI(fileInputStream, fileDetail, url, wsdlArchiveExtractedPath, apiToAdd);
+                createdApi = importSOAPToRESTAPI(validationResponse.getWsdlProcessor().getWSDL(), fileDetail, url,
+                        wsdlArchiveExtractedPath, apiToAdd);
             } else {
                 RestApiUtil.handleBadRequest("Invalid implementationType parameter", log);
             }
@@ -3514,7 +3540,7 @@ public class ApisApiServiceImpl implements ApisApiService {
      * @return API added api
      */
     private API importSOAPToRESTAPI(InputStream fileInputStream, Attachment fileDetail, String url,
-            String wsdlArchiveExtractedPath, API apiToAdd) throws APIManagementException {
+                                    String wsdlArchiveExtractedPath, API apiToAdd) throws APIManagementException {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             //adding the api
@@ -3529,11 +3555,10 @@ public class ApisApiServiceImpl implements ApisApiService {
             } else if (fileInputStream != null) {
                 String filename = fileDetail.getContentDisposition().getFilename();
                 if (filename.endsWith(".zip")) {
-                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
+                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath);
                 } else if (filename.endsWith(".wsdl")) {
-                    wsdlArchiveExtractedPath = wsdlArchiveExtractedPath.substring(0,
-                            wsdlArchiveExtractedPath.lastIndexOf('/'));
-                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlArchiveExtractedPath, url);
+                    byte[] wsdlContent = APIUtil.toByteArray(fileInputStream);
+                    swaggerStr = SOAPOperationBindingUtils.getSoapOperationMapping(wsdlContent);
                 } else {
                     throw new APIManagementException(ExceptionCodes.UNSUPPORTED_WSDL_FILE_EXTENSION);
                 }
@@ -3541,7 +3566,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             String updatedSwagger = updateSwagger(createdApi.getUUID(), swaggerStr);
             SequenceGenerator.generateSequencesFromSwagger(updatedSwagger, apiToAdd.getId());
             return createdApi;
-        } catch (FaultGatewaysException  e) {
+        } catch (FaultGatewaysException | IOException e) {
             throw new APIManagementException("Error while importing WSDL to create a SOAP-to-REST API", e);
         }
     }
@@ -3595,7 +3620,7 @@ public class ApisApiServiceImpl implements ApisApiService {
     public Response updateWSDLOfAPI(String apiId, InputStream fileInputStream, Attachment fileDetail, String url,
            String ifMatch, MessageContext messageContext) throws APIManagementException {
 
-        validateWSDLAndReset(fileInputStream, fileDetail, url);
+        WSDLValidationResponse validationResponse = validateWSDLAndReset(fileInputStream, fileDetail, url);
         APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
         String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         API api = apiProvider.getAPIbyUUID(apiId, tenantDomain);
@@ -3607,9 +3632,11 @@ public class ApisApiServiceImpl implements ApisApiService {
             ResourceFile wsdlResource;
             if (APIConstants.APPLICATION_ZIP.equals(fileDetail.getContentType().toString()) ||
                     APIConstants.APPLICATION_X_ZIP_COMPRESSED.equals(fileDetail.getContentType().toString())) {
-                wsdlResource = new ResourceFile(fileInputStream, APIConstants.APPLICATION_ZIP);
+                wsdlResource = new ResourceFile(validationResponse.getWsdlProcessor().getWSDL(),
+                        APIConstants.APPLICATION_ZIP);
             } else {
-                wsdlResource = new ResourceFile(fileInputStream, fileDetail.getContentType().toString());
+                wsdlResource = new ResourceFile(validationResponse.getWsdlProcessor().getWSDL(),
+                        fileDetail.getContentType().toString());
             }
             api.setWsdlResource(wsdlResource);
             api.setWsdlUrl(null);
@@ -3682,9 +3709,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
             API api = apiProvider.getAPIbyUUID(apiId, tenantDomain);
             APIIdentifier apiIdentifier = api.getId();
-            if (defaultVersion) {
-                api.setAsDefaultVersion(true);
-            }
+            api.setAsDefaultVersion(defaultVersion);
             //creates the new version
             apiProvider.createNewAPIVersion(api, newVersion);
 

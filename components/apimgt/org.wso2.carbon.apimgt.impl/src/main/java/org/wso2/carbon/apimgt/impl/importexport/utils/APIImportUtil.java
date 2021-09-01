@@ -414,6 +414,7 @@ public final class APIImportUtil {
                     //Load required properties from swagger to the API
                     APIDefinition apiDefinition = OASParserUtil.getOASParser(swaggerContent);
                     Set<URITemplate> uriTemplates = apiDefinition.getURITemplates(swaggerContent);
+                    String defaultAPILevelPolicy = APIUtil.getDefaultAPILevelPolicy(tenantId);
                     for (URITemplate uriTemplate : uriTemplates) {
                         Scope scope = uriTemplate.getScope();
                         if (scope != null && !(APIUtil.isWhiteListedScope(scope.getKey()))
@@ -422,6 +423,9 @@ public final class APIImportUtil {
                                     "Error in adding API. Scope " + scope.getKey() + " is already assigned by another API.";
                             log.error(errorMessage);
                             throw new APIImportExportException(errorMessage);
+                        }
+                        if (StringUtils.isEmpty(uriTemplate.getThrottlingTier())) {
+                            uriTemplate.setThrottlingTier(defaultAPILevelPolicy);
                         }
                     }
                     importedApi.setUriTemplates(uriTemplates);

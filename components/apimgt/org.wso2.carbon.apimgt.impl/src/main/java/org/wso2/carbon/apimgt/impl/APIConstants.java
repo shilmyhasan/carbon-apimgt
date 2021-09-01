@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.apimgt.impl;
 
+import com.google.common.collect.FluentIterable;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -124,6 +126,9 @@ public final class APIConstants {
     public static final String ANALYTICS_ROLE = "Internal/analytics";
 
     public static final String API_TENANT_CONF_IS_UNLIMITED_TIER_PAID = "IsUnlimitedTierPaid";
+    public static final String API_TENANT_CONF_DEFAULT_API_TIER = "DefaultAPILevelTier";
+    public static final String API_TENANT_CONF_DEFAULT_APPLICATION_TIER = "DefaultApplicationLevelTier";
+    public static final String API_TENANT_CONF_DEFAULT_SUBSCRIPTION_TIER = "DefaultSubscriptionLevelTier";
 
     public static final String API_TENANT_CONF_EXPOSE_ENDPOINT_PASSWORD = "ExposeEndpointPassword";
 
@@ -537,7 +542,9 @@ public final class APIConstants {
     public static final String CACHE_INVALIDATION_TYPE = "type";
     public static final String GATEWAY_JWKS_CACHE = "JWKS_CACHE";
     public static final String BLOCKING_CONDITION_ID = "id";
-
+    public static final String BEGIN_CERTIFICATE_STRING = "-----BEGIN CERTIFICATE-----\n";
+    public static final String BEGIN_CERTIFICATE_STRING_SPACE = "-----BEGIN CERTIFICATE----- ";
+    public static final String END_CERTIFICATE_STRING = "-----END CERTIFICATE-----";
     public static class TokenStatus {
         public static final String ACTIVE = "ACTIVE";
         public static final String BLOCKED = "BLOCKED";
@@ -1299,11 +1306,15 @@ public final class APIConstants {
     public static final String SWAGGER_SECURITY_DEFINITIONS = "securityDefinitions";
     public static final String SWAGGER_APIM_DEFAULT_SECURITY = "default";
     public static final String SWAGGER_APIM_RESTAPI_SECURITY = "OAuth2Security";
+    public static final String SWAGGER_SECURITY_SCHEMA_KEY = "default";
+    public static final String SWAGGER_DEFAULT_AUTHORIZATION_URL = "https://test.com";
     public static final String OPEN_API_V3 = "3.0.x";
     public static final String OPEN_API = "openapi";
     public static final String OPEN_API_VERSION_REGEX = "3\\.0\\.\\d{1,}";
     public static final String SWAGGER_IS_MISSING_MSG = "swagger is missing";
     public static final String OPENAPI_IS_MISSING_MSG = "openapi is missing";
+    public static final String OPENAPI_SECURITY_SCHEMA_KEY = "default";
+    public static final String OPENAPI_DEFAULT_AUTHORIZATION_URL = "https://test.com";
     public static final String SWAGGER_X_SCOPES_BINDINGS = "x-scopes-bindings";
 
     //swagger v1.2 constants
@@ -1623,6 +1634,7 @@ public final class APIConstants {
         public static final String EVALUATED_CONDITIONS = "evaluatedConditions";
         public static final String TRUE = "true";
         public static final String ADD = "add";
+        public static final String ENABLE_IMMEDIATE_SUBSCRIPTION_POLICY_UPDATE = "EnableImmediateSubscriptionUpdate";
     }
 
     /**

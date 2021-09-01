@@ -527,7 +527,8 @@ public class RoleBasedScopesIssuerTestCase {
         ArrayList<String> whiteListedScopes = new ArrayList<String>();
         whiteListedScopes.add("scope 3");
         whiteListedScopes.add("scope 4");
-        Assert.assertEquals(null, roleBasedScopesIssuer.getScopes(tokReqMsgCtx, whiteListedScopes));
+        List<String> authorizedScopes = new ArrayList<String>();
+        Assert.assertEquals(authorizedScopes, roleBasedScopesIssuer.getScopes(tokReqMsgCtx, whiteListedScopes));
     }
 
     @Test

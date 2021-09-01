@@ -167,9 +167,11 @@ function GeneralConfiguration(props) {
         const filteredEndpoints = [];
         const epLookup = [];
         for (const ep of endpoints) {
-            if (!epLookup.includes(ep.url)) {
-                filteredEndpoints.push(ep);
-                epLookup.push(ep.url);
+            if (ep) {
+                if (!epLookup.includes(ep.url)) {
+                    filteredEndpoints.push(ep);
+                    epLookup.push(ep.url);
+                }
             }
         }
         endpoints = filteredEndpoints;

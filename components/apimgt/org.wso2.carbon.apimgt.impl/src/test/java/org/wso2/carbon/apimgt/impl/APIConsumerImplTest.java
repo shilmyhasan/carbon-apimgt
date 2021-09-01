@@ -33,7 +33,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.api.ApplicationNameWithInvalidCharactersException;
+import org.wso2.carbon.apimgt.api.APIMgtResourceAlreadyExistsException;
 import org.wso2.carbon.apimgt.api.WorkflowStatus;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
@@ -112,7 +112,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.fail;
 import static org.wso2.carbon.base.CarbonBaseConstants.CARBON_HOME;
 
 
@@ -868,38 +867,6 @@ public class APIConsumerImplTest {
         Mockito.when(apiMgtDAO.addApplication(application, "userID")).thenReturn(1);
         assertEquals(1, apiConsumer.addApplication(application, "userID"));
     }
-
-    @Test
-    public void testAddApplicationWithSpecialCharacter() throws APIManagementException {
-        APIConsumerImpl apiConsumer = new APIConsumerImplWrapper(apiMgtDAO);
-        Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getName()).thenReturn("app");
-        PowerMockito.when(application.getSubscriber()).thenReturn(new Subscriber("User1"));
-        PowerMockito.when(APIUtil.isApplicationExist("userID", "app", "1")).
-                thenReturn(false);
-        Mockito.when(apiMgtDAO.addApplication(application, "userID")).thenReturn(1);
-        assertEquals(1, apiConsumer.addApplication(application, "userID"));
-
-        Application allowApplication = Mockito.mock(Application.class);
-        Mockito.when(allowApplication.getName()).thenReturn("ÅÄÖÅÄÖ");
-        PowerMockito.when(application.getSubscriber()).thenReturn(new Subscriber("User2"));
-        PowerMockito.when(APIUtil.isApplicationExist("userID", "ÅÄÖÅÄÖ", "1")).
-                thenReturn(false);
-        Mockito.when(apiMgtDAO.addApplication(allowApplication, "userID")).thenReturn(1);
-        assertEquals(1, apiConsumer.addApplication(allowApplication, "userID"));
-
-        Application disallowApplication = Mockito.mock(Application.class);
-        Mockito.when(disallowApplication.getName()).thenReturn("ÅÄÖÅÄÖ!@#");
-        PowerMockito.when(APIUtil.isApplicationExist("userID", "ÅÄÖÅÄÖ!@#", "1")).
-                thenReturn(false);
-        try {
-            apiConsumer.addApplication(disallowApplication, "userID");
-            fail("Application with special character should not allowed.");
-        } catch (ApplicationNameWithInvalidCharactersException e) {
-        }
-
-    }
-
     @Test
     public void testGetScopesBySubscribedAPIs() throws APIManagementException {
         APIConsumerImpl apiConsumer = new APIConsumerImplWrapper(apiMgtDAO);
@@ -1296,6 +1263,61 @@ public class APIConsumerImplTest {
             Assert.fail("API management exception not thrown for error scenario");
         } catch (APIManagementException e) {
             Assert.assertTrue(e.getMessage().contains("Cannot update the application while it is INACTIVE"));
+        }
+    }
+
+    @Test
+    public void testUpdateApplicationWithExistingGroupCombination() throws APIManagementException {
+
+        Application application1 = new Application("app1", new Subscriber("sub2"));
+        application1.setGroupId("org1");
+
+        Application application2 = new Application("app1", new Subscriber("sub2"));
+        application2.setGroupId("org2");
+
+        Mockito.when(APIUtil.isApplicationGroupCombinationExist(
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyString())).thenReturn(true);
+
+        application1.setStatus(APIConstants.ApplicationStatus.APPLICATION_APPROVED);
+
+        Mockito.when(apiMgtDAO.getApplicationById(Mockito.anyInt())).thenReturn(application1);
+        Mockito.when(apiMgtDAO.getApplicationByUUID(Mockito.anyString())).thenReturn(application1);
+        APIConsumerImpl apiConsumer = new APIConsumerImplWrapper(apiMgtDAO);
+
+        try {
+            apiConsumer.updateApplication(application2);
+            Assert.fail("API management exception not thrown for error scenario");
+        } catch (APIMgtResourceAlreadyExistsException e) {
+            Assert.assertTrue(e.getMessage().contains("A duplicate application already exists by the name"));
+        }
+    }
+
+    @Test
+    public void testUpdateApplicationNameWithExistingGroupCombination() throws APIManagementException {
+
+        Application oldApplication = new Application("app1", new Subscriber("sub2"));
+
+        Application updatedApplication = new Application("app1", new Subscriber("sub2"));
+        updatedApplication.setGroupId("org1");
+
+        Mockito.when(APIUtil.isApplicationGroupCombinationExist(
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyString())).thenReturn(true);
+
+        oldApplication.setStatus(APIConstants.ApplicationStatus.APPLICATION_APPROVED);
+
+        Mockito.when(apiMgtDAO.getApplicationById(Mockito.anyInt())).thenReturn(oldApplication);
+        Mockito.when(apiMgtDAO.getApplicationByUUID(Mockito.anyString())).thenReturn(oldApplication);
+        APIConsumerImpl apiConsumer = new APIConsumerImplWrapper(apiMgtDAO);
+
+        try {
+            apiConsumer.updateApplication(updatedApplication);
+            Assert.fail("API management exception not thrown for error scenario");
+        } catch (APIMgtResourceAlreadyExistsException e) {
+            Assert.assertTrue(e.getMessage().contains("A duplicate application already exists by the name"));
         }
     }
 

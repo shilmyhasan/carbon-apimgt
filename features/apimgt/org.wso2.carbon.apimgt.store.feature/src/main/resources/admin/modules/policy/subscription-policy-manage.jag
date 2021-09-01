@@ -6,12 +6,19 @@ var deleteSubscriptionPolicy = function (policyName) {
         var provider = jagg.getUser().username;
         var APIProviderImpl = Packages.org.wso2.carbon.apimgt.impl.APIProviderImpl;
         var apiProvider = new APIProviderImpl(provider);
-	var hasSubscription = apiProvider.hasAttachments(provider,policyName, "sub");
+	    var hasSubscription = apiProvider.hasAttachments(provider,policyName, "sub");
+	    var utils = Packages.org.wso2.carbon.apimgt.impl.utils.APIUtil;
+        var isDefaultPolicy = utils.checkPolicyConfiguredAsDefault(policyName, "sub", provider);
 
         if(hasSubscription){
             return {
                 error: true,
                 message: "Policy already has subscriptions "
+            };
+        }else if(isDefaultPolicy){
+            return {
+                error: true,
+                message: "Policy is configured as the default policy"
             };
         }else{
            var subscriptionPolicies = apiProvider.deletePolicy(provider, "sub", policyName);

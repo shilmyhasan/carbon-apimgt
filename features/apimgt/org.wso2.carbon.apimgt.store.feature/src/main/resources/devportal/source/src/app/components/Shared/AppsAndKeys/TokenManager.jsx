@@ -28,7 +28,8 @@ import Icon from '@material-ui/core/Icon';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import Loading from 'AppComponents/Base/Loading/Loading';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import Box from '@material-ui/core/Box';
 import Alert from 'AppComponents/Shared/Alert';
 import ProvideOAuthKeys from 'AppComponents/Shared/AppsAndKeys/ProvideOAuthKeys';
 import Application from 'AppData/Application';
@@ -81,6 +82,17 @@ const styles = (theme) => ({
         marginBottom: theme.spacing(2),
         marginTop: theme.spacing(2),
     },
+    errorBox: {
+        background: 'rgb(253, 236, 234)',
+        color: 'rgb(97, 26, 21)',
+        padding: '6px 16px',
+        display: 'flex',
+        flexDirection: 'row',
+        '& svg': {
+            color: '#f44336',
+            marginRight: 5,
+        }
+    }
 });
 
 /**
@@ -442,6 +454,15 @@ class TokenManager extends React.Component {
         }
         if (key && (key.keyState === this.keyStates.CREATED || key.keyState === this.keyStates.REJECTED)) {
             return <WaitingForApproval keyState={key.keyState} states={this.keyStates} />;
+        }
+
+        if (keys.size > 0 && key && (key.consumerKey && !key.consumerSecret)) {
+            return <Box className={classes.errorBox}>
+                <ErrorOutlineIcon />
+                <FormattedMessage
+            defaultMessage='Error with application keys.'
+            id='Shared.AppsAndKeys.TokenManager.application.delete.error'
+        /></Box>;
         }
         // todo replace use of localStorage with useContext
         // const settingsData = localStorage.getItem('settings');

@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.inflector.examples.ExampleBuilder;
 import io.swagger.inflector.examples.models.Example;
 import io.swagger.inflector.processors.JsonNodeExampleSerializer;
@@ -93,7 +92,6 @@ import static org.wso2.carbon.apimgt.impl.APIConstants.SWAGGER_APIM_RESTAPI_SECU
  */
 public class OAS2Parser extends APIDefinition {
     private static final Log log = LogFactory.getLog(OAS2Parser.class);
-    private static final String SWAGGER_SECURITY_SCHEMA_KEY = "default";
     private List<String> otherSchemes;
 
     private List<String> getOtherSchemes() {
@@ -1226,7 +1224,8 @@ public class OAS2Parser extends APIDefinition {
         if (securityDefinitions == null) {
             return false;
         }
-        OAuth2Definition checkDefault = (OAuth2Definition) securityDefinitions.get(SWAGGER_SECURITY_SCHEMA_KEY);
+        OAuth2Definition checkDefault = (OAuth2Definition) securityDefinitions
+                .get(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY);
         if (checkDefault == null) {
             return false;
         }
@@ -1279,63 +1278,70 @@ public class OAS2Parser extends APIDefinition {
     }
 
     /**
-     * This method injects the oauth scopes from other schemes into default scheme
+     * This method injects the oauth scopes from other schemes into default scheme.
      *
      * @param swagger - Swagger object
      * @return Swagger
-     * @throws APIManagementException if failed to get objects from openAPI
      */
-    private Swagger injectOtherScopesToDefaultScheme(Swagger swagger) throws APIManagementException {
+    private Swagger injectOtherScopesToDefaultScheme(Swagger swagger) {
         //Get security definitions from swagger
         Map<String, SecuritySchemeDefinition> securityDefinitions = swagger.getSecurityDefinitions();
         List<String> otherSetOfSchemes = new ArrayList<>();
         Map<String, String> defaultScopeBindings = null;
-        if (securityDefinitions != null) {
-            //If there is no default type schemes set a one
-            OAuth2Definition newDefault = new OAuth2Definition().implicit("https://test.com");
-            newDefault.setType("oauth2");
-            newDefault.setDescription("");
-            securityDefinitions.put(SWAGGER_SECURITY_SCHEMA_KEY, newDefault);
-            //Check all the security definitions
-            for (Map.Entry<String, SecuritySchemeDefinition> definition : securityDefinitions.entrySet()) {
-                String checkType = definition.getValue().getType();
-                //Inject other scheme scopes into default scope
-                if (!SWAGGER_SECURITY_SCHEMA_KEY.equals(definition.getKey()) && "oauth2".equals(checkType)) {
-                    //Add non default scopes to other scopes list
-                    otherSetOfSchemes.add(definition.getKey());
-                    //Check for default one
-                    OAuth2Definition noneDefaultFlowType = (OAuth2Definition) definition.getValue();
-                    OAuth2Definition defaultTypeFlow = (OAuth2Definition) securityDefinitions.get(SWAGGER_SECURITY_SCHEMA_KEY);
-                    Map<String, String> noneDefaultFlowScopes = noneDefaultFlowType.getScopes();
-                    Map<String, String> defaultTypeScopes = defaultTypeFlow.getScopes();
-                    if (defaultTypeScopes == null) {
-                        defaultTypeScopes = new HashMap<>();
-                    }
-                    for (Map.Entry<String, String> input : noneDefaultFlowScopes.entrySet()) {
-                        defaultTypeScopes.put(input.getKey(), input.getValue());
-                    }
-                    defaultTypeFlow.setScopes(defaultTypeScopes);
-                    //Check X-Scope Bindings
-                    Map<String, String> noneDefaultScopeBindings = null;
-                    Map<String, Object> defaultTypeExtension = defaultTypeFlow.getVendorExtensions();
-                    if (noneDefaultFlowType.getVendorExtensions() != null && (noneDefaultScopeBindings =
-                            (Map<String, String>) noneDefaultFlowType.getVendorExtensions().get(APIConstants.SWAGGER_X_SCOPES_BINDINGS))
-                            != null) {
-                        if (defaultScopeBindings == null) {
-                            defaultScopeBindings = new HashMap<>();
-                        }
-                        //Inject non default scope bindings into default scheme
-                        for (Map.Entry<String, String> roleInUse : noneDefaultScopeBindings.entrySet()) {
-                            defaultScopeBindings.put(roleInUse.getKey(), roleInUse.getValue());
-                        }
-                    }
-                    defaultTypeExtension.put(APIConstants.SWAGGER_X_SCOPES_BINDINGS, defaultScopeBindings);
-                    defaultTypeFlow.setVendorExtensions(defaultTypeExtension);
-                    securityDefinitions.put(SWAGGER_SECURITY_SCHEMA_KEY, defaultTypeFlow);
-                }
-            }
-            swagger.setSecurityDefinitions(securityDefinitions);
+        if (securityDefinitions == null) {
+            securityDefinitions = new LinkedHashMap<>();
         }
+        //If there is no default type schemes, set a one
+        OAuth2Definition newDefault = new OAuth2Definition().implicit(APIConstants.SWAGGER_DEFAULT_AUTHORIZATION_URL);
+        newDefault.setType("oauth2");
+        newDefault.setDescription("");
+        securityDefinitions.put(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY, newDefault);
+        if (swagger.getSecurity() == null) {
+            SecurityRequirement securityRequirement = new SecurityRequirement();
+            securityRequirement.setRequirements(APIConstants.SWAGGER_APIM_DEFAULT_SECURITY, new ArrayList<>());
+            swagger.addSecurity(securityRequirement);
+        }
+        //Check all the security definitions
+        for (Map.Entry<String, SecuritySchemeDefinition> definition : securityDefinitions.entrySet()) {
+            String checkType = definition.getValue().getType();
+            //Inject other scheme scopes into default scope
+            if (!APIConstants.SWAGGER_SECURITY_SCHEMA_KEY.equals(definition.getKey()) && "oauth2".equals(checkType)) {
+                //Add non default scopes to other scopes list
+                otherSetOfSchemes.add(definition.getKey());
+                //Check for default one
+                OAuth2Definition noneDefaultFlowType = (OAuth2Definition) definition.getValue();
+                OAuth2Definition defaultTypeFlow = (OAuth2Definition) securityDefinitions
+                        .get(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY);
+                Map<String, String> noneDefaultFlowScopes = noneDefaultFlowType.getScopes();
+                Map<String, String> defaultTypeScopes = defaultTypeFlow.getScopes();
+                if (defaultTypeScopes == null) {
+                    defaultTypeScopes = new HashMap<>();
+                }
+                for (Map.Entry<String, String> input : noneDefaultFlowScopes.entrySet()) {
+                    defaultTypeScopes.put(input.getKey(), input.getValue());
+                }
+                defaultTypeFlow.setScopes(defaultTypeScopes);
+                //Check X-Scope Bindings
+                Map<String, String> noneDefaultScopeBindings = null;
+                Map<String, Object> defaultTypeExtension = defaultTypeFlow.getVendorExtensions();
+                if (noneDefaultFlowType.getVendorExtensions() != null && (noneDefaultScopeBindings =
+                        (Map<String, String>) noneDefaultFlowType.getVendorExtensions()
+                                .get(APIConstants.SWAGGER_X_SCOPES_BINDINGS))
+                        != null) {
+                    if (defaultScopeBindings == null) {
+                        defaultScopeBindings = new HashMap<>();
+                    }
+                    //Inject non default scope bindings into default scheme
+                    for (Map.Entry<String, String> roleInUse : noneDefaultScopeBindings.entrySet()) {
+                        defaultScopeBindings.put(roleInUse.getKey(), roleInUse.getValue());
+                    }
+                }
+                defaultTypeExtension.put(APIConstants.SWAGGER_X_SCOPES_BINDINGS, defaultScopeBindings);
+                defaultTypeFlow.setVendorExtensions(defaultTypeExtension);
+                securityDefinitions.put(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY, defaultTypeFlow);
+            }
+        }
+        swagger.setSecurityDefinitions(securityDefinitions);
         //update list of security schemes in the swagger object
         setOtherSchemes(otherSetOfSchemes);
         return swagger;
@@ -1365,14 +1371,15 @@ public class OAS2Parser extends APIDefinition {
                 }
                 if (APIConstants.SUPPORTED_METHODS.contains(httpMethod.name().toLowerCase())) {
                     List<String> opScopesDefault = new ArrayList<>();
-                    List<String> opScopesDefaultInstance = getScopeOfOperations(SWAGGER_SECURITY_SCHEMA_KEY, operation);
+                    List<String> opScopesDefaultInstance =
+                            getScopeOfOperations(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY, operation);
                     if (opScopesDefaultInstance != null) {
                         opScopesDefault.addAll(opScopesDefaultInstance);
                     }
-                    updatedDefaultSecurityRequirement.put(SWAGGER_SECURITY_SCHEMA_KEY, opScopesDefault);
+                    updatedDefaultSecurityRequirement.put(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY, opScopesDefault);
                     for (Map<String, List<String>> input : securityRequirements) {
                         for (String scheme : schemes) {
-                            if (!SWAGGER_SECURITY_SCHEMA_KEY.equals(scheme)) {
+                            if (!APIConstants.SWAGGER_SECURITY_SCHEMA_KEY.equals(scheme)) {
                                 List<String> opScopesOthers = getScopeOfOperations(scheme, operation);
                                 if (opScopesOthers != null) {
                                     for (String scope : opScopesOthers) {
@@ -1382,7 +1389,7 @@ public class OAS2Parser extends APIDefinition {
                                     }
                                 }
                             }
-                            updatedDefaultSecurityRequirement.put(SWAGGER_SECURITY_SCHEMA_KEY, opScopesDefault);
+                            updatedDefaultSecurityRequirement.put(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY, opScopesDefault);
                         }
                     }
                     securityRequirements.add(updatedDefaultSecurityRequirement);

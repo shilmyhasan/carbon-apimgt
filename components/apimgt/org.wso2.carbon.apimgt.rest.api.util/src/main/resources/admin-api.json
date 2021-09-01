@@ -1853,6 +1853,13 @@
             "description": "Tenant domain of the applications to get. This has to be specified only if require to get applications of\nanother tenant other than the requester's tenant. So, if not specified, the default will be set as the\nrequester's tenant domain. This cross tenant Application access is allowed only for super tenant admin\nusers only at a migration process.\n",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "applicationName",
+            "in": "query",
+            "description": "Sending the application name will search for this application and send back results with a similar\napplication name. Adding single quotes wrapping the name will search for the name explicitly.\n",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1863,6 +1870,53 @@
             "description": "OK.\nApplication list returned.\n",
             "schema": {
               "$ref": "#/definitions/ApplicationList"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "The content type of the body.\n",
+                "type": "string"
+              }
+            }
+          },
+          "304": {
+            "description": "Not Modified.\nEmpty body because the client has already the latest version of the requested resource (Will be supported in future).\n"
+          },
+          "400": {
+            "description": "Bad Request.\nInvalid request or validation error.\n",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "406": {
+            "description": "Not Acceptable.\nThe requested media type is not supported.\n",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/applications/{applicationId}": {
+      "get": {
+        "x-scope": "apim:app_owner_change",
+        "x-wso2-request": "GET https://localhost:9443/api/am/admin/v0.16/applications\nAuthorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8\n",
+        "x-wso2-curl": "curl -k -H \"Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8\" \"https://localhost:9443/api/am/admin/v0.16/applications\"",
+        "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"groupId\": \"\",\n         \"owner\": \"admin\",\n           \"applicationId\": \"367a2361-8db5-4140-8133-c6c8dc7fa0c4\",\n         \"status\": \"APPROVED\",\n         \"name\": \"app1\"\n      },\n            {\n         \"groupId\": \"\",\n         \"owner\": \"admin\",\n             \"applicationId\": \"896658a0-b4ee-4535-bbfa-806c894a4015\",\n          \"status\": \"APPROVED\",\n         \"name\": \"DefaultApplication\"\n      }\n   ],\n   \"count\": 2,\n   \"next\": \"\"\n}",
+        "summary": "Retrieve/Search applications by application id\n",
+        "description": "This operation can be used to retrieve an application by providing the application id.\n",
+        "parameters": [
+          {
+            "$ref": "#/parameters/applicationId"
+          }
+        ],
+        "tags": [
+          "Application (Individual)"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.\nApplication info returned.\n",
+            "schema": {
+              "$ref": "#/definitions/ApplicationInfo"
             },
             "headers": {
               "Content-Type": {
@@ -3694,6 +3748,9 @@
           "items": {
             "$ref": "#/definitions/ApplicationInfo"
           }
+        },
+        "pagination": {
+          "$ref": "#/definitions/Pagination"
         }
       }
     },
@@ -3959,6 +4016,31 @@
           "type": "string",
           "description": "media-type of the file",
           "example": "image/jpeg"
+        }
+      }
+    },
+    "Pagination": {
+      "title": "Pagination",
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "example": 0
+        },
+        "limit": {
+          "type": "integer",
+          "example": 1
+        },
+        "total": {
+          "type": "integer",
+          "example": 10
+        },
+        "next": {
+          "type": "string",
+          "description": "Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n"
+        },
+        "previous": {
+          "type": "string",
+          "description": "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n"
         }
       }
     }

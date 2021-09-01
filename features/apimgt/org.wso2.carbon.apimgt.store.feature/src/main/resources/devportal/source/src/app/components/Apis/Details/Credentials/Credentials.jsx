@@ -306,7 +306,7 @@ class Credentials extends React.Component {
                 defaultMessage: 'Subscription deleted successfully!',
                 id: 'Apis.Details.Credentials.Credentials.subscription.deleted.successfully',
             }));
-            if (updateSubscriptionData) updateSubscriptionData();
+            if (updateSubscriptionData) updateSubscriptionData(this.updateData);
         });
     };
 

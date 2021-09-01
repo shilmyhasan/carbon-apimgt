@@ -162,6 +162,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
@@ -3352,10 +3353,10 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             application.setApplicationAttributes(null);
         }
 
-        String regex = "[~!#$;%^&*+={}|<>,'/\" \\\\]";
+        String regex = "^[a-zA-Z0-9 ._-]*$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(application.getName());
-        if (matcher.find()) {
+        if (!matcher.find()) {
             handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
         }
 
@@ -3374,10 +3375,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         appLogObject.put(APIConstants.AuditLogConstants.TIER, application.getTier());
         appLogObject.put(APIConstants.AuditLogConstants.CALLBACK, application.getCallbackUrl());
         appLogObject.put(APIConstants.AuditLogConstants.GROUPS, application.getGroupId());
-        Subscriber subscriber = application.getSubscriber();
-        if (subscriber != null) {
-            appLogObject.put(APIConstants.AuditLogConstants.OWNER, application.getSubscriber().getName());
-        }
+        appLogObject.put(APIConstants.AuditLogConstants.OWNER, application.getSubscriber().getName());
 
         APIUtil.logAuditMessage(APIConstants.AuditLogConstants.APPLICATION, appLogObject.toString(),
                 APIConstants.AuditLogConstants.CREATED, this.username);
@@ -3478,7 +3476,28 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleApplicationNameContainSpacesException("Application name " +
                     "cannot contain leading or trailing white spaces");
         }
-       
+
+        String regex = "^[a-zA-Z0-9 ._-]*$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(application.getName());
+        if (!matcher.find()) {
+            handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
+        }
+
+        String processedIds;
+
+        if (!existingApp.getName().equals(application.getName())) {
+            processedIds = application.getGroupId();
+        } else {
+            processedIds = processGroupIds(existingApp.getGroupId(), application.getGroupId());
+        }
+
+        if (application.getGroupId()!= null &&
+            APIUtil.isApplicationGroupCombinationExist(application.getSubscriber().getName(), application.getName(),
+            processedIds)) {
+            handleResourceAlreadyExistsException("A duplicate application already exists by the name - "
+                    + application.getName()); }
+
         Subscriber subscriber = application.getSubscriber();
 
         JSONArray applicationAttributesFromConfig = getAppAttributesFromConfig(subscriber.getName());
@@ -3545,13 +3564,6 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             application.setApplicationAttributes(null);
         }
 
-        String regex = "[~!#$;%^&*+={}|<>,'/\" \\\\]";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(application.getName());
-        if (matcher.find()) {
-            handleApplicationNameContainsInvalidCharactersException("Application name contains invalid characters");
-        }
-
         apiMgtDAO.updateApplication(application);
         if (log.isDebugEnabled()) {
             log.debug("Successfully updated the Application: " + application.getId() +" in the database.");
@@ -3581,6 +3593,24 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             Thread recommendationThread = new Thread(extractor);
             recommendationThread.start();
         }
+    }
+
+    private String processGroupIds(String existing, String updated) {
+        if (updated == null || updated.isEmpty()) {
+            return updated;
+        }
+
+        Set<String> existingSet = new HashSet<>();
+        if (existing != null && !existing.isEmpty()) {
+            existingSet.addAll(Arrays.asList(existing.split(",")));
+        }
+        Set<String> updatedSet = new HashSet<>();
+        updatedSet.addAll(Arrays.asList(updated.split(",")));
+
+        updatedSet.removeAll(existingSet);
+
+        updated = String.join(",", updatedSet);
+        return updated;
     }
 
     /**

@@ -33,6 +33,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.JavaUtils;
+import org.apache.commons.codec.Charsets;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -2205,7 +2206,6 @@ public final class APIUtil {
      *
      * @return Origin string of the external IDP
      */
-
     public static String getExternalIDPOrigin() throws APIManagementException {
 
         APIManagerConfiguration config = ServiceReferenceHolder.getInstance().
@@ -4881,10 +4881,6 @@ public final class APIUtil {
         return false;
     }
 
-    public static String getApplicationUUID(String appName, String userId) throws APIManagementException {
-        return ApiMgtDAO.getInstance().getApplicationUUID(appName, userId);
-    }
-
     public static int getApplicationId(String appName, String userId) throws APIManagementException {
         return ApiMgtDAO.getInstance().getApplicationId(appName, userId);
     }
@@ -6781,6 +6777,20 @@ public final class APIUtil {
     public static boolean isApplicationExist(String subscriber, String applicationName, String groupId)
             throws APIManagementException {
         return ApiMgtDAO.getInstance().isApplicationExist(applicationName, subscriber, groupId);
+    }
+
+    /**
+     * Check whether given application , group combination exists
+     *
+     * @param subscriber      subscriber name
+     * @param applicationName application name
+     * @param groupId         group of the subscriber
+     * @return true if application group combination exist
+     * @throws APIManagementException if failed to get applications for given subscriber
+     */
+    public static boolean isApplicationGroupCombinationExist(String subscriber, String applicationName, String groupId)
+            throws APIManagementException {
+        return ApiMgtDAO.getInstance().isApplicationGroupCombinationExists(applicationName, subscriber, groupId);
     }
 
     /**
@@ -9815,15 +9825,15 @@ public final class APIUtil {
      */
     public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws APIManagementException {
         try {
-            //generate the SHA-1 thumbprint of the certificate
-            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
+            //generate the SHA-256 thumbprint of the certificate
+            MessageDigest digestValue = MessageDigest.getInstance(APIConstants.SHA_256);
             byte[] der = publicCert.getEncoded();
             digestValue.update(der);
             byte[] digestInBytes = digestValue.digest();
             String publicCertThumbprint = hexify(digestInBytes);
             String base64UrlEncodedThumbPrint;
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+            base64UrlEncodedThumbPrint = new String(new Base64(0, null, true).encode(
+                    publicCertThumbprint.getBytes(Charsets.UTF_8)), Charsets.UTF_8);
             StringBuilder jwtHeader = new StringBuilder();
             //Sample header
             //{"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10"}
@@ -9847,15 +9857,15 @@ public final class APIUtil {
 
     public static String generateBackendJWTHeader(Certificate publicCert, String signatureAlgorithm) throws APIManagementException {
         try {
-            //generate the SHA-1 thumbprint of the certificate
-            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
+            //generate the SHA-256 thumbprint of the certificate
+            MessageDigest digestValue = MessageDigest.getInstance(APIConstants.SHA_256);
             byte[] der = publicCert.getEncoded();
             digestValue.update(der);
             byte[] digestInBytes = digestValue.digest();
             String publicCertThumbprint = hexify(digestInBytes);
             String base64UrlEncodedThumbPrint;
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+            base64UrlEncodedThumbPrint = new String(new Base64(0, null, true).encode(
+                    publicCertThumbprint.getBytes(Charsets.UTF_8)), Charsets.UTF_8);
             StringBuilder jwtHeader = new StringBuilder();
             /**
              * Sample header
@@ -10802,5 +10812,88 @@ public final class APIUtil {
             throw new APIManagementException(msg, e);
         } 
         return api;
+    }
+
+    public static String getDefaultAPILevelPolicy(int tenantId) throws APIManagementException {
+
+        Map<String, Tier> apiPolicies = getTiersFromPolicies(PolicyConstants.POLICY_LEVEL_API, tenantId);
+        if (apiPolicies.size() > 0) {
+            String defaultTier =
+                    getTenantConfigPropertyValue(APIConstants.API_TENANT_CONF_DEFAULT_API_TIER, tenantId);
+            if (StringUtils.isNotEmpty(defaultTier) && apiPolicies.containsKey(defaultTier)) {
+                return defaultTier;
+            }
+            if (isEnabledUnlimitedTier()) {
+                return APIConstants.UNLIMITED_TIER;
+            }
+            return apiPolicies.keySet().toArray()[0].toString();
+        }
+        return null;
+    }
+
+    public static String getDefaultApplicationLevelPolicy(int tenantId) throws APIManagementException {
+
+        Map<String, Tier> applicationLevelPolicies = getTiersFromPolicies(PolicyConstants.POLICY_LEVEL_APP,
+                tenantId);
+        if (applicationLevelPolicies.size() > 0) {
+            String defaultTier =
+                    getTenantConfigPropertyValue(APIConstants.API_TENANT_CONF_DEFAULT_APPLICATION_TIER, tenantId);
+            if (StringUtils.isNotEmpty(defaultTier) && applicationLevelPolicies.containsKey(defaultTier)) {
+                return defaultTier;
+            }
+            if (isEnabledUnlimitedTier()) {
+                return APIConstants.UNLIMITED_TIER;
+            }
+            return applicationLevelPolicies.keySet().toArray()[0].toString();
+        }
+        return null;
+    }
+
+    public static String getDefaultSubscriptionPolicy(int tenantId) throws APIManagementException {
+
+        Map<String, Tier> subscriptionPolicies = getTiersFromPolicies(PolicyConstants.POLICY_LEVEL_SUB, tenantId);
+        if (subscriptionPolicies.size() > 0) {
+            String defaultTier =
+                    getTenantConfigPropertyValue(APIConstants.API_TENANT_CONF_DEFAULT_SUBSCRIPTION_TIER, tenantId);
+            if (StringUtils.isNotEmpty(defaultTier) && subscriptionPolicies.containsKey(defaultTier)) {
+                return defaultTier;
+            }
+            if (isEnabledUnlimitedTier()) {
+                return APIConstants.UNLIMITED_TIER;
+            }
+            return subscriptionPolicies.keySet().toArray()[0].toString();
+        }
+        return null;
+    }
+
+    public static boolean checkPolicyConfiguredAsDefault(String policyName, String policyLevel, String provider)
+            throws APIManagementException {
+
+        String tenantDomain = MultitenantUtils.getTenantDomain(provider);
+        String configKey = null;
+        if (PolicyConstants.POLICY_LEVEL_API.equalsIgnoreCase(policyLevel)) {
+            configKey = APIConstants.API_TENANT_CONF_DEFAULT_API_TIER;
+        } else if (PolicyConstants.POLICY_LEVEL_SUB.equalsIgnoreCase(policyLevel)) {
+            configKey = APIConstants.API_TENANT_CONF_DEFAULT_SUBSCRIPTION_TIER;
+        } else if (PolicyConstants.POLICY_LEVEL_APP.equalsIgnoreCase(policyLevel)) {
+            configKey = APIConstants.API_TENANT_CONF_DEFAULT_APPLICATION_TIER;
+        }
+        if (StringUtils.isNotEmpty(configKey)) {
+            String defaultPolicyValue = getTenantConfigPropertyValue(configKey,
+                    getTenantIdFromTenantDomain(tenantDomain));
+            return StringUtils.equalsIgnoreCase(defaultPolicyValue, policyName);
+        }
+        return false;
+    }
+
+
+    private static String getTenantConfigPropertyValue(String propertyName, int tenantId)
+            throws APIManagementException {
+
+        JSONObject tenantConfig = getTenantConfig(tenantId);
+        if (tenantConfig.containsKey(propertyName)) {
+            return tenantConfig.get(propertyName).toString();
+        }
+        return null;
     }
 }

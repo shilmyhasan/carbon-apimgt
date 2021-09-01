@@ -1097,7 +1097,7 @@ public class RestApiUtil {
      * @return constructed paginated url
      */
     public static String getApplicationPaginatedURL(Integer offset, Integer limit) {
-        String paginatedURL = RestApiConstants.APPLICATIONS_GET_PAGINATION_URL;
+        String paginatedURL = RestApiConstants.ADMIN_APPLICATIONS_GET_PAGINATION_URL;
         paginatedURL = paginatedURL.replace(RestApiConstants.LIMIT_PARAM, String.valueOf(limit));
         paginatedURL = paginatedURL.replace(RestApiConstants.OFFSET_PARAM, String.valueOf(offset));
         return paginatedURL;

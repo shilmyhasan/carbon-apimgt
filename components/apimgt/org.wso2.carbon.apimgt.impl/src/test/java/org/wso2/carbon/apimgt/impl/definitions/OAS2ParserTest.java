@@ -19,19 +19,14 @@
 
 package org.wso2.carbon.apimgt.impl.definitions;
 
-import io.swagger.models.HttpMethod;
-import io.swagger.models.Operation;
-import io.swagger.models.Path;
-import io.swagger.models.Swagger;
+import io.swagger.models.*;
 import io.swagger.models.auth.OAuth2Definition;
+import io.swagger.models.auth.SecuritySchemeDefinition;
 import io.swagger.parser.SwaggerParser;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.wso2.carbon.apimgt.api.APIDefinition;
-import org.wso2.carbon.apimgt.api.model.API;
-import org.wso2.carbon.apimgt.api.model.APIIdentifier;
-import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
@@ -42,6 +37,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.hamcrest.Matchers.hasItems;
 
 public class OAS2ParserTest extends OASTestBase {
     private OAS2Parser oas2Parser = new OAS2Parser();
@@ -168,5 +165,24 @@ public class OAS2ParserTest extends OASTestBase {
         uriTemplates.add(getUriTemplate("GET", "Application & Application User", "/abc"));
         Set<URITemplate> uriTemplateSet = oas2Parser.getURITemplates(swagger);
         Assert.assertEquals(uriTemplateSet, uriTemplates);
+    }
+
+    @Test
+    public void testProcessOtherSchemeScopes() throws Exception {
+        String relativePath = "definitions" + File.separator + "oas2" + File.separator + "oas2_non_security.json";
+        String swaggerContent = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath),
+                "UTF-8");
+        swaggerContent = oas2Parser.processOtherSchemeScopes(swaggerContent);
+        Swagger swagger = oas2Parser.getSwagger(swaggerContent);
+        SecuritySchemeDefinition schemeDefinition = swagger.getSecurityDefinitions()
+                .get(APIConstants.SWAGGER_SECURITY_SCHEMA_KEY);
+        Assert.assertNotNull(schemeDefinition);
+        OAuth2Definition oAuth2Definition = (OAuth2Definition) schemeDefinition;
+        Assert.assertEquals(oAuth2Definition.getAuthorizationUrl(),APIConstants.SWAGGER_DEFAULT_AUTHORIZATION_URL);
+        Assert.assertEquals(oAuth2Definition.getFlow(),APIConstants.SWAGGER_SECURITY_OAUTH2_IMPLICIT);
+        Assert.assertEquals(oAuth2Definition.getDescription(),"");
+        SecurityRequirement securityRequirement = new SecurityRequirement();
+        securityRequirement.setRequirements(APIConstants.SWAGGER_APIM_DEFAULT_SECURITY, new ArrayList<>());
+        Assert.assertThat(swagger.getSecurity(), hasItems(securityRequirement));
     }
 }

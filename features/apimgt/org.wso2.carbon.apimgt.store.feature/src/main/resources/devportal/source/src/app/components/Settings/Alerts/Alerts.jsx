@@ -222,7 +222,7 @@ const Alerts = (props) => {
      * @param {string} email The email address that is being added.
      * */
     const handleAddEmail = (email) => {
-        setEmailsList(email);
+        setEmailsList([...emails, ...email]);
     };
 
     /**
@@ -265,7 +265,11 @@ const Alerts = (props) => {
      * */
     const handleSubscribe = () => {
         setInProgress({ subscribing: true });
-        const alertsToSubscribe = { alerts: subscribedAlerts, emailList: emails };
+        const copyOfSubscribedAlerts = [...subscribedAlerts];
+        for (const subscribedAlert of copyOfSubscribedAlerts) {
+            subscribedAlert.configuration = [];
+        }
+        const alertsToSubscribe = { alerts: copyOfSubscribedAlerts, emailList: emails };
         api.subscribeAlerts(alertsToSubscribe).then(() => {
             Alert.success(intl.formatMessage({
                 id: 'Settings.Alerts.Alerts.subscribe.success.msg',
@@ -428,7 +432,7 @@ const Alerts = (props) => {
                             </React.Fragment>}
                     </React.Fragment>}
             </div>
-            <Dialog open={openDialog.open}>
+            <Dialog fullWidth maxWidth="md" open={openDialog.open}>
                 <DialogTitle>
                     <FormattedMessage
                         id='Settings.Alerts.Alerts.configure.alert'

@@ -104,13 +104,6 @@ const KeyConfiguration = (props) => {
 
         switch (field) {
             case 'callbackUrl':
-                if (Validation.url.validate(currentTarget.value).error) {
-                    setCallbackUrlError(true);
-                    setGenerateEnabled(false);
-                } else {
-                    setCallbackUrlError(false);
-                    setGenerateEnabled(true);
-                }
                 newRequest.callbackUrl = currentTarget.value;
                 break;
             case 'validityTime':

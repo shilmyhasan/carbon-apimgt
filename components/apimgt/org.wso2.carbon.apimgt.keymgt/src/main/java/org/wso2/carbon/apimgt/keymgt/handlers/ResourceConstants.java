@@ -48,7 +48,8 @@ public final class ResourceConstants {
     public static final String IAT_PARAM_NAME = "iat";
     public static final String EXP_PARAM_NAME = "exp";
     public static final String CLIENT_ID_PARAM_NAME = "client_id";
-    
+    public static final long DEFAULT_UNLIMITED_VALIDITY_PERIOD = -2L;
+
     private ResourceConstants(){
         
     }

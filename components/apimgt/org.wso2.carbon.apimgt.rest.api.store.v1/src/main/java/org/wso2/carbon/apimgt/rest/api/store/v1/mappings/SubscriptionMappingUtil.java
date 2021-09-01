@@ -33,9 +33,12 @@ import org.wso2.carbon.apimgt.rest.api.store.v1.dto.ApplicationInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SubscriptionDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SubscriptionListDTO;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
+import org.wso2.carbon.apimgt.rest.api.store.v1.dto.PaginationDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /** This class is responsible for mapping APIM core subscription related objects into REST API subscription related DTOs 
  *
@@ -98,8 +101,14 @@ public class SubscriptionMappingUtil {
             subscriptionListDTO.setList(subscriptionDTOs);
         }
 
-        for (SubscribedAPI subscription : subscriptions) {
+        //identifying the proper start and end indexes
+        int size = subscriptions.size();
+        int start = offset < size && offset >= 0 ? offset : Integer.MAX_VALUE;
+        int end = offset + limit - 1 <= size - 1 ? offset + limit -1 : size - 1;
+
+        for (int i = start; i <= end; i++) {
             try {
+                SubscribedAPI subscription = subscriptions.get(i);
                 subscriptionDTOs.add(fromSubscriptionToDTO(subscription));
             } catch (APIManagementException e) {
                 log.error("Error while obtaining api metadata", e);
@@ -108,5 +117,60 @@ public class SubscriptionMappingUtil {
 
         subscriptionListDTO.setCount(subscriptionDTOs.size());
         return subscriptionListDTO;
+    }
+
+    /**
+     * Sets pagination urls for a SubscriptionListDTO object given pagination parameters and url parameters
+     *
+     * @param subscriptionListDTO a SubscriptionListDTO object
+     * @param apiId               uuid/id of API
+     * @param groupId             group id of the applications to be returned
+     * @param limit               max number of objects returned
+     * @param offset              starting index
+     * @param size                max offset
+     */
+    public static void setPaginationParams(SubscriptionListDTO subscriptionListDTO, String apiId, String applicationId,
+                                           String groupId, int limit, int offset, int size) {
+
+        String paginatedPrevious = "";
+        String paginatedNext = "";
+
+        Map<String, Integer> paginatedParams = RestApiUtil.getPaginationParams(offset, limit, size);
+
+        if (paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET) != null) {
+            if (apiId != null) {
+                paginatedPrevious = RestApiUtil
+                        .getSubscriptionPaginatedURLForAPIId(
+                                paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
+                                paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), apiId, groupId);
+            } else {
+                paginatedPrevious = RestApiUtil
+                        .getSubscriptionPaginatedURLForApplicationId(
+                                paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
+                                paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), applicationId);
+            }
+
+        }
+
+        if (paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET) != null) {
+            if (apiId != null) {
+                paginatedNext = RestApiUtil
+                        .getSubscriptionPaginatedURLForAPIId(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
+                                paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), apiId, groupId);
+            } else {
+                paginatedNext = RestApiUtil
+                        .getSubscriptionPaginatedURLForApplicationId(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
+                                paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), apiId);
+            }
+
+        }
+
+        PaginationDTO pagination = new PaginationDTO();
+        pagination.setOffset(offset);
+        pagination.setLimit(limit);
+        pagination.setNext(paginatedNext);
+        pagination.setPrevious(paginatedPrevious);
+        pagination.setTotal(size);
+        subscriptionListDTO.setPagination(pagination);
     }
 }

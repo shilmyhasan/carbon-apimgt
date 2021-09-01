@@ -60,7 +60,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
@@ -755,6 +754,13 @@ public class APIManagerConfiguration {
                 throttleProperties.setEnabledSubscriptionLevelSpikeArrest(JavaUtils.isTrueExplicitly
                         (enabledSubscriptionLevelSpikeArrestElement
                                 .getText()));
+            }
+            // Check Immediate SubscriptionPolicyUpdate
+            OMElement enableImmediateSubscriptionPolicyUpdateElement =
+                    throttleConfigurationElement.getFirstChildWithName(new QName(APIConstants.AdvancedThrottleConstants.ENABLE_IMMEDIATE_SUBSCRIPTION_POLICY_UPDATE));
+            if (enableImmediateSubscriptionPolicyUpdateElement != null) {
+                throttleProperties.setEnableImmediateSubscriptionUpdate(JavaUtils.isTrueExplicitly
+                        (enableImmediateSubscriptionPolicyUpdateElement.getText()));
             }
             // if advance Throttling enable
             if (throttleProperties.isEnabled()) {
