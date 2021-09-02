@@ -65,6 +65,7 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
      * @param apiId         api identifier
      * @param applicationId application identifier
      * @param groupId       group id
+     * @param xWSO2Tenant   requested tenant domain for cross tenant invocations
      * @param offset        starting index of the subscription list
      * @param limit         max num of subscriptions returned
      * @param accept        Accept header value
@@ -72,10 +73,10 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
      * @return matched subscriptions as a list of SubscriptionDTOs
      */
     @Override
-    public Response subscriptionsGet(String apiId, String applicationId, String groupId, Integer offset,
-                                     Integer limit, String accept, String ifNoneMatch) {
+    public Response subscriptionsGet(String apiId, String applicationId, String groupId, String xWSO2Tenant,
+            Integer offset, Integer limit, String accept, String ifNoneMatch) {
         String username = RestApiUtil.getLoggedInUsername();
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        String tenantDomain = RestApiUtil.getRequestedTenantDomain(xWSO2Tenant);
         Subscriber subscriber = new Subscriber(username);
         Set<SubscribedAPI> subscriptions;
         List<SubscribedAPI> subscribedAPIList = new ArrayList<>();
@@ -165,12 +166,13 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
      *
      * @param body        new subscription details
      * @param contentType Content-Type header
+     * @param xWSO2Tenant requested tenant domain for cross tenant invocations
      * @return newly added subscription as a SubscriptionDTO if successful
      */
     @Override
-    public Response subscriptionsMultiplePost(List<SubscriptionDTO> body, String contentType) {
+    public Response subscriptionsMultiplePost(List<SubscriptionDTO> body, String contentType, String xWSO2Tenant) {
         String username = RestApiUtil.getLoggedInUsername();
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        String tenantDomain = RestApiUtil.getRequestedTenantDomain(xWSO2Tenant);
         List<SubscriptionDTO> subscriptions = new ArrayList<>();
         for (SubscriptionDTO subscriptionDTO : body) {
             APIConsumer apiConsumer;
@@ -240,18 +242,19 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
      *
      * @param body        new subscription details
      * @param contentType Content-Type header
+     * @param xWSO2Tenant requested tenant domain for cross tenant invocations
      * @return newly added subscription as a SubscriptionDTO if successful
      */
     @Override
-    public Response subscriptionsPost(SubscriptionDTO body, String contentType) {
+    public Response subscriptionsPost(SubscriptionDTO body, String contentType,String xWSO2Tenant) {
         String username = RestApiUtil.getLoggedInUsername();
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        String tenantDomain = RestApiUtil.getRequestedTenantDomain(xWSO2Tenant);
         APIConsumer apiConsumer;
         try {
             apiConsumer = RestApiUtil.getConsumer(username);
             String applicationId = body.getApplicationId();
 
-            //check whether user is permitted to access the API. If the API does not exist, 
+            //check whether user is permitted to access the API. If the API does not exist,
             // this will throw a APIMgtResourceNotFoundException
             if (!RestAPIStoreUtils.isUserAccessAllowedForAPI(body.getApiIdentifier(), tenantDomain)) {
                 RestApiUtil.handleAuthorizationFailure(RestApiConstants.RESOURCE_API, body.getApiIdentifier(), log);
@@ -378,6 +381,7 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
      * @param apiId         api identifier
      * @param applicationId application identifier
      * @param groupId       group id
+     * @param xWSO2Tenant   requested tenant domain for cross tenant invocations
      * @param offset        starting index of the subscription list
      * @param limit         max num of subscriptions returned
      * @param accept        Accept header value
@@ -385,12 +389,14 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
      * @return LastUpdated time for the resource in UNIX time as a {@link String}
      */
     @Override
-    public String subscriptionsGetGetLastUpdatedTime(String apiId, String applicationId, String groupId, Integer offset, Integer limit, String accept, String ifNoneMatch) {
+    public String subscriptionsGetGetLastUpdatedTime(String apiId, String applicationId, String groupId,
+            String xWSO2Tenant, Integer offset, Integer limit, String accept, String ifNoneMatch) {
         return null;
     }
 
     @Override
-    public String subscriptionsMultiplePostGetLastUpdatedTime(List<SubscriptionDTO> body, String contentType) {
+    public String subscriptionsMultiplePostGetLastUpdatedTime(List<SubscriptionDTO> body, String contentType,
+            String xWSO2Tenant) {
         return null;
     }
 
@@ -402,7 +408,8 @@ public class SubscriptionsApiServiceImpl extends SubscriptionsApiService {
      * @return LastUpdated time for the resource in UNIX time as a {@link String}
      */
     @Override
-    public String subscriptionsPostGetLastUpdatedTime(SubscriptionDTO body, String contentType) {
+    public String subscriptionsPostGetLastUpdatedTime(SubscriptionDTO body, String contentType,
+            String xWSO2Tenant) {
         return null;
     }
 

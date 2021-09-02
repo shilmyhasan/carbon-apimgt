@@ -6,10 +6,10 @@ import org.wso2.carbon.apimgt.rest.api.store.factories.SubscriptionsApiServiceFa
 
 import io.swagger.annotations.ApiParam;
 
-import org.wso2.carbon.apimgt.rest.api.store.dto.SubscriptionListDTO;
 import org.wso2.carbon.apimgt.rest.api.store.dto.ErrorDTO;
-import org.wso2.carbon.apimgt.rest.api.store.dto.SubscriptionDTO;
+import org.wso2.carbon.apimgt.rest.api.store.dto.SubscriptionListDTO;
 import java.util.List;
+import org.wso2.carbon.apimgt.rest.api.store.dto.SubscriptionDTO;
 
 import java.util.List;
 
@@ -17,6 +17,7 @@ import java.io.InputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.*;
 
@@ -32,7 +33,7 @@ public class SubscriptionsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get all subscriptions\n", notes = "This operation can be used to retrieve a list of subscriptions of the user associated with the provided access token. This operation is capable of\n\n1. Retrieving applications which are subscibed to a specific API.\n`GET https://127.0.0.1:9443/api/am/store/v0.11/subscriptions?apiId=c43a325c-260b-4302-81cb-768eafaa3aed`\n\n2. Retrieving APIs which are subscribed by a specific application.\n`GET https://127.0.0.1:9443/api/am/store/v0.11/subscriptions?applicationId=c43a325c-260b-4302-81cb-768eafaa3aed`\n\n**IMPORTANT:**\n* It is mandatory to provide either **apiId** or **applicationId**.\n", response = SubscriptionListDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Get all subscriptions\n", notes = "This operation can be used to retrieve a list of subscriptions of the user associated with the provided access token. This operation is capable of\n\n1. Retrieving applications which are subscibed to a specific API.\n`GET https://localhost:9443/api/am/store/v0.11/subscriptions?apiId=c43a325c-260b-4302-81cb-768eafaa3aed`\n\n2. Retrieving APIs which are subscribed by a specific application.\n`GET https://localhost:9443/api/am/store/v0.11/subscriptions?applicationId=c43a325c-260b-4302-81cb-768eafaa3aed`\n\n**IMPORTANT:**\n* It is mandatory to provide either **apiId** or **applicationId**.\n", response = SubscriptionListDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nSubscription list returned.\n"),
         
@@ -43,17 +44,18 @@ public class SubscriptionsApi  {
     public Response subscriptionsGet(@ApiParam(value = "**API ID** consisting of the **UUID** of the API. Using the **UUID** in the API call is recommended.\nThe combination of the provider of the API, name of the API and the version is also accepted as a valid API I.\nShould be formatted as **provider-name-version**.\n",required=true) @QueryParam("apiId") @Encoded String apiId,
     @ApiParam(value = "Application Identifier consisting of the UUID of the Application.\n",required=true) @QueryParam("applicationId")  String applicationId,
     @ApiParam(value = "Application Group Id\n") @QueryParam("groupId")  String groupId,
+    @ApiParam(value = "For cross-tenant invocations, this is used to specify the tenant domain, where the resource need to be\n  retirieved from.\n"  )@HeaderParam("X-WSO2-Tenant") String xWSO2Tenant,
     @ApiParam(value = "Starting point within the complete list of items qualified.\n", defaultValue="0") @QueryParam("offset")  Integer offset,
     @ApiParam(value = "Maximum size of resource array to return.\n", defaultValue="25") @QueryParam("limit")  Integer limit,
     @ApiParam(value = "Media types acceptable for the response. Default is application/json.\n"  , defaultValue="application/json")@HeaderParam("Accept") String accept,
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n"  )@HeaderParam("If-None-Match") String ifNoneMatch)
     {
-    return delegate.subscriptionsGet(apiId,applicationId,groupId,offset,limit,accept,ifNoneMatch);
+    return delegate.subscriptionsGet(apiId,applicationId,groupId,xWSO2Tenant,offset,limit,accept,ifNoneMatch);
     }
 
-    public String subscriptionsGetGetLastUpdatedTime(String apiId,String applicationId,String groupId,Integer offset,Integer limit,String accept,String ifNoneMatch)
+    public String subscriptionsGetGetLastUpdatedTime(String apiId,String applicationId,String groupId,String xWSO2Tenant,Integer offset,Integer limit,String accept,String ifNoneMatch)
     {
-        return delegate.subscriptionsGetGetLastUpdatedTime(apiId,applicationId,groupId,offset,limit,accept,ifNoneMatch);
+        return delegate.subscriptionsGetGetLastUpdatedTime(apiId,applicationId,groupId,xWSO2Tenant,offset,limit,accept,ifNoneMatch);
     }
     @POST
     @Path("/multiple")
@@ -67,15 +69,16 @@ public class SubscriptionsApi  {
         
         @io.swagger.annotations.ApiResponse(code = 415, message = "Unsupported media type.\nThe entity of the request was in a not supported format.\n") })
 
-    public Response subscriptionsMultiplePost(@ApiParam(value = "Subscription objects that should to be added\n" ,required=true ) List<SubscriptionDTO> body,
-    @ApiParam(value = "Media type of the entity in the body. Default is application/json.\n" ,required=true , defaultValue="application/json")@HeaderParam("Content-Type") String contentType)
+    public Response subscriptionsMultiplePost(@ApiParam(value = "Subscription objects that should to be added\n" ,required=true ) @NotNull List<SubscriptionDTO> body,
+    @ApiParam(value = "Media type of the entity in the body. Default is application/json.\n" ,required=true , defaultValue="application/json")@HeaderParam("Content-Type") String contentType,
+    @ApiParam(value = "For cross-tenant invocations, this is used to specify the tenant domain, where the resource need to be\n  retirieved from.\n"  )@HeaderParam("X-WSO2-Tenant") String xWSO2Tenant)
     {
-    return delegate.subscriptionsMultiplePost(body,contentType);
+    return delegate.subscriptionsMultiplePost(body,contentType,xWSO2Tenant);
     }
 
-    public String subscriptionsMultiplePostGetLastUpdatedTime(List<SubscriptionDTO> body,String contentType)
+    public String subscriptionsMultiplePostGetLastUpdatedTime(List<SubscriptionDTO> body,String contentType,String xWSO2Tenant)
     {
-        return delegate.subscriptionsMultiplePostGetLastUpdatedTime(body,contentType);
+        return delegate.subscriptionsMultiplePostGetLastUpdatedTime(body,contentType,xWSO2Tenant);
     }
     @POST
     
@@ -89,15 +92,16 @@ public class SubscriptionsApi  {
         
         @io.swagger.annotations.ApiResponse(code = 415, message = "Unsupported media type.\nThe entity of the request was in a not supported format.\n") })
 
-    public Response subscriptionsPost(@ApiParam(value = "Subscription object that should to be added\n" ,required=true ) SubscriptionDTO body,
-    @ApiParam(value = "Media type of the entity in the body. Default is application/json.\n" ,required=true , defaultValue="application/json")@HeaderParam("Content-Type") String contentType)
+    public Response subscriptionsPost(@ApiParam(value = "Subscription object that should to be added\n" ,required=true ) @NotNull SubscriptionDTO body,
+    @ApiParam(value = "Media type of the entity in the body. Default is application/json.\n" ,required=true , defaultValue="application/json")@HeaderParam("Content-Type") String contentType,
+    @ApiParam(value = "For cross-tenant invocations, this is used to specify the tenant domain, where the resource need to be\n  retirieved from.\n"  )@HeaderParam("X-WSO2-Tenant") String xWSO2Tenant)
     {
-    return delegate.subscriptionsPost(body,contentType);
+    return delegate.subscriptionsPost(body,contentType,xWSO2Tenant);
     }
 
-    public String subscriptionsPostGetLastUpdatedTime(SubscriptionDTO body,String contentType)
+    public String subscriptionsPostGetLastUpdatedTime(SubscriptionDTO body,String contentType,String xWSO2Tenant)
     {
-        return delegate.subscriptionsPostGetLastUpdatedTime(body,contentType);
+        return delegate.subscriptionsPostGetLastUpdatedTime(body,contentType,xWSO2Tenant);
     }
     @DELETE
     @Path("/{subscriptionId}")
