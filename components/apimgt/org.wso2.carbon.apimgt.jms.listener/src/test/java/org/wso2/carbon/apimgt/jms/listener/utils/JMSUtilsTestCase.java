@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import java.util.Hashtable;
 
-public class JMSUtilsTest {
+public class JMSUtilsTestCase {
 
     @Test
     public void testMaskAxis2ConfigSensitiveParameters() {
@@ -35,7 +35,7 @@ public class JMSUtilsTest {
         Assert.assertEquals("amqp://***:***@clientid/carbon?brokerlist='tcp://localhost:5672'",
                 maskedParamTable.get("connectionfactory.TopicConnectionFactory"));
 
-        sensitiveParamsTable = new Hashtable<>();
+        sensitiveParamsTable = new Hashtable<String, String>();
         sensitiveParamsTable.put("connectionfactory.TopicConnectionFactory",
                 "amqp://admin:%23admin@clientid/carbon?brokerlist='tcp://localhost:5672'");
         maskedParamTable = JMSUtils.maskAxis2ConfigSensitiveParameters(sensitiveParamsTable);
