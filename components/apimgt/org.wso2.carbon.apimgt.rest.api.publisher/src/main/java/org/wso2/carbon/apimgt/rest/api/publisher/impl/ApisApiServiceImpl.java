@@ -449,7 +449,7 @@ public class ApisApiServiceImpl extends ApisApiService {
                 it.remove();
             }
             apiDefinitionJson.put(APIConstants.SWAGGER_PATHS, clonePathMap);
-            return apiDefinitionJson.toJSONString();
+            return apiDefinitionJson.toJSONString().replace("\\/","/");
         } catch (ParseException e) {
             String errorMessage = "Error while validating the swagger definition";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
