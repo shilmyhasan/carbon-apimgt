@@ -22,6 +22,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
@@ -48,27 +51,23 @@ import org.wso2.carbon.apimgt.rest.api.publisher.dto.DocumentDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.dto.DocumentListDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.dto.FileInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.utils.RestApiPublisherUtils;
+import org.wso2.carbon.apimgt.rest.api.publisher.utils.mappings.APIMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.utils.mappings.DocumentationMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.util.RestApiConstants;
-import org.wso2.carbon.apimgt.rest.api.publisher.utils.mappings.APIMappingUtil;
 import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.models.Path;
-import io.swagger.models.Swagger;
-import io.swagger.parser.SwaggerParser;
-import io.swagger.util.Json;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -429,23 +428,29 @@ public class ApisApiServiceImpl extends ApisApiService {
     private String validateSwaggerDefinition(String apiDefinition) {
         try {
             if (apiDefinition == null) {
-                RestApiUtil.handleBadRequest("Parameter: \"apiDefinition\" cannot be null", log);
+                RestApiUtil.handleBadRequest("Parameter: API Definition cannot be null", log);
             }
-            Swagger swagger = new SwaggerParser().parse(apiDefinition);
-            Map<String, Path> paths = swagger.getPaths();
-            List<String> modifiableResources = new ArrayList<>();
-            for (String key : paths.keySet()) {
+            JSONParser parser = new JSONParser();
+            JSONObject apiDefinitionJson = (JSONObject) parser.parse(apiDefinition);
+            Map <String, JSONObject> pathMap = (Map<String, JSONObject>) apiDefinitionJson
+                    .get(APIConstants.SWAGGER_PATHS);
+            Map <String, JSONObject> clonePathMap = new HashMap<>();
+            apiDefinitionJson.remove(APIConstants.SWAGGER_PATHS);
+            Iterator<Map.Entry<String, JSONObject>> it = pathMap.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry resource = it.next();
+                String key = (String) resource.getKey();
+                JSONObject resourceDefinition = (JSONObject) resource.getValue();
                 if (key.endsWith("/")) {
-                    modifiableResources.add(key);
+                    clonePathMap.put(key.substring(0, key.length()-1), resourceDefinition);
+                } else {
+                    clonePathMap.put(key, resourceDefinition);
                 }
+                it.remove();
             }
-            for (String modifiableResource : modifiableResources) {
-                String newResource = modifiableResource.substring(0, modifiableResource.length() - 1);
-                paths.put(newResource, paths.remove(modifiableResource));
-            }
-            swagger.setPaths(paths);
-            return Json.mapper().writeValueAsString(swagger);
-        } catch (JsonProcessingException e) {
+            apiDefinitionJson.put(APIConstants.SWAGGER_PATHS, clonePathMap);
+            return apiDefinitionJson.toJSONString().replace("\\/","/");
+        } catch (ParseException e) {
             String errorMessage = "Error while validating the swagger definition";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
