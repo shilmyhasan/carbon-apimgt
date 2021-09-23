@@ -377,3 +377,8 @@ body {
 a {
   text-decoration: none;
 }
+
+/* Hiding models section in swagger console */
+.wrapper section.models {
+  display: none;
+}
