@@ -159,38 +159,37 @@ public class OAuthAuthenticator implements Authenticator {
                     log.debug("OAuth2 Authentication: Expected authorization header with the name '"
                             .concat(getSecurityHeader()).concat("' was not found."));
                 }
-                return null;
-            }
-
-            ArrayList<String> remainingAuthHeaders = new ArrayList<>();
-            boolean consumerkeyFound = false;
-            String[] splitHeaders = authHeader.split(oauthHeaderSplitter);
-            if (splitHeaders != null) {
-                for (int i = 0; i < splitHeaders.length; i++) {
-                    String[] elements = splitHeaders[i].split(consumerKeySegmentDelimiter);
-                    if (elements != null && elements.length > 1) {
-                        int j = 0;
-                        boolean isConsumerKeyHeaderAvailable = false;
-                        for (String element : elements) {
-                            if (!"".equals(element.trim())) {
-                                if (consumerKeyHeaderSegment.equals(elements[j].trim())) {
-                                    isConsumerKeyHeaderAvailable = true;
-                                } else if (isConsumerKeyHeaderAvailable) {
-                                    apiKey = removeLeadingAndTrailing(elements[j].trim());
-                                    consumerkeyFound = true;
+            } else {
+                ArrayList<String> remainingAuthHeaders = new ArrayList<>();
+                boolean consumerkeyFound = false;
+                String[] splitHeaders = authHeader.split(oauthHeaderSplitter);
+                if (splitHeaders != null) {
+                    for (int i = 0; i < splitHeaders.length; i++) {
+                        String[] elements = splitHeaders[i].split(consumerKeySegmentDelimiter);
+                        if (elements != null && elements.length > 1) {
+                            int j = 0;
+                            boolean isConsumerKeyHeaderAvailable = false;
+                            for (String element : elements) {
+                                if (!"".equals(element.trim())) {
+                                    if (consumerKeyHeaderSegment.equals(elements[j].trim())) {
+                                        isConsumerKeyHeaderAvailable = true;
+                                    } else if (isConsumerKeyHeaderAvailable) {
+                                        apiKey = removeLeadingAndTrailing(elements[j].trim());
+                                        consumerkeyFound = true;
+                                    }
                                 }
+                                j++;
                             }
-                            j++;
+                        }
+                        if (!consumerkeyFound) {
+                            remainingAuthHeaders.add(splitHeaders[i]);
+                        } else {
+                            consumerkeyFound = false;
                         }
                     }
-                    if (!consumerkeyFound) {
-                        remainingAuthHeaders.add(splitHeaders[i]);
-                    } else {
-                        consumerkeyFound = false;
-                    }
                 }
+                remainingAuthHeader = String.join(oauthHeaderSplitter, remainingAuthHeaders);
             }
-            remainingAuthHeader = String.join(oauthHeaderSplitter, remainingAuthHeaders);
 
             if (log.isDebugEnabled()) {
                 log.debug(apiKey != null ? "Received Token ".concat(apiKey) : "No valid Authorization header found");
