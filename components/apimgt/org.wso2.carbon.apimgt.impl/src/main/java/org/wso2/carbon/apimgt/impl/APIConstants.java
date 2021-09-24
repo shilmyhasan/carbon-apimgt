@@ -980,6 +980,10 @@ public final class APIConstants {
     public static final String DISABLED = "Disabled";
     public static final int API_RESPONSE_CACHE_TIMEOUT = 300;
 
+    public static class APPLICATION {
+        public static final String OVERRIDE_SP_NAME = "override.sp.name";
+    }
+
     public static class ApplicationStatus {
         public static final String APPLICATION_CREATED = "CREATED";
         public static final String APPLICATION_APPROVED = "APPROVED";
