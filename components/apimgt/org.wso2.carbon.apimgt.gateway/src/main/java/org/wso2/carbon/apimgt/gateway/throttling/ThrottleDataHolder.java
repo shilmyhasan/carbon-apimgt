@@ -366,4 +366,8 @@ public class ThrottleDataHolder {
     public void setKeyTemplatesPresent(boolean keyTemplatesPresent) {
         isKeyTemplatesPresent = keyTemplatesPresent;
     }
+
+    public boolean isSubscriptionRemoved(String subscriptionBlockingKey) {
+        return (blockedSubscriptionConditionsMap.containsKey(subscriptionBlockingKey));
+    }
 }
