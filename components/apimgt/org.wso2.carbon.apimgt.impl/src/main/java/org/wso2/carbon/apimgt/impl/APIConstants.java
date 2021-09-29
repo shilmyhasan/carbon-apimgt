@@ -572,6 +572,8 @@ public final class APIConstants {
             + "ApplicationTokenDefaultValidityPeriod";
     public static final String API_KEY_VALIDATOR_ENABLE_PROVISION_APP_VALIDATION = API_KEY_VALIDATOR +
             "EnableProvisionedAppValidation";
+    public static final String API_KEY_SUBSCRIPTION_VALIDATION_ENABLED = API_KEY_VALIDATOR +
+            "EnableAPIKeySubscriptionValidation";
 
     // Constants needed for KeyManager section
     public static final String API_KEY_MANAGER = "APIKeyManager.";
@@ -707,6 +709,8 @@ public final class APIConstants {
     public static final String API_KEY_TYPE = "AM_KEY_TYPE";
     public static final String API_KEY_TYPE_PRODUCTION = "PRODUCTION";
     public static final String API_KEY_TYPE_SANDBOX = "SANDBOX";
+
+    public static final String SUB_REMOVED = "SUB_REMOVED";
 
     public static final String BILLING_AND_USAGE_CONFIGURATION = "EnableBillingAndUsage";
 

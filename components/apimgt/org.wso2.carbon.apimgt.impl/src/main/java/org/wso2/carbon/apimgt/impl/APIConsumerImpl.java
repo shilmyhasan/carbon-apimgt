@@ -56,6 +56,7 @@ import org.wso2.carbon.apimgt.api.model.ApiTypeWrapper;
 import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.ApplicationConstants;
 import org.wso2.carbon.apimgt.api.model.ApplicationKeysDTO;
+import org.wso2.carbon.apimgt.api.model.BlockConditionsDTO;
 import org.wso2.carbon.apimgt.api.model.Comment;
 import org.wso2.carbon.apimgt.api.model.Documentation;
 import org.wso2.carbon.apimgt.api.model.Identifier;
@@ -81,6 +82,7 @@ import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.JwtTokenInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.SubscriptionWorkflowDTO;
 import org.wso2.carbon.apimgt.impl.dto.TierPermissionDTO;
+import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -104,6 +106,8 @@ import org.wso2.carbon.apimgt.impl.wsdl.WSDLProcessor;
 import org.wso2.carbon.apimgt.impl.wsdl.model.WSDLArchiveInfo;
 import org.wso2.carbon.apimgt.impl.wsdl.model.WSDLValidationResponse;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.databridge.commons.Event;
+import org.wso2.carbon.event.output.adapter.core.OutputEventAdapterService;
 import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
@@ -156,6 +160,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -2920,6 +2925,15 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 invalidateCachedKeys(applicationId);
             }
 
+            if (APIUtil.isAPIKeySubscriptionValidationEnabled()) {
+                Application application = getApplicationById(applicationId);
+                String appId = application.getOwner() + "-" + application.getName();
+                String subscriptionRemovedConditionKey =
+                        apiContext + ":" + identifier.getVersion() + ":" + appId + ":" + APIConstants.SUB_REMOVED;
+                //delete existing block conditions if there are any
+                deleteSubscriptionBlockCondition(subscriptionRemovedConditionKey);
+            }
+
             //to handle on-the-fly subscription rejection (and removal of subscription entry from the database)
             //the response should have {"Status":"REJECTED"} in the json payload for this to work.
             boolean subscriptionRejected = false;
@@ -3012,6 +3026,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
         boolean isTenantFlowStarted = false;
         APIIdentifier apiIdentifier = null;
+        String context = null;
         APIProductIdentifier apiProdIdentifier = null;
         if (identifier instanceof APIIdentifier) {
             apiIdentifier = (APIIdentifier) identifier;
@@ -3052,7 +3067,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             workflowDTO.setApiProvider(identifier.getProviderName());
             API api = null;
             APIProduct product = null;
-            String context = null;
+
             if (apiIdentifier != null) {
                 api = getAPI(apiIdentifier);
                 context = api.getContext();
@@ -3147,10 +3162,118 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         if (APIUtil.isAPIGatewayKeyCacheEnabled()) {
             invalidateCachedKeys(applicationId);
         }
+
+        if (APIUtil.isAPIKeySubscriptionValidationEnabled()) {
+            Application application = getApplicationById(applicationId);
+            String appId = application.getOwner() + "-" + application.getName();
+            String subscriptionRemovedConditionKey =
+                    context + ":" + identifier.getVersion() + ":" + appId + ":" + APIConstants.SUB_REMOVED;
+            //delete existing block conditions
+            deleteSubscriptionBlockCondition(subscriptionRemovedConditionKey);
+            //add new block condition
+            addBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION, subscriptionRemovedConditionKey);
+        }
+
         if (log.isDebugEnabled()) {
             String logMessage = "Subscription removed from app " + applicationName + " by " + userId + " For Id: "
                     + identifier.toString();
             log.debug(logMessage);
+        }
+    }
+
+    public String addBlockCondition(String conditionType, String conditionValue) throws APIManagementException {
+        if (APIConstants.BLOCKING_CONDITIONS_IP.equals(conditionType)) {
+            conditionValue = tenantDomain + ":" + conditionValue.trim();
+        }
+        if (APIConstants.BLOCKING_CONDITIONS_USER.equals(conditionType)) {
+            conditionValue = MultitenantUtils.getTenantAwareUsername(conditionValue);
+            conditionValue = conditionValue + "@" + tenantDomain;
+        }
+        String uuid = apiMgtDAO.addBlockConditions(conditionType, conditionValue, tenantDomain);
+
+        if (uuid != null) {
+            publishBlockingEvent(conditionType, conditionValue, "true");
+        }
+
+        return uuid;
+    }
+
+    public boolean deleteBlockCondition(int conditionId) throws APIManagementException {
+
+        BlockConditionsDTO blockCondition = apiMgtDAO.getBlockCondition(conditionId);
+        boolean deleteState = apiMgtDAO.deleteBlockCondition(conditionId);
+        if (deleteState && blockCondition != null) {
+            unpublishBlockCondition(blockCondition);
+        }
+        return deleteState;
+    }
+
+    public boolean deleteBlockConditionByUUID(String uuid) throws APIManagementException {
+        boolean deleteState = false;
+        BlockConditionsDTO blockCondition = apiMgtDAO.getBlockConditionByUUID(uuid);
+        if (blockCondition != null) {
+            deleteState = apiMgtDAO.deleteBlockCondition(blockCondition.getConditionId());
+            if (deleteState) {
+                unpublishBlockCondition(blockCondition);
+            }
+        }
+        return deleteState;
+    }
+
+    /**
+     * Unpublish a blocking condition.
+     *
+     * @param blockCondition Block Condition object
+     */
+    private void unpublishBlockCondition(BlockConditionsDTO blockCondition) {
+        String blockingConditionType = blockCondition.getConditionType();
+        String blockingConditionValue = blockCondition.getConditionValue();
+        if (APIConstants.BLOCKING_CONDITIONS_USER.equalsIgnoreCase(blockingConditionType)) {
+            blockingConditionValue = MultitenantUtils.getTenantAwareUsername(blockingConditionValue);
+            blockingConditionValue = blockingConditionValue + "@" + tenantDomain;
+        }
+        publishBlockingEvent(blockingConditionType, blockingConditionValue, "delete");
+    }
+
+    public void deleteSubscriptionBlockCondition(String conditionValue)
+            throws APIManagementException {
+        boolean status = apiMgtDAO.deleteSubscriptionBlockCondition(conditionValue, tenantDomain);
+
+        if (status) {
+            publishBlockingEvent(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION, conditionValue, "false");
+        }
+    }
+
+    /**
+     * Publishes the changes on blocking conditions.
+     *
+     * @param conditionType  -
+     * @param conditionValue
+     */
+    private void publishBlockingEvent(String conditionType, String conditionValue, String state) {
+        OutputEventAdapterService eventAdapterService = ServiceReferenceHolder.getInstance().getOutputEventAdapterService();
+        Object[] objects = new Object[]{conditionType,conditionValue,state,tenantDomain};
+        Event blockingMessage = new Event(APIConstants.BLOCKING_CONDITIONS_STREAM_ID, System.currentTimeMillis(),
+                null, null, objects);
+        ThrottleProperties throttleProperties = getAPIManagerConfiguration().getThrottleProperties();
+
+        if (throttleProperties.getDataPublisher() != null && throttleProperties.getDataPublisher().isEnabled()) {
+
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            boolean isTenantFlowStarted = false;
+            try {
+                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().
+                            setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+                }
+                eventAdapterService.publish(APIConstants.BLOCKING_EVENT_PUBLISHER, Collections.EMPTY_MAP, blockingMessage);
+            } finally {
+                if (isTenantFlowStarted) {
+                    PrivilegedCarbonContext.endTenantFlow();
+                }
+            }
         }
     }
 
