@@ -93,6 +93,9 @@ public class APIMWSDLReader {
 	
 	public APIMWSDLReader(String baseURI) {
 		this.baseURI = baseURI;
+        if (baseURI.startsWith("file://")) {
+            this.baseURI = baseURI.replaceFirst("file://", "file:///");
+        }
 	}
 
 	public static WSDLFactory getWsdlFactoryInstance() throws WSDLException {
