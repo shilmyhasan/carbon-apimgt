@@ -7438,6 +7438,7 @@ public class ApiMgtDAO {
         ResultSet resultSet = null;
         PreparedStatement ps = null;
         Map<String, Set<Scope>> apiScopeSet = new HashMap<String, Set<Scope>>();
+        HashMap<Integer, Scope> scopeHashMap = new HashMap<>();
 
         try (Connection conn = APIMgtDBUtil.getConnection()) {
 
@@ -7454,20 +7455,41 @@ public class ApiMgtDAO {
             while (resultSet.next()) {
 
                 String apiId = resultSet.getString(1);
-                Scope scope = new Scope();
-                scope.setId(resultSet.getInt(2));
-                scope.setName(resultSet.getString(3));
-                scope.setDescription(resultSet.getString(4));
+                Scope scope;
+                int scopeId = resultSet.getInt(2);
+                String scopeKey = resultSet.getString(3);
+                if (scopeHashMap.containsKey(scopeId)) {
+                    // scope already exists append roles.
+                    scope = scopeHashMap.get(scopeId);
+                    String roles = resultSet.getString(5);
+                    if (StringUtils.isNotEmpty(roles)) {
+                        scope.setRoles(scope.getRoles().concat("," + roles.trim()));
+                    }
+                } else {
+                    scope = new Scope();
+                    scope.setId(scopeId);
+                    scope.setKey(scopeKey);
+                    scope.setName(resultSet.getString(3));
+                    scope.setDescription(resultSet.getString(4));
+                    String roles = resultSet.getString(5);
+                    if (StringUtils.isNotEmpty(roles)) {
+                        scope.setRoles(roles.trim());
+                    }
+                }
 
                 Set<Scope> scopeList = apiScopeSet.get(apiId);
-
-                if (scopeList == null) {
-                    scopeList = new LinkedHashSet<Scope>();
-                    scopeList.add(scope);
-                    apiScopeSet.put(apiId, scopeList);
-                } else {
-                    scopeList.add(scope);
-                    apiScopeSet.put(apiId, scopeList);
+                scopeHashMap.put(scopeId, scope);
+                if (!scopeHashMap.containsKey(scopeId)) {
+                    if (scopeList == null) {
+                        scopeList = new LinkedHashSet<Scope>();
+                        scopeList.add(scope);
+                        apiScopeSet.put(apiId, scopeList);
+                    } else {
+                        if (!scopeList.contains(scope)) {
+                            scopeList.add(scope);
+                        }
+                        apiScopeSet.put(apiId, scopeList);
+                    }
                 }
             }
         } catch (SQLException e) {
