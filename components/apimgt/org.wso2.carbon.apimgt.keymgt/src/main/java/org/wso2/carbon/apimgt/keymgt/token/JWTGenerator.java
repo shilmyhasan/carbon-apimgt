@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.token.ClaimsRetriever;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
@@ -163,8 +164,20 @@ public class JWTGenerator extends AbstractJWTGenerator {
                             .getEndUserName());
                 }
             }
-            // If claims are not found in AuthorizationGrantCache, they will be retrieved from the userstore.
 
+            // If the authenticated user is a federated user and not needed to bind federated user claims,
+            // no requirement to retrieve claims from local user store.
+            if (validationContext.getTokenInfo().isFederatedEndUser()) {
+                APIManagerConfiguration config = ServiceReferenceHolder
+                        .getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                boolean enableBindFederatedUserClaims = Boolean
+                        .parseBoolean(config.getFirstProperty(APIConstants.ENABLE_BIND_FEDERATED_USER_CLAIMS));
+                if (!enableBindFederatedUserClaims) {
+                    return customClaims;
+                }
+            }
+
+            // If claims are not found in AuthorizationGrantCache, they will be retrieved from the userstore.
             try {
 
                 if (tenantId != -1) {

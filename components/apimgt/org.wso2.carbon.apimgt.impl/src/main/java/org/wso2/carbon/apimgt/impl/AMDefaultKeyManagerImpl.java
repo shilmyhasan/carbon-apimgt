@@ -56,10 +56,13 @@ import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.OAuthAdminService;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.OAuth2TokenValidationService;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2ClientApplicationDTO;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2TokenValidationRequestDTO;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2TokenValidationResponseDTO;
+import org.wso2.carbon.identity.oauth2.model.AccessTokenDO;
+import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -483,6 +486,17 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         if (checkAccessTokenPartitioningEnabled() &&
                 checkUserNameAssertionEnabled()) {
             tokenInfo.setConsumerKey(ApiMgtDAO.getInstance().getConsumerKeyForTokenWhenTokenPartitioningEnabled(accessToken));
+        }
+
+        // Binding federated user authentication data for the given access token
+        try {
+            AccessTokenDO accessTokenDO = OAuth2Util.findAccessToken(accessToken, false);
+            if (accessTokenDO.getAuthzUser() != null) {
+                tokenInfo.setFederatedEndUser(accessTokenDO.getAuthzUser().isFederatedUser());
+            }
+        } catch (IdentityOAuth2Exception e) {
+            // The flow has to be continued without identifying the user is federated or not
+            log.warn("Error while identifying if the user is federated ", e);
         }
 
         return tokenInfo;
