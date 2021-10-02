@@ -241,7 +241,7 @@ public class AMDefaultKeyManagerImplTest {
     }
     
     @Test
-    public void testGetTokenMetaData() throws APIManagementException {
+    public void testGetTokenMetaData() throws APIManagementException, IdentityOAuth2Exception {
         final String accessToken = "ert567yhk";
         AMDefaultKeyManagerImplWrapper keyManager = new AMDefaultKeyManagerImplWrapper();
         AccessTokenDO accessTokenDO = new AccessTokenDO();
