@@ -248,7 +248,7 @@ public class AMDefaultKeyManagerImplTest {
         AuthenticatedUser user = new AuthenticatedUser();
         user.setUserName("dummyName");
         accessTokenDO.setAuthzUser(user);
-        PowerMockito.when(OAuth2Util.getAccessTokenDOfromTokenIdentifier(accessToken)).
+        PowerMockito.when(OAuth2Util.findAccessToken(accessToken, false)).
                 thenReturn(accessTokenDO);
         AccessTokenInfo tokenInfo = keyManager.getTokenMetaData(accessToken);
         
