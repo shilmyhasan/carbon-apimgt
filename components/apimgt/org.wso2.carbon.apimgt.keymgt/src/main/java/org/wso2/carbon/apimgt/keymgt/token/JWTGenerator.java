@@ -182,7 +182,7 @@ public class JWTGenerator extends AbstractJWTGenerator {
 
             // If the authenticated user is a federated user and not needed to bind federated user claims,
             // no requirement to retrieve claims from local user store.
-            if (validationContext.getTokenInfo().isEndUserFederated()) {
+            if (validationContext.getTokenInfo() != null && validationContext.getTokenInfo().isEndUserFederated()) {
                 boolean enableBindFederatedUserClaims = true;
                 APIManagerConfiguration config = ServiceReferenceHolder
                         .getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
