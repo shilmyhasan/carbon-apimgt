@@ -109,7 +109,7 @@ public class DefaultKeyValidationHandler extends AbstractKeyValidationHandler {
             try {
                 AuthenticatedUser user = OAuth2Util.findAccessToken(validationContext.getAccessToken(),
                         false).getAuthzUser();
-                tokenInfo.setEndUserFederated(user.isFederatedUser());
+                tokenInfo.setFederatedEndUser(user.isFederatedUser());
             } catch (Exception e) {
                 // The flow can continue without identifying whether user is federated
                 log.warn("Error while identifying if the user is federated ", e);
