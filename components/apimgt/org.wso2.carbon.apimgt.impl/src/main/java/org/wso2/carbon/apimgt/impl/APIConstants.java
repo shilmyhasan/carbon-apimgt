@@ -326,6 +326,7 @@ public final class APIConstants {
     public static final String TOKEN_GENERATOR_IMPL = JWT_CONFIGS + "JWTGeneratorImpl";
     public static final String ENABLE_JWT_GENERATION = JWT_CONFIGS + "EnableJWTGeneration";
     public static final String CLAIMS_RETRIEVER_CLASS = JWT_CONFIGS + "ClaimsRetrieverImplClass";
+    public static final String ENABLE_BIND_FEDERATED_USER_CLAIMS = JWT_CONFIGS + "EnableBindingFederatedUserClaims";
     public static final String CONSUMER_DIALECT_URI = JWT_CONFIGS + "ConsumerDialectURI";
     public static final String JWT_SIGNATURE_ALGORITHM = JWT_CONFIGS + "SignatureAlgorithm";
 

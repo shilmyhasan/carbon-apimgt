@@ -21,6 +21,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.token.ClaimsRetriever;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
@@ -113,6 +115,24 @@ public class JWTGenerator extends AbstractJWTGenerator {
                             .getEndUserName());
                 }
             }
+
+            // If the authenticated user is a federated user and not needed to bind federated user claims,
+            // no requirement to retrieve claims from local user store.
+            if (validationContext.getTokenInfo() != null && validationContext.getTokenInfo().isFederatedUser()) {
+                boolean enableBindFederatedUserClaims = true;
+                APIManagerConfiguration config = ServiceReferenceHolder
+                        .getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+
+                String bindFederatedUserClaim = config.getFirstProperty(APIConstants.ENABLE_BIND_FEDERATED_USER_CLAIMS);
+                if (bindFederatedUserClaim != null) {
+                    enableBindFederatedUserClaims = Boolean.parseBoolean(bindFederatedUserClaim);
+                }
+
+                if (!enableBindFederatedUserClaims) {
+                    return customClaims;
+                }
+            }
+
             // If claims are not found in AuthorizationGrantCache, they will be retrieved from the userstore.
             String username = validationContext.getValidationInfoDTO().getEndUserName();
 
