@@ -18,10 +18,10 @@
 
 package org.wso2.carbon.apimgt.impl;
 
-import org.json.simple.JSONObject;
-import org.junit.Assert;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -34,13 +34,13 @@ import org.wso2.carbon.apimgt.api.model.ApplicationConstants;
 import org.wso2.carbon.apimgt.api.model.KeyManagerConfiguration;
 import org.wso2.carbon.apimgt.api.model.OAuthAppRequest;
 import org.wso2.carbon.apimgt.api.model.OAuthApplicationInfo;
+import org.json.simple.JSONObject;
+import org.junit.Assert;
+import org.junit.Test;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.model.AccessTokenDO;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({OAuth2Util.class})
