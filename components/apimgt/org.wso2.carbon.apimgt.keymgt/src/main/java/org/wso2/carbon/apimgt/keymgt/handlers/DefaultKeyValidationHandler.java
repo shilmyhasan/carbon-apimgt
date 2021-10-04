@@ -33,6 +33,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.model.AccessTokenDO;
+import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.identity.oauth2.validators.OAuth2ScopeValidator;
 
 import java.util.Arrays;
@@ -104,6 +105,16 @@ public class DefaultKeyValidationHandler extends AbstractKeyValidationHandler {
                 Set<String> scopeSet = new HashSet<String>(Arrays.asList(tokenInfo.getScopes()));
                 apiKeyValidationInfoDTO.setScopes(scopeSet);
             }
+
+            try {
+                AuthenticatedUser user = OAuth2Util.findAccessToken(validationContext.getAccessToken(),
+                        false).getAuthzUser();
+                tokenInfo.setEndUserFederated(user.isFederatedUser());
+            } catch (Exception e) {
+                // The flow can continue without identifying whether user is federated
+                log.warn("Error while identifying if the user is federated ", e);
+            }
+
 
         } catch (APIManagementException e) {
             log.error("Error while obtaining Token Metadata from Authorization Server", e);
