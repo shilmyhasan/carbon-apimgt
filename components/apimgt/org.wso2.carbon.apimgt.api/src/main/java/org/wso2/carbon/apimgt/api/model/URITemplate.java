@@ -266,8 +266,11 @@ public class URITemplate implements Serializable{
         this.scope = scope;
     }
 
-    public void setScopes(Scope scope){
+    public void setScopes(Scope scope) {
         this.scopes.add(scope);
+        if (scope == null) {
+            this.scopes.clear();
+        }
     }
 
     public String getResourceMap(){
