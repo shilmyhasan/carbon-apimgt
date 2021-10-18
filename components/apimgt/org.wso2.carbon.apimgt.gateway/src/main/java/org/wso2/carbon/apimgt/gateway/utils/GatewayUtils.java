@@ -93,6 +93,7 @@ import java.util.regex.Pattern;
 public class GatewayUtils {
 
     private static final Log log = LogFactory.getLog(GatewayUtils.class);
+    private static final String HEADER_X_FORWARDED_FOR = "X-FORWARDED-FOR";
 
     public static boolean isClusteringEnabled() {
 
@@ -130,6 +131,26 @@ public class GatewayUtils {
             ipRangeMap.put(ipRange.getTenantDomain(), tenantWiseIpRangeList);
         }
         return ipRangeMap;
+    }
+
+    public static String getClientIp(org.apache.synapse.MessageContext synCtx) {
+        String clientIp;
+
+        org.apache.axis2.context.MessageContext axis2MsgContext =
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        Map headers =
+                (Map) (axis2MsgContext).getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        String xForwardForHeader = (String) headers.get(HEADER_X_FORWARDED_FOR);
+        if (!StringUtils.isEmpty(xForwardForHeader)) {
+            clientIp = xForwardForHeader;
+            int idx = xForwardForHeader.indexOf(',');
+            if (idx > -1) {
+                clientIp = clientIp.substring(0, idx);
+            }
+        } else {
+            clientIp = (String) axis2MsgContext.getProperty(org.apache.axis2.context.MessageContext.REMOTE_ADDR);
+        }
+        return clientIp;
     }
 
     private static void convertIpRangeBigIntValue(IPRange ipRange) {
