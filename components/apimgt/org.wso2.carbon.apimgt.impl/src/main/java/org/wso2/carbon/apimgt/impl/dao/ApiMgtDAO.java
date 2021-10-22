@@ -7439,6 +7439,7 @@ public class ApiMgtDAO {
         PreparedStatement ps = null;
         Map<String, Set<Scope>> apiScopeSet = new HashMap<String, Set<Scope>>();
         HashMap<Integer, Scope> scopeHashMap = new HashMap<>();
+        HashMap<String, HashSet<String>> apiScopeUniqueSet = new HashMap<>();
 
         try (Connection conn = APIMgtDBUtil.getConnection()) {
 
@@ -7478,19 +7479,24 @@ public class ApiMgtDAO {
                 }
 
                 Set<Scope> scopeList = apiScopeSet.get(apiId);
-                scopeHashMap.put(scopeId, scope);
+                HashSet<String> uniqueScopeKeySet = apiScopeUniqueSet.get(apiId);
                 if (!scopeHashMap.containsKey(scopeId)) {
                     if (scopeList == null) {
                         scopeList = new LinkedHashSet<Scope>();
                         scopeList.add(scope);
-                        apiScopeSet.put(apiId, scopeList);
+                        uniqueScopeKeySet = new HashSet<String>();
+                        uniqueScopeKeySet.add(scope.getKey());
                     } else {
-                        if (!scopeList.contains(scope)) {
+                        if (!scopeList.contains(scope) && apiId != null &&
+                                !apiScopeUniqueSet.get(apiId).contains(scope.getKey())) {
                             scopeList.add(scope);
+                            uniqueScopeKeySet.add(scope.getKey());
                         }
-                        apiScopeSet.put(apiId, scopeList);
                     }
+                    apiScopeSet.put(apiId, scopeList);
+                    apiScopeUniqueSet.put(apiId, uniqueScopeKeySet);
                 }
+                scopeHashMap.put(scopeId, scope);
             }
         } catch (SQLException e) {
             handleException("Failed to retrieve api scopes ", e);
