@@ -6940,6 +6940,10 @@ public class ApiMgtDAO {
             return true;
         }
 
+        if (newAPI.getUriTemplates() == null) {
+            return true;
+        }
+
         if (newAPI.getUriTemplates().size() != oldTemplates.size()) {
             return true;
         }
