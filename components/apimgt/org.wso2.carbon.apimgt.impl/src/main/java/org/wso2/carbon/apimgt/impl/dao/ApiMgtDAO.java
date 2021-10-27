@@ -6940,6 +6940,10 @@ public class ApiMgtDAO {
             return true;
         }
 
+        if (newAPI.getUriTemplates() == null) {
+            return true;
+        }
+
         if (newAPI.getUriTemplates().size() != oldTemplates.size()) {
             return true;
         }
@@ -6967,7 +6971,7 @@ public class ApiMgtDAO {
         }
         if (template1.getUriTemplate().equals(template2.getUriTemplate())
                 && template1.getHTTPVerb().equals(template2.getHTTPVerb())) {
-            return template1.equals(template2);
+            return template2.equals(template1);
         }
         return false;
     }
