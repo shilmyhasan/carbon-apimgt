@@ -6961,12 +6961,31 @@ public class ApiMgtDAO {
     }
 
     private boolean isURITemplatesEqual(URITemplate template1, URITemplate template2) {
-        if (template2.getMediationScript() != null && template2.getMediationScript().equals("null")) {
-            template2.setMediationScript(null);
-        }
         if (template1.getUriTemplate().equals(template2.getUriTemplate())
                 && template1.getHTTPVerb().equals(template2.getHTTPVerb())) {
-            return template2.equals(template1);
+            if (template1.getAuthType() != null && template1.getAuthType().
+                    equals(template2.getAuthType())) {
+                Scope scope1 = template1.getScope();
+                Scope scope2 = template2.getScope();
+
+                if ((scope1 == null && scope2 != null) || (scope1 != null && scope2 == null)) {
+                    return false;
+                }
+
+                if (scope1 == null) {
+                    return true;
+                }
+
+                if (!scope1.getName().equals(scope2.getName())) {
+                    return false;
+                }
+
+                List<String> roleList1 = APIUtil.getRolesList(scope1.getRoles());
+                List<String> roleList2 = APIUtil.getRolesList(scope2.getRoles());
+                if (roleList1.containsAll(roleList2) && roleList2.containsAll(roleList1)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
