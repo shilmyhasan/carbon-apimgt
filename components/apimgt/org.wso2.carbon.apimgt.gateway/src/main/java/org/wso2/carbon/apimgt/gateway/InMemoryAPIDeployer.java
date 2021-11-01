@@ -188,7 +188,7 @@ public class InMemoryAPIDeployer {
                     result = true;
                     //Setting the result to false only if all the API deployments are failed
                     if (gatewayRuntimeArtifacts.size() == errorCount) {
-                        result = false;
+                        return false;
                     }
                 } catch (ArtifactSynchronizerException | AxisFault e) {
                     String msg = "Error  deploying APIs to the Gateway ";
