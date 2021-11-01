@@ -12672,8 +12672,7 @@ public class ApiMgtDAO {
                     }
 
                     // Check whether the given application is valid
-                    if ((MultitenantUtils.getTenantDomain(appOwner).equals(tenantDomain)) &&
-                            isValidApplication(appOwner, appName)) {
+                    if (isValidApplication(appOwner, appName)) {
                         valid = true;
                     } else {
                         throw new APIManagementException(
