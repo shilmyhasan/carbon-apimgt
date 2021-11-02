@@ -25,7 +25,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 public class JWTTokenPayloadInfo {
 
     JWTClaimsSet payload;
-    String rawPayload;
+    String tokenString;
     String scopes;
 
     public JWTClaimsSet getPayload() {
@@ -36,12 +36,12 @@ public class JWTTokenPayloadInfo {
         this.payload = payload;
     }
 
-    public String getRawPayload() {
-        return rawPayload;
+    public String getToken() {
+        return tokenString;
     }
 
-    public void setRawPayload(String rawPayload) {
-        this.rawPayload = rawPayload;
+    public void setToken(String rawToken) {
+        this.tokenString = rawToken;
     }
 
     public String getScopes() {
