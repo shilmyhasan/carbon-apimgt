@@ -170,11 +170,18 @@ public class JWTValidator {
                 if (getGatewayKeyCache().get(cacheKey) != null) {
                     // Token is found in the key cache
                     payloadInfo = (JWTTokenPayloadInfo) getGatewayKeyCache().get(cacheKey);
-                    String rawPayload = payloadInfo.getRawPayload();
-                    if (!rawPayload.equals(splitToken[1])) {
+                    String cachedToken = payloadInfo.getToken();
+                    String[] splitCachedToken = cachedToken.split("\\.");
+                    // validate raw payload
+                    if (!splitCachedToken[1].equals(splitToken[1])) {
                         isVerified = false;
                     } else {
                         isVerified = true;
+                    }
+
+                    // verify signature
+                    if (splitCachedToken[2] != null && !splitCachedToken[2].equals(splitToken[2])) {
+                        isVerified = false;
                     }
                 }
             } else if (getInvalidTokenCache().get(tokenIdentifier) != null) {
@@ -309,7 +316,7 @@ public class JWTValidator {
                 if (isGatewayTokenCacheEnabled) {
                     JWTTokenPayloadInfo jwtTokenPayloadInfo = new JWTTokenPayloadInfo();
                     jwtTokenPayloadInfo.setPayload(payload);
-                    jwtTokenPayloadInfo.setRawPayload(splitToken[1]);
+                    jwtTokenPayloadInfo.setToken(jwtToken);
                     jwtTokenPayloadInfo.setScopes(scopeSet.toString());
                     getGatewayKeyCache().put(cacheKey, jwtTokenPayloadInfo);
                 }
@@ -653,11 +660,18 @@ public class JWTValidator {
                 if (getGatewayKeyCache().get(cacheKey) != null) {
                     // Token is found in the key cache
                     payloadInfo = (JWTTokenPayloadInfo) getGatewayKeyCache().get(cacheKey);
-                    String rawPayload = payloadInfo.getRawPayload();
-                    if (!rawPayload.equals(splitToken[1])) {
+                    String cachedToken = payloadInfo.getToken();
+                    String[] splitCachedToken = cachedToken.split("\\.");
+                    // validate raw payload
+                    if (!splitCachedToken[1].equals(splitToken[1])) {
                         isVerified = false;
                     } else {
                         isVerified = true;
+                    }
+
+                    // verify signature
+                    if (splitCachedToken[2] != null && !splitCachedToken[2].equals(tokenSignature)) {
+                        isVerified = false;
                     }
                 }
             } else if (getInvalidTokenCache().get(tokenIdentifier) != null) {
@@ -766,7 +780,7 @@ public class JWTValidator {
                 if (isGatewayTokenCacheEnabled) {
                     JWTTokenPayloadInfo jwtTokenPayloadInfo = new JWTTokenPayloadInfo();
                     jwtTokenPayloadInfo.setPayload(payload);
-                    jwtTokenPayloadInfo.setRawPayload(splitToken[1]);
+                    jwtTokenPayloadInfo.setToken(jwtToken);
                     getGatewayKeyCache().put(cacheKey, jwtTokenPayloadInfo);
                 }
             }

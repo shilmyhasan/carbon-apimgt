@@ -213,8 +213,9 @@ public class ApiKeyAuthenticator implements Authenticator {
                     if (getGatewayApiKeyDataCache().get(cacheKey) != null) {
                         // Token is found in the key cache
                         payloadInfo = (JWTTokenPayloadInfo) getGatewayApiKeyDataCache().get(cacheKey);
-                        String rawPayload = payloadInfo.getRawPayload();
-                        if (!rawPayload.equals(splitToken[1])) {
+                        String cachedToken = payloadInfo.getToken();
+                        String[] splitCachedToken = cachedToken.split("\\.");
+                        if (!splitCachedToken[1].equals(splitToken[1])) {
                             isVerified = false;
                         } else {
                             isVerified = true;
@@ -350,7 +351,7 @@ public class ApiKeyAuthenticator implements Authenticator {
                     if (isGatewayTokenCacheEnabled) {
                         JWTTokenPayloadInfo jwtTokenPayloadInfo = new JWTTokenPayloadInfo();
                         jwtTokenPayloadInfo.setPayload(payload);
-                        jwtTokenPayloadInfo.setRawPayload(splitToken[1]);
+                        jwtTokenPayloadInfo.setToken(apiKey);
                         getGatewayApiKeyDataCache().put(cacheKey, jwtTokenPayloadInfo);
                     }
                 }
