@@ -6967,7 +6967,6 @@ public class ApiMgtDAO {
                     equals(template2.getAuthType())) {
                 Scope scope1 = template1.getScope();
                 Scope scope2 = template2.getScope();
-
                 if ((scope1 == null && scope2 != null) || (scope1 != null && scope2 == null)) {
                     return false;
                 }
