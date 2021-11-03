@@ -306,6 +306,10 @@
             var config = this.element.find("#advance_form").find( ":input" ).serializeArray();
             config = this._convert_to_object(config);
 
+            if (config.suspendErrorCode != undefined && !(config.suspendErrorCode instanceof Array)) {
+               config.suspendErrorCode = [ config.suspendErrorCode ];
+            }
+
             if(this.config[this.selected_ep_type] == undefined) this.config[this.selected_ep_type] = [];
             if(this.config[this.selected_ep_type][this.selected_ep_index] == undefined) this.config[this.selected_ep_index] = { url:"" , config:"", endpoint_type:this._get_selected_ep()};  
             this.config[this.selected_ep_type][this.selected_ep_index].config = config;
