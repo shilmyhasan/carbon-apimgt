@@ -17,6 +17,20 @@
     </repository>
 </repositories>
 ```
+- If the support branch is for U2 (i.e. `.x-full` branch), add the following also under repositories in the parent pom file.
+```
+<repository>
+    <id>updates2-nexus</id>
+    <name>Support Nexus Repository of WSO2</name>
+    <url>https://support-maven.wso2.org/nexus/content/repositories/updates-2.0/</url>
+    <releases>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+    </releases>
+</repository>
+```
+
 - Make sure to be connected to the wso2 vpn when following this method.
 - This method does not require to build the additional repos required by the corresponding support branch.
 - As an alternative, build the additional repos mentioned under the relevant support branch before building the branch. (Do not need to be connected to the wso2 vpn when following this method)
