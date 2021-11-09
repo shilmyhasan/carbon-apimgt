@@ -103,7 +103,8 @@ public class APIManagerOAuthCallbackHandlerTestCase {
                 OAuthCallbackType.SCOPE_VALIDATION_AUTHZ);
         String[] scopesList = {"wso2:default", "wso2:test"};
         List<String> authorizedScopes = Arrays.asList(scopesList);
-        List<String> whiteListScopes = new ArrayList<>();        oAuthCallback.setRequestedScope(scopesList);
+        List<String> whiteListScopes = new ArrayList<>();
+        oAuthCallback.setRequestedScope(scopesList);
         Callback[] callbacks = {oAuthCallback};
         APIManagerOAuthCallbackHandler handler = new APIManagerOAuthCallbackHandler();
         PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
@@ -147,8 +148,15 @@ public class APIManagerOAuthCallbackHandlerTestCase {
         oAuthCallback.setRequestedScope(scopesList);
         Callback[] callbacks = {oAuthCallback};
         APIManagerOAuthCallbackHandler handler = new APIManagerOAuthCallbackHandler();
-        handler.handle(callbacks);
 
+        PowerMockito.mockStatic(APIKeyMgtDataHolder.class);
+        AbstractScopesIssuer mockIssuer = Mockito.mock(AbstractScopesIssuer.class);
+        Map<String, AbstractScopesIssuer> scopesIssuerMap = new HashMap<String, AbstractScopesIssuer>();
+        scopesIssuerMap.put("wso2", mockIssuer);
+        BDDMockito.given(APIKeyMgtDataHolder.getScopesIssuers()).willReturn(scopesIssuerMap);
+        ScopesIssuer.loadInstance(Collections.<String>emptyList());
+
+        handler.handle(callbacks);
         String[] scopes = oAuthCallback.getApprovedScope();
         Assert.assertEquals(2, scopes.length);
         Arrays.sort(scopes);
