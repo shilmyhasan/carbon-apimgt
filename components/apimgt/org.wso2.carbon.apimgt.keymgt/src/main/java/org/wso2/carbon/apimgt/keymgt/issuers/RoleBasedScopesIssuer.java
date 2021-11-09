@@ -22,23 +22,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.opensaml.saml2.core.Assertion;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.impl.APIConstants;
-import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
-import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
-import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.handlers.ResourceConstants;
-import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtUtil;
 import org.wso2.carbon.identity.application.authentication.framework.model.AuthenticatedUser;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
-import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.oauth.callback.OAuthCallback;
 import org.wso2.carbon.identity.oauth.common.GrantType;
-import org.wso2.carbon.identity.oauth2.grant.jwt.JWTConstants;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
@@ -46,14 +36,12 @@ import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.util.UserCoreUtil;
 
 
-import javax.cache.Caching;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.LinkedHashSet;
+
 
 /**
  * This class represents the functions related to an scope issuer which
@@ -125,21 +113,12 @@ public class RoleBasedScopesIssuer extends AbstractScopesIssuer {
             String grantType = tokReqMsgCtx.getOauth2AccessTokenReqDTO().getGrantType();
             String[] userRoles = null;
 
-            // If GrantType is SAML20_BEARER and CHECK_ROLES_FROM_SAML_ASSERTION is true, or if GrantType is
-            // JWT_BEARER and retrieveRolesFromUserStoreForScopeValidation system property is true,
-            // use user roles from assertion or jwt otherwise use roles from userstore.
+            // If GrantType is SAML20_BEARER and CHECK_ROLES_FROM_SAML_ASSERTION is true,
+            // use user roles from assertion otherwise use roles from userstore.
             String isSAML2Enabled = System.getProperty(ResourceConstants.CHECK_ROLES_FROM_SAML_ASSERTION);
-            String isRetrieveRolesFromUserStoreForScopeValidation = System
-                    .getProperty(ResourceConstants.RETRIEVE_ROLES_FROM_USERSTORE_FOR_SCOPE_VALIDATION);
             if (GrantType.SAML20_BEARER.toString().equals(grantType) && Boolean.parseBoolean(isSAML2Enabled)) {
                 Assertion assertion = (Assertion) tokReqMsgCtx.getProperty(ResourceConstants.SAML2_ASSERTION);
                 userRoles = getRolesFromAssertion(assertion);
-            } else if (JWTConstants.OAUTH_JWT_BEARER_GRANT_TYPE.equals(grantType) && !(Boolean
-                    .parseBoolean(isRetrieveRolesFromUserStoreForScopeValidation))) {
-                AuthenticatedUser user = tokReqMsgCtx.getAuthorizedUser();
-                Map<ClaimMapping, String> userAttributes = user.getUserAttributes();
-                userRoles = getRolesFromUserAttribute(userAttributes,
-                        tokReqMsgCtx.getProperty(ResourceConstants.ROLE_CLAIM).toString());
             } else {
                 userRoles = getUserRoles(authenticatedUser);
             }
