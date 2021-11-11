@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityUtils;
+import org.wso2.carbon.apimgt.gateway.handlers.security.basicauth.BasicAuthCredentialValidatorClientPool;
 import org.wso2.carbon.apimgt.gateway.handlers.security.keys.APIKeyValidatorClientPool;
 import org.wso2.carbon.apimgt.gateway.listeners.ServerStartupListener;
 import org.wso2.carbon.apimgt.gateway.jwt.RevokedJWTMapCleaner;
@@ -63,6 +64,7 @@ public class APIHandlerServiceComponent {
     private static final Log log = LogFactory.getLog(APIHandlerServiceComponent.class);
 
     private APIKeyValidatorClientPool clientPool;
+    private BasicAuthCredentialValidatorClientPool basicAuthClientPool;
 
     private APIManagerConfiguration configuration = new APIManagerConfiguration();
 
@@ -80,6 +82,7 @@ public class APIHandlerServiceComponent {
             if (APIConstants.API_KEY_VALIDATOR_WS_CLIENT.equals(APISecurityUtils.getKeyValidatorClientType())) {
                 clientPool = APIKeyValidatorClientPool.getInstance();
             }
+            basicAuthClientPool = BasicAuthCredentialValidatorClientPool.getInstance();
             String filePath = getFilePath();
             configuration.load(filePath);
             String gatewayType = configuration.getFirstProperty(APIConstants.API_GATEWAY_TYPE);
@@ -142,6 +145,7 @@ public class APIHandlerServiceComponent {
         if (APIConstants.API_KEY_VALIDATOR_WS_CLIENT.equals(APISecurityUtils.getKeyValidatorClientType())) {
             clientPool.cleanup();
         }
+        basicAuthClientPool.cleanup();
         if (registration != null) {
             log.debug("Unregistering ThrottleDataService...");
             registration.unregister();

@@ -17,11 +17,6 @@
 package org.wso2.carbon.apimgt.gateway.handlers.security.basicauth;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,28 +33,16 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.BasicAuthValidationInfoDTO;
-import org.wso2.carbon.apimgt.keymgt.stub.usermanager.APIKeyMgtRemoteUserStoreMgtService;
 import org.wso2.carbon.apimgt.keymgt.stub.usermanager.APIKeyMgtRemoteUserStoreMgtServiceAPIManagementException;
-import org.wso2.carbon.apimgt.keymgt.stub.usermanager.APIKeyMgtRemoteUserStoreMgtServiceStub;
-import org.wso2.carbon.apimgt.keymgt.stub.validator.APIKeyValidationServiceAPIManagementException;
-import org.wso2.carbon.apimgt.keymgt.stub.validator.APIKeyValidationServiceStub;
-import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceStub;
-import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.UserCoreConstants;
-import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import javax.cache.Cache;
 import javax.cache.Caching;
 
@@ -71,7 +54,7 @@ public class BasicAuthCredentialValidator {
     private boolean gatewayKeyCacheEnabled;
 
     protected Log log = LogFactory.getLog(getClass());
-    private APIKeyMgtRemoteUserStoreMgtServiceStub apiKeyMgtRemoteUserStoreMgtServiceStub;
+    private static final BasicAuthCredentialValidatorClientPool clientPool = BasicAuthCredentialValidatorClientPool.getInstance();
 
     /**
      * Initialize the validator with the synapse environment.
@@ -81,28 +64,6 @@ public class BasicAuthCredentialValidator {
     BasicAuthCredentialValidator() throws APISecurityException {
         this.gatewayKeyCacheEnabled = isGatewayTokenCacheEnabled();
         this.getGatewayUsernameCache();
-
-        ConfigurationContext configurationContext = ServiceReferenceHolder.getInstance().getAxis2ConfigurationContext();
-        APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
-        String username = config.getFirstProperty(APIConstants.API_KEY_VALIDATOR_USERNAME);
-        String password = config.getFirstProperty(APIConstants.API_KEY_VALIDATOR_PASSWORD);
-        String url = config.getFirstProperty(APIConstants.API_KEY_VALIDATOR_URL);
-        if (url == null) {
-            throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
-                    "API key manager URL unspecified");
-        }
-
-        try {
-            apiKeyMgtRemoteUserStoreMgtServiceStub = new APIKeyMgtRemoteUserStoreMgtServiceStub(configurationContext, url +
-                    "APIKeyMgtRemoteUserStoreMgtService");
-            ServiceClient client = apiKeyMgtRemoteUserStoreMgtServiceStub._getServiceClient();
-            Options options = client.getOptions();
-            options.setCallTransportCleanup(true);
-            options.setManageSession(true);
-            CarbonUtils.setBasicAccessSecurityHeaders(username, password, client);
-        } catch (AxisFault axisFault) {
-            throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR, axisFault.getMessage(), axisFault);
-        }
     }
 
     /**
@@ -146,8 +107,16 @@ public class BasicAuthCredentialValidator {
             }
         }
         BasicAuthValidationInfoDTO basicAuthValidationInfoDTO;
+        BasicAuthCredentialValidatorClient client = null;
         try {
-            org.wso2.carbon.apimgt.impl.dto.xsd.BasicAuthValidationInfoDTO generatedInfoDTO = apiKeyMgtRemoteUserStoreMgtServiceStub
+            try {
+                client = clientPool.get();
+            } catch (Exception e) {
+                log.debug("Getting a client from client pool caused an exception = " + e.getMessage());
+                throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
+                        "Error while accessing backend services for user credential validation", e);
+            }
+            org.wso2.carbon.apimgt.impl.dto.xsd.BasicAuthValidationInfoDTO generatedInfoDTO = client
                     .getUserAuthenticationInfo(username, password);
             basicAuthValidationInfoDTO = convertToDTO(generatedInfoDTO);
             isAuthenticated = basicAuthValidationInfoDTO.isAuthenticated();
@@ -156,6 +125,16 @@ public class BasicAuthCredentialValidator {
                     "Basic Authentication: Error while accessing backend services to validate user authentication for user : "
                             + username);
             throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR, e.getMessage(), e);
+        } finally {
+            try {
+                if (client != null) {
+                    clientPool.release(client);
+                }
+            } catch (Exception exception) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Releasing client from client pool caused an exception = " + exception.getMessage());
+                }
+            }
         }
 
         if (gatewayKeyCacheEnabled) {
@@ -434,7 +413,15 @@ public class BasicAuthCredentialValidator {
     private String[] getUserRoles(String username) throws APISecurityException {
         String[] userRoles;
         try {
-            userRoles = apiKeyMgtRemoteUserStoreMgtServiceStub.getUserRoles(username);
+            BasicAuthCredentialValidatorClient client;
+            try {
+                client = clientPool.get();
+            } catch (Exception e) {
+                log.debug("Getting a client from client pool caused an exception = " + e.getMessage());
+                throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
+                        "Error while accessing backend services for user credential validation", e);
+            }
+            userRoles = client.getUserRoles(username);
         } catch (APIKeyMgtRemoteUserStoreMgtServiceAPIManagementException | RemoteException e) {
             throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR, e.getMessage(), e);
         }
