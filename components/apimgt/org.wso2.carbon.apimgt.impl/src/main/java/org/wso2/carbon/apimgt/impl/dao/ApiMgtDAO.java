@@ -3155,7 +3155,6 @@ public class ApiMgtDAO {
         try {
             String sqlQuery = SQLConstants.GET_APP_API_USAGE_BY_PROVIDER_AND_ID_SQL;
             connection = APIMgtDBUtil.getConnection();
-
             ps = connection.prepareStatement(sqlQuery);
             ps.setString(1, APIUtil.replaceEmailDomainBack(providerName));
             ps.setString(2, identifier.getApiName());
