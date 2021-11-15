@@ -31,25 +31,39 @@ import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.apimgt.gateway.handlers.security.AuthenticationResponse;
+import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.utils.OpenAPIUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.dto.BasicAuthValidationInfoDTO;
 
 import java.util.TreeMap;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(OpenAPIUtils.class)
+@PrepareForTest({OpenAPIUtils.class, ServiceReferenceHolder.class})
 public class BasicAuthAuthenticatorTest {
     private MessageContext messageContext;
     private org.apache.axis2.context.MessageContext axis2MsgCntxt;
     private BasicAuthAuthenticator basicAuthAuthenticator;
     private final String CUSTOM_AUTH_HEADER = "AUTH-HEADER";
+    private static BasicAuthCredentialValidatorClientPool clientPool = null;
+    BasicAuthCredentialValidatorClient client = null;
+    private APIManagerConfiguration apiManagerConfiguration;
+    ServiceReferenceHolder serviceReferenceHolder = null;
 
     @Before
-    public void setup() throws APISecurityException {
+    public void setup() throws Exception {
         PowerMockito.mockStatic(OpenAPIUtils.class);
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
         PowerMockito.when(OpenAPIUtils.getResourceAuthenticationScheme(Mockito.any(), Mockito.any()))
                 .thenReturn(APIConstants.AUTH_APPLICATION_OR_USER_LEVEL_TOKEN);
+        serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        clientPool = Mockito.mock(BasicAuthCredentialValidatorClientPool.class);
+        client = Mockito.mock(BasicAuthCredentialValidatorClient.class);
+        Mockito.when(clientPool.get()).thenReturn(client);
 
         messageContext = Mockito.mock(Axis2MessageContext.class);
         axis2MsgCntxt = Mockito.mock(org.apache.axis2.context.MessageContext.class);
