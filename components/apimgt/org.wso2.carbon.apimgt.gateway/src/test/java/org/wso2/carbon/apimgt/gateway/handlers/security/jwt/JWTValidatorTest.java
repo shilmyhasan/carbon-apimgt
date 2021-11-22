@@ -52,6 +52,7 @@ public class JWTValidatorTest {
     private org.apache.axis2.context.MessageContext axis2MsgCntxt;
     private JSONObject payload;
     private String validJwtToken;
+    private String validJwtTokenWithTemperedSignature;
     private String validJwtTokenWithCookieBindingRef;
     private APIManagerConfiguration amConfig;
 
@@ -96,7 +97,7 @@ public class JWTValidatorTest {
         );
 
         // Encoded jwt token
-        validJwtToken = "eyJ4NXQiOiJOVEF4Wm1NeE5ETXlaRGczTVRVMVpHTTBNekV6T0RKaFpXSTRORE5sWkRVMU9HRmtOakZpTVEiL" +
+        String jwtTokenWithHeaderAndPayload = "eyJ4NXQiOiJOVEF4Wm1NeE5ETXlaRGczTVRVMVpHTTBNekV6T0RKaFpXSTRORE5sWkRVMU9HRmtOakZpTVEiL" +
                 "CJraWQiOiJOVEF4Wm1NeE5ETXlaRGczTVRVMVpHTTBNekV6T0RKaFpXSTRORE5sWkRVMU9HRmtOakZpTVEiLCJhbGciO" +
                 "iJSUzI1NiJ9" +
                 ".ewogICJzdWIiOiAiYWRtaW5AY2FyYm9uLnN1cGVyIiwKICAiaXNzIjogImh0dHBzOi8vbG9j" +
@@ -111,8 +112,10 @@ public class JWTValidatorTest {
                 "OiAiRGVmYXVsdEFwcGxpY2F0aW9uIiwKICAgICJpZCI6IDEKICB9LAogICJzY29wZSI6ICJhbV9hcHBsaWNhdGlvbl9zY" +
                 "29wZSBkZWZhdWx0IiwKICAiY29uc3VtZXJLZXkiOiAiVTZTam0xcGF3dWM2SzBteDVIYzlqZTVQVE44YSIsCiAgImV4cC" +
                 "I6IDE1NjMwMzI2OTEsCiAgImdyYW50VHlwZSI6ICJjbGllbnRfY3JlZGVudGlhbHMiLAogICJpYXQiOiAxNTYzMDI5MDk" +
-                "xLAogICJqdGkiOiAiM2YzMWEyZGItMzlmOS00YTAwLWEzMTQtZjU0OGM4ZTY1N2UyIgp9" +
-                ".ghi";
+                "xLAogICJqdGkiOiAiM2YzMWEyZGItMzlmOS00YTAwLWEzMTQtZjU0OGM4ZTY1N2UyIgp9";
+
+        validJwtToken = jwtTokenWithHeaderAndPayload + ".ghi";
+        validJwtTokenWithTemperedSignature = jwtTokenWithHeaderAndPayload + ".iJSUzI1NiJ9";
 
         validJwtTokenWithCookieBindingRef = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IlpERTVNRE01TURoaU1EbGlZ" +
                 "ekJqWVdNeE56WTNNV05sTlRVNU1tSTVNV1JrT1ROa09URTJPUT09In0.eyJiaW5kaW5nX3R5cGUiOiJjb29raWUiLCJzdWIiO" +
@@ -185,6 +188,19 @@ public class JWTValidatorTest {
 
         try {
             jwtValidator.authenticate(validJwtToken, messageContext, null);
+            Assert.fail();
+        } catch (APISecurityException e) {
+            Assert.assertEquals(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS, e.getErrorCode());
+        }
+    }
+
+    @Test
+    public void testAuthenticationSignatureVerificationFailureForCachedKeysWithTemperedSignature() throws Exception {
+        initMocks();
+        PowerMockito.when(GatewayUtils.verifyTokenSignature(Mockito.any(SignedJWT.class), Mockito.anyString()))
+                .thenReturn(true);
+        try {
+            jwtValidator.authenticate(validJwtTokenWithTemperedSignature, messageContext, null);
             Assert.fail();
         } catch (APISecurityException e) {
             Assert.assertEquals(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS, e.getErrorCode());
