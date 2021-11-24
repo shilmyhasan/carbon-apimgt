@@ -51,8 +51,12 @@ public class ScopesIssuer {
     }
 
     public static void loadInstance(List<String> whitelist) throws APIKeyMgtException {
-        APIManagerConfiguration apiManagerConfiguration = ServiceReferenceHolder.getInstance()
-                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        APIManagerConfiguration apiManagerConfiguration = null;
+        if (ServiceReferenceHolder.getInstance() != null && ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService() != null) {
+            apiManagerConfiguration = ServiceReferenceHolder.getInstance()
+                    .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        }
         if (apiManagerConfiguration != null) {
             String scopeIssuerClass = apiManagerConfiguration.getFirstProperty(CONFIG_ELEM_SCOPE_ISSUER);
             if (scopeIssuerClass != null) {
