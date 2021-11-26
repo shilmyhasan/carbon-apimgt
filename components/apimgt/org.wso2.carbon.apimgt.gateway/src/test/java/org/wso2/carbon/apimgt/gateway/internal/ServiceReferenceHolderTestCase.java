@@ -28,8 +28,6 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-import javax.validation.constraints.AssertTrue;
-
 /**
  * Test class for ServiceReferenceHolder.
  */
