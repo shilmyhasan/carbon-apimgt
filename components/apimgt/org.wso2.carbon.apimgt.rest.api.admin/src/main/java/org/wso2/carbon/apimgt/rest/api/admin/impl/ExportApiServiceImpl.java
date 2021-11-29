@@ -116,6 +116,7 @@ public class ExportApiServiceImpl extends ExportApiService {
             apiImportExportManager = new APIImportExportManager(apiProvider, userName);
             File file = apiImportExportManager.exportAPIArchive(api, isStatusPreserved, exportFormat);
             return Response.ok(file)
+                    .header(RestApiConstants.HEADER_CONTENT_TYPE, RestApiConstants.APPLICATION_OCTET_STREAM)
                     .header(RestApiConstants.HEADER_CONTENT_DISPOSITION, "attachment; filename=\""
                             + file.getName() + "\"")
                     .build();
