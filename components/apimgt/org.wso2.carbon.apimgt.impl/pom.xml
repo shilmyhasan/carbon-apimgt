@@ -466,7 +466,7 @@
                             javax.sql,
                             javax.wsdl.*,
                             javax.xml.*;version="0.0.0",
-                            org.json.*;version="[1.0.0,4.0.0)",
+                            org.json.*;version="[0.0.0,4.0.0)",
                             org.slf4j,
                             org.w3c.dom,
                             com.ibm.wsdl.*; version="${wsdl4j.version.range}";resolution:=optional,
