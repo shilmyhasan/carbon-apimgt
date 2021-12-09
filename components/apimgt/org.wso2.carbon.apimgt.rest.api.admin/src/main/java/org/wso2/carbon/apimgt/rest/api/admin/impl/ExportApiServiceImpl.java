@@ -117,9 +117,8 @@ public class ExportApiServiceImpl extends ExportApiService {
             File file = apiImportExportManager.exportAPIArchive(api, isStatusPreserved, exportFormat);
             return Response.ok(file)
                     .header(RestApiConstants.HEADER_CONTENT_TYPE, RestApiConstants.APPLICATION_OCTET_STREAM)
-                    .header(RestApiConstants.HEADER_CONTENT_DISPOSITION, "attachment; filename=\""
-                            + file.getName() + "\"")
-                    .build();
+                    .header(RestApiConstants.HEADER_CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + file.getName() + "\"").build();
         } catch (APIManagementException | APIImportExportException e) {
             RestApiUtil.handleInternalServerError("Error while exporting " + RestApiConstants.RESOURCE_API, e, log);
         }
