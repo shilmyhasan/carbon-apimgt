@@ -200,7 +200,14 @@ public class JWTGenerator extends AbstractJWTGenerator {
                 }
             }
 
-            if (validationContext.getTokenInfo().isFederatedEndUser()) {
+            boolean isFederatedEndUser = false;
+            if (validationContext.getTokenInfo() != null) {
+                isFederatedEndUser = validationContext.getTokenInfo().isFederatedEndUser();
+            } else if (validationContext.getUser() != null) {
+                isFederatedEndUser = validationContext.getUser().isFederatedUser();
+            }
+
+            if (isFederatedEndUser) {
                 APIManagerConfiguration config = ServiceReferenceHolder
                         .getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
                 boolean enableBindFederatedUserClaims = Boolean
