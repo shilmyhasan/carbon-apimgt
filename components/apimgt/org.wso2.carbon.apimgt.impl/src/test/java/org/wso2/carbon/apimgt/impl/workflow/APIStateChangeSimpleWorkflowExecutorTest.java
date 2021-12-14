@@ -59,14 +59,4 @@ public class APIStateChangeSimpleWorkflowExecutorTest {
             Assert.fail("Unexpected WorkflowException occurred while retrieving Workflow details");
         }
     }
-
-    @Test
-    public void testGetWorkflowDetails(){
-        try {
-            apiStateChangeSimpleWorkflowExecutor.getWorkflowDetails(Mockito.anyString());
-        } catch (WorkflowException e) {
-            Assert.fail("Unexpected exception occurred while retriving workflow details");
-        }
-    }
-
 }
