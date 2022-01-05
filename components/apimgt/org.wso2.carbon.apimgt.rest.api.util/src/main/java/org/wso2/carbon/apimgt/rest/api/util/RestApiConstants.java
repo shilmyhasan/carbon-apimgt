@@ -179,4 +179,5 @@ public final class RestApiConstants {
     public static final String SEQUENCE_CONTENT = "content";
     public static final String SEQUENCE_ARTIFACT_ID = "id";
     public static final String HTTP_METHOD = "method";
+    public static final String EMPTY_STRING = " ";
 }
