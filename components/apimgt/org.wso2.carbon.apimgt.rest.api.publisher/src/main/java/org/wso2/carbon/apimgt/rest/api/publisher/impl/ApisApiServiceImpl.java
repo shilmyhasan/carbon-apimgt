@@ -260,7 +260,7 @@ public class ApisApiServiceImpl extends ApisApiService {
                 RestApiUtil.handleBadRequest("Error occurred while adding API. API with name " + body.getName()
                         + " already exists.", log);
             }
-            if (body.getName().contains(" ")) {
+            if (body.getName().contains(RestApiConstants.EMPTY_STRING)) {
                 RestApiUtil.handleBadRequest("Error occurred while adding API. API name "
                         + "cannot contains white spaces.", log);
             }
