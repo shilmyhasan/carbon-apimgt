@@ -271,9 +271,9 @@ var populateAPIList = function () {
                 var apis = '';
                 for (var name in apiNameVersionMap) {
                     if (name == window.requestedApiName) {
-                        apis += '<option selected="selected" value=' + name + '>' + name + '</option>';
+                        apis += '<option selected="selected" value="' + name + '">' + name + '</option>';
                     } else {
-                        apis += '<option value=' + name + '>' + name + '</option>';
+                        apis += '<option value="' + name + '">' + name + '</option>';
                     }
                     i++;
                 }
