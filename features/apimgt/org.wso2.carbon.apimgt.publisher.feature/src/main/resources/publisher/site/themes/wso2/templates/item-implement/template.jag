@@ -1244,12 +1244,12 @@
 					<label class="control-label col-sm-3" for="format">Format</label>
 					<div class="col-sm-4">
 						<select class="form-control selectpicker" id="format" name="format">
+							<option {{#contains "leave-as-is" format}}selected{{/contains}} value="leave-as-is"><%=i18n.localize("Leave As-Is")%></option>
 							<option {{#contains "soap11" format}}selected{{/contains}} value="soap11">SOAP 1.1</option>
 							<option {{#contains "soap12" format}}selected{{/contains}} value="soap12">SOAP 1.2</option>
 							<option {{#contains "POX" format}}selected{{/contains}} value="POX">Plain Old XML (POX)</option>
 							<option {{#contains "REST" format}}selected{{/contains}} value="REST">Representational State Transer (REST)</option>
 							<option {{#contains "GET" format}}selected{{/contains}} value="GET">GET</option>
-							<option value="leave-as-is"><%=i18n.localize("Leave As-Is")%></option>
 						</select>
 						<p class="help-block hide"><%=i18n.localize("Message format for the endpoint.")%></p>
 					</div>
@@ -1258,9 +1258,9 @@
 					<label class="control-label col-sm-3" for="optimize"><%=i18n.localize("Optimize")%></label>
 					<div class="col-sm-4">
 						<select class="form-control selectpicker" id="optimize" name="optimize">
+							<option {{#contains "leave-as-is" optimize}}selected{{/contains}} value="leave-as-is"><%=i18n.localize("Leave As-Is")%></option>
 							<option {{#contains "SWA" optimize}}selected{{/contains}} value="SWA">SWA</option>
 							<option {{#contains "MTOM" optimize}}selected{{/contains}} value="MTOM">MTOM</option>
-							<option value="leave-as-is"><%=i18n.localize("Leave As-Is")%></option>
 						</select>
 						<p class="help-block hide"><%=i18n.localize("Method to optimize the attachments.")%></p>
 					</div>
