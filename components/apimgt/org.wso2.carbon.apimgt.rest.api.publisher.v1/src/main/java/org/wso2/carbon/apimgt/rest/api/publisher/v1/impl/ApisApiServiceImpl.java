@@ -3755,6 +3755,9 @@ public class ApisApiServiceImpl implements ApisApiService {
                 }
             } else {
                 API versionedAPI = apiProvider.createNewAPIVersion(apiId, newVersion, defaultVersion, tenantDomain);
+                if (APIConstants.API_TYPE_SOAPTOREST.equals(versionedAPI.getType())) {
+                    updateSwagger(versionedAPI.getUuid(), versionedAPI.getSwaggerDefinition());
+                }
                 newVersionedApi = APIMappingUtil.fromAPItoDTO(versionedAPI);
             }
             //This URI used to set the location header of the POST response
@@ -3767,7 +3770,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             } else {
                 throw e;
             }
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | FaultGatewaysException e) {
             String errorMessage = "Error while retrieving API location of " + apiId;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
