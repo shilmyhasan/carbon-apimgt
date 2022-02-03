@@ -174,10 +174,12 @@ public class GatewayArtifactsMgtDAO {
             statement.setString(3, tenantDomain);
             rs = statement.executeQuery();
             while (rs.next()) {
+                log.info(">>>>>>>>>>>> get all api artifacts result set received");
                 try (InputStream inputStream = rs.getBinaryStream(1)) {
                     String gatewayRuntimeArtifacts = IOUtils.toString(inputStream,
                             APIConstants.DigestAuthConstants.CHARSET);
                     gatewayRuntimeArtifactsArray.add(gatewayRuntimeArtifacts);
+                    log.info(">>>>>>>>>>>>>>> adding runtime time artifact to array: " + gatewayRuntimeArtifacts);
                 } catch (IOException  e) {
                     handleException("Error in generating gatewayRuntimeArtifacts ", e);
                 }

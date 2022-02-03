@@ -4,6 +4,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -34,6 +36,8 @@ import java.util.List;
 @RunWith(PowerMockRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GatewayArtifactsMgtDAOTest {
+
+    private static Log log = LogFactory.getLog(GatewayArtifactsMgtDAOTest.class);
     public static GatewayArtifactsMgtDAO gatewayArtifactsMgtDAO;
     String apiUUID = "1236233";
     String apiName = "testAddGatewayPublishedAPIDetails";
@@ -121,6 +125,9 @@ public class GatewayArtifactsMgtDAOTest {
     public void testGetAllGatewayPublishedAPIArtifacts() throws APIManagementException {
         List<String> artifacts = gatewayArtifactsMgtDAO
                 .getAllGatewayPublishedAPIArtifacts(label, String.valueOf(MultitenantConstants.SUPER_TENANT_ID));
+        if (artifacts == null) {
+            log.info(">>>>>>>>>>> Null Artifacts received");
+        }
         Assert.assertTrue(artifacts.size() == 1);
     }
 
