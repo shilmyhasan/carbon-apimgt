@@ -37,7 +37,6 @@ import java.util.List;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GatewayArtifactsMgtDAOTest {
 
-    private static Log log = LogFactory.getLog(GatewayArtifactsMgtDAOTest.class);
     public static GatewayArtifactsMgtDAO gatewayArtifactsMgtDAO;
     String apiUUID = "1236233";
     String apiName = "testAddGatewayPublishedAPIDetails";
@@ -119,16 +118,8 @@ public class GatewayArtifactsMgtDAOTest {
                 1, APIConstants.GatewayArtifactSynchronizer.GATEWAY_INSTRUCTION_PUBLISH,
                 SQLConstants.ADD_GW_API_ARTIFACT);
         Assert.assertTrue(result);
-    }
-
-    @Test
-    public void testGetAllGatewayPublishedAPIArtifacts() throws APIManagementException {
         List<String> artifacts = gatewayArtifactsMgtDAO
                 .getAllGatewayPublishedAPIArtifacts(label, String.valueOf(MultitenantConstants.SUPER_TENANT_ID));
-        if (artifacts == null) {
-            log.info(">>>>>>>>>>> Null Artifacts received");
-        }
         Assert.assertTrue(artifacts.size() == 1);
     }
-
 }
