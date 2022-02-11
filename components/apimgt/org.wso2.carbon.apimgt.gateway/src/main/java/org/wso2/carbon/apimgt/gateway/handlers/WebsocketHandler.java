@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.gateway.InboundMessageContextDataHolder;
 import org.wso2.carbon.apimgt.gateway.dto.InboundProcessorResponseDTO;
+import org.wso2.carbon.apimgt.gateway.dto.WebSocketThrottleResponseDTO;
 import org.wso2.carbon.apimgt.gateway.graphQL.GraphQLConstants;
 import org.wso2.carbon.apimgt.gateway.graphQL.GraphQLResponseProcessor;
 import org.wso2.carbon.apimgt.impl.APIConstants;
@@ -96,7 +97,7 @@ public class WebsocketHandler extends CombinedChannelDuplexHandler<WebsocketInbo
                     if (log.isDebugEnabled()) {
                         log.debug("Sending Outbound Websocket frame." + ctx.channel().toString());
                     }
-                    handleWSResponseSuccess(ctx, msg, promise, inboundMessageContext);
+                    outboundHandler().write(ctx, msg, promise);
                 }
             } else {
                 // If not a GraphQL API (Only a WebSocket API)
@@ -128,14 +129,23 @@ public class WebsocketHandler extends CombinedChannelDuplexHandler<WebsocketInbo
         // publish analytics events if analytics is enabled
         if (APIUtil.isAnalyticsEnabled()) {
             String clientIp = getClientIp(ctx);
-            WebsocketUtil.publishRequestEvent(clientIp, true, inboundMessageContext,
+            WebsocketUtil.publishWSRequestEvent(clientIp, true, inboundMessageContext,
                     inboundHandler().getUsageDataPublisher());
         }
     }
 
     protected boolean isAllowed(ChannelHandlerContext ctx, WebSocketFrame msg,
-            InboundMessageContext inboundMessageContext, APIMgtUsageDataPublisher usageDataPublisher) {
-        return WebsocketUtil.doThrottle(ctx, msg, null, inboundMessageContext, usageDataPublisher);
+                                InboundMessageContext inboundMessageContext,
+                                APIMgtUsageDataPublisher usageDataPublisher) {
+        WebSocketThrottleResponseDTO webSocketThrottleResponseDTO =
+                WebsocketUtil.doThrottle(ctx, msg, null, inboundMessageContext);
+        if (webSocketThrottleResponseDTO.isThrottled()) {
+            if (APIUtil.isAnalyticsEnabled()) {
+                WebsocketUtil.publishWSThrottleEvent(inboundMessageContext, usageDataPublisher,
+                        webSocketThrottleResponseDTO.getThrottledOutReason());
+            }
+        }
+        return !webSocketThrottleResponseDTO.isThrottled();
     }
 
     protected String getClientIp(ChannelHandlerContext ctx) {

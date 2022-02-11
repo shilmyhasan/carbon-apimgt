@@ -40,6 +40,7 @@ import org.wso2.carbon.apimgt.api.model.subscription.URLMapping;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.InboundMessageContextDataHolder;
 import org.wso2.carbon.apimgt.gateway.dto.InboundProcessorResponseDTO;
+import org.wso2.carbon.apimgt.gateway.dto.WebSocketThrottleResponseDTO;
 import org.wso2.carbon.apimgt.gateway.graphQL.GraphQLConstants;
 import org.wso2.carbon.apimgt.gateway.graphQL.GraphQLRequestProcessor;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APIKeyValidator;
@@ -226,19 +227,10 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                         inboundMessageContext.getHeaders().get(HttpHeaders.AUTHORIZATION));
             } else {
                 InboundMessageContextDataHolder.getInstance().removeInboundMessageContextForConnection(channelId);
-                if (APIConstants.APITransportType.GRAPHQL.toString()
-                        .equals(inboundMessageContext.getElectedAPI().getApiType())) {
-                    String errorMessage = "No Authorization Header or access_token query parameter present";
-                    log.error(errorMessage + " in request for the websocket context "
-                            + inboundMessageContext.getApiContextUri());
-                    responseDTO = GraphQLRequestProcessor.getHandshakeErrorDTO(
-                            GraphQLConstants.HandshakeErrorConstants.API_AUTH_ERROR, errorMessage);
-                } else {
-                    // If not a GraphQL API (Only a WebSocket API)
-                    responseDTO.setError(true);
+                if (StringUtils.isEmpty(responseDTO.getErrorMessage())) {
                     responseDTO.setErrorMessage(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS_MESSAGE);
-                    responseDTO.setErrorCode(HttpResponseStatus.UNAUTHORIZED.code());
                 }
+                responseDTO.setErrorCode(HttpResponseStatus.UNAUTHORIZED.code());
                 WebsocketUtil.sendInvalidCredentialsMessage(ctx, inboundMessageContext, responseDTO);
             }
         } else if ((msg instanceof CloseWebSocketFrame) || (msg instanceof PingWebSocketFrame)) {
@@ -256,20 +248,23 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                 if (responseDTO.isError()) {
                     handleGraphQLRequestError(responseDTO, channelId, ctx);
                 } else {
-                    handleWSRequestSuccess(ctx, msg, inboundMessageContext, usageDataPublisher);
+                    ctx.fireChannelRead(msg);
                 }
             } else {
                 // If not a GraphQL API (Only a WebSocket API)
-                boolean isAllowed = WebsocketUtil.doThrottle(ctx, (WebSocketFrame) msg, null, inboundMessageContext,
-                        usageDataPublisher);
-
-                if (isAllowed) {
-                    handleWSRequestSuccess(ctx, msg, inboundMessageContext, usageDataPublisher);
-                } else {
+                WebSocketThrottleResponseDTO throttleResponseDTO =
+                        WebsocketUtil.doThrottle(ctx, (WebSocketFrame) msg, null, inboundMessageContext);
+                if (throttleResponseDTO.isThrottled()) {
+                    if (APIUtil.isAnalyticsEnabled()) {
+                        WebsocketUtil.publishWSThrottleEvent(inboundMessageContext, usageDataPublisher,
+                                throttleResponseDTO.getThrottledOutReason());
+                    }
                     ctx.writeAndFlush(new TextWebSocketFrame("Websocket frame throttled out"));
                     if (log.isDebugEnabled()) {
                         log.debug("Inbound Websocket frame is throttled. " + ctx.channel().toString());
                     }
+                } else {
+                    handleWSRequestSuccess(ctx, msg, inboundMessageContext, usageDataPublisher);
                 }
             }
         }
@@ -300,8 +295,13 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                                     APIConstants.AUTHORIZATION_QUERY_PARAM_DEFAULT).get(0));
                     removeTokenFromQuery(requestMap, inboundMessageContext);
                 } else {
-                    log.error("No Authorization Header or access_token query parameter present");
+                    String errorMessage = "No Authorization Header or access_token query parameter present";
+                    log.error(errorMessage + " in request for the websocket context "
+                            + inboundMessageContext.getApiContextUri());
                     responseDTO.setError(true);
+                    responseDTO = GraphQLRequestProcessor.getHandshakeErrorDTO(
+                            GraphQLConstants.HandshakeErrorConstants.API_AUTH_ERROR, errorMessage);
+                    return responseDTO;
                 }
             }
             String authorizationHeader = req.headers().get(HttpHeaders.AUTHORIZATION);
@@ -484,7 +484,7 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
         ctx.fireChannelRead(msg);
         // publish analytics events if analytics is enabled
         if (APIUtil.isAnalyticsEnabled()) {
-            WebsocketUtil.publishRequestEvent(inboundMessageContext.getUserIP(), true, inboundMessageContext,
+            WebsocketUtil.publishWSRequestEvent(inboundMessageContext.getUserIP(), true, inboundMessageContext,
                     usageDataPublisher);
         }
     }
