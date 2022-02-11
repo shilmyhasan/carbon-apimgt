@@ -111,10 +111,13 @@ public class ExtendedJWTBearerGrantHandler extends JWTBearerGrantHandler {
         AuthenticatedUser user = tokReqMsgCtx.getAuthorizedUser();
         Map<ClaimMapping, String> userAttributes = user.getUserAttributes();
         String roleClaim = identityProvider.getClaimConfig().getRoleClaimURI();
+        log.debug("updatedRoles after the role mapping applied = " + updatedRoles);
+
         if (roleClaim != null) {
             userAttributes
                     .put(ClaimMapping.build(roleClaim, roleClaim, null, false),
-                            updatedRoles.toString().replace(" ", ""));
+                            updatedRoles.toString().replace(" ", "").
+                                    replace("[", "").replace("]", ""));
             tokReqMsgCtx.addProperty(ResourceConstants.ROLE_CLAIM, roleClaim);
         }
         user.setUserAttributes(userAttributes);
