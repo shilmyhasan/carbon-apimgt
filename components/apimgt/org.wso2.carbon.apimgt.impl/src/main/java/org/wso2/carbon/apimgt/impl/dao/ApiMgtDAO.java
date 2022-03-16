@@ -6963,6 +6963,11 @@ public class ApiMgtDAO {
     private boolean isURITemplatesEqual(URITemplate template1, URITemplate template2) {
         if (template1.getUriTemplate().equals(template2.getUriTemplate())
                 && template1.getHTTPVerb().equals(template2.getHTTPVerb())) {
+
+            if (!template2.equals(template1)) {
+                return false;
+            }
+
             if (template1.getAuthType() != null && template1.getAuthType().
                     equals(template2.getAuthType())) {
                 Scope scope1 = template1.getScope();
