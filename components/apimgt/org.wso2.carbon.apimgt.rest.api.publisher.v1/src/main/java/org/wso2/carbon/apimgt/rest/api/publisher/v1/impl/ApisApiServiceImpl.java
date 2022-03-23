@@ -3253,6 +3253,11 @@ public class ApisApiServiceImpl implements ApisApiService {
         // Import the API and Definition
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            // Add description from definition if it is not defined by user
+            if (validationResponseDTO.getInfo().getDescription() != null
+                    && apiDTOFromProperties.getDescription() == null) {
+                apiDTOFromProperties.setDescription(validationResponse.getInfo().getDescription());
+            }
             API apiToAdd = prepareToCreateAPIByDTO(apiDTOFromProperties);
 
             boolean syncOperations = apiDTOFromProperties.getOperations().size() > 0;
