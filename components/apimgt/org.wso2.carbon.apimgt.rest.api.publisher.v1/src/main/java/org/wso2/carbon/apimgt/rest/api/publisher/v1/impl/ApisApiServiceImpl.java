@@ -3253,7 +3253,7 @@ public class ApisApiServiceImpl implements ApisApiService {
         // Import the API and Definition
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            // Add description from definition if it is not defined by user
+            // Add description from definition if it is not defined by the user
             if (validationResponseDTO.getInfo().getDescription() != null
                     && apiDTOFromProperties.getDescription() == null) {
                 apiDTOFromProperties.setDescription(validationResponse.getInfo().getDescription());
