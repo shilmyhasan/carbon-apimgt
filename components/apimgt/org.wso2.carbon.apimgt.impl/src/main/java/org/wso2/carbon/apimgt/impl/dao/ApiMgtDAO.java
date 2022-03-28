@@ -5101,7 +5101,7 @@ public class ApiMgtDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
             if (connection.getMetaData().getDriverName().contains("Oracle")) {
-                offset = offset + limit;
+                limit = offset + limit;
             }
             sqlQuery = sqlQuery.replace("$1", sortColumn);
             sqlQuery = sqlQuery.replace("$2", sortOrder);
