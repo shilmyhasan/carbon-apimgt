@@ -464,14 +464,15 @@ public class Utils {
 
     /**
      * Check if certificate is encoded or not
+     *
      * @return boolean value of encoded or not
      */
     private static boolean isClientCertificateEncoded() {
-        APIManagerConfiguration apiManagerConfiguration =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+        APIManagerConfiguration apiManagerConfiguration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfiguration();
         if (apiManagerConfiguration != null) {
-            String firstProperty = apiManagerConfiguration
-                    .getFirstProperty(APIConstants.MutualSSL.CLIENT_CERTIFICATE_ENCODE);
+            String firstProperty = apiManagerConfiguration.getFirstProperty(
+                    APIConstants.MutualSSL.CLIENT_CERTIFICATE_ENCODE);
             if (firstProperty != null) {
                 return Boolean.parseBoolean(firstProperty);
             } else {
@@ -483,6 +484,7 @@ public class Utils {
 
     /**
      * Get encoded client certificate when provided with the certificate
+     *
      * @param certificate the client certificate
      * @return the encoded client certificate
      * @throws CertificateEncodingException exception is thrown whenever an error occurs whilst attempting to encode the given certificate
@@ -490,11 +492,12 @@ public class Utils {
     public static String getEncodedClientCertificate(X509Certificate certificate) throws CertificateEncodingException {
         byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
         if (isClientCertificateEncoded()) {
-            String base64EncodedString = APIConstants.BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n"
-            ).concat(APIConstants.END_CERTIFICATE_STRING);
+            String base64EncodedString = APIConstants.BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n")
+                    .concat(APIConstants.END_CERTIFICATE_STRING);
             return Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
         } else {
-            return APIConstants.BEGIN_CERTIFICATE_STRING_SPACE.concat(new String(encoded)).concat(" ").concat(APIConstants.END_CERTIFICATE_STRING);
+            return APIConstants.BEGIN_CERTIFICATE_STRING_SPACE.concat(new String(encoded)).concat(" ")
+                    .concat(APIConstants.END_CERTIFICATE_STRING);
         }
     }
 
