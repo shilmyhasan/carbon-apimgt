@@ -19,16 +19,16 @@
 
 package org.wso2.carbon.apimgt.gateway.handlers.common;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.Utils;
+
 import java.util.Map;
+
 import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.X509Certificate;
 
@@ -47,13 +47,7 @@ public class MutualSSLCertificateHandler extends AbstractHandler {
             X509Certificate clientCertificate = Utils.getClientCertificate(axis2MsgContext);
             headers.remove(Utils.getClientCertificateHeader());
             if (clientCertificate != null) {
-                byte[] encoded = Base64.encodeBase64(clientCertificate.getEncoded());
-                String base64EncodedString =
-                        APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING
-                                .concat(new String(encoded)).concat("\n")
-                                .concat(APIMgtGatewayConstants.END_CERTIFICATE_STRING);
-                base64EncodedString = Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
-                headers.put(Utils.getClientCertificateHeader(), base64EncodedString);
+                headers.put(Utils.getClientCertificateHeader(), Utils.getEncodedClientCertificate(clientCertificate));
             }
         } catch (APIManagementException | CertificateEncodingException e) {
             log.error("Error while converting client certificate", e);
