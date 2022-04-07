@@ -32,6 +32,7 @@ import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.addressing.RelatesTo;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +54,6 @@ import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.apache.commons.codec.binary.Base64;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +64,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.cache.Caching;
+import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.CertificateException;
 import javax.security.cert.X509Certificate;
 import javax.xml.namespace.QName;
@@ -71,8 +72,7 @@ import javax.xml.namespace.QName;
 public class Utils {
     
     private static final Log log = LogFactory.getLog(Utils.class);
-    private static APIManagerConfiguration config= ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
-    
+
     public static void sendFault(MessageContext messageContext, int status) {
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
                 getAxis2MessageContext();
@@ -87,7 +87,6 @@ public class Utils {
         axis2MC.removeProperty(Constants.Configuration.CONTENT_TYPE);
         Map headers = (Map) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         if (headers != null) {
-            headers.remove(HttpHeaders.AUTHORIZATION);
             headers.remove(HttpHeaders.AUTHORIZATION);
 
             headers.remove(HttpHeaders.HOST);
@@ -385,7 +384,7 @@ public class Utils {
     }
 
     /**
-     * Get certificate fromm message context using header and validate according to config
+     * Get certificate from message context using header and validate according to config
      * @param axis2MessageContext
      * @return certificate
      * @throws APIManagementException
@@ -402,17 +401,27 @@ public class Utils {
             certificateFromMessageContext = certs[0];
         }
         if (headers.containsKey(Utils.getClientCertificateHeader())) {
-
             try {
                 if (!isClientCertificateValidationEnabled() || APIUtil
                         .isCertificateExistsInTrustStore(certificateFromMessageContext)) {
-                    String base64EncodedCertificate = (String) headers.get(Utils.getClientCertificateHeader());
-                    if (base64EncodedCertificate != null) {
-                        base64EncodedCertificate = URLDecoder.decode(base64EncodedCertificate).
-                                replaceAll(APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING, "")
-                                .replaceAll(APIMgtGatewayConstants.END_CERTIFICATE_STRING, "");
-
-                        byte[] bytes = Base64.decodeBase64(base64EncodedCertificate);
+                    String certificate = (String) headers.get(Utils.getClientCertificateHeader());
+                    byte[] bytes;
+                    if (certificate != null) {
+                        if (!isClientCertificateEncoded()) {
+                            certificate = certificate
+                                    .replaceAll(APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING, "")
+                                    .replaceAll(APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING_SPACE, "")
+                                    .replaceAll(APIMgtGatewayConstants.END_CERTIFICATE_STRING, "");
+                            certificate = certificate.replaceAll(" ", "\n");
+                            certificate = APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING + certificate
+                                    + APIMgtGatewayConstants.END_CERTIFICATE_STRING;
+                            bytes = certificate.getBytes();
+                        } else {
+                            certificate = URLDecoder.decode(certificate)
+                                    .replaceAll(APIMgtGatewayConstants.BEGIN_CERTIFICATE_STRING, "")
+                                    .replaceAll(APIMgtGatewayConstants.END_CERTIFICATE_STRING, "");
+                            bytes = Base64.decodeBase64(certificate);
+                        }
                         try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
                             X509Certificate x509Certificate = X509Certificate.getInstance(inputStream);
                             if (APIUtil.isCertificateExistsInTrustStore(x509Certificate)) {
@@ -427,15 +436,12 @@ public class Utils {
                             throw new APIManagementException(msg, e);
                         }
                     }
-
                 }
             } catch (APIManagementException e) {
                 String msg = "Error while validating into Certificate Existence";
                 log.error(msg, e);
                 throw new APIManagementException(msg, e);
-
             }
-
         }
         return certificateFromMessageContext;
     }
@@ -455,5 +461,42 @@ public class Utils {
         }
         return false;
     }
+
+    /**
+     * Check if certificate is encoded or not
+     * @return boolean value of encoded or not
+     */
+    private static boolean isClientCertificateEncoded() {
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+        if (apiManagerConfiguration != null) {
+            String firstProperty = apiManagerConfiguration
+                    .getFirstProperty(APIConstants.MutualSSL.CLIENT_CERTIFICATE_ENCODE);
+            if (firstProperty != null) {
+                return Boolean.parseBoolean(firstProperty);
+            } else {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get encoded client certificate when provided with the certificate
+     * @param certificate the client certificate
+     * @return the encoded client certificate
+     * @throws CertificateEncodingException exception is thrown whenever an error occurs whilst attempting to encode the given certificate
+     */
+    public static String getEncodedClientCertificate(X509Certificate certificate) throws CertificateEncodingException {
+        byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
+        if (isClientCertificateEncoded()) {
+            String base64EncodedString = APIConstants.BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n"
+            ).concat(APIConstants.END_CERTIFICATE_STRING);
+            return Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
+        } else {
+            return APIConstants.BEGIN_CERTIFICATE_STRING_SPACE.concat(new String(encoded)).concat(" ").concat(APIConstants.END_CERTIFICATE_STRING);
+        }
+    }
+
 }
 
