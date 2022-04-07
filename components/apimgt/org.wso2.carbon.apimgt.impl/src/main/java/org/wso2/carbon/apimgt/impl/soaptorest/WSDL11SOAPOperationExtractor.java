@@ -628,9 +628,10 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
         if (prevNode.hasChildNodes()) {
             NodeList childNodes = prevNode.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
-                if (childNodes.item(i).getAttributes() != null && current.getAttributes()
-                        .getNamedItem(SOAPToRESTConstants.NAME_ATTRIBUTE).getNodeValue().equals(childNodes.item(i)
-                                .getAttributes().getNamedItem(SOAPToRESTConstants.NAME_ATTRIBUTE).getNodeValue())) {
+                if (childNodes.item(i).getAttributes() != null &&
+                        childNodes.item(i).getAttributes().getNamedItem(NAME_ATTRIBUTE) != null &&
+                        current.getAttributes().getNamedItem(NAME_ATTRIBUTE).getNodeValue().equals(childNodes.item(i)
+                                .getAttributes().getNamedItem(NAME_ATTRIBUTE).getNodeValue())) {
                     isChild = true;
                 }
             }
@@ -1271,7 +1272,7 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
     @Override
     public void loadXSDs(APIMWSDLReader wsdlReader, String url) throws APIManagementException {
         Collection<File> foundXSDFiles = new java.util.LinkedList<>();
-        if (url!= null && url.endsWith(File.pathSeparator + "extracted")) {
+        if (url!= null && url.endsWith(File.separator + "extracted")) {
             File folderToImport = new File(url);
             foundXSDFiles = APIFileUtil.searchFilesWithMatchingExtension(folderToImport, "xsd", false);
         }
