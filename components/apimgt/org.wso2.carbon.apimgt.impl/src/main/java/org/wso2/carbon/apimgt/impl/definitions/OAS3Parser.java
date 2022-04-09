@@ -517,6 +517,9 @@ public class OAS3Parser extends APIDefinition {
                     Map<String, String> scopeBindings;
                     scopeSet.add(scope);
                 }
+            } else if (openAPI.getExtensions() != null
+                    && openAPI.getExtensions().containsKey(APIConstants.SWAGGER_X_WSO2_SECURITY)) {
+                return OASParserUtil.sortScopes(getScopesFromExtensions(openAPI));
             }
             return OASParserUtil.sortScopes(scopeSet);
         } else {
@@ -649,9 +652,10 @@ public class OAS3Parser extends APIDefinition {
         }
         updateSwaggerSecurityDefinition(openAPI, swaggerData, OPENAPI_DEFAULT_AUTHORIZATION_URL);
         updateLegacyScopesFromSwagger(openAPI, swaggerData);
-        
-        openAPI.getInfo().setTitle(swaggerData.getTitle());
 
+        if (StringUtils.isEmpty(openAPI.getInfo().getTitle())) {
+            openAPI.getInfo().setTitle(swaggerData.getTitle());
+        }
         if (StringUtils.isEmpty(openAPI.getInfo().getVersion())) {
             openAPI.getInfo().setVersion(swaggerData.getVersion());
         }
