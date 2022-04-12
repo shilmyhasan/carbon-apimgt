@@ -349,26 +349,26 @@ public class JWTValidator {
                         synCtx.setProperty(APIMgtGatewayConstants.API_PUBLISHER, apiKeyValidationInfoDTO.getApiPublisher());
                         log.debug("JWT authentication successful.");
                         String endUserToken = null;
-                        if (jwtGenerationEnabled) {
-                            JWTInfoDto jwtInfoDto;
-                            try {
-                                jwtInfoDto =
-                                        GatewayUtils.generateJWTInfoDto(payload, api, apiKeyValidationInfoDTO, synCtx);
+                        try {
+                            if (jwtGenerationEnabled) {
+                                JWTInfoDto jwtInfoDto = GatewayUtils.generateJWTInfoDto(payload, api,
+                                        apiKeyValidationInfoDTO, synCtx);
                                 endUserToken = generateAndRetrieveJWTToken(tokenIdentifier, jwtInfoDto);
-                                return GatewayUtils.generateAuthenticationContext(tokenIdentifier, payload, null,
-                                        apiKeyValidationInfoDTO, getApiLevelPolicy(), endUserToken, true);
-                            } catch (ParseException e) {
-                                throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
-                                        APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
                             }
+                            return GatewayUtils.generateAuthenticationContext(tokenIdentifier, payload, null,
+                                    apiKeyValidationInfoDTO, getApiLevelPolicy(), endUserToken, true);
+                        } catch (ParseException e) {
+                            throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
+                                    APISecurityConstants.API_AUTH_GENERAL_ERROR_MESSAGE);
                         }
                     } else {
                         log.debug("User is NOT authorized to access the Resource. API Subscription validation failed.");
                         throw new APISecurityException(apiKeyValidationInfoDTO.getValidationStatus(),
                                 "User is NOT authorized to access the Resource. API Subscription validation failed.");
                     }
+                } else {
+                    log.debug("Ignored subscription validation");
                 }
-                log.debug("Ignored subscription validation");
             }
 
             log.debug("JWT authentication successful.");
