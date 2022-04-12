@@ -171,6 +171,7 @@
                             org.wso2.carbon.utils.*; version="${carbon.kernel.package.import.version.range}",
                             org.osgi.service.component.*,
                             org.apache.commons.logging; version="${commons.logging.imp.pkg.version}",
+                            org.slf4j,
                             org.wso2.carbon.tenant.mgt.services.*; version="${carbon.multitenancy.version}",
                             org.wso2.carbon.context.*;  version="${carbon.kernel.package.import.version.range}",
                             org.wso2.carbon.core.multitenancy.*;  version="${carbon.kernel.package.import.version.range}",
