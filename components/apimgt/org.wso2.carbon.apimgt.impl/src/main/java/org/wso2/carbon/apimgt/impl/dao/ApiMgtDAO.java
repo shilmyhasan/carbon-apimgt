@@ -13104,10 +13104,10 @@ public class ApiMgtDAO {
     }
 
     /**
-     * Delete the block condition given the id
+     * Delete the block condition given the id.
      *
-     * @param uuid UUID of the block condition
-     * @return true if successfully deleted
+     * @param uuid UUID of the block condition.
+     * @return true if successfully deleted.
      * @throws APIManagementException
      */
     public boolean deleteBlockConditionByUUID(String uuid) throws APIManagementException {
