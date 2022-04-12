@@ -435,8 +435,6 @@ public final class APIImportUtil {
                     importedApi = OASParserUtil.setExtensionsToAPI(swaggerContent, importedApi);
                 }
             }
-            // This is required to make url templates and scopes get effected
-            apiProvider.updateAPI(importedApi);
 
             //Since Image, documents, sequences and WSDL are optional, exceptions are logged and ignored in implementation
             addAPIImage(pathToArchive, importedApi, apiProvider);
@@ -453,6 +451,9 @@ public final class APIImportUtil {
                 }
                 addClientCertificates(pathToArchive, apiProvider);
             }
+
+            // This is required to make url templates and scopes get effected
+            apiProvider.updateAPI(importedApi);
 
             // Change API lifecycle if state transition is required
             if (StringUtils.isNotEmpty(lifecycleAction)) {
@@ -571,10 +572,6 @@ public final class APIImportUtil {
             importedApi.setThumbnailUrl(APIUtil.prependTenantPrefix(thumbnailUrl,
                     apiIdentifier.getProviderName()));
             APIUtil.setResourcePermissions(apiIdentifier.getProviderName(), null, null, thumbPath);
-            apiProvider.updateAPI(importedApi);
-        } catch (FaultGatewaysException e) {
-            //This is logged and process is continued because icon is optional for an API
-            log.error("Failed to update API after adding icon. ", e);
         } catch (APIManagementException e) {
             log.error("Failed to add icon to the API: " + apiIdentifier.getApiName(), e);
         } catch (FileNotFoundException e) {
@@ -824,7 +821,6 @@ public final class APIImportUtil {
                 URL wsdlFileUrl = new File(wsdlPath).toURI().toURL();
                 importedApi.setWsdlUrl(wsdlFileUrl.toString());
                 APIUtil.createWSDL(registry, importedApi);
-                apiProvider.updateAPI(importedApi);
             } catch (MalformedURLException e) {
                 //this exception is logged and ignored since WSDL is optional for an API
                 log.error("Error in getting WSDL URL. ", e);
@@ -834,9 +830,6 @@ public final class APIImportUtil {
             } catch (APIManagementException e) {
                 //this exception is logged and ignored since WSDL is optional for an API
                 log.error("Error in creating the WSDL resource in the registry. ", e);
-            } catch (FaultGatewaysException e) {
-                //This is logged and process is continued because WSDL is optional for an API
-                log.error("Failed to update API after adding WSDL. ", e);
             }
         }
     }
