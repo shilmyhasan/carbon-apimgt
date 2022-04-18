@@ -317,20 +317,16 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                                     APIConstants.AUTHORIZATION_QUERY_PARAM_DEFAULT).get(0));
                     removeTokenFromQuery(requestMap, inboundMessageContext);
                 } else {
-                    String errorMessage = "No Authorization Header or access_token query parameter present";
-                    log.error(errorMessage + " in request for the websocket context "
-                            + inboundMessageContext.getApiContextUri());
-                    responseDTO.setError(true);
-                    responseDTO = GraphQLRequestProcessor.getHandshakeErrorDTO(
-                            GraphQLConstants.HandshakeErrorConstants.API_AUTH_ERROR, errorMessage);
-                    return responseDTO;
+                    return  handleEmptyAuthHeader(responseDTO, inboundMessageContext);
                 }
             }
             String authorizationHeader = req.headers().get(HttpHeaders.AUTHORIZATION);
             inboundMessageContext.setHeaders(
                     inboundMessageContext.getHeaders().add(HttpHeaders.AUTHORIZATION, authorizationHeader));
             String[] auth = authorizationHeader.split(" ");
-            if (APIConstants.CONSUMER_KEY_SEGMENT.equals(auth[0])) {
+            if (auth.length != 2) {
+                handleEmptyAuthHeader(responseDTO, inboundMessageContext);
+            } else if (APIConstants.CONSUMER_KEY_SEGMENT.equals(auth[0])) {
                 boolean isJwtToken = false;
                 inboundMessageContext.setJWTToken(isJwtToken);
                 String apiKey = auth[1];
@@ -398,6 +394,24 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
 
     protected APIManagerAnalyticsConfiguration getApiManagerAnalyticsConfiguration() {
         return DataPublisherUtil.getApiManagerAnalyticsConfiguration();
+    }
+
+    /**
+     * Handle requests with empty authentication headers.
+     *
+     * @param inboundMessageContext InboundMessageContext
+     * @param responseDTO InboundProcessorResponseDTO
+     * @return responseDTO InboundProcessorResponseDTO
+     */
+    private InboundProcessorResponseDTO handleEmptyAuthHeader(InboundProcessorResponseDTO responseDTO,
+            InboundMessageContext inboundMessageContext) {
+        String errorMessage = "No Authorization Header or access_token query parameter present";
+        log.error(errorMessage + " in request for the websocket context "
+                + inboundMessageContext.getApiContextUri());
+        responseDTO.setError(true);
+        responseDTO = GraphQLRequestProcessor.getHandshakeErrorDTO(
+                GraphQLConstants.HandshakeErrorConstants.API_AUTH_ERROR, errorMessage);
+        return responseDTO;
     }
 
     private void removeTokenFromQuery(Map<String, List<String>> parameters,
