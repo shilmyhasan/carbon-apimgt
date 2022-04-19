@@ -377,6 +377,8 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
 
             // Replace domain separator by "_" if user is coming from a secondary userstore.
             String domain = UserCoreUtil.extractDomainFromName(userNameForSP);
+            String overrideSpName = System.getProperty(APIConstants.APPLICATION.OVERRIDE_SP_NAME);
+            String serviceProviderApplicationName = null;
             if (domain != null && !domain.isEmpty() && !UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals(domain)) {
                 userNameForSP = userNameForSP.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
             }
@@ -401,6 +403,7 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                                         appMgtService.getApplicationExcludingFileBasedSPs(appName, tenantDomain);
                 ServiceProvider serviceProviderUpdate = new ServiceProvider();
                 if (serviceProvider != null) {
+                    serviceProviderApplicationName = serviceProvider.getApplicationName();
                     serviceProviderUpdate.setApplicationID(serviceProvider.getApplicationID());
                     serviceProviderUpdate.setCertificateContent(serviceProvider.getCertificateContent());
                     serviceProviderUpdate.setClaimConfig(serviceProvider.getClaimConfig());
@@ -434,9 +437,8 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                         serviceProviderProperties.add(serviceProviderProperty);
                     }
                     serviceProviderUpdate.setSpProperties(serviceProviderProperties.toArray(new ServiceProviderProperty[0]));
-                    String overrideSpName = System.getProperty(APIConstants.APPLICATION.OVERRIDE_SP_NAME);
                     if (StringUtils.isNotEmpty(overrideSpName) && !Boolean.parseBoolean(overrideSpName)) {
-                        serviceProviderUpdate.setApplicationName(serviceProvider.getApplicationName());
+                        serviceProviderUpdate.setApplicationName(serviceProviderApplicationName);
                     } else {
                         serviceProviderUpdate.setApplicationName(applicationName);
                     }
@@ -459,7 +461,12 @@ public class APIKeyMgtSubscriberService extends AbstractAdmin {
                 }
                 oAuthConsumerAppDTO.setOauthConsumerKey(consumerKey);
                 if (applicationName != null && !applicationName.isEmpty()) {
-                    oAuthConsumerAppDTO.setApplicationName(applicationName);
+                    if (StringUtils.isNotEmpty(overrideSpName) && !Boolean.parseBoolean(overrideSpName) &&
+                            serviceProviderApplicationName != null ) {
+                        oAuthConsumerAppDTO.setApplicationName(serviceProviderApplicationName);
+                    } else {
+                        oAuthConsumerAppDTO.setApplicationName(applicationName);
+                    }
                     log.debug("Name of the OAuthApplication is set to : " + applicationName);
                 }
 
