@@ -33,12 +33,10 @@ public class GraphQLSchemaDefinitionTest {
     public void testSubscriptionAvailability() throws Exception {
         String graphqlDirPath = "definitions" + File.separator + "graphql" + File.separator;
         String relativePath = graphqlDirPath + "schema_with_subscriptions.graphql";
-        String schema = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath),
-                StandardCharsets.UTF_8);
+        String schema = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath));
         Assert.assertTrue(graphQLSchemaDefinition.isSubscriptionAvailable(schema));
         relativePath = graphqlDirPath + "schema_without_subscriptions.graphql";
-        schema = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath),
-                StandardCharsets.UTF_8);
+        schema = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath));
         Assert.assertFalse(graphQLSchemaDefinition.isSubscriptionAvailable(schema));
     }
 }
