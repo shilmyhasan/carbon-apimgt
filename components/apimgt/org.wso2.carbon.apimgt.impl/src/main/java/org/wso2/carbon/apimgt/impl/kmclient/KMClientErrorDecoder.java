@@ -20,6 +20,8 @@ import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -30,6 +32,8 @@ import static feign.FeignException.errorStatus;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class KMClientErrorDecoder implements ErrorDecoder {
+
+    private static final Log log = LogFactory.getLog(KMClientErrorDecoder.class);
 
     @Override
     public Exception decode(String methodKey, Response response) {
@@ -52,7 +56,7 @@ public class KMClientErrorDecoder implements ErrorDecoder {
         String errorDescription = null;
         if (response.body() != null) {
             try {
-                String responseStr = IOUtils.toString(response.body().asInputStream(), UTF_8);
+                String responseStr = IOUtils.toString(response.body().asInputStream());
                 JSONParser jsonParser = new JSONParser();
                 JSONObject responseJson = (JSONObject) jsonParser.parse(responseStr);
                 Object errorObj = responseJson.get("error_description");
@@ -60,7 +64,7 @@ public class KMClientErrorDecoder implements ErrorDecoder {
                     errorDescription = errorObj.toString();
                 }
             } catch (IOException | ParseException ignore) {
-
+                log.error("Error while getting the error message from stream");
             }
         }
         return errorDescription;
