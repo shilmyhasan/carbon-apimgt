@@ -924,7 +924,7 @@ APIDesigner.prototype.render_additionalProperties = function () {
 APIDesigner.prototype.render_resources = function(){
     var json = jsyaml.safeLoad(window.localStorage.getItem(SWAGGER_CONTENT));
     context = {
-        "doc" : this.transform(json),
+        "doc" : this.transform(this.api_doc),
         "verbs" :VERBS,
         "has_resources" : this.has_resources()
     }
