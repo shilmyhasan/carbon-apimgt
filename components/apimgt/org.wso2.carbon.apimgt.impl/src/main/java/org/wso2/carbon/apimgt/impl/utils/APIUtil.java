@@ -112,6 +112,7 @@ import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.api.model.policy.QuotaPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
+import org.wso2.carbon.apimgt.api.model.EndpointSecurity;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIMRegistryServiceImpl;
 import org.wso2.carbon.apimgt.impl.APIManagerAnalyticsConfiguration;
@@ -9306,6 +9307,7 @@ public final class APIUtil {
                 GenericArtifact apiArtifact = artifactManager.getGenericArtifact(resource.getApiId());
                 API api = getAPI(apiArtifact, registry);
 
+                resource.setEndpointSecurityMap(setEndpointSecurityForAPIProduct(api));
                 resource.setEndpointConfig(api.getEndpointConfig());
             }
 
@@ -9333,6 +9335,24 @@ public final class APIUtil {
             throw new APIManagementException(msg, e);
         }
         return apiProduct;
+    }
+
+    public static Map<String, EndpointSecurity> setEndpointSecurityForAPIProduct(API api) throws APIManagementException {
+        Map<String,EndpointSecurity> endpointSecurityMap = new HashMap<>();
+        endpointSecurityMap.put(APIConstants.ENDPOINT_SECURITY, new EndpointSecurity());
+        if (api.isEndpointSecured()) {
+            EndpointSecurity productionEndpointSecurity = new EndpointSecurity();
+            productionEndpointSecurity.setEnabled(true);
+            productionEndpointSecurity.setUsername(api.getEndpointUTUsername());
+            productionEndpointSecurity.setPassword(api.getEndpointUTUsername());
+            if (api.isEndpointAuthDigest()) {
+                productionEndpointSecurity.setType(APIConstants.ENDPOINT_SECURITY_TYPE_DIGEST.toUpperCase());
+            } else {
+                productionEndpointSecurity.setType(APIConstants.ENDPOINT_SECURITY_TYPE_BASIC.toUpperCase());
+            }
+            endpointSecurityMap.replace(APIConstants.ENDPOINT_SECURITY, productionEndpointSecurity);
+        }
+        return endpointSecurityMap;
     }
 
     /**

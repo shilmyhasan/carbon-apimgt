@@ -23,7 +23,7 @@ public class EndpointSecurity {
 
     private String type = null;
 
-    private Boolean enabled = null;
+    private boolean enabled = false;
 
     private String username = null;
 
@@ -52,7 +52,7 @@ public class EndpointSecurity {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
 
         this.enabled = enabled;
     }
