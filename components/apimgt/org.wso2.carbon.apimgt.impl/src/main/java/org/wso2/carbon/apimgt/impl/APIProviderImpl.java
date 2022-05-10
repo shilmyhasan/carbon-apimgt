@@ -3827,7 +3827,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         // Extracting API details for the recommendation system
         if (api != null && recommendationEnvironment != null) {
             RecommenderEventPublisher
-                    extractor = new RecommenderDetailsExtractor(api, tenantDomain, APIConstants.DELETE_API);
+                    extractor = new RecommenderDetailsExtractor(api, organization, APIConstants.DELETE_API);
             Thread recommendationThread = new Thread(extractor);
             recommendationThread.start();
         }
@@ -5406,7 +5406,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             + ", version " + apiVersion + ", New Status : " + targetStatus;
                     log.debug(logMessage);
                 }
-                extractRecommendationDetails(apiTypeWrapper);
+                if (!isApiProduct) {
+                    extractRecommendationDetails(apiTypeWrapper.getApi());
+                }
                 return response;
             }
         } catch (APIPersistenceException e) {
@@ -5541,11 +5543,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         APIUtil.sendNotification(apiEvent, APIConstants.NotifierType.API.name());
     }
 
-    private void extractRecommendationDetails(ApiTypeWrapper apiTypeWrapper) {
-        // Extracting API or API Product details for the recommendation system
+    private void extractRecommendationDetails(API api) {
+        // Extracting API details for the recommendation system
         if (recommendationEnvironment != null) {
             RecommenderEventPublisher
-                    extractor = new RecommenderDetailsExtractor(apiTypeWrapper, tenantDomain, APIConstants.ADD_API);
+                    extractor = new RecommenderDetailsExtractor(api, tenantDomain, APIConstants.ADD_API);
             Thread recommendationThread = new Thread(extractor);
             recommendationThread.start();
         }
