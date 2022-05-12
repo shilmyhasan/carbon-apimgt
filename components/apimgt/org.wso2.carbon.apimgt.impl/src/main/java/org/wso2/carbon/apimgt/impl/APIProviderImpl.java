@@ -84,6 +84,7 @@ import org.wso2.carbon.apimgt.api.model.policy.Pipeline;
 import org.wso2.carbon.apimgt.api.model.policy.Policy;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
+import org.wso2.carbon.apimgt.api.model.EndpointSecurity;
 import org.wso2.carbon.apimgt.impl.certificatemgt.CertificateManager;
 import org.wso2.carbon.apimgt.impl.certificatemgt.CertificateManagerImpl;
 import org.wso2.carbon.apimgt.impl.certificatemgt.GatewayCertificateManager;
@@ -6993,7 +6994,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         validateApiProductInfo(product);
         String tenantDomain = MultitenantUtils
                 .getTenantDomain(APIUtil.replaceEmailDomainBack(product.getId().getProviderName()));
-        createAPIProduct(product);
+
 
         if (log.isDebugEnabled()) {
             log.debug("API Product details successfully added to the registry. API Product Name: " + product.getId().getName()
@@ -7028,6 +7029,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 apiProductResource.setApiIdentifier(api.getId());
                 apiProductResource.setProductIdentifier(product.getId());
                 apiProductResource.setEndpointConfig(api.getEndpointConfig());
+                apiProductResource.setEndpointSecurityMap(APIUtil.setEndpointSecurityForAPIProduct(api));
                 URITemplate uriTemplate = apiProductResource.getUriTemplate();
 
                 Map<String, URITemplate> templateMap = apiMgtDAO.getURITemplatesForAPI(api);
@@ -7041,7 +7043,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         uriTemplate.setId(templateMap.get(key).getId());
                         //request has a valid API id and a valid resource. we add it to valid resource map
                         validResources.add(apiProductResource);
-
                     } else {
                         //ignore
                         log.warn("API with id " + apiProductResource.getApiId()
@@ -7054,6 +7055,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
         //set the valid resources only
         product.setProductResources(validResources);
+
+        // Create registry artifact
+        createAPIProduct(product);
+
         //now we have validated APIs and it's resources inside the API product. Add it to database
 
         apiMgtDAO.addAPIProduct(product, tenantDomain);
@@ -7063,7 +7068,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public void saveToGateway(APIProduct product) throws FaultGatewaysException, APIManagementException {
-        Map<String, Map<String, String>> failedGateways = new ConcurrentHashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> failedGateways = new ConcurrentHashMap<>();
 
         List<APIProductResource> productResources = product.getProductResources();
 
@@ -7238,6 +7243,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             apiProductResource.setApiIdentifier(api.getId());
             apiProductResource.setProductIdentifier(product.getId());
             apiProductResource.setEndpointConfig(api.getEndpointConfig());
+            apiProductResource.setEndpointSecurityMap(APIUtil.setEndpointSecurityForAPIProduct(api));
             URITemplate uriTemplate = apiProductResource.getUriTemplate();
 
             Map<String, URITemplate> templateMap = apiMgtDAO.getURITemplatesForAPI(api);
