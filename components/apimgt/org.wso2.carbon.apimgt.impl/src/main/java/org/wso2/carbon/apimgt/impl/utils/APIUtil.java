@@ -7573,6 +7573,45 @@ public final class APIUtil {
         }
         return authConfigValue;
     }
+
+    /**
+     * Check whether the user is authorized for the application
+     *
+     * @param applicationName   - Application Name
+     * @param username - User name of the user
+     * @return User is authorized or not.
+     */
+    public static boolean isUserAuthorized(String applicationName, String username) {
+
+        String applicationRoleName = getAppRoleName(applicationName);
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Checking whether user has role : " + applicationRoleName + " by retrieving role list of " +
+                        "user : " + username);
+            }
+
+            UserStoreManager userStoreManager = CarbonContext.getThreadLocalCarbonContext().getUserRealm()
+                    .getUserStoreManager();
+            if (userStoreManager instanceof AbstractUserStoreManager) {
+                return ((AbstractUserStoreManager) userStoreManager).isUserInRole(username, applicationRoleName);
+            }
+
+            String[] userRoles = userStoreManager.getRoleListOfUser(username);
+            for (String userRole : userRoles) {
+                if (applicationRoleName.equals(userRole)) {
+                    return true;
+                }
+            }
+        } catch (UserStoreException e) {
+            log.error("Error while checking authorization for user: " +
+                    username + " for application: " + applicationName, e);
+        }
+        return false;
+    }
+
+    private static String getAppRoleName(String applicationName) {
+        return ApplicationConstants.APPLICATION_DOMAIN + UserCoreConstants.DOMAIN_SEPARATOR + applicationName;
+    }
     
     /**
      * This method is used to get the authorization configurations from the tenant registry
