@@ -144,6 +144,8 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceConstants;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.governance.lcm.util.CommonUtil;
+import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.user.profile.stub.UserProfileMgtServiceStub;
 import org.wso2.carbon.identity.user.profile.stub.UserProfileMgtServiceUserProfileExceptionException;
@@ -172,6 +174,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserRealm;
+import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.config.RealmConfigXMLProcessor;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.mgt.UserMgtConstants;
@@ -7573,6 +7576,45 @@ public final class APIUtil {
         }
         return authConfigValue;
     }
+
+    /**
+     * Check whether the user is authorized for the application
+     *
+     * @param applicationName   - Application Name
+     * @param username - User name of the user
+     * @return User is authorized or not.
+     */
+    public static boolean isUserAuthorized(String applicationName, String username) {
+
+        String applicationRoleName = getAppRoleName(applicationName);
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Checking whether user has role : " + applicationRoleName + " by retrieving role list of " +
+                        "user : " + username);
+            }
+
+            UserStoreManager userStoreManager = CarbonContext.getThreadLocalCarbonContext().getUserRealm()
+                    .getUserStoreManager();
+            if (userStoreManager instanceof AbstractUserStoreManager) {
+                return ((AbstractUserStoreManager) userStoreManager).isUserInRole(username, applicationRoleName);
+            }
+
+            String[] userRoles = userStoreManager.getRoleListOfUser(username);
+            for (String userRole : userRoles) {
+                if (applicationRoleName.equals(userRole)) {
+                    return true;
+                }
+            }
+        } catch (UserStoreException e) {
+            log.error("Error while checking authorization for user: " +
+                    username + " for application: " + applicationName, e);
+        }
+        return false;
+    }
+
+    private static String getAppRoleName(String applicationName) {
+        return ApplicationConstants.APPLICATION_DOMAIN + UserCoreConstants.DOMAIN_SEPARATOR + applicationName;
+    }
     
     /**
      * This method is used to get the authorization configurations from the tenant registry
@@ -7950,7 +7992,7 @@ public final class APIUtil {
 
     /**
      * Check whether the file type is supported.
-     * @param file name
+     * @param filename name
      * @return true if supported
      */
     public static boolean isSupportedFileType(String filename) {
