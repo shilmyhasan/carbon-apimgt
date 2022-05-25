@@ -866,6 +866,8 @@ public class ExportUtils {
     public static void addAPIMetaInformationToArchive(String archivePath, APIDTO apiDtoToReturn,
             ExportFormat exportFormat, APIProvider apiProvider, APIIdentifier apiIdentifier, String organization,
             String currentApiUuid) throws APIImportExportException {
+        String apiTenantDomain = null;
+        String schemaContent;
 
         CommonUtil.createDirectory(archivePath + File.separator + ImportExportConstants.DEFINITIONS_DIRECTORY);
 
@@ -874,12 +876,21 @@ public class ExportUtils {
             // Therefore swagger export is only required for REST or SOAP based APIs
             String apiType = apiDtoToReturn.getType().toString();
             API api = APIMappingUtil.fromDTOtoAPI(apiDtoToReturn, apiDtoToReturn.getProvider());
-            api.setOrganization(organization);
+            if (organization != null) {
+                api.setOrganization(organization);
+            } else {
+                apiTenantDomain = getTenantDomain(apiIdentifier);
+                api.setOrganization(apiTenantDomain);
+            }
             api.setId(apiIdentifier);
             if (!PublisherCommonUtils.isStreamingAPI(apiDtoToReturn)) {
                 // For Graphql APIs, the graphql schema definition should be exported.
                 if (StringUtils.equals(apiType, APIConstants.APITransportType.GRAPHQL.toString())) {
-                    String schemaContent = apiProvider.getGraphqlSchema(apiIdentifier);
+                    if (organization != null) {
+                        schemaContent = apiProvider.getGraphqlSchemaDefinition(currentApiUuid, organization);
+                    } else {
+                        schemaContent = apiProvider.getGraphqlSchemaDefinition(currentApiUuid, apiTenantDomain);
+                    }
                     CommonUtil.writeFile(archivePath + ImportExportConstants.GRAPHQL_SCHEMA_DEFINITION_LOCATION,
                             schemaContent);
                     GraphqlComplexityInfo graphqlComplexityInfo = apiProvider
@@ -939,7 +950,11 @@ public class ExportUtils {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             JsonElement apiObj = gson.toJsonTree(apiDtoToReturn);
             JsonObject apiJson = (JsonObject) apiObj;
-            apiJson.addProperty("organizationId", organization);
+            if (organization != null) {
+                apiJson.addProperty("organizationId", organization);
+            } else {
+                apiJson.addProperty("organizationId", apiTenantDomain);
+            }
 
             CommonUtil.writeDtoToFile(archivePath + ImportExportConstants.API_FILE_LOCATION, exportFormat,
                     ImportExportConstants.TYPE_API, apiJson);
@@ -1099,5 +1114,11 @@ public class ExportUtils {
                     isStatusPreserved, preserveDocs, StringUtils.EMPTY, organization);
             CommonUtil.extractArchive(dependentAPI, apisDirectoryPath);
         }
+    }
+
+    protected static String getTenantDomain(Identifier identifier) {
+
+        return MultitenantUtils.getTenantDomain(
+                APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
     }
 }

@@ -8056,6 +8056,34 @@ public class ApiMgtDAO {
     }
 
     /**
+     * Get API Product UUID by the API Product Identifier.
+     *
+     * @param identifier API Product Identifier
+     * @return String UUID
+     * @throws APIManagementException if an error occurs
+     */
+    public String getUUIDFromIdentifier(APIProductIdentifier identifier) throws APIManagementException {
+
+        String uuid = null;
+        String sql = SQLConstants.GET_UUID_BY_IDENTIFIER_SQL;
+        try (Connection connection = APIMgtDBUtil.getConnection()) {
+            PreparedStatement prepStmt = connection.prepareStatement(sql);
+            prepStmt.setString(1, APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
+            prepStmt.setString(2, identifier.getName());
+            prepStmt.setString(3, identifier.getVersion());
+            try (ResultSet resultSet = prepStmt.executeQuery()) {
+                while (resultSet.next()) {
+                    uuid = resultSet.getString(1);
+                }
+            }
+        } catch (SQLException e) {
+            handleException("Failed to retrieve the UUID for the API Product : " + identifier.getName() + '-'
+                    + identifier.getVersion(), e);
+        }
+        return uuid;
+    }
+
+    /**
      * Get API UUID by the API Identifier.
      *
      * @param identifier API Identifier
@@ -8128,7 +8156,42 @@ public class ApiMgtDAO {
      */
     public String getUUIDFromIdentifier(APIProductIdentifier identifier, String organization)
             throws APIManagementException {
-        return getUUIDFromIdentifier(identifier, organization, null);
+        if (organization != null) {
+            return getUUIDFromIdentifier(identifier, organization, null);
+        } else {
+            String apiTenantDomain = MultitenantUtils.getTenantDomain(
+                    APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
+            return getUUIDFromIdentifier(identifier, apiTenantDomain, null);
+        }
+    }
+
+    /**
+     * Get API UUID by passed parameters.
+     *
+     * @param provider Provider of the API
+     * @param apiName  Name of the API
+     * @param version  Version of the API
+     * @return String UUID
+     * @throws APIManagementException if an error occurs
+     */
+    public String getUUIDFromIdentifier(String provider, String apiName, String version) throws APIManagementException {
+
+        String uuid = null;
+        String sql = SQLConstants.GET_UUID_BY_IDENTIFIER_SQL;
+        try (Connection connection = APIMgtDBUtil.getConnection()) {
+            PreparedStatement prepStmt = connection.prepareStatement(sql);
+            prepStmt.setString(1, APIUtil.replaceEmailDomainBack(provider));
+            prepStmt.setString(2, apiName);
+            prepStmt.setString(3, version);
+            try (ResultSet resultSet = prepStmt.executeQuery()) {
+                while (resultSet.next()) {
+                    uuid = resultSet.getString(1);
+                }
+            }
+        } catch (SQLException e) {
+            handleException("Failed to get the UUID for API : ", e);
+        }
+        return uuid;
     }
 
     /**
@@ -16208,7 +16271,10 @@ public class ApiMgtDAO {
                     }
                 }
 
-                setOperationPoliciesToURITemplatesMap(apiRevision.getApiUUID(), uriTemplateMap);
+                String migrate =  System.getProperty(APIConstants.MIGRATE);
+                if (migrate == null) {
+                    setOperationPoliciesToURITemplatesMap(apiRevision.getApiUUID(), uriTemplateMap);
+                }
 
                 PreparedStatement insertURLMappingsStatement = connection
                         .prepareStatement(SQLConstants.APIRevisionSqlConstants.INSERT_URL_MAPPINGS);
@@ -18155,6 +18221,18 @@ public class ApiMgtDAO {
         }
 
         return false;
+    }
+
+    public String getUUIDFromIdentifier(Identifier apiIdentifier, String organization) throws APIManagementException {
+        if (apiIdentifier instanceof APIProductIdentifier) {
+            return getUUIDFromIdentifier((APIProductIdentifier) apiIdentifier, organization);
+        } else {
+            if (organization != null) {
+                return getUUIDFromIdentifier((APIIdentifier) apiIdentifier, organization);
+            } else {
+                return getUUIDFromIdentifier((APIIdentifier) apiIdentifier);
+            }
+        }
     }
 
     private class SubscriptionInfo {
