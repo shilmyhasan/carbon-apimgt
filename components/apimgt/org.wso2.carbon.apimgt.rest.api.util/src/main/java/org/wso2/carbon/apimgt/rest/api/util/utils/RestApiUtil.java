@@ -38,6 +38,7 @@ import org.wso2.carbon.apimgt.api.APIProvider;
 import org.wso2.carbon.apimgt.api.ApplicationNameWhiteSpaceValidationException;
 import org.wso2.carbon.apimgt.api.ApplicationNameWithInvalidCharactersException;
 import org.wso2.carbon.apimgt.api.ErrorHandler;
+import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.DuplicateAPIException;
@@ -651,6 +652,21 @@ public class RestApiUtil {
     public static boolean isDueToApplicationNameWithInvalidCharacters(Throwable e) {
         Throwable rootCause = getPossibleErrorCause(e);
         return rootCause instanceof ApplicationNameWithInvalidCharactersException;
+    }
+
+    /**
+     * Check if the specified throwable e is happened due to parsing an invalid Open API Specification
+     *
+     * @param e throwable to check
+     * @return true if the specified throwable e is happened due to parsing an invalid Open API Specification
+     * false otherwise
+     */
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public static boolean isDueToInvalidOpenAPIDefinition(Throwable e) {
+        if (e.getMessage().contains(ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorMessage())) {
+            return true;
+        }
+        return false;
     }
 
     /**

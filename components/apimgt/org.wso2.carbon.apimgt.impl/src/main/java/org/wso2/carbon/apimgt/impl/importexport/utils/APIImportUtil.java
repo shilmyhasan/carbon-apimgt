@@ -38,11 +38,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.wso2.carbon.apimgt.api.APIDefinition;
+import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIMgtAuthorizationFailedException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceAlreadyExistsException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceNotFoundException;
 import org.wso2.carbon.apimgt.api.APIProvider;
+import org.wso2.carbon.apimgt.api.ErrorHandler;
+import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.FaultGatewaysException;
 import org.wso2.carbon.apimgt.api.doc.model.APIResource;
 import org.wso2.carbon.apimgt.api.dto.ClientCertificateDTO;
@@ -52,7 +55,6 @@ import org.wso2.carbon.apimgt.api.model.APIStatus;
 import org.wso2.carbon.apimgt.api.model.Documentation;
 import org.wso2.carbon.apimgt.api.model.ResourceFile;
 import org.wso2.carbon.apimgt.api.model.Scope;
-import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.Tier;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
@@ -244,6 +246,7 @@ public final class APIImportUtil {
         String currentStatus;
         String targetStatus;
         String lifecycleAction = null;
+        String swaggerContent = null;
         String pathToYamlFile = pathToArchive + APIImportExportConstants.YAML_API_FILE_LOCATION;
         String pathToJsonFile = pathToArchive + APIImportExportConstants.JSON_API_FILE_LOCATION;
         UserRegistry registry;
@@ -318,6 +321,21 @@ public final class APIImportUtil {
                 setCurrentProviderToAPIProperties(importedApi, currentTenantDomain, prevTenantDomain);
             }
 
+            // Validate the swagger definition if the API type is not Web Socket.
+            if (!APIConstants.APITransportType.WS.toString().equalsIgnoreCase(importedApi.getType())) {
+                swaggerContent = loadSwaggerFile(pathToArchive);
+                APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(swaggerContent, true);
+                if (!response.isValid()) {
+                    String errorDescription = ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorMessage();
+                    if (response.getErrorItems().size() > 0) {
+                        for (ErrorHandler errorHandler : response.getErrorItems()) {
+                            errorDescription = errorDescription.concat(". " + errorHandler.getErrorDescription());
+                        }
+                    }
+                    throw new APIImportExportException(errorDescription);
+                }
+            }
+
             // Store imported API status
             targetStatus = importedApi.getStatus();
             if (Boolean.TRUE.equals(overwrite)) {
@@ -389,9 +407,8 @@ public final class APIImportUtil {
             }
 
             //Swagger definition will only be available of API type HTTP. Web socket API does not have it.
-            if (!APIConstants.APITransportType.WS.toString().equalsIgnoreCase(importedApi.getType())) {
-                String swaggerContent = loadSwaggerFile(pathToArchive);
-
+            if (!APIConstants.APITransportType.WS.toString().equalsIgnoreCase(importedApi.getType())
+                    && !StringUtils.isBlank(swaggerContent)) {
                 //preProcess swagger definition
                 swaggerContent = OASParserUtil.preProcess(swaggerContent);
 
