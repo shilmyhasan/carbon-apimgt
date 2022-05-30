@@ -179,15 +179,6 @@ public class APIManagerComponent {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             String filePath = CarbonUtils.getCarbonConfigDirPath() + File.separator + "api-manager.xml";
             configuration.load(filePath);
-            String migrateFromVersionProperty = System.getProperty(APIConstants.MIGRATE);
-            if (migrateFromVersionProperty == null) {
-                CommonConfigDeployer configDeployer = new CommonConfigDeployer();
-                bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), configDeployer, null);
-                TenantLoadMessageSender tenantLoadMessageSender = new TenantLoadMessageSender();
-                bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), tenantLoadMessageSender, null);
-                KeyMgtConfigDeployer keyMgtConfigDeployer = new KeyMgtConfigDeployer();
-                bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), keyMgtConfigDeployer, null);
-            }
 
             //Registering Notifiers
             bundleContext.registerService(Notifier.class.getName(), new SubscriptionsNotifier(), null);
@@ -202,10 +193,17 @@ public class APIManagerComponent {
             bundleContext.registerService(Notifier.class.getName(),new ExternalGatewayNotifier(),null);
             bundleContext.registerService(Notifier.class.getName(),new ExternallyDeployedApiNotifier(),null);
             APIManagerConfigurationServiceImpl configurationService = new APIManagerConfigurationServiceImpl(configuration);
+            String migrateFromVersionProperty = System.getProperty(APIConstants.MIGRATE);
+            if (migrateFromVersionProperty == null) {
+                CommonConfigDeployer configDeployer = new CommonConfigDeployer();
+                bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), configDeployer, null);
+                TenantLoadMessageSender tenantLoadMessageSender = new TenantLoadMessageSender();
+                bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), tenantLoadMessageSender, null);
+                KeyMgtConfigDeployer keyMgtConfigDeployer = new KeyMgtConfigDeployer();
+                bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), keyMgtConfigDeployer, null);
+            }
             ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(configurationService);
             APIMgtDBUtil.initialize();
-            APIMConfigService apimConfigService = new APIMConfigServiceImpl();
-            bundleContext.registerService(APIMConfigService.class.getName(), apimConfigService, null);
             if (migrateFromVersionProperty == null) {
                 APIUtil.loadAndSyncTenantConf(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                 APIUtil.loadTenantExternalStoreConfig(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
@@ -226,6 +224,8 @@ public class APIManagerComponent {
                 ServiceReferenceHolder.getInstance().setKeyManagerConfigurationService(keyManagerConfigurationService);
                 APIStatusObserverList.getInstance().init(configuration);
                 MonetizationDataHolder.getInstance().init();
+                registration = componentContext.getBundleContext()
+                        .registerService(APIManagerConfigurationService.class.getName(), configurationService, null);
             }
             log.debug("Reading Analytics Configuration from file...");
             // This method is called in two places. Mostly by the time activate hits,

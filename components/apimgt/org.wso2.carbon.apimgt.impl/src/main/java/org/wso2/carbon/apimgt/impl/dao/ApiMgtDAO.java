@@ -166,6 +166,8 @@ public class ApiMgtDAO {
     private boolean forceCaseInsensitiveComparisons = false;
     private boolean multiGroupAppSharingEnabled = false;
 
+    String migrationEnabled = System.getProperty(APIConstants.MIGRATE);
+
     private ApiMgtDAO() {
 
         APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
@@ -5763,59 +5765,63 @@ public class ApiMgtDAO {
                         uriScopeMappingPrepStmt.addBatch();
                     }
 
-                    if (uriTemplate.getOperationPolicies() != null) {
-                        for (OperationPolicy policy : uriTemplate.getOperationPolicies()) {
-                            if (!updatedPoliciesMap.keySet().contains(policy.getPolicyId())) {
-                                OperationPolicyData existingPolicy =
-                                        getAPISpecificOperationPolicyByPolicyID(policy.getPolicyId(), api.getUuid(),
-                                                tenantDomain, false);
-                                String clonedPolicyId = policy.getPolicyId();
-                                if (existingPolicy != null) {
-                                    if (existingPolicy.isClonedPolicy()) {
+                    if (migrationEnabled == null) {
+                        if (uriTemplate.getOperationPolicies() != null) {
+                            for (OperationPolicy policy : uriTemplate.getOperationPolicies()) {
+                                if (!updatedPoliciesMap.keySet().contains(policy.getPolicyId())) {
+                                    OperationPolicyData existingPolicy =
+                                            getAPISpecificOperationPolicyByPolicyID(policy.getPolicyId(), api.getUuid(),
+                                                    tenantDomain, false);
+                                    String clonedPolicyId = policy.getPolicyId();
+                                    if (existingPolicy != null) {
+                                        if (existingPolicy.isClonedPolicy()) {
+                                            usedClonedPolicies.add(clonedPolicyId);
+                                        }
+                                    } else {
+                                        // Even though the policy ID attached is not in the API specific policy list,
+                                        // it can be a common policy and we need to verify that it has not been previously cloned
+                                        // for the API before cloning again.
+                                        clonedPolicyId = getClonedPolicyIdForCommonPolicyId(connection,
+                                                policy.getPolicyId(), api.getUuid());
+                                        if (clonedPolicyId == null) {
+                                            clonedPolicyId = cloneOperationPolicy(connection, policy.getPolicyId(),
+                                                    api.getUuid(), null);
+                                        }
                                         usedClonedPolicies.add(clonedPolicyId);
+                                        //usedClonedPolicies set will not contain used API specific policies that are not cloned.
+                                        //TODO: discuss whether we need to clone API specific policies as well
                                     }
-                                } else {
-                                    // Even though the policy ID attached is not in the API specific policy list,
-                                    // it can be a common policy and we need to verify that it has not been previously cloned
-                                    // for the API before cloning again.
-                                    clonedPolicyId = getClonedPolicyIdForCommonPolicyId(connection,
-                                            policy.getPolicyId(), api.getUuid());
-                                    if (clonedPolicyId == null) {
-                                        clonedPolicyId = cloneOperationPolicy(connection, policy.getPolicyId(),
-                                                api.getUuid(), null);
-                                    }
-                                    usedClonedPolicies.add(clonedPolicyId);
-                                    //usedClonedPolicies set will not contain used API specific policies that are not cloned.
-                                    //TODO: discuss whether we need to clone API specific policies as well
+
+                                    // Updated policies map will record the updated policy ID for the used policy ID.
+                                    // If the policy has been cloned to the API specific policy list, we need to use the
+                                    // updated policy Id.
+                                    updatedPoliciesMap.put(policy.getPolicyId(), clonedPolicyId);
                                 }
 
-                                // Updated policies map will record the updated policy ID for the used policy ID.
-                                // If the policy has been cloned to the API specific policy list, we need to use the
-                                // updated policy Id.
-                                updatedPoliciesMap.put(policy.getPolicyId(), clonedPolicyId);
-                            }
+                                Gson gson = new Gson();
+                                String paramJSON = gson.toJson(policy.getParameters());
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Adding operation policy " + policy.getPolicyName() + " for API "
+                                            + api.getId().getApiName() + " to URL mapping Id " + uriMappingId);
+                                }
 
-                            Gson gson = new Gson();
-                            String paramJSON = gson.toJson(policy.getParameters());
-                            if (log.isDebugEnabled()) {
-                                log.debug("Adding operation policy " + policy.getPolicyName() + " for API "
-                                        + api.getId().getApiName() + " to URL mapping Id " + uriMappingId);
+                                operationPolicyMappingPrepStmt.setInt(1, uriMappingId);
+                                operationPolicyMappingPrepStmt.setString(2, updatedPoliciesMap.get(policy.getPolicyId()));
+                                operationPolicyMappingPrepStmt.setString(3, policy.getDirection());
+                                operationPolicyMappingPrepStmt.setString(4, paramJSON);
+                                operationPolicyMappingPrepStmt.setInt(5, policy.getOrder());
+                                operationPolicyMappingPrepStmt.addBatch();
                             }
-
-                            operationPolicyMappingPrepStmt.setInt(1, uriMappingId);
-                            operationPolicyMappingPrepStmt.setString(2, updatedPoliciesMap.get(policy.getPolicyId()));
-                            operationPolicyMappingPrepStmt.setString(3, policy.getDirection());
-                            operationPolicyMappingPrepStmt.setString(4, paramJSON);
-                            operationPolicyMappingPrepStmt.setInt(5, policy.getOrder());
-                            operationPolicyMappingPrepStmt.addBatch();
                         }
+                        uriTemplate.setId(uriMappingId);
                     }
                 }
-                uriTemplate.setId(uriMappingId);
             } // end URITemplate list iteration
             uriScopeMappingPrepStmt.executeBatch();
-            operationPolicyMappingPrepStmt.executeBatch();
-            cleanUnusedClonedOperationPolicies(connection, usedClonedPolicies, api.getUuid());
+            if (migrationEnabled == null) {
+                operationPolicyMappingPrepStmt.executeBatch();
+                cleanUnusedClonedOperationPolicies(connection, usedClonedPolicies, api.getUuid());
+            }
         }
     }
 
@@ -7140,7 +7146,9 @@ public class ApiMgtDAO {
                 }
 
                 setAssociatedAPIProducts(currentApiUuid, uriTemplates);
-                setOperationPolicies(apiRevision.getRevisionUUID(), uriTemplates);
+                if (migrationEnabled == null) {
+                    setOperationPolicies(apiRevision.getRevisionUUID(), uriTemplates);
+                }
             } catch (SQLException e) {
                 handleException("Failed to get URI Templates of API with UUID " + uuid, e);
             }
@@ -7198,7 +7206,9 @@ public class ApiMgtDAO {
                 }
 
                 setAssociatedAPIProducts(currentApiUuid, uriTemplates);
-                setOperationPolicies(currentApiUuid, uriTemplates);
+                if (migrationEnabled == null) {
+                    setOperationPolicies(currentApiUuid, uriTemplates);
+                }
             } catch (SQLException e) {
                 handleException("Failed to get URI Templates of API with UUID " + currentApiUuid, e);
             }
@@ -14803,18 +14813,19 @@ public class ApiMgtDAO {
                                     }
                                 }
                             }
-
-                            try (PreparedStatement policiesStatement = connection.
-                                    prepareStatement(
-                                            SQLConstants.OperationPolicyConstants.GET_OPERATION_POLICIES_BY_URI_TEMPLATE_ID)) {
-                                policiesStatement.setInt(1, uriTemplateId);
-                                try (ResultSet policiesResult = policiesStatement.executeQuery()) {
-                                    List<OperationPolicy> operationPolicies = new ArrayList<>();
-                                    while (policiesResult.next()) {
-                                        OperationPolicy policy = populateOperationPolicyWithRS(policiesResult);
-                                        operationPolicies.add(policy);
+                            if (migrationEnabled == null) {
+                                try (PreparedStatement policiesStatement = connection.
+                                        prepareStatement(
+                                                SQLConstants.OperationPolicyConstants.GET_OPERATION_POLICIES_BY_URI_TEMPLATE_ID)) {
+                                    policiesStatement.setInt(1, uriTemplateId);
+                                    try (ResultSet policiesResult = policiesStatement.executeQuery()) {
+                                        List<OperationPolicy> operationPolicies = new ArrayList<>();
+                                        while (policiesResult.next()) {
+                                            OperationPolicy policy = populateOperationPolicyWithRS(policiesResult);
+                                            operationPolicies.add(policy);
+                                        }
+                                        uriTemplate.setOperationPolicies(operationPolicies);
                                     }
-                                    uriTemplate.setOperationPolicies(operationPolicies);
                                 }
                             }
 
