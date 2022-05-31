@@ -88,6 +88,8 @@ import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleHistoryDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.LifecycleStateDTO;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.core.util.CryptoUtil;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -780,6 +782,16 @@ public class PublisherCommonUtils {
                         APIDTO.TypeEnum.SSE.equals(apiDto.getType()) || APIDTO.TypeEnum.ASYNC.equals(apiDto.getType());
         username = StringUtils.isEmpty(username) ? RestApiCommonUtil.getLoggedInUsername() : username;
         APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
+
+        String context = apiDto.getContext();
+        context = context.startsWith("/") ? context : ("/" + context);
+        String providerDomain = MultitenantUtils.getTenantDomain(username);
+        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(providerDomain) &&
+                !context.contains("/t/" + providerDomain)) {
+            //Create tenant aware context for API
+            context = "/t/" + providerDomain + context;
+        }
+        apiDto.setContext(context);
 
         // validate web socket api endpoint configurations
         if (isWSAPI && !PublisherCommonUtils.isValidWSAPI(apiDto)) {
