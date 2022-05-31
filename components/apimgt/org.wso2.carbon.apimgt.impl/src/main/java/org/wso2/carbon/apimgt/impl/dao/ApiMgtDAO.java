@@ -7080,12 +7080,15 @@ public class ApiMgtDAO {
     public Set<URITemplate> getURITemplatesOfAPI(String uuid)
             throws APIManagementException {
 
-        String currentApiUuid;
-        APIRevision apiRevision = checkAPIUUIDIsARevisionUUID(uuid);
-        if (apiRevision != null && apiRevision.getApiUUID() != null) {
-            currentApiUuid = apiRevision.getApiUUID();
-        } else {
-            currentApiUuid = uuid;
+        String currentApiUuid = uuid;
+        APIRevision apiRevision = null;
+        if (migrationEnabled == null) {
+            apiRevision = checkAPIUUIDIsARevisionUUID(uuid);
+            if (apiRevision != null && apiRevision.getApiUUID() != null) {
+                currentApiUuid = apiRevision.getApiUUID();
+            } else {
+                currentApiUuid = uuid;
+            }
         }
         Map<Integer, URITemplate> uriTemplates = new LinkedHashMap<>();
         Map<Integer, Set<String>> scopeToURITemplateId = new HashMap<>();

@@ -224,9 +224,9 @@ public class APIManagerComponent {
                 ServiceReferenceHolder.getInstance().setKeyManagerConfigurationService(keyManagerConfigurationService);
                 APIStatusObserverList.getInstance().init(configuration);
                 MonetizationDataHolder.getInstance().init();
-                registration = componentContext.getBundleContext()
-                        .registerService(APIManagerConfigurationService.class.getName(), configurationService, null);
             }
+            registration = componentContext.getBundleContext()
+                    .registerService(APIManagerConfigurationService.class.getName(), configurationService, null);
             log.debug("Reading Analytics Configuration from file...");
             // This method is called in two places. Mostly by the time activate hits,
             // ServiceDataPublisherAdmin is not activated. Therefore, this same method is run,
