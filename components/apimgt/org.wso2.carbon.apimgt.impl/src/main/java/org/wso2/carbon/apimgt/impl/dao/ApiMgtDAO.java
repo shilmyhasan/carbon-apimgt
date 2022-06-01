@@ -14871,17 +14871,19 @@ public class ApiMgtDAO {
                                 }
                             }
 
-                            try (PreparedStatement policiesStatement = connection.
-                                prepareStatement(
-                                    SQLConstants.OperationPolicyConstants.GET_OPERATION_POLICIES_BY_URI_TEMPLATE_ID)) {
-                                policiesStatement.setInt(1, uriTemplateId);
-                                try (ResultSet policiesResult = policiesStatement.executeQuery()) {
-                                    List<OperationPolicy> operationPolicies = new ArrayList<>();
-                                    while (policiesResult.next()) {
-                                        OperationPolicy policy = populateOperationPolicyWithRS(policiesResult);
-                                        operationPolicies.add(policy);
+                            if (migrationEnabled == null) {
+                                try (PreparedStatement policiesStatement = connection.
+                                        prepareStatement(
+                                                SQLConstants.OperationPolicyConstants.GET_OPERATION_POLICIES_BY_URI_TEMPLATE_ID)) {
+                                    policiesStatement.setInt(1, uriTemplateId);
+                                    try (ResultSet policiesResult = policiesStatement.executeQuery()) {
+                                        List<OperationPolicy> operationPolicies = new ArrayList<>();
+                                        while (policiesResult.next()) {
+                                            OperationPolicy policy = populateOperationPolicyWithRS(policiesResult);
+                                            operationPolicies.add(policy);
+                                        }
+                                        uriTemplate.setOperationPolicies(operationPolicies);
                                     }
-                                    uriTemplate.setOperationPolicies(operationPolicies);
                                 }
                             }
 

@@ -53,6 +53,7 @@ import org.wso2.carbon.apimgt.api.model.OperationPolicy;
 import org.wso2.carbon.apimgt.api.model.OperationPolicyData;
 import org.wso2.carbon.apimgt.api.model.ResourceFile;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
+import org.wso2.carbon.apimgt.api.model.Mediation;
 import org.wso2.carbon.apimgt.api.model.graphql.queryanalysis.GraphqlComplexityInfo;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.certificatemgt.CertificateManager;
@@ -101,6 +102,8 @@ public class ExportUtils {
     private static final String IN = "in";
     private static final String OUT = "out";
     private static final String SOAPTOREST = "SoapToRest";
+
+    private static String migrationEnabled = System.getProperty(APIConstants.MIGRATE);
 
     /**
      * Validate name, version and provider before exporting an API/API Product.
@@ -216,6 +219,10 @@ public class ExportUtils {
                 api, currentApiUuid);
         addGatewayEnvironmentsToArchive(archivePath, apiDtoToReturn.getId(), exportFormat, apiProvider);
 
+        if (migrationEnabled != null) {
+            apiProvider.loadMediationPoliciesToAPI(api, organization);
+            addRuntimeSequencesToArchive(archivePath, api);
+        }
         if (!ImportUtils.isAdvertiseOnlyAPI(apiDtoToReturn)) {
             addEndpointCertificatesToArchive(archivePath, apiDtoToReturn, tenantId, exportFormat);
             // Export mTLS authentication related certificates
@@ -1120,5 +1127,79 @@ public class ExportUtils {
 
         return MultitenantUtils.getTenantDomain(
                 APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
+    }
+
+    /**
+     * Retrieve available custom sequences and API specific sequences for API export, and store it in the archive
+     * directory.
+     *
+     * @param archivePath File path to export the sequences
+     * @throws APIImportExportException If an error occurs while exporting sequences
+     */
+    public static void addRuntimeSequencesToArchive(String archivePath, API api)
+            throws APIImportExportException, APIManagementException {
+
+        String seqArchivePath = archivePath.concat(File.separator + ImportExportConstants.SEQUENCES_RESOURCE);
+        Mediation inSequenceMediation = api.getInSequenceMediation();
+        Mediation outSequenceMediation = api.getOutSequenceMediation();
+        Mediation faultSequenceMediation = api.getFaultSequenceMediation();
+        if (inSequenceMediation != null || outSequenceMediation != null || faultSequenceMediation != null) {
+            CommonUtil.createDirectory(seqArchivePath);
+            if (inSequenceMediation != null) {
+                String individualSequenceExportPath;
+                if (inSequenceMediation.isGlobal()) {
+                    individualSequenceExportPath =
+                            seqArchivePath + File.separator + ImportExportConstants.IN_SEQUENCE_PREFIX +
+                                    ImportExportConstants.SEQUENCE_LOCATION_POSTFIX;
+                } else {
+                    individualSequenceExportPath =
+                            seqArchivePath + File.separator + ImportExportConstants.IN_SEQUENCE_PREFIX
+                                    + ImportExportConstants.SEQUENCE_LOCATION_POSTFIX + File.separator
+                                    + ImportExportConstants.CUSTOM_TYPE;
+                }
+                if (!CommonUtil.checkFileExistence(individualSequenceExportPath)) {
+                    CommonUtil.createDirectory(individualSequenceExportPath);
+                }
+                writeSequenceToArchive(inSequenceMediation.getConfig(), individualSequenceExportPath,
+                        inSequenceMediation.getName());
+            }
+            if (outSequenceMediation != null) {
+                String individualSequenceExportPath;
+                if (outSequenceMediation.isGlobal()) {
+                    individualSequenceExportPath =
+                            seqArchivePath + File.separator + ImportExportConstants.OUT_SEQUENCE_PREFIX +
+                                    ImportExportConstants.SEQUENCE_LOCATION_POSTFIX;
+                } else {
+                    individualSequenceExportPath =
+                            seqArchivePath + File.separator + ImportExportConstants.OUT_SEQUENCE_PREFIX
+                                    + ImportExportConstants.SEQUENCE_LOCATION_POSTFIX + File.separator
+                                    + ImportExportConstants.CUSTOM_TYPE;
+                }
+                if (!CommonUtil.checkFileExistence(individualSequenceExportPath)) {
+                    CommonUtil.createDirectory(individualSequenceExportPath);
+                }
+                writeSequenceToArchive(outSequenceMediation.getConfig(), individualSequenceExportPath,
+                        outSequenceMediation.getName());
+            }
+            if (faultSequenceMediation != null) {
+                String individualSequenceExportPath;
+                if (faultSequenceMediation.isGlobal()) {
+                    individualSequenceExportPath =
+                            seqArchivePath + File.separator + ImportExportConstants.FAULT_SEQUENCE_PREFIX +
+                                    ImportExportConstants.SEQUENCE_LOCATION_POSTFIX;
+                } else {
+                    individualSequenceExportPath =
+                            seqArchivePath + File.separator + ImportExportConstants.FAULT_SEQUENCE_PREFIX
+                                    + ImportExportConstants.SEQUENCE_LOCATION_POSTFIX + File.separator
+                                    + ImportExportConstants.CUSTOM_TYPE;
+
+                }
+                if (!CommonUtil.checkFileExistence(individualSequenceExportPath)) {
+                    CommonUtil.createDirectory(individualSequenceExportPath);
+                }
+                writeSequenceToArchive(faultSequenceMediation.getConfig(), individualSequenceExportPath,
+                        faultSequenceMediation.getName());
+            }
+        }
     }
 }

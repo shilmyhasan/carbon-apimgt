@@ -6904,6 +6904,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             APIProductIdentifier apiProductIdentifier, String organization) throws APIManagementException {
         APIIdentifier apiIdentifier = new APIIdentifier(apiProductIdentifier.getProviderName(),
                 apiProductIdentifier.getName(), apiProductIdentifier.getVersion());
+        apiIdentifier.setUuid(apiMgtDAO.getUUIDFromIdentifier(apiIdentifier));
         return certificateManager.searchClientCertificates(tenantId, alias, apiIdentifier, organization);
     }
 
