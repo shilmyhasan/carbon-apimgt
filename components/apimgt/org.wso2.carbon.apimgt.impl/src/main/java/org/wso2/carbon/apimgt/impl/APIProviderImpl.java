@@ -281,6 +281,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     protected ImportExportAPI importExportAPI;
     protected GatewayArtifactsMgtDAO gatewayArtifactsMgtDAO;
     private RecommendationEnvironment recommendationEnvironment;
+    String migrationEnabled = System.getProperty(APIConstants.MIGRATE);
 
     public APIProviderImpl(String username) throws APIManagementException {
         super(username);
@@ -8339,8 +8340,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 /////////////////// Do processing on the data object//////////
                 populateRevisionInformation(api, uuid);
                 populateAPIInformation(uuid, organization, api);
-                if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOutSequence())
-                        || APIUtil.isSequenceDefined(api.getFaultSequence())) {
+                if ((APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOutSequence())
+                        || APIUtil.isSequenceDefined(api.getFaultSequence())) && migrationEnabled == null) {
                     loadMediationPoliciesAsOperationPoliciesToAPI(api, organization);
                 }
                 populateAPIStatus(api);
