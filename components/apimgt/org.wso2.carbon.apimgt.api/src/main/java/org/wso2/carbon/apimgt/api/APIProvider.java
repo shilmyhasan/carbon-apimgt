@@ -1526,7 +1526,6 @@ public interface APIProvider extends APIManager {
      * @param apiId       ID of the API
      * @param definition  API Definition
      * @param orgId       Identifier of an organization
-     *
      * @throws APIManagementException
      */
     void saveGraphqlSchemaDefinition(String apiId, String definition, String orgId) throws APIManagementException;
