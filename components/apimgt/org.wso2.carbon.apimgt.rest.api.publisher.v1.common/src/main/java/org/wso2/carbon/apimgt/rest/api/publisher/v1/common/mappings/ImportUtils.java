@@ -506,6 +506,51 @@ public class ImportUtils {
                                     policyID = provider.importOperationPolicy(operationPolicyData, tenantDomain);
                                     importedPolicies.put(policyFileName, policyID);
                                     policyImported = true;
+                                } else {
+                                    // check the API specific operation policy list
+                                    OperationPolicyData policyData =
+                                            provider.getAPISpecificOperationPolicyByPolicyName(policy.getPolicyName(),
+                                                    policy.getPolicyVersion(), api.getUuid(), null,
+                                                    tenantDomain, false);
+                                    if (policyData != null) {
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Policy Id is not defined and an API specific policy is" +
+                                                    " found for "
+                                                    + policy.getPolicyName() + ". Validating the policy");
+                                        }
+                                        OperationPolicySpecification policySpecification = policyData.
+                                                getSpecification();
+                                        if (provider.validateAppliedPolicyWithSpecification(policySpecification,
+                                                policy, api)) {
+                                            policy.setPolicyId(policyData.getPolicyId());
+                                            validatedOperationPolicies.add(policy);
+                                        }
+                                    } else {
+                                        OperationPolicyData commonPolicyData =
+                                                provider.getCommonOperationPolicyByPolicyName(policy.getPolicyName(),
+                                                        policy.getPolicyVersion(), tenantDomain,
+                                                        false);
+                                        if (commonPolicyData != null) {
+                                            log.info(commonPolicyData.getPolicyId());
+                                            // A common policy is found for specified policy. This will be validated
+                                            // according to the provided
+                                            // attributes and added to API policy list
+                                            if (log.isDebugEnabled()) {
+                                                log.debug("Policy Id is not defined and a common policy is found " +
+                                                        "for " + policy.getPolicyName() + ". Validating the policy");
+                                            }
+                                            OperationPolicySpecification commonPolicySpec = commonPolicyData.
+                                                    getSpecification();
+                                            if (provider.validateAppliedPolicyWithSpecification(commonPolicySpec,
+                                                    policy, api)) {
+                                                policy.setPolicyId(commonPolicyData.getPolicyId());
+                                                validatedOperationPolicies.add(policy);
+                                            }
+                                        } else {
+                                            log.warn("Selected policy " + policy.getPolicyName() + " is not found." +
+                                                    " Hence dropped");
+                                        }
+                                    }
                                 }
                             } else {
                                 policyID = importedPolicies.get(policyFileName);

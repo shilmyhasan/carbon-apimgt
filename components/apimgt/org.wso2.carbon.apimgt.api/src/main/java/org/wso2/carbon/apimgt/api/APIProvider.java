@@ -1526,6 +1526,7 @@ public interface APIProvider extends APIManager {
      * @param apiId       ID of the API
      * @param definition  API Definition
      * @param orgId       Identifier of an organization
+     *
      * @throws APIManagementException
      */
     void saveGraphqlSchemaDefinition(String apiId, String definition, String orgId) throws APIManagementException;
@@ -1960,4 +1961,14 @@ public interface APIProvider extends APIManager {
      */
     APIRevision checkAPIUUIDIsARevisionUUID(String apiUUID) throws APIManagementException;
 
+    /***
+     * Validate the policies with spec
+     * @param policySpecification policy spec
+     * @param appliedPolicy policyID
+     * @param api API
+     * @return validation status
+     * @throws APIManagementException
+     */
+    boolean validateAppliedPolicyWithSpecification(OperationPolicySpecification policySpecification, OperationPolicy
+            appliedPolicy, API api) throws APIManagementException;
 }
