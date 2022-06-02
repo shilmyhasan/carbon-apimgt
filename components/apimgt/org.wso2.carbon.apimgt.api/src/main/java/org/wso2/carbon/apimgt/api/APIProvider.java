@@ -1960,4 +1960,14 @@ public interface APIProvider extends APIManager {
      */
     APIRevision checkAPIUUIDIsARevisionUUID(String apiUUID) throws APIManagementException;
 
+    /***
+     * Validate the policies with spec
+     * @param policySpecification policy spec
+     * @param appliedPolicy policyID
+     * @param api API
+     * @return validation status
+     * @throws APIManagementException
+     */
+    boolean validateAppliedPolicyWithSpecification(OperationPolicySpecification policySpecification, OperationPolicy
+            appliedPolicy, API api) throws APIManagementException;
 }

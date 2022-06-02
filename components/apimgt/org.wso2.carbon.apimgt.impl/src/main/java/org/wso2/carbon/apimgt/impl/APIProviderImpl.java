@@ -2804,8 +2804,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             uriTemplate.setOperationPolicies(validatedPolicies);
         }
     }
-
-    private boolean validateAppliedPolicyWithSpecification(OperationPolicySpecification policySpecification,
+    @Override
+    public boolean validateAppliedPolicyWithSpecification(OperationPolicySpecification policySpecification,
                                                            OperationPolicy appliedPolicy, API api)
             throws APIManagementException {
 
