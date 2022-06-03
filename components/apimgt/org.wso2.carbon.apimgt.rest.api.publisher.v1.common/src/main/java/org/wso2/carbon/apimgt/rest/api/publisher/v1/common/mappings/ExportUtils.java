@@ -220,7 +220,6 @@ public class ExportUtils {
         addGatewayEnvironmentsToArchive(archivePath, apiDtoToReturn.getId(), exportFormat, apiProvider);
 
         if (migrationEnabled != null) {
-            apiProvider.loadMediationPoliciesToAPI(api, organization);
             addRuntimeSequencesToArchive(archivePath, api);
         }
         if (!ImportUtils.isAdvertiseOnlyAPI(apiDtoToReturn)) {

@@ -150,6 +150,8 @@ public class APIMappingUtil {
 
     private static final Log log = LogFactory.getLog(APIMappingUtil.class);
 
+    private static String migrationEnabled = System.getProperty(APIConstants.MIGRATE);
+
     public static API fromDTOtoAPI(APIDTO dto, String provider) throws APIManagementException {
 
         String providerEmailDomainReplaced = APIUtil.replaceEmailDomain(provider);
