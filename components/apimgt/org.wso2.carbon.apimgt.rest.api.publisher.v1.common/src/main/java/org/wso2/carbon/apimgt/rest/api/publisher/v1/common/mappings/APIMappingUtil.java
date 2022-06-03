@@ -2176,7 +2176,11 @@ public class APIMappingUtil {
         productDto.setDescription(product.getDescription());
         productDto.setApiType(APIProductDTO.ApiTypeEnum.fromValue(APIConstants.AuditLogConstants.API_PRODUCT));
         productDto.setAuthorizationHeader(product.getAuthorizationHeader());
-        productDto.setGatewayVendor(product.getGatewayVendor());
+        if (product.getGatewayVendor() == null) {
+            productDto.setGatewayVendor(APIConstants.WSO2_GATEWAY_ENVIRONMENT);
+        } else {
+            productDto.setGatewayVendor(product.getGatewayVendor());
+        }
         productDto.setHasThumbnail(!StringUtils.isBlank(product.getThumbnailUrl()));
 
         Set<String> apiTags = product.getTags();
