@@ -3188,13 +3188,13 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             }
             if (subId != null) {
                 apiMgtDAO.updateSubscriptionStatus(Integer.parseInt(subId), APIConstants.SubscriptionStatus.DELETE_PENDING);
+                workflowDTO.setWorkflowReference(subId);
             }
 
             // update attributes of the new remove workflow to be created
             workflowDTO.setStatus(WorkflowStatus.CREATED);
             workflowDTO.setWorkflowType(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION);
             workflowDTO.setCreatedTime(System.currentTimeMillis());
-            workflowDTO.setWorkflowReference(subId);
             workflowDTO.setExternalWorkflowReference(removeSubscriptionWFExecutor.generateUUID());
 
             Tier tier = null;
