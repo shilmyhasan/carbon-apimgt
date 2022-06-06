@@ -3209,8 +3209,14 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         blockConditionsDTO.setTenantDomain(tenantDomain);
         blockConditionsDTO.setEnabled(true);
         blockConditionsDTO.setUUID(UUID.randomUUID().toString());
-        BlockConditionsDTO createdBlockConditionsDto = apiMgtDAO.addBlockConditions(blockConditionsDTO);
-
+        String[] conditionsArray = conditionValue.split(":");
+        BlockConditionsDTO createdBlockConditionsDto;
+        if (conditionsArray.length > 0) {
+            createdBlockConditionsDto = apiMgtDAO.insertBlockCondition(blockConditionsDTO);
+        } else {
+            throw new APIManagementException(
+                    "Invalid subscription block condition with insufficient data : " + conditionValue);
+        }
         if (createdBlockConditionsDto != null) {
             publishBlockingEvent(createdBlockConditionsDto, "true");
         }
