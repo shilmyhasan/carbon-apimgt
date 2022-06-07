@@ -169,42 +169,7 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
                 schemaNodeList.addAll(SOAPOperationBindingUtils.list(schemaNodes));
                 //gets types from imported schemas from the parent wsdl. Nested schemas will not be imported.
                 if (importedSchemas != null) {
-                    for (Object importedSchemaObj : importedSchemas.keySet()) {
-                        String schemaUrl = (String) importedSchemaObj;
-                        if (importedSchemas.get(schemaUrl) == null) {
-                            continue;
-                        }
-                        Vector vector = (Vector) importedSchemas.get(schemaUrl);
-                        for (Object schemaVector : vector) {
-                            if (!(schemaVector instanceof SchemaImport)) {
-                                continue;
-                            }
-                            Schema referencedSchema = ((SchemaImport) schemaVector).getReferencedSchema();
-                            if (referencedSchema != null && referencedSchema.getElement() != null) {
-                                if (referencedSchema.getElement().hasChildNodes()) {
-                                    schemaNodeList.addAll(SOAPOperationBindingUtils
-                                            .list(referencedSchema.getElement().getChildNodes()));
-                                } else {
-                                    log.warn(
-                                            "The referenced schema : " + schemaUrl + " doesn't have any defined types");
-                                }
-                            } else {
-                                boolean isInlineSchema = false;
-                                for (Object aSchema : typeList) {
-                                    if (schemaUrl.equalsIgnoreCase(
-                                            ((Schema) aSchema).getElement().getAttribute(TARGET_NAMESPACE_ATTRIBUTE))) {
-                                        isInlineSchema = true;
-                                        break;
-                                    }
-                                }
-                                if (isInlineSchema) {
-                                    log.debug(schemaUrl + " is already defined inline. Hence continue.");
-                                } else {
-                                    log.warn("Cannot access referenced schema for the schema defined at: " + schemaUrl);
-                                }
-                            }
-                        }
-                    }
+                    resolveImportedXSDs(importedSchemas);
                 } else {
                     log.info("No any imported schemas found in the given wsdl.");
                 }
@@ -246,6 +211,51 @@ public class WSDL11SOAPOperationExtractor implements WSDLSOAPOperationExtractor 
         return canProcess;
     }
 
+    /**
+     * Recursively import definitions from imported entities.
+     * @param importedSchemas Schemas imported from the definition
+     */
+    private void resolveImportedXSDs(Map importedSchemas) {
+
+        for (Object importedSchemaObj : importedSchemas.keySet()) {
+            String schemaUrl = (String) importedSchemaObj;
+            if (importedSchemas.get(schemaUrl) == null) {
+                continue;
+            }
+            Vector vector = (Vector) importedSchemas.get(schemaUrl);
+            for (Object schemaVector : vector) {
+                if (!(schemaVector instanceof SchemaImport)) {
+                    continue;
+                }
+                Schema referencedSchema = ((SchemaImport) schemaVector).getReferencedSchema();
+                if (referencedSchema != null && referencedSchema.getElement() != null) {
+                    if (referencedSchema.getImports() != null) {
+                        resolveImportedXSDs(referencedSchema.getImports());
+                    }
+                    if (referencedSchema.getElement().hasChildNodes()) {
+                        schemaNodeList.addAll(SOAPOperationBindingUtils.list(referencedSchema.getElement()
+                                .getChildNodes()));
+                    } else {
+                        log.warn("The referenced schema : " + schemaUrl + " doesn't have any defined types");
+                    }
+                } else {
+                    boolean isInlineSchema = false;
+                    for (Object aSchema : typeList) {
+                        if (schemaUrl.equalsIgnoreCase(((Schema) aSchema).getElement()
+                                .getAttribute(TARGET_NAMESPACE_ATTRIBUTE))) {
+                            isInlineSchema = true;
+                            break;
+                        }
+                    }
+                    if (isInlineSchema) {
+                        log.debug(schemaUrl + " is already defined inline. Hence continue.");
+                    } else {
+                        log.warn("Cannot access referenced schema for the schema defined at: " + schemaUrl);
+                    }
+                }
+            }
+        }
+    }
 
     private void traverseTypeElement(Node element, Node prevNode, ModelImpl model, Property currentProp) {
 
