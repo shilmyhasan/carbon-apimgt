@@ -100,6 +100,7 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionComparator;
 import org.wso2.carbon.apimgt.impl.utils.ApplicationUtils;
 import org.wso2.carbon.apimgt.impl.utils.ContentSearchResultNameComparator;
+import org.wso2.carbon.apimgt.impl.utils.SubscriptionBlockingUtil;
 import org.wso2.carbon.apimgt.impl.workflow.AbstractApplicationRegistrationWorkflowExecutor;
 import org.wso2.carbon.apimgt.impl.workflow.GeneralWorkflowResponse;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowConstants;
@@ -3187,7 +3188,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             //delete existing block conditions
             deleteSubscriptionBlockCondition(subscriptionRemovedConditionKey);
             //add new block condition
-            addBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION, subscriptionRemovedConditionKey);
+            SubscriptionBlockingUtil.addSubscriptionBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION,
+                    subscriptionRemovedConditionKey, tenantDomain);
         }
 
         if (log.isDebugEnabled()) {
@@ -3195,33 +3197,6 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     + identifier.toString();
             log.debug(logMessage);
         }
-    }
-
-    public String addBlockCondition(String conditionType, String conditionValue) throws APIManagementException {
-
-        if (APIConstants.BLOCKING_CONDITIONS_USER.equals(conditionType)) {
-            conditionValue = MultitenantUtils.getTenantAwareUsername(conditionValue);
-            conditionValue = conditionValue + "@" + tenantDomain;
-        }
-        BlockConditionsDTO blockConditionsDTO = new BlockConditionsDTO();
-        blockConditionsDTO.setConditionType(conditionType);
-        blockConditionsDTO.setConditionValue(conditionValue);
-        blockConditionsDTO.setTenantDomain(tenantDomain);
-        blockConditionsDTO.setEnabled(true);
-        blockConditionsDTO.setUUID(UUID.randomUUID().toString());
-        String[] conditionsArray = conditionValue.split(":");
-        BlockConditionsDTO createdBlockConditionsDto;
-        if (conditionsArray.length > 0) {
-            createdBlockConditionsDto = apiMgtDAO.insertBlockCondition(blockConditionsDTO);
-        } else {
-            throw new APIManagementException(
-                    "Invalid subscription block condition with insufficient data : " + conditionValue);
-        }
-        if (createdBlockConditionsDto != null) {
-            publishBlockingEvent(createdBlockConditionsDto, "true");
-        }
-
-        return createdBlockConditionsDto.getUUID();
     }
 
     public void deleteSubscriptionBlockCondition(String conditionValue)
