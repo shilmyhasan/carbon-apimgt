@@ -19,6 +19,12 @@
         <dependency>
             <groupId>org.wso2.carbon.apimgt</groupId>
             <artifactId>org.wso2.carbon.apimgt.jms.listener</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-codec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
