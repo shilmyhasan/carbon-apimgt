@@ -231,6 +231,12 @@
                         <groupId>org.wso2.carbon.apimgt</groupId>
                         <artifactId>org.wso2.carbon.apimgt.rest.api.util</artifactId>
                         <version>${carbon.apimgt.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.codehaus.jackson</groupId>
+                                <artifactId>jackson-mapper-asl</artifactId>
+                            </exclusion>
+                        </exclusions>
                     </dependency>
                 </dependencies>
             </plugin>

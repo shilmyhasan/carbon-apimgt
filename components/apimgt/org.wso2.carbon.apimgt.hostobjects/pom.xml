@@ -74,6 +74,10 @@
                     <groupId>jboss</groupId>
                     <artifactId>javassist</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
