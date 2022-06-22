@@ -58,14 +58,6 @@
                     <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
                     <artifactId>jetty-bundle</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-codec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-common</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -75,10 +67,6 @@
                 <exclusion>
                     <groupId>org.apache.axis2</groupId>
                     <artifactId>axis2-codegen</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-codec</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -266,16 +254,6 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-codec</artifactId>
-            <version>${io.netty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-codec-http</artifactId>
-            <version>${io.netty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.openapitools.swagger.parser</groupId>
