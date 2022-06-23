@@ -99,9 +99,12 @@ public class OpenAPIRequest implements Request {
         }
         String apiResource = "/";
         Pattern pattern = Pattern.compile(APIMgtGatewayConstants.RESOURCE_PATTERN);
-        Matcher matcher = pattern.matcher((String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH));
-        if (matcher.find()) {
-            apiResource = matcher.group(1);
+        String restFullRequestPath = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
+        if (restFullRequestPath != null) {
+            Matcher matcher = pattern.matcher(restFullRequestPath);
+            if (matcher.find()) {
+                apiResource = matcher.group(1);
+            }
         }
         //Extracting query params
         try {
