@@ -647,8 +647,7 @@ public class ApiKeyAuthenticator implements Authenticator {
             if (ttl != -1) {
                 return ttl;
             }
-            APIManagerConfiguration config = org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance().
-                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
+            APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
 
             String gwTokenCacheConfig = config.getFirstProperty(APIConstants.GATEWAY_TOKEN_CACHE_ENABLED);
             boolean isGWTokenCacheEnabled = Boolean.parseBoolean(gwTokenCacheConfig);
