@@ -186,7 +186,7 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
                     WorkflowStatus.APPROVED.equals(workflowDTO.getStatus())) {
                 APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
                 int applicationId = Integer.parseInt(workflowDTO.getWorkflowReference());
-                apiConsumer.cleanupSubscriptionAndRegistrationPendingTasks(applicationId, workflowReferenceId);
+                apiConsumer.cleanupPendingTasksForApplicationDeletion(applicationId);
             }
 
             WorkflowExecutor workflowExecutor = WorkflowExecutorFactory.getInstance().getWorkflowExecutor(workflowType);

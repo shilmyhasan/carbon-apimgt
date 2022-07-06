@@ -3821,16 +3821,9 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
             WorkflowExecutor removeApplicationWFExecutor = getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_APPLICATION_DELETION);
 
-            workflowExtRef = apiMgtDAO.getExternalWorkflowRefByInternalRefWorkflowType(applicationId, WorkflowConstants.WF_TYPE_AM_APPLICATION_CREATION);
-
             apiMgtDAO.updateApplicationStatus(applicationId, APIConstants.ApplicationStatus.DELETE_PENDING);
 
-            // in a normal flow workflowExtRef is null when workflows are not enabled
-            if (workflowExtRef == null) {
-                workflowDTO = new ApplicationWorkflowDTO();
-            } else {
-                workflowDTO = (ApplicationWorkflowDTO) apiMgtDAO.retrieveWorkflow(workflowExtRef);
-            }
+            workflowDTO = new ApplicationWorkflowDTO();
             workflowDTO.setApplication(application);
             workflowDTO.setWorkflowReference(String.valueOf(applicationId));
             workflowDTO.setExternalWorkflowReference(removeApplicationWFExecutor.generateUUID());
@@ -3846,7 +3839,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             workflowDTO.setExternalWorkflowReference(removeApplicationWFExecutor.generateUUID());
 
             if (!(removeApplicationWFExecutor instanceof ApplicationDeletionApprovalWorkflowExecutor)) {
-                cleanupSubscriptionAndRegistrationPendingTasks(applicationId, workflowExtRef);
+                cleanupPendingTasksForApplicationDeletion(applicationId);
             }
 
             removeApplicationWFExecutor.execute(workflowDTO);
@@ -3926,15 +3919,23 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
     }
 
-    public void cleanupSubscriptionAndRegistrationPendingTasks(int applicationId, String workflowExtRef) throws APIManagementException {
+    /**
+     * Cleans the pending approval tasks associated with the given application subjected to be deleted
+     * Pending approvals for Application creation, Subscription Creation, Subscription Deletion, Subscription Update will be deleted
+     * @param applicationId ID of the application which the associated pending tasks should be removed
+     * @throws APIManagementException
+     */
+    public void cleanupPendingTasksForApplicationDeletion(int applicationId) throws APIManagementException {
 
         try {
             WorkflowExecutor createApplicationWFExecutor = getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_APPLICATION_CREATION);
             WorkflowExecutor createSubscriptionWFExecutor = getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
             WorkflowExecutor deleteSubscriptionWFExecutor = getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION);
+            WorkflowExecutor updateSubscriptionWFExecutor = getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_UPDATE);
             WorkflowExecutor createProductionRegistrationWFExecutor = getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_APPLICATION_REGISTRATION_PRODUCTION);
             WorkflowExecutor createSandboxRegistrationWFExecutor = getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_APPLICATION_REGISTRATION_SANDBOX);
 
+            String workflowExtRef;
             // clean up pending subscription tasks
             Map<String, Set<Integer>> pendingSubscriptionsByAppIdSubStatus = apiMgtDAO
                     .getPendingSubscriptionsByAppId(applicationId);
@@ -3955,8 +3956,25 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
             for (int subscription : pendingSubscriptionsByAppIdSubStatus.get(APIConstants.SubscriptionStatus.DELETE_PENDING)) {
                 try {
-                    workflowExtRef = apiMgtDAO.getExternalWorkflowReferenceForSubscriptionAndWFType(subscription, WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION);
+                    workflowExtRef = apiMgtDAO.getExternalWorkflowReferenceForSubscriptionAndWFType(subscription,
+                            WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION);
                     deleteSubscriptionWFExecutor.cleanUpPendingTask(workflowExtRef);
+                } catch (APIManagementException ex) {
+
+                    // failed cleanup processes are ignored to prevent failing the application removal process
+                    log.warn("Failed to get external workflow reference for subscription " + subscription);
+                } catch (WorkflowException ex) {
+
+                    // failed cleanup processes are ignored to prevent failing the application removal process
+                    log.warn("Failed to clean pending subscription approval task: " + subscription);
+                }
+            }
+
+            for (int subscription : pendingSubscriptionsByAppIdSubStatus.get(APIConstants.SubscriptionStatus.TIER_UPDATE_PENDING)) {
+                try {
+                    workflowExtRef = apiMgtDAO.getExternalWorkflowReferenceForSubscriptionAndWFType(subscription,
+                            WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_UPDATE);
+                    updateSubscriptionWFExecutor.cleanUpPendingTask(workflowExtRef);
                 } catch (APIManagementException ex) {
 
                     // failed cleanup processes are ignored to prevent failing the application removal process
@@ -4014,6 +4032,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 }
             });
 
+            workflowExtRef = apiMgtDAO.getExternalWorkflowRefByInternalRefWorkflowType(applicationId,
+                    WorkflowConstants.WF_TYPE_AM_APPLICATION_CREATION);
             if (workflowExtRef != null) {
                 try {
                     createApplicationWFExecutor.cleanUpPendingTask(workflowExtRef);
