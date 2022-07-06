@@ -960,8 +960,8 @@ public class ApisApiServiceImpl implements ApisApiService {
                                 awsLambdaClient = AWSLambdaClientBuilder.standard()
                                         .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
                                         .build();
-                            } else if (!StringUtils.isEmpty(roleArn) && !StringUtils.isEmpty(roleSessionName)
-                                    && !StringUtils.isEmpty(roleRegion)) {
+                            } else if (StringUtils.isNotEmpty(roleArn) && StringUtils.isNotEmpty(roleSessionName)
+                                    && StringUtils.isNotEmpty(roleRegion)) {
                                 AWSSecurityTokenService awsSTSClient = AWSSecurityTokenServiceClientBuilder.standard()
                                         .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
                                         .build();
@@ -982,8 +982,8 @@ public class ApisApiServiceImpl implements ApisApiService {
                                 log.error("Missing AWS STS configurations");
                                 return null;
                             }
-                        } else if (!StringUtils.isEmpty(accessKey) && !StringUtils.isEmpty(secretKey) &&
-                                    !StringUtils.isEmpty(region)) {
+                        } else if (StringUtils.isNotEmpty(accessKey) && StringUtils.isNotEmpty(secretKey) &&
+                                    StringUtils.isNotEmpty(region)) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Using user given stored credentials");
                             }
@@ -999,8 +999,8 @@ public class ApisApiServiceImpl implements ApisApiService {
                                         .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                                         .withRegion(region)
                                         .build();
-                            } else if (!StringUtils.isEmpty(roleArn) && !StringUtils.isEmpty(roleSessionName)
-                                    && !StringUtils.isEmpty(roleRegion)) {
+                            } else if (StringUtils.isNotEmpty(roleArn) && StringUtils.isNotEmpty(roleSessionName)
+                                    && StringUtils.isNotEmpty(roleRegion)) {
                                 AWSSecurityTokenService awsSTSClient = AWSSecurityTokenServiceClientBuilder.standard()
                                         .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                                         .withRegion(region)
