@@ -46,6 +46,7 @@ import org.apache.synapse.rest.RESTConstants;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.analytics.Constants;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.gateway.mediators.oauth.TokenCache;
 import org.wso2.carbon.apimgt.gateway.utils.redis.RedisCacheUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
@@ -246,12 +247,16 @@ public class AWSLambdaMediator extends AbstractMediator {
                     .getObject(roleSessionName, Credentials.class);
             if (previousCredentialsObject != null) {
                 sessionCredentials = (Credentials) previousCredentialsObject;
-                long expirationTime = sessionCredentials.getExpiration().getTime();
-                long currentTime = System.currentTimeMillis();
-                long timeDifference = expirationTime - currentTime;
-                if (timeDifference > 1000) {
-                    return sessionCredentials;
-                }
+            }
+        } else {
+            sessionCredentials = CredentialsCache.getInstance().getCredentialsMap().get(roleSessionName);
+        }
+        if (sessionCredentials != null) {
+            long expirationTime = sessionCredentials.getExpiration().getTime();
+            long currentTime = System.currentTimeMillis();
+            long timeDifference = expirationTime - currentTime;
+            if (timeDifference > 1000) {
+                return sessionCredentials;
             }
         }
         AWSSecurityTokenService awsSTSClient;
@@ -273,6 +278,8 @@ public class AWSLambdaMediator extends AbstractMediator {
         if (ServiceReferenceHolder.getInstance().isRedisEnabled()) {
             new RedisCacheUtils(ServiceReferenceHolder.getInstance().getRedisPool())
                     .addObject(roleSessionName, sessionCredentials);
+        } else {
+            CredentialsCache.getInstance().getCredentialsMap().put(roleSessionName, sessionCredentials);
         }
         return sessionCredentials;
     }
