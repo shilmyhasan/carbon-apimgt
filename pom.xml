@@ -1386,6 +1386,7 @@
         <hamcrest.version>1.3</hamcrest.version>
         <carbon.apimgt.version>6.3.95.23-SNAPSHOT</carbon.apimgt.version>
         <carbon.apimgt.imp.pkg.version>[6.0.0, 7.0.0)</carbon.apimgt.imp.pkg.version>
+        <carbon.apimgt.exp.pkg.version>6.3.95</carbon.apimgt.exp.pkg.version>
 
         <analytics.shared.version>1.0.4</analytics.shared.version>
         <carbon.analytics.common.version>5.1.42</carbon.analytics.common.version>

@@ -300,7 +300,7 @@
                             !javax.servlet.http,
                             !org.wso2.carbon.apimgt.gateway.internal,
                             !org.wso2.carbon.apimgt.gateway.stub.*,
-                            org.wso2.carbon.apimgt.gateway.*;version="${carbon.apimgt.version}",
+                            org.wso2.carbon.apimgt.gateway.*;version="${carbon.apimgt.exp.pkg.version}",
                             org.wso2.throttle.*
                         </Export-Package>
                         <Import-Package>
@@ -324,6 +324,7 @@
                             org.apache.axis2.transport.base,
                             org.wso2.carbon.core; version="${carbon.platform.package.import.version.range}",
                             org.wso2.carbon.registry.api; version="${carbon.registry.imp.pkg.version}",
+                            org.wso2.carbon.apimgt.*; version="${carbon.apimgt.imp.pkg.version}",
                             org.wso2.carbon.apimgt.impl.*; version="${carbon.apimgt.imp.pkg.version}",
                             javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
                             org.wso2.carbon.apimgt.api.*; version="${carbon.apimgt.imp.pkg.version}",
