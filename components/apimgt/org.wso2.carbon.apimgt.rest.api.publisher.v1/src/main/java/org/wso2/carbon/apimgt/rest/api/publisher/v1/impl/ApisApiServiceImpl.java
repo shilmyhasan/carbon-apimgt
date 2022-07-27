@@ -994,7 +994,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                             }
                             BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
                             if (StringUtils.isEmpty(roleArn) && StringUtils.isEmpty(roleSessionName)
-                                    && !StringUtils.isEmpty(roleRegion)) {
+                                    && StringUtils.isEmpty(roleRegion)) {
                                 awsLambdaClient = AWSLambdaClientBuilder.standard()
                                         .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
                                         .withRegion(region)
