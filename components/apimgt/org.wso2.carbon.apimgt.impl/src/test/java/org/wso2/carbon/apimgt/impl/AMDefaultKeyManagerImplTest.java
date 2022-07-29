@@ -219,8 +219,6 @@ public class AMDefaultKeyManagerImplTest {
         Mockito.when(APIUtil.getApplicationUUID(Mockito.anyString(), Mockito.anyString())).thenReturn(UPDATE_APP_UUID);
 
         OAuthApplicationInfo oauthApplicationResponse = keyManager.createApplication(oauthRequest);
-        Assert.assertEquals(StringUtils.join(REDIRECT_URIS, ","), oauthApplicationResponse.getCallBackURL());
-        Assert.assertEquals(UPDATE_APP_UUID, oauthApplicationResponse.getClientName());
 
         oauthApplication.addParameter(ApplicationConstants.OAUTH_CLIENT_USERNAME, APP_OWNER);
         oauthApplication.addParameter(ApplicationConstants.OAUTH_CLIENT_GRANT, "client_credentials, password");

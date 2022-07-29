@@ -4170,6 +4170,11 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             if (StringUtils.isEmpty(application.getTokenType())) {
                 applicationTokenType = APIConstants.DEFAULT_TOKEN_TYPE;
             }
+            // Fix done to migrated apps new keys generation flow to show the default token type in the UI correctly.
+            if (StringUtils.equals(applicationTokenType,APIConstants.DEFAULT_TOKEN_TYPE)
+                    || StringUtils.equals(applicationTokenType,APIConstants.TOKEN_TYPE_OAUTH)) {
+                applicationTokenType = APIConstants.DEFAULT_TOKEN_TYPE_NEW;
+            }
             // Build key manager instance and create oAuthAppRequest by jsonString.
             OAuthAppRequest request =
                     ApplicationUtils
@@ -4648,6 +4653,11 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
                 tenantFlowStarted = true;
+            }
+            // Fix done to migrated apps update keys generation flow to show the default token type in the UI correctly.
+            if (StringUtils.equals(application.getTokenType(),APIConstants.DEFAULT_TOKEN_TYPE)
+                    || StringUtils.equals(application.getTokenType(),APIConstants.TOKEN_TYPE_OAUTH)) {
+                application.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE_NEW);
             }
 
             final String subscriberName = application.getSubscriber().getName();
