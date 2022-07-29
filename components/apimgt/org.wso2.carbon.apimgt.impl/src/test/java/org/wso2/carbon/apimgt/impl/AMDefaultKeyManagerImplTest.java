@@ -36,6 +36,7 @@ import org.wso2.carbon.apimgt.api.model.AccessTokenInfo;
 import org.wso2.carbon.apimgt.api.model.ApplicationConstants;
 import org.wso2.carbon.apimgt.api.model.OAuthAppRequest;
 import org.wso2.carbon.apimgt.api.model.OAuthApplicationInfo;
+import org.wso2.carbon.apimgt.api.model.KeyManager;
 import org.wso2.carbon.apimgt.impl.kmclient.KeyManagerClientException;
 import org.wso2.carbon.apimgt.impl.kmclient.model.ClientInfo;
 import org.wso2.carbon.apimgt.impl.kmclient.model.DCRClient;
@@ -70,12 +71,20 @@ public class AMDefaultKeyManagerImplTest {
     private final String CLIENT_SECRET = "GGGGGGG";
     private final String CLIENT_ID = "XXXXXXXXXX";
     private final String KEY_TYPE = "PRODUCTION";
+    private final String UPDATE_APP_OWNER = "hasunie";
+    private final String UPDATE_APP_NAME = "app2";
+    private final String UPDATE_APP_UUID = "YYYY";
+    //Same client_id client_secret are used in AMDefaultKeyManagerImplWrapper mock class
+    private final String UPDATE_CLIENT_SECRET = "GGGGGGG";
+    private final String UPDATE_CLIENT_ID = "YYYYYYYY";
     private final String[] REDIRECT_URIS = new String[]{"http://locahost, https://client.example.org/callback"};
     private final String[] GRANT_TYPES = new String[]{"client_credentials", "password"};
+    private KeyManager km;
 
     @Before
     public void init() {
         PowerMockito.mockStatic(APIUtil.class);
+        km = Mockito.mock(KeyManager.class);
     }
         
     @Test
@@ -177,6 +186,54 @@ public class AMDefaultKeyManagerImplTest {
         OAuthApplicationInfo oauthApplicationResponse = keyManager.createApplication(oauthRequest);
         Assert.assertEquals(StringUtils.join(REDIRECT_URIS, ","), oauthApplicationResponse.getCallBackURL());
         Assert.assertEquals(APP_UUID, oauthApplicationResponse.getClientName());
+    }
+
+    @Test
+    public void testUpdateApplication() throws APIManagementException, KeyManagerClientException {
+
+        PowerMockito.mockStatic(APIUtil.class);
+        System.setProperty("carbon.home", "klmn");
+        PowerMockito.mockStatic(PrivilegedCarbonContext.class);
+        OAuthAppRequest oauthRequest = new OAuthAppRequest();
+
+        OAuthApplicationInfo oauthApplication = new OAuthApplicationInfo();
+        oauthApplication.setAppOwner(UPDATE_APP_OWNER);
+        oauthApplication.setCallBackURL(StringUtils.join(REDIRECT_URIS, ","));
+        oauthApplication.setClientName(UPDATE_APP_NAME);
+        oauthApplication.addParameter(ApplicationConstants.OAUTH_CLIENT_USERNAME, UPDATE_APP_OWNER);
+        oauthApplication.addParameter(ApplicationConstants.APP_KEY_TYPE, KEY_TYPE);
+        oauthApplication.setJsonString(getJSONString());
+        oauthApplication.setTokenType(null);
+        oauthRequest.setMappingId("456");
+        oauthRequest.setOAuthApplicationInfo(oauthApplication);
+
+        PowerMockito.when(APIUtil.isCrossTenantSubscriptionsEnabled()).thenReturn(false);
+        PrivilegedCarbonContext privilegedCarbonContext = Mockito.mock(PrivilegedCarbonContext.class);
+        ClientInfo response = new ClientInfo();
+        response.setClientId(UPDATE_CLIENT_ID);
+        response.setClientName(UPDATE_APP_UUID);
+        response.setClientSecret(UPDATE_CLIENT_SECRET);
+        response.setRedirectUris(Arrays.asList(REDIRECT_URIS));
+        response.setGrantTypes(Arrays.asList(GRANT_TYPES));
+
+        Mockito.when(dcrClient.createApplication(Mockito.any(ClientInfo.class))).thenReturn(response);
+        PowerMockito.when(PrivilegedCarbonContext.getThreadLocalCarbonContext()).thenReturn(privilegedCarbonContext);
+        Mockito.when(privilegedCarbonContext.getTenantDomain()).
+                thenReturn(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+        Mockito.when(APIUtil.getApplicationUUID(Mockito.anyString(), Mockito.anyString())).thenReturn(UPDATE_APP_UUID);
+
+        OAuthApplicationInfo oauthApplicationResponse = keyManager.createApplication(oauthRequest);
+
+        oauthApplication.addParameter(ApplicationConstants.OAUTH_CLIENT_USERNAME, APP_OWNER);
+        oauthApplication.addParameter(ApplicationConstants.OAUTH_CLIENT_GRANT, "client_credentials, password");
+        oauthApplication.addParameter(ApplicationConstants.APP_KEY_TYPE, "PRODUCTION");
+        oauthApplication.setCallBackURL("http://newcallback.com");
+        OAuthAppRequest testoauthRequest = new OAuthAppRequest();
+
+        OAuthApplicationInfo testoauthApplication = new OAuthApplicationInfo();
+        testoauthApplication.setTokenType("JWT");
+        testoauthRequest.setOAuthApplicationInfo(testoauthApplication);
+        km.updateApplication(testoauthRequest);
     }
 
 //
