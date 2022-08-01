@@ -1412,6 +1412,7 @@
 				{{#unless allowAll }}
 				<div id="accesseAllowOriginDiv" class="add-margin-top-2x">
 					<input type="text"  class="tagsinput  form-control" placeholder="<%=i18n.localize("Access Control Allow Origins")%>" id="accessControlAllowOrigins" name="accessControlAllowOrigins" value="{{accessControlAllowOrigins}}" data-role="tagsinput"/>
+					<small class="form-text text-muted"><%=i18n.localize("Press Enter to add each domain") || "Press Enter to add each domain"%></small>
 				</div>
 				{{/unless}}
 			</div>
