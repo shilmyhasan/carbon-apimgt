@@ -127,7 +127,7 @@ class AppsTableContent extends Component {
                                         app.name
                                     )}
                                 </StyledTableCell>
-                                <StyledTableCell align='left'>{app.owner}</StyledTableCell>
+                                <StyledTableCell align='left'>{app.owner.toLowerCase()}</StyledTableCell>
                                 <StyledTableCell align='left'>{app.throttlingPolicy}</StyledTableCell>
                                 <StyledTableCell align='left'>
                                     {app.status === this.APPLICATION_STATES.APPROVED && (
