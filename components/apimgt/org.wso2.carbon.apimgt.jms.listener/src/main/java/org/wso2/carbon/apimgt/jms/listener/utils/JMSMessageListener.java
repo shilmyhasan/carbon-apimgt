@@ -45,11 +45,11 @@ public class JMSMessageListener implements MessageListener {
     private static final Log log = LogFactory.getLog(JMSMessageListener.class);
 
     // These patterns will be used to determine for which type of keys the throttling condition has occurred.
-    private Pattern apiPattern = Pattern.compile("/.*/(.*):\\1_(condition_(\\d*)|default)");
+    private Pattern apiPattern = Pattern.compile("/?.*/(.*).*:\\1_(condition_(\\d*)|default)");
     private static final int API_PATTERN_GROUPS = 3;
     private static final int API_PATTERN_CONDITION_INDEX = 2;
 
-    private Pattern resourcePattern = Pattern.compile("/.*/(.*)/\\1(.*)?:[A-Z]{0,7}_(condition_(\\d*)|default)");
+    private Pattern resourcePattern = Pattern.compile("/?.*/(.*)/.*\\1(.*)?:[A-Z]{0,7}_(condition_(\\d*)|default)");
     public static final int RESOURCE_PATTERN_GROUPS = 4;
     public static final int RESOURCE_PATTERN_CONDITION_INDEX = 3;
     public static final String CONDITION_KEY = "condition";
