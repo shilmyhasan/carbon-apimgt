@@ -205,8 +205,6 @@ public class APIManagerComponent {
             }
             ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(configurationService);
             APIMgtDBUtil.initialize();
-            APIUtil.init();
-
             if (migrateFromVersionProperty == null) {
                 APIUtil.loadAndSyncTenantConf(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                 APIUtil.loadTenantExternalStoreConfig(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
@@ -283,6 +281,8 @@ public class APIManagerComponent {
                 // Initialize PasswordResolver
                 PasswordResolverFactory.initializePasswordResolver();
             }
+
+            APIUtil.init();
 
             // Activating UserPostSelfRegistration handler componeAPITemplateBuilderImplnt
             try {
