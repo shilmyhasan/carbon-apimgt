@@ -79,7 +79,8 @@ import static org.mockito.Matchers.eq;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({LogFactory.class, ApiMgtDAO.class, ServiceReferenceHolder.class, APIManagerConfigurationService.class, APIManagerConfiguration.class, APIUtil.class})
+@PrepareForTest({LogFactory.class, ApiMgtDAO.class, ServiceReferenceHolder.class, APIManagerConfigurationService.class,
+        APIManagerConfiguration.class, APIUtil.class, RealmService.class, TenantManager.class})
 public class APIUtilTierTest {
     private static byte[] tenantConf;
     private final String[] validTierNames = {"Gold", "Silver", "Bronze", "Platinum", "Medium", "100PerMinute", "50PerMinute", APIConstants.UNLIMITED_TIER};
@@ -885,6 +886,8 @@ public class APIUtilTierTest {
         ApplicationPolicy applicationPolicy = Mockito.mock(ApplicationPolicy.class);
         SubscriptionPolicy subscriptionPolicy = Mockito.mock(SubscriptionPolicy.class);
         APIPolicy apiPolicy = Mockito.mock(APIPolicy.class);
+        RealmService realmService = Mockito.mock(RealmService.class);
+        TenantManager tenantManager = Mockito.mock(TenantManager.class);
         Mockito.when(applicationPolicy.getDefaultQuotaPolicy()).thenReturn(quotaPolicy);
         Mockito.when(subscriptionPolicy.getDefaultQuotaPolicy()).thenReturn(quotaPolicy);
         Mockito.when(apiPolicy.getDefaultQuotaPolicy()).thenReturn(quotaPolicy);
@@ -915,5 +918,8 @@ public class APIUtilTierTest {
         Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
                 .thenReturn(apiManagerConfigurationService);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+        Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
+        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
+        Mockito.when(tenantManager.getSuperTenantDomain()).thenReturn("carbon.super");
     }
 }

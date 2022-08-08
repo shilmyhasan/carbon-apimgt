@@ -194,6 +194,9 @@ public class APIManagerComponent {
             bundleContext.registerService(Notifier.class.getName(),new ExternalGatewayNotifier(),null);
             bundleContext.registerService(Notifier.class.getName(),new ExternallyDeployedApiNotifier(),null);
             APIManagerConfigurationServiceImpl configurationService = new APIManagerConfigurationServiceImpl(configuration);
+            ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(configurationService);
+            APIMgtDBUtil.initialize();
+            APIUtil.init();
             String migrateFromVersionProperty = System.getProperty(APIConstants.MIGRATE);
             if (migrateFromVersionProperty == null) {
                 CommonConfigDeployer configDeployer = new CommonConfigDeployer();
@@ -203,8 +206,7 @@ public class APIManagerComponent {
                 KeyMgtConfigDeployer keyMgtConfigDeployer = new KeyMgtConfigDeployer();
                 bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), keyMgtConfigDeployer, null);
             }
-            ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(configurationService);
-            APIMgtDBUtil.initialize();
+
             if (migrateFromVersionProperty == null) {
                 APIUtil.loadAndSyncTenantConf(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                 APIUtil.loadTenantExternalStoreConfig(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
