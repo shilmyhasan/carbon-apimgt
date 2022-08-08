@@ -7221,21 +7221,31 @@ public final class APIUtil {
                 needDeployment = true;
             }
 
-            if (!apiMgtDAO.isPolicyDeployed(PolicyConstants.POLICY_LEVEL_APP, tenantId, policyName)) {
-                needDeployment = true;
+            if (!needDeployment) {
+                continue;
+            }
+            String superTenantDomain = null;
+            try {
+                superTenantDomain = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                        getSuperTenantDomain();
+            } catch (UserStoreException e) {
+                handleInternalException("Error in getting the super tenant domain", e);
             }
 
-            if (needDeployment) {
-                if (!APIConstants.DEFAULT_APP_POLICY_UNLIMITED.equalsIgnoreCase(policyName)) {
-                    ApplicationPolicy retrievedPolicy = apiMgtDAO.getApplicationPolicy(policyName, tenantId);
-                    ApplicationPolicyEvent applicationPolicyEvent = new ApplicationPolicyEvent(
-                            UUID.randomUUID().toString(),
-                            System.currentTimeMillis(), APIConstants.EventType.POLICY_CREATE.name(), tenantId,
-                            retrievedPolicy.getTenantDomain(), retrievedPolicy.getPolicyId(),
-                            retrievedPolicy.getPolicyName(),
-                            retrievedPolicy.getDefaultQuotaPolicy().getType());
-                    APIUtil.sendNotification(applicationPolicyEvent, APIConstants.NotifierType.POLICY.name());
-                }
+            boolean isSuperTenant = tenantDomain.equals(superTenantDomain);
+            if (isSuperTenant) {
+                continue;
+            }
+
+            if (!APIConstants.DEFAULT_APP_POLICY_UNLIMITED.equalsIgnoreCase(policyName)) {
+                ApplicationPolicy retrievedPolicy = apiMgtDAO.getApplicationPolicy(policyName, tenantId);
+                ApplicationPolicyEvent applicationPolicyEvent = new ApplicationPolicyEvent(
+                        UUID.randomUUID().toString(),
+                        System.currentTimeMillis(), APIConstants.EventType.POLICY_CREATE.name(), tenantId,
+                        retrievedPolicy.getTenantDomain(), retrievedPolicy.getPolicyId(),
+                        retrievedPolicy.getPolicyName(),
+                        retrievedPolicy.getDefaultQuotaPolicy().getType());
+                APIUtil.sendNotification(applicationPolicyEvent, APIConstants.NotifierType.POLICY.name());
             }
         }
 
@@ -7279,15 +7289,25 @@ public final class APIUtil {
                 needDeployment = true;
             }
 
-            if (!apiMgtDAO.isPolicyDeployed(PolicyConstants.POLICY_LEVEL_SUB, tenantId, policyName)) {
-                needDeployment = true;
+            if (!needDeployment) {
+                continue;
+            }
+            String superTenantDomain = null;
+            try {
+                superTenantDomain = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                        getSuperTenantDomain();
+            } catch (UserStoreException e) {
+                handleInternalException("Error in getting the super tenant domain", e);
             }
 
-            if (needDeployment) {
-                if (!APIConstants.DEFAULT_SUB_POLICY_UNLIMITED.equalsIgnoreCase(policyName)) {
-                    SubscriptionPolicy retrievedPolicy = apiMgtDAO.getSubscriptionPolicy(policyName, tenantId);
-                    deployRetrievedSubscriptionPolicy(tenantId, retrievedPolicy);
-                }
+            boolean isSuperTenant = tenantDomain.equals(superTenantDomain);
+            if (isSuperTenant) {
+                continue;
+            }
+
+            if (!APIConstants.DEFAULT_SUB_POLICY_UNLIMITED.equalsIgnoreCase(policyName)) {
+                SubscriptionPolicy retrievedPolicy = apiMgtDAO.getSubscriptionPolicy(policyName, tenantId);
+                deployRetrievedSubscriptionPolicy(tenantId, retrievedPolicy);
             }
         }
 
@@ -7323,14 +7343,24 @@ public final class APIUtil {
                 needDeployment = true;
             }
 
-            if (!apiMgtDAO.isPolicyDeployed(PolicyConstants.POLICY_LEVEL_SUB, tenantId, policyName)) {
-                needDeployment = true;
+            if (!needDeployment) {
+                continue;
+            }
+            String superTenantDomain = null;
+            try {
+                superTenantDomain = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                        getSuperTenantDomain();
+            } catch (UserStoreException e) {
+                handleInternalException("Error in getting the super tenant domain", e);
             }
 
-            if (needDeployment) {
-                SubscriptionPolicy retrievedPolicy = apiMgtDAO.getSubscriptionPolicy(policyName, tenantId);
-                deployRetrievedSubscriptionPolicy(tenantId, retrievedPolicy);
+            boolean isSuperTenant = tenantDomain.equals(superTenantDomain);
+            if (isSuperTenant) {
+                continue;
             }
+
+            SubscriptionPolicy retrievedPolicy = apiMgtDAO.getSubscriptionPolicy(policyName, tenantId);
+            deployRetrievedSubscriptionPolicy(tenantId, retrievedPolicy);
         }
 
         //Adding Event based Webhooks API specific policies (WEBSUB)
@@ -7367,14 +7397,24 @@ public final class APIUtil {
                 needDeployment = true;
             }
 
-            if (!apiMgtDAO.isPolicyDeployed(PolicyConstants.POLICY_LEVEL_SUB, tenantId, policyName)) {
-                needDeployment = true;
+            if (!needDeployment) {
+                continue;
+            }
+            String superTenantDomain = null;
+            try {
+                superTenantDomain = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                        getSuperTenantDomain();
+            } catch (UserStoreException e) {
+                handleInternalException("Error in getting the super tenant domain", e);
             }
 
-            if (needDeployment) {
-                SubscriptionPolicy retrievedPolicy = apiMgtDAO.getSubscriptionPolicy(policyName, tenantId);
-                deployRetrievedSubscriptionPolicy(tenantId, retrievedPolicy);
+            boolean isSuperTenant = tenantDomain.equals(superTenantDomain);
+            if (isSuperTenant) {
+                continue;
             }
+
+            SubscriptionPolicy retrievedPolicy = apiMgtDAO.getSubscriptionPolicy(policyName, tenantId);
+            deployRetrievedSubscriptionPolicy(tenantId, retrievedPolicy);
         }
 
         long tenThousandPerMinTier = defualtLimits.containsKey(APIConstants.DEFAULT_API_POLICY_TEN_THOUSAND_REQ_PER_MIN) ?
@@ -7415,26 +7455,37 @@ public final class APIUtil {
 
             if (!apiMgtDAO.isPolicyExist(PolicyConstants.POLICY_LEVEL_API, tenantId, policyName)) {
                 apiMgtDAO.addAPIPolicy(apiPolicy);
-            }
-
-            if (!apiMgtDAO.isPolicyDeployed(PolicyConstants.POLICY_LEVEL_API, tenantId, policyName)) {
                 needDeployment = true;
             }
 
-            if (needDeployment) {
-                if (!APIConstants.DEFAULT_API_POLICY_UNLIMITED.equalsIgnoreCase(policyName)) {
-                    APIPolicy retrievedPolicy = apiMgtDAO.getAPIPolicy(policyName, tenantId);
-                    List<Integer> addedConditionGroupIds = new ArrayList<>();
-                    for (Pipeline pipeline : retrievedPolicy.getPipelines()) {
-                        addedConditionGroupIds.add(pipeline.getId());
-                    }
-                    APIPolicyEvent apiPolicyEvent = new APIPolicyEvent(UUID.randomUUID().toString(),
-                            System.currentTimeMillis(), APIConstants.EventType.POLICY_CREATE.name(), tenantId,
-                            retrievedPolicy.getTenantDomain(), retrievedPolicy.getPolicyId(),
-                            retrievedPolicy.getPolicyName(),
-                            retrievedPolicy.getDefaultQuotaPolicy().getType(), addedConditionGroupIds, null);
-                    APIUtil.sendNotification(apiPolicyEvent, APIConstants.NotifierType.POLICY.name());
+            if (!needDeployment) {
+                continue;
+            }
+            String superTenantDomain = null;
+            try {
+                superTenantDomain = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                        getSuperTenantDomain();
+            } catch (UserStoreException e) {
+                handleInternalException("Error in getting the super tenant domain", e);
+            }
+
+            boolean isSuperTenant = tenantDomain.equals(superTenantDomain);
+            if (isSuperTenant) {
+                continue;
+            }
+
+            if (!APIConstants.DEFAULT_API_POLICY_UNLIMITED.equalsIgnoreCase(policyName)) {
+                APIPolicy retrievedPolicy = apiMgtDAO.getAPIPolicy(policyName, tenantId);
+                List<Integer> addedConditionGroupIds = new ArrayList<>();
+                for (Pipeline pipeline : retrievedPolicy.getPipelines()) {
+                    addedConditionGroupIds.add(pipeline.getId());
                 }
+                APIPolicyEvent apiPolicyEvent = new APIPolicyEvent(UUID.randomUUID().toString(),
+                        System.currentTimeMillis(), APIConstants.EventType.POLICY_CREATE.name(), tenantId,
+                        retrievedPolicy.getTenantDomain(), retrievedPolicy.getPolicyId(),
+                        retrievedPolicy.getPolicyName(),
+                        retrievedPolicy.getDefaultQuotaPolicy().getType(), addedConditionGroupIds, null);
+                APIUtil.sendNotification(apiPolicyEvent, APIConstants.NotifierType.POLICY.name());
             }
         }
     }
