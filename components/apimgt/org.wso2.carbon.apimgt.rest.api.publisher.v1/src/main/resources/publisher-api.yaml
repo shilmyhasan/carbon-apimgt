@@ -11549,6 +11549,9 @@ components:
         displayName:
           type: string
           example: Remove Header Policy
+        version:
+          type: string
+          example: v1
         description:
           type: string
           example: With this policy, user can add a new header to the request
