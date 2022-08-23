@@ -8740,8 +8740,9 @@ public class ApiMgtDAO {
 
     public Map<String, Set<Integer>> getPendingSubscriptionsByAppId(int applicationId) throws APIManagementException {
 
-        Set<Integer> pendingUpdateSubscriptionIds = new HashSet<>();
+        Set<Integer> pendingCreateSubscriptionIds = new HashSet<>();
         Set<Integer> pendingDeleteSubscriptionIds = new HashSet<>();
+        Set<Integer> pendingUpdateSubscriptionIds = new HashSet<>();
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -8756,10 +8757,13 @@ public class ApiMgtDAO {
             while (rs.next()) {
                 String subStatus = rs.getString("SUB_STATUS");
                 if(APIConstants.SubscriptionStatus.ON_HOLD.equals(subStatus)) {
-                    pendingUpdateSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
+                    pendingCreateSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
                 }
                 else if(APIConstants.SubscriptionStatus.DELETE_PENDING.equals(subStatus)){
                     pendingDeleteSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
+                }
+                else if(APIConstants.SubscriptionStatus.TIER_UPDATE_PENDING.equals(subStatus)){
+                    pendingUpdateSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
                 }
             }
         } catch (SQLException e) {
@@ -8769,8 +8773,9 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }
         Map<String,Set<Integer>> map = new HashMap<>();
-        map.put(APIConstants.SubscriptionStatus.ON_HOLD, pendingUpdateSubscriptionIds);
+        map.put(APIConstants.SubscriptionStatus.ON_HOLD, pendingCreateSubscriptionIds);
         map.put(APIConstants.SubscriptionStatus.DELETE_PENDING, pendingDeleteSubscriptionIds);
+        map.put(APIConstants.SubscriptionStatus.TIER_UPDATE_PENDING, pendingUpdateSubscriptionIds);
         return map;
     }
 

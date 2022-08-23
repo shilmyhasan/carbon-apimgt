@@ -234,10 +234,9 @@ public interface APIConsumer extends APIManager {
     /**
      * This method will delete pending subscription tasks
      * @param applicationId
-     * @param workflowExtRef
      * @throws APIManagementException
      */
-    default void cleanupSubscriptionAndRegistrationPendingTasks(int applicationId, String workflowExtRef) throws APIManagementException {
+    default void cleanupPendingTasksForApplicationDeletion(int applicationId) throws APIManagementException {
         //no default implementation
     }
 
