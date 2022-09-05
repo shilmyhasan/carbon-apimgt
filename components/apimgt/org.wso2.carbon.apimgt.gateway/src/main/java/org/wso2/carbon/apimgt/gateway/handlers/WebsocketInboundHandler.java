@@ -31,6 +31,7 @@ import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.util.CharsetUtil;
+import io.netty.util.ReferenceCountUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -129,6 +130,7 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                 InboundWebsocketProcessorUtil.publishGoogleAnalyticsData(inboundMessageContext,
                         ctx.channel().remoteAddress().toString());
             } else {
+                ReferenceCountUtil.release(msg);
                 InboundMessageContextDataHolder.getInstance().removeInboundMessageContextForConnection(channelId);
                 FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                         HttpResponseStatus.valueOf(responseDTO.getErrorCode()),
@@ -146,6 +148,7 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
             InboundProcessorResponseDTO responseDTO =
                     webSocketProcessor.handleRequest((WebSocketFrame) msg, inboundMessageContext);
             if (responseDTO.isError()) {
+                ReferenceCountUtil.release(msg);
                 if (responseDTO.isCloseConnection()) {
                     //remove inbound message context from data holder
                     InboundMessageContextDataHolder.getInstance().getInboundMessageContextMap().remove(channelId);
