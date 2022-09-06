@@ -395,7 +395,7 @@ public class JWTValidator {
             log.debug("Token signature verification failure. Token: " + GatewayUtils.getMaskedToken(splitToken[0]));
         }
         throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
-                "Invalid JWT token. Signature verification failed.");
+                APISecurityConstants.SIGNATURE_VERIFICATION_FAILURE_MESSAGE);
     }
 
     /**
@@ -809,7 +809,7 @@ public class JWTValidator {
             log.debug("Token signature verification failure. Token: " + GatewayUtils.getMaskedToken(splitToken[0]));
         }
         throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
-                "Invalid JWT token. Signature verification failed.");
+                APISecurityConstants.SIGNATURE_VERIFICATION_FAILURE_MESSAGE);
     }
 
 
