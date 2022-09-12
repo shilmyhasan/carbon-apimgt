@@ -19,6 +19,10 @@ package org.wso2.carbon.apimgt.gateway.mediators.webhooks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.util.MultipleEntryHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -45,12 +49,12 @@ import org.wso2.carbon.apimgt.gateway.utils.WebhooksUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This mediator would persist webhooks subscription data.
@@ -61,21 +65,24 @@ public class SubscribersPersistMediator extends AbstractMediator {
     @Override
     public boolean mediate(MessageContext messageContext) {
         try {
-            Map<String, String> queryParams = populateQueryParamData(messageContext);
-            if (queryParams.isEmpty()) {
-                populateException("Query params must present in the request", messageContext);
+            Map<String, String> params = populateParamData(messageContext);
+            if (params.isEmpty()) {
+                populateException("Subscription parameters must present in the request", messageContext);
             }
-            String callback = queryParams.get(APIConstants.Webhooks.HUB_CALLBACK_QUERY_PARAM);
-            String topicName = queryParams.get(APIConstants.Webhooks.HUB_TOPIC_QUERY_PARAM);
-            String mode = queryParams.get(APIConstants.Webhooks.HUB_MODE_QUERY_PARAM);
-            String secret = queryParams.get(APIConstants.Webhooks.HUB_SECRET_QUERY_PARAM);
-            String leaseSeconds = queryParams.get(APIConstants.Webhooks.HUB_LEASE_SECONDS_QUERY_PARAM);
+            String callback = params.get(APIConstants.Webhooks.HUB_CALLBACK_QUERY_PARAM);
+            String topicName = params.get(APIConstants.Webhooks.HUB_TOPIC_QUERY_PARAM);
+            String mode = params.get(APIConstants.Webhooks.HUB_MODE_QUERY_PARAM);
+            String secret = params.get(APIConstants.Webhooks.HUB_SECRET_QUERY_PARAM);
+            String leaseSeconds = params.get(APIConstants.Webhooks.HUB_LEASE_SECONDS_QUERY_PARAM);
             messageContext.setProperty(Constants.SKIP_DEFAULT_METRICS_PUBLISHING, true);
             org.apache.axis2.context.MessageContext axisCtx =
                     ((Axis2MessageContext) messageContext).getAxis2MessageContext();
             axisCtx.setProperty(PassThroughConstants.SYNAPSE_ARTIFACT_TYPE, APIConstants.API_TYPE_WEBSUB);
             if (StringUtils.isEmpty(callback)) {
                 populateException("Callback URL cannot be empty", messageContext);
+            }
+            if (StringUtils.isEmpty(topicName)) {
+                populateException("Topic cannot be empty", messageContext);
             }
             if (StringUtils.isEmpty(mode)) {
                 populateException("Mode cannot be empty", messageContext);
@@ -166,17 +173,39 @@ public class SubscribersPersistMediator extends AbstractMediator {
      *
      * @param messageContext    the message context.
      */
-    private Map<String, String> populateQueryParamData(MessageContext messageContext) throws URISyntaxException {
+    private Map<String, String> populateParamData(MessageContext messageContext) throws URISyntaxException, UnsupportedEncodingException {
         Map<String, String> queryData = new HashMap<>();
-        String urlQueryParams = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().
-                getProperty(APIConstants.TRANSPORT_URL_IN);
-        if (StringUtils.isEmpty(urlQueryParams)) {
-            handleException("Invalid subscription request: URL params are missing", messageContext);
-        }
-        List<NameValuePair> queryParameter = URLEncodedUtils.parse(new URI(urlQueryParams),
-                StandardCharsets.UTF_8.name());
-        for (NameValuePair nvPair : queryParameter) {
-            queryData.put(nvPair.getName(), nvPair.getValue());
+        org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+        String contentType = (String) axis2MsgCtx.getProperty("ContentType");
+        if (contentType != null && contentType.equals(HTTPConstants.MEDIA_TYPE_X_WWW_FORM)) {
+            // envelope must already be built at this point
+            SOAPEnvelope soapEnvelope = messageContext.getEnvelope();
+            if (soapEnvelope != null) {
+                OMElement xFormValuesOMElement = soapEnvelope.getBody().getFirstElement();
+                Iterator<OMElement> children = xFormValuesOMElement.getChildElements();
+                while (children.hasNext()) {
+                    OMElement requestElement = children.next();
+                    String key = requestElement.getQName().toString();
+                    String value = requestElement.getText();
+
+                    if (key.contains(APIConstants.Webhooks.HUB_CALLBACK_QUERY_PARAM)) {
+                        value = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
+                    }
+                    queryData.put(key, value);
+                }
+            }
+        } else {
+            // if not form-urlEncoded data, check for query params
+            String urlQueryParams = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().
+                    getProperty(APIConstants.TRANSPORT_URL_IN);
+            if (StringUtils.isEmpty(urlQueryParams)) {
+                handleException("Invalid subscription request: URL params are missing", messageContext);
+            }
+            List<NameValuePair> queryParameter = URLEncodedUtils.parse(new URI(urlQueryParams),
+                    StandardCharsets.UTF_8.name());
+            for (NameValuePair nvPair : queryParameter) {
+                queryData.put(nvPair.getName(), nvPair.getValue());
+            }
         }
         return queryData;
     }

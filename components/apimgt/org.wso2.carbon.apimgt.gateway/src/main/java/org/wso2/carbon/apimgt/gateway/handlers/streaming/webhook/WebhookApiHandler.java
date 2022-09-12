@@ -18,7 +18,11 @@
 
 package org.wso2.carbon.apimgt.gateway.handlers.streaming.webhook;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.Constants;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.util.MultipleEntryHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
@@ -42,6 +46,8 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import static org.apache.axis2.Constants.Configuration.HTTP_METHOD;
@@ -75,8 +81,38 @@ public class WebhookApiHandler extends APIAuthenticationHandler {
         String requestSubPath = getRequestSubPath(synCtx);
         // all other requests are assumed to be for subscription as there will be only 2 resources for web hook api
         if (!requestSubPath.startsWith(eventReceiverResourcePath)) {
-            String topicName = getTopicName(ApiUtils.getFullRequestPath(synCtx));
-            if (topicName.isEmpty()) {
+            String topicName = null;
+            org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            String contentType = (String) axis2MsgCtx.getProperty("ContentType");
+            // priority will be given to form-urlEncoded payloads
+            if (contentType != null && contentType.equals(HTTPConstants.MEDIA_TYPE_X_WWW_FORM)) {
+                try {
+                    RelayUtils.buildMessage(axis2MsgCtx, false);
+                    SOAPEnvelope soapEnvelope = synCtx.getEnvelope();
+                    if (soapEnvelope != null) {
+                        OMElement xFormValuesOMElement = soapEnvelope.getBody().getFirstElement();
+                        Iterator<OMElement> children = xFormValuesOMElement.getChildElements();
+                        while (children.hasNext()) {
+                            OMElement requestElement = children.next();
+                            if (requestElement.getQName().toString().contains(APIConstants.Webhooks.HUB_TOPIC_QUERY_PARAM)) {
+                                topicName = requestElement.getText();
+                                break;
+                            }
+                        }
+                    }
+                } catch (IOException | XMLStreamException e) {
+                    log.error("Error building the subscription request payload");
+                    return false;
+                } catch (Exception e) {
+                    log.error("Error while processing the subscription request");
+                    return false;
+                }
+            } else {
+                // process query string parameter here
+                topicName = getTopicName(ApiUtils.getFullRequestPath(synCtx));
+            }
+
+            if (topicName == null || topicName.isEmpty()) {
                 handleFailure(synCtx, "Topic name not found for web hook subscription request");
                 return false;
             }
