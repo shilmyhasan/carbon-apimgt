@@ -404,17 +404,21 @@ public class JWTValidator {
     private JWTValidationInfo validateTokenForWS(SignedJWTInfo signedJWTInfo, String tokenSignature, String jti)
             throws APISecurityException {
 
-        JWTValidationInfo jwtValidationInfo;
+        JWTValidationInfo jwtValidationInfo = null;
+        String jwtTokenIdentifier = getJWTTokenIdentifier(signedJWTInfo);
         String jwtHeader = signedJWTInfo.getSignedJWT().getHeader().toString();
-        jwtValidationInfo = getJwtValidationInfo(signedJWTInfo, jti);
-        if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(tokenSignature)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
-                        getMaskedToken(jwtHeader));
+
+        if (StringUtils.isNotEmpty(jwtTokenIdentifier)) {
+            jwtValidationInfo = getJwtValidationInfo(signedJWTInfo, jwtTokenIdentifier);
+            if (RevokedJWTDataHolder.isJWTTokenSignatureExistsInRevokedMap(jwtTokenIdentifier)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.getMaskedToken(
+                            jwtHeader));
+                }
+                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(jwtHeader));
+                jwtValidationInfo.setValidationCode(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS);
+                jwtValidationInfo.setValid(false);
             }
-            log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(jwtHeader));
-            jwtValidationInfo.setValidationCode(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS);
-            jwtValidationInfo.setValid(false);
         }
         return jwtValidationInfo;
     }
