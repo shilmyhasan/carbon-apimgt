@@ -23,10 +23,12 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
@@ -53,15 +55,15 @@ public class WebsocketUtil {
 	 *
 	 */
 	protected static void initParams() {
-			APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
-			String cacheEnabled = config.getFirstProperty(APIConstants.GATEWAY_TOKEN_CACHE_ENABLED);
-			if (cacheEnabled != null) {
-				gatewayTokenCacheEnabled = Boolean.parseBoolean(cacheEnabled);
-			}
-			String value = config.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE);
-			if (value != null) {
-				removeOAuthHeadersFromOutMessage = Boolean.parseBoolean(value);
-			}
+		APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+		String cacheEnabled = config.getFirstProperty(APIConstants.GATEWAY_TOKEN_CACHE_ENABLED);
+		if (cacheEnabled != null) {
+			gatewayTokenCacheEnabled = Boolean.parseBoolean(cacheEnabled);
+		}
+		String value = config.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE);
+		if (value != null) {
+			removeOAuthHeadersFromOutMessage = Boolean.parseBoolean(value);
+		}
 	}
 
 	public static boolean isRemoveOAuthHeadersFromOutMessage() {
