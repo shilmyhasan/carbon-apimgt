@@ -65,7 +65,13 @@ public class SubscribersPersistMediator extends AbstractMediator {
     @Override
     public boolean mediate(MessageContext messageContext) {
         try {
-            Map<String, String> params = populateParamData(messageContext);
+            Map<String, String> params = (Map<String, String>) messageContext.
+                    getProperty(APIConstants.Webhooks.SUBSCRIPTION_PARAMETER_PROPERTY);
+
+            // just in case the populated property from the handler is not available
+            if (params == null || params.isEmpty()) {
+                params = populateParamData(messageContext);
+            }
             if (params.isEmpty()) {
                 populateException("Subscription parameters must present in the request", messageContext);
             }
@@ -78,15 +84,8 @@ public class SubscribersPersistMediator extends AbstractMediator {
             org.apache.axis2.context.MessageContext axisCtx =
                     ((Axis2MessageContext) messageContext).getAxis2MessageContext();
             axisCtx.setProperty(PassThroughConstants.SYNAPSE_ARTIFACT_TYPE, APIConstants.API_TYPE_WEBSUB);
-            if (StringUtils.isEmpty(callback)) {
-                populateException("Callback URL cannot be empty", messageContext);
-            }
-            if (StringUtils.isEmpty(topicName)) {
-                populateException("Topic cannot be empty", messageContext);
-            }
-            if (StringUtils.isEmpty(mode)) {
-                populateException("Mode cannot be empty", messageContext);
-            } else if (!(APIConstants.Webhooks.SUBSCRIBE_MODE.equalsIgnoreCase(mode.trim()) || APIConstants.Webhooks.
+
+            if (!(APIConstants.Webhooks.SUBSCRIBE_MODE.equalsIgnoreCase(mode.trim()) || APIConstants.Webhooks.
                     UNSUBSCRIBE_MODE.equalsIgnoreCase(mode.trim()))) {
                 populateException("Invalid Entry for hub.mode", messageContext);
             }
@@ -176,7 +175,7 @@ public class SubscribersPersistMediator extends AbstractMediator {
     private Map<String, String> populateParamData(MessageContext messageContext) throws URISyntaxException, UnsupportedEncodingException {
         Map<String, String> queryData = new HashMap<>();
         org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-        String contentType = (String) axis2MsgCtx.getProperty("ContentType");
+        String contentType = (String) axis2MsgCtx.getProperty(SynapseConstants.AXIS2_PROPERTY_CONTENT_TYPE);
         if (contentType != null && contentType.equals(HTTPConstants.MEDIA_TYPE_X_WWW_FORM)) {
             // envelope must already be built at this point
             SOAPEnvelope soapEnvelope = messageContext.getEnvelope();

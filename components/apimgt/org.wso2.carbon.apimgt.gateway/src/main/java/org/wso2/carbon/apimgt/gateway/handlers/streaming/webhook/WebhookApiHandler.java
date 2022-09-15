@@ -23,9 +23,12 @@ import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.Constants;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.util.MultipleEntryHashMap;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
@@ -41,14 +44,16 @@ import org.wso2.carbon.apimgt.gateway.handlers.security.APIAuthenticationHandler
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import scala.util.parsing.combinator.testing.Str;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.apache.axis2.Constants.Configuration.HTTP_METHOD;
 import static org.wso2.carbon.apimgt.impl.APIConstants.AsyncApi.ASYNC_MESSAGE_TYPE;
@@ -71,7 +76,6 @@ public class WebhookApiHandler extends APIAuthenticationHandler {
     private static final Log log = LogFactory.getLog(WebhookApiHandler.class);
     private static final String EMPTY_STRING = "";
     private static final String TEXT_CONTENT_TYPE = "text/plain";
-
     private String eventReceiverResourcePath = APIConstants.WebHookProperties.DEFAULT_SUBSCRIPTION_RESOURCE_PATH;
     private String topicQueryParamName = APIConstants.WebHookProperties.DEFAULT_TOPIC_QUERY_PARAM_NAME;
 
@@ -81,46 +85,35 @@ public class WebhookApiHandler extends APIAuthenticationHandler {
         String requestSubPath = getRequestSubPath(synCtx);
         // all other requests are assumed to be for subscription as there will be only 2 resources for web hook api
         if (!requestSubPath.startsWith(eventReceiverResourcePath)) {
+            // Mandatory parameters
             String topicName = null;
-            org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-            String contentType = (String) axis2MsgCtx.getProperty("ContentType");
+            HashMap<String, String> hubParameters = new HashMap<>();
+
+            org.apache.axis2.context.MessageContext axisCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            String contentType = (String) axisCtx.getProperty(SynapseConstants.AXIS2_PROPERTY_CONTENT_TYPE);
             // priority will be given to form-urlEncoded payloads
             if (contentType != null && contentType.equals(HTTPConstants.MEDIA_TYPE_X_WWW_FORM)) {
-                try {
-                    RelayUtils.buildMessage(axis2MsgCtx, false);
-                    SOAPEnvelope soapEnvelope = synCtx.getEnvelope();
-                    if (soapEnvelope != null) {
-                        OMElement xFormValuesOMElement = soapEnvelope.getBody().getFirstElement();
-                        Iterator<OMElement> children = xFormValuesOMElement.getChildElements();
-                        while (children.hasNext()) {
-                            OMElement requestElement = children.next();
-                            if (requestElement.getQName().toString().contains(APIConstants.Webhooks.HUB_TOPIC_QUERY_PARAM)) {
-                                topicName = requestElement.getText();
-                                break;
-                            }
-                        }
-                    }
-                } catch (IOException | XMLStreamException e) {
-                    log.error("Error building the subscription request payload");
-                    return false;
-                } catch (Exception e) {
-                    log.error("Error while processing the subscription request");
-                    return false;
-                }
+                // populate form-url-Encoded data here
+                populateParamsWithFormUrlEncodedData(synCtx, hubParameters);
             } else {
                 // process query string parameter here
-                topicName = getTopicName(ApiUtils.getFullRequestPath(synCtx));
+                populateParamsWithQueryData(synCtx, hubParameters);
             }
 
-            if (topicName == null || topicName.isEmpty()) {
-                handleFailure(synCtx, "Topic name not found for web hook subscription request");
+            if (!hasMandatorySubscriptionParameters(hubParameters)) {
+                handleFailure(synCtx, "One or more mandatory parameters were not found in web hook subscription request");
                 return false;
             }
-            org.apache.axis2.context.MessageContext axisCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
             Object httpVerb = axisCtx.getProperty(HTTP_METHOD);
             axisCtx.setProperty(HTTP_METHOD, APIConstants.SubscriptionCreatedStatus.SUBSCRIBE);
+            // Add the hub parameters to the message context so that subsequent mediators in the flow
+            // can access it, without relying on the content type
+            synCtx.setProperty(APIConstants.Webhooks.SUBSCRIPTION_PARAMETER_PROPERTY, hubParameters);
+
             synCtx.setProperty(APIConstants.API_TYPE, APIConstants.API_TYPE_WEBSUB);
-            synCtx.setProperty(APIConstants.API_ELECTED_RESOURCE, topicName);
+            synCtx.setProperty(APIConstants.API_ELECTED_RESOURCE, hubParameters.
+                    get(APIConstants.WebHookProperties.DEFAULT_TOPIC_QUERY_PARAM_NAME));
             synCtx.setProperty(ASYNC_MESSAGE_TYPE, ASYNC_MESSAGE_TYPE_SUBSCRIBE);
             boolean authenticationResolved = super.handleRequest(synCtx);
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().
@@ -170,38 +163,6 @@ public class WebhookApiHandler extends APIAuthenticationHandler {
     }
 
     /**
-     * Retrieves the name of the topic from the query param to which the subscription request is entering for the
-     * web hook api.
-     *
-     * @param url request url
-     * @return topic name
-     */
-    private String getTopicName(String url) {
-
-        int queryIndex = url.indexOf('?');
-        if (queryIndex != -1 && url.contains(topicQueryParamName)) {
-            String query = url.substring(queryIndex + 1);
-            String[] entries = query.split(RESTConstants.QUERY_PARAM_DELIMITER);
-            String name;
-            for (String entry : entries) {
-                int index = entry.indexOf('=');
-                if (index != -1) {
-                    try {
-                        name = entry.substring(0, index);
-                        if (name.equalsIgnoreCase(topicQueryParamName)) {
-                            return URLDecoder.decode(entry.substring(index + 1), RESTConstants.DEFAULT_ENCODING);
-                        }
-                    } catch (UnsupportedEncodingException | IllegalArgumentException e) {
-                        log.error("Error extracting topic name from query param", e);
-                        return EMPTY_STRING;
-                    }
-                }
-            }
-        }
-        return EMPTY_STRING;
-    }
-
-    /**
      * This method handle the failure
      *
      * @param messageContext   message context of the request
@@ -218,5 +179,65 @@ public class WebhookApiHandler extends APIAuthenticationHandler {
 
     public void setTopicQueryParamName(String topicQueryParamName) {
         this.topicQueryParamName = topicQueryParamName;
+    }
+
+    /**
+     *  Populates subscriber request parameters to a provided Map
+     *  from form-URL-encoded data.
+     *
+     * @param synCtx Request message context
+     * @param hubParameters Map to be populated
+     */
+    private void populateParamsWithFormUrlEncodedData(MessageContext synCtx, HashMap<String, String> hubParameters) {
+
+        org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+        try {
+            RelayUtils.buildMessage(axis2MsgCtx, false);
+            SOAPEnvelope soapEnvelope = synCtx.getEnvelope();
+            if (soapEnvelope != null) {
+                OMElement xFormValuesOMElement = soapEnvelope.getBody().getFirstElement();
+                Iterator<OMElement> children = xFormValuesOMElement.getChildElements();
+                while (children.hasNext()) {
+                    // insert all available parameters to the parameter map
+                    OMElement requestElement = children.next();
+                    hubParameters.put(requestElement.getQName().toString(), requestElement.getText());
+                }
+            }
+        } catch (IOException | XMLStreamException e) {
+            log.error("Error building the subscription request payload");
+        }
+    }
+
+    /**
+     *  Populates subscriber request parameters to a provided Map
+     *  from query parameters.
+     *
+     * @param synCtx Request message context
+     * @param hubParameters Map to be populated
+     */
+    private void populateParamsWithQueryData(MessageContext synCtx, HashMap<String, String> hubParameters) {
+        String url = ApiUtils.getFullRequestPath(synCtx);
+        try {
+            List<NameValuePair> queryParameter = URLEncodedUtils.parse(new URI(url),
+                    StandardCharsets.UTF_8.name());
+            for (NameValuePair nvPair : queryParameter) {
+                hubParameters.put(nvPair.getName(), nvPair.getValue());
+            }
+        } catch (URISyntaxException e) {
+            log.error("Error while parsing the query parameters", e);
+        }
+    }
+
+    /**
+     * Checks the availability of hub.topic, hub.mode and hub.callback
+     * parameters in the request parameter map.
+     *
+     * @param hubParameters Map
+     * @return boolean
+     */
+    private boolean hasMandatorySubscriptionParameters(HashMap<String, String> hubParameters) {
+        return StringUtils.isNotEmpty(hubParameters.get(topicQueryParamName))
+                && StringUtils.isNotEmpty(hubParameters.get(APIConstants.Webhooks.HUB_CALLBACK_QUERY_PARAM))
+                && StringUtils.isNotEmpty(hubParameters.get(APIConstants.Webhooks.HUB_MODE_QUERY_PARAM));
     }
 }
