@@ -134,5 +134,6 @@
   "oauth.grant_type.iwa_ntlm.grant_validator": "org.wso2.carbon.identity.oauth.common.NTLMAuthenticationValidator",
   "apim.certificate_reloader.period": "600",
   "apimgt.mutual_ssl.certificate_header": "X-WSO2-CLIENT-CERTIFICATE",
-  "apimgt.mutual_ssl.enable_client_validation": true
+  "apimgt.mutual_ssl.enable_client_validation": true,
+  "apim.auth_manager.iskm_reverseproxy_enabled": false
 }
