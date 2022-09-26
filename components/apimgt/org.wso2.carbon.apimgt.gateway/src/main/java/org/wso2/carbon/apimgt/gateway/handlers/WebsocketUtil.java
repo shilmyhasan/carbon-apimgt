@@ -53,15 +53,15 @@ public class WebsocketUtil {
 	 *
 	 */
 	protected static void initParams() {
-			APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
-			String cacheEnabled = config.getFirstProperty(APIConstants.GATEWAY_TOKEN_CACHE_ENABLED);
-			if (cacheEnabled != null) {
-				gatewayTokenCacheEnabled = Boolean.parseBoolean(cacheEnabled);
-			}
-			String value = config.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE);
-			if (value != null) {
-				removeOAuthHeadersFromOutMessage = Boolean.parseBoolean(value);
-			}
+		APIManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+		String cacheEnabled = config.getFirstProperty(APIConstants.GATEWAY_TOKEN_CACHE_ENABLED);
+		if (cacheEnabled != null) {
+			gatewayTokenCacheEnabled = Boolean.parseBoolean(cacheEnabled);
+		}
+		String value = config.getFirstProperty(APIConstants.REMOVE_OAUTH_HEADERS_FROM_MESSAGE);
+		if (value != null) {
+			removeOAuthHeadersFromOutMessage = Boolean.parseBoolean(value);
+		}
 	}
 
 	public static boolean isRemoveOAuthHeadersFromOutMessage() {
