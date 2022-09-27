@@ -86,7 +86,6 @@ public class WebhookApiHandler extends APIAuthenticationHandler {
         // all other requests are assumed to be for subscription as there will be only 2 resources for web hook api
         if (!requestSubPath.startsWith(eventReceiverResourcePath)) {
             // Mandatory parameters
-            String topicName = null;
             HashMap<String, String> hubParameters = new HashMap<>();
 
             org.apache.axis2.context.MessageContext axisCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();

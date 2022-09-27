@@ -142,8 +142,8 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
                     // default is set as false
                     APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
                             .getAPIManagerConfigurationService().getAPIManagerConfiguration();
-                    Boolean isForceSubscriberVerificationEnabled = Boolean.
-                            parseBoolean(configuration.getFirstProperty(APIConstants.ENABLE_WEBSUB_SUBSCRIBER_VERIFICATION_CONFIG));
+                    Boolean isForceSubscriberVerificationEnabled = Boolean.parseBoolean(
+                            configuration.getFirstProperty(APIConstants.ENABLE_WEBSUB_SUBSCRIBER_VERIFICATION_CONFIG));
                     context.put("enableSubscriberVerification", isForceSubscriberVerificationEnabled);
                 } else if (APIConstants.GRAPHQL_API.equals(api.getType())) {
                     boolean isSubscriptionAvailable = false;
