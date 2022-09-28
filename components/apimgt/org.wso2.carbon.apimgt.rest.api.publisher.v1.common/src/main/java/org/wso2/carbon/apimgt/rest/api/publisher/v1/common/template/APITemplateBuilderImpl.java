@@ -139,8 +139,12 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
                             getSecret()));
                     // enableSubscriberVerification can be set as an additional property from publisher portal
                     // default is set as false
-                    context.put(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION, Boolean.parseBoolean(
-                            (String) api.getAdditionalProperties().get(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION)));
+                    if (api != null && api.getAdditionalProperties() != null) {
+                        context.put(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION, Boolean.parseBoolean(
+                                (String) api.getAdditionalProperties().get(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION)));
+                    } else {
+                        context.put(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION, false);
+                    }
                 } else if (APIConstants.GRAPHQL_API.equals(api.getType())) {
                     boolean isSubscriptionAvailable = false;
                     if (api.getWebSocketTopicMappingConfiguration() != null) {
