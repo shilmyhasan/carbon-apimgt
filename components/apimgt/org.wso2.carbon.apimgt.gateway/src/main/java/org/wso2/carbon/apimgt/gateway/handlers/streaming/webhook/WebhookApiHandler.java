@@ -86,13 +86,12 @@ public class WebhookApiHandler extends APIAuthenticationHandler {
         // all other requests are assumed to be for subscription as there will be only 2 resources for web hook api
         if (!requestSubPath.startsWith(eventReceiverResourcePath)) {
             // Mandatory parameters
-            String topicName = null;
             HashMap<String, String> hubParameters = new HashMap<>();
 
             org.apache.axis2.context.MessageContext axisCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
             String contentType = (String) axisCtx.getProperty(SynapseConstants.AXIS2_PROPERTY_CONTENT_TYPE);
             // priority will be given to form-urlEncoded payloads
-            if (contentType != null && contentType.equals(HTTPConstants.MEDIA_TYPE_X_WWW_FORM)) {
+            if (contentType != null && contentType.contains(HTTPConstants.MEDIA_TYPE_X_WWW_FORM)) {
                 // populate form-url-Encoded data here
                 populateParamsWithFormUrlEncodedData(synCtx, hubParameters);
             } else {

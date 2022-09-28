@@ -27,7 +27,6 @@ import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIProduct;
 import org.wso2.carbon.apimgt.api.model.Environment;
 import org.wso2.carbon.apimgt.impl.APIConstants;
-import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.dto.SoapToRestMediationDto;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -62,6 +61,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
     private static final Log log = LogFactory.getLog(APITemplateBuilderImpl.class);
     private static final String TEMPLATE_TYPE_ENDPOINT = "endpoint_template";
     private static final String TEMPLATE_TYPE_API_PRODUCT = "api_product_template";
+    private static final String WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION = "enableSubscriberVerification";
     private List<SoapToRestMediationDto> soapToRestOutMediationDtoList;
     private List<SoapToRestMediationDto> soapToRestInMediationDtoList;
     private API api;
@@ -137,14 +137,10 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
                     context.put("signatureHeader", api.getWebsubSubscriptionConfiguration().getSignatureHeader());
                     context.put("isSecurityEnabled", !StringUtils.isEmpty(api.getWebsubSubscriptionConfiguration().
                             getSecret()));
-                    // user can define the property EnableWebSubSubscriberVerification in api-manager.xml
-                    // if set as true, we will proceed with the subscription request validation.
+                    // enableSubscriberVerification can be set as an additional property from publisher portal
                     // default is set as false
-                    APIManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
-                            .getAPIManagerConfigurationService().getAPIManagerConfiguration();
-                    Boolean isForceSubscriberVerificationEnabled = Boolean.
-                            parseBoolean(configuration.getFirstProperty(APIConstants.ENABLE_WEBSUB_SUBSCRIBER_VERIFICATION_CONFIG));
-                    context.put("enableSubscriberVerification", isForceSubscriberVerificationEnabled);
+                    context.put(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION, Boolean.parseBoolean(
+                            (String) api.getAdditionalProperties().get(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION)));
                 } else if (APIConstants.GRAPHQL_API.equals(api.getType())) {
                     boolean isSubscriptionAvailable = false;
                     if (api.getWebSocketTopicMappingConfiguration() != null) {
