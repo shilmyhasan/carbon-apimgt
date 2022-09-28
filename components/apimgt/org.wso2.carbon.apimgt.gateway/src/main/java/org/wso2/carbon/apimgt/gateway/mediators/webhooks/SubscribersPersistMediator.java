@@ -68,11 +68,7 @@ public class SubscribersPersistMediator extends AbstractMediator {
             Map<String, String> params = (Map<String, String>) messageContext.
                     getProperty(APIConstants.Webhooks.SUBSCRIPTION_PARAMETER_PROPERTY);
 
-            // just in case the populated property from the handler is not available
-            if (params == null || params.isEmpty()) {
-                params = populateParamData(messageContext);
-            }
-            if (params.isEmpty()) {
+            if (params != null && params.isEmpty()) {
                 populateException("Subscription parameters must present in the request", messageContext);
             }
             String callback = params.get(APIConstants.Webhooks.HUB_CALLBACK_QUERY_PARAM);
@@ -165,48 +161,6 @@ public class SubscribersPersistMediator extends AbstractMediator {
         messageContext.setProperty(SynapseConstants.ERROR_MESSAGE, errorMsg);
         messageContext.setProperty(SynapseConstants.ERROR_DETAIL, errorMsg);
         throw new SynapseException(errorMsg);
-    }
-
-    /**
-     * This method is used to populate query param data of the subscription request.
-     *
-     * @param messageContext    the message context.
-     */
-    private Map<String, String> populateParamData(MessageContext messageContext) throws URISyntaxException, UnsupportedEncodingException {
-        Map<String, String> queryData = new HashMap<>();
-        org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-        String contentType = (String) axis2MsgCtx.getProperty(SynapseConstants.AXIS2_PROPERTY_CONTENT_TYPE);
-        if (contentType != null && contentType.equals(HTTPConstants.MEDIA_TYPE_X_WWW_FORM)) {
-            // envelope must already be built at this point
-            SOAPEnvelope soapEnvelope = messageContext.getEnvelope();
-            if (soapEnvelope != null) {
-                OMElement xFormValuesOMElement = soapEnvelope.getBody().getFirstElement();
-                Iterator<OMElement> children = xFormValuesOMElement.getChildElements();
-                while (children.hasNext()) {
-                    OMElement requestElement = children.next();
-                    String key = requestElement.getQName().toString();
-                    String value = requestElement.getText();
-
-                    if (key.contains(APIConstants.Webhooks.HUB_CALLBACK_QUERY_PARAM)) {
-                        value = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
-                    }
-                    queryData.put(key, value);
-                }
-            }
-        } else {
-            // if not form-urlEncoded data, check for query params
-            String urlQueryParams = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().
-                    getProperty(APIConstants.TRANSPORT_URL_IN);
-            if (StringUtils.isEmpty(urlQueryParams)) {
-                handleException("Invalid subscription request: URL params are missing", messageContext);
-            }
-            List<NameValuePair> queryParameter = URLEncodedUtils.parse(new URI(urlQueryParams),
-                    StandardCharsets.UTF_8.name());
-            for (NameValuePair nvPair : queryParameter) {
-                queryData.put(nvPair.getName(), nvPair.getValue());
-            }
-        }
-        return queryData;
     }
 
     /**
