@@ -54,7 +54,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This mediator would persist webhooks subscription data.
@@ -102,7 +104,7 @@ public class SubscribersPersistMediator extends AbstractMediator {
             HttpResponse httpResponse = WebhooksUtils.persistData(jsonString, subscriptionDataPersisRetries,
                     APIConstants.Webhooks.SUBSCRIPTION_EVENT_TYPE);
             handleResponse(httpResponse, messageContext);
-        } catch (URISyntaxException | InterruptedException | IOException e) {
+        } catch (InterruptedException | IOException e) {
             messageContext.setProperty(SynapseConstants.ERROR_CODE, HttpStatus.SC_INTERNAL_SERVER_ERROR);
             messageContext.setProperty(SynapseConstants.ERROR_MESSAGE, "Error while persisting request");
             messageContext.setProperty(SynapseConstants.ERROR_DETAIL, "Error while persisting request");
