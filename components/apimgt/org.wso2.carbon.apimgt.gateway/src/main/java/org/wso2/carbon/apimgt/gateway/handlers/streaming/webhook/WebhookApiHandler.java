@@ -53,7 +53,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.axis2.Constants.Configuration.HTTP_METHOD;
 import static org.wso2.carbon.apimgt.impl.APIConstants.AsyncApi.ASYNC_MESSAGE_TYPE;
@@ -203,7 +206,7 @@ public class WebhookApiHandler extends APIAuthenticationHandler {
                 }
             }
         } catch (IOException | XMLStreamException e) {
-            log.error("Error building the subscription request payload");
+            log.error("Error building the subscription request payload", e);
         }
     }
 
