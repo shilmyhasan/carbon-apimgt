@@ -61,6 +61,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
     private static final Log log = LogFactory.getLog(APITemplateBuilderImpl.class);
     private static final String TEMPLATE_TYPE_ENDPOINT = "endpoint_template";
     private static final String TEMPLATE_TYPE_API_PRODUCT = "api_product_template";
+    private static final String WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION = "enableSubscriberVerification";
     private List<SoapToRestMediationDto> soapToRestOutMediationDtoList;
     private List<SoapToRestMediationDto> soapToRestInMediationDtoList;
     private API api;
@@ -136,6 +137,14 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
                     context.put("signatureHeader", api.getWebsubSubscriptionConfiguration().getSignatureHeader());
                     context.put("isSecurityEnabled", !StringUtils.isEmpty(api.getWebsubSubscriptionConfiguration().
                             getSecret()));
+                    // enableSubscriberVerification can be set as an additional property from publisher portal
+                    // default is set as false
+                    if (api != null && api.getAdditionalProperties() != null) {
+                        context.put(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION, Boolean.parseBoolean(
+                                (String) api.getAdditionalProperties().get(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION)));
+                    } else {
+                        context.put(WEBSUB_ENABLE_SUBSCRIBER_VERIFICATION, false);
+                    }
                 } else if (APIConstants.GRAPHQL_API.equals(api.getType())) {
                     boolean isSubscriptionAvailable = false;
                     if (api.getWebSocketTopicMappingConfiguration() != null) {
