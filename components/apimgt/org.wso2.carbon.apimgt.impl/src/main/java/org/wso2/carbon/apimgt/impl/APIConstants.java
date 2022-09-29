@@ -604,7 +604,6 @@ public final class APIConstants {
     public static final String ENABLE_TENANT_BASE_SIGNING = "EnableTenantBasedSigning";
     public static final String DEFAULT_WEBSUB_SIGNING_ALGO = "SHA1";
     public static final String DEFAULT_WEBSUB_SIGNATURE_HEADER = "x-hub-signature";
-    public static final String ENABLE_WEBSUB_SUBSCRIBER_VERIFICATION_CONFIG = "WebSubConfigs.EnableSubscriberVerification";
     public static final String INTERNAL_KEY_APP_NAME = "internal-key-app";
 
     // Constants for for api quota limit feature
