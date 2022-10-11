@@ -31,6 +31,7 @@ public class APIKey {
     private String callbackUrl;
     private String grantTypes;
     private String additionalProperties;
+    private String createMode;
 
     public String getState() {
         return state;
@@ -132,4 +133,12 @@ public class APIKey {
 	public void setAdditionalProperties(String additionalProperties) {
 		this.additionalProperties = additionalProperties;
 	}
+
+    public String getCreateMode() {
+        return createMode;
+    }
+
+    public void setCreateMode(String createMode) {
+        this.createMode = createMode;
+    }
 }

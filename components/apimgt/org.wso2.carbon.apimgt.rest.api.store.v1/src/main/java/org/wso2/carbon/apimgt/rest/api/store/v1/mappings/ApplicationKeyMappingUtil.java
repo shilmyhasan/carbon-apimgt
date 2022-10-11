@@ -55,6 +55,10 @@ public class ApplicationKeyMappingUtil {
         applicationKeyDTO
                 .setConsumerSecret((String) keyDetails.get(APIConstants.FrontEndParameterNames.CONSUMER_SECRET));
         applicationKeyDTO.setKeyState((String) keyDetails.get(APIConstants.FrontEndParameterNames.KEY_STATE));
+        Object mode = keyDetails.get(APIConstants.FrontEndParameterNames.MODE);
+        if (mode != null) {
+            applicationKeyDTO.setMode(ApplicationKeyDTO.ModeEnum.valueOf((String) mode));
+        }
         try {
             String appDetailsString = (String) keyDetails.get(ApplicationConstants.OAUTH_APP_DETAILS);
             if (appDetailsString != null) {
@@ -107,6 +111,10 @@ public class ApplicationKeyMappingUtil {
         applicationKeyDTO.setConsumerKey(apiKey.getConsumerKey());
         applicationKeyDTO.setConsumerSecret(apiKey.getConsumerSecret());
         applicationKeyDTO.setKeyState(apiKey.getState());
+        String mode = apiKey.getCreateMode();
+        if (mode != null) {
+            applicationKeyDTO.setMode(ApplicationKeyDTO.ModeEnum.valueOf(mode));
+        }
         if (apiKey.getGrantTypes() != null) {
             applicationKeyDTO.setSupportedGrantTypes(Arrays.asList(apiKey.getGrantTypes().split(" ")));
         } else {
