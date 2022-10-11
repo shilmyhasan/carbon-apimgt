@@ -1239,13 +1239,13 @@ public class APIConsumerImplTest {
         Map<String, Object> result = apiConsumer
                 .requestApprovalForApplicationRegistration("1", "app1", APIConstants.API_KEY_TYPE_PRODUCTION,
                         "identity.com/auth", null, "3600", "api_view", "2", null);
-        Assert.assertEquals(result.size(), 8);
+        Assert.assertEquals(result.size(), 9);
         Assert.assertEquals(result.get("keyState"), "APPROVED");
 
         result = apiConsumer
                 .requestApprovalForApplicationRegistration("1", "app1", APIConstants.API_KEY_TYPE_SANDBOX, "", null,
                         "3600", "api_view", "2", null);
-        Assert.assertEquals(result.size(), 8);
+        Assert.assertEquals(result.size(), 9);
         Assert.assertEquals(result.get("keyState"), "APPROVED");
 
     }
@@ -1484,7 +1484,7 @@ public class APIConsumerImplTest {
         } catch (APIManagementException e) {
             Assert.assertTrue(e.getMessage().contains("is used for another Application"));
         }
-        Assert.assertEquals(6, apiConsumer.mapExistingOAuthClient("", "admin", "1",
+        Assert.assertEquals(7, apiConsumer.mapExistingOAuthClient("", "admin", "1",
                 "app1", "refresh", "DEFAULT").size());
     }
 
