@@ -3156,6 +3156,9 @@ public abstract class AbstractAPIManager implements APIManager {
             apiKey.setConsumerKey(consumerKey);
             apiKey.setType(keyType);
             apiKey.setState(consumerKeyStatus);
+            if (createMode != null) {
+                apiKey.setCreateMode(createMode);
+            }
             if (oAuthApplicationInfo != null) {
                 apiKey.setConsumerSecret(oAuthApplicationInfo.getClientSecret());
                 apiKey.setCallbackUrl(oAuthApplicationInfo.getCallBackURL());

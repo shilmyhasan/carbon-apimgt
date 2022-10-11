@@ -2612,6 +2612,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         keyDetails.put("consumerKey", oAuthApplication.getClientId());
         keyDetails.put("consumerSecret", oAuthApplication.getParameter("client_secret"));
         keyDetails.put("appDetails", oAuthApplication.getJsonString());
+        keyDetails.put(APIConstants.FrontEndParameterNames.MODE, APIConstants.OAuthAppMode.MAPPED.name());
 
         return keyDetails;
     }
@@ -4017,6 +4018,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 keyDetails.put("consumerKey", applicationInfo.getClientId());
                 keyDetails.put("consumerSecret", applicationInfo.getClientSecret());
                 keyDetails.put("appDetails", applicationInfo.getJsonString());
+                keyDetails.put(APIConstants.FrontEndParameterNames.MODE, APIConstants.OAuthAppMode.CREATED.name());
             }
 
             // There can be instances where generating the Application Token is
