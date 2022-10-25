@@ -38,8 +38,8 @@ public class VHost {
     private Integer websubHttpPort = DEFAULT_WEBSUB_HTTP_PORT;
     private Integer websubHttpsPort = DEFAULT_WEBSUB_HTTPS_PORT;
 
-    public static final int DEFAULT_HTTP_PORT = -1;
-    public static final int DEFAULT_HTTPS_PORT = -1;
+    public static final Integer DEFAULT_HTTP_PORT = null;
+    public static final Integer DEFAULT_HTTPS_PORT = null;
     public static final int DEFAULT_WS_PORT = 9099;
     public static final int DEFAULT_WSS_PORT = 8099;
     public static final int DEFAULT_WEBSUB_HTTP_PORT = 9021;
