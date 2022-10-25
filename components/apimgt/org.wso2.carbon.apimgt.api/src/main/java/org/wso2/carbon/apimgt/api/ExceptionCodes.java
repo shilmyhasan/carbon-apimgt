@@ -504,6 +504,9 @@ public enum ExceptionCodes implements ErrorHandler {
     OPERATION_POLICY_NOT_FOUND(902010, "Operation Policy Not Found", 404,
             "Requested operation policy with id '%s' not found"),
 
+    ERROR_VALIDATING_API_POLICY(902011, "Error while validating API policies enforced for the API", 400,
+            "Error while validating the API policies enforced for the API"),
+
     SUBSCRIPTION_TIER_NOT_ALLOWED(902002, "Subscription Tier is not allowed for user", 403, "Subscription Tier %s is" +
             " not allowed for user %s ", false),
     INVALID_KEY_MANAGER_REQUEST(902003, "Invalid Request sent to Key Manager.", 400, "Invalid Request sent to Key Manager.Error from Backend : %s", false),

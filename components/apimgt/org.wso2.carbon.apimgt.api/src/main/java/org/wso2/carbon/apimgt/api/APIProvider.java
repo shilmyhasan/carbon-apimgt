@@ -1964,10 +1964,10 @@ public interface APIProvider extends APIManager {
      * Validate the policies with spec
      * @param policySpecification policy spec
      * @param appliedPolicy policyID
-     * @param api API
+     * @param apiType API Type
      * @return validation status
      * @throws APIManagementException
      */
     boolean validateAppliedPolicyWithSpecification(OperationPolicySpecification policySpecification, OperationPolicy
-            appliedPolicy, API api) throws APIManagementException;
+            appliedPolicy, String apiType) throws APIManagementException;
 }

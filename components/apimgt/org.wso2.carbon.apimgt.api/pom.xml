@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.wso2.carbon.apimgt</groupId>
         <artifactId>apimgt</artifactId>
-        <version>9.20.74.47-SNAPSHOT</version>
+        <version>9.20.74.51-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -40,6 +40,10 @@
             <artifactId>org.wso2.carbon.user.api</artifactId>
             <version>4.5.2</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.graphQL</groupId>
