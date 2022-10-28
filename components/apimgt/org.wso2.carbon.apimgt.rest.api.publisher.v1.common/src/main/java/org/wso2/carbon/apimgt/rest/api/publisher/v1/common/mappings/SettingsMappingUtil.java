@@ -65,6 +65,7 @@ public class SettingsMappingUtil {
             settingsDTO.setEnvironment(environmentListDTO.getList());
             String storeUrl = APIUtil.getStoreUrl();
             String loggedInUserTenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
+            int tenantId = APIUtil.getTenantIdFromTenantDomain(loggedInUserTenantDomain);
             Map<String, String> domainMappings =
                     APIUtil.getDomainMappings(loggedInUserTenantDomain, APIConstants.API_DOMAIN_MAPPINGS_STORE);
             if (domainMappings.size() != 0) {
@@ -75,6 +76,8 @@ public class SettingsMappingUtil {
                     break;
                 }
             }
+            settingsDTO.setDefaultAdvancePolicy(APIUtil.getDefaultAPILevelPolicy(tenantId));
+            settingsDTO.setDefaultSubscriptionPolicy(APIUtil.getDefaultSubscriptionPolicy(tenantId));
             settingsDTO.setDevportalUrl(storeUrl);
             settingsDTO.setMonetizationAttributes(getMonetizationAttributes());
             settingsDTO.setSecurityAuditProperties(getSecurityAuditProperties());
