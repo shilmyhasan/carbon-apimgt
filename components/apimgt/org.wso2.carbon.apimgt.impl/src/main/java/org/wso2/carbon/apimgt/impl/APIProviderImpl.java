@@ -876,7 +876,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     private void addURITemplates(int apiId, API api, int tenantId) throws APIManagementException {
 
         String tenantDomain = APIUtil.getTenantDomainFromTenantId(tenantId);
-        validateAndUpdateURITemplates(api, tenantId);
         apiMgtDAO.addURITemplates(apiId, api, tenantId);
         Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
@@ -1627,7 +1626,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 oldLocalScopesItr.remove();
             }
         }
-        validateAndUpdateURITemplates(api, tenantId);
         apiMgtDAO.updateURITemplates(api, tenantId);
         if (log.isDebugEnabled()) {
             log.debug("Successfully updated the URI templates of API: " + apiIdentifier + " in the database");
@@ -5026,7 +5024,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             " found in api definition for resource " + template.getHTTPVerb() + " " +
                             template.getUriTemplate();
                     log.error(message);
-                    throw new APIManagementException(message, ExceptionCodes.TIER_NAME_INVALID);
+                    throw new APIManagementException(message);
                 }
             }
         }
@@ -9752,18 +9750,4 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return apiMgtDAO.checkAPIUUIDIsARevisionUUID(apiUUID);
     }
 
-    private void validateAndUpdateURITemplates(API api, int tenantId) throws APIManagementException {
-        if (api.getUriTemplates() != null) {
-            for (URITemplate uriTemplate : api.getUriTemplates()) {
-                if (StringUtils.isEmpty(api.getApiLevelPolicy())) {
-                    // API level policy not attached.
-                    if (StringUtils.isEmpty(uriTemplate.getThrottlingTier())) {
-                        uriTemplate.setThrottlingTier(APIUtil.getDefaultAPILevelPolicy(tenantId));
-                    }
-                } else {
-                    uriTemplate.setThrottlingTier(api.getApiLevelPolicy());
-                }
-            }
-        }
-    }
 }
