@@ -3541,6 +3541,13 @@ public class RegistryPersistenceImpl implements APIPersistence {
                 }
             }
 
+            /*remove revision directory with UUID*/
+            String revisionDirectoryPath = APIConstants.API_REVISION_LOCATION + RegistryConstants.PATH_SEPARATOR +
+                    apiId;
+            if (registry.resourceExists(revisionDirectoryPath)) {
+                registry.delete(revisionDirectoryPath);
+            }
+
         } catch (RegistryException e) {
             String msg = "Failed to get API";
             throw new APIPersistenceException(msg, e);
