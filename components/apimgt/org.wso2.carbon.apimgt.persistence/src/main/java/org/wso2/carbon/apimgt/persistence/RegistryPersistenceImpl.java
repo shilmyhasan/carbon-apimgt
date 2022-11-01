@@ -19,8 +19,6 @@ import static org.wso2.carbon.apimgt.persistence.utils.PersistenceUtil.handleExc
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -56,7 +54,6 @@ import org.wso2.carbon.apimgt.api.model.APICategory;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIProduct;
 import org.wso2.carbon.apimgt.api.model.APIProductIdentifier;
-import org.wso2.carbon.apimgt.api.model.APIStatus;
 import org.wso2.carbon.apimgt.api.model.SOAPToRestSequence;
 import org.wso2.carbon.apimgt.api.model.SOAPToRestSequence.Direction;
 import org.wso2.carbon.apimgt.api.model.Tag;
@@ -883,6 +880,14 @@ public class RegistryPersistenceImpl implements APIPersistence {
                     registry.delete(apiProviderPath);
                 }
             }
+
+            /*remove revision directory with UUID*/
+            String revisionDirectoryPath = APIConstants.API_REVISION_LOCATION + RegistryConstants.PATH_SEPARATOR +
+                    apiId;
+            if (registry.resourceExists(revisionDirectoryPath)) {
+                registry.delete(revisionDirectoryPath);
+            }
+
             registry.commitTransaction();
             transactionCommitted  = true;
         } catch (RegistryException e) {
@@ -3534,6 +3539,13 @@ public class RegistryPersistenceImpl implements APIPersistence {
                     }
                     registry.delete(productProviderPath);
                 }
+            }
+
+            /*remove revision directory with UUID*/
+            String revisionDirectoryPath = APIConstants.API_REVISION_LOCATION + RegistryConstants.PATH_SEPARATOR +
+                    apiId;
+            if (registry.resourceExists(revisionDirectoryPath)) {
+                registry.delete(revisionDirectoryPath);
             }
 
         } catch (RegistryException e) {
