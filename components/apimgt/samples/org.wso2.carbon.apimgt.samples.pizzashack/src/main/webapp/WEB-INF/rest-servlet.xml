@@ -38,7 +38,7 @@
             <bean class="org.wso2.carbon.apimgt.samples.pizzashack.api.PizzaShackMenuAPI" />
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+            <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
         </jaxrs:providers>
     </jaxrs:server>
 
