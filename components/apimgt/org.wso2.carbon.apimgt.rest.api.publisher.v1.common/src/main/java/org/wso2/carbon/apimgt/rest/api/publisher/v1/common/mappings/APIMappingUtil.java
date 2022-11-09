@@ -1646,8 +1646,8 @@ public class APIMappingUtil {
      * @return operations
      */
     public static List<APIOperationsDTO> getOperationListWithOldData(Set<URITemplate> uriTemplates,
-                                                                     List<APIOperationsDTO> operations,
-                                                                     int tenantId) throws APIManagementException {
+                                                                     List<APIOperationsDTO>
+                                                                             operations) {
 
         for (APIOperationsDTO operation : operations) {
             for (URITemplate uriTemplate : uriTemplates) {
@@ -1659,7 +1659,7 @@ public class APIMappingUtil {
                             Collectors.toList()));
                 }
                 if (operation.getThrottlingPolicy() == null) {
-                    operation.setThrottlingPolicy(APIUtil.getDefaultAPILevelPolicy(tenantId));
+                    operation.setThrottlingPolicy(APIConstants.UNLIMITED_TIER);
                 }
             }
         }
