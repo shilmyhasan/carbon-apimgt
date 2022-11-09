@@ -567,7 +567,7 @@
                             javax.sql,
                             javax.wsdl.*,
                             javax.xml.*;version="0.0.0",
-                            org.json.simple.*,
+                            org.json.simple.*;version="0.0.0",
                             org.json.*;version="${org.json.version.range}",
                             org.slf4j,
                             org.slf4j.ext,

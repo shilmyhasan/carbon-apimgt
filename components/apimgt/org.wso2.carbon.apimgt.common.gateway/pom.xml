@@ -100,7 +100,7 @@
                             org.apache.commons.logging.*,
                             org.wso2.am.analytics.publisher.*;version="${analytics.event.publisher.client.version.range}",
                             graphql.*; version="${graphql.java.version}",
-                            org.json.simple.*,
+                            org.json.simple.*;version="0.0.0",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
