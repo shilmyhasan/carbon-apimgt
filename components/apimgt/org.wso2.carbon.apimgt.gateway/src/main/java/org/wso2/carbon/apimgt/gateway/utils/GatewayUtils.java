@@ -730,8 +730,11 @@ public class GatewayUtils {
                 } else {
                     return null;
                 }
+            } catch (IOException e) {
+                log.error("Error while executing the HTTP client", e);
             }
         }
+        return null;
     }
 
     public static String getMaskedToken(String splitToken) {
