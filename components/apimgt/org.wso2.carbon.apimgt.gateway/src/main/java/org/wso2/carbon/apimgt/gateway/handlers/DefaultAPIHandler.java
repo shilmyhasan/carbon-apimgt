@@ -18,13 +18,17 @@
 package org.wso2.carbon.apimgt.gateway.handlers;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.AbstractSynapseHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.api.ApiUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
+import org.wso2.carbon.apimgt.gateway.InMemoryAPIDeployer;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.exception.ArtifactSynchronizerException;
 import org.wso2.carbon.apimgt.keymgt.model.entity.API;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
 
@@ -37,6 +41,8 @@ import java.util.TreeMap;
  * Default API Handler to handle Default Version.
  */
 public class DefaultAPIHandler extends AbstractSynapseHandler {
+    private static final Log log = LogFactory.getLog(DefaultAPIHandler.class);
+
     @Override
     public boolean handleRequestInFlow(MessageContext messageContext) {
         if (messageContext.getPropertyKeySet().contains(InboundWebsocketConstants.WEBSOCKET_SUBSCRIBER_PATH)) {
@@ -50,12 +56,27 @@ public class DefaultAPIHandler extends AbstractSynapseHandler {
             Object transportInUrl = axis2MessageContext.getProperty(APIConstants.TRANSPORT_URL_IN);
             String selectedPath = selectedAPIS.firstKey();
             API selectedAPI = selectedAPIS.get(selectedPath);
-            if (transportInUrl instanceof String && StringUtils.isNotEmpty((String) transportInUrl)) {
-                String updatedTransportInUrl = ((String) transportInUrl).replaceFirst(selectedPath,
-                        selectedAPI.getContext());
-                axis2MessageContext.setProperty(APIConstants.TRANSPORT_URL_IN, updatedTransportInUrl);
+            if (selectedAPI != null) {
+                if (GatewayUtils.isOnDemandLoading()){
+                    if (!selectedAPI.isDeployed()) {
+                        synchronized ("LoadAPI_".concat(selectedAPI.getContext().intern())) {
+                            InMemoryAPIDeployer inMemoryAPIDeployer = new InMemoryAPIDeployer();
+                            try {
+                                inMemoryAPIDeployer.deployAPI(selectedAPI.getUuid());
+                            } catch (ArtifactSynchronizerException e) {
+                                log.error("Error while retrieve and deploy artifact for API : " + selectedAPI.getApiId(), e);
+                                return false;
+                            }
+                        }
+                    }
+                }
+                if (transportInUrl instanceof String && StringUtils.isNotEmpty((String) transportInUrl)) {
+                    String updatedTransportInUrl = ((String) transportInUrl).replaceFirst(selectedPath,
+                            selectedAPI.getContext());
+                    axis2MessageContext.setProperty(APIConstants.TRANSPORT_URL_IN, updatedTransportInUrl);
+                }
+                messageContext.getPropertyKeySet().remove(RESTConstants.REST_FULL_REQUEST_PATH);
             }
-            messageContext.getPropertyKeySet().remove(RESTConstants.REST_FULL_REQUEST_PATH);
         }
         return true;
     }
@@ -64,7 +85,6 @@ public class DefaultAPIHandler extends AbstractSynapseHandler {
     public boolean handleRequestOutFlow(MessageContext messageContext) {
         return true;
     }
-
     @Override
     public boolean handleResponseInFlow(MessageContext messageContext) {
         return true;

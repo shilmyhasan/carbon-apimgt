@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -52,6 +53,9 @@ public class EndpointCertificateDeployer {
             ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getEventHubConfigurationDto();
     private String baseURL = eventHubConfigurationDto.getServiceUrl() + APIConstants.INTERNAL_WEB_APP_EP;
 
+    public EndpointCertificateDeployer() {
+    }
+
     public EndpointCertificateDeployer(String tenantDomain) {
 
         this.tenantDomain = tenantDomain;
@@ -60,14 +64,43 @@ public class EndpointCertificateDeployer {
     public void deployCertificatesAtStartup() throws APIManagementException {
 
         String endpoint = baseURL + APIConstants.CERTIFICATE_RETRIEVAL_ENDPOINT;
-
         try (CloseableHttpResponse closeableHttpResponse = invokeService(endpoint, tenantDomain)) {
             retrieveCertificatesAndDeploy(closeableHttpResponse);
-
         } catch (IOException | ArtifactSynchronizerException e) {
             throw new APIManagementException("Error while inserting certificates into truststore", e);
         }
     }
+
+    public void deployAllCertificatesAtStartup() throws APIManagementException {
+
+        String endpoint = baseURL + APIConstants.CERTIFICATE_RETRIEVAL_ENDPOINT;
+        try (CloseableHttpResponse closeableHttpResponse = invokeService(endpoint, APIConstants.ORG_ALL_QUERY_PARAM)) {
+            if (closeableHttpResponse.getStatusLine().getStatusCode() == 200) {
+                retrieveAllCertificatesAndDeploy(closeableHttpResponse.getEntity());
+            } else {
+                log.error("Error while retrieving certificates from the endpoint : " + endpoint
+                        + "with the status code : " + closeableHttpResponse.getStatusLine().getStatusCode()
+                        + "and error : " + closeableHttpResponse.getStatusLine().getReasonPhrase());
+            }
+        } catch (IOException | ArtifactSynchronizerException e) {
+            throw new APIManagementException("Error while inserting certificates into truststore", e);
+        }
+    }
+
+    private void retrieveAllCertificatesAndDeploy(HttpEntity certContent) throws IOException {
+
+        String content = EntityUtils.toString(certContent);
+        List<CertificateMetadataDTO> certificateMetadataDTOList;
+        Type listType = new TypeToken<List<CertificateMetadataDTO>>() {
+        }.getType();
+        certificateMetadataDTOList = new Gson().fromJson(content, listType);
+        for (CertificateMetadataDTO certificateMetadataDTO : certificateMetadataDTOList) {
+            CertificateManagerImpl.getInstance()
+                    .addAllCertificateToGateway(certificateMetadataDTO.getCertificate(),
+                            certificateMetadataDTO.getAlias(), certificateMetadataDTO.getTenantId());
+        }
+    }
+
 
     public void deployCertificate(String alias) throws APIManagementException {
 

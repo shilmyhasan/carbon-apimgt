@@ -545,6 +545,7 @@ public class TemplateBuilderUtil {
         productAPIDto.setApiId(apiProduct.getUuid());
         productAPIDto.setName(id.getName());
         productAPIDto.setVersion(id.getVersion());
+        productAPIDto.setApiContext(apiProduct.getContext());
         productAPIDto.setTenantDomain(tenantDomain);
         productAPIDto.setKeyManagers(Collections.singletonList(APIConstants.KeyManager.API_LEVEL_ALL_KEY_MANAGERS));
         String definition = apiProduct.getDefinition();
@@ -625,6 +626,7 @@ public class TemplateBuilderUtil {
         gatewayAPIDTO.setVersion(api.getId().getVersion());
         gatewayAPIDTO.setProvider(api.getId().getProviderName());
         gatewayAPIDTO.setApiId(api.getUUID());
+        gatewayAPIDTO.setApiContext(api.getContext());
         gatewayAPIDTO.setTenantDomain(tenantDomain);
         gatewayAPIDTO.setKeyManagers(api.getKeyManagers());
 

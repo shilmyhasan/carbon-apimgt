@@ -613,6 +613,7 @@ public final class APIConstants {
     public static final String API_QUOTA_LIMIT = "ResourceQuotaLimit.";
     public static final String API_QUOTA_LIMIT_ENABLE = API_QUOTA_LIMIT + "EnableAPIQuotaLimit";
     public static final String JWKS_URI = "jwksUri";
+    public static final String ORG_ALL_QUERY_PARAM = "ALL";
 
     public static class TokenStatus {
 
@@ -2643,7 +2644,7 @@ public final class APIConstants {
         public static final String API_ID = "apiId";
         public static final String LABEL = "label";
         public static final String LABELS = "labels";
-
+        public static final String EnableOnDemandLoadingAPIS = "EnableOnDemandLoadingAPIS";
     }
 
     public static class AsyncApi {

@@ -48,10 +48,12 @@ public class OnPremResolver implements OrganizationResolver {
                 tenantDomain = header;
             }
             try {
+                if (APIConstants.ORG_ALL_QUERY_PARAM.equals(tenantDomain)){
+                    return tenantDomain;
+                }
                 if (!APIUtil.isTenantAvailable(tenantDomain)) {
-                    String errorMessage = "Provided tenant domain '" + tenantDomain + "' is invalid";
+                    String errorMessage = "Provided tenant domain '" + tenantDomain + "' is invFalid";
                     throw new APIMgtBadRequestException(errorMessage);
-
                 }
             } catch (UserStoreException  e) {
                 String errorMessage = "Error while checking availability of tenant " + tenantDomain;
