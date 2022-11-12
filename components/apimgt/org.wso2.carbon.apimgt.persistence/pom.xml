@@ -37,7 +37,8 @@
                             org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.wso2.carbon.registry.core.*; version="${carbon.registry.imp.pkg.version}",
                             org.wso2.carbon.governance.lcm.* version="${carbon.governance.version}",
-                            org.apache.cxf.jaxrs.ext.multipart.* version="${cxf.version}"
+                            org.apache.cxf.jaxrs.ext.multipart.* version="${cxf.version}",
+                            org.json.simple.*;version="0.0.0"
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
