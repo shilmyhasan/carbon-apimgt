@@ -2,20 +2,18 @@
 
 ## Prerequisite for building support branches
 
-- Replace the ```<repositories>``` tag of the parent pom.xml file of the relevant support branch with the following before building the branch.
+- Add the following ```repository``` section inside ```repositories``` before building the branch.
 ```
-<repositories>
-    <repository>
-        <id>wso2-nexus</id>
-        <name>WSO2 internal Repository</name>
-        <url>https://support-maven.wso2.org/nexus/content/repositories/releases/</url>
-        <releases>
-            <enabled>true</enabled>
-            <updatePolicy>daily</updatePolicy>
-            <checksumPolicy>ignore</checksumPolicy>
-        </releases>
-    </repository>
-</repositories>
+<repository>
+    <id>wso2-nexus</id>
+    <name>WSO2 internal Repository</name>
+    <url>https://support-maven.wso2.org/nexus/content/repositories/releases/</url>
+    <releases>
+       <enabled>true</enabled>
+       <updatePolicy>daily</updatePolicy>
+       <checksumPolicy>ignore</checksumPolicy>
+    </releases>
+</repository>
 ```
 - If the support branch is for U2 (i.e. `.x-full` branch), add the following also under repositories in the parent pom file.
 ```
