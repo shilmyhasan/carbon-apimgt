@@ -2,20 +2,20 @@
 
 ## Prerequisite for building support branches
 
-- Add the following ```repository``` section inside ```repositories``` before building the branch.
+- If the support branch is for WUM, **prepend** the following ```repository``` section inside ```repositories``` before building the branch.
 ```
 <repository>
-    <id>wso2-nexus</id>
+    <id>wso2-nexus-support</id>
     <name>WSO2 internal Repository</name>
     <url>https://support-maven.wso2.org/nexus/content/repositories/releases/</url>
     <releases>
-       <enabled>true</enabled>
-       <updatePolicy>daily</updatePolicy>
-       <checksumPolicy>ignore</checksumPolicy>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>ignore</checksumPolicy>
     </releases>
 </repository>
 ```
-- If the support branch is for U2 (i.e. `.x-full` branch), add the following also under repositories in the parent pom file.
+- If the support branch is for U2 (i.e. `.x-full` branch), **prepend** the following ```repository``` section inside ```repositories``` before building the branch.
 ```
 <repository>
     <id>updates2-nexus</id>
@@ -25,6 +25,16 @@
         <enabled>true</enabled>
         <updatePolicy>daily</updatePolicy>
         <checksumPolicy>fail</checksumPolicy>
+    </releases>
+</repository>
+<repository>
+    <id>wso2-nexus-support</id>
+    <name>WSO2 internal Repository</name>
+    <url>https://support-maven.wso2.org/nexus/content/repositories/releases/</url>
+    <releases>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>ignore</checksumPolicy>
     </releases>
 </repository>
 ```
