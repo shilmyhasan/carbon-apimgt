@@ -267,6 +267,8 @@ public class APIManagerComponent {
                 }
                 // Adding default throttle policies
                 addDefaultAdvancedThrottlePolicies(tenantDomain,tenantId);
+                addDefaultAsyncThrottlePolicies(tenantDomain, tenantId);
+
                 // Update all NULL THROTTLING_TIER values to Unlimited
                 boolean isNullThrottlingTierConversionEnabled = APIUtil.updateNullThrottlingTierAtStartup();
                 try {
@@ -568,6 +570,10 @@ public class APIManagerComponent {
 
     private void addDefaultAdvancedThrottlePolicies(String tenantDomain, int tenantId) throws APIManagementException {
         APIUtil.addDefaultTenantAdvancedThrottlePolicies(tenantDomain, tenantId);
+    }
+
+    private void addDefaultAsyncThrottlePolicies(String tenantDomain, int tenantId) throws APIManagementException {
+        APIUtil.addDefaultTenantAsyncThrottlePolicies(tenantDomain, tenantId);
     }
 
     @Reference(
