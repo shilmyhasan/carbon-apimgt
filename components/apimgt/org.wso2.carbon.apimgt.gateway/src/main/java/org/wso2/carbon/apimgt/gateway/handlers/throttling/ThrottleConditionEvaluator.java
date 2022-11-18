@@ -223,7 +223,8 @@ public class ThrottleConditionEvaluator {
 
     private boolean isJWTClaimPresent(AuthenticationContext authenticationContext, ConditionDto.JWTClaimConditions
             condition) {
-
+        if (authenticationContext.getCallerToken()== null)
+            return false;
         Map<String, String> assertions = JWTUtil.getJWTClaims(authenticationContext.getCallerToken());
         boolean status = true;
 
