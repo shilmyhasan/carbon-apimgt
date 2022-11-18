@@ -709,6 +709,8 @@ public class JWTValidator {
             }
         } catch (ParseException | JOSEException | IOException e) {
             log.error("Error while parsing JWT", e);
+            throw new APISecurityException(APISecurityConstants.API_AUTH_GENERAL_ERROR,
+                    "Error while parsing JWT");
         }
         return GatewayUtils.verifyTokenSignature(parsedJWTToken, certificateAlias);
     }
