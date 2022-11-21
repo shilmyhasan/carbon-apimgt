@@ -2,6 +2,16 @@
 
 ## Prerequisite for building support branches
 
+- For 3.x and 4.0 we need to have node installed.
+Use nvm ( Node Version Manager ) to install node. Following are the required node versions for each versions.
+
+| APIM Version | Node Version |
+| ---------------- | ------------------- |
+| 3.0 | 12 |
+| 3.1 | 12 |
+| 3.2 | 12 |
+| 4.0 | 14 |
+
 - If the support branch is for WUM, **prepend** the following ```repository``` section inside ```repositories``` before building the branch.
 ```
 <repository>
