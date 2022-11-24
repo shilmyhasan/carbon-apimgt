@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.apimgt.keymgt.token;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.JWTClaimsSet;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.Charsets;
@@ -243,7 +244,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             }
 
             JWTClaimsSet.Builder jwtClaimsSetBuilder = new JWTClaimsSet.Builder();
-            ObjectMapper mapper = new ObjectMapper();
+            JSONParser jsonParser = new JSONParser(JSONParser.ACCEPT_SIMPLE_QUOTE);
 
             if (standardClaims != null) {
                 Iterator<String> it = new TreeSet(standardClaims.keySet()).iterator();
@@ -251,28 +252,16 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                     String claimURI = it.next();
                     String claimVal = standardClaims.get(claimURI);
                     List<String> claimList = new ArrayList<String>();
-                    if (claimVal != null && claimVal.contains("{")) {
-
+                    if (claimVal != null && ((claimVal.startsWith("[") && claimVal.endsWith("]"))
+                            || claimVal.contains("{"))) {
                         try {
-                            Map<String, String> map = mapper.readValue(claimVal, Map.class);
-                            jwtClaimsSetBuilder.claim(claimURI, map);
-                        } catch (IOException e) {
+                            Object jsonObj = jsonParser.parse(claimVal);
+                            jwtClaimsSetBuilder.claim(claimURI, jsonObj);
+                        } catch (ParseException e) {
                             // Exception isn't thrown in order to generate jwt without claim, even if an error is
                             // occurred during the retrieving claims.
                             log.error("Error while reading claim values", e);
                         }
-                    } else if (Boolean.parseBoolean(System.getProperty(FORMAT_JSON_ARRAY_PROPERTY)) && claimVal != null
-                            && claimVal.contains("[\"") && claimVal.contains("\"]")){
-
-                        try {
-                            List<String> arrayList = mapper.readValue(claimVal, List.class);
-                            jwtClaimsSetBuilder.claim(claimURI, arrayList);
-                        } catch (IOException e) {
-                            // Exception isn't thrown in order to generate jwt without claim, even if an error is
-                            // occurred during the retrieving claims.
-                            log.error("Error while reading claim values", e);
-                        }
-
                     } else if (userAttributeSeparator != null && claimVal != null &&
                             claimVal.contains(userAttributeSeparator)) {
                         StringTokenizer st = new StringTokenizer(claimVal, userAttributeSeparator);
