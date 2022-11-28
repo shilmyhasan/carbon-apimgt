@@ -253,7 +253,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                     String claimVal = standardClaims.get(claimURI);
                     List<String> claimList = new ArrayList<String>();
                     if (claimVal != null && ((claimVal.startsWith("[") && claimVal.endsWith("]"))
-                            || claimVal.contains("{"))) {
+                            || (claimVal.startsWith("{") && claimVal.endsWith("}")))) {
                         try {
                             Object jsonObj = jsonParser.parse(claimVal);
                             jwtClaimsSetBuilder.claim(claimURI, jsonObj);
