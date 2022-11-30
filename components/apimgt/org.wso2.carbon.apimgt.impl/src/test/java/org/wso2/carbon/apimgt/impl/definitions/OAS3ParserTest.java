@@ -13,6 +13,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.wso2.carbon.apimgt.api.APIDefinition;
+import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
+import org.wso2.carbon.apimgt.api.ErrorHandler;
+import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.SwaggerData;
@@ -20,6 +23,7 @@ import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -157,5 +161,36 @@ public class OAS3ParserTest extends OASTestBase {
                 Assert.assertEquals("", description);
             }
         }
+    }
+    @Test
+    public void testOpenAPIValidatorWithValidationLevel0() throws Exception {
+        String swaggerDefinition = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas3"
+                        + File.separator + "openApi3_validation.json"),
+                StandardCharsets.UTF_8);
+        OASParserUtil.setValidationLevel(0);
+        APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(swaggerDefinition, true);
+
+        Assert.assertTrue(response.isValid());
+        Assert.assertEquals(1, response.getErrorItems().size());
+        Assert.assertEquals(ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorCode(),
+                response.getErrorItems().get(0).getErrorCode());
+    }
+
+    @Test
+    public void testOpenAPIValidatorWithValidationLevel1() throws Exception {
+        String faultySwagger = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas3"
+                        + File.separator + "openApi3_validation.json"),
+                StandardCharsets.UTF_8);
+        OASParserUtil.setValidationLevel(1);
+        APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(faultySwagger, true);
+
+        Assert.assertFalse(response.isValid());
+        Assert.assertEquals(1, response.getErrorItems().size());
+        Assert.assertEquals(ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorCode(),
+                response.getErrorItems().get(0).getErrorCode());
+        Assert.assertEquals("attribute extraInfo is unexpected",
+                response.getErrorItems().get(0).getErrorDescription());
     }
 }
