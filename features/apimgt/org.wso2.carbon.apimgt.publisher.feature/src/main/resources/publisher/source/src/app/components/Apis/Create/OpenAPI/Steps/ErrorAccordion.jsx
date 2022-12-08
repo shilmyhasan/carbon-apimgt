@@ -35,37 +35,60 @@ import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
  */
 const useStyles = makeStyles((theme) => ({
     errorAccordion: {
-        backgroundColor: theme.palette.error.dark,
-        color: theme.palette.error.contrastText,
+        borderColor: theme.palette.error.main,
+        color: theme.custom.errorAccordion.errorColor,
+        border: '2px solid',
         boxShadow: 'none',
     },
     warningAccordion: {
-        backgroundColor: theme.palette.warning.light,
-        color: theme.palette.warning.contrastText,
+        borderColor: theme.palette.warning.main,
+        color: theme.custom.errorAccordion.warningColor,
         boxShadow: 'none',
+        border: '2px solid',
+    },
+    warningContentGrid: {
+        padding: '10px',
+        backgroundColor: theme.custom.errorAccordion.warningBackgroundColor,
     },
     errorContentGrid: {
         padding: '10px',
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: theme.custom.errorAccordion.errorBackgroundColor,
     },
     errorGrid: {
         margin: theme.spacing(1),
+        border: '2px solid',
+        borderColor: theme.palette.error.main,
+    },
+    warningGrid: {
+        margin: theme.spacing(1),
+        border: '2px solid',
+        borderColor: theme.palette.warning.main,
     },
     warningPaper: {
-        backgroundColor: theme.palette.warning.light,
-        color: theme.palette.warning.contrastText,
+        borderColor: theme.palette.warning.light,
+        color: theme.custom.errorAccordion.warningColor,
         alignItems: 'center',
         display: 'flex',
         padding: '5px 10px 5px 10px',
         wordBreak: 'break-word',
     },
     errorPaper: {
-        backgroundColor: theme.palette.error.dark,
-        color: theme.palette.error.contrastText,
+        borderColor: theme.palette.error.main,
+        color: theme.custom.errorAccordion.errorColor,
         alignItems: 'center',
         display: 'flex',
         padding: '5px 10px 5px 10px',
         wordBreak: 'break-word',
+    },
+    warningIcon: {
+        float: 'left',
+        marginRight: 4,
+        color: theme.palette.warning.main,
+    },
+    errorIcon: {
+        float: 'left',
+        marginRight: 4,
+        color: theme.palette.error.main,
     },
 }));
 
@@ -90,9 +113,7 @@ export default function ErrorAccordion(props) {
                             id='panel1a-header'
                         >
                             <Typography>
-                                <WarningOutlined
-                                    style={{ float: 'left', marginRight: 4 }}
-                                />
+                                <WarningOutlined className={classes.warningIcon} />
                                 {' Found '}
                                 {noOfErrors}
                                 {' warnings while parsing the file'}
@@ -105,12 +126,12 @@ export default function ErrorAccordion(props) {
                                     classes.appTablePaperPosition,
                                 )}
                                 >
-                                    <Grid item xs={12} className={classes.errorContentGrid}>
+                                    <Grid item xs={12} className={classes.warningContentGrid}>
                                         {errorDetails.errors.map((error) => {
                                             const warnDescription = error.description.charAt(0).toUpperCase()
                                                 + error.description.slice(1);
                                             return (
-                                                <Grid item xs={12} className={classes.errorGrid}>
+                                                <Grid item xs={12} className={classes.warningGrid}>
                                                     <Paper elevation={2} className={classes.warningPaper}>
                                                         <Typography>
                                                             {warnDescription}
@@ -132,9 +153,7 @@ export default function ErrorAccordion(props) {
                         aria-controls='panel1a-content'
                     >
                         <Typography>
-                            <ErrorOutlineOutlinedIcon
-                                style={{ float: 'left', marginRight: 4 }}
-                            />
+                            <ErrorOutlineOutlinedIcon className={classes.errorIcon} />
                             {' Found '}
                             {noOfErrors}
                             {' errors while parsing the file'}

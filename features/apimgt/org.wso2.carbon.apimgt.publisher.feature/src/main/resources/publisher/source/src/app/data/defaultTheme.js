@@ -284,10 +284,11 @@ export default {
                 background: 'radial-gradient(#29bb89, #f7ea00)',
             },
         },
-        listView: {
-            tableHeadBackground: '#fff',
-            tableBodyOddBackgrund: '#aa6f70',
-            tableBodyEvenBackgrund: '#690606',
+        errorAccordion: {
+            errorColor: '#611a15',
+            warningColor: '#663c00',
+            warningBackgroundColor: '#fff4e5',
+            errorBackgroundColor: '#fff6f6',
         },
     },
 };
