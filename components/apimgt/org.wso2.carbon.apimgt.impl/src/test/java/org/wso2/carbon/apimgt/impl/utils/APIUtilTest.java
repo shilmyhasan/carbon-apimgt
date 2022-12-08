@@ -2555,6 +2555,15 @@ public class APIUtilTest {
         fileName = "test1.xlsx";
         Assert.assertTrue("Excel file type (xlsx)  validation failed", APIUtil.isSupportedFileType(fileName));
 
+        fileName = "test1.json";
+        Assert.assertTrue("JSON file type (json)  validation failed", APIUtil.isSupportedFileType(fileName));
+
+        fileName = "test1.yaml";
+        Assert.assertTrue("Yaml file type (yaml)  validation failed", APIUtil.isSupportedFileType(fileName));
+
+        fileName = "test1.md";
+        Assert.assertTrue("Markdown file type (md)  validation failed", APIUtil.isSupportedFileType(fileName));
+
         // test invalid types
         fileName = "test1.js";
         Assert.assertFalse("JS file type should not be allowed", APIUtil.isSupportedFileType(fileName));
