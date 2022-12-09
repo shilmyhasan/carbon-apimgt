@@ -332,15 +332,32 @@ export default function Resources(props) {
         /*
         * Used SwaggerParser.validate() because we can get the errors as well.
         */
-        SwaggerParser.validate(specCopy, (err, result) => {
-            setResolvedSpec(() => {
-                const errors = err ? [err] : [];
-                return {
-                    spec: result,
-                    errors,
-                };
+        if (Configurations.swaggerValidationBehaviour === 'default'
+            || !Configurations.swaggerValidationBehaviour) {
+            SwaggerParser.validate(specCopy, (err, result) => {
+                setResolvedSpec(() => {
+                    const errors = err ? [err] : [];
+                    return {
+                        spec: result,
+                        errors,
+                    };
+                });
             });
-        });
+        } else {
+            /*
+            * Used OpenAPI validate Rest endpoint because we can get the errors as well.
+            */
+            API.validateOpenAPIByInlineDefinition(specCopy)
+                .then((response) => {
+                    setResolvedSpec(() => {
+                        const errors = response.body.errors ? response.body.errors : [];
+                        return {
+                            spec: response.body.info,
+                            errors,
+                        };
+                    });
+                });
+        }
         operationsDispatcher({ action: 'init', data: rawSpec.paths });
         setOpenAPISpec(rawSpec);
         setSecurityDefScopesFromSpec(rawSpec);

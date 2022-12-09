@@ -41,10 +41,12 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 
-import Banner from 'AppComponents/Shared/Banner';
 import APIValidation from 'AppData/APIValidation';
 import API from 'AppData/api';
 import DropZoneLocal, { humanFileSize } from 'AppComponents/Shared/DropZoneLocal';
+import Paper from '@material-ui/core/Paper';
+import SwaggerValidationErrors from 'AppComponents/Apis/Create/OpenAPI/Steps/SwaggerValidationErrors';
+
 
 const useStyles = makeStyles((theme) => ({
     mandatoryStar: {
@@ -67,6 +69,8 @@ export default function ProvideOpenAPI(props) {
     // If valid value is `null`,that means valid, else an error object will be there
     const [isValid, setValidity] = useState({});
     const [isValidating, setIsValidating] = useState(false);
+    const [errorDetails, setErrorDetails] = useState({ isValid: false, errors: [] });
+    const [noOfErrors, setNoOfErrors] = useState(0);
 
     /**
      *
@@ -84,18 +88,29 @@ export default function ProvideOpenAPI(props) {
         API.validateOpenAPIByFile(file)
             .then((response) => {
                 const {
-                    body: { isValid: isValidFile, info },
+                    body: { isValid: isValidFile, info, errors },
                 } = response;
                 if (isValidFile) {
                     validFile = file;
                     inputsDispatcher({ action: 'preSetAPI', value: info });
                     setValidity({ ...isValid, file: null });
+                    setErrorDetails({ isValid: response.body.isValid, errors });
+                    setNoOfErrors(response.body.errors.length);
                 } else {
                     setValidity({ ...isValid, file: { message: 'OpenAPI content validation failed!' } });
+                    setErrorDetails({ isValid: response.body.isValid, errors });
+                    setNoOfErrors(response.body.errors.length);
                 }
             })
             .catch((error) => {
+                const errors = [];
+                const errorData = {
+                    description: 'OpenAPI content validation failed!',
+                };
+                errors.push(errorData);
                 setValidity({ ...isValid, file: { message: 'OpenAPI content validation failed!' } });
+                setErrorDetails({ isValid: false, errors });
+                setNoOfErrors(1);
                 console.error(error);
             })
             .finally(() => {
@@ -214,19 +229,15 @@ export default function ProvideOpenAPI(props) {
                         </RadioGroup>
                     </FormControl>
                 </Grid>
-                {isValid.file
-                    && (
-                        <Grid item md={11}>
-                            <Banner
-                                onClose={() => setValidity({ file: null })}
-                                disableActions
-                                dense
-                                paperProps={{ elevation: 1 }}
-                                type='error'
-                                message={isValid.file.message}
-                            />
-                        </Grid>
-                    )}
+                <Grid item xs={10} md={11}>
+                    <Paper elevation={3}>
+                        <SwaggerValidationErrors
+                            errorDetails={errorDetails}
+                            noOfErrors={noOfErrors}
+                            isValid={isValid}
+                        />
+                    </Paper>
+                </Grid>
                 <Grid item xs={10} md={11}>
                     {isFileInput ? (
                         <>
