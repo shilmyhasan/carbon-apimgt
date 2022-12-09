@@ -36,23 +36,23 @@ import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined';
 const useStyles = makeStyles((theme) => ({
     errorAccordion: {
         borderColor: theme.palette.error.main,
-        color: theme.custom.errorAccordion.errorColor,
+        color: theme.custom.swaggerValidationErrors.errorColor,
         border: '2px solid',
         boxShadow: 'none',
     },
     warningAccordion: {
         borderColor: theme.palette.warning.main,
-        color: theme.custom.errorAccordion.warningColor,
+        color: theme.custom.swaggerValidationErrors.warningColor,
         boxShadow: 'none',
         border: '2px solid',
     },
     warningContentGrid: {
         padding: '10px',
-        backgroundColor: theme.custom.errorAccordion.warningBackgroundColor,
+        backgroundColor: theme.custom.swaggerValidationErrors.warningBackgroundColor,
     },
     errorContentGrid: {
         padding: '10px',
-        backgroundColor: theme.custom.errorAccordion.errorBackgroundColor,
+        backgroundColor: theme.custom.swaggerValidationErrors.errorBackgroundColor,
     },
     errorGrid: {
         margin: theme.spacing(1),
@@ -66,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
     },
     warningPaper: {
         borderColor: theme.palette.warning.light,
-        color: theme.custom.errorAccordion.warningColor,
+        color: theme.custom.swaggerValidationErrors.warningColor,
         alignItems: 'center',
         display: 'flex',
         padding: '5px 10px 5px 10px',
@@ -74,7 +74,7 @@ const useStyles = makeStyles((theme) => ({
     },
     errorPaper: {
         borderColor: theme.palette.error.main,
-        color: theme.custom.errorAccordion.errorColor,
+        color: theme.custom.swaggerValidationErrors.errorColor,
         alignItems: 'center',
         display: 'flex',
         padding: '5px 10px 5px 10px',
@@ -95,10 +95,10 @@ const useStyles = makeStyles((theme) => ({
 /**
  *
  *
- * @class ErrorAccordion
+ * @class SwaggerValidationErrors
  * @extends {Component}
  */
-export default function ErrorAccordion(props) {
+export default function SwaggerValidationErrors(props) {
     const { errorDetails, noOfErrors, isValid } = props;
     const classes = useStyles();
 
@@ -123,7 +123,6 @@ export default function ErrorAccordion(props) {
                             <Grid item xs={12}>
                                 <Paper className={classNames(
                                     classes.warningAccordion,
-                                    classes.appTablePaperPosition,
                                 )}
                                 >
                                     <Grid item xs={12} className={classes.warningContentGrid}>
@@ -164,7 +163,6 @@ export default function ErrorAccordion(props) {
                             <Paper
                                 className={classNames(
                                     classes.errorAccordion,
-                                    classes.appTablePaperPosition,
                                 )}
                                 elevation={3}
                             >
@@ -192,7 +190,7 @@ export default function ErrorAccordion(props) {
     );
 }
 
-ErrorAccordion.propTypes = {
+SwaggerValidationErrors.propTypes = {
     errorDetails: PropTypes.objectOf(PropTypes.object).isRequired,
     noOfErrors: PropTypes.number.isRequired,
     isValid: PropTypes.objectOf(PropTypes.object).isRequired,

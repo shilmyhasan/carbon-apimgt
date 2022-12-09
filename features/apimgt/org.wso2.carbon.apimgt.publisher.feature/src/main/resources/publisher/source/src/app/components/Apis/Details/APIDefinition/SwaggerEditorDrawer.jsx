@@ -19,7 +19,7 @@ import React, { lazy } from 'react';
 import Grid from '@material-ui/core/Grid';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
-import ErrorAccordion from 'AppComponents/Apis/Create/OpenAPI/Steps/ErrorAccordion';
+import SwaggerValidationErrors from 'AppComponents/Apis/Create/OpenAPI/Steps/SwaggerValidationErrors';
 import SwaggerUI from './swaggerUI/SwaggerUI';
 
 const styles = () => ({
@@ -94,7 +94,7 @@ class SwaggerEditorDrawer extends React.Component {
                     <Grid item className={classes.editorPane}>
                         {isValid.file && (
                             <Grid item className={classes.errorPane}>
-                                <ErrorAccordion
+                                <SwaggerValidationErrors
                                     errorDetails={errorDetails}
                                     noOfErrors={noOfErrors}
                                     isValid={isValid}

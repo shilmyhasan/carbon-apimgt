@@ -333,7 +333,7 @@ export default function Resources(props) {
         * Used SwaggerParser.validate() because we can get the errors as well.
         */
         if (Configurations.swaggerValidationBehaviour === 'default'
-            || Configurations.swaggerValidationBehaviour === null) {
+            || !Configurations.swaggerValidationBehaviour) {
             SwaggerParser.validate(specCopy, (err, result) => {
                 setResolvedSpec(() => {
                     const errors = err ? [err] : [];

@@ -45,7 +45,7 @@ import APIValidation from 'AppData/APIValidation';
 import API from 'AppData/api';
 import DropZoneLocal, { humanFileSize } from 'AppComponents/Shared/DropZoneLocal';
 import Paper from '@material-ui/core/Paper';
-import ErrorAccordion from 'AppComponents/Apis/Create/OpenAPI/Steps/ErrorAccordion';
+import SwaggerValidationErrors from 'AppComponents/Apis/Create/OpenAPI/Steps/SwaggerValidationErrors';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -231,7 +231,7 @@ export default function ProvideOpenAPI(props) {
                 </Grid>
                 <Grid item xs={10} md={11}>
                     <Paper elevation={3}>
-                        <ErrorAccordion
+                        <SwaggerValidationErrors
                             errorDetails={errorDetails}
                             noOfErrors={noOfErrors}
                             isValid={isValid}
