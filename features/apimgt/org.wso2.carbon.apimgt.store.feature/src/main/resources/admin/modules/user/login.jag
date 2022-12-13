@@ -293,7 +293,7 @@ var getAuthorizationHeaderCredentials=function(username, password){
     var byteArray = [];
 
     for (var i = 0; i < inputString.length; ++i) {
-        byteArray.push(inputString.charCodeAt(i));
+        byteArray.push(inputString.charCodeAt(i) % 128);
     }
     var encodedString = Base64Utils.encode(byteArray);
 
