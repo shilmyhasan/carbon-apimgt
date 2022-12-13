@@ -190,7 +190,7 @@ public class ImportUtils {
 
             String apiType = importedApiDTO.getType().toString();
 
-            APIProvider apiProvider = RestApiCommonUtil.getProvider(importedApiDTO.getProvider());
+            APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
 
             // Validate swagger content except for streaming APIs
             if (!PublisherCommonUtils.isStreamingAPI(importedApiDTO)
@@ -250,8 +250,6 @@ public class ImportUtils {
                         .addAPIWithGeneratedSwaggerDefinition(importedApiDTO, ImportExportConstants.OAS_VERSION_3,
                                 importedApiDTO.getProvider());
             }
-
-            apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
 
             // Retrieving the life cycle action to do the lifecycle state change explicitly later
             lifecycleAction = getLifeCycleAction(currentTenantDomain, currentStatus, targetStatus, apiProvider);
@@ -529,6 +527,8 @@ public class ImportUtils {
                             + APIConstants.API_DATA_VERSION + ": " + apiVersion + " not found", ExceptionCodes
                     .from(ExceptionCodes.API_NOT_FOUND, apiIdentifier.getApiName() + "-" + apiIdentifier.getVersion()));
         }
+
+        // check whether the user and the corresponding roles exist or not
         return apiProvider.getAPI(apiIdentifier);
     }
 
