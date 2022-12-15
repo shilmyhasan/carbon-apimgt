@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2022, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
  *    WSO2 LLC licenses this file to you under the Apache License,
@@ -15,7 +14,6 @@
  *   KIND, either express or implied.  See the License for the
  *   specific language governing permissions and limitations
  *   under the License.
- *
  */
 
 package org.wso2.carbon.apimgt.gateway.listeners;
@@ -23,8 +21,11 @@ package org.wso2.carbon.apimgt.gateway.listeners;
 import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionPolicyEvent;
 import org.wso2.carbon.apimgt.keymgt.service.KeyManagerDataServiceImpl;
 
+/**
+ * A wrapper class related to GatewayJMSMessageListenerTest to check whether addOrUpdateSubscriptionPolicy method
+ * call was executed.
+ */
 public class KeyManagerDataServiceImplWrapper extends KeyManagerDataServiceImpl {
-
     static boolean subscriptionPolicyUpdate = false;
 
     @Override
