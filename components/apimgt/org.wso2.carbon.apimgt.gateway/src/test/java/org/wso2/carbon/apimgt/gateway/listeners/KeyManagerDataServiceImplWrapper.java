@@ -21,7 +21,7 @@ package org.wso2.carbon.apimgt.gateway.listeners;
 import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionPolicyEvent;
 import org.wso2.carbon.apimgt.keymgt.service.KeyManagerDataServiceImpl;
 
-/**
+/*
  * A wrapper class related to GatewayJMSMessageListenerTest to check whether addOrUpdateSubscriptionPolicy method
  * call was executed.
  */
