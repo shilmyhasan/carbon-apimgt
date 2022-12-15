@@ -42,7 +42,7 @@ import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
 import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.ArtifactRetriever;
 
-/**
+/*
  * Unit test cases related GatewayJMSMessageListener
  */
 @RunWith(PowerMockRunner.class)
