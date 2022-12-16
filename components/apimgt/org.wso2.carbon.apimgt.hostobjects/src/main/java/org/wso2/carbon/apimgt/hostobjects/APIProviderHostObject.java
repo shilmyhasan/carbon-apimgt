@@ -755,7 +755,7 @@ public class APIProviderHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain
                         (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
             }
-            OMElement seqElment = APIUtil.buildOMElement(seqFile.getInputStream());
+            OMElement seqElment = APIUtil.buildSecuredOMElement(seqFile.getInputStream());
             String localName = seqElment.getLocalName();
             seqFileName = seqElment.getAttributeValue(new QName("name"));
             if ("sequence".equals(localName) && seqFileName != null) {
