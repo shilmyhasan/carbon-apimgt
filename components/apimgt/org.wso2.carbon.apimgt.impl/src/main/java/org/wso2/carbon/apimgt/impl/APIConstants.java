@@ -1369,6 +1369,7 @@ public final class APIConstants {
         public static final String ENDPOINT_SECURITY_TYPE = "type";
         public static final String ENDPOINT_SECURITY_ENABLED = "enabled";
         public static final String ENDPOINT_SECURITY_USERNAME = "username";
+        public static final String ENCODE_OAUTH2_ENDPOINT_CREDENTIALS = "APIPublisher.Oauth2EndpointCredentialsEncoding";
 
         private OAuthConstants() {
 

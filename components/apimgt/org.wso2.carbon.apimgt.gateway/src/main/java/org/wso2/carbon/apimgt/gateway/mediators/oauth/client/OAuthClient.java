@@ -30,6 +30,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 
 import java.io.BufferedReader;
@@ -74,6 +75,16 @@ public class OAuthClient {
         URL urlObject;
         String credentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 
+        String string_value_of_password = String.valueOf(password);
+
+        if (Boolean.valueOf(
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                        .getFirstProperty(APIConstants.OAuthConstants.ENCODE_OAUTH2_ENDPOINT_CREDENTIALS))) {
+            username = URLEncoder.encode(username, APIConstants.DigestAuthConstants.CHARSET);
+            string_value_of_password = URLEncoder.encode(string_value_of_password,
+                    APIConstants.DigestAuthConstants.CHARSET);
+        }
+
         urlObject = new URL(url);
         StringBuilder payload = new StringBuilder();
         try (CloseableHttpClient httpClient = (CloseableHttpClient) APIUtil
@@ -89,8 +100,8 @@ public class OAuthClient {
                 payload.append(APIConstants.OAuthConstants.CLIENT_CRED_GRANT_TYPE);
             } else if (APIConstants.OAuthConstants.PASSWORD.equals(grantType)) {
                 payload.append(APIConstants.OAuthConstants.PASSWORD_GRANT_TYPE + "&username=")
-                        .append(URLEncoder.encode(username, APIConstants.DigestAuthConstants.CHARSET)).append("&password=")
-                        .append(URLEncoder.encode(String.valueOf(password), APIConstants.DigestAuthConstants.CHARSET));
+                        .append(username).append("&password=")
+                        .append(string_value_of_password);
             }
 
             payload = appendCustomParameters(customParameters, payload);
