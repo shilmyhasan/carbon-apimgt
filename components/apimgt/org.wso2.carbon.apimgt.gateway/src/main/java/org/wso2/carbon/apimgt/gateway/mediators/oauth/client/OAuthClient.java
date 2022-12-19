@@ -81,8 +81,7 @@ public class OAuthClient {
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
                         .getFirstProperty(APIConstants.OAuthConstants.ENCODE_OAUTH2_ENDPOINT_CREDENTIALS))) {
             username = URLEncoder.encode(username, APIConstants.DigestAuthConstants.CHARSET);
-            stringValueOfPassword = URLEncoder.encode(stringValueOfPassword,
-                    APIConstants.DigestAuthConstants.CHARSET);
+            stringValueOfPassword = URLEncoder.encode(stringValueOfPassword, APIConstants.DigestAuthConstants.CHARSET);
         }
 
         urlObject = new URL(url);
