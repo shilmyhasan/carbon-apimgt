@@ -345,7 +345,13 @@
                         obj[arr[i].name] = [ obj[arr[i].name] ];
                         obj[arr[i].name].push(arr[i].value);
                     }
-                }else{
+                } else if(arr[i].name === "retryErroCode" || arr[i].name === "suspendErrorCode") {
+                    if(typeof arr[i].value === "string") {
+                        let newArray = [];
+                        newArray.push(arr[i].value);
+                        obj[arr[i].name] = newArray;
+                    }
+                } else {
                     obj[arr[i].name] = arr[i].value;
                 }
             }
