@@ -118,7 +118,18 @@
             lock.release();
         }
     }
-    var authRequestParams = "?response_type=code&client_id=" + clientId + "&scope=" + scopes + "&state=" + state + "&redirect_uri=" + loginCallbackUrl;
+
+    var isPKCEEnabled = systemApplicationDAO.isPKCEEnabled(clientId);
+    var pkceParams = "";
+    if (isPKCEEnabled) {
+      var codeVerifier = utils.generateCodeVerifier();
+      session.put("code_verifier", codeVerifier);
+      var codeChallenge = utils.generateCodeChallenge(codeVerifier);
+      pkceParams = "&code_challenge=" + codeChallenge + "&code_challenge_method=S256";
+    }
+
+    var authRequestParams = "?response_type=code&client_id=" + clientId + "&scope=" + scopes + "&state=" + state + "&redirect_uri=" + loginCallbackUrl
+    + pkceParams;
     if (request.getParameter("loginPrompt") === "false") {
         authRequestParams += "&prompt=none";
     } 

@@ -275,6 +275,32 @@ public class SystemApplicationDAO {
     }
 
     /**
+     * Method to check whether PKCE is enabled for the application identified by the consumer key
+     * @param consumerKey consumer key of the sysetm app
+     * @return true is PKCE is enabled, false otherwise
+     * @throws APIMgtDAOException
+     */
+    public static boolean isPKCEEnabled(String consumerKey) throws APIMgtDAOException {
+        boolean isPKCEMandatory = false;
+        String sql = "SELECT PKCE_MANDATORY FROM IDN_OAUTH_CONSUMER_APPS WHERE CONSUMER_KEY = ? ";
+
+        try (Connection connection = APIMgtDBUtil.getConnection()) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1,  consumerKey);
+                try (ResultSet result = preparedStatement.executeQuery()) {
+                    if (result.next()) {
+                        isPKCEMandatory = result.getBoolean("PKCE_MANDATORY");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new APIMgtDAOException("Error while checking for whether PKCE is enabled for System Application by " +
+                    "consumer key: " + consumerKey, e);
+        }
+        return isPKCEMandatory;
+    }
+
+    /**
      * Method to handle the SQL Exception.
      *
      * @param message : Error message.
