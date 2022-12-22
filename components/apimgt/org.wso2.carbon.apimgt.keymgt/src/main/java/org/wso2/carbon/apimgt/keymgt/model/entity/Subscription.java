@@ -30,9 +30,9 @@ public class Subscription implements CacheableEntity<String> {
     private String subscriptionId = null;
     private String policyId = null;
     private Integer apiId = null;
-    private String apiUUId;
+    private String apiUUID;
     private Integer appId = null;
-    private String appUUID;
+    private String applicationUUID;
     private String subscriptionState = null;
     private long timeStamp;
 
@@ -46,24 +46,24 @@ public class Subscription implements CacheableEntity<String> {
         this.subscriptionUUId = subscriptionUUId;
     }
 
-    public String getApiUUId() {
+    public String getApiUUID() {
 
-        return apiUUId;
+        return apiUUID;
     }
 
-    public void setApiUUId(String apiUUId) {
+    public void setApiUUID(String apiUUID) {
 
-        this.apiUUId = apiUUId;
+        this.apiUUID = apiUUID;
     }
 
-    public String getAppUUID() {
+    public String getApplicationUUID() {
 
-        return appUUID;
+        return applicationUUID;
     }
 
-    public void setAppUUID(String appUUID) {
+    public void setApplicationUUID(String applicationUUID) {
 
-        this.appUUID = appUUID;
+        this.applicationUUID = applicationUUID;
     }
 
     public String getSubscriptionId() {
@@ -140,9 +140,9 @@ public class Subscription implements CacheableEntity<String> {
                 ", subscriptionId='" + subscriptionId + '\'' +
                 ", policyId='" + policyId + '\'' +
                 ", apiId=" + apiId +
-                ", apiUUId='" + apiUUId + '\'' +
+                ", apiUUId='" + apiUUID + '\'' +
                 ", appId=" + appId +
-                ", appUUID='" + appUUID + '\'' +
+                ", applicationUUID='" + applicationUUID + '\'' +
                 ", subscriptionState='" + subscriptionState + '\'' +
                 ", timeStamp=" + timeStamp +
                 '}';
