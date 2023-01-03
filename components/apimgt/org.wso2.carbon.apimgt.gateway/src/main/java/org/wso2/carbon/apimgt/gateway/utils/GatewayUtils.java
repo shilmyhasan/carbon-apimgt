@@ -107,6 +107,8 @@ public class GatewayUtils {
 
     private static final Log log = LogFactory.getLog(GatewayUtils.class);
     private static final String HEADER_X_FORWARDED_FOR = "X-FORWARDED-FOR";
+    private static final String HTTP_SC = "HTTP_SC";
+    private static final String HTTP_SC_DESC = "HTTP_SC_DESC";
 
     public static boolean isClusteringEnabled() {
 
@@ -1089,6 +1091,18 @@ public class GatewayUtils {
             Util.setTag(tracingSpan, APIMgtGatewayConstants.SPAN_API_NAME, api.getApiName());
             Util.setTag(tracingSpan, APIMgtGatewayConstants.SPAN_API_VERSION, api.getApiVersion());
         }
+
+        Object httpStatusCode = ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty(HTTP_SC);
+        if (httpStatusCode != null) {
+            Util.setTag(tracingSpan, APIMgtGatewayConstants.SPAN_HTTP_RESPONSE_STATUS_CODE, httpStatusCode.toString());
+        }
+        Object httpStatusCodeDescription =
+                ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty(HTTP_SC_DESC);
+        if (httpStatusCodeDescription != null) {
+            Util.setTag(tracingSpan, APIMgtGatewayConstants.SPAN_HTTP_RESPONSE_STATUS_CODE_DESCRIPTION,
+                    httpStatusCodeDescription.toString());
+        }
+
         Object consumerKey = messageContext.getProperty(APIMgtGatewayConstants.CONSUMER_KEY);
         if (consumerKey != null) {
             Util.setTag(tracingSpan, APIMgtGatewayConstants.SPAN_APPLICATION_CONSUMER_KEY, (String) consumerKey);
