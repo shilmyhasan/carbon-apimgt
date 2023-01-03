@@ -5397,7 +5397,7 @@ public final class APIUtil {
 
                 for (String childPath : childPaths) {
                     Resource sequence = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     if (sequenceName.equals(seqElment.getAttributeValue(new QName("name")))) {
                         return seqElment;
                     }
@@ -5413,7 +5413,7 @@ public final class APIUtil {
 
                 for (String childPath : childPaths) {
                     Resource sequence = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     if (sequenceName.equals(seqElment.getAttributeValue(new QName("name")))) {
                         return seqElment;
                     }
@@ -5456,7 +5456,7 @@ public final class APIUtil {
 
                     for (String childPath : childPaths) {
                         Resource sequence = registry.get(childPath);
-                        OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                        OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                         if (sequenceName.equals(seqElment.getAttributeValue(new QName("name")))) {
                             return true;
                         }
@@ -5523,7 +5523,7 @@ public final class APIUtil {
                 String[] childPaths = seqCollection.getChildren();
                 for (String childPath : childPaths) {
                     Resource sequence = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     String seqElmentName = seqElment.getAttributeValue(new QName("name"));
                     if (sequenceName.equals(seqElmentName)) {
                         return sequence.getUUID();
@@ -5539,7 +5539,7 @@ public final class APIUtil {
                 String[] childPaths = seqCollection.getChildren();
                 for (String childPath : childPaths) {
                     Resource sequence = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     if (sequenceName.equals(seqElment.getAttributeValue(new QName("name")))) {
                         return sequence.getUUID();
                     }
@@ -5597,7 +5597,7 @@ public final class APIUtil {
                 String[] childPaths = seqCollection.getChildren();
                 for (String childPath : childPaths) {
                     Resource mediationPolicy = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(mediationPolicy.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(mediationPolicy.getContentStream());
                     String seqElmentName = seqElment.getAttributeValue(new QName("name"));
                     if (policyName.equals(seqElmentName)) {
                         mediationPolicyAttributes.put("path", childPath);
@@ -5616,7 +5616,7 @@ public final class APIUtil {
                 String[] childPaths = seqCollection.getChildren();
                 for (String childPath : childPaths) {
                     Resource mediationPolicy = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(mediationPolicy.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(mediationPolicy.getContentStream());
                     if (policyName.equals(seqElment.getAttributeValue(new QName("name")))) {
                         mediationPolicyAttributes.put("path", childPath);
                         mediationPolicyAttributes.put("uuid", mediationPolicy.getUUID());
