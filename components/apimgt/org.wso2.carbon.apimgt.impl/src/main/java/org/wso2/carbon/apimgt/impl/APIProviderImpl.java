@@ -184,6 +184,7 @@ import org.wso2.carbon.apimgt.persistence.dto.PublisherSearchContent;
 import org.wso2.carbon.apimgt.persistence.dto.SearchContent;
 import org.wso2.carbon.apimgt.persistence.dto.UserContext;
 import org.wso2.carbon.apimgt.persistence.exceptions.APIPersistenceException;
+import org.wso2.carbon.apimgt.persistence.exceptions.AsyncSpecPersistenceException;
 import org.wso2.carbon.apimgt.persistence.exceptions.DocumentationPersistenceException;
 import org.wso2.carbon.apimgt.persistence.exceptions.GraphQLPersistenceException;
 import org.wso2.carbon.apimgt.persistence.exceptions.MediationPolicyPersistenceException;
@@ -8403,12 +8404,19 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public void saveAsyncApiDefinition(API api, String jsonText) throws APIManagementException {
+        String apiId;
+        if (api.getUuid() != null) {
+            apiId = api.getUuid();
+        } else if (api.getId().getUUID() != null) {
+            apiId = api.getId().getUUID();
+        } else {
+            apiId = apiMgtDAO.getUUIDFromIdentifier(api.getId().getProviderName(), api.getId().getApiName(),
+                                                    api.getId().getVersion());
+        }
         try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-            AsyncApiParserUtil.saveAPIDefinition(api, jsonText, registry);
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
+            apiPersistenceInstance.saveAsyncDefinition(new Organization(tenantDomain), apiId, jsonText);
+        } catch (AsyncSpecPersistenceException e) {
+            throw new APIManagementException("Error while persisting Async API definition ", e);
         }
     }
 

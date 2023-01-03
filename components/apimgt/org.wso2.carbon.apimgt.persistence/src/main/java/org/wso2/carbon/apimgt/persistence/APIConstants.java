@@ -178,6 +178,7 @@ public final class APIConstants {
     public static final String DEFAULT_APP_TIER_FILE_NAME = "default-app-tiers.xml";
 
     public static final String DEFAULT_RES_TIER_FILE_NAME = "default-res-tiers.xml";
+    public static final String APPLICATION_JSON_MEDIA_TYPE = "application/json";
 
     public static final String DOCUMENTATION_KEY = "document";
 

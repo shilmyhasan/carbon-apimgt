@@ -814,12 +814,6 @@ public class PublisherCommonUtils {
             apiToAdd.setAsyncApiDefinition(asyncApiDefinition);
         }
 
-        if (isAsyncAPI) {
-            AsyncApiParser asyncApiParser = new AsyncApiParser();
-            String apiDefinition = asyncApiParser.generateAsyncAPIDefinition(apiToAdd);
-            apiProvider.saveAsyncApiDefinition(apiToAdd, apiDefinition);
-        }
-
         //adding the api
         apiProvider.addAPI(apiToAdd);
         return apiToAdd;
