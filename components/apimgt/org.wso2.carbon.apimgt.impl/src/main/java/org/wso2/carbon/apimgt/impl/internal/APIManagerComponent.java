@@ -251,7 +251,7 @@ public class APIManagerComponent {
                 log.error("Exception when creating default roles for tenant " + MultitenantConstants.SUPER_TENANT_ID, e);
             }
             // Adding default throttle policies
-            addDefaultAdvancedThrottlePolicies(tenantDomain,tenantId);
+            addDefaultAdvancedThrottlePolicies(tenantDomain, tenantId);
             addDefaultAsyncThrottlePolicies(tenantDomain, tenantId);
 
             // Update all NULL THROTTLING_TIER values to Unlimited
