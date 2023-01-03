@@ -202,6 +202,7 @@ import org.wso2.carbon.governance.lcm.util.CommonUtil;
 import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
 import org.wso2.carbon.identity.oauth.OAuthAdminService;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
 import org.wso2.carbon.identity.user.profile.stub.UserProfileMgtServiceStub;
 import org.wso2.carbon.identity.user.profile.stub.UserProfileMgtServiceUserProfileExceptionException;
 import org.wso2.carbon.identity.user.profile.stub.types.UserProfileDTO;
@@ -273,6 +274,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
@@ -11741,5 +11743,30 @@ public final class APIUtil {
             list = Arrays.asList(defaultType);
         }
         return list.contains(fileType.toLowerCase());
+    }
+
+    /**
+     * Generate code verifier for PKCE
+     * @return code verifier
+     */
+    public static String generateCodeVerifier () {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] codeVerifier = new byte[32];
+        secureRandom.nextBytes(codeVerifier);
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(codeVerifier);
+    }
+
+    /**
+     * Generate code challende for PKCE
+     * @param code verifier
+     * @return code challenge
+     */
+    public static String generateCodeChallenge(String codeVerifier) throws UnsupportedEncodingException,
+            NoSuchAlgorithmException {
+        byte[] bytes = codeVerifier.getBytes(APIConstants.US_ASCII);
+        MessageDigest messageDigest = MessageDigest.getInstance(APIConstants.SHA_256);
+        messageDigest.update(bytes, 0, bytes.length);
+        byte[] digest = messageDigest.digest();
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
     }
 }
