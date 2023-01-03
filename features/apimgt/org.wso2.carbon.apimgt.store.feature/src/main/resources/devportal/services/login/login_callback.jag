@@ -72,7 +72,7 @@
         if (loginCallbackUrl == null) {
             loginCallbackUrl = serverUrl + appContext + LOGIN_CALLBACK_URL_SUFFIX;
         }
-        var codeVerifier = session.get("codeVerifier");
+        var codeVerifier = session.get("code_verifier");
         if (codeVerifier !== null) {
           tokenRequestData = {
               "grant_type": "authorization_code",
