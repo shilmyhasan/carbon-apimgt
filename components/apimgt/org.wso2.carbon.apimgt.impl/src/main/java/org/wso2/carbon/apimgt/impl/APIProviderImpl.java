@@ -3140,7 +3140,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     Resource sequence = registry.get(seqChildPath);
 
                     ResourceFile seqFile = new ResourceFile(sequence.getContentStream(), sequence.getMediaType());
-                    OMElement seqElement = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElement = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     String seqFileName = seqElement.getAttributeValue(new QName("name"));
                     addResourceFile(api.getId(), seqNewFilePath + seqFileName, seqFile);
                 }
@@ -4424,7 +4424,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String inSeqChildPath : inSeqChildPaths) {
                         Resource inSequence = registry.get(inSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(inSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(inSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + inSeqChildPath + "' from the registry.", e);
@@ -4444,7 +4444,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String inSeqChildPath : inSeqChildPaths) {
                         Resource inSequence = registry.get(inSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(inSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(inSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + inSeqChildPath + "' from the registry.", e);
@@ -4497,7 +4497,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String childPath : outSeqChildPaths) {
                         Resource outSequence = registry.get(childPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(outSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(outSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + childPath + "' from the registry.", e);
@@ -4517,7 +4517,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String outSeqChildPath : outSeqChildPaths) {
                         Resource outSequence = registry.get(outSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(outSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(outSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + outSeqChildPath + "' from the registry.", e);
@@ -4556,7 +4556,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String inSeqChildPath : inSeqChildPaths) {
                         Resource inSequence = registry.get(inSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(inSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(inSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + inSeqChildPath + "' from the registry.", e);
@@ -4602,7 +4602,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String outSeqChildPath : outSeqChildPaths) {
                         Resource outSequence = registry.get(outSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(outSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(outSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + outSeqChildPath + "' from the registry.", e);
@@ -4648,7 +4648,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String faultSeqChildPath : faultSeqChildPaths) {
                         Resource outSequence = registry.get(faultSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(outSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(outSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + faultSeqChildPath + "' from the registry.", e);
@@ -4708,7 +4708,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String faultSeqChildPath : faultSeqChildPaths) {
                         Resource outSequence = registry.get(faultSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(outSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(outSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + faultSeqChildPath
@@ -4731,7 +4731,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String faultSeqChildPath : faultSeqChildPaths) {
                         Resource faultSequence = registry.get(faultSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(faultSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(faultSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + faultSeqChildPath
@@ -4799,7 +4799,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String inSeqChildPath : inSeqChildPaths) {
                         Resource outSequence = registry.get(inSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(outSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(outSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + inSeqChildPath
@@ -4865,7 +4865,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String outSeqChildPath : outSeqChildPaths) {
                         Resource outSequence = registry.get(outSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(outSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(outSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + outSeqChildPath
@@ -4930,7 +4930,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String faultSeqChildPath : faultSeqChildPaths) {
                         Resource faultSequence = registry.get(faultSeqChildPath);
                         try {
-                            OMElement seqElment = APIUtil.buildOMElement(faultSequence.getContentStream());
+                            OMElement seqElment = APIUtil.buildSecuredOMElement(faultSequence.getContentStream());
                             sequenceList.add(seqElment.getAttributeValue(new QName("name")));
                         } catch (OMException e) {
                             log.info("Error occurred when reading the sequence '" + faultSeqChildPath
