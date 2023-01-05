@@ -814,12 +814,6 @@ public class PublisherCommonUtils {
             apiToAdd.setAsyncApiDefinition(asyncApiDefinition);
         }
 
-        if (isAsyncAPI) {
-            AsyncApiParser asyncApiParser = new AsyncApiParser();
-            String apiDefinition = asyncApiParser.generateAsyncAPIDefinition(apiToAdd);
-            apiProvider.saveAsyncApiDefinition(apiToAdd, apiDefinition);
-        }
-
         //adding the api
         apiProvider.addAPI(apiToAdd);
         return apiToAdd;
@@ -1077,6 +1071,7 @@ public class PublisherCommonUtils {
         String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
         //this will fall if user does not have access to the API or the API does not exist
         API existingAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
+        API unmodifiedAPI = existingAPI;
         String apiDefinition = response.getJsonContent();
 
         AsyncApiParser asyncApiParser = new AsyncApiParser();
@@ -1093,7 +1088,7 @@ public class PublisherCommonUtils {
 
         //updating APi with the new AsyncAPI definition
         apiProvider.saveAsyncApiDefinition(existingAPI, apiDefinition);
-        apiProvider.updateAPI(existingAPI);
+        apiProvider.updateAPI(existingAPI, unmodifiedAPI);
         //retrieves the updated AsyncAPI definition
         return apiProvider.getAsyncAPIDefinition(existingAPI.getId());
     }
