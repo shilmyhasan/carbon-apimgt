@@ -2347,7 +2347,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                 byte[] sequenceBytes = outputStream.toByteArray();
                 InputStream inSequenceStream = new ByteArrayInputStream(sequenceBytes);
                 String content = IOUtils.toString(inSequenceStream, StandardCharsets.UTF_8.name());
-                OMElement seqElement = APIUtil.buildOMElement(new ByteArrayInputStream(sequenceBytes));
+                OMElement seqElement = APIUtil.buildSecuredOMElement(new ByteArrayInputStream(sequenceBytes));
                 String localName = seqElement.getLocalName();
 
                 Mediation returnedPolicy;
