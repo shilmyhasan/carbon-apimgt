@@ -1625,7 +1625,7 @@ public class PublisherCommonUtils {
             String apiId, String tenantDomain, List<Mediation> existingMediations, boolean isAPISpecific)
             throws Exception {
         if (StringUtils.isNotEmpty(content)) {
-            OMElement seqElement = APIUtil.buildOMElement(new ByteArrayInputStream(content.getBytes()));
+            OMElement seqElement = APIUtil.buildSecuredOMElement(new ByteArrayInputStream(content.getBytes()));
             String localName = seqElement.getLocalName();
             String fileName = seqElement.getAttributeValue(new QName("name"));
             Mediation existingMediation = (existingMediations != null) ?

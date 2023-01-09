@@ -1058,7 +1058,7 @@ public class TemplateBuilderUtil {
                             mediationPolicyDTO.getName());
             if (StringUtils.isNotEmpty(sequenceContent)) {
                 try {
-                    OMElement omElement = APIUtil.buildOMElement(new ByteArrayInputStream(sequenceContent.getBytes()));
+                    OMElement omElement = APIUtil.buildSecuredOMElement(new ByteArrayInputStream(sequenceContent.getBytes()));
                     if (omElement != null) {
                         String seqExt = APIUtil.getSequenceExtensionName(apiProductIdentifier.getName(),
                                 apiProductIdentifier.getVersion()).concat("--").concat(api.getUuid());
@@ -1103,7 +1103,7 @@ public class TemplateBuilderUtil {
                             mediationPolicyDTO.getName());
             if (StringUtils.isNotEmpty(sequenceContent)) {
                 try {
-                    OMElement omElement = APIUtil.buildOMElement(new ByteArrayInputStream(sequenceContent.getBytes()));
+                    OMElement omElement = APIUtil.buildSecuredOMElement(new ByteArrayInputStream(sequenceContent.getBytes()));
                     if (omElement != null) {
                         String seqExt = APIUtil.getSequenceExtensionName(api);
 
