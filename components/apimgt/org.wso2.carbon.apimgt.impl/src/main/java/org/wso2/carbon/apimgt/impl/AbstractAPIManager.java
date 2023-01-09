@@ -854,10 +854,8 @@ public abstract class AbstractAPIManager implements APIManager {
                                 Resource sequenceResource = registry.get(sequence);
                                 String resourceId = sequenceResource.getUUID();
                                 try {
-                                    String contentString = IOUtils.toString
-                                            (sequenceResource.getContentStream(),
-                                            RegistryConstants.DEFAULT_CHARSET_ENCODING);
-                                    OMElement omElement = AXIOMUtil.stringToOM(contentString);
+                                    OMElement omElement = APIUtil.buildSecuredOMElement(
+                                            sequenceResource.getContentStream());
                                     OMAttribute attribute = omElement.getAttribute(new QName
                                             (PolicyConstants.MEDIATION_NAME_ATTRIBUTE));
                                     String mediationPolicyName = attribute.getAttributeValue();
@@ -869,13 +867,11 @@ public abstract class AbstractAPIManager implements APIManager {
                                     mediation.setType(resourceType);
                                     //Add mediation to the mediation list
                                     mediationList.add(mediation);
-                                } catch (XMLStreamException e) {
-                                    //If any exception been caught flow may continue with the next mediation policy
-                                    log.error("Error occurred while getting omElement out of " +
-                                            "mediation content from "+sequence, e);
                                 } catch (IOException e) {
                                     log.error("Error occurred while converting resource " +
                                             "contentStream in to string in "+sequence,e);
+                                } catch (Exception e) {
+                                    log.error("Error occurred while reading sequence resource: " + sequence, e);
                                 }
                             }
                         }
@@ -909,7 +905,7 @@ public abstract class AbstractAPIManager implements APIManager {
                 String contentString = IOUtils.toString(mediationResource.getContentStream(),
                         RegistryConstants.DEFAULT_CHARSET_ENCODING);
                 //Get policy name from the mediation config
-                OMElement omElement = AXIOMUtil.stringToOM(contentString);
+                OMElement omElement = APIUtil.buildSecuredOMElement(mediationResource.getContentStream());
                 OMAttribute attribute = omElement.getAttribute(new QName
                         (PolicyConstants.MEDIATION_NAME_ATTRIBUTE));
                 String mediationPolicyName = attribute.getAttributeValue();
@@ -928,8 +924,8 @@ public abstract class AbstractAPIManager implements APIManager {
             } catch (IOException e) {
                 log.error("Error occurred while converting content stream of mediation policy " +
                         "into string ", e);
-            } catch (XMLStreamException e) {
-                log.error("Error occurred while getting omElement out of mediation content ", e);
+            } catch (Exception e) {
+                log.error("Error occurred while reading sequence resource", e);
             }
         }
         return mediation;
@@ -2431,11 +2427,9 @@ public abstract class AbstractAPIManager implements APIManager {
 
                                     //Get mediation policy config
                                     try {
-                                        String contentString = IOUtils.toString
-                                                (policyResource.getContentStream(),
-                                                        RegistryConstants.DEFAULT_CHARSET_ENCODING);
                                         //Extract name from the policy config
-                                        OMElement omElement = AXIOMUtil.stringToOM(contentString);
+                                        OMElement omElement = APIUtil.buildSecuredOMElement(
+                                                policyResource.getContentStream());
                                         OMAttribute attribute = omElement.getAttribute(new QName("name"));
                                         String mediationPolicyName = attribute.getAttributeValue();
                                         mediation = new Mediation();
@@ -2445,15 +2439,13 @@ public abstract class AbstractAPIManager implements APIManager {
                                         String resourceType = type.substring(type.lastIndexOf("/") + 1);
                                         mediation.setType(resourceType);
                                         mediationList.add(mediation);
-                                    } catch (XMLStreamException e) {
-                                        // If exception been caught flow will continue with next mediation policy
-                                        log.error("Error occurred while getting omElement out of" +
-                                                " mediation content", e);
                                     } catch (IOException e) {
                                         log.error("Error occurred while converting the content " +
                                                 "stream of mediation " + mediationPolicy + " to string", e);
+                                    } catch (Exception e) {
+                                        log.error("Error occurred while reading mediation policy content of"
+                                                +  mediationPolicy , e);
                                     }
-
                                 }
                             }
                         }
@@ -2514,7 +2506,7 @@ public abstract class AbstractAPIManager implements APIManager {
                 String contentString = IOUtils.toString(mediationResource.getContentStream(),
                         RegistryConstants.DEFAULT_CHARSET_ENCODING);
                 //Extracting name specified in the mediation config
-                OMElement omElement = AXIOMUtil.stringToOM(contentString);
+                OMElement omElement = APIUtil.buildSecuredOMElement(mediationResource.getContentStream());
                 OMAttribute attribute = omElement.getAttribute(new QName("name"));
                 String mediationPolicyName = attribute.getAttributeValue();
                 mediation = new Mediation();
@@ -2526,10 +2518,6 @@ public abstract class AbstractAPIManager implements APIManager {
                 String resourceType = path[(path.length - 2)];
                 mediation.setType(resourceType);
                 mediation.setConfig(contentString);
-            } catch (XMLStreamException e) {
-                String errorMsg = "Error occurred while getting omElement out of mediation content";
-                log.error(errorMsg, e);
-                throw new APIManagementException(errorMsg, e);
             } catch (IOException e) {
                 String errorMsg = "Error occurred while converting content stream into string ";
                 log.error(errorMsg, e);
@@ -2537,6 +2525,10 @@ public abstract class AbstractAPIManager implements APIManager {
             } catch (RegistryException e) {
                 String errorMsg = "Error occurred while accessing content stream of mediation" +
                         " policy";
+                log.error(errorMsg, e);
+                throw new APIManagementException(errorMsg, e);
+            } catch (Exception e) {
+                String errorMsg = "Error occurred while parsing XML content";
                 log.error(errorMsg, e);
                 throw new APIManagementException(errorMsg, e);
             }
