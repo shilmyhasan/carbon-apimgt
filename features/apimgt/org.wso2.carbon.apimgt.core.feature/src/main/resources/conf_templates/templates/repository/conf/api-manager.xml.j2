@@ -486,6 +486,8 @@
         {% endif %}
          <!--This parameter specifies the alias value of the internal Api Key which will be used for Api Key Authentication-->
         <InternalKeyAlias>{{apim.publisher.key_alias}}</InternalKeyAlias>
+        <!-- This parameter specifies whether encoding is enabled for credentials of the Oauth2 endpoint. -->
+        <Oauth2EndpointCredentialsEncoding>{{apim.publisher.enable_oauth2_endpoint_credentials_encoding}}</Oauth2EndpointCredentialsEncoding>
     </APIPublisher>
 
     <!-- Status observers can be registered against the API Publisher to listen for

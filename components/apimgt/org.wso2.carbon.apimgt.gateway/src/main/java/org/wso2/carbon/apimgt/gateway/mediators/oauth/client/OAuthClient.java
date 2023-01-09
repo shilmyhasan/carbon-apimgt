@@ -30,12 +30,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Set;
@@ -73,6 +75,15 @@ public class OAuthClient {
         URL urlObject;
         String credentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 
+        String stringValueOfPassword = String.valueOf(password);
+
+        if (Boolean.valueOf(
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                        .getFirstProperty(APIConstants.OAuthConstants.ENCODE_OAUTH2_ENDPOINT_CREDENTIALS))) {
+            username = URLEncoder.encode(username, APIConstants.DigestAuthConstants.CHARSET);
+            stringValueOfPassword = URLEncoder.encode(stringValueOfPassword, APIConstants.DigestAuthConstants.CHARSET);
+        }
+
         urlObject = new URL(url);
         StringBuilder payload = new StringBuilder();
         try (CloseableHttpClient httpClient = (CloseableHttpClient) APIUtil
@@ -89,7 +100,7 @@ public class OAuthClient {
             } else if (APIConstants.OAuthConstants.PASSWORD.equals(grantType)) {
                 payload.append(APIConstants.OAuthConstants.PASSWORD_GRANT_TYPE + "&username=")
                         .append(username).append("&password=")
-                        .append(String.valueOf(password));
+                        .append(stringValueOfPassword);
             }
 
             payload = appendCustomParameters(customParameters, payload);
