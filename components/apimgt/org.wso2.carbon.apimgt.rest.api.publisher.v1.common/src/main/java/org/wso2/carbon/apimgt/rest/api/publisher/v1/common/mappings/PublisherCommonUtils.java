@@ -753,7 +753,7 @@ public class PublisherCommonUtils {
                 isWSAPI || APIDTO.TypeEnum.WEBSUB.equals(apiDto.getType()) ||
                         APIDTO.TypeEnum.SSE.equals(apiDto.getType());
         username = StringUtils.isEmpty(username) ? RestApiCommonUtil.getLoggedInUsername() : username;
-        APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
+        APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
 
         // validate web socket api endpoint configurations
         if (isWSAPI && !PublisherCommonUtils.isValidWSAPI(apiDto)) {
@@ -1486,7 +1486,7 @@ public class PublisherCommonUtils {
 
         username = StringUtils.isEmpty(username) ? RestApiCommonUtil.getLoggedInUsername() : username;
         String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
-        APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
+        APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
         // if not add product
         String provider = apiProductDTO.getProvider();
         String context = apiProductDTO.getContext();
