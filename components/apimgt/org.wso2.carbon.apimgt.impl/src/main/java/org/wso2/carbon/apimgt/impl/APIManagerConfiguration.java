@@ -37,6 +37,7 @@ import org.wso2.carbon.apimgt.common.gateway.dto.ClaimMappingDto;
 import org.wso2.carbon.apimgt.common.gateway.dto.JWKSConfigurationDTO;
 import org.wso2.carbon.apimgt.common.gateway.dto.TokenIssuerDto;
 import org.wso2.carbon.apimgt.common.gateway.extensionlistener.ExtensionListener;
+import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.dto.EventHubConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
@@ -569,6 +570,8 @@ public class APIManagerConfiguration {
                 setSkipListConfigurations(element);
             } else if (APIConstants.ExtensionListenerConstants.EXTENSION_LISTENERS.equals(localName)) {
                 setExtensionListenerConfigurations(element);
+            } else if (APIConstants.SWAGGER_VALIDATION.equals(localName)) {
+                setSwaggerValidationProperties(element);
             } else if (APIConstants.JWT_AUDIENCES.equals(localName)) {
                 setRestApiJWTAuthAudiences(element);
             }
@@ -1566,6 +1569,17 @@ public class APIManagerConfiguration {
                     }
                 }
             }
+        }
+    }
+
+    public void setSwaggerValidationProperties(OMElement omElement) {
+        int validationLevel = 1;
+        if (omElement.getFirstChildWithName(new QName(APIConstants.VALIDATION_LEVEL)).getText() != null) {
+            validationLevel = Integer.parseInt(
+                    omElement.getFirstChildWithName(new QName(APIConstants.VALIDATION_LEVEL)).getText());
+            OASParserUtil.setValidationLevel(validationLevel);
+        } else {
+            OASParserUtil.setValidationLevel(validationLevel);
         }
     }
 
