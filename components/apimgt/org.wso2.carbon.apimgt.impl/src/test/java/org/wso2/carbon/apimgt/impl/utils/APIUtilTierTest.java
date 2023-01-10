@@ -81,6 +81,7 @@ public class APIUtilTierTest {
     private static byte[] tenantConf;
     private final String[] validTierNames = {"Gold", "Silver", "Bronze", "Platinum", "Medium", "100PerMinute", "50PerMinute", APIConstants.UNLIMITED_TIER};
     private final String[] tiersReturned = {"policy1", "gold", APIConstants.UNLIMITED_TIER};
+    private String superTenant = "carbon.super";
 
     @Before
     public void setup() throws IOException {
@@ -299,8 +300,8 @@ public class APIUtilTierTest {
 
         try {
             mockPolicyRetrieval(apiMgtDAO);
-            APIUtil.addDefaultTenantAdvancedThrottlePolicies("carbon.super",1);
-            APIUtil.addDefaultTenantAsyncThrottlePolicies("carbon.super",1);
+            APIUtil.addDefaultTenantAdvancedThrottlePolicies(superTenant, 1);
+            APIUtil.addDefaultTenantAsyncThrottlePolicies(superTenant, 1);
             Mockito.verify(apiMgtDAO, Mockito.times(appPolicies.length)).addApplicationPolicy(Mockito.any(ApplicationPolicy.class));
         } catch (APIManagementException e) {
             Assert.assertTrue("Exception thrown", false);
@@ -330,8 +331,8 @@ public class APIUtilTierTest {
 
         try {
             mockPolicyRetrieval(apiMgtDAO);
-            APIUtil.addDefaultTenantAdvancedThrottlePolicies("carbon.super",1);
-            APIUtil.addDefaultTenantAsyncThrottlePolicies("carbon.super",1);
+            APIUtil.addDefaultTenantAdvancedThrottlePolicies(superTenant, 1);
+            APIUtil.addDefaultTenantAsyncThrottlePolicies(superTenant, 1);
             Mockito.verify(apiMgtDAO, Mockito.never()).addApplicationPolicy(Mockito.any(ApplicationPolicy.class));
         } catch (APIManagementException e) {
             Assert.assertTrue("Exception thrown", false);
@@ -362,8 +363,8 @@ public class APIUtilTierTest {
 
         try {
             mockPolicyRetrieval(apiMgtDAO);
-            APIUtil.addDefaultTenantAdvancedThrottlePolicies("carbon.super",1);
-            APIUtil.addDefaultTenantAsyncThrottlePolicies("carbon.super",1);
+            APIUtil.addDefaultTenantAdvancedThrottlePolicies(superTenant, 1);
+            APIUtil.addDefaultTenantAsyncThrottlePolicies(superTenant, 1);
             Mockito.verify(apiMgtDAO, Mockito.times(subPolicies.length)).addSubscriptionPolicy(Mockito.any(SubscriptionPolicy.class));
         } catch (APIManagementException e) {
             Assert.assertTrue("Exception thrown", false);
@@ -395,8 +396,8 @@ public class APIUtilTierTest {
 
         try {
             mockPolicyRetrieval(apiMgtDAO);
-            APIUtil.addDefaultTenantAdvancedThrottlePolicies("carbon.super",1);
-            APIUtil.addDefaultTenantAsyncThrottlePolicies("carbon.super",1);
+            APIUtil.addDefaultTenantAdvancedThrottlePolicies(superTenant, 1);
+            APIUtil.addDefaultTenantAsyncThrottlePolicies(superTenant, 1);
         } catch (APIManagementException e) {
             Assert.assertTrue("Exception thrown", false);
         }
@@ -422,8 +423,8 @@ public class APIUtilTierTest {
 
         try {
             mockPolicyRetrieval(apiMgtDAO);
-            APIUtil.addDefaultTenantAdvancedThrottlePolicies("carbon.super",1);
-            APIUtil.addDefaultTenantAsyncThrottlePolicies("carbon.super",1);
+            APIUtil.addDefaultTenantAdvancedThrottlePolicies(superTenant, 1);
+            APIUtil.addDefaultTenantAsyncThrottlePolicies(superTenant, 1);
             Mockito.verify(apiMgtDAO, Mockito.times(apiPolicies.length)).addAPIPolicy(Mockito.any(APIPolicy.class));
         } catch (APIManagementException e) {
             Assert.assertTrue("Exception thrown", false);
@@ -450,8 +451,8 @@ public class APIUtilTierTest {
 
         try {
             mockPolicyRetrieval(apiMgtDAO);
-            APIUtil.addDefaultTenantAdvancedThrottlePolicies("carbon.super",1);
-            APIUtil.addDefaultTenantAsyncThrottlePolicies("carbon.super",1);
+            APIUtil.addDefaultTenantAdvancedThrottlePolicies(superTenant, 1);
+            APIUtil.addDefaultTenantAsyncThrottlePolicies(superTenant, 1);
         } catch (APIManagementException e) {
             Assert.assertTrue("Exception thrown", false);
         }
@@ -841,6 +842,6 @@ public class APIUtilTierTest {
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
         Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(tenantManager.getSuperTenantDomain()).thenReturn("carbon.super");
+        Mockito.when(tenantManager.getSuperTenantDomain()).thenReturn(superTenant);
     }
 }
