@@ -801,6 +801,7 @@ class SubscriptionsTable extends Component {
             search: false,
             selectableRows: 'none',
             rowsPerPageOptions: [5, 10, 25, 50, 100],
+            rowsPerPage: this.state.rowsPerPage,
             customFooter: () => {
                 return (
                     <TablePagination
