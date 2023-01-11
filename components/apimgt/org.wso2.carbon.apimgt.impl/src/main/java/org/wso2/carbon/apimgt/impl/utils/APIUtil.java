@@ -5332,6 +5332,32 @@ public final class APIUtil {
     }
 
     /**
+     * Build OMElement from input stream with securely configured parser.
+     * @param inputStream Input Stream
+     * @return
+     * @throws Exception
+     */
+    public static OMElement buildSecuredOMElement(InputStream inputStream) throws Exception {
+
+        XMLStreamReader parser;
+        StAXOMBuilder builder;
+
+        try {
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            factory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
+            factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            parser = factory.createXMLStreamReader(inputStream);
+            builder = new StAXOMBuilder(parser);
+        } catch (XMLStreamException e) {
+            String msg = "Error in initializing the parser.";
+            log.error(msg, e);
+            throw new Exception(msg, e);
+        }
+        return builder.getDocumentElement();
+    }
+
+    /**
      * Get stored in sequences, out sequences and fault sequences from the governanceSystem registry
      *
      * @param sequenceName -The sequence to be retrieved
@@ -5371,7 +5397,7 @@ public final class APIUtil {
 
                 for (String childPath : childPaths) {
                     Resource sequence = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     if (sequenceName.equals(seqElment.getAttributeValue(new QName("name")))) {
                         return seqElment;
                     }
@@ -5387,7 +5413,7 @@ public final class APIUtil {
 
                 for (String childPath : childPaths) {
                     Resource sequence = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     if (sequenceName.equals(seqElment.getAttributeValue(new QName("name")))) {
                         return seqElment;
                     }
@@ -5430,7 +5456,7 @@ public final class APIUtil {
 
                     for (String childPath : childPaths) {
                         Resource sequence = registry.get(childPath);
-                        OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                        OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                         if (sequenceName.equals(seqElment.getAttributeValue(new QName("name")))) {
                             return true;
                         }
@@ -5497,7 +5523,7 @@ public final class APIUtil {
                 String[] childPaths = seqCollection.getChildren();
                 for (String childPath : childPaths) {
                     Resource sequence = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     String seqElmentName = seqElment.getAttributeValue(new QName("name"));
                     if (sequenceName.equals(seqElmentName)) {
                         return sequence.getUUID();
@@ -5513,7 +5539,7 @@ public final class APIUtil {
                 String[] childPaths = seqCollection.getChildren();
                 for (String childPath : childPaths) {
                     Resource sequence = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(sequence.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(sequence.getContentStream());
                     if (sequenceName.equals(seqElment.getAttributeValue(new QName("name")))) {
                         return sequence.getUUID();
                     }
@@ -5571,7 +5597,7 @@ public final class APIUtil {
                 String[] childPaths = seqCollection.getChildren();
                 for (String childPath : childPaths) {
                     Resource mediationPolicy = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(mediationPolicy.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(mediationPolicy.getContentStream());
                     String seqElmentName = seqElment.getAttributeValue(new QName("name"));
                     if (policyName.equals(seqElmentName)) {
                         mediationPolicyAttributes.put("path", childPath);
@@ -5590,7 +5616,7 @@ public final class APIUtil {
                 String[] childPaths = seqCollection.getChildren();
                 for (String childPath : childPaths) {
                     Resource mediationPolicy = registry.get(childPath);
-                    OMElement seqElment = APIUtil.buildOMElement(mediationPolicy.getContentStream());
+                    OMElement seqElment = APIUtil.buildSecuredOMElement(mediationPolicy.getContentStream());
                     if (policyName.equals(seqElment.getAttributeValue(new QName("name")))) {
                         mediationPolicyAttributes.put("path", childPath);
                         mediationPolicyAttributes.put("uuid", mediationPolicy.getUUID());

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.apimgt.impl;
 
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.derby.iapi.services.io.ArrayInputStream;
@@ -104,6 +105,7 @@ import java.util.UUID;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import static org.mockito.Matchers.any;
 import static org.wso2.carbon.apimgt.impl.TestUtils.mockRegistryAndUserRealm;
 import static org.wso2.carbon.utils.ServerConstants.CARBON_HOME;
 
@@ -493,7 +495,7 @@ public class AbstractAPIManagerTestCase {
 
     @Test
     public void testGetAllGlobalMediationPolicies()
-            throws RegistryException, APIManagementException, IOException, XMLStreamException {
+            throws RegistryException, APIManagementException, IOException, Exception {
         AbstractAPIManager abstractAPIManager = new AbstractAPIManagerWrapper(registry);
         Collection parentCollection = new CollectionImpl();
         String mediationResourcePath = APIConstants.API_CUSTOM_SEQUENCE_LOCATION;
@@ -521,10 +523,10 @@ public class AbstractAPIManagerTestCase {
         Assert.assertNotNull(policies);
         Assert.assertEquals(policies.size(), 1);
         PowerMockito.mockStatic(IOUtils.class);
-        PowerMockito.mockStatic(AXIOMUtil.class);
+        PowerMockito.mockStatic(APIUtil.class);
         PowerMockito.when(IOUtils.toString((InputStream) Mockito.any(), Mockito.anyString()))
                 .thenThrow(IOException.class).thenReturn(mediationPolicyContent);
-        PowerMockito.when(AXIOMUtil.stringToOM(Mockito.anyString())).thenThrow(XMLStreamException.class);
+        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
         abstractAPIManager.getAllGlobalMediationPolicies(); // cover the logged only exceptions
         abstractAPIManager.getAllGlobalMediationPolicies(); // cover the logged only exceptions
 
@@ -532,7 +534,7 @@ public class AbstractAPIManagerTestCase {
 
     @Test
     public void testGetGlobalMediationPolicy()
-            throws RegistryException, APIManagementException, XMLStreamException, IOException {
+            throws RegistryException, APIManagementException, Exception, IOException {
         AbstractAPIManager abstractAPIManager = new AbstractAPIManagerWrapper(registry);
         String resourceUUID = SAMPLE_RESOURCE_ID;
         Collection parentCollection = new CollectionImpl();
@@ -561,10 +563,10 @@ public class AbstractAPIManagerTestCase {
         Mediation policy = abstractAPIManager.getGlobalMediationPolicy(resourceUUID);
         Assert.assertNotNull(policy);
         PowerMockito.mockStatic(IOUtils.class);
-        PowerMockito.mockStatic(AXIOMUtil.class);
+        PowerMockito.mockStatic(APIUtil.class);
         PowerMockito.when(IOUtils.toString((InputStream) Mockito.any(), Mockito.anyString()))
                 .thenThrow(IOException.class).thenReturn(mediationPolicyContent);
-        PowerMockito.when(AXIOMUtil.stringToOM(Mockito.anyString())).thenThrow(XMLStreamException.class);
+        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
         abstractAPIManager.getGlobalMediationPolicy(resourceUUID); // cover the logged only exceptions
         abstractAPIManager.getGlobalMediationPolicy(resourceUUID); // cover the logged only exceptions
 
@@ -1736,7 +1738,7 @@ public class AbstractAPIManagerTestCase {
 
     @Test
     public void testGetAllApiSpecificMediationPolicies()
-            throws RegistryException, APIManagementException, IOException, XMLStreamException {
+            throws RegistryException, APIManagementException, IOException, Exception {
         APIIdentifier identifier = getAPIIdentifier(SAMPLE_API_NAME, API_PROVIDER, SAMPLE_API_VERSION);
         String parentCollectionPath =
                 APIConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR + identifier.getProviderName()
@@ -1773,11 +1775,17 @@ public class AbstractAPIManagerTestCase {
                     e.getMessage().contains("Error occurred  while getting Api Specific mediation policies "));
         }
         Assert.assertEquals(abstractAPIManager.getAllApiSpecificMediationPolicies(identifier).size(), 1);
+
+        String apiResourcePath =
+                APIConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR + identifier.getProviderName()
+                        + RegistryConstants.PATH_SEPARATOR + identifier.getApiName() + RegistryConstants.PATH_SEPARATOR
+                        + identifier.getVersion() + APIConstants.API_RESOURCE_NAME;
         PowerMockito.mockStatic(IOUtils.class);
-        PowerMockito.mockStatic(AXIOMUtil.class);
+        PowerMockito.mockStatic(APIUtil.class);
         PowerMockito.when(IOUtils.toString((InputStream) Mockito.any(), Mockito.anyString()))
                 .thenThrow(IOException.class).thenReturn(mediationPolicyContent);
-        PowerMockito.when(AXIOMUtil.stringToOM(Mockito.anyString())).thenThrow(XMLStreamException.class);
+        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
+        PowerMockito.when(APIUtil.getAPIPath(identifier)).thenReturn(apiResourcePath);
         abstractAPIManager.getAllApiSpecificMediationPolicies(identifier);// covers exception which is only logged
         abstractAPIManager.getAllApiSpecificMediationPolicies(identifier);// covers exception which is only logged
     }
@@ -1804,7 +1812,8 @@ public class AbstractAPIManagerTestCase {
 
     @Test
     public void testGetApiSpecificMediationPolicy()
-            throws RegistryException, APIManagementException, IOException, XMLStreamException {
+            throws RegistryException, APIManagementException, IOException, XMLStreamException,
+            Exception {
         String parentCollectionPath = "config/mediation/";
 
         parentCollectionPath = parentCollectionPath.substring(0, parentCollectionPath.lastIndexOf("/"));
@@ -1843,10 +1852,11 @@ public class AbstractAPIManagerTestCase {
                 abstractAPIManager.getApiSpecificMediationPolicy(identifier, parentCollectionPath, SAMPLE_RESOURCE_ID)
                         .getName(), "default-endpoint");
         PowerMockito.mockStatic(IOUtils.class);
-        PowerMockito.mockStatic(AXIOMUtil.class);
+        PowerMockito.mockStatic(APIUtil.class);
         PowerMockito.when(IOUtils.toString((InputStream) Mockito.any(), Mockito.anyString()))
                 .thenThrow(IOException.class).thenReturn(mediationPolicyContent);
-        PowerMockito.when(AXIOMUtil.stringToOM(Mockito.anyString())).thenThrow(XMLStreamException.class);
+
+        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
 
         try {
             abstractAPIManager.getApiSpecificMediationPolicy(identifier, parentCollectionPath, SAMPLE_RESOURCE_ID);
@@ -1856,10 +1866,10 @@ public class AbstractAPIManagerTestCase {
         }
         try {
             abstractAPIManager.getApiSpecificMediationPolicy(identifier, parentCollectionPath, SAMPLE_RESOURCE_ID);
-            Assert.fail("XMLStream exception  not thrown for error scenario");
+            Assert.fail("java.lang.Exception  not thrown for error scenario");
         } catch (APIManagementException e) {
             Assert.assertTrue(
-                    e.getMessage().contains("Error occurred while getting omElement out of mediation content"));
+                    e.getMessage().contains("Error occurred while parsing XML content"));
         }
         resource.setContent(null);
         try {
