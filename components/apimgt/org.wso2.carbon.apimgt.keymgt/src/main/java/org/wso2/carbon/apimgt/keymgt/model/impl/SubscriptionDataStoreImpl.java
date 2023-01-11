@@ -706,7 +706,7 @@ public class SubscriptionDataStoreImpl implements SubscriptionDataStore {
 
         if (subscriptionMap != null) {
             for (Subscription subscription : subscriptionMap.values()) {
-                if (subscription.getApiUUId().equals(apiUUID) && subscription.getAppUUID().equals(appUUID)) {
+                if (subscription.getApiUUID().equals(apiUUID) && subscription.getApplicationUUID().equals(appUUID)) {
                     return subscription;
                 }
             }
