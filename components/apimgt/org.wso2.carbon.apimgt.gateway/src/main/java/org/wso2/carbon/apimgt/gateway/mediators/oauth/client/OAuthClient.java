@@ -74,16 +74,7 @@ public class OAuthClient {
 
         URL urlObject;
         String credentials = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
-
-        String stringValueOfPassword = String.valueOf(password);
-
-        if (Boolean.valueOf(
-                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
-                        .getFirstProperty(APIConstants.OAuthConstants.ENCODE_OAUTH2_ENDPOINT_CREDENTIALS))) {
-            username = URLEncoder.encode(username, APIConstants.DigestAuthConstants.CHARSET);
-            stringValueOfPassword = URLEncoder.encode(stringValueOfPassword, APIConstants.DigestAuthConstants.CHARSET);
-        }
-
+        
         urlObject = new URL(url);
         StringBuilder payload = new StringBuilder();
         try (CloseableHttpClient httpClient = (CloseableHttpClient) APIUtil
@@ -98,6 +89,13 @@ public class OAuthClient {
             } else if (APIConstants.OAuthConstants.CLIENT_CREDENTIALS.equals(grantType)) {
                 payload.append(APIConstants.OAuthConstants.CLIENT_CRED_GRANT_TYPE);
             } else if (APIConstants.OAuthConstants.PASSWORD.equals(grantType)) {
+                String stringValueOfPassword = String.valueOf(password);
+                if (Boolean.valueOf(
+                        ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                                .getFirstProperty(APIConstants.OAuthConstants.ENCODE_OAUTH2_ENDPOINT_CREDENTIALS))) {
+                    username = URLEncoder.encode(username, APIConstants.DigestAuthConstants.CHARSET);
+                    stringValueOfPassword = URLEncoder.encode(stringValueOfPassword, APIConstants.DigestAuthConstants.CHARSET);
+                }
                 payload.append(APIConstants.OAuthConstants.PASSWORD_GRANT_TYPE + "&username=")
                         .append(username).append("&password=")
                         .append(stringValueOfPassword);
