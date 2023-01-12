@@ -58,7 +58,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import javax.cache.Cache;
 
 /**
@@ -87,7 +86,7 @@ public class OAuthAuthenticator implements Authenticator {
     private boolean removeDefaultAPIHeaderFromOutMessage = true;
     private String clientDomainHeader = "referer";
     private String requestOrigin;
-    private String remainingAuthHeader;
+    private ThreadLocal<String> remainingAuthHeader = new ThreadLocal<String>();
     private boolean isMandatory;
 
     public OAuthAuthenticator() {
@@ -151,12 +150,12 @@ public class OAuthAuthenticator implements Authenticator {
 
         if (removeOAuthHeadersFromOutMessage) {
             //Remove authorization headers sent for authentication at the gateway and pass others to the backend
-            if (StringUtils.isNotBlank(remainingAuthHeader)) {
+            if (StringUtils.isNotBlank(remainingAuthHeader.get())) {
                 if (log.isDebugEnabled()) {
                     log.debug("Removing OAuth key from Authorization header");
                 }
-                headers.put(getSecurityHeader(), remainingAuthHeader);
-                remainingAuthHeader = "";
+                headers.put(getSecurityHeader(), remainingAuthHeader.get());
+                remainingAuthHeader.remove();
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("Removing Authorization header from headers");
@@ -419,7 +418,7 @@ public class OAuthAuthenticator implements Authenticator {
                 }
             }
         }
-        remainingAuthHeader = String.join(oauthHeaderSplitter, remainingAuthHeaders);
+        remainingAuthHeader.set(String.join(oauthHeaderSplitter, remainingAuthHeaders));
         return consumerKey;
     }
 
