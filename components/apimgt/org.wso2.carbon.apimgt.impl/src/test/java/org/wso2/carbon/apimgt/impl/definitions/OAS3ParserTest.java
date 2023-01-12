@@ -20,7 +20,6 @@ import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -147,7 +146,7 @@ public class OAS3ParserTest extends OASTestBase {
         String faultySwagger = IOUtils.toString(
                 getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas3"
                         + File.separator + "openApi3_validation.json"),
-                StandardCharsets.UTF_8);
+                "UTF-8");
         OASParserUtil.setValidationLevel(1);
         APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(faultySwagger, true);
 

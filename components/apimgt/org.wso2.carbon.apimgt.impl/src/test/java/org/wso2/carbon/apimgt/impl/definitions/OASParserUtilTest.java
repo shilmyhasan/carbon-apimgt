@@ -37,7 +37,6 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -588,7 +587,7 @@ public class OASParserUtilTest {
     public void testSwaggerValidatorWithDefaultValidation() throws Exception {
         String faultySwagger = IOUtils.toString(
                 getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
-                        + File.separator + "oas_util_test_faulty_swagger.json"), StandardCharsets.UTF_8);
+                        + File.separator + "oas_util_test_faulty_swagger.json"), "UTF-8");
         APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(faultySwagger, true);
         Assert.assertFalse(response.isValid());
         Assert.assertEquals(3, response.getErrorItems().size());
@@ -604,7 +603,7 @@ public class OASParserUtilTest {
     public void testSwaggerValidatorWithValidationLevel2() throws Exception {
         String faultySwagger = IOUtils.toString(
                 getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
-                        + File.separator + "oas_util_test_faulty_swagger.json"), StandardCharsets.UTF_8);
+                        + File.separator + "oas_util_test_faulty_swagger.json"), "UTF-8");
         OASParserUtil.setValidationLevel(2);
         APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(faultySwagger, true);
         Assert.assertFalse(response.isValid());
