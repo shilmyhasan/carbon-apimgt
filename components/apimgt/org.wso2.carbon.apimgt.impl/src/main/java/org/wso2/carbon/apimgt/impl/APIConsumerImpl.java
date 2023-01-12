@@ -3173,7 +3173,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     // failed cleanup processes are ignored to prevent failing the deletion process
                     log.warn("Failed to clean pending subscription update approval task");
                 }
-            } else if (APIConstants.SubscriptionStatus.UNBLOCKED.equals(status)){
+            } else if (APIConstants.SubscriptionStatus.UNBLOCKED.equals(status)) {
                 try {
                     if (apiIdentifier != null) {
                         subId = apiMgtDAO.getSubscriptionId(apiIdentifier.getUUID(), applicationId);
