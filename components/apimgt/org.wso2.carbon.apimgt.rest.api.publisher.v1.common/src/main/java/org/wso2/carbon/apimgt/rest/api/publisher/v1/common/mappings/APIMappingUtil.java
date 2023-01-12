@@ -1852,6 +1852,9 @@ public class APIMappingUtil {
             if (returnContent) {
                 responseDTO.setContent(model.getContent());
             }
+            if (model.getErrorItems().size() > 0) {
+                responseDTO.setErrors(getErrorListItemsDTOsFromErrorHandlers(model.getErrorItems()));
+            }
         } else {
             responseDTO.setErrors(getErrorListItemsDTOsFromErrorHandlers(model.getErrorItems()));
         }

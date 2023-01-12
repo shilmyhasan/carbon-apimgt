@@ -26,7 +26,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.wso2.carbon.apimgt.api.APIDefinition;
+import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIProductResource;
@@ -35,6 +37,7 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -579,6 +582,36 @@ public class OASParserUtilTest {
         pathsObj = (JSONObject) ((JSONObject) ((JSONObject) json.get("paths")).get("/users")).get("get");
         Assert.assertFalse(APIConstants.SWAGGER_X_THROTTLING_BANDWIDTH + " exists on resource level",
                 pathsObj.has(APIConstants.SWAGGER_X_THROTTLING_BANDWIDTH));
+    }
 
+    @Test
+    public void testSwaggerValidatorWithDefaultValidation() throws Exception {
+        String faultySwagger = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
+                        + File.separator + "oas_util_test_faulty_swagger.json"), StandardCharsets.UTF_8);
+        APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(faultySwagger, true);
+        Assert.assertFalse(response.isValid());
+        Assert.assertEquals(3, response.getErrorItems().size());
+        Assert.assertEquals(ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorCode(),
+                response.getErrorItems().get(0).getErrorCode());
+        Assert.assertEquals(ExceptionCodes.INVALID_OAS2_FOUND.getErrorCode(),
+                response.getErrorItems().get(1).getErrorCode());
+        Assert.assertEquals(ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorCode(),
+                response.getErrorItems().get(2).getErrorCode());
+    }
+
+    @Test
+    public void testSwaggerValidatorWithValidationLevel2() throws Exception {
+        String faultySwagger = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
+                        + File.separator + "oas_util_test_faulty_swagger.json"), StandardCharsets.UTF_8);
+        OASParserUtil.setValidationLevel(2);
+        APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(faultySwagger, true);
+        Assert.assertFalse(response.isValid());
+        Assert.assertEquals(3, response.getErrorItems().size());
+        Assert.assertEquals(ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorCode(),
+                response.getErrorItems().get(0).getErrorCode());
+        Assert.assertEquals(ExceptionCodes.INVALID_OAS2_FOUND.getErrorCode(),
+                response.getErrorItems().get(1).getErrorCode());
     }
 }
