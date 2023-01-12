@@ -4044,7 +4044,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 }
             }
         } catch (WorkflowException ex) {
-            log.warn("Failed to load workflow executors");
+            log.warn("Failed to load workflow executors", ex);
         }
     }
 
