@@ -190,7 +190,7 @@ public class ImportUtils {
 
             String apiType = importedApiDTO.getType().toString();
 
-            APIProvider apiProvider = RestApiCommonUtil.getProvider(importedApiDTO.getProvider());
+            APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
 
             // Validate swagger content except for streaming APIs
             if (!PublisherCommonUtils.isStreamingAPI(importedApiDTO)
@@ -1932,7 +1932,7 @@ public class ImportUtils {
                 }
             }
 
-            APIProvider apiProvider = RestApiCommonUtil.getProvider(importedApiProductDTO.getProvider());
+            APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
 
             // Check whether the API resources are valid
             checkAPIProductResourcesValid(extractedFolderPath, userName, apiProvider, importedApiProductDTO,
