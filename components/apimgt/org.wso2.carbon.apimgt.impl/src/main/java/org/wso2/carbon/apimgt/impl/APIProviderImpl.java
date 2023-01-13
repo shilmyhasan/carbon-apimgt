@@ -9496,7 +9496,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public String generateApiKey(String apiId) throws APIManagementException {
+    public String generateApiKey(String apiId, String organization) throws APIManagementException {
         APIInfo apiInfo = apiMgtDAO.getAPIInfoByUUID(apiId);
         if (apiInfo == null) {
             throw new APIMgtResourceNotFoundException("Couldn't retrieve existing API with ID: "
@@ -9510,6 +9510,23 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         JwtTokenInfoDTO jwtTokenInfoDTO = new JwtTokenInfoDTO();
         jwtTokenInfoDTO.setEndUserName(username);
         jwtTokenInfoDTO.setKeyType(APIConstants.API_KEY_TYPE_PRODUCTION);
+        if (!apiInfo.getApiType().equals(APIConstants.API_PRODUCT)) { // Check if this an actual API
+            API api = getAPIbyUUID(apiId, organization);
+            String endpointConfig = api.getEndpointConfig();
+            log.debug("endpointConfig in generateApiKey - " + endpointConfig);
+            if (!StringUtils.isEmpty(endpointConfig)) {
+                try {
+                    JSONObject endpointConfigJson = (JSONObject) new JSONParser().parse(endpointConfig);
+                    if (endpointConfigJson.get(APIConstants.API_DATA_PRODUCTION_ENDPOINTS) == null
+                            && endpointConfigJson.get(APIConstants.API_DATA_SANDBOX_ENDPOINTS) != null) {
+                        // If no production endpoints available and a sandbox endpoint is available
+                        jwtTokenInfoDTO.setKeyType(APIConstants.API_KEY_TYPE_SANDBOX);
+                    }
+                } catch (ParseException e) {
+                    // Ignore since we set the default key type previously
+                }
+            }
+        }
         jwtTokenInfoDTO.setSubscribedApiDTOList(Arrays.asList(subscribedApiInfo));
         jwtTokenInfoDTO.setExpirationTime(60 * 1000);
         ApiKeyGenerator apiKeyGenerator = new InternalAPIKeyGenerator();
