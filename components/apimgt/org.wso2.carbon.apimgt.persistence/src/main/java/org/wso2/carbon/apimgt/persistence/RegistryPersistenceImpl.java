@@ -879,13 +879,7 @@ public class RegistryPersistenceImpl implements APIPersistence {
                     registry.delete(apiProviderPath);
                 }
             }
-
-            /*remove revision directory with UUID*/
-            String revisionDirectoryPath = APIConstants.API_REVISION_LOCATION + RegistryConstants.PATH_SEPARATOR +
-                    apiId;
-            if (registry.resourceExists(revisionDirectoryPath)) {
-                registry.delete(revisionDirectoryPath);
-            }
+            deleteApiRevisionDirectory(apiId, registry);
 
             registry.commitTransaction();
             transactionCommitted  = true;
@@ -902,6 +896,19 @@ public class RegistryPersistenceImpl implements APIPersistence {
             } catch (RegistryException ex) {
                 throw new APIPersistenceException("Error occurred while rolling back the transaction. ", ex);
             }
+        }
+    }
+
+    /**
+     * Remove revision directory with UUID.
+     * @param apiId String
+     * @param registry Registry
+     **/
+    private void deleteApiRevisionDirectory(String apiId, Registry registry) throws RegistryException {
+        String revisionDirectoryPath = APIConstants.API_REVISION_LOCATION + RegistryConstants.PATH_SEPARATOR +
+                apiId;
+        if (registry.resourceExists(revisionDirectoryPath)) {
+            registry.delete(revisionDirectoryPath);
         }
     }
 
@@ -3540,12 +3547,7 @@ public class RegistryPersistenceImpl implements APIPersistence {
                 }
             }
 
-            /*remove revision directory with UUID*/
-            String revisionDirectoryPath = APIConstants.API_REVISION_LOCATION + RegistryConstants.PATH_SEPARATOR +
-                    apiId;
-            if (registry.resourceExists(revisionDirectoryPath)) {
-                registry.delete(revisionDirectoryPath);
-            }
+           deleteApiRevisionDirectory(apiId, registry);
 
         } catch (RegistryException e) {
             String msg = "Failed to get API";
