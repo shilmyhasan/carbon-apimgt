@@ -32,9 +32,7 @@ import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * APIProvider responsible for providing helper functionality
@@ -1153,6 +1151,18 @@ public interface APIProvider extends APIManager {
      * @throws APIManagementException
      */
     String addBlockCondition(String conditionType, String conditionValue, boolean conditionStatus)
+            throws APIManagementException;
+
+
+    /**
+     *  Add a block condition to the subscription
+     *
+     * @param conditionValue value of the condition
+     * @param additionalProperties
+     * @return UUID of the new Block Condition
+     * @throws APIManagementException
+     */
+    String addSubscriptionBlockCondition(String conditionValue, Map<String, Object> additionalProperties)
             throws APIManagementException;
 
     /**

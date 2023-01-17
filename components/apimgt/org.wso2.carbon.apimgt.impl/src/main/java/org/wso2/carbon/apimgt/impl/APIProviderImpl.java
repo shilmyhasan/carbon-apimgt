@@ -112,7 +112,6 @@ import org.wso2.carbon.apimgt.impl.clients.TierCacheInvalidationClient;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dao.GatewayArtifactsMgtDAO;
 import org.wso2.carbon.apimgt.impl.dao.ServiceCatalogDAO;
-import org.wso2.carbon.apimgt.impl.definitions.AsyncApiParserUtil;
 import org.wso2.carbon.apimgt.impl.definitions.GraphQLSchemaDefinition;
 import org.wso2.carbon.apimgt.impl.definitions.OAS3Parser;
 import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
@@ -6692,6 +6691,29 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         blockConditionsDTO.setEnabled(conditionStatus);
         blockConditionsDTO.setUUID(UUID.randomUUID().toString());
         BlockConditionsDTO createdBlockConditionsDto = apiMgtDAO.addBlockConditions(blockConditionsDTO);
+
+        if (createdBlockConditionsDto != null) {
+            publishBlockingEvent(createdBlockConditionsDto, "true");
+        }
+
+        return createdBlockConditionsDto.getUUID();
+    }
+
+    Override
+    public String addSubscriptionBlockCondition(String conditionValue, Map<String, Object> additionalProperties)
+            throws APIManagementException{
+        if (APIConstants.BLOCKING_CONDITIONS_USER.equals(conditionType)) {
+            conditionValue = MultitenantUtils.getTenantAwareUsername(conditionValue);
+            conditionValue = conditionValue + "@" + tenantDomain;
+        }
+        BlockConditionsDTO blockConditionsDTO = new BlockConditionsDTO();
+        blockConditionsDTO.setConditionType(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION);
+        blockConditionsDTO.setConditionValue(conditionValue);
+        blockConditionsDTO.setTenantDomain(tenantDomain);
+        blockConditionsDTO.setEnabled(true);
+        blockConditionsDTO.setUUID(UUID.randomUUID().toString());
+        blockConditionsDTO.setAdditionalProperties(additionalProperties);
+        BlockConditionsDTO createdBlockConditionsDto = apiMgtDAO.addSubscriptionBlockCondition(blockConditionsDTO);
 
         if (createdBlockConditionsDto != null) {
             publishBlockingEvent(createdBlockConditionsDto, "true");
