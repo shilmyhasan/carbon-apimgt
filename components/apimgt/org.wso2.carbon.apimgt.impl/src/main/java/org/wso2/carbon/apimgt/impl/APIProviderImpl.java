@@ -6699,15 +6699,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return createdBlockConditionsDto.getUUID();
     }
 
-    Override
-    public String addSubscriptionBlockCondition(String conditionValue, Map<String, Object> additionalProperties)
-            throws APIManagementException{
+    @Override
+    public String addSubscriptionBlockCondition(String conditionType, String conditionValue,
+                                                Map<String, Object> additionalProperties) throws APIManagementException{
         if (APIConstants.BLOCKING_CONDITIONS_USER.equals(conditionType)) {
             conditionValue = MultitenantUtils.getTenantAwareUsername(conditionValue);
             conditionValue = conditionValue + "@" + tenantDomain;
         }
         BlockConditionsDTO blockConditionsDTO = new BlockConditionsDTO();
-        blockConditionsDTO.setConditionType(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION);
+        blockConditionsDTO.setConditionType(conditionType);
         blockConditionsDTO.setConditionValue(conditionValue);
         blockConditionsDTO.setTenantDomain(tenantDomain);
         blockConditionsDTO.setEnabled(true);
