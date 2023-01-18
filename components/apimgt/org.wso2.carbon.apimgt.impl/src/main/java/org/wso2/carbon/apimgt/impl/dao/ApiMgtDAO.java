@@ -12808,7 +12808,6 @@ public class ApiMgtDAO {
             String[] conditionsArray = conditionValue.split(":");
             if (conditionsArray.length > 0) {
                 String apiContext = conditionsArray[0];
-                String applicationIdentifier = conditionsArray[2];
 
                 String appOwner = (String) additionalProperties.get("appOwner");
                 String appName = (String) additionalProperties.get("appName");

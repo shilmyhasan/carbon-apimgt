@@ -104,7 +104,6 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
                 }
 
                 String appId = subscribedApp.getOwner() + "-" + subscribedApp.getName();
-                String substatus = currentSubscription.getSubStatus();
 
                 String productionBlockConditionKey =
                         apiContext + ":" + apiVersion + ":" + appId + ":" + APIConstants.API_KEY_TYPE_PRODUCTION;
@@ -118,7 +117,7 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
                 Map<String, Object> additionalProperties = new HashMap<>();
                 additionalProperties.put("appOwner", subscribedApp.getOwner());
                 additionalProperties.put("appName", subscribedApp.getName());
-                if (APIConstants.SubscriptionStatus.BLOCKED.equals(substatus)) {
+                if (APIConstants.SubscriptionStatus.BLOCKED.equals(blockState)) {
                     /*In case all subscriptions blocked, add block conditions for both sandbox and production
                     key types*/
                     apiProvider.addSubscriptionBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION,
