@@ -49,6 +49,7 @@ import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import javax.ws.rs.core.Response;
 
@@ -103,7 +104,6 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
                 }
 
                 String appId = subscribedApp.getOwner() + "-" + subscribedApp.getName();
-                String substatus = currentSubscription.getSubStatus();
 
                 String productionBlockConditionKey =
                         apiContext + ":" + apiVersion + ":" + appId + ":" + APIConstants.API_KEY_TYPE_PRODUCTION;
@@ -114,17 +114,20 @@ public class SubscriptionsApiServiceImpl implements SubscriptionsApiService {
                 apiProvider.deleteSubscriptionBlockCondition(productionBlockConditionKey);
                 apiProvider.deleteSubscriptionBlockCondition(sandboxBlockConditionKey);
 
-                if (APIConstants.SubscriptionStatus.BLOCKED.equals(substatus)) {
+                Map<String, Object> additionalProperties = new HashMap<>();
+                additionalProperties.put("appOwner", subscribedApp.getOwner());
+                additionalProperties.put("appName", subscribedApp.getName());
+                if (APIConstants.SubscriptionStatus.BLOCKED.equals(blockState)) {
                     /*In case all subscriptions blocked, add block conditions for both sandbox and production
                     key types*/
-                    apiProvider.addBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION,
-                            productionBlockConditionKey);
-                    apiProvider
-                            .addBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION, sandboxBlockConditionKey);
+                    apiProvider.addSubscriptionBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION,
+                            productionBlockConditionKey, additionalProperties);
+                    apiProvider.addSubscriptionBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION,
+                            sandboxBlockConditionKey, additionalProperties);
                 } else {
                     /*In case production only blocked add a blocking condition only for production type*/
-                    apiProvider.addBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION,
-                            productionBlockConditionKey);
+                    apiProvider.addSubscriptionBlockCondition(APIConstants.BLOCKING_CONDITIONS_SUBSCRIPTION,
+                            productionBlockConditionKey, additionalProperties);
                 }
             }
 

@@ -18,12 +18,15 @@
 
 package org.wso2.carbon.apimgt.api.model;
 
+import java.util.*;
+
 public class BlockConditionsDTO {
     private boolean enabled;
     private String conditionType,conditionValue;
     private int conditionId;
     private String tenantDomain;
     private String uuid;
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     public int getConditionId() {
         return conditionId;
@@ -71,5 +74,13 @@ public class BlockConditionsDTO {
 
     public String getTenantDomain() {
         return tenantDomain;
+    }
+
+    public Map<String, Object> getAdditionalProperties() {
+        return additionalProperties;
+    }
+
+    public void setAdditionalProperties(Map<String, Object> additionalProperties) {
+        this.additionalProperties = additionalProperties;
     }
 }
