@@ -122,7 +122,7 @@ class LifeCycleUpdate extends Component {
         let promisedUpdate;
         const lifecycleChecklist = this.props.checkList.map((item) => item.value + ':' + item.checked);
         if (lifecycleChecklist.length > 0) {
-            promisedUpdate = this.api.updateLcState(apiUUID, action, lifecycleChecklist);
+            promisedUpdate = this.api.updateLcState(apiUUID, action, lifecycleChecklist.toString());
         } else {
             promisedUpdate = this.api.updateLcState(apiUUID, action);
         }
