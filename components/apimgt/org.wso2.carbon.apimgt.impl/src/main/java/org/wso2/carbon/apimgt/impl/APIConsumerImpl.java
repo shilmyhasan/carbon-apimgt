@@ -3810,7 +3810,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
 
-            String deletePendingWorkflowRef = apiMgtDAO.getExternalWorkflowRefByInternalRefWorkflowType(applicationId, WorkflowConstants.WF_TYPE_AM_APPLICATION_DELETION);
+            String deletePendingWorkflowRef = apiMgtDAO.getExternalWorkflowRefByInternalRefWorkflowType(applicationId,
+                    WorkflowConstants.WF_TYPE_AM_APPLICATION_DELETION);
             if (deletePendingWorkflowRef != null) {
                 WorkflowDTO deletePendingWorkflow = apiMgtDAO.retrieveWorkflow(deletePendingWorkflowRef);
                 if (deletePendingWorkflow != null && WorkflowStatus.CREATED.equals(deletePendingWorkflow.getStatus())) {
@@ -3954,7 +3955,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 }
             }
 
-            for (int subscription : pendingSubscriptionsByAppIdSubStatus.get(APIConstants.SubscriptionStatus.DELETE_PENDING)) {
+            for (int subscription : pendingSubscriptionsByAppIdSubStatus.get(
+                    APIConstants.SubscriptionStatus.DELETE_PENDING)) {
                 try {
                     workflowExtRef = apiMgtDAO.getExternalWorkflowReferenceForSubscriptionAndWFType(subscription,
                             WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION);
@@ -3970,7 +3972,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 }
             }
 
-            for (int subscription : pendingSubscriptionsByAppIdSubStatus.get(APIConstants.SubscriptionStatus.TIER_UPDATE_PENDING)) {
+            for (int subscription : pendingSubscriptionsByAppIdSubStatus.get(
+                    APIConstants.SubscriptionStatus.TIER_UPDATE_PENDING)) {
                 try {
                     workflowExtRef = apiMgtDAO.getExternalWorkflowReferenceForSubscriptionAndWFType(subscription,
                             WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_UPDATE);

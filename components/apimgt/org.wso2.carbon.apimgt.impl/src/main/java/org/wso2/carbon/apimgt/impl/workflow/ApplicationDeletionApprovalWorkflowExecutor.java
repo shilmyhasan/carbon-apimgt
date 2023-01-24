@@ -72,7 +72,8 @@ public class ApplicationDeletionApprovalWorkflowExecutor extends WorkflowExecuto
             }
         } else if (WorkflowStatus.REJECTED.equals(workflowDTO.getStatus())) {
             try {
-                apiMgtDAO.updateApplicationStatus(Integer.parseInt(applicationWorkflowDTO.getWorkflowReference()), APIConstants.ApplicationStatus.APPLICATION_APPROVED);
+                apiMgtDAO.updateApplicationStatus(Integer.parseInt(applicationWorkflowDTO.getWorkflowReference()),
+                        APIConstants.ApplicationStatus.APPLICATION_APPROVED);
             } catch (APIManagementException e) {
                 if (e.getMessage() == null) {
                     errorMsg = "Couldn't complete simple application deletion workflow for application: ";
