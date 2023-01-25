@@ -154,7 +154,7 @@
                             org.wso2.carbon.tenant.common.*;version="${carbon.platform.package.import.version.range}",
                             org.wso2.carbon.ntask.common;version="${carbon.ntask.import.version.range}",
                             org.wso2.carbon.ntask.core.*;version="${carbon.ntask.import.version.range}",
-                            com.fasterxml.jackson.databind.*; version="${fasterxml.jackson.version}",
+                            com.fasterxml.jackson.databind.*; version="${fasterxml.jackson.databind.version}",
                             com.fasterxml.jackson.annotation.*; version="${fasterxml.jackson.version}",
                             org.apache.commons.*,
                             org.apache.http.*,
