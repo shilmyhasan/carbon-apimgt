@@ -37,33 +37,40 @@ function saveContent(provider, apiName, apiVersion, docName, mode) {
 		/* Remove &nbsp */
 	  	contentDoc = contentDoc.replace(/&nbsp;/gi,'');
 	}
-    jagg.post("/site/blocks/documentation/ajax/docs.jag", { action:"addInlineContent",provider:provider,apiName:apiName,version:apiVersion,docName:docName,content:contentDoc},
-              function (result) {
-                  if (result.error) {
-                      if (result.message == "AuthenticateError") {
-                          jagg.showLogin();
-                      } else {
-                          jagg.message({content:result.message,type:"error"});
-                      }
-                  } else {
-                      if (mode == "save") {
-                         /* $('#messageModal').html($('#confirmation-data').html());
-                          $('#messageModal h3.modal-title').html('Document Content Addition Successful');
-                          $('#messageModal div.modal-body').html('\n\n Successfully saved the documentation content and you will be moved away from this tab.');
-                          $('#messageModal a.btn-primary').html('OK');
-                          $('#messageModal a.btn-other').hide();
-                          $('#messageModal a.btn-primary').click(function() {*/
-                              window.close();
-                          /*});
-                          $('#messageModal').modal();*/
-                      } else {
-                           $('#docAddMessage').show();
-                           setTimeout("hideMsg()", 3000);
-                          localStorage.removeItem("doc_auto_save"+apiName+provider+version+docName+"draft");
-                          localStorage.removeItem("doc_auto_time"+apiName+provider+version+docName+"draft");
-                      }
-                  }
-              }, "json");
+    //check for illegal characters in doc name
+    var illegalChars = /([~!&@#$;%^*+={}\|\\<>\"\',])/;
+    var illegalCharsCondition = illegalChars.test(docName);
+    if(illegalCharsCondition) {
+        jagg.message({content:'Document name contains one or more illegal characters  (~ ! & @ # $ ; % ^ & * + = { } | &lt; &gt;, \' " \\ ) .',type:"error"});
+    } else {
+        jagg.post("/site/blocks/documentation/ajax/docs.jag", { action:"addInlineContent",provider:provider,apiName:apiName,version:apiVersion,docName:docName,content:contentDoc},
+                    function (result) {
+                        if (result.error) {
+                            if (result.message == "AuthenticateError") {
+                                jagg.showLogin();
+                            } else {
+                                jagg.message({content:result.message,type:"error"});
+                            }
+                        } else {
+                            if (mode == "save") {
+                               /* $('#messageModal').html($('#confirmation-data').html());
+                                $('#messageModal h3.modal-title').html('Document Content Addition Successful');
+                                $('#messageModal div.modal-body').html('\n\n Successfully saved the documentation content and you will be moved away from this tab.');
+                                $('#messageModal a.btn-primary').html('OK');
+                                $('#messageModal a.btn-other').hide();
+                                $('#messageModal a.btn-primary').click(function() {*/
+                                    window.close();
+                                /*});
+                                $('#messageModal').modal();*/
+                            } else {
+                                 $('#docAddMessage').show();
+                                 setTimeout("hideMsg()", 3000);
+                                localStorage.removeItem("doc_auto_save"+apiName+provider+version+docName+"draft");
+                                localStorage.removeItem("doc_auto_time"+apiName+provider+version+docName+"draft");
+                            }
+                        }
+                    }, "json");
+    }
 }
 
 var hideMsg=function () {
