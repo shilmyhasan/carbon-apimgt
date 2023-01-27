@@ -8509,29 +8509,19 @@ public class ApiMgtDAO {
     public String getExternalWorkflowRefByInternalRefWorkflowType(int internalRef, String workflowType) throws APIManagementException {
 
         String workflowExtRef = null;
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
         String sqlQuery = SQLConstants.GET_EXTERNAL_WORKFLOW_REFERENCE_SQL;
-        try {
-            conn = APIMgtDBUtil.getConnection();
-            ps = conn.prepareStatement(sqlQuery);
+        try (Connection conn = APIMgtDBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sqlQuery)) {
             ps.setString(1, workflowType);
             ps.setString(2, String.valueOf(internalRef));
-            rs = ps.executeQuery();
-
-            // returns only one row
-            while (rs.next()) {
-                workflowExtRef = rs.getString("WF_EXTERNAL_REFERENCE");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    workflowExtRef = rs.getString("WF_EXTERNAL_REFERENCE");
+                }
             }
         } catch (SQLException e) {
-            handleException("Error occurred while getting workflow entry for " +
-                    "Internal Ref : " + internalRef, e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+            handleException("Error occurred while getting workflow entry for " + "Internal Ref : " + internalRef, e);
         }
-
         return workflowExtRef;
     }
 
@@ -8656,29 +8646,23 @@ public class ApiMgtDAO {
     public String getExternalWorkflowReferenceForSubscriptionAndWFType(int subscriptionId, String wfType) throws APIManagementException {
 
         String workflowExtRef = null;
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
         String sqlQuery = SQLConstants.GET_EXTERNAL_WORKFLOW_FOR_SUBSCRIPTION_SQL;
-        try {
-            conn = APIMgtDBUtil.getConnection();
-            ps = conn.prepareStatement(sqlQuery);
+        try (Connection conn = APIMgtDBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sqlQuery);) {
+
             // setting subscriptionId as string to prevent error when db finds string type IDs for
             // ApplicationRegistration workflows
             ps.setString(1, String.valueOf(subscriptionId));
             ps.setString(2, wfType);
-            rs = ps.executeQuery();
-
-            // returns only one row
-            while (rs.next()) {
-                workflowExtRef = rs.getString("WF_EXTERNAL_REFERENCE");
+            try (ResultSet rs = ps.executeQuery()) {
+                // returns only one row
+                while (rs.next()) {
+                    workflowExtRef = rs.getString("WF_EXTERNAL_REFERENCE");
+                }
             }
         } catch (SQLException e) {
             handleException("Error occurred while getting workflow entry for " +
                     "Subscription : " + subscriptionId, e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }
         return workflowExtRef;
     }
@@ -8752,41 +8736,41 @@ public class ApiMgtDAO {
         return pendingSubscriptions;
     }
 
+    /**
+     * Get pending subscriptions by application id
+     *
+     * @param applicationId Application Id
+     * @return Pending subscriptions corresponding to the application id
+     * @throws APIManagementException if an SQL expception has occurred
+     */
     public Map<String, Set<Integer>> getPendingSubscriptionsByAppId(int applicationId) throws APIManagementException {
 
         Set<Integer> pendingCreateSubscriptionIds = new HashSet<>();
         Set<Integer> pendingDeleteSubscriptionIds = new HashSet<>();
         Set<Integer> pendingUpdateSubscriptionIds = new HashSet<>();
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
 
         String sqlQuery = SQLConstants.GET_SUBSCRIPTION_ID_STATUS_BY_APPLICATION_SQL;
-        try {
-            conn = APIMgtDBUtil.getConnection();
-            ps = conn.prepareStatement(sqlQuery);
-            ps.setInt(1, applicationId);
-            rs = ps.executeQuery();
+        try (Connection conn = APIMgtDBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sqlQuery)) {
 
-            while (rs.next()) {
-                String subStatus = rs.getString("SUB_STATUS");
-                if(APIConstants.SubscriptionStatus.ON_HOLD.equals(subStatus)) {
-                    pendingCreateSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
-                }
-                else if(APIConstants.SubscriptionStatus.DELETE_PENDING.equals(subStatus)){
-                    pendingDeleteSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
-                }
-                else if(APIConstants.SubscriptionStatus.TIER_UPDATE_PENDING.equals(subStatus)){
-                    pendingUpdateSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
+            ps.setInt(1, applicationId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String subStatus = rs.getString("SUB_STATUS");
+                    if (APIConstants.SubscriptionStatus.ON_HOLD.equals(subStatus)) {
+                        pendingCreateSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
+                    } else if (APIConstants.SubscriptionStatus.DELETE_PENDING.equals(subStatus)) {
+                        pendingDeleteSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
+                    } else if (APIConstants.SubscriptionStatus.TIER_UPDATE_PENDING.equals(subStatus)) {
+                        pendingUpdateSubscriptionIds.add(rs.getInt("SUBSCRIPTION_ID"));
+                    }
                 }
             }
         } catch (SQLException e) {
             handleException("Error occurred while getting subscription entries for " +
                     "Application : " + applicationId, e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }
-        Map<String,Set<Integer>> map = new HashMap<>();
+        Map<String, Set<Integer>> map = new HashMap<>();
         map.put(APIConstants.SubscriptionStatus.ON_HOLD, pendingCreateSubscriptionIds);
         map.put(APIConstants.SubscriptionStatus.DELETE_PENDING, pendingDeleteSubscriptionIds);
         map.put(APIConstants.SubscriptionStatus.TIER_UPDATE_PENDING, pendingUpdateSubscriptionIds);

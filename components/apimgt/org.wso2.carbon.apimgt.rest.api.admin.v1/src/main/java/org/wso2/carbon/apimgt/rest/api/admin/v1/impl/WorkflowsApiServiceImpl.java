@@ -196,7 +196,6 @@ public class WorkflowsApiServiceImpl implements WorkflowsApiService {
             workflowExecutor.complete(workflowDTO);
             if (WorkflowStatus.APPROVED.equals(workflowDTO.getStatus())) {
                 WorkflowUtils.sendNotificationAfterWFComplete(workflowDTO, workflowType);
-
             }
             APIUtil.logAuditMessage(APIConstants.AuditLogConstants.WORKFLOW_STATUS, new Gson().toJson(workflowDTO),
                     APIConstants.AuditLogConstants.UPDATED, RestApiCommonUtil.getLoggedInUsername());
