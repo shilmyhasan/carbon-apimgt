@@ -349,12 +349,18 @@ export default function Resources(props) {
             */
             API.validateOpenAPIByInlineDefinition(specCopy)
                 .then((response) => {
-                    setResolvedSpec(() => {
-                        const errors = response.body.errors ? response.body.errors : [];
-                        return {
-                            spec: response.body.info,
-                            errors,
-                        };
+                    // use spec returned by swagger parser to get a consistent spec in both scenarios
+                    SwaggerParser.validate(specCopy, (err, result) => {
+                        let spec = result;
+                        setResolvedSpec(() => {
+                            const errors = response.body.errors ? response.body.errors : [];
+                            // use response.body.info only if spec from swagger parser is undefined
+                            spec = !spec ? response.body.info : spec;
+                            return {
+                                spec,
+                                errors,
+                            };
+                        });
                     });
                 });
         }
