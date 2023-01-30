@@ -123,7 +123,7 @@ export default function ListParameters(props) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {operation.parameters
+                    {operation.parameters && resolvedSpec.paths
                         && operation.parameters.map((parameter, index) => {
                             const isRefParam = isRef(parameter);
                             const paramCopy = isRefParam
@@ -200,8 +200,8 @@ export default function ListParameters(props) {
                                 </TableRow>
                             );
                         })}
-                    {operation.requestBody && (isRef(operation.requestBody)
-                        ? Object.entries(resolvedSpec.paths[target][verb].requestBody.content).map(
+                    {operation.requestBody && isRef(operation.requestBody) && resolvedSpec.paths
+                        && Object.entries(resolvedSpec.paths[target][verb].requestBody.content).map(
                             ([contentType, content]) => {
                                 return (
                                     <RequestBody
@@ -216,7 +216,9 @@ export default function ListParameters(props) {
                                     />
                                 );
                             },
-                        ) : Object.entries(operation.requestBody.content).map(([contentType, content]) => {
+                        )}
+                    {operation.requestBody && !isRef(operation.requestBody)
+                        && Object.entries(operation.requestBody.content).map(([contentType, content]) => {
                             return (
                                 <RequestBody
                                     contentType={contentType}
@@ -229,7 +231,7 @@ export default function ListParameters(props) {
                                     verb={verb}
                                 />
                             );
-                        }))}
+                        })}
                 </TableBody>
             </Table>
         </>
