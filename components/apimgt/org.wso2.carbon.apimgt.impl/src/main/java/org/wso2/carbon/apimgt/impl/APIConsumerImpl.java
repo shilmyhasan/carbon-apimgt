@@ -5567,6 +5567,10 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             apiSet = (ArrayList<Object>) apiObj;
         }
 
+        // Store the length of the APIs list with the versioned APIs
+        int apiSetLengthWithVersionedApis = apiSet.size();
+        int totalLength = Integer.parseInt(searchResults.get("length").toString());
+
         //filter store results if displayMultipleVersions is set to false
         Boolean displayMultipleVersions = APIUtil.isAllowDisplayMultipleVersions();
         if (!displayMultipleVersions) {
@@ -5630,6 +5634,10 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     }
                 }
             }
+
+            // Store the length of the APIs list without the versioned APIs
+            int apiSetLengthWithoutVersionedApis = tempApiSet.size();
+
             apiSet = tempApiSet;
             ArrayList<Object> resultAPIandProductSet = new ArrayList<>();
             resultAPIandProductSet.addAll(apiSet);
@@ -5641,6 +5649,9 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             } else {
                 searchResults.put("apis", resultAPIandProductSet);
             }
+            searchResults.put("length",
+                    totalLength - (apiSetLengthWithVersionedApis - (apiSetLengthWithoutVersionedApis + apiProductSet
+                            .size())));
         }
         return searchResults;
     }
