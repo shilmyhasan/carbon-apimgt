@@ -1904,6 +1904,16 @@
                 <artifactId>log4j-slf4j-impl</artifactId>
                 <version>${log4j2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${tika.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>batik-all</artifactId>
+                <version>${batik.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2179,5 +2189,7 @@
         <log4j2.version>2.17.1</log4j2.version>
         <jinjava.version>2.5.6</jinjava.version>
         <h2.orbit.version>2.1.210.wso2v1</h2.orbit.version>
+        <tika.version>2.7.0</tika.version>
+        <batik.version>1.16</batik.version>
     </properties>
 </project>
