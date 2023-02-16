@@ -26,6 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import io.swagger.models.Path;
 import io.swagger.models.RefModel;
 import io.swagger.models.RefPath;
@@ -1151,13 +1154,12 @@ public class OASParserUtil {
                             apiIdentifier.getProviderName());
         }
 
-        JSONParser parser = new JSONParser();
         String apiDocContent = null;
         try {
             if (registry.resourceExists(resourcePath + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME)) {
                 Resource apiDocResource = registry.get(resourcePath + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME);
                 apiDocContent = new String((byte[]) apiDocResource.getContent(), Charset.defaultCharset());
-                parser.parse(apiDocContent);
+                new Gson().fromJson(apiDocContent, JsonObject.class);
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("Resource " + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME + " not found at "
@@ -1168,7 +1170,7 @@ public class OASParserUtil {
             handleException(
                     "Error while retrieving OpenAPI v2.0 or v3.0.0 Definition for " + apiIdentifier.getName() + '-'
                             + apiIdentifier.getVersion(), e);
-        } catch (ParseException e) {
+        } catch (JsonSyntaxException e) {
             handleException("Error while parsing OpenAPI v2.0 or v3.0.0 Definition for " + apiIdentifier.getName() + '-'
                     + apiIdentifier.getVersion() + " in " + resourcePath, e);
         }
