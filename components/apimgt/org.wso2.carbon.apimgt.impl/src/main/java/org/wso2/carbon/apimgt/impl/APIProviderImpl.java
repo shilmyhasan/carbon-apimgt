@@ -53,6 +53,7 @@ import org.wso2.carbon.apimgt.api.doc.model.APIResource;
 import org.wso2.carbon.apimgt.api.dto.CertificateInformationDTO;
 import org.wso2.carbon.apimgt.api.dto.CertificateMetadataDTO;
 import org.wso2.carbon.apimgt.api.dto.ClientCertificateDTO;
+import org.wso2.carbon.apimgt.api.dto.ClonePolicyMetadataDTO;
 import org.wso2.carbon.apimgt.api.dto.EnvironmentPropertiesDTO;
 import org.wso2.carbon.apimgt.api.dto.KeyManagerConfigurationDTO;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
@@ -3092,6 +3093,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throws APIManagementException {
         Map<String, String> clonedPolicies = new HashMap<>();
         Set<URITemplate> uriTemplates = newAPI.getUriTemplates();
+        List<ClonePolicyMetadataDTO> toBeClonedPolicyDetails = new ArrayList<>();
         for (URITemplate uriTemplate : uriTemplates) {
             String key = uriTemplate.getHTTPVerb() + ":" + uriTemplate.getUriTemplate();
             if (extractedPoliciesMap.containsKey(key)) {
@@ -3099,10 +3101,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 for (OperationPolicy operationPolicy : operationPolicies) {
                     String clonedPolicyId;
                     if (!clonedPolicies.containsKey(operationPolicy.getPolicyId())) {
-                        OperationPolicyData apiSpecificOperationPolicy =
-                                apiMgtDAO.getAPISpecificOperationPolicyByPolicyID(operationPolicy.getPolicyId(),
-                                        oldAPIUuid, newAPI.getOrganization(), true);
-                        clonedPolicyId = apiMgtDAO.cloneOperationPolicy(newAPI.getUuid(), apiSpecificOperationPolicy);
+                        clonedPolicyId = UUID.randomUUID().toString();
+
+                        ClonePolicyMetadataDTO toBeClonedSinglePolicyData = new ClonePolicyMetadataDTO();
+                        toBeClonedSinglePolicyData.setClonedPolicyUUID(clonedPolicyId);
+                        toBeClonedSinglePolicyData.setCurrentPolicyUUID(operationPolicy.getPolicyId());
+                        toBeClonedPolicyDetails.add(toBeClonedSinglePolicyData);
+
                         clonedPolicies.put(operationPolicy.getPolicyId(), clonedPolicyId);
                     } else {
                         clonedPolicyId = clonedPolicies.get(operationPolicy.getPolicyId());
@@ -3114,6 +3119,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         if (uriTemplates != null) {
+            apiMgtDAO.cloneAPISpecificPoliciesForVersioning(oldAPIUuid, newAPI.getUuid(), newAPI.getOrganization(),
+                    toBeClonedPolicyDetails);
             apiMgtDAO.addOperationPolicyMapping(uriTemplates);
         }
     }
