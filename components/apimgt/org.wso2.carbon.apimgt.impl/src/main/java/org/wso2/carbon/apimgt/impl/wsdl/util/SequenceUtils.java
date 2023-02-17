@@ -526,13 +526,11 @@ public class SequenceUtils {
      * method, a simple type will be assigned if the schema ends with a primitive type in an object schema. If it ends
      * as primitive elements in an array, array type is assigned.
      *
-     * @param parent                   Paren nodes schema path
+     * @param parent                   Parent nodes' schema path
      * @param example                  Example data node
-     * @param parameterJsonPathMapping map to be populated with the respective schema paths
-     * @throws JSONException
+     * @param parameterJsonPathMapping Map to be populated with the respective schema paths
      */
-    public static void listExamples(String parent, Example example, Map<String, String> parameterJsonPathMapping)
-            throws JSONException {
+    public static void listExamples(String parent, Example example, Map<String, String> parameterJsonPathMapping) {
 
         if (SOAPToRESTConstants.Swagger.OBJECT_TYPE.equals(example.getTypeName())) {
             Map<String, Example> values = ((ObjectExample) example).getValues();
