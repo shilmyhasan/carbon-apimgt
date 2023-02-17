@@ -169,6 +169,9 @@ public class SequenceGenerator {
                                         org.json.JSONObject json = new org.json.JSONObject(jsonExample);
                                         SequenceUtils.listJson(json, parameterJsonPathMapping);
                                     } else {
+                                        // Using the jsonObjects to process the schema will change the order of the
+                                        // parameters. This will break the SOAP mapping if wsdl has sequence elements
+                                        // which requires the sequential order of the parameters.
                                         SequenceUtils.listExamples(example, parameterJsonPathMapping);
                                     }
                                 } catch (JSONException e) {
@@ -243,6 +246,9 @@ public class SequenceGenerator {
                                 org.json.JSONObject json = new org.json.JSONObject(jsonExample);
                                 SequenceUtils.listJson(json, parameterJsonPathMapping);
                             } else {
+                                // Using the jsonObjects to process the schema will change the order of the parameters.
+                                // This will break the SOAP mapping if wsdl has sequence elements which requires the
+                                // sequential order of the parameters.
                                 SequenceUtils.listExamples(example, parameterJsonPathMapping);
                             }
                         } catch (JSONException e) {
