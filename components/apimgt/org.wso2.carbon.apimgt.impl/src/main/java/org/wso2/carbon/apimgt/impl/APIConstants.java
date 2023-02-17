@@ -2761,6 +2761,7 @@ public final class APIConstants {
     }
 
     public static final String CASE_SENSITIVE_CHECK_PATH =    "caseSensitiveRoleValidation";
+    public static final String SOAP_TO_REST_PRESERVE_ELEMENT_ORDER = "soapToRestPreserveElementOrder";
 
 
     // Constants related to basic health check APIs
