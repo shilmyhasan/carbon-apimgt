@@ -752,11 +752,10 @@ public final class APIUtil {
             // AWS Lambda: get paths
             OASParserUtil oasParserUtil = new OASParserUtil();
             String resourceConfigsString = oasParserUtil.getAPIDefinition(apiIdentifier, registry);
-            JSONParser jsonParser = new JSONParser();
-            JSONObject paths = null;
+            JsonElement paths = null;
             if (resourceConfigsString != null) {
-                JSONObject resourceConfigsJSON = (JSONObject) jsonParser.parse(resourceConfigsString);
-                paths = (JSONObject) resourceConfigsJSON.get(APIConstants.SWAGGER_PATHS);
+                JsonObject resourceConfigsJSON = new Gson().fromJson(resourceConfigsString, JsonObject.class);
+                paths = resourceConfigsJSON.get(APIConstants.SWAGGER_PATHS);
             }
 
             for (URITemplate uriTemplate : uriTemplates) {
@@ -775,17 +774,19 @@ public final class APIUtil {
                 uriTemplate.setResourceSandboxURI(api.getSandboxUrl());
                 // AWS Lambda: set arn & timeout to URI template
                 if (paths != null) {
-                    JSONObject path = (JSONObject) paths.get(uTemplate);
+                    JsonElement path = paths.getAsJsonObject().get(uTemplate);
                     if (path != null) {
-                        JSONObject operation = (JSONObject) path.get(method.toLowerCase());
+                        JsonElement operation = path.getAsJsonObject().get(method.toLowerCase());
                         if (operation != null) {
-                            if (operation.containsKey(APIConstants.SWAGGER_X_AMZN_RESOURCE_NAME)) {
-                                uriTemplate.setAmznResourceName((String)
-                                        operation.get(APIConstants.SWAGGER_X_AMZN_RESOURCE_NAME));
+                            if (operation.getAsJsonObject().get(APIConstants.SWAGGER_X_AMZN_RESOURCE_NAME) != null) {
+                                uriTemplate.setAmznResourceName(
+                                        operation.getAsJsonObject().get(APIConstants.SWAGGER_X_AMZN_RESOURCE_NAME)
+                                                .toString());
                             }
-                            if (operation.containsKey(APIConstants.SWAGGER_X_AMZN_RESOURCE_TIMEOUT)) {
-                                uriTemplate.setAmznResourceTimeout(((Long)
-                                        operation.get(APIConstants.SWAGGER_X_AMZN_RESOURCE_TIMEOUT)).intValue());
+                            if (operation.getAsJsonObject().get(APIConstants.SWAGGER_X_AMZN_RESOURCE_TIMEOUT) != null) {
+                                uriTemplate.setAmznResourceTimeout(
+                                        operation.getAsJsonObject().get(APIConstants.SWAGGER_X_AMZN_RESOURCE_TIMEOUT)
+                                                .getAsInt());
                             }
                         }
                     }
