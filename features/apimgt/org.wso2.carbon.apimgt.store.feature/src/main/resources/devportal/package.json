@@ -40,7 +40,7 @@
         "dayjs": "^1.10.4",
         "downshift": "^2.1.1",
         "fs-react": "0.0.4",
-        "graphiql": "^0.17.5",
+        "graphiql": "^1.4.7",
         "graphiql-explorer": "^0.5.1",
         "graphql": "^14.6.0",
         "graphql-to-postman": "0.0.6",
