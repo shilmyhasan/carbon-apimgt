@@ -1406,15 +1406,16 @@ public class APIConsumerImplTest {
         BDDMockito.when(ApplicationUtils.createAccessTokenRequest(keyManager,oAuthApplicationInfo, null)).thenReturn
                 (accessTokenRequest);
         Mockito.when(keyManager.getNewApplicationAccessToken(accessTokenRequest)).thenReturn(accessTokenInfo);
+        Application application = new Application(1);
         try {
-            apiConsumer.mapExistingOAuthClient("", "admin", "1", "app1", "refresh", "DEFAULT", "default", "carbon" +
+            apiConsumer.mapExistingOAuthClient("", "admin", "1", application, "refresh", "DEFAULT", "default", "carbon" +
                     ".super");
             Assert.fail("Exception is not thrown when client id is already mapped to an application");
         } catch (APIManagementException e) {
             Assert.assertTrue(e.getMessage().contains("is used for another Application"));
         }
         Assert.assertEquals(8, apiConsumer.mapExistingOAuthClient("", "admin", "1",
-                "app1", "refresh", "DEFAULT", "default", "carbon.super").size());
+                application, "refresh", "DEFAULT", "default", "carbon.super").size());
     }
 
     @Test
