@@ -229,6 +229,7 @@ public class BasicAuthAuthenticator implements Authenticator {
                     authContext.setSubscriber(APIConstants.BASIC_AUTH_APPLICATION_OWNER); //Set application owner in basic auth scenario
                     authContext.setConsumerKey(null);
                     APISecurityUtils.setAuthenticationContext(synCtx, authContext, null);
+                    synCtx.setProperty(APIMgtGatewayConstants.END_USER_NAME, authContext.getUsername());
                 }
                 log.debug("Basic Authentication: Scope validation passed");
                 return new AuthenticationResponse(true, isMandatory, false, 0, null);
