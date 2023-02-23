@@ -1565,7 +1565,6 @@ public class ImportUtils {
 
         try {
             // Remove all documents associated with the API before update
-
             List<Documentation> documents = apiProvider.getAllDocumentation(identifier);
             if (documents != null) {
                 for (Documentation documentation : documents) {
