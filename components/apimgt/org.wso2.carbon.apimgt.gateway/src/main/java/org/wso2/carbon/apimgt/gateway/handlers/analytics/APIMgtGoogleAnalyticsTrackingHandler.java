@@ -181,7 +181,7 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
             trackPageViewWithGoogleAnalytics4(googleAnalytics4ApiSecret, googleAnalytics4MeasurementId, documentPath,
                     host, userIP, userAgent, httpMethod, msgCtx);
         }
-	}
+    }
 
     private void trackPageViewWithUniversalAnalytics(String trackingId, String documentPath, String domainName,
                                                      String userIP, String userAgent, String httpMethod,
@@ -311,15 +311,15 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
         log.error(msg);
         throw new SynapseException(msg);
     }
-	
-	private class GoogleAnalyticsConfig {
-		private boolean enabled;
-		private String googleAnalyticsTrackingID;
-		private String googleAnalyticsMeasurementID;
-		private String apiSecret;
-		
-		public GoogleAnalyticsConfig(OMElement config) {
-			googleAnalyticsTrackingID =
+
+    private class GoogleAnalyticsConfig {
+        private boolean enabled;
+        private String googleAnalyticsTrackingID;
+        private String googleAnalyticsMeasurementID;
+        private String apiSecret;
+
+        public GoogleAnalyticsConfig(OMElement config) {
+            googleAnalyticsTrackingID =
                     getConfigPropertyValue(APIMgtUsagePublisherConstants.API_GOOGLE_ANALYTICS_TRACKING_ID, config);
             googleAnalyticsMeasurementID =
                     getConfigPropertyValue(APIMgtUsagePublisherConstants.API_GOOGLE_ANALYTICS_MEASUREMENT_ID, config);
@@ -327,10 +327,10 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
                     getConfigPropertyValue(APIMgtUsagePublisherConstants.API_GOOGLE_ANALYTICS_API_SECRET, config);
             String googleAnalyticsEnabledStr =
                     getConfigPropertyValue(APIMgtUsagePublisherConstants.API_GOOGLE_ANALYTICS_TRACKING_ENABLED, config);
-            enabled =  googleAnalyticsEnabledStr != null && JavaUtils.isTrueExplicitly(googleAnalyticsEnabledStr);
-		}
+            enabled = googleAnalyticsEnabledStr != null && JavaUtils.isTrueExplicitly(googleAnalyticsEnabledStr);
+        }
 
-		private String getConfigPropertyValue(String propertyName, OMElement config) {
+        private String getConfigPropertyValue(String propertyName, OMElement config) {
             OMElement omElement = config.getFirstChildWithName(new QName(propertyName));
             if (omElement != null) {
                 return omElement.getText();
