@@ -83,6 +83,15 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        String channelId = ctx.channel().id().asLongText();
+        if (InboundMessageContextDataHolder.getInstance().getInboundMessageContextMap().containsKey(channelId)) {
+            InboundMessageContextDataHolder.getInstance().removeInboundMessageContextForConnection(channelId);
+        }
+        super.channelInactive(ctx);
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 
         String channelId = ctx.channel().id().asLongText();
