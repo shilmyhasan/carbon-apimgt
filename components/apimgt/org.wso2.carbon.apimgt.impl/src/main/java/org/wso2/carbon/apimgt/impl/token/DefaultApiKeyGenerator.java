@@ -17,6 +17,7 @@
 package org.wso2.carbon.apimgt.impl.token;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
@@ -82,7 +83,15 @@ public class DefaultApiKeyGenerator implements ApiKeyGenerator {
         }
         String issuerIdentifier = OAuthServerConfiguration.getInstance().getOpenIDConnectIDTokenIssuerIdentifier();
         JWTClaimsSet.Builder jwtClaimsSetBuilder = new JWTClaimsSet.Builder();
-        jwtClaimsSetBuilder.claim(APIConstants.JwtTokenConstants.END_USERNAME, APIUtil.getUserNameWithTenantSuffix(jwtTokenInfoDTO.getEndUserName()));
+
+        String tenantAwareSubClaim = System.getProperty(APIConstants.ENABLE_TENANT_AWARE_SUB_CLAIM);
+        if (StringUtils.isNotEmpty(tenantAwareSubClaim) && Boolean.parseBoolean(tenantAwareSubClaim)) {
+            jwtClaimsSetBuilder.claim(APIConstants.JwtTokenConstants.END_USERNAME,
+                    APIUtil.getUserNameWithoutTenantSuffix(jwtTokenInfoDTO.getEndUserName()));
+        } else {
+            jwtClaimsSetBuilder.claim(APIConstants.JwtTokenConstants.END_USERNAME,
+                    APIUtil.getUserNameWithTenantSuffix(jwtTokenInfoDTO.getEndUserName()));
+        }
         jwtClaimsSetBuilder.claim(APIConstants.JwtTokenConstants.JWT_ID, UUID.randomUUID().toString());
         jwtClaimsSetBuilder.claim(APIConstants.JwtTokenConstants.ISSUER_IDENTIFIER, issuerIdentifier);
         jwtClaimsSetBuilder.claim(APIConstants.JwtTokenConstants.ISSUED_TIME, currentTime);

@@ -563,6 +563,9 @@ public final class APIConstants {
     //Property for enabling scope sharing between APIs
     public static final String ENABLE_API_SCOPES_SHARING = "enable-api-scopes-sharing";
 
+    //Property for enabling tenant aware sub claims when invoking APIs with API key
+    public static final String ENABLE_TENANT_AWARE_SUB_CLAIM= "enable.tenant.aware.subclaim";
+
     // Constants for obtaining organization claims
     public static final String READ_ORGANIZATION_FROM_SAML_ASSERTION = "readOrganizationClaimFromSamlAssertion";
     public static final String SAML2_SSO_AUTHENTICATOR_NAME = "SAML2SSOAuthenticator";
