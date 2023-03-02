@@ -4935,6 +4935,17 @@ public final class APIUtil {
     }
 
     /**
+     * Helper method to get username without tenant domain.
+     *
+     * @param userName
+     * @return userName without tenant domain
+     */
+    public static String getUserNameWithoutTenantSuffix(String userName) {
+
+        return MultitenantUtils.getTenantAwareUsername(userName);
+    }
+
+    /**
      * Build OMElement from inputstream
      *
      * @param inputStream
