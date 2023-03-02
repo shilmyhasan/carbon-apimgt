@@ -84,6 +84,7 @@ public class DefaultApiKeyGenerator implements ApiKeyGenerator {
         String issuerIdentifier = OAuthServerConfiguration.getInstance().getOpenIDConnectIDTokenIssuerIdentifier();
         JWTClaimsSet.Builder jwtClaimsSetBuilder = new JWTClaimsSet.Builder();
 
+        // A system property is used to enable/disable getting the tenant aware username as sub claim.
         String tenantAwareSubClaim = System.getProperty(APIConstants.ENABLE_TENANT_AWARE_SUB_CLAIM);
         if (StringUtils.isNotEmpty(tenantAwareSubClaim) && Boolean.parseBoolean(tenantAwareSubClaim)) {
             jwtClaimsSetBuilder.claim(APIConstants.JwtTokenConstants.END_USERNAME,
