@@ -1562,16 +1562,13 @@ public class ImportUtils {
 
         File documentsFolder = new File(docDirectoryPath);
         File[] fileArray = documentsFolder.listFiles();
-        String provider = (apiTypeWrapper.isAPIProduct()) ? apiTypeWrapper.getApiProduct().getId().getProviderName() :
-                apiTypeWrapper.getApi().getId().getProviderName();
-        String tenantDomain = MultitenantUtils.getTenantDomain(provider);
 
         try {
             // Remove all documents associated with the API before update
             List<Documentation> documents = apiProvider.getAllDocumentation(identifier);
             if (documents != null) {
                 for (Documentation documentation : documents) {
-                    apiProvider.removeDocumentation(identifier, documentation.getId(), tenantDomain);
+                    apiProvider.removeDocumentation(identifier, documentation.getId(), organization);
                 }
             }
 
@@ -1632,7 +1629,7 @@ public class ImportUtils {
                                 individualDocumentFilePath + File.separator + folderName)) {
                             String inlineContent = IOUtils.toString(inputStream, ImportExportConstants.CHARSET);
                             PublisherCommonUtils.addDocumentationContent(documentation, apiProvider, apiOrApiProductId,
-                                    documentation.getId(), tenantDomain, inlineContent);
+                                    documentation.getId(), organization, inlineContent);
                         }
                     } else if (ImportExportConstants.FILE_DOC_TYPE.equalsIgnoreCase(docSourceType)) {
                         String filePath = documentation.getFilePath();
@@ -1643,7 +1640,7 @@ public class ImportUtils {
                                             + File.separator + filePath);
                             PublisherCommonUtils.addDocumentationContentForFile(inputStream, docExtension,
                                     documentation.getFilePath(), apiProvider, apiOrApiProductId, documentation.getId(),
-                                    tenantDomain);
+                                    organization);
                         } catch (FileNotFoundException e) {
                             //this error is logged and ignored because documents are optional in an API
                             log.error("Failed to locate the document files of the API/API Product: " + apiTypeWrapper
