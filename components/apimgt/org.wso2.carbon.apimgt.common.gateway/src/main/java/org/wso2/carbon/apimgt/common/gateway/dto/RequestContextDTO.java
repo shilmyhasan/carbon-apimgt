@@ -71,7 +71,7 @@ public class RequestContextDTO {
 
     public Certificate[] getClientCertsLatest() {
 
-        javax.security.cert.X509Certificate[] clientCerts = this.clientCerts;
+        X509Certificate[] clientCerts = this.clientCerts;
         Certificate[] clientCertsLatest = null;
         try {
              clientCertsLatest = CertUtils.convertCerts(clientCerts);
