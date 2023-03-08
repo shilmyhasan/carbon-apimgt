@@ -494,6 +494,29 @@ public class GatewayArtifactsMgtDAO {
         }
     }
 
+    /**
+     * Remove published gateway labels
+     * @param apiId APIID
+     * @param apiRevisionId Revision ID
+     * @param apiRevisionDeployments APIRevisionDeployment list
+     * @throws APIManagementException
+     */
+    public void removePublishedGatewayLabels(String apiId, String apiRevisionId, List<APIRevisionDeployment> apiRevisionDeployments) throws APIManagementException {
+
+        try (Connection connection = GatewayArtifactsMgtDBUtil.getArtifactSynchronizerConnection()) {
+            try {
+                connection.setAutoCommit(false);
+                removePublishedGatewayLabels(connection, apiId, apiRevisionId, apiRevisionDeployments);
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            handleException("Failed to delete Gateway Artifact of the API " + apiId, e);
+        }
+    }
+
     private void removePublishedGatewayLabels(Connection connection, String apiId, String revision)
             throws SQLException {
 
@@ -505,14 +528,37 @@ public class GatewayArtifactsMgtDAO {
         }
     }
 
+
+    private void removePublishedGatewayLabels(Connection connection, String apiId, String revision, List<APIRevisionDeployment> apiRevisionDeployments)
+            throws SQLException {
+
+        try (PreparedStatement preparedStatement = connection
+                .prepareStatement(SQLConstants.DELETE_GW_PUBLISHED_LABELS_BY_API_ID_REVISION_ID_DEPLOYMENT)) {
+            for(APIRevisionDeployment apiRevisionDeployment : apiRevisionDeployments) {
+                preparedStatement.setString(1, apiId);
+                preparedStatement.setString(2, revision);
+                preparedStatement.setString(3, apiRevisionDeployment.getDeployment());
+                preparedStatement.addBatch();
+            }
+            preparedStatement.executeBatch();
+        }
+    }
+
     public void addAndRemovePublishedGatewayLabels(String apiId, String revision, Set<String> gateways,
                                                    Map<String, String> gatewayVhosts)
             throws APIManagementException {
 
+        List<APIRevisionDeployment> labels = new ArrayList<>();
+        for (String gateway : gateways) {
+            APIRevisionDeployment apiRevisionDeployment = new APIRevisionDeployment();
+            apiRevisionDeployment.setDeployment(gateway);
+            labels.add(apiRevisionDeployment);
+        }
+
         try (Connection connection = GatewayArtifactsMgtDBUtil.getArtifactSynchronizerConnection()) {
             try {
                 connection.setAutoCommit(false);
-                removePublishedGatewayLabels(connection, apiId, revision);
+                removePublishedGatewayLabels(connection, apiId, revision, labels);
                 addPublishedGatewayLabels(connection, apiId, revision, gateways, gatewayVhosts);
                 connection.commit();
             } catch (SQLException | APIManagementException e) {

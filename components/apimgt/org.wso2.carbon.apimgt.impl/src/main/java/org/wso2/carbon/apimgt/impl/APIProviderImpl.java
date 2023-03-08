@@ -9464,7 +9464,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         API api = getAPIbyUUID(apiId, apiRevision);
         removeFromGateway(api, new HashSet<>(apiRevisionDeployments), Collections.emptySet());
         apiMgtDAO.removeAPIRevisionDeployment(apiRevisionId, apiRevisionDeployments);
-        GatewayArtifactsMgtDAO.getInstance().removePublishedGatewayLabels(apiId, apiRevisionId);
+        GatewayArtifactsMgtDAO.getInstance().removePublishedGatewayLabels(apiId, apiRevisionId, apiRevisionDeployments);
     }
 
     /**
