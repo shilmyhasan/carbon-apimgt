@@ -2548,6 +2548,7 @@ public final class APIConstants {
         public static final String BINDING_FEDERATED_USER_CLAIMS = "bindFederatedUserClaims";
         public static final String DEFAULT_KEY_MANAGER_OPENID_CONNECT_DISCOVERY_ENDPOINT = "/oauth2/token/.well-known/openid-configuration";
         public static final String DEFAULT_JWKS_ENDPOINT = "/oauth2/jwks";
+        public static final String GATEWAY_JWKS_ENDPOINT = "/jwks";
         public static final String PRODUCTION_TOKEN_ENDPOINT = "production_token_endpoint";
         public static final String SANDBOX_TOKEN_ENDPOINT = "sandbox_token_endpoint";
         public static final String PRODUCTION_REVOKE_ENDPOINT = "production_revoke_endpoint";
