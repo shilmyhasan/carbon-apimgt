@@ -2905,6 +2905,8 @@ public final class APIConstants {
         SELF_SIGNUP
     }
 
+    public static final String CASE_SENSITIVE_CHECK_PATH = "caseSensitiveRoleValidation";
+
     public static final String  PROPERTY_QUERY_KEY = "query";
     public static final String  PROPERTY_HEADERS_KEY = "headers";
     public static final String DEFAULT_ORG_RESOLVER = "org.wso2.carbon.apimgt.impl.resolver.OnPremResolver";
