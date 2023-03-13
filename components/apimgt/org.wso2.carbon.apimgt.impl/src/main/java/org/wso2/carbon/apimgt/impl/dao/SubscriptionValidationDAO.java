@@ -1124,6 +1124,7 @@ public class SubscriptionValidationDAO {
                         api.setContext(resultSet.getString("CONTEXT"));
                         String revision = resultSet.getString("REVISION_UUID");
                         api.setStatus(resultSet.getString("STATUS"));
+                        api.setOrganization(resultSet.getString("ORGANIZATION"));
                         api.setIsDefaultVersion(isAPIDefaultVersion(connection, provider, name, version));
                         if (isExpand) {
                             api.setPolicy(getAPILevelTier(connection, apiUuid, revision));
