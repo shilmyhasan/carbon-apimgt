@@ -3,19 +3,24 @@ package org.wso2.carbon.apimgt.gateway.handlers.common;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.commons.json.JsonUtil;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.wso2.carbon.apimgt.common.gateway.exception.JWTGeneratorException;
 import org.wso2.carbon.apimgt.common.gateway.util.JWTUtil;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.common.gateway.dto.JWTConfigurationDto;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
@@ -29,7 +34,9 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.*;
@@ -44,16 +51,42 @@ public class JwksHandler extends AbstractHandler {
     private static final String SECURITY_KEY_STORE_LOCATION = "Security.KeyStore.Location";
     private static final String SECURITY_KEY_STORE_PW = "Security.KeyStore.Password";
     private static final String KEYS = "keys";
+    public JWTConfigurationDto jwtConfigurationDto;
 
     public boolean handleRequest(MessageContext messageContext) {
-        log.info("Hello");
-        log.info(getJwksEndpointResponse());
+//        log.info("Hello");
+//        log.info(getJwksEndpointResponse());
+
+        org.apache.axis2.context.MessageContext axis2MsgContext =
+                ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+        Map headers =
+                (Map) (axis2MsgContext).getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+        // Set the content type as application/json
+        headers.put(HttpHeaders.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+
+        // Set the response payload to the message context
+        // Retrieve the response body
+        String payload = getJwksEndpointResponse();
+        axis2MsgContext.getEnvelope().getBody().setText(payload);
+        //body.setText(payload);
+
+        // Get the JWKS endpoint response that is to be sent as the response body and create a new OMElement
+        // representing the new response body
 //        String payload = getJwksEndpointResponse();
+//        OMElement newBody = OMAbstractFactory.getOMFactory().createOMElement(payload, null);
+//
+//        // Replace the existing response body with the new response body
+//        body.getFirstElement().detach();
+//        body.addChild(newBody);
+//        body = axis2MsgContext.getEnvelope().getOMFactory().createOMElement(payload, null);
+//        axis2MsgContext.getEnvelope().getBody().addChild(body);
+
 //        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
 //        axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
 //        axis2MC.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-////        JsonUtil.removeJsonPayload(axis2MC);
-////        ((Axis2MessageContext) messageContext).getAxis2MessageContext().setProperty("ContentType",APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+//        JsonUtil.removeJsonPayload(axis2MC);
+//        ((Axis2MessageContext) messageContext).getAxis2MessageContext().setProperty("ContentType",APIConstants.APPLICATION_JSON_MEDIA_TYPE);
 //        try {
 //            JsonUtil.getNewJsonPayload(axis2MC, payload, true, true);
 //        } catch (AxisFault e) {
@@ -64,19 +97,19 @@ public class JwksHandler extends AbstractHandler {
 //        return "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"kid\":\"MDJlNjIxN2E1OGZlOGVmMGQxOTFlMzBmNmFjZjQ0Y2YwOGY0N2I0YzE4YzZjNjRhYmRmMmQ0ODdiNDhjMGEwMA_RS256\",\"alg\":\"RS256\",\"n\":\"kdgncoCrz655Lq8pTdX07eoVBjdZDCUE6ueBd0D1hpJ0_zE3x3Az6tlvzs98PsPuGzaQOMmuLa4qxNJ-OKxJmutDUlClpuvxuf-jyq4gCV5tEIILWRMBjlBEpJfWm63-VKKU4nvBWNJ7KfhWjl8-DUdNSh2pCDLpUObmb9Kquqc1x4BgttjN4rx_P-3_v-1jETXzIP1L44yHtpQNv0khYf4j_aHjcEri9ykvpz1mtdacbrKK25N4V1HHRwDqZiJzOCCISXDuqB6wguY_v4n0l1XtrEs7iCyfRFwNSKNrLqr23tR1CscmLfbH6ZLg5CYJTD-1uPSx0HMOB4Wv51PbWw\"}]}";
 
     public boolean handleResponse(MessageContext messageContext) {
-        log.info("World");
-        log.info(getJwksEndpointResponse());
-        String payload = getJwksEndpointResponse();
-        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-        axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-        axis2MC.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-        //        JsonUtil.removeJsonPayload(axis2MC);
-        //        ((Axis2MessageContext) messageContext).getAxis2MessageContext().setProperty("ContentType",APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-        try {
-            JsonUtil.getNewJsonPayload(axis2MC, payload, true, true);
-        } catch (AxisFault e) {
-            throw new RuntimeException(e);
-        }
+//        log.info("World");
+//        log.info(getJwksEndpointResponse());
+//        String payload = getJwksEndpointResponse();
+//        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+//        axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+//        axis2MC.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+//        //        JsonUtil.removeJsonPayload(axis2MC);
+//        //        ((Axis2MessageContext) messageContext).getAxis2MessageContext().setProperty("ContentType",APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+//        try {
+//            JsonUtil.getNewJsonPayload(axis2MC, payload, true, true);
+//        } catch (AxisFault e) {
+//            throw new RuntimeException(e);
+//        }
         return true;
     }
 
@@ -127,23 +160,24 @@ public class JwksHandler extends AbstractHandler {
         OAuthServerConfiguration config = OAuthServerConfiguration.getInstance();
         JWSAlgorithm accessTokenSignAlgorithm =
                 OAuth2Util.mapSignatureAlgorithmForJWSAlgorithm(config.getSignatureAlgorithm());
-        // If we read different algorithms from identity.xml then put them in a list.
         List<JWSAlgorithm> diffAlgorithms = findDifferentAlgorithms(accessTokenSignAlgorithm, config);
         // Create JWKS for different algorithms using new KeyID creation method.
         for (Map.Entry certificateWithAlias : certificates.entrySet()) {
             for (JWSAlgorithm algorithm : diffAlgorithms) {
                 Certificate cert = (Certificate) certificateWithAlias.getValue();
-                String alias = (String) certificateWithAlias.getKey();
                 RSAPublicKey publicKey = (RSAPublicKey) cert.getPublicKey();
                 RSAKey.Builder jwk = new RSAKey.Builder(publicKey);
-//                String publicCertThumbprint = OAuth2Util.getThumbPrint(cert);
-//                String base64UrlEncodedThumbprint = java.util.Base64.getUrlEncoder()
-//                        .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
-//                jwk.keyID(JWTUtil.getKID(base64UrlEncodedThumbprint, algorithm));
-                jwk.keyID(OAuth2Util.getKID(cert, algorithm, getTenantDomain()));
-                jwk.algorithm(algorithm);
-                jwk.keyUse(KeyUse.parse(KEY_USE));
-                jwksArray.put(jwk.build().toJSONObject());
+
+                try {
+                    String base64UrlEncodedThumbPrint = JWTUtil.generateThumbprint("SHA-1", cert, true);
+                    jwk.keyID(JWTUtil.getKID(base64UrlEncodedThumbPrint, algorithm.toString()));
+                    jwk.algorithm(algorithm);
+                    jwk.keyUse(KeyUse.parse(KEY_USE));
+                    jwksArray.put(jwk.build().toJSONObject());
+                } catch (NoSuchAlgorithmException | CertificateEncodingException e) {
+                    String errorMessage = "Error in generating certificate thumbprint";
+                    return logAndReturnError(errorMessage, e);
+                }
             }
         }
         jwksJson.put(KEYS, jwksArray);
