@@ -30,7 +30,6 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.common.gateway.exception.JWTGeneratorException;
 import org.wso2.carbon.apimgt.common.gateway.jwtgenerator.JWTSignatureAlg;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -83,23 +82,26 @@ public final class JWTUtil {
     public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws
             JWTGeneratorException {
 
+        /*
+         * Sample header
+         * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
+         * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256"}
+         * {"typ":"JWT", "alg":"[2]", "x5t":"[1]", "x5t":"[1]"}
+         * */
+
         try {
-            //generate the SHA-1 thumbprint of the certificate
-            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
-            byte[] der = publicCert.getEncoded();
-            digestValue.update(der);
-            byte[] digestInBytes = digestValue.digest();
-            String publicCertThumbprint = hexify(digestInBytes);
-            String base64UrlEncodedThumbPrint;
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+//            //generate the SHA-1 thumbprint of the certificate
+//            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
+//            byte[] der = publicCert.getEncoded();
+//            digestValue.update(der);
+//            byte[] digestInBytes = digestValue.digest();
+//            String publicCertThumbprint = hexify(digestInBytes);
+//            String base64UrlEncodedThumbPrint;
+//            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
+//                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
             StringBuilder jwtHeader = new StringBuilder();
-            /*
-             * Sample header
-             * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
-             * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256"}
-             * {"typ":"JWT", "alg":"[2]", "x5t":"[1]", "x5t":"[1]"}
-             * */
+            String base64UrlEncodedThumbPrint = generateThumbprint("SHA-1", publicCert, true);
+
             jwtHeader.append("{\"typ\":\"JWT\",");
             jwtHeader.append("\"alg\":\"");
             jwtHeader.append(getJWSCompliantAlgorithmCode(signatureAlgorithm));
@@ -116,9 +118,28 @@ public final class JWTUtil {
             jwtHeader.append("}");
             return jwtHeader.toString();
 
-        } catch (NoSuchAlgorithmException | CertificateEncodingException | UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException | CertificateEncodingException e) {
             throw new JWTGeneratorException("Error in generating public certificate thumbprint", e);
         }
+    }
+
+    public static String generateThumbprint(String hashType, Certificate publicCert, boolean usePadding)
+            throws CertificateEncodingException, NoSuchAlgorithmException {
+        MessageDigest digestValue;
+        byte[] der = publicCert.getEncoded();
+        digestValue = MessageDigest.getInstance(hashType);
+        digestValue.update(der);
+        byte[] digestInBytes = digestValue.digest();
+        String publicCertThumbprint = hexify(digestInBytes);
+        String base64UrlEncodedThumbPrint;
+        if (usePadding) {
+            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
+                    .encodeToString(publicCertThumbprint.getBytes(StandardCharsets.UTF_8));
+        } else {
+            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder().withoutPadding()
+                    .encodeToString(publicCertThumbprint.getBytes(StandardCharsets.UTF_8));
+        }
+        return base64UrlEncodedThumbPrint;
     }
 
     /**
@@ -147,7 +168,7 @@ public final class JWTUtil {
      * @param signatureAlgorithm relevant signature algorithm
      * @return KID
      */
-    private static String getKID(String certThumbprint, String signatureAlgorithm) {
+    public static String getKID(String certThumbprint, String signatureAlgorithm) {
 
         return certThumbprint + "_" + signatureAlgorithm;
     }
