@@ -3,24 +3,19 @@ package org.wso2.carbon.apimgt.gateway.handlers.common;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.commons.json.JsonUtil;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.wso2.carbon.apimgt.common.gateway.exception.JWTGeneratorException;
 import org.wso2.carbon.apimgt.common.gateway.util.JWTUtil;
 import org.wso2.carbon.apimgt.impl.APIConstants;
-import org.wso2.carbon.apimgt.common.gateway.dto.JWTConfigurationDto;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
@@ -39,7 +34,11 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation for JWKS endpoint.
@@ -51,68 +50,33 @@ public class JwksHandler extends AbstractHandler {
     private static final String SECURITY_KEY_STORE_LOCATION = "Security.KeyStore.Location";
     private static final String SECURITY_KEY_STORE_PW = "Security.KeyStore.Password";
     private static final String KEYS = "keys";
-    public JWTConfigurationDto jwtConfigurationDto;
 
     public boolean handleRequest(MessageContext messageContext) {
-//        log.info("Hello");
-//        log.info(getJwksEndpointResponse());
-
         org.apache.axis2.context.MessageContext axis2MsgContext =
                 ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-        Map headers =
-                (Map) (axis2MsgContext).getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-
-        // Set the content type as application/json
-        headers.put(HttpHeaders.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-
-        // Set the response payload to the message context
-        // Retrieve the response body
         String payload = getJwksEndpointResponse();
-        axis2MsgContext.getEnvelope().getBody().setText(payload);
-        //body.setText(payload);
 
-        // Get the JWKS endpoint response that is to be sent as the response body and create a new OMElement
-        // representing the new response body
-//        String payload = getJwksEndpointResponse();
-//        OMElement newBody = OMAbstractFactory.getOMFactory().createOMElement(payload, null);
-//
-//        // Replace the existing response body with the new response body
-//        body.getFirstElement().detach();
-//        body.addChild(newBody);
-//        body = axis2MsgContext.getEnvelope().getOMFactory().createOMElement(payload, null);
-//        axis2MsgContext.getEnvelope().getBody().addChild(body);
-
-//        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-//        axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-//        axis2MC.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-//        JsonUtil.removeJsonPayload(axis2MC);
-//        ((Axis2MessageContext) messageContext).getAxis2MessageContext().setProperty("ContentType",APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-//        try {
-//            JsonUtil.getNewJsonPayload(axis2MC, payload, true, true);
-//        } catch (AxisFault e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            JsonUtil.removeJsonPayload(axis2MsgContext);
+            JsonUtil.getNewJsonPayload(axis2MsgContext, payload, true, true);
+            axis2MsgContext.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+            axis2MsgContext.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+            axis2MsgContext.removeProperty(APIConstants.NO_ENTITY_BODY);
+        } catch (AxisFault axisFault) {
+            log.error("Error while setting payload " + axis2MsgContext.getLogIDString(), axisFault);
+        }
         return true;
     }
-//        return "{\"keys\":[{\"kty\":\"RSA\",\"e\":\"AQAB\",\"use\":\"sig\",\"kid\":\"MDJlNjIxN2E1OGZlOGVmMGQxOTFlMzBmNmFjZjQ0Y2YwOGY0N2I0YzE4YzZjNjRhYmRmMmQ0ODdiNDhjMGEwMA_RS256\",\"alg\":\"RS256\",\"n\":\"kdgncoCrz655Lq8pTdX07eoVBjdZDCUE6ueBd0D1hpJ0_zE3x3Az6tlvzs98PsPuGzaQOMmuLa4qxNJ-OKxJmutDUlClpuvxuf-jyq4gCV5tEIILWRMBjlBEpJfWm63-VKKU4nvBWNJ7KfhWjl8-DUdNSh2pCDLpUObmb9Kquqc1x4BgttjN4rx_P-3_v-1jETXzIP1L44yHtpQNv0khYf4j_aHjcEri9ykvpz1mtdacbrKK25N4V1HHRwDqZiJzOCCISXDuqB6wguY_v4n0l1XtrEs7iCyfRFwNSKNrLqr23tR1CscmLfbH6ZLg5CYJTD-1uPSx0HMOB4Wv51PbWw\"}]}";
 
     public boolean handleResponse(MessageContext messageContext) {
-//        log.info("World");
-//        log.info(getJwksEndpointResponse());
-//        String payload = getJwksEndpointResponse();
-//        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-//        axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-//        axis2MC.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-//        //        JsonUtil.removeJsonPayload(axis2MC);
-//        //        ((Axis2MessageContext) messageContext).getAxis2MessageContext().setProperty("ContentType",APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-//        try {
-//            JsonUtil.getNewJsonPayload(axis2MC, payload, true, true);
-//        } catch (AxisFault e) {
-//            throw new RuntimeException(e);
-//        }
         return true;
     }
 
+    /**
+     * This method is used to get the response for the JWKS endpoint using the certificates in the keystore.
+     *
+     * @return JWKS response
+     */
     public String getJwksEndpointResponse() {
         String tenantDomain = getTenantDomain();
         String keyStorePath = CarbonUtils.getServerConfiguration()
@@ -152,8 +116,13 @@ public class JwksHandler extends AbstractHandler {
         }
     }
 
-    private String buildResponse(Map<String, Certificate> certificates)
-            throws IdentityOAuth2Exception, ParseException {
+    /**
+     * JWKS response is formed by considering the map of certificates provided
+     *
+     * @param certificates Map of certificates
+     * @return JWKS response as a JSON string
+     */
+    private String buildResponse(Map<String, Certificate> certificates) throws IdentityOAuth2Exception, ParseException {
 
         JSONArray jwksArray = new JSONArray();
         JSONObject jwksJson = new JSONObject();
@@ -161,7 +130,7 @@ public class JwksHandler extends AbstractHandler {
         JWSAlgorithm accessTokenSignAlgorithm =
                 OAuth2Util.mapSignatureAlgorithmForJWSAlgorithm(config.getSignatureAlgorithm());
         List<JWSAlgorithm> diffAlgorithms = findDifferentAlgorithms(accessTokenSignAlgorithm, config);
-        // Create JWKS for different algorithms using new KeyID creation method.
+
         for (Map.Entry certificateWithAlias : certificates.entrySet()) {
             for (JWSAlgorithm algorithm : diffAlgorithms) {
                 Certificate cert = (Certificate) certificateWithAlias.getValue();
@@ -175,11 +144,11 @@ public class JwksHandler extends AbstractHandler {
                     jwk.keyUse(KeyUse.parse(KEY_USE));
                     jwksArray.put(jwk.build().toJSONObject());
                 } catch (NoSuchAlgorithmException | CertificateEncodingException e) {
-                    String errorMessage = "Error in generating certificate thumbprint";
-                    return logAndReturnError(errorMessage, e);
+                    return logAndReturnError("Error in generating certificate thumbprint", e);
                 }
             }
         }
+
         jwksJson.put(KEYS, jwksArray);
         return jwksJson.toString();
     }
@@ -187,10 +156,10 @@ public class JwksHandler extends AbstractHandler {
     /**
      * This method read identity.xml and find different signing algorithms
      *
-     * @param accessTokenSignAlgorithm
-     * @param config
-     * @return
-     * @throws IdentityOAuth2Exception
+     * @param accessTokenSignAlgorithm Access token signing algorithm
+     * @param config                   OAuthServerConfiguration object
+     * @return List of different signing algorithms
+     * @throws IdentityOAuth2Exception exception
      */
     private List<JWSAlgorithm> findDifferentAlgorithms(
             JWSAlgorithm accessTokenSignAlgorithm, OAuthServerConfiguration config) throws IdentityOAuth2Exception {
@@ -211,6 +180,11 @@ public class JwksHandler extends AbstractHandler {
         return diffAlgorithms;
     }
 
+    /**
+     * Method to get the tenant domain from the thread local properties
+     *
+     * @return tenant domain
+     */
     private String getTenantDomain() {
 
         Object tenantObj = IdentityUtil.threadLocalProperties.get().get(OAuthConstants.TENANT_NAME_FROM_CONTEXT);
@@ -220,19 +194,27 @@ public class JwksHandler extends AbstractHandler {
         return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
     }
 
-    private String logAndReturnError(String errorMesage, Exception e) {
+    /**
+     * This method logs the error and returns the error message
+     *
+     * @param errorMessage error message
+     * @param e exception
+     * @return error message that was logged
+     */
+    private String logAndReturnError(String errorMessage, Exception e) {
 
         if (e != null) {
-            log.error(errorMesage, e);
+            log.error(errorMessage, e);
         } else {
-            log.error(errorMesage);
+            log.error(errorMessage);
         }
-        return errorMesage;
+        return errorMessage;
     }
 
     /**
      * This method generates the key store file name from the Domain Name
      *
+     * @param tenantDomain tenant domain
      * @return key store file name
      */
     private String generateKSNameFromDomainName(String tenantDomain) {
