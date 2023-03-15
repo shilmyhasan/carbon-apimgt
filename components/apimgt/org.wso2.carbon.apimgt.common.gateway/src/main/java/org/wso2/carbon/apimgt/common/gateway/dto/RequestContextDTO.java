@@ -18,15 +18,23 @@
 package org.wso2.carbon.apimgt.common.gateway.dto;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.common.gateway.util.CertUtils;
 
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.util.Map;
 
+import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.X509Certificate;
 
 /**
  * Representation of Request Information.
  */
 public class RequestContextDTO {
+
+    private static final Log log = LogFactory.getLog(RequestContextDTO.class);
 
     // request message information
     MsgInfoDTO msgInfo;
@@ -60,6 +68,18 @@ public class RequestContextDTO {
     public X509Certificate[] getClientCerts() {
 
         return (X509Certificate[]) SerializationUtils.clone(clientCerts);
+    }
+
+    public Certificate[] getClientCertsLatest() {
+
+        X509Certificate[] clientCerts = this.clientCerts;
+        Certificate[] clientCertsLatest = null;
+        try {
+            clientCertsLatest = CertUtils.convertCerts(clientCerts);
+        } catch (CertificateException | CertificateEncodingException e) {
+            log.error("Error while converting client certificates", e);
+        }
+        return clientCertsLatest;
     }
 
     public void setClientCerts(javax.security.cert.X509Certificate[] clientCerts) {
