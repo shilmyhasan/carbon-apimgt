@@ -1328,16 +1328,27 @@ public class OAS3Parser extends APIDefinition {
                 if (securitySchemes != null) {
                     SecurityScheme defaultSecurityScheme = openAPI.getComponents().getSecuritySchemes()
                             .get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
-                    if (defaultSecurityScheme != null) {
-                        OAuthFlow oAuthFlow = defaultSecurityScheme.getFlows().getImplicit();
-                        String authUrl = oAuthFlow.getAuthorizationUrl();
-                        if (StringUtils.isBlank(authUrl)) {
-                            oAuthFlow.setAuthorizationUrl(APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
+                    if (defaultSecurityScheme != null && defaultSecurityScheme.getFlows() != null) {
+                        OAuthFlows flows = defaultSecurityScheme.getFlows();
+                        OAuthFlow oauthFlow = null;
+                        if (flows.getImplicit() != null || flows.getAuthorizationCode() != null) {
+                            oauthFlow =
+                                    flows.getImplicit() != null ? flows.getImplicit() : flows.getAuthorizationCode();
+                            String authUrl = oauthFlow.getAuthorizationUrl();
+                            if (StringUtils.isBlank(authUrl)) {
+                                oauthFlow.setAuthorizationUrl(APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
+                            }
+                        } else if (flows.getClientCredentials() != null) {
+                            oauthFlow = flows.getClientCredentials();
+                        } else if (flows.getPassword() != null) {
+                            oauthFlow = flows.getPassword();
                         }
-                        Scopes scopes = oAuthFlow.getScopes();
-                        if (scopes == null) {
-                            Scopes newScopes = new Scopes();
-                            oAuthFlow.setScopes(newScopes);
+                        if (oauthFlow != null) {
+                            Scopes scopes = oauthFlow.getScopes();
+                            if (scopes == null) {
+                                Scopes newScopes = new Scopes();
+                                oauthFlow.setScopes(newScopes);
+                            }
                         }
                     }
                 }
