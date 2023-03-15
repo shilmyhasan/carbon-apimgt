@@ -1329,28 +1329,26 @@ public class OAS3Parser extends APIDefinition {
                     SecurityScheme defaultSecurityScheme = openAPI.getComponents().getSecuritySchemes()
                             .get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
                     if (defaultSecurityScheme != null && defaultSecurityScheme.getFlows() != null) {
-                        OAuthFlow oAuthFlow;
-                        if (defaultSecurityScheme.getFlows().getImplicit() != null) {
-                            oAuthFlow = defaultSecurityScheme.getFlows().getImplicit();
-                            String authUrl = oAuthFlow.getAuthorizationUrl();
+                        OAuthFlows flows = defaultSecurityScheme.getFlows();
+                        OAuthFlow oauthFlow = null;
+                        if (flows.getImplicit() != null || flows.getAuthorizationCode() != null) {
+                            oauthFlow =
+                                    flows.getImplicit() != null ? flows.getImplicit() : flows.getAuthorizationCode();
+                            String authUrl = oauthFlow.getAuthorizationUrl();
                             if (StringUtils.isBlank(authUrl)) {
-                                oAuthFlow.setAuthorizationUrl(APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
+                                oauthFlow.setAuthorizationUrl(APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
                             }
-                        } else if (defaultSecurityScheme.getFlows().getAuthorizationCode() != null) {
-                            oAuthFlow = defaultSecurityScheme.getFlows().getAuthorizationCode();
-                            String authUrl = oAuthFlow.getAuthorizationUrl();
-                            if (StringUtils.isBlank(authUrl)) {
-                                oAuthFlow.setAuthorizationUrl(APIConstants.OPENAPI_DEFAULT_AUTHORIZATION_URL);
-                            }
-                        } else if (defaultSecurityScheme.getFlows().getClientCredentials() != null) {
-                            oAuthFlow = defaultSecurityScheme.getFlows().getClientCredentials();
-                        } else {
-                            oAuthFlow = defaultSecurityScheme.getFlows().getPassword();
+                        } else if (flows.getClientCredentials() != null) {
+                            oauthFlow = flows.getClientCredentials();
+                        } else if (flows.getPassword() != null) {
+                            oauthFlow = flows.getPassword();
                         }
-                        Scopes scopes = oAuthFlow.getScopes();
-                        if (scopes == null) {
-                            Scopes newScopes = new Scopes();
-                            oAuthFlow.setScopes(newScopes);
+                        if (oauthFlow != null) {
+                            Scopes scopes = oauthFlow.getScopes();
+                            if (scopes == null) {
+                                Scopes newScopes = new Scopes();
+                                oauthFlow.setScopes(newScopes);
+                            }
                         }
                     }
                 }
