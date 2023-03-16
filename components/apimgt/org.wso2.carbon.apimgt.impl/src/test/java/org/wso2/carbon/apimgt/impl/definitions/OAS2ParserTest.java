@@ -28,6 +28,7 @@ import io.swagger.parser.SwaggerParser;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.model.API;
@@ -43,6 +44,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.mockito.Mockito.when;
 
 public class OAS2ParserTest extends OASTestBase {
     private OAS2Parser oas2Parser = new OAS2Parser();
@@ -156,4 +159,23 @@ public class OAS2ParserTest extends OASTestBase {
         Assert.assertEquals(oas2Parser.removeResponsesObject(swagger,swaggerWithoutResponsesObject),
                 oas2Parser.removeResponsesObject(swagger,swaggerWithResponsesObject));
     }
+
+    @Test
+    public void testRootLevelApplicationSecurity() throws Exception {
+        String apiSecurity = "oauth2,oauth_basic_auth_api_key_mandatory,api_key";
+        String oasDefinition = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
+                        + File.separator + "oas2_app_security.json"),
+                "UTF-8");
+        String oasDefinitionEdited = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
+                        + File.separator + "oas2_app_security_key.json"),
+                "UTF-8");
+        API api = Mockito.mock(API.class);
+        when(api.getApiSecurity()).thenReturn(apiSecurity);
+        APIDefinition parser = OASParserUtil.getOASParser(oasDefinition);
+        String response = parser.getOASDefinitionForPublisher(api, oasDefinition);
+        Assert.assertEquals(oasDefinitionEdited, response);
+    }
+
 }
