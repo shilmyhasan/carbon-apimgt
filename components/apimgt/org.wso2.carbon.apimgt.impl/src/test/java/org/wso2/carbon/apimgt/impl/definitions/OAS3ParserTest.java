@@ -186,4 +186,28 @@ public class OAS3ParserTest extends OASTestBase {
         Assert.assertThat(openAPI.getSecurity(), hasItems(secReq));
     }
 
+    // Test case for an API with clientCredentials security scheme
+    @Test
+    public void testProcessOtherSchemeScopesWithClientCredentialsScheme() throws Exception {
+        //Read the API definition file
+        String relativePath = "definitions" + File.separator + "oas3" + File.separator
+                + "oas3_client_credential_security_scheme.yaml";
+        String swaggerContent = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath),
+                "UTF-8");
+        swaggerContent = oas3Parser.processOtherSchemeScopes(swaggerContent);
+        OpenAPI openAPI = oas3Parser.getOpenAPI(swaggerContent);
+        //Take the default security schema, where only the token url is not null
+        SecurityScheme defaultSecScheme = openAPI.getComponents().getSecuritySchemes()
+                .get(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY);
+        //Check whether the default security schema is not null
+        Assert.assertNotNull(defaultSecScheme);
+        //Check whether the default security flows are not null
+        Assert.assertNotNull(defaultSecScheme.getFlows());
+        //Check whether the token url is available
+        Assert.assertNotNull(defaultSecScheme.getFlows().getClientCredentials().getTokenUrl());
+        //Check whether the authorization url and scopes are null
+        Assert.assertNull(defaultSecScheme.getFlows().getClientCredentials().getAuthorizationUrl());
+        Assert.assertNull(defaultSecScheme.getFlows().getClientCredentials().getScopes());
+    }
+
 }
