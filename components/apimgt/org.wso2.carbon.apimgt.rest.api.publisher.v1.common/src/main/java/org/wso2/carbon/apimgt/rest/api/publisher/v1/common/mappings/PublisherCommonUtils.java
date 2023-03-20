@@ -615,7 +615,6 @@ public class PublisherCommonUtils {
         String userName = RestApiCommonUtil.getLoggedInUsername();
         boolean isMatched = false;
         String[] userRoleList = null;
-        String[] tenantRoleList = APIUtil.getRoleNames(userName);
 
         if (APIUtil.hasPermission(userName, APIConstants.Permissions.APIM_ADMIN)) {
             isMatched = true;
@@ -624,6 +623,7 @@ public class PublisherCommonUtils {
         }
         if (inputRoles != null && !inputRoles.isEmpty()) {
             if (Boolean.parseBoolean(System.getProperty(APIConstants.CASE_SENSITIVE_CHECK_PATH))) {
+                String[] tenantRoleList = APIUtil.getRoleNames(userName);
                 String status = "";
                 if (tenantRoleList != null || userRoleList != null) {
                     for (String inputRole : inputRoles) {
