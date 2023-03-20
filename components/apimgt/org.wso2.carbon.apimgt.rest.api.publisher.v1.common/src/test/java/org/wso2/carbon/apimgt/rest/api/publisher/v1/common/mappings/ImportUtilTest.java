@@ -19,9 +19,9 @@
 package org.wso2.carbon.apimgt.rest.api.publisher.v1.common.mappings;
 
 import com.google.gson.JsonObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
