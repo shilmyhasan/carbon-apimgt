@@ -47,6 +47,7 @@ import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.CORSConfiguration;
 import org.wso2.carbon.apimgt.api.model.Documentation;
 import org.wso2.carbon.apimgt.api.model.DocumentationType;
+import org.wso2.carbon.apimgt.api.model.EndpointSecurity;
 import org.wso2.carbon.apimgt.api.model.KeyManager;
 import org.wso2.carbon.apimgt.api.model.KeyManagerConfiguration;
 import org.wso2.carbon.apimgt.api.model.Label;
@@ -2083,6 +2084,20 @@ public class APIUtilTest {
         Assert.assertFalse(APIUtil.isRoleExistForUser(userName, null));
         Assert.assertFalse(APIUtil.isRoleExistForUser(userName, "test"));
         */
+    }
+
+    @Test
+    public void testSetEndpointSecurityForAPIProduct() throws Exception {
+        API api = new API(new APIIdentifier("admin", "test", "1.0"));
+        api.setEndpointUTPassword("testpassword");
+        api.setEndpointUTUsername("testuser");
+        api.setEndpointSecured(true);
+        Map<String, EndpointSecurity> map = APIUtil.setEndpointSecurityForAPIProduct(api);
+        Assert.assertEquals("Username mismatch for endpoint", "testuser",
+                map.get(APIConstants.ENDPOINT_SECURITY).getUsername());
+        Assert.assertEquals("Password mismatch for endpoint", "testpassword",
+                map.get(APIConstants.ENDPOINT_SECURITY).getPassword());
+
     }
 
     @Test
