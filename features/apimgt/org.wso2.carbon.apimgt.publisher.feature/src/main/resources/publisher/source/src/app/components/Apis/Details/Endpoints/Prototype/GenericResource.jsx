@@ -50,7 +50,7 @@ const MonacoEditor = lazy(() => import('react-monaco-editor' /* webpackChunkName
  * */
 function GenericResource(props) {
     const {
-        resourcePath, resourceMethod, scriptContent, onChange, originalScript, setMockValueDetails,
+        resourcePath, resourceMethod, scriptContent, onChange, originalScript,
     } = props;
     const { api } = useContext(APIContext);
     const [showReset, setShowReset] = useState(false);
@@ -127,7 +127,6 @@ function GenericResource(props) {
                                     color='primary'
                                     onClick={() => {
                                         setShowReset(false);
-                                        setMockValueDetails({ resourcePath, resourceMethod });
                                         onChange(originalScript, resourcePath, resourceMethod);
                                     }}
                                 >
@@ -149,7 +148,6 @@ function GenericResource(props) {
                                     language='javascript'
                                     onChange={(content) => {
                                         setShowReset(true);
-                                        setMockValueDetails({ resourcePath, resourceMethod });
                                         onChange(content, resourcePath, resourceMethod);
                                     }}
                                 />
