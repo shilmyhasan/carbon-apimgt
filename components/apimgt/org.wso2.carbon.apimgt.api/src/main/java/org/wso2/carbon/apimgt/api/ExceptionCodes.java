@@ -96,6 +96,7 @@ public enum ExceptionCodes implements ErrorHandler {
             "Invalid additional properties for API: %s:%s"),
     INVALID_CONTEXT(900346, "Invalid context provided", 400, "Invalid context provided for API: %s:%s"),
     INVALID_ENDPOINT_URL(900346, "Endpoint URL(s) is(are) not valid", 400, "Endpoint URL(s) is(are) not valid"),
+
     USER_ROLES_CANNOT_BE_NULL(900610, "User roles cannot be found", 400, "User roles cannot be found"),
     API_REVISION_NOT_FOUND(900347, "API Revision Not Found", 404, "Requested API Revision with id %s not found"),
     EXISTING_API_REVISION_DEPLOYMENT_FOUND(900348, "Can not delete API Revision ", 400, "Couldn't delete API revision since API revision is currently deployed to a gateway. " +
@@ -510,8 +511,8 @@ public enum ExceptionCodes implements ErrorHandler {
     SUBSCRIPTION_TIER_NOT_ALLOWED(902002, "Subscription Tier is not allowed for user", 403, "Subscription Tier %s is" +
             " not allowed for user %s ", false),
     INVALID_KEY_MANAGER_REQUEST(902003, "Invalid Request sent to Key Manager.", 400, "Invalid Request sent to Key Manager.Error from Backend : %s", false),
-    INTERNAL_SERVER_ERROR_FROM_KEY_MANAGER(902004, "Internal Server Error from Key Manager", 500, "Internal Server Error from Key Manager.Error from Backend : %s", true);
-
+    INTERNAL_SERVER_ERROR_FROM_KEY_MANAGER(902004, "Internal Server Error from Key Manager", 500, "Internal Server Error from Key Manager.Error from Backend : %s", true),
+    INVALID_ENDPOINT_CONFIG(902012, "Endpoint config value(s) is(are) not valid", 400, "Endpoint config value(s) is(are) not valid");
     private final long errorCode;
     private final String errorMessage;
     private final int httpStatusCode;
