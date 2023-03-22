@@ -29,7 +29,7 @@ public class AbstractAPIMgtGatewayJWTGeneratorTest {
         // Test whether the encode method is base64 encoding.
         AbstractAPIMgtGatewayJWTGenerator apiMgtGatewayJWTGenerator = new APIMgtGatewayJWTGeneratorImpl();
         String stringToBeEncoded = "<<???>>";
-        String expectedEncodedString = "PDw/Pz8+Pg";
+        String expectedEncodedString = "PDw/Pz8+Pg==";
         try {
             String actualEncodedString = apiMgtGatewayJWTGenerator.encode(stringToBeEncoded.getBytes());
             Assert.assertEquals(expectedEncodedString, actualEncodedString);
