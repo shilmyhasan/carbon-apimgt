@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.apimgt.gateway.handlers.security;
 
+import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.parser.core.models.ParseOptions;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -283,6 +286,11 @@ public class TestSchemaValidator {
         String contentType = "application/json";
         String ApiId = "admin-SwaggerPetstore-1.0.0";
 
+        OpenAPIParser parser = new OpenAPIParser();
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolveFully(true);
+        OpenAPI openAPI = parser.readContents(swaggerValue, null, parseOptions).getOpenAPI();
+
         Mockito.doReturn(env).when(messageContext).getEnvelope();
         // Mockito.when()
 
@@ -308,6 +316,8 @@ public class TestSchemaValidator {
                 thenReturn(httpMethod);
         Mockito.when((String) messageContext.getProperty(APIMgtGatewayConstants.OPEN_API_STRING))
                 .thenReturn(swaggerValue);
+        Mockito.when((OpenAPI) messageContext.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT))
+                .thenReturn(openAPI);
         Map<String, String> headers = new HashMap<>();
         headers.put(CONTENT_TYPE_HEADER, contentType);
         Mockito.when(axis2MsgContext.getProperty(TRANSPORT_HEADERS)).thenReturn(headers);
