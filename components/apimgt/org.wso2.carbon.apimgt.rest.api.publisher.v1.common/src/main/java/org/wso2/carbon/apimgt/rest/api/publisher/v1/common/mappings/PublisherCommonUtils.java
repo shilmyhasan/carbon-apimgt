@@ -110,7 +110,7 @@ import java.util.Set;
 public class PublisherCommonUtils {
 
     private static final Log log = LogFactory.getLog(PublisherCommonUtils.class);
-    private static final String SESSION_TIMEOUT_CONFIG_KEY = "sessionTimeOut";
+    public static final String SESSION_TIMEOUT_CONFIG_KEY = "sessionTimeOut";
     /**
      * Update an API.
      *
@@ -952,7 +952,7 @@ public class PublisherCommonUtils {
                         }
                         try {
                             Long.parseLong(strVal);
-                        } catch (Exception e) {
+                        } catch (NumberFormatException e) {
                             log.error("Failed to parse " + SESSION_TIMEOUT_CONFIG_KEY, e);
                             return false;
                         }
