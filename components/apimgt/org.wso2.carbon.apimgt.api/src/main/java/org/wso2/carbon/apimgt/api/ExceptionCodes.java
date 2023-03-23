@@ -510,8 +510,8 @@ public enum ExceptionCodes implements ErrorHandler {
     SUBSCRIPTION_TIER_NOT_ALLOWED(902002, "Subscription Tier is not allowed for user", 403, "Subscription Tier %s is" +
             " not allowed for user %s ", false),
     INVALID_KEY_MANAGER_REQUEST(902003, "Invalid Request sent to Key Manager.", 400, "Invalid Request sent to Key Manager.Error from Backend : %s", false),
-    INTERNAL_SERVER_ERROR_FROM_KEY_MANAGER(902004, "Internal Server Error from Key Manager", 500, "Internal Server Error from Key Manager.Error from Backend : %s", true);
-
+    INTERNAL_SERVER_ERROR_FROM_KEY_MANAGER(902004, "Internal Server Error from Key Manager", 500, "Internal Server Error from Key Manager.Error from Backend : %s", true),
+    INVALID_ENDPOINT_CONFIG(902012, "Endpoint config value(s) is(are) not valid", 400, "Endpoint config value(s) is(are) not valid");
     private final long errorCode;
     private final String errorMessage;
     private final int httpStatusCode;

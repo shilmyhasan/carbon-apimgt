@@ -792,7 +792,10 @@ public class ApisApiServiceImpl implements ApisApiService {
             String organization = RestApiUtil.getValidatedOrganization(messageContext);
             //validate if api exists
             validateAPIExistence(apiId);
-
+            if (!PublisherCommonUtils.validateEndpointConfigs(body)) {
+                throw new APIManagementException("Invalid endpoint configs detected",
+                        ExceptionCodes.INVALID_ENDPOINT_CONFIG);
+            }
             // validate sandbox and production endpoints
             if (!PublisherCommonUtils.validateEndpoints(body)) {
                 throw new APIManagementException("Invalid/Malformed endpoint URL(s) detected",
