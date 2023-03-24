@@ -88,13 +88,7 @@ import org.wso2.carbon.apimgt.impl.indexing.indexer.DocumentIndexer;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationEvent;
 import org.wso2.carbon.apimgt.impl.token.ClaimsRetriever;
-import org.wso2.carbon.apimgt.impl.utils.APIAPIProductNameComparator;
-import org.wso2.carbon.apimgt.impl.utils.APINameComparator;
-import org.wso2.carbon.apimgt.impl.utils.APIProductNameComparator;
-import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.apimgt.impl.utils.ContentSearchResultNameComparator;
-import org.wso2.carbon.apimgt.impl.utils.LRUCache;
-import org.wso2.carbon.apimgt.impl.utils.TierNameComparator;
+import org.wso2.carbon.apimgt.impl.utils.*;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.apimgt.persistence.APIPersistence;
 import org.wso2.carbon.apimgt.persistence.PersistenceManager;
@@ -141,6 +135,7 @@ import org.wso2.carbon.registry.indexing.service.ContentBasedSearchService;
 import org.wso2.carbon.registry.indexing.service.SearchResultsBean;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.TenantManager;
+import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -168,6 +163,7 @@ import java.util.UUID;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import static org.wso2.carbon.apimgt.impl.APIConstants.API_PUBLISHER_ENABLE_API_DOC_VISIBILITY_LEVELS;
 import static org.wso2.carbon.apimgt.impl.workflow.WorkflowConstants.WF_TYPE_AM_API_STATE;
 
 /**
@@ -1351,25 +1347,82 @@ public abstract class AbstractAPIManager implements APIManager {
         Organization org = new Organization(tenantDomain);
         UserContext ctx = new UserContext(username, org, null, null);
         List<Documentation> convertedList = null;
+        boolean isDocVisibilityEnabled = Boolean.parseBoolean(
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                        getAPIManagerConfiguration().getFirstProperty(
+                                APIConstants.API_PUBLISHER_ENABLE_API_DOC_VISIBILITY_LEVELS));
         try {
             DocumentSearchResult list =
                     apiPersistenceInstance.searchDocumentation(org, uuid, 0, 0, null, ctx);
             if (list != null) {
                 convertedList = new ArrayList<Documentation>();
+                List<Documentation> privateDocs = new ArrayList<Documentation>();
                 List<org.wso2.carbon.apimgt.persistence.dto.Documentation> docList = list.getDocumentationList();
                 if (docList != null) {
                     for (int i = 0; i < docList.size(); i++) {
-                        convertedList.add(DocumentMapper.INSTANCE.toDocumentation(docList.get(i)));
+                        if (!isDocVisibilityEnabled) {
+                            convertedList.add(DocumentMapper.INSTANCE.toDocumentation(docList.get(i)));
+                        } else {
+                            org.wso2.carbon.apimgt.persistence.dto.Documentation doc = docList.get(i);
+                            if (APIConstants.DOC_API_BASED_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
+                                convertedList.add(DocumentMapper.INSTANCE.toDocumentation(docList.get(i)));
+                            }
+                            if (APIConstants.DOC_OWNER_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
+                                if (APIConstants.WSO2_ANONYMOUS_USER != username
+                                        && !isTenantDomainNotMatching(tenantDomain)) {
+                                    convertedList.add(DocumentMapper.INSTANCE.toDocumentation(docList.get(i)));
+                                }
+                            }
+                            if (APIConstants.DOC_SHARED_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
+                                if (APIConstants.WSO2_ANONYMOUS_USER != username) {
+                                    privateDocs.add(DocumentMapper.INSTANCE.toDocumentation(docList.get(i)));
+                                }
+                            }
+
+                        }
+                    }
+
+                    if (isDocVisibilityEnabled && privateDocs.size() > 0) {
+                        if (validatePrivateScopes(username, tenantDomain)) {
+                            convertedList.addAll(privateDocs);
+                        }
                     }
                 }
             } else {
                 convertedList = new ArrayList<Documentation>();
             }
-        } catch (DocumentationPersistenceException e) {
+        } catch (DocumentationPersistenceException | org.wso2.carbon.user.api.UserStoreException e) {
             String msg = "Failed to get documentations for api/product " + uuid;
             throw new APIManagementException(msg, e);
         }
         return convertedList;
+    }
+
+    /**
+     * Validates whether the user has creator or publisher scopes for the documentation visibility control.
+     *
+     * @param username      Username
+     * @param tenantDomain  Tenant domain
+     * @return true if user has creator or publisher scopes
+     * @throws UserStoreException if user store is not found.
+     */
+    private boolean validatePrivateScopes(String username, String tenantDomain) throws org.wso2.carbon.user.api.UserStoreException {
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+
+        String[] roleList = ServiceReferenceHolder.getInstance().getRealmService().getTenantUserRealm(tenantId)
+                .getUserStoreManager().getRoleListOfUser(MultitenantUtils.getTenantAwareUsername(username));
+        Map<String, String> restAPIScopes = APIUtil.getRESTAPIScopesForTenant(tenantDomain);
+
+        Set<String> roles = new HashSet();
+        roles.addAll(Arrays.asList(restAPIScopes.get(APIConstants.APIM_CREATOR_SCOPE).split(",")));
+        roles.addAll(Arrays.asList(restAPIScopes.get(APIConstants.APIM_PUBLISHER_SCOPE).split(",")));
+
+        for (String userRole : roleList) {
+            if (roles.contains(userRole)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Documentation> getAllDocumentation(Identifier id) throws APIManagementException {
