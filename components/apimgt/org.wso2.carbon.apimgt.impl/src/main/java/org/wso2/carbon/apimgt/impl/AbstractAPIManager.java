@@ -163,7 +163,6 @@ import java.util.UUID;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
-import static org.wso2.carbon.apimgt.impl.APIConstants.API_PUBLISHER_ENABLE_API_DOC_VISIBILITY_LEVELS;
 import static org.wso2.carbon.apimgt.impl.workflow.WorkflowConstants.WF_TYPE_AM_API_STATE;
 
 /**
