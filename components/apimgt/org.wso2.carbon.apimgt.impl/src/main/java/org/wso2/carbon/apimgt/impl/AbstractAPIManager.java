@@ -135,7 +135,6 @@ import org.wso2.carbon.registry.indexing.service.ContentBasedSearchService;
 import org.wso2.carbon.registry.indexing.service.SearchResultsBean;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.TenantManager;
-import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -1382,7 +1381,9 @@ public abstract class AbstractAPIManager implements APIManager {
                     }
 
                     if (isDocVisibilityEnabled && privateDocs.size() > 0) {
-                        if (validatePrivateScopes(username, tenantDomain)) {
+                        String loggedInTenantDomain =
+                                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                        if (validatePrivateScopes(username, loggedInTenantDomain)) {
                             convertedList.addAll(privateDocs);
                         }
                     }
@@ -1400,17 +1401,17 @@ public abstract class AbstractAPIManager implements APIManager {
     /**
      * Validates whether the user has creator or publisher scopes for the documentation visibility control.
      *
-     * @param username      Username
-     * @param tenantDomain  Tenant domain
+     * @param username              Username
+     * @param loggedInTenantDomain  Logged in Tenant domain
      * @return true if user has creator or publisher scopes
      * @throws UserStoreException if user store is not found.
      */
-    private boolean validatePrivateScopes(String username, String tenantDomain) throws org.wso2.carbon.user.api.UserStoreException {
-        int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+    private boolean validatePrivateScopes(String username, String loggedInTenantDomain) throws org.wso2.carbon.user.api.UserStoreException {
+        int tenantId = APIUtil.getTenantIdFromTenantDomain(loggedInTenantDomain);
 
         String[] roleList = ServiceReferenceHolder.getInstance().getRealmService().getTenantUserRealm(tenantId)
                 .getUserStoreManager().getRoleListOfUser(MultitenantUtils.getTenantAwareUsername(username));
-        Map<String, String> restAPIScopes = APIUtil.getRESTAPIScopesForTenant(tenantDomain);
+        Map<String, String> restAPIScopes = APIUtil.getRESTAPIScopesForTenant(loggedInTenantDomain);
 
         Set<String> roles = new HashSet();
         roles.addAll(Arrays.asList(restAPIScopes.get(APIConstants.APIM_CREATOR_SCOPE).split(",")));
@@ -1642,7 +1643,8 @@ public abstract class AbstractAPIManager implements APIManager {
         try {
             org.wso2.carbon.apimgt.persistence.dto.Documentation doc = apiPersistenceInstance
                     .getDocumentation(new Organization(requestedTenantDomain), apiId, docId);
-            if (doc != null) {
+            if (doc != null && isDocVisible(doc, requestedTenantDomain)) {
+
                 if (log.isDebugEnabled()) {
                     log.debug("Retrieved doc: " + doc);
                 }
@@ -1652,10 +1654,58 @@ public abstract class AbstractAPIManager implements APIManager {
                         + " does not exist";
                 throw new APIMgtResourceNotFoundException(msg);
             }
-        } catch (DocumentationPersistenceException e) {
+        } catch (DocumentationPersistenceException | APIManagementException e) {
             throw new APIManagementException("Error while retrieving document for id " + docId, e);
         }
         return documentation;
+    }
+
+
+    /**
+     * Validate the document for doc visibility
+     *
+     * @param doc         Document ID
+     * @return False      if user is not authorized to view the document
+     */
+    public boolean isDocVisible(org.wso2.carbon.apimgt.persistence.dto.Documentation doc,
+                             String requestedTenantDomain) throws APIManagementException {
+        boolean isDocVisibilityEnabled = Boolean.parseBoolean(
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                        getAPIManagerConfiguration().getFirstProperty(
+                                APIConstants.API_PUBLISHER_ENABLE_API_DOC_VISIBILITY_LEVELS));
+
+        if (!isDocVisibilityEnabled) {
+            return true;
+        }
+
+        String username = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String loggedInTenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+        boolean validDoc = false;
+        if (APIConstants.DOC_API_BASED_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
+            validDoc = true;
+        } else if (APIConstants.DOC_OWNER_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
+            if (APIConstants.WSO2_ANONYMOUS_USER != username && !isTenantDomainNotMatching(requestedTenantDomain)) {
+                validDoc = true;
+            }
+        } else if (APIConstants.DOC_SHARED_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
+            if (APIConstants.WSO2_ANONYMOUS_USER != username) {
+                try {
+                    if (validatePrivateScopes(username, loggedInTenantDomain)) {
+                        validDoc = true;
+                    }
+                } catch (org.wso2.carbon.user.api.UserStoreException e) {
+                    throw new APIManagementException(e);
+                }
+            }
+        }
+
+        if(!validDoc) {
+            if (log.isDebugEnabled()) {
+                log.debug("User " + username + " cannot view the requested document " + doc.getId());
+            }
+        }
+        return validDoc;
     }
 
     @Override
