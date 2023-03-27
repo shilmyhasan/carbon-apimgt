@@ -74,10 +74,12 @@ public class RequestContextDTO {
 
         X509Certificate[] clientCerts = this.clientCerts;
         Certificate[] clientCertsLatest = null;
-        try {
-            clientCertsLatest = CertUtils.convertCerts(clientCerts);
-        } catch (CertificateException | CertificateEncodingException e) {
-            log.error("Error while converting client certificates", e);
+        if (clientCerts != null) {
+            try {
+                clientCertsLatest = CertUtils.convertCerts(clientCerts);
+            } catch (CertificateException | CertificateEncodingException e) {
+                log.error("Error while converting client certificates", e);
+            }
         }
         return clientCertsLatest;
     }
