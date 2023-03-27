@@ -1406,7 +1406,8 @@ public abstract class AbstractAPIManager implements APIManager {
      * @return true if user has creator or publisher scopes
      * @throws UserStoreException if user store is not found.
      */
-    private boolean validatePrivateScopes(String username, String loggedInTenantDomain) throws org.wso2.carbon.user.api.UserStoreException {
+    private boolean validatePrivateScopes(String username, String loggedInTenantDomain)
+            throws org.wso2.carbon.user.api.UserStoreException {
         int tenantId = APIUtil.getTenantIdFromTenantDomain(loggedInTenantDomain);
 
         String[] roleList = ServiceReferenceHolder.getInstance().getRealmService().getTenantUserRealm(tenantId)
