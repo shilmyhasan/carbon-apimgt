@@ -41,18 +41,7 @@ import org.wso2.carbon.apimgt.impl.dto.EventHubConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
 import org.wso2.carbon.apimgt.impl.dto.WebhooksDTO;
 import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.exception.ArtifactSynchronizerException;
-import org.wso2.carbon.apimgt.impl.notifier.events.APIEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.APIPolicyEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationPolicyEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationRegistrationEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.CertificateEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.DeployAPIInGatewayEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.GoogleAnalyticsConfigEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.PolicyEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.ScopeEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionPolicyEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.*;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
@@ -143,7 +132,7 @@ public class GatewayJMSMessageListener implements MessageListener {
 
         if (APIConstants.EventType.DEPLOY_API_IN_GATEWAY.name().equals(eventType)
                 || APIConstants.EventType.REMOVE_API_FROM_GATEWAY.name().equals(eventType)) {
-            Thread handleGatewayNotificationMessageThread = new Thread(()->{
+            Thread handleGatewayNotificationMessageThread = new Thread(() -> {
                 DeployAPIInGatewayEvent gatewayEvent = new Gson().fromJson(new String(eventDecoded),
                         DeployAPIInGatewayEvent.class);
                 String tenantDomain = gatewayEvent.getTenantDomain();
@@ -206,7 +195,8 @@ public class GatewayJMSMessageListener implements MessageListener {
         if (EventType.APPLICATION_CREATE.toString().equals(eventType)
                 || EventType.APPLICATION_UPDATE.toString().equals(eventType)) {
             ApplicationEvent event = new Gson().fromJson(eventJson, ApplicationEvent.class);
-            ServiceReferenceHolder.getInstance().getKeyManagerDataService().addOrUpdateApplication(event);;
+            ServiceReferenceHolder.getInstance().getKeyManagerDataService().addOrUpdateApplication(event);
+            ;
         } else if (EventType.SUBSCRIPTIONS_CREATE.toString().equals(eventType)
                 || EventType.SUBSCRIPTIONS_UPDATE.toString().equals(eventType)) {
             SubscriptionEvent event = new Gson().fromJson(eventJson, SubscriptionEvent.class);
@@ -219,7 +209,7 @@ public class GatewayJMSMessageListener implements MessageListener {
             APIEvent event = new Gson().fromJson(eventJson, APIEvent.class);
             if (APIStatus.RETIRED.toString().equals(event.getApiStatus())) {
                 ServiceReferenceHolder.getInstance().getKeyManagerDataService().removeAPI(event);
-                DataHolder.getInstance().removeAPIFromAllTenantMap(event.getApiContext(),event.getTenantDomain());
+                DataHolder.getInstance().removeAPIFromAllTenantMap(event.getApiContext(), event.getTenantDomain());
             } else {
                 ServiceReferenceHolder.getInstance().getKeyManagerDataService().addOrUpdateAPI(event);
             }
@@ -236,7 +226,7 @@ public class GatewayJMSMessageListener implements MessageListener {
             ApplicationRegistrationEvent event = new Gson().fromJson(eventJson, ApplicationRegistrationEvent.class);
             ServiceReferenceHolder.getInstance().getKeyManagerDataService().removeApplicationKeyMapping(event);
         } else if (EventType.SCOPE_CREATE.toString().equals(eventType)) {
-            ScopeEvent event = new Gson().fromJson(eventJson,ScopeEvent.class);
+            ScopeEvent event = new Gson().fromJson(eventJson, ScopeEvent.class);
             ServiceReferenceHolder.getInstance().getKeyManagerDataService().addScope(event);
         } else if (EventType.SCOPE_UPDATE.toString().equals(eventType)) {
             ScopeEvent event = new Gson().fromJson(eventJson, ScopeEvent.class);
@@ -245,8 +235,8 @@ public class GatewayJMSMessageListener implements MessageListener {
             ScopeEvent event = new Gson().fromJson(eventJson, ScopeEvent.class);
             ServiceReferenceHolder.getInstance().getKeyManagerDataService().deleteScope(event);
         } else if (EventType.POLICY_CREATE.toString().equals(eventType) ||
-            EventType.POLICY_DELETE.toString().equals(eventType) ||
-            EventType.POLICY_UPDATE.toString().equals(eventType)) {
+                EventType.POLICY_DELETE.toString().equals(eventType) ||
+                EventType.POLICY_UPDATE.toString().equals(eventType)) {
             PolicyEvent event = new Gson().fromJson(eventJson, PolicyEvent.class);
             boolean updatePolicy = false;
             boolean deletePolicy = false;
@@ -319,10 +309,24 @@ public class GatewayJMSMessageListener implements MessageListener {
         } else if (EventType.UDATE_API_LOG_LEVEL.toString().equals(eventType)) {
             APIEvent apiEvent = new Gson().fromJson(eventJson, APIEvent.class);
             APILoggerManager.getInstance().updateLoggerMap(apiEvent.getApiContext(), apiEvent.getLogLevel());
+        } else if (EventType.CUSTOM_POLICY_ADD.toString().equals(eventType) ||
+                EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType) ||
+                EventType.CUSTOM_POLICY_UPDATE.toString().equals(eventType)) {
+            KeyTemplate keyTemplateEvent = new Gson().fromJson(eventJson, KeyTemplate.class);
+            if (EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType)) {
+                ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
+                        .addKeyTemplate(keyTemplateEvent);
+            } else if (EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType)) {
+                ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
+                        .removeKeyTemplate(keyTemplateEvent);
+            } else if (EventType.CUSTOM_POLICY_UPDATE.toString().equals(eventType)) {
+                ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
+                        .removeKeyTemplate(keyTemplateEvent);
+                ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
+                        .addKeyTemplate(keyTemplateEvent);
+            }
         }
-
     }
-
     private void endTenantFlow() {
 
         PrivilegedCarbonContext.endTenantFlow();

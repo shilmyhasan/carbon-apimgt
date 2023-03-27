@@ -21,6 +21,7 @@
 package org.wso2.carbon.apimgt.impl.throttling;
 
 import org.wso2.carbon.apimgt.impl.dto.ConditionDto;
+import org.wso2.carbon.apimgt.impl.notifier.events.KeyTemplate;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public interface APIThrottleDataService {
 
     void removeIpBlockingCondition(String tenantDomain, int conditionId);
 
-    void addKeyTemplate(String key, String keyTemplateValue);
+    void addKeyTemplate(KeyTemplate event);
 
-    void removeKeyTemplate(String key);
+    void removeKeyTemplate(KeyTemplate event);
 }
