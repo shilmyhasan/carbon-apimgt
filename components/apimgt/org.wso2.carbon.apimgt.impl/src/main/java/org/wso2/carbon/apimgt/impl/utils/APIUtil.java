@@ -332,6 +332,7 @@ import javax.cache.Caching;
 import javax.net.ssl.SSLContext;
 import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.X509Certificate;
+import javax.validation.constraints.NotNull;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -356,6 +357,8 @@ public final class APIUtil {
     private static boolean isContextCacheInitialized = false;
 
     public static final String DISABLE_ROLE_VALIDATION_AT_SCOPE_CREATION = "disableRoleValidationAtScopeCreation";
+
+    public static final String DISABLE_API_CONTEXT_VALIDATION = "disableApiContextValidation";
 
     private static final int ENTITY_EXPANSION_LIMIT = 0;
 
@@ -3458,17 +3461,23 @@ public final class APIUtil {
      * @throws APIManagementException If the context is not valid
      */
     public static void validateAPIContext(String context, String apiName) throws APIManagementException {
+        String disableAPIContextValidation = System.getProperty(DISABLE_API_CONTEXT_VALIDATION);
+        if (Boolean.parseBoolean(disableAPIContextValidation)) {
+            return;
+        }
         Pattern pattern = Pattern.compile(contextRegex);
         String errorMsg = "Invalid Context " + context + " of API " + apiName + ":";
 
         if (context == null || context.isEmpty()) {
-            log.error("Invalid Context: Context cannot be empty or null");
-            throw new APIManagementException("Invalid Context: Context cannot be empty or null");
+            errorMsg = errorMsg + " Context cannot be empty or null";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
         }
 
         if (context.endsWith("/")) {
-            log.error("Invalid Context: Context cannot end with /");
-            throw new APIManagementException("Invalid Context: Context cannot end with /");
+            errorMsg = errorMsg + " Context cannot end with /";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
         }
 
         Matcher matcher = pattern.matcher(context);
@@ -3493,10 +3502,15 @@ public final class APIUtil {
             }
 
             //check whether the parentheses are balanced
-            checkBalancedParentheses(context);
+            boolean isBalanced = checkBalancedParentheses(context);
+            if (!isBalanced) {
+                errorMsg = errorMsg + " Cannot contain Unbalanced parentheses";
+                throw new APIManagementException(errorMsg);
+            }
         } else {
-            log.error("Invalid Context: Context cannot contain special characters");
-            throw new APIManagementException("Invalid Context: Context cannot contain special characters");
+            errorMsg = errorMsg + " Context cannot contain special characters";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
         }
     }
 
@@ -3506,7 +3520,7 @@ public final class APIUtil {
      * @param input API Context
      * @throws APIManagementException If parentheses are not balanced
      */
-    private static void checkBalancedParentheses(String input) throws APIManagementException {
+    public static boolean checkBalancedParentheses(@NotNull String input) throws APIManagementException {
         int count = 0;
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) == '(') {
@@ -3515,12 +3529,15 @@ public final class APIUtil {
                 count--;
             }
             if (count < 0) {
-                throw new APIManagementException("Invalid Context: Context cannot contain unbalanced parentheses");
+                log.error("Unbalanced parentheses in : " + input);
+                return false;
             }
         }
         if (count != 0) {
-            throw new APIManagementException("Invalid Context: Context cannot contain unbalanced parentheses");
+            log.error("Unbalanced parentheses in : " + input);
+            return false;
         }
+        return true;
     }
 
     public static void copyResourcePermissions(String username, String sourceArtifactPath, String targetArtifactPath)

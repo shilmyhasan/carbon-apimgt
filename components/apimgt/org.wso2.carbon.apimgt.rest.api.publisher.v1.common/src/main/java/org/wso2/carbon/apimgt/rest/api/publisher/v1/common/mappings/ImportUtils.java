@@ -2140,6 +2140,9 @@ public class ImportUtils {
                 }
             }
 
+            // Validate API Product Context
+            APIUtil.validateAPIContext(importedApiProductDTO.getContext(), importedApiProductDTO.getName());
+
             APIProvider apiProvider = RestApiCommonUtil.getProvider(importedApiProductDTO.getProvider());
 
             // Check whether the API resources are valid
