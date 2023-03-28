@@ -804,6 +804,15 @@ public class PublisherCommonUtils {
         APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
 
         String context = apiDto.getContext();
+
+        // validate context before proceeding
+        try {
+            APIUtil.validateAPIContext(context, apiDto.getName());
+        } catch (APIManagementException e) {
+            throw new APIManagementException("Error while importing API: " + e.getMessage(),
+                    ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, e.getMessage()));
+        }
+
         context = context.startsWith("/") ? context : ("/" + context);
         String providerDomain = MultitenantUtils.getTenantDomain(username);
         if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(providerDomain) &&
