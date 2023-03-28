@@ -388,7 +388,7 @@ public final class APIUtil {
 
     private static Schema tenantConfigJsonSchema;
     private static Schema operationPolicySpecSchema;
-
+    private static final String contextRegex = "^[a-zA-Z0-9_${}/.;()-]+$";
 
     private APIUtil() {
 
@@ -3449,6 +3449,78 @@ public final class APIUtil {
                     APIConstants.EMAIL_DOMAIN_SEPARATOR);
         }
         return input;
+    }
+
+    /**
+     * This method is used to get the APIProvider instance for a given username
+     *
+     * @param context API Context of the API
+     * @throws APIManagementException If the context is not valid
+     */
+    public static void validateAPIContext(String context, String apiName) throws APIManagementException {
+        Pattern pattern = Pattern.compile(contextRegex);
+        String errorMsg = "Invalid Context " + context + " of API " + apiName + ":";
+
+        if (context == null || context.isEmpty()) {
+            log.error("Invalid Context: Context cannot be empty or null");
+            throw new APIManagementException("Invalid Context: Context cannot be empty or null");
+        }
+
+        if (context.endsWith("/")) {
+            log.error("Invalid Context: Context cannot end with /");
+            throw new APIManagementException("Invalid Context: Context cannot end with /");
+        }
+
+        Matcher matcher = pattern.matcher(context);
+
+        // if the context has allowed characters
+        if (matcher.matches()) {
+            context = context.startsWith("/") ? context : "/".concat(context);
+            String split[] = context.split("/");
+
+            for (String param : split) {
+                if (param != null && !APIConstants.VERSION_PLACEHOLDER.equals(param)) {
+                    if (param.contains(APIConstants.VERSION_PLACEHOLDER)) {
+                        errorMsg = errorMsg + " {version} cannot exist as a substring of a sub-context";
+                        log.error(errorMsg);
+                        throw new APIManagementException(errorMsg);
+                    } else if (param.contains("{") || param.contains("}")) {
+                        errorMsg = errorMsg + " { or } cannot exist as a substring of a sub-context";
+                        log.error(errorMsg);
+                        throw new APIManagementException(errorMsg);
+                    }
+                }
+            }
+
+            //check whether the parentheses are balanced
+            checkBalancedParentheses(context);
+        } else {
+            log.error("Invalid Context: Context cannot contain special characters");
+            throw new APIManagementException("Invalid Context: Context cannot contain special characters");
+        }
+    }
+
+    /**
+     * Check whether the parentheses are balanced
+     *
+     * @param input API Context
+     * @throws APIManagementException If parentheses are not balanced
+     */
+    private static void checkBalancedParentheses(String input) throws APIManagementException {
+        int count = 0;
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '(') {
+                count++;
+            } else if (input.charAt(i) == ')') {
+                count--;
+            }
+            if (count < 0) {
+                throw new APIManagementException("Invalid Context: Context cannot contain unbalanced parentheses");
+            }
+        }
+        if (count != 0) {
+            throw new APIManagementException("Invalid Context: Context cannot contain unbalanced parentheses");
+        }
     }
 
     public static void copyResourcePermissions(String username, String sourceArtifactPath, String targetArtifactPath)

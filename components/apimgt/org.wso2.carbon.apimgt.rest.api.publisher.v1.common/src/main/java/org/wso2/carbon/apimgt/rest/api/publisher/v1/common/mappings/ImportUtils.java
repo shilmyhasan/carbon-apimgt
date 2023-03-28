@@ -218,6 +218,9 @@ public class ImportUtils {
             // The status of the importing API should be stored separately to do the lifecycle change at the end
             targetStatus = importedApiDTO.getLifeCycleStatus();
 
+            // validate the API context
+            APIUtil.validateAPIContext(importedApiDTO.getContext(), importedApiDTO.getName());
+
             API targetApi = retrieveApiToOverwrite(importedApiDTO.getName(), importedApiDTO.getVersion(),
                     currentTenantDomain, apiProvider, Boolean.TRUE, organization);
 
@@ -419,6 +422,9 @@ public class ImportUtils {
                 errorMessage +=
                         importedApi.getId().getApiName() + StringUtils.SPACE + APIConstants.API_DATA_VERSION + ": "
                                 + importedApi.getId().getVersion();
+            } else if (e.getMessage().contains("Invalid Context")) {
+                throw new APIManagementException("Error while importing API: " + e.getMessage(),
+                        ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, e.getMessage()));
             }
             throw new APIManagementException(errorMessage + StringUtils.SPACE + e.getMessage(), e);
         }
