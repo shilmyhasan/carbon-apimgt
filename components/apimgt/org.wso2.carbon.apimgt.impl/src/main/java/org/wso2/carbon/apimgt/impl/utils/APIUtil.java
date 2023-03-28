@@ -332,6 +332,7 @@ import javax.cache.Caching;
 import javax.net.ssl.SSLContext;
 import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.X509Certificate;
+import javax.validation.constraints.NotNull;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -390,7 +391,7 @@ public final class APIUtil {
 
     private static Schema tenantConfigJsonSchema;
     private static Schema operationPolicySpecSchema;
-    private static final String contextRegex = "^[a-zA-Z0-9_${}/.;()!?~-]+$";
+    private static final String contextRegex = "^[a-zA-Z0-9_${}/.;()-]+$";
 
     private APIUtil() {
 
@@ -3501,10 +3502,15 @@ public final class APIUtil {
             }
 
             //check whether the parentheses are balanced
-            checkBalancedParentheses(context, errorMsg);
+            boolean isBalanced = checkBalancedParentheses(context);
+            if (!isBalanced) {
+                errorMsg = errorMsg + " Cannot contain Unbalanced parentheses";
+                throw new APIManagementException(errorMsg);
+            }
         } else {
-            log.error("Invalid Context: Context cannot contain special characters");
-            throw new APIManagementException("Invalid Context: Context cannot contain special characters");
+            errorMsg = errorMsg + " Context cannot contain special characters";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
         }
     }
 
@@ -3514,9 +3520,8 @@ public final class APIUtil {
      * @param input API Context
      * @throws APIManagementException If parentheses are not balanced
      */
-    private static void checkBalancedParentheses(String input, String errorMsg) throws APIManagementException {
+    public static boolean checkBalancedParentheses(@NotNull String input) throws APIManagementException {
         int count = 0;
-        errorMsg = errorMsg + " Context cannot contain unbalanced parentheses";
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) == '(') {
                 count++;
@@ -3524,12 +3529,15 @@ public final class APIUtil {
                 count--;
             }
             if (count < 0) {
-                throw new APIManagementException(errorMsg);
+                log.error("Unbalanced parentheses in : " + input);
+                return false;
             }
         }
         if (count != 0) {
-            throw new APIManagementException(errorMsg);
+            log.error("Unbalanced parentheses in : " + input);
+            return false;
         }
+        return true;
     }
 
     public static void copyResourcePermissions(String username, String sourceArtifactPath, String targetArtifactPath)
