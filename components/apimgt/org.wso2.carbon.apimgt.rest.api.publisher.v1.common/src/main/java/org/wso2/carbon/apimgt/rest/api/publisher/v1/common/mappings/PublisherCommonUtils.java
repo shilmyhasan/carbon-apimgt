@@ -1685,6 +1685,10 @@ public class PublisherCommonUtils {
         // if not add product
         String provider = apiProductDTO.getProvider();
         String context = apiProductDTO.getContext();
+
+        // Validate the API context
+        APIUtil.validateAPIContext(context, apiProductDTO.getName());
+
         if (!StringUtils.isBlank(provider) && !provider.equals(username)) {
             if (!APIUtil.hasPermission(username, APIConstants.Permissions.APIM_ADMIN)) {
                 if (log.isDebugEnabled()) {

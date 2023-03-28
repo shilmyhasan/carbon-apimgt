@@ -357,6 +357,8 @@ public final class APIUtil {
 
     public static final String DISABLE_ROLE_VALIDATION_AT_SCOPE_CREATION = "disableRoleValidationAtScopeCreation";
 
+    public static final String DISABLE_API_CONTEXT_VALIDATION = "disableApiContextValidation";
+
     private static final int ENTITY_EXPANSION_LIMIT = 0;
 
     private static final String DESCRIPTION = "Allows [1] request(s) per minute.";
@@ -388,7 +390,7 @@ public final class APIUtil {
 
     private static Schema tenantConfigJsonSchema;
     private static Schema operationPolicySpecSchema;
-    private static final String contextRegex = "^[a-zA-Z0-9_${}/.;()-]+$";
+    private static final String contextRegex = "^[a-zA-Z0-9_${}/.;()!?~-]+$";
 
     private APIUtil() {
 
@@ -3458,17 +3460,23 @@ public final class APIUtil {
      * @throws APIManagementException If the context is not valid
      */
     public static void validateAPIContext(String context, String apiName) throws APIManagementException {
+        String disableAPIContextValidation = System.getProperty(DISABLE_API_CONTEXT_VALIDATION);
+        if (Boolean.parseBoolean(disableAPIContextValidation)) {
+            return;
+        }
         Pattern pattern = Pattern.compile(contextRegex);
         String errorMsg = "Invalid Context " + context + " of API " + apiName + ":";
 
         if (context == null || context.isEmpty()) {
-            log.error("Invalid Context: Context cannot be empty or null");
-            throw new APIManagementException("Invalid Context: Context cannot be empty or null");
+            errorMsg = errorMsg + " Context cannot be empty or null";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
         }
 
         if (context.endsWith("/")) {
-            log.error("Invalid Context: Context cannot end with /");
-            throw new APIManagementException("Invalid Context: Context cannot end with /");
+            errorMsg = errorMsg + " Context cannot end with /";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
         }
 
         Matcher matcher = pattern.matcher(context);
@@ -3493,7 +3501,7 @@ public final class APIUtil {
             }
 
             //check whether the parentheses are balanced
-            checkBalancedParentheses(context);
+            checkBalancedParentheses(context, errorMsg);
         } else {
             log.error("Invalid Context: Context cannot contain special characters");
             throw new APIManagementException("Invalid Context: Context cannot contain special characters");
@@ -3506,8 +3514,9 @@ public final class APIUtil {
      * @param input API Context
      * @throws APIManagementException If parentheses are not balanced
      */
-    private static void checkBalancedParentheses(String input) throws APIManagementException {
+    private static void checkBalancedParentheses(String input, String errorMsg) throws APIManagementException {
         int count = 0;
+        errorMsg = errorMsg + " Context cannot contain unbalanced parentheses";
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) == '(') {
                 count++;
@@ -3515,11 +3524,11 @@ public final class APIUtil {
                 count--;
             }
             if (count < 0) {
-                throw new APIManagementException("Invalid Context: Context cannot contain unbalanced parentheses");
+                throw new APIManagementException(errorMsg);
             }
         }
         if (count != 0) {
-            throw new APIManagementException("Invalid Context: Context cannot contain unbalanced parentheses");
+            throw new APIManagementException(errorMsg);
         }
     }
 
