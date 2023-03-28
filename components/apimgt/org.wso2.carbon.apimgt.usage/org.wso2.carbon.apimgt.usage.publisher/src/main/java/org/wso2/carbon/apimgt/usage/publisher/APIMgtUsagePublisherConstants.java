@@ -27,5 +27,7 @@ public final class APIMgtUsagePublisherConstants {
 
     public static final String API_GOOGLE_ANALYTICS_TRACKING_ENABLED = "Enabled";
     public static final String API_GOOGLE_ANALYTICS_TRACKING_ID = "TrackingID";
+    public static final String API_GOOGLE_ANALYTICS_MEASUREMENT_ID = "MeasurementID";
+    public static final String API_GOOGLE_ANALYTICS_API_SECRET = "APISecret";
     public static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
 }
