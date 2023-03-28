@@ -88,6 +88,14 @@
         "maxAge": 2
     };
     response.addCookie(cookie);
+    cookie = {
+        'name': 'publisher_session_state',
+        'value':'',
+        'path': app.context + "/",
+        "secure": true,
+        "maxAge": 2
+    };
+    response.addCookie(cookie);
 
     log.debug("redirecting to logout");
     response.sendRedirect(app.context + "/logout");
