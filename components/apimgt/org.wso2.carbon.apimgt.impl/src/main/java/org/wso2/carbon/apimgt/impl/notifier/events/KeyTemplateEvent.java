@@ -25,7 +25,7 @@ public class KeyTemplateEvent extends Event {
     private String newKeyTemplate;
 
     public KeyTemplateEvent(String eventId, long timestamp, String type, int tenantId, String tenantDomain,
-                            String keyTemplateState, String keyTemplate){
+                            String keyTemplateState, String keyTemplate) {
         this.eventId = eventId;
         this.timeStamp = timestamp;
         this.type = type;
@@ -36,7 +36,7 @@ public class KeyTemplateEvent extends Event {
     }
 
     public KeyTemplateEvent(String eventId, long timestamp, int tenantId, String tenantDomain, String type,
-                            String keyTemplateState, String oldKeyTemplate, String newKeyTemplate){
+                            String keyTemplateState, String oldKeyTemplate, String newKeyTemplate) {
         this.eventId = eventId;
         this.timeStamp = timestamp;
         this.type = type;
