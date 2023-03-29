@@ -18,14 +18,14 @@
 
 package org.wso2.carbon.apimgt.impl.notifier.events;
 
-public class KeyTemplate extends Event {
+public class KeyTemplateEvent extends Event {
     private String keyTemplateState;
     private String keyTemplate;
     private String oldKeyTemplate;
     private String newKeyTemplate;
 
-    public KeyTemplate(String eventId, long timestamp, String type, int tenantId, String tenantDomain,
-                       String keyTemplateState, String keyTemplate){
+    public KeyTemplateEvent(String eventId, long timestamp, String type, int tenantId, String tenantDomain,
+                            String keyTemplateState, String keyTemplate){
         this.eventId = eventId;
         this.timeStamp = timestamp;
         this.type = type;
@@ -35,8 +35,8 @@ public class KeyTemplate extends Event {
         this.keyTemplate = keyTemplate;
     }
 
-    public KeyTemplate(String eventId, long timestamp, int tenantId, String tenantDomain, String type,
-                      String keyTemplateState, String oldKeyTemplate, String newKeyTemplate){
+    public KeyTemplateEvent(String eventId, long timestamp, int tenantId, String tenantDomain, String type,
+                            String keyTemplateState, String oldKeyTemplate, String newKeyTemplate){
         this.eventId = eventId;
         this.timeStamp = timestamp;
         this.type = type;
@@ -78,6 +78,5 @@ public class KeyTemplate extends Event {
     public void setNewKeyTemplate(String newKeyTemplate) {
         this.newKeyTemplate = newKeyTemplate;
     }
-
 
 }

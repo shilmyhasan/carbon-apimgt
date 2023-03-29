@@ -41,11 +41,22 @@ import org.wso2.carbon.apimgt.impl.dto.EventHubConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
 import org.wso2.carbon.apimgt.impl.dto.WebhooksDTO;
 import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.exception.ArtifactSynchronizerException;
-import org.wso2.carbon.apimgt.impl.notifier.events.*;
+import org.wso2.carbon.apimgt.impl.notifier.events.APIEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.APIPolicyEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationPolicyEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationRegistrationEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.CertificateEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.DeployAPIInGatewayEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.GoogleAnalyticsConfigEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.PolicyEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.ScopeEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionPolicyEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.KeyTemplateEvent;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.jms.JMSException;
@@ -196,7 +207,6 @@ public class GatewayJMSMessageListener implements MessageListener {
                 || EventType.APPLICATION_UPDATE.toString().equals(eventType)) {
             ApplicationEvent event = new Gson().fromJson(eventJson, ApplicationEvent.class);
             ServiceReferenceHolder.getInstance().getKeyManagerDataService().addOrUpdateApplication(event);
-            ;
         } else if (EventType.SUBSCRIPTIONS_CREATE.toString().equals(eventType)
                 || EventType.SUBSCRIPTIONS_UPDATE.toString().equals(eventType)) {
             SubscriptionEvent event = new Gson().fromJson(eventJson, SubscriptionEvent.class);
@@ -312,18 +322,27 @@ public class GatewayJMSMessageListener implements MessageListener {
         } else if (EventType.CUSTOM_POLICY_ADD.toString().equals(eventType) ||
                 EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType) ||
                 EventType.CUSTOM_POLICY_UPDATE.toString().equals(eventType)) {
-            KeyTemplate keyTemplateEvent = new Gson().fromJson(eventJson, KeyTemplate.class);
-            if (EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType)) {
+            String key;
+            String keyTemplateValue;
+            KeyTemplateEvent keyTemplateEvent = new Gson().fromJson(eventJson, KeyTemplateEvent.class);
+            if (keyTemplateEvent.getKeyTemplate() != null) {
+                key = keyTemplateEvent.getKeyTemplate();
+                keyTemplateValue = keyTemplateEvent.getKeyTemplate();
+            } else {
+                key = keyTemplateEvent.getNewKeyTemplate();
+                keyTemplateValue = keyTemplateEvent.getNewKeyTemplate();
+            }
+            if (EventType.CUSTOM_POLICY_ADD.toString().equals(eventType)) {
                 ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .addKeyTemplate(keyTemplateEvent);
+                        .addKeyTemplate(key, keyTemplateValue);
             } else if (EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType)) {
                 ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .removeKeyTemplate(keyTemplateEvent);
+                        .removeKeyTemplate(key);
             } else if (EventType.CUSTOM_POLICY_UPDATE.toString().equals(eventType)) {
                 ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .removeKeyTemplate(keyTemplateEvent);
+                        .removeKeyTemplate(key);
                 ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .addKeyTemplate(keyTemplateEvent);
+                        .addKeyTemplate(key, keyTemplateValue);
             }
         }
     }
