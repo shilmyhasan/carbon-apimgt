@@ -319,31 +319,26 @@ public class GatewayJMSMessageListener implements MessageListener {
         } else if (EventType.UDATE_API_LOG_LEVEL.toString().equals(eventType)) {
             APIEvent apiEvent = new Gson().fromJson(eventJson, APIEvent.class);
             APILoggerManager.getInstance().updateLoggerMap(apiEvent.getApiContext(), apiEvent.getLogLevel());
-        } else if (EventType.CUSTOM_POLICY_ADD.toString().equals(eventType) ||
-                EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType) ||
-                EventType.CUSTOM_POLICY_UPDATE.toString().equals(eventType)) {
-            String key;
-            String keyTemplateValue;
+        } else if (EventType.CUSTOM_POLICY_ADD.toString().equals(eventType)) {
             KeyTemplateEvent keyTemplateEvent = new Gson().fromJson(eventJson, KeyTemplateEvent.class);
-            if (keyTemplateEvent.getKeyTemplate() != null) {
-                key = keyTemplateEvent.getKeyTemplate();
-                keyTemplateValue = keyTemplateEvent.getKeyTemplate();
-            } else {
-                key = keyTemplateEvent.getNewKeyTemplate();
-                keyTemplateValue = keyTemplateEvent.getNewKeyTemplate();
-            }
-            if (EventType.CUSTOM_POLICY_ADD.toString().equals(eventType)) {
-                ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .addKeyTemplate(key, keyTemplateValue);
-            } else if (EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType)) {
-                ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .removeKeyTemplate(key);
-            } else if (EventType.CUSTOM_POLICY_UPDATE.toString().equals(eventType)) {
-                ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .removeKeyTemplate(key);
-                ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
-                        .addKeyTemplate(key, keyTemplateValue);
-            }
+            String key = keyTemplateEvent.getKeyTemplate();
+            String keyTemplateValue = keyTemplateEvent.getKeyTemplate();
+            ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
+                    .addKeyTemplate(key, keyTemplateValue);
+        } else if (EventType.CUSTOM_POLICY_DELETE.toString().equals(eventType)) {
+            KeyTemplateEvent keyTemplateEvent = new Gson().fromJson(eventJson, KeyTemplateEvent.class);
+            String key = keyTemplateEvent.getKeyTemplate();
+            ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
+                    .removeKeyTemplate(key);
+        } else if (EventType.CUSTOM_POLICY_UPDATE.toString().equals(eventType)) {
+            KeyTemplateEvent keyTemplateEvent = new Gson().fromJson(eventJson, KeyTemplateEvent.class);
+            String oldKey = keyTemplateEvent.getOldKeyTemplate();
+            String newKey = keyTemplateEvent.getNewKeyTemplate();
+            String newTemplateValue = newKey;
+            ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
+                    .removeKeyTemplate(oldKey);
+            ServiceReferenceHolder.getInstance().getAPIThrottleDataService()
+                    .addKeyTemplate(newKey, newTemplateValue);
         }
     }
     private void endTenantFlow() {
