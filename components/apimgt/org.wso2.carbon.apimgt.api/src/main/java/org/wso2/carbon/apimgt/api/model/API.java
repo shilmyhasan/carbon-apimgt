@@ -979,6 +979,7 @@ public class API implements Serializable {
 
     public void setEndpointConfig(String endpointConfig) {
         try {
+            // The code chunk is added to resolve a migration issue. https://github.com/wso2-enterprise/wso2-apim-internal/issues/2390
             if (endpointConfig != null && endpointConfig.contains(APIConstants.ENDPOINT_CONFIG_SESSION_TIMEOUT)) {
                 JSONParser parser = new JSONParser();
                 ObjectMapper objectMapper = new ObjectMapper();
