@@ -36,8 +36,8 @@ public class APIConstants {
     public static final String EMAIL_DOMAIN_SEPARATOR_REPLACEMENT = "-AT-";
 
     public static final String ENDPOINT_SECURITY_TYPE = "type";
-    public static final String ENDPOINT_SECURITY_TYPE_BASIC = "basic";
-    public static final String ENDPOINT_SECURITY_TYPE_DIGEST = "digest";
+    public static final String ENDPOINT_SECURITY_TYPE_BASIC = "BASIC";
+    public static final String ENDPOINT_SECURITY_TYPE_DIGEST = "DIGEST";
     public static final String ENDPOINT_SECURITY_TYPE_OAUTH = "oauth";
     public static final String ENDPOINT_SECURITY = "endpoint_security";
     public static final String ENDPOINT_SECURITY_PRODUCTION = "production";

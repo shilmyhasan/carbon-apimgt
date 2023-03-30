@@ -327,6 +327,10 @@ function EndpointSecurity(props) {
         return items;
     };
 
+    if (endpointSecurityInfo.type != null) {
+        endpointSecurityInfo.type = endpointSecurityInfo.type.toUpperCase();
+    }
+
     return (
         <Grid container direction='row' spacing={2}>
             <Grid item xs={6}>
