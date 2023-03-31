@@ -1947,6 +1947,8 @@ public final class APIConstants {
         public static final String EVALUATED_CONDITIONS = "evaluatedConditions";
         public static final String TRUE = "true";
         public static final String ADD = "add";
+
+        public static final String DELETE = "delete";
         public static final String ENABLE_POLICY_DEPLOYMENT = "EnablePolicyDeployment";
     }
 
@@ -2605,7 +2607,8 @@ public final class APIConstants {
         SUBSCRIPTIONS,
         SCOPE,
         CERTIFICATE,
-        GA_CONFIG
+        GA_CONFIG,
+        KEY_TEMPLATE
     }
 
     // Supported Event Types
@@ -2634,7 +2637,10 @@ public final class APIConstants {
         ENDPOINT_CERTIFICATE_UPDATE,
         ENDPOINT_CERTIFICATE_REMOVE,
         GA_CONFIG_UPDATE,
-        UDATE_API_LOG_LEVEL
+        UDATE_API_LOG_LEVEL,
+        CUSTOM_POLICY_ADD,
+        CUSTOM_POLICY_DELETE,
+        CUSTOM_POLICY_UPDATE
     }
 
     public enum EventAction {

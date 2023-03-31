@@ -28,7 +28,6 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -121,7 +120,6 @@ import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.dto.JwtTokenInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.KeyManagerDto;
 import org.wso2.carbon.apimgt.impl.dto.SubscribedApiDTO;
-import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowProperties;
@@ -137,14 +135,15 @@ import org.wso2.carbon.apimgt.impl.notification.NotificationDTO;
 import org.wso2.carbon.apimgt.impl.notification.NotificationExecutor;
 import org.wso2.carbon.apimgt.impl.notification.NotifierConstants;
 import org.wso2.carbon.apimgt.impl.notification.exception.NotificationException;
+import org.wso2.carbon.apimgt.impl.notifier.events.KeyTemplateEvent;
 import org.wso2.carbon.apimgt.impl.notifier.events.APIEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.APIPolicyEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationPolicyEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.CertificateEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.GlobalPolicyEvent;
-import org.wso2.carbon.apimgt.impl.notifier.events.ScopeEvent;
 import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.APIPolicyEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.GlobalPolicyEvent;
 import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionPolicyEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.CertificateEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.ScopeEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationPolicyEvent;
 import org.wso2.carbon.apimgt.impl.publishers.WSO2APIPublisher;
 import org.wso2.carbon.apimgt.impl.recommendationmgt.RecommendationEnvironment;
 import org.wso2.carbon.apimgt.impl.recommendationmgt.RecommenderDetailsExtractor;
@@ -231,7 +230,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -6168,7 +6166,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             apiMgtDAO.addGlobalPolicy(globalPolicy);
 
-            publishKeyTemplateEvent(globalPolicy.getKeyTemplate(), "add");
+            KeyTemplateEvent keyTemplateEvent = new KeyTemplateEvent(UUID.randomUUID().toString(), System.currentTimeMillis(),
+                    APIConstants.EventType.CUSTOM_POLICY_ADD.name(), tenantId, tenantDomain,
+                    "add", globalPolicy.getKeyTemplate());
+            APIUtil.sendNotification(keyTemplateEvent, APIConstants.NotifierType.KEY_TEMPLATE.name());
 
             GlobalPolicy retrievedPolicy = apiMgtDAO.getGlobalPolicy(globalPolicy.getPolicyName());
             GlobalPolicyEvent globalPolicyEvent = new GlobalPolicyEvent(UUID.randomUUID().toString(),
@@ -6431,8 +6432,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
         //publishing keytemplate after update
         if (oldKeyTemplate != null && newKeyTemplate != null) {
-            publishKeyTemplateEvent(oldKeyTemplate, "remove");
-            publishKeyTemplateEvent(newKeyTemplate, "add");
+            KeyTemplateEvent keyTemplateEvent = new KeyTemplateEvent(UUID.randomUUID().toString(), System.currentTimeMillis(),
+                    tenantId, tenantDomain, APIConstants.EventType.CUSTOM_POLICY_UPDATE.name(),
+                    "update", oldKeyTemplate, newKeyTemplate );
+            APIUtil.sendNotification(keyTemplateEvent, APIConstants.NotifierType.KEY_TEMPLATE.name());
         }
     }
 
@@ -6504,7 +6507,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         apiMgtDAO.removeThrottlePolicy(policyLevel, policyName, tenantID);
 
         if (globalPolicy != null) {
-            publishKeyTemplateEvent(globalPolicy.getKeyTemplate(), "remove");
+            KeyTemplateEvent keyTemplateEvent = new KeyTemplateEvent(UUID.randomUUID().toString(), System.currentTimeMillis(),
+                    APIConstants.EventType.CUSTOM_POLICY_DELETE.name(), tenantId, tenantDomain,
+                    "remove", globalPolicy.getKeyTemplate());
+            APIUtil.sendNotification(keyTemplateEvent, APIConstants.NotifierType.KEY_TEMPLATE.name());
         }
     }
 
@@ -6749,19 +6755,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 System.currentTimeMillis(), objects, blockingMessage.toString());
         APIUtil.publishEvent(EventPublisherType.BLOCKING_EVENT, blockingEvent, blockingMessage.toString());
     }
-
-    private void publishKeyTemplateEvent(String templateValue, String state) {
-        Object[] objects = new Object[]{templateValue, state};
-        Event keyTemplateMessage = new Event(APIConstants.KEY_TEMPLATE_STREM_ID, System.currentTimeMillis(),
-                null, null, objects);
-
-        ThrottleProperties throttleProperties = getAPIManagerConfiguration().getThrottleProperties();
-
-        EventPublisherEvent keyTemplateEvent = new EventPublisherEvent(APIConstants.KEY_TEMPLATE_STREM_ID,
-                System.currentTimeMillis(), objects, keyTemplateMessage.toString());
-        APIUtil.publishEvent(EventPublisherType.KEY_TEMPLATE, keyTemplateEvent, keyTemplateMessage.toString());
-    }
-
     public String getLifecycleConfiguration(String tenantDomain) throws APIManagementException {
         boolean isTenantFlowStarted = false;
         try {
