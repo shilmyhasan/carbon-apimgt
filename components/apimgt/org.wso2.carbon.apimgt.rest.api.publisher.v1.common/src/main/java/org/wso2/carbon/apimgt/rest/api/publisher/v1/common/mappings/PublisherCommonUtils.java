@@ -801,7 +801,7 @@ public class PublisherCommonUtils {
                 isWSAPI || APIDTO.TypeEnum.WEBSUB.equals(apiDto.getType()) ||
                         APIDTO.TypeEnum.SSE.equals(apiDto.getType()) || APIDTO.TypeEnum.ASYNC.equals(apiDto.getType());
         username = StringUtils.isEmpty(username) ? RestApiCommonUtil.getLoggedInUsername() : username;
-        APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
+        APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
 
         String context = apiDto.getContext();
 
@@ -1681,7 +1681,7 @@ public class PublisherCommonUtils {
             String organization) throws APIManagementException, FaultGatewaysException {
 
         username = StringUtils.isEmpty(username) ? RestApiCommonUtil.getLoggedInUsername() : username;
-        APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
+        APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
         // if not add product
         String provider = apiProductDTO.getProvider();
         String context = apiProductDTO.getContext();
