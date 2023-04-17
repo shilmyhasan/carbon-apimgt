@@ -206,6 +206,8 @@ public class RegistryPersistenceUtilTestCase {
                 api.getVersion());
         Assert.assertEquals("API provider does not match", genericArtifact.getAttribute("overview_provider"),
                 api.getProviderName());
+        Assert.assertEquals("API provider does not match", genericArtifact.getAttribute("overview_thumbnail"),
+                api.getThumbnail());
     }
     
     @Test
