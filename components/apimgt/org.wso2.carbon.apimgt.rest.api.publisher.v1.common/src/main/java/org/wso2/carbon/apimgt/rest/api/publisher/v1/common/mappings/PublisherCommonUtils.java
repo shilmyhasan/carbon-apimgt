@@ -110,7 +110,7 @@ import java.util.Set;
 public class PublisherCommonUtils {
 
     private static final Log log = LogFactory.getLog(PublisherCommonUtils.class);
-
+    public static final String SESSION_TIMEOUT_CONFIG_KEY = "sessionTimeOut";
     /**
      * Update an API.
      *
@@ -615,7 +615,6 @@ public class PublisherCommonUtils {
         String userName = RestApiCommonUtil.getLoggedInUsername();
         boolean isMatched = false;
         String[] userRoleList = null;
-        String[] tenantRoleList = APIUtil.getRoleNames(userName);
 
         if (APIUtil.hasPermission(userName, APIConstants.Permissions.APIM_ADMIN)) {
             isMatched = true;
@@ -624,6 +623,7 @@ public class PublisherCommonUtils {
         }
         if (inputRoles != null && !inputRoles.isEmpty()) {
             if (Boolean.parseBoolean(System.getProperty(APIConstants.CASE_SENSITIVE_CHECK_PATH))) {
+                String[] tenantRoleList = APIUtil.getRoleNames(userName);
                 String status = "";
                 if (tenantRoleList != null || userRoleList != null) {
                     for (String inputRole : inputRoles) {
@@ -801,9 +801,18 @@ public class PublisherCommonUtils {
                 isWSAPI || APIDTO.TypeEnum.WEBSUB.equals(apiDto.getType()) ||
                         APIDTO.TypeEnum.SSE.equals(apiDto.getType()) || APIDTO.TypeEnum.ASYNC.equals(apiDto.getType());
         username = StringUtils.isEmpty(username) ? RestApiCommonUtil.getLoggedInUsername() : username;
-        APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
+        APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
 
         String context = apiDto.getContext();
+
+        // validate context before proceeding
+        try {
+            APIUtil.validateAPIContext(context, apiDto.getName());
+        } catch (APIManagementException e) {
+            throw new APIManagementException("Error while importing API: " + e.getMessage(),
+                    ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, e.getMessage()));
+        }
+
         context = context.startsWith("/") ? context : ("/" + context);
         String providerDomain = MultitenantUtils.getTenantDomain(username);
         if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(providerDomain) &&
@@ -920,6 +929,50 @@ public class PublisherCommonUtils {
 
         return isValid;
     }
+
+    /**
+     * Validate endpoint configurations.
+     *
+     * @param apiDto the APIDTO object containing the endpoint configuration to validate
+     * @return true if the endpoint configuration is valid, false otherwise
+     */
+    public static boolean validateEndpointConfigs(APIDTO apiDto) {
+        Map endpointConfigsMap = (Map) apiDto.getEndpointConfig();
+        if (endpointConfigsMap != null) {
+            for (Object config : endpointConfigsMap.keySet()) {
+                if (config instanceof String) {
+                    if (SESSION_TIMEOUT_CONFIG_KEY.equals(config)) {
+                        Object value = endpointConfigsMap.get(config);
+                        if (value == null) {
+                            continue;
+                        }
+                        String strVal;
+                        if (value instanceof String) {
+                            strVal = (String) value;
+                            if (strVal.length() == 0) {
+                                continue;
+                            }
+                        } else if (value instanceof Integer || value instanceof Long) {
+                            strVal = value.toString();
+                        } else if (value instanceof Double) {
+                            strVal = Integer.toString(((Double) value).intValue());
+                        } else {
+                            return false;
+                        }
+                        try {
+                            Long.parseLong(strVal);
+                        } catch (NumberFormatException e) {
+                            log.error("Failed to parse " + SESSION_TIMEOUT_CONFIG_KEY, e);
+                            return false;
+                        }
+                        endpointConfigsMap.put(config, strVal);
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
 
     /**
      * Validate sandbox and production endpoint URLs.
@@ -1628,10 +1681,14 @@ public class PublisherCommonUtils {
             String organization) throws APIManagementException, FaultGatewaysException {
 
         username = StringUtils.isEmpty(username) ? RestApiCommonUtil.getLoggedInUsername() : username;
-        APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
+        APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
         // if not add product
         String provider = apiProductDTO.getProvider();
         String context = apiProductDTO.getContext();
+
+        // Validate the API context
+        APIUtil.validateAPIContext(context, apiProductDTO.getName());
+
         if (!StringUtils.isBlank(provider) && !provider.equals(username)) {
             if (!APIUtil.hasPermission(username, APIConstants.Permissions.APIM_ADMIN)) {
                 if (log.isDebugEnabled()) {

@@ -332,6 +332,7 @@ import javax.cache.Caching;
 import javax.net.ssl.SSLContext;
 import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.X509Certificate;
+import javax.validation.constraints.NotNull;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -356,6 +357,8 @@ public final class APIUtil {
     private static boolean isContextCacheInitialized = false;
 
     public static final String DISABLE_ROLE_VALIDATION_AT_SCOPE_CREATION = "disableRoleValidationAtScopeCreation";
+
+    public static final String DISABLE_API_CONTEXT_VALIDATION = "disableApiContextValidation";
 
     private static final int ENTITY_EXPANSION_LIMIT = 0;
 
@@ -388,7 +391,7 @@ public final class APIUtil {
 
     private static Schema tenantConfigJsonSchema;
     private static Schema operationPolicySpecSchema;
-
+    private static final String contextRegex = "^[a-zA-Z0-9_${}/.;()-]+$";
 
     private APIUtil() {
 
@@ -3449,6 +3452,92 @@ public final class APIUtil {
                     APIConstants.EMAIL_DOMAIN_SEPARATOR);
         }
         return input;
+    }
+
+    /**
+     * This method is used to get the APIProvider instance for a given username
+     *
+     * @param context API Context of the API
+     * @throws APIManagementException If the context is not valid
+     */
+    public static void validateAPIContext(String context, String apiName) throws APIManagementException {
+        String disableAPIContextValidation = System.getProperty(DISABLE_API_CONTEXT_VALIDATION);
+        if (Boolean.parseBoolean(disableAPIContextValidation)) {
+            return;
+        }
+        Pattern pattern = Pattern.compile(contextRegex);
+        String errorMsg = "Invalid Context " + context + " of API " + apiName + ":";
+
+        if (context == null || context.isEmpty()) {
+            errorMsg = errorMsg + " Context cannot be empty or null";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
+        }
+
+        if (context.endsWith("/")) {
+            errorMsg = errorMsg + " Context cannot end with /";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
+        }
+
+        Matcher matcher = pattern.matcher(context);
+
+        // if the context has allowed characters
+        if (matcher.matches()) {
+            context = context.startsWith("/") ? context : "/".concat(context);
+            String split[] = context.split("/");
+
+            for (String param : split) {
+                if (param != null && !APIConstants.VERSION_PLACEHOLDER.equals(param)) {
+                    if (param.contains(APIConstants.VERSION_PLACEHOLDER)) {
+                        errorMsg = errorMsg + " {version} cannot exist as a substring of a sub-context";
+                        log.error(errorMsg);
+                        throw new APIManagementException(errorMsg);
+                    } else if (param.contains("{") || param.contains("}")) {
+                        errorMsg = errorMsg + " { or } cannot exist as a substring of a sub-context";
+                        log.error(errorMsg);
+                        throw new APIManagementException(errorMsg);
+                    }
+                }
+            }
+
+            //check whether the parentheses are balanced
+            boolean isBalanced = checkBalancedParentheses(context);
+            if (!isBalanced) {
+                errorMsg = errorMsg + " Cannot contain Unbalanced parentheses";
+                throw new APIManagementException(errorMsg);
+            }
+        } else {
+            errorMsg = errorMsg + " Context cannot contain special characters";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
+        }
+    }
+
+    /**
+     * Check whether the parentheses are balanced
+     *
+     * @param input API Context
+     * @throws APIManagementException If parentheses are not balanced
+     */
+    public static boolean checkBalancedParentheses(@NotNull String input) throws APIManagementException {
+        int count = 0;
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '(') {
+                count++;
+            } else if (input.charAt(i) == ')') {
+                count--;
+            }
+            if (count < 0) {
+                log.error("Unbalanced parentheses in : " + input);
+                return false;
+            }
+        }
+        if (count != 0) {
+            log.error("Unbalanced parentheses in : " + input);
+            return false;
+        }
+        return true;
     }
 
     public static void copyResourcePermissions(String username, String sourceArtifactPath, String targetArtifactPath)

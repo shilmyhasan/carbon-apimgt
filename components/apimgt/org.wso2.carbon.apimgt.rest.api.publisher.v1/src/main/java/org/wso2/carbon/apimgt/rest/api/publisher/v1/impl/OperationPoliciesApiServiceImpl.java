@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.apimgt.rest.api.publisher.v1.impl;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.MessageContext;
@@ -44,7 +45,6 @@ import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URLConnection;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -85,7 +85,7 @@ public class OperationPoliciesApiServiceImpl implements OperationPoliciesApiServ
                 jsonContent = RestApiPublisherUtils.readInputStream(policySpecFileInputStream, policySpecFileDetail);
 
                 String fileName = policySpecFileDetail.getDataHandler().getName();
-                String fileContentType = URLConnection.guessContentTypeFromName(fileName);
+                String fileContentType = FilenameUtils.getExtension(fileName);
                 if (org.apache.commons.lang3.StringUtils.isBlank(fileContentType)) {
                     fileContentType = policySpecFileDetail.getContentType().toString();
                 }

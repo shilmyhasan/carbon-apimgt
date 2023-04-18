@@ -39,6 +39,8 @@ public final class APIConstants {
     //key value of the APIImpl rxt
     public static final String API_KEY = "api";
 
+    public static final String VERSION_PLACEHOLDER = "{version}";
+
     //governance registry apimgt root location
     public static final String APIMGT_REGISTRY_LOCATION = "/apimgt";
 
@@ -1473,8 +1475,6 @@ public final class APIConstants {
     public static final String API_MANAGER_HOSTNAME = "HostName";
     public static final String API_MANAGER_HOSTNAME_UNKNOWN = "UNKNOWN_HOST";
 
-    public static final String VERSION_PLACEHOLDER = "{version}";
-
     public enum SupportedHTTPVerbs {
         GET,
         POST,
@@ -1947,6 +1947,8 @@ public final class APIConstants {
         public static final String EVALUATED_CONDITIONS = "evaluatedConditions";
         public static final String TRUE = "true";
         public static final String ADD = "add";
+
+        public static final String DELETE = "delete";
         public static final String ENABLE_POLICY_DEPLOYMENT = "EnablePolicyDeployment";
     }
 
@@ -2605,7 +2607,8 @@ public final class APIConstants {
         SUBSCRIPTIONS,
         SCOPE,
         CERTIFICATE,
-        GA_CONFIG
+        GA_CONFIG,
+        KEY_TEMPLATE
     }
 
     // Supported Event Types
@@ -2634,7 +2637,10 @@ public final class APIConstants {
         ENDPOINT_CERTIFICATE_UPDATE,
         ENDPOINT_CERTIFICATE_REMOVE,
         GA_CONFIG_UPDATE,
-        UDATE_API_LOG_LEVEL
+        UDATE_API_LOG_LEVEL,
+        CUSTOM_POLICY_ADD,
+        CUSTOM_POLICY_DELETE,
+        CUSTOM_POLICY_UPDATE
     }
 
     public enum EventAction {
@@ -2906,6 +2912,7 @@ public final class APIConstants {
     }
 
     public static final String CASE_SENSITIVE_CHECK_PATH = "caseSensitiveRoleValidation";
+    public static final String SOAP_TO_REST_PRESERVE_ELEMENT_ORDER = "soapToRestPreserveElementOrder";
 
     public static final String  PROPERTY_QUERY_KEY = "query";
     public static final String  PROPERTY_HEADERS_KEY = "headers";
@@ -2918,7 +2925,7 @@ public final class APIConstants {
     public static final String OPERATION_SEQUENCE_TYPE_FAULT = "fault";
     public static final String SYNAPSE_POLICY_DEFINITION_EXTENSION = ".j2";
     public static final String CC_POLICY_DEFINITION_EXTENSION = ".gotmpl";
-    public static final String YAML_CONTENT_TYPE = "text/yaml";
+    public static final String YAML_CONTENT_TYPE = "yaml";
     public static final String COMMON_OPERATION_POLICY_SPECIFICATIONS_LOCATION = "repository" + File.separator
             + "resources" + File.separator + "operation_policies" + File.separator + "specifications";
     public static final String COMMON_OPERATION_POLICY_DEFINITIONS_LOCATION = "repository" + File.separator
