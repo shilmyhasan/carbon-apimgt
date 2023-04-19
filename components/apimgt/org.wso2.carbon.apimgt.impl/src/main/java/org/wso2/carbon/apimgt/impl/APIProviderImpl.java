@@ -1200,6 +1200,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new APIManagementException("Invalid API update operation involving API status changes");
         }
         validateKeyManagers(api);
+        api.setMonetizationEnabled(oldApi.isMonetizationEnabled());
         Gson gson = new Gson();
         Map<String, String> oldMonetizationProperties = gson.fromJson(oldApi.getMonetizationProperties().toString(),
                 HashMap.class);
