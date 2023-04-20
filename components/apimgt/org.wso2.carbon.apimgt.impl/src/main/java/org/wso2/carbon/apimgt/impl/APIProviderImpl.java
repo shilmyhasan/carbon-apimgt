@@ -1358,6 +1358,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String publishedDefaultVersion = getPublishedDefaultVersion(api.getId());
         String prevDefaultVersion = getDefaultVersion(api.getId());
 
+        api.setMonetizationEnabled(existingAPI.isMonetizationEnabled());
         Gson gson = new Gson();
         String organization = api.getOrganization();
         Map<String, String> oldMonetizationProperties =
