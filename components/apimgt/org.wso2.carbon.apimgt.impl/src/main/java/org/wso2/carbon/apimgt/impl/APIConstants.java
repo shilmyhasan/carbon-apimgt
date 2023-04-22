@@ -41,6 +41,8 @@ public final class APIConstants {
 
     public static final String VERSION_PLACEHOLDER = "{version}";
 
+    public static final String API_CONTEXT_MALFORMED = "The API context is malformed";
+
     //governance registry apimgt root location
     public static final String APIMGT_REGISTRY_LOCATION = "/apimgt";
 
