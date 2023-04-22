@@ -4797,6 +4797,8 @@ public class ApisApiServiceImpl implements ApisApiService {
                 RestApiUtil.handleResourceNotFoundError("Service", serviceKey, e, log);
             } else if (e.getMessage().contains(APIConstants.API_CONTEXT_MALFORMED)) {
                 RestApiUtil.handleBadRequest(e.getMessage(), e, log);
+            } else if (e.getMessage().contains("duplicate API context")) {
+                RestApiUtil.handleBadRequest(e.getMessage(), e, log);
             }
             else {
                 String errorMessage = "Error while creating API using Service with Id : " + serviceKey
