@@ -44,6 +44,7 @@ import org.wso2.carbon.apimgt.api.model.ResourceFile;
 import org.wso2.carbon.apimgt.api.model.APIRevision;
 import org.wso2.carbon.apimgt.api.model.APIRevisionDeployment;
 import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.importexport.APIImportExportException;
 import org.wso2.carbon.apimgt.impl.importexport.ExportFormat;
@@ -777,6 +778,10 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
             return Response.created(createdApiProductUri).entity(createdApiProductDTO).build();
 
         } catch (APIManagementException | FaultGatewaysException e) {
+            if (e.getMessage().contains(APIConstants.API_CONTEXT_MALFORMED)) {
+                RestApiUtil.handleBadRequest("Error while adding new API Product. "
+                    + e.getMessage().replace("API", "API Product"), e, log);
+            }
             String errorMessage = "Error while adding new API Product : " + provider + "-" + body.getName()
                     + " - " + e.getMessage();
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
