@@ -29,9 +29,8 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -137,15 +136,11 @@ public class JwksHandler extends AbstractHandler {
                 RSAPublicKey publicKey = (RSAPublicKey) cert.getPublicKey();
                 RSAKey.Builder jwk = new RSAKey.Builder(publicKey);
 
-                try {
-                    String base64UrlEncodedThumbPrint = JWTUtil.generateThumbprint("SHA-1", cert, true);
-                    jwk.keyID(JWTUtil.getKID(base64UrlEncodedThumbPrint, algorithm.toString()));
-                    jwk.algorithm(algorithm);
-                    jwk.keyUse(KeyUse.parse(KEY_USE));
-                    jwksArray.put(jwk.build().toJSONObject());
-                } catch (NoSuchAlgorithmException | CertificateEncodingException e) {
-                    return logAndReturnError("Error in generating certificate thumbprint", e);
-                }
+                X509Certificate x509Certificate = (X509Certificate) cert;
+                jwk.keyID(JWTUtil.getKID(x509Certificate));
+                jwk.algorithm(algorithm);
+                jwk.keyUse(KeyUse.parse(KEY_USE));
+                jwksArray.put(jwk.build().toJSONObject());
             }
         }
 

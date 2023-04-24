@@ -40,6 +40,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -101,6 +102,7 @@ public final class JWTUtil {
 //                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
             StringBuilder jwtHeader = new StringBuilder();
             String base64UrlEncodedThumbPrint = generateThumbprint("SHA-1", publicCert, true);
+            X509Certificate x509Certificate = (X509Certificate) publicCert;
 
             jwtHeader.append("{\"typ\":\"JWT\",");
             jwtHeader.append("\"alg\":\"");
@@ -112,7 +114,7 @@ public final class JWTUtil {
             jwtHeader.append("\",");
 
             jwtHeader.append("\"kid\":\"");
-            jwtHeader.append(getKID(base64UrlEncodedThumbPrint, getJWSCompliantAlgorithmCode(signatureAlgorithm)));
+            jwtHeader.append(getKID(x509Certificate));
             jwtHeader.append("\"");
 
             jwtHeader.append("}");
@@ -164,13 +166,14 @@ public final class JWTUtil {
     /**
      * Helper method to add kid claim into to JWT_HEADER.
      *
-     * @param certThumbprint     thumbPrint generated for certificate
-     * @param signatureAlgorithm relevant signature algorithm
+     * @param cert X509 certificate
      * @return KID
      */
-    public static String getKID(String certThumbprint, String signatureAlgorithm) {
-
-        return certThumbprint + "_" + signatureAlgorithm;
+    public static String getKID(X509Certificate cert) {
+        String serialNumber = cert.getSerialNumber().toString();
+        String issuerName = cert.getIssuerDN().getName();
+        String kid = issuerName + "#" + serialNumber;
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(kid.getBytes(StandardCharsets.UTF_8));
     }
 
 
