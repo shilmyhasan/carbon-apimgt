@@ -3930,7 +3930,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             URI createdApiUri = new URI(RestApiConstants.RESOURCE_PATH_APIS + "/" + createdApiDTO.getId());
             return Response.created(createdApiUri).entity(createdApiDTO).build();
         } catch (APIManagementException e) {
-            if (e.getMessage().contains(APIConstants.API_CONTEXT_MALFORMED)) {
+            if (e.getMessage().contains(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION.getErrorMessage())) {
                 RestApiUtil.handleBadRequest(e.getMessage(), e, log);
             }
             String errorMessage = "Error while adding new API : " + additionalPropertiesAPI.getProvider() + "-" +
@@ -4795,7 +4795,7 @@ public class ApisApiServiceImpl implements ApisApiService {
         } catch (APIManagementException e) {
             if (RestApiUtil.isDueToResourceNotFound(e)) {
                 RestApiUtil.handleResourceNotFoundError("Service", serviceKey, e, log);
-            } else if (e.getMessage().contains(APIConstants.API_CONTEXT_MALFORMED)) {
+            } else if (e.getMessage().contains(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION.getErrorMessage())) {
                 RestApiUtil.handleBadRequest(e.getMessage(), e, log);
             } else if (e.getMessage().contains("duplicate API context")) {
                 RestApiUtil.handleBadRequest(e.getMessage(), e, log);

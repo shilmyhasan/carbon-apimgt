@@ -3466,7 +3466,7 @@ public final class APIUtil {
             return;
         }
         Pattern pattern = Pattern.compile(contextRegex);
-        String errorMsg = APIConstants.API_CONTEXT_MALFORMED + ".";
+        String errorMsg = ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION.getErrorMessage();
 
         if (context == null || context.isEmpty()) {
             errorMsg = errorMsg + " For API " + apiName + ", context cannot be empty or null";
