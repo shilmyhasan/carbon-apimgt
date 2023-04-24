@@ -3466,16 +3466,16 @@ public final class APIUtil {
             return;
         }
         Pattern pattern = Pattern.compile(contextRegex);
-        String errorMsg = "Invalid Context " + context + " of API " + apiName + ":";
+        String errorMsg = ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION.getErrorMessage();
 
         if (context == null || context.isEmpty()) {
-            errorMsg = errorMsg + " Context cannot be empty or null";
+            errorMsg = errorMsg + " For API " + apiName + ", context cannot be empty or null";
             log.error(errorMsg);
             throw new APIManagementException(errorMsg);
         }
 
         if (context.endsWith("/")) {
-            errorMsg = errorMsg + " Context cannot end with /";
+            errorMsg = errorMsg + " For API " + apiName + ", context " + context + " cannot end with /";
             log.error(errorMsg);
             throw new APIManagementException(errorMsg);
         }
@@ -3490,11 +3490,13 @@ public final class APIUtil {
             for (String param : split) {
                 if (param != null && !APIConstants.VERSION_PLACEHOLDER.equals(param)) {
                     if (param.contains(APIConstants.VERSION_PLACEHOLDER)) {
-                        errorMsg = errorMsg + " {version} cannot exist as a substring of a sub-context";
+                        errorMsg = errorMsg + " For API " + apiName +
+                                ", {version} cannot exist as a substring of a sub-context";
                         log.error(errorMsg);
                         throw new APIManagementException(errorMsg);
                     } else if (param.contains("{") || param.contains("}")) {
-                        errorMsg = errorMsg + " { or } cannot exist as a substring of a sub-context";
+                        errorMsg = errorMsg + " For API " + apiName +
+                                ", { or } cannot exist as a substring of a sub-context";
                         log.error(errorMsg);
                         throw new APIManagementException(errorMsg);
                     }
@@ -3504,11 +3506,12 @@ public final class APIUtil {
             //check whether the parentheses are balanced
             boolean isBalanced = checkBalancedParentheses(context);
             if (!isBalanced) {
-                errorMsg = errorMsg + " Cannot contain Unbalanced parentheses";
+                errorMsg = errorMsg + " Unbalanced parenthesis cannot be used in context " + context + " for API "
+                        + apiName;
                 throw new APIManagementException(errorMsg);
             }
         } else {
-            errorMsg = errorMsg + " Context cannot contain special characters";
+            errorMsg = errorMsg + " Special characters cannot be used in context " + context + " for API "+ apiName;
             log.error(errorMsg);
             throw new APIManagementException(errorMsg);
         }
