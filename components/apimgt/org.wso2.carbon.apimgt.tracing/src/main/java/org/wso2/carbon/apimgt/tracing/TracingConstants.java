@@ -19,7 +19,6 @@
 package org.wso2.carbon.apimgt.tracing;
 
 class TracingConstants {
-
     /**
      * OpenTracer Constants
      * */
