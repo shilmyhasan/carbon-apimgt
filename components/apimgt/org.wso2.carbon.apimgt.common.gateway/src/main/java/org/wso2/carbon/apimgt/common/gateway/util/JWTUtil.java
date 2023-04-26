@@ -76,33 +76,20 @@ public final class JWTUtil {
     /**
      * Utility method to generate JWT header with public certificate thumbprint for signature verification.
      *
-     * @param publicCert         - The public certificate which needs to include in the header as thumbprint
-     * @param signatureAlgorithm signature algorithm which needs to include in the header
+     * @param publicCert         The public certificate which needs to include in the header as thumbprint
+     * @param signatureAlgorithm Signature algorithm which needs to include in the header
+     * @param useKid             Specifies whether the header should include the kid property
      * @throws JWTGeneratorException
      */
-    public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws
+    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid) throws
             JWTGeneratorException {
 
-        /*
-         * Sample header
-         * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
-         * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256"}
-         * {"typ":"JWT", "alg":"[2]", "x5t":"[1]", "x5t":"[1]"}
-         * */
-
         try {
-//            //generate the SHA-1 thumbprint of the certificate
-//            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
-//            byte[] der = publicCert.getEncoded();
-//            digestValue.update(der);
-//            byte[] digestInBytes = digestValue.digest();
-//            String publicCertThumbprint = hexify(digestInBytes);
-//            String base64UrlEncodedThumbPrint;
-//            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-//                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
             StringBuilder jwtHeader = new StringBuilder();
-            String base64UrlEncodedThumbPrint = generateThumbprint("SHA-1", publicCert, true);
             X509Certificate x509Certificate = (X509Certificate) publicCert;
+
+            // Generate the SHA-1 thumbprint of the certificate
+            String base64UrlEncodedThumbPrint = generateThumbprint("SHA-1", publicCert);
 
             jwtHeader.append("{\"typ\":\"JWT\",");
             jwtHeader.append("\"alg\":\"");
@@ -111,11 +98,13 @@ public final class JWTUtil {
 
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64UrlEncodedThumbPrint);
-            jwtHeader.append("\",");
-
-            jwtHeader.append("\"kid\":\"");
-            jwtHeader.append(getKID(x509Certificate));
             jwtHeader.append("\"");
+
+            if (useKid) {
+                jwtHeader.append(",\"kid\":\"");
+                jwtHeader.append(getKID(x509Certificate));
+                jwtHeader.append("\"");
+            }
 
             jwtHeader.append("}");
             return jwtHeader.toString();
@@ -125,7 +114,16 @@ public final class JWTUtil {
         }
     }
 
-    public static String generateThumbprint(String hashType, Certificate publicCert, boolean usePadding)
+    /**
+     * Utility method to generate public certificate thumbprint
+     *
+     * @param hashType   Hash type
+     * @param publicCert The public certificate which needs to include in the header as thumbprint
+     * @return base64UrlEncodedThumbPrint
+     * @throws CertificateEncodingException
+     * @throws NoSuchAlgorithmException
+     */
+    public static String generateThumbprint(String hashType, Certificate publicCert)
             throws CertificateEncodingException, NoSuchAlgorithmException {
         MessageDigest digestValue;
         byte[] der = publicCert.getEncoded();
@@ -134,13 +132,8 @@ public final class JWTUtil {
         byte[] digestInBytes = digestValue.digest();
         String publicCertThumbprint = hexify(digestInBytes);
         String base64UrlEncodedThumbPrint;
-        if (usePadding) {
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-                    .encodeToString(publicCertThumbprint.getBytes(StandardCharsets.UTF_8));
-        } else {
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder().withoutPadding()
-                    .encodeToString(publicCertThumbprint.getBytes(StandardCharsets.UTF_8));
-        }
+        base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
+                .encodeToString(publicCertThumbprint.getBytes(StandardCharsets.UTF_8));
         return base64UrlEncodedThumbPrint;
     }
 
