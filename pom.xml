@@ -2011,10 +2011,10 @@
         <swagger.inflector.version>1.0.16.wso2v1</swagger.inflector.version>
         <swagger.inflector.oas3.version>2.0.5.wso2v1</swagger.inflector.oas3.version>
         <swagger.parser.version>1.0.51.wso2v1</swagger.parser.version>
-        <swagger.parser.v3.version>2.0.20.wso2v1</swagger.parser.v3.version>
-        <swagger.core.version>1.6.1</swagger.core.version>
-        <swagger.models.version>1.6.1</swagger.models.version>
-        <swagger.annotations.version>1.6.1</swagger.annotations.version>
+        <swagger.parser.v3.version>2.1.13.wso2v1</swagger.parser.v3.version>
+        <swagger.core.version>2.2.9</swagger.core.version>
+        <swagger.models.version>2.2.9</swagger.models.version>
+        <swagger.annotations.version>2.2.9</swagger.annotations.version>
         <servicemix.bundles.jedis.version>3.3.0_1</servicemix.bundles.jedis.version>
         <google.guava.version>27.0-jre</google.guava.version>
         <xercesImpl.version>2.8.1.wso2v2</xercesImpl.version>
