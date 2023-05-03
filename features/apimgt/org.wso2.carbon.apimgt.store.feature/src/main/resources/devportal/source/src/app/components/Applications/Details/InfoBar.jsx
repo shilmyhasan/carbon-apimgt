@@ -378,7 +378,7 @@ class InfoBar extends React.Component {
         if (!application) {
             return <Loading />;
         }
-        const isUserOwner = AuthManager.getUser().name === applicationOwner;
+        const isUserOwner = AuthManager.getUser().name.toLowerCase() === applicationOwner.toLowerCase();
 
         return (
             <div className={classes.infoBarMain}>
@@ -435,7 +435,6 @@ class InfoBar extends React.Component {
                             <Grid item xs={1} m={1} className={classes.button}>
                                 <Button
                                     onClick={this.handleDeleteConfimation}
-                                    disabled={AuthManager.getUser().name !== applicationOwner}
                                     color='default'
                                     classes={{ label: classes.iconButton }}
                                     className='application-info-bar-delete-button'
