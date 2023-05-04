@@ -342,7 +342,8 @@
                 <configuration>
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>org.ops4j.pax.logging:pax-logging-api</classpathDependencyExclude>
-                        <classpathDependencyExclude>com.fasterxml.jackson.core:jackson-core</classpathDependencyExclude>
+                        <classpathDependencyExclude>org.wso2.orbit.com.fasterxml.jackson.core:jackson-core</classpathDependencyExclude>
+                        <classpathDependencyExclude>io.swagger.parser.v3:swagger-parser-v2-converter</classpathDependencyExclude>
                     </classpathDependencyExcludes>
                     <systemProperties>
                         <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
