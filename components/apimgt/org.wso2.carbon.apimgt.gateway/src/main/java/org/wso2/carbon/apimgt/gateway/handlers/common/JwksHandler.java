@@ -49,18 +49,21 @@ public class JwksHandler extends AbstractHandler {
     private static final String SECURITY_KEY_STORE_LOCATION = "Security.KeyStore.Location";
     private static final String SECURITY_KEY_STORE_PW = "Security.KeyStore.Password";
     private static final String KEYS = "keys";
+    private Map<String, Certificate> certificatesWithAliases = new HashMap<>();
 
     public boolean handleRequest(MessageContext messageContext) {
         org.apache.axis2.context.MessageContext axis2MsgContext =
                 ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-        String payload = getJwksEndpointResponse();
 
         try {
+            String payload = getJwksEndpointResponse();
             JsonUtil.removeJsonPayload(axis2MsgContext);
             JsonUtil.getNewJsonPayload(axis2MsgContext, payload, true, true);
             axis2MsgContext.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
             axis2MsgContext.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
             axis2MsgContext.removeProperty(APIConstants.NO_ENTITY_BODY);
+        } catch (ParseException | IdentityOAuth2Exception e) {
+            log.error("Error while generating payload " + axis2MsgContext.getLogIDString(), e);
         } catch (AxisFault axisFault) {
             log.error("Error while setting payload " + axis2MsgContext.getLogIDString(), axisFault);
         }
@@ -76,43 +79,44 @@ public class JwksHandler extends AbstractHandler {
      *
      * @return JWKS response
      */
-    public String getJwksEndpointResponse() {
-        String tenantDomain = getTenantDomain();
-        String keyStorePath = CarbonUtils.getServerConfiguration()
-                .getFirstProperty(SECURITY_KEY_STORE_LOCATION);
-        String keyStorePassword = CarbonUtils.getServerConfiguration()
-                .getFirstProperty(SECURITY_KEY_STORE_PW);
+    public String getJwksEndpointResponse() throws IdentityOAuth2Exception, ParseException {
+        if (certificatesWithAliases.isEmpty()) {
+            String tenantDomain = getTenantDomain();
+            String keyStorePath = CarbonUtils.getServerConfiguration()
+                    .getFirstProperty(SECURITY_KEY_STORE_LOCATION);
+            String keyStorePassword = CarbonUtils.getServerConfiguration()
+                    .getFirstProperty(SECURITY_KEY_STORE_PW);
 
-        try (FileInputStream file = new FileInputStream(keyStorePath)) {
-            final KeyStore keystore;
-            Map<String, Certificate> certificatesWithAliases = new HashMap<>();
-            if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)) {
-                keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-                keystore.load(file, keyStorePassword.toCharArray());
-            } else {
-                try {
-                    int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
-                    IdentityTenantUtil.initializeRegistry(tenantId);
-                    FrameworkUtils.startTenantFlow(tenantDomain);
-                    KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
-                    keystore = keyStoreManager.getKeyStore(generateKSNameFromDomainName(tenantDomain));
-                } finally {
-                    FrameworkUtils.endTenantFlow();
+            try (FileInputStream file = new FileInputStream(keyStorePath)) {
+                final KeyStore keystore;
+                if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)) {
+                    keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+                    keystore.load(file, keyStorePassword.toCharArray());
+                } else {
+                    try {
+                        int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+                        IdentityTenantUtil.initializeRegistry(tenantId);
+                        FrameworkUtils.startTenantFlow(tenantDomain);
+                        KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
+                        keystore = keyStoreManager.getKeyStore(generateKSNameFromDomainName(tenantDomain));
+                    } finally {
+                        FrameworkUtils.endTenantFlow();
+                    }
                 }
-            }
-            Enumeration enumeration = keystore.aliases();
-            while (enumeration.hasMoreElements()) {
-                String alias = (String) enumeration.nextElement();
-                if (keystore.isKeyEntry(alias)) {
-                    Certificate cert = keystore.getCertificate(alias);
-                    certificatesWithAliases.put(alias, cert);
+                Enumeration enumeration = keystore.aliases();
+                while (enumeration.hasMoreElements()) {
+                    String alias = (String) enumeration.nextElement();
+                    if (keystore.isKeyEntry(alias)) {
+                        Certificate cert = keystore.getCertificate(alias);
+                        certificatesWithAliases.put(alias, cert);
+                    }
                 }
+            } catch (Exception e) {
+                String errorMessage = "Error while generating the keyset for tenant domain: " + tenantDomain;
+                return logAndReturnError(errorMessage, e);
             }
-            return buildResponse(certificatesWithAliases);
-        } catch (Exception e) {
-            String errorMessage = "Error while generating the keyset for tenant domain: " + tenantDomain;
-            return logAndReturnError(errorMessage, e);
         }
+        return buildResponse(certificatesWithAliases);
     }
 
     /**
