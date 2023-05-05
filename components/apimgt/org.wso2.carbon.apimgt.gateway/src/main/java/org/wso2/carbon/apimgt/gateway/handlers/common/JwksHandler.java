@@ -14,8 +14,13 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.common.gateway.util.JWTUtil;
+import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.SigningUtil;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
@@ -25,6 +30,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.FileInputStream;
@@ -33,11 +39,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementation for JWKS endpoint.
@@ -49,7 +51,9 @@ public class JwksHandler extends AbstractHandler {
     private static final String SECURITY_KEY_STORE_LOCATION = "Security.KeyStore.Location";
     private static final String SECURITY_KEY_STORE_PW = "Security.KeyStore.Password";
     private static final String KEYS = "keys";
-    private Map<String, Certificate> certificatesWithAliases = new HashMap<>();
+    private final Map<String, Certificate> certificatesWithAliases = new HashMap<>();
+    private final Set<Certificate> certificates = new HashSet<>();
+    ExtendedJWTConfigurationDto jwtConfigurationDto;
 
     public boolean handleRequest(MessageContext messageContext) {
         org.apache.axis2.context.MessageContext axis2MsgContext =
@@ -80,52 +84,26 @@ public class JwksHandler extends AbstractHandler {
      * @return JWKS response
      */
     public String getJwksEndpointResponse() throws IdentityOAuth2Exception, ParseException {
-        if (certificatesWithAliases.isEmpty()) {
-            String tenantDomain = getTenantDomain();
-            String keyStorePath = CarbonUtils.getServerConfiguration()
-                    .getFirstProperty(SECURITY_KEY_STORE_LOCATION);
-            String keyStorePassword = CarbonUtils.getServerConfiguration()
-                    .getFirstProperty(SECURITY_KEY_STORE_PW);
-
-            try (FileInputStream file = new FileInputStream(keyStorePath)) {
-                final KeyStore keystore;
-                if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)) {
-                    keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    keystore.load(file, keyStorePassword.toCharArray());
-                } else {
-                    try {
-                        int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
-                        IdentityTenantUtil.initializeRegistry(tenantId);
-                        FrameworkUtils.startTenantFlow(tenantDomain);
-                        KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
-                        keystore = keyStoreManager.getKeyStore(generateKSNameFromDomainName(tenantDomain));
-                    } finally {
-                        FrameworkUtils.endTenantFlow();
-                    }
-                }
-                Enumeration enumeration = keystore.aliases();
-                while (enumeration.hasMoreElements()) {
-                    String alias = (String) enumeration.nextElement();
-                    if (keystore.isKeyEntry(alias)) {
-                        Certificate cert = keystore.getCertificate(alias);
-                        certificatesWithAliases.put(alias, cert);
-                    }
-                }
-            } catch (Exception e) {
-                String errorMessage = "Error while generating the keyset for tenant domain: " + tenantDomain;
-                return logAndReturnError(errorMessage, e);
+        if (certificates.isEmpty()) {
+            this.jwtConfigurationDto =
+                    ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getJwtConfigurationDto();
+            if (jwtConfigurationDto.isTenantBasedSigningEnabled()) {
+                Set<Certificate> certificateSet = getTenantCertificates();
+                certificates.addAll(certificateSet);
+            } else {
+                certificates.add(ServiceReferenceHolder.getInstance().getPublicCert());
             }
         }
-        return buildResponse(certificatesWithAliases);
+        return buildResponse(certificates);
     }
 
     /**
-     * JWKS response is formed by considering the map of certificates provided
+     * JWKS response is formed by considering the set of certificates provided
      *
-     * @param certificates Map of certificates
+     * @param certificates Set of certificates
      * @return JWKS response as a JSON string
      */
-    private String buildResponse(Map<String, Certificate> certificates) throws IdentityOAuth2Exception, ParseException {
+    private String buildResponse(Set<Certificate> certificates) throws IdentityOAuth2Exception, ParseException {
 
         JSONArray jwksArray = new JSONArray();
         JSONObject jwksJson = new JSONObject();
@@ -134,13 +112,12 @@ public class JwksHandler extends AbstractHandler {
                 OAuth2Util.mapSignatureAlgorithmForJWSAlgorithm(config.getSignatureAlgorithm());
         List<JWSAlgorithm> diffAlgorithms = findDifferentAlgorithms(accessTokenSignAlgorithm, config);
 
-        for (Map.Entry certificateWithAlias : certificates.entrySet()) {
+        for (Certificate certificate : certificates) {
             for (JWSAlgorithm algorithm : diffAlgorithms) {
-                Certificate cert = (Certificate) certificateWithAlias.getValue();
-                RSAPublicKey publicKey = (RSAPublicKey) cert.getPublicKey();
+                RSAPublicKey publicKey = (RSAPublicKey) certificate.getPublicKey();
                 RSAKey.Builder jwk = new RSAKey.Builder(publicKey);
 
-                X509Certificate x509Certificate = (X509Certificate) cert;
+                X509Certificate x509Certificate = (X509Certificate) certificate;
                 jwk.keyID(JWTUtil.getKID(x509Certificate));
                 jwk.algorithm(algorithm);
                 jwk.keyUse(KeyUse.parse(KEY_USE));
@@ -220,5 +197,24 @@ public class JwksHandler extends AbstractHandler {
 
         String ksName = tenantDomain.trim().replace(".", "-");
         return (ksName + ".jks");
+    }
+
+    /**
+     * This method returns the set of certificates of all the tenants
+     * @return set of certificates
+     */
+    private Set<Certificate> getTenantCertificates() {
+        Set<Certificate> tenantCertificates = new HashSet<>();
+        try {
+            Set<String> tenantDomains = APIUtil.getActiveTenantDomains();
+            for (String tenantDomain: tenantDomains) {
+                int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+                Certificate publicCert = SigningUtil.getPublicCertificate(tenantId);
+                tenantCertificates.add(publicCert);
+            }
+        } catch (UserStoreException | APIManagementException e) {
+            log.error("Encountered an error while retrieving certificates", e);
+        }
+        return tenantCertificates;
     }
 }
