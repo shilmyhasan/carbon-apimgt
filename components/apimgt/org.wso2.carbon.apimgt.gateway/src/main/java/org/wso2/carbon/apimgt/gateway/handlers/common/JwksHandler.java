@@ -5,7 +5,6 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -21,25 +20,19 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.SigningUtil;
-import org.wso2.carbon.base.MultitenantConstants;
-import org.wso2.carbon.core.util.KeyStoreManager;
-import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkUtils;
-import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
-import org.wso2.carbon.identity.core.util.IdentityUtil;
-import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.CarbonUtils;
 
-import java.io.FileInputStream;
-import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation for JWKS endpoint.
@@ -48,10 +41,7 @@ public class JwksHandler extends AbstractHandler {
 
     private static final Log log = LogFactory.getLog(JwksHandler.class);
     private static final String KEY_USE = "sig";
-    private static final String SECURITY_KEY_STORE_LOCATION = "Security.KeyStore.Location";
-    private static final String SECURITY_KEY_STORE_PW = "Security.KeyStore.Password";
     private static final String KEYS = "keys";
-    private final Map<String, Certificate> certificatesWithAliases = new HashMap<>();
     private final Set<Certificate> certificates = new HashSet<>();
     ExtendedJWTConfigurationDto jwtConfigurationDto;
 
@@ -154,49 +144,6 @@ public class JwksHandler extends AbstractHandler {
             diffAlgorithms.add(userInfoSignAlgorithm);
         }
         return diffAlgorithms;
-    }
-
-    /**
-     * Method to get the tenant domain from the thread local properties
-     *
-     * @return tenant domain
-     */
-    private String getTenantDomain() {
-
-        Object tenantObj = IdentityUtil.threadLocalProperties.get().get(OAuthConstants.TENANT_NAME_FROM_CONTEXT);
-        if (tenantObj != null && StringUtils.isNotBlank((String) tenantObj)) {
-            return (String) tenantObj;
-        }
-        return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-    }
-
-    /**
-     * This method logs the error and returns the error message
-     *
-     * @param errorMessage error message
-     * @param e exception
-     * @return error message that was logged
-     */
-    private String logAndReturnError(String errorMessage, Exception e) {
-
-        if (e != null) {
-            log.error(errorMessage, e);
-        } else {
-            log.error(errorMessage);
-        }
-        return errorMessage;
-    }
-
-    /**
-     * This method generates the key store file name from the Domain Name
-     *
-     * @param tenantDomain tenant domain
-     * @return key store file name
-     */
-    private String generateKSNameFromDomainName(String tenantDomain) {
-
-        String ksName = tenantDomain.trim().replace(".", "-");
-        return (ksName + ".jks");
     }
 
     /**
