@@ -13,23 +13,24 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.common.gateway.util.JWTUtil;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.apimgt.impl.utils.SigningUtil;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
-import org.wso2.carbon.user.api.UserStoreException;
 
+import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -77,12 +78,12 @@ public class JwksHandler extends AbstractHandler {
         if (certificates.isEmpty()) {
             this.jwtConfigurationDto =
                     ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getJwtConfigurationDto();
-            if (jwtConfigurationDto.isTenantBasedSigningEnabled()) {
-                Set<Certificate> certificateSet = getTenantCertificates();
-                certificates.addAll(certificateSet);
-            } else {
-                certificates.add(ServiceReferenceHolder.getInstance().getPublicCert());
-            }
+//            if (jwtConfigurationDto.isTenantBasedSigningEnabled()) {
+            Set<Certificate> certificateSet = getCertificates(jwtConfigurationDto.isTenantBasedSigningEnabled());
+            certificates.addAll(certificateSet);
+//            } else {
+//                certificates.add(ServiceReferenceHolder.getInstance().getPublicCert());
+//            }
         }
         return buildResponse(certificates);
     }
@@ -147,21 +148,72 @@ public class JwksHandler extends AbstractHandler {
     }
 
     /**
-     * This method returns the set of certificates of all the tenants
+     * This method generates the key store file name from the Domain Name.
+     *
+     * @return key store file name
+     */
+    private String generateKSNameFromDomainName(String tenantDomain) {
+        String ksName = tenantDomain.trim().replace(".", "-");
+        return (ksName + APIConstants.KeyStoreManagement.KEY_STORE_EXTENSION_JKS);
+    }
+
+    /**
+     * This method returns the set of certificates depending on whether tenant based signing is enabled.
+     *
+     * @param isTenantFlow whether tenant flow or not
      * @return set of certificates
      */
-    private Set<Certificate> getTenantCertificates() {
-        Set<Certificate> tenantCertificates = new HashSet<>();
+    private Set<Certificate> getCertificates(boolean isTenantFlow) {
+        Set<Certificate> certificates = new HashSet<>();
         try {
-            Set<String> tenantDomains = APIUtil.getActiveTenantDomains();
-            for (String tenantDomain: tenantDomains) {
-                int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
-                Certificate publicCert = SigningUtil.getPublicCertificate(tenantId);
-                tenantCertificates.add(publicCert);
+            if (isTenantFlow) {
+                // Get all tenant keyStores
+                    Set<String> tenantDomains = APIUtil.getActiveTenantDomains();
+                    for (String tenantDomain : tenantDomains) {
+                        KeyStore keyStore;
+                        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+                            // get tenant's key store manager
+                            APIUtil.loadTenantRegistry(tenantId);
+                            KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
+                            keyStore = keyStoreManager.getKeyStore(generateKSNameFromDomainName(tenantDomain));
+                        } else {
+                            KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
+                            keyStore = keyStoreManager.getPrimaryKeyStore();
+                        }
+                        Enumeration<String> enumeration = keyStore.aliases();
+                        while (enumeration.hasMoreElements()) {
+                            String alias = enumeration.nextElement();
+                            if (keyStore.isKeyEntry(alias)) {
+                                Certificate publicCert = keyStore.getCertificate(alias);
+                                certificates.add(publicCert);
+                            }
+                        }
+                        //                Certificate publicCert = SigningUtil.getPublicCertificate(tenantId);
+                        //                tenantCertificates.add(publicCert);
+                    }
+            } else {
+                // Get super tenant keyStore
+                KeyStore keyStore;
+                KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
+                keyStore = keyStoreManager.getPrimaryKeyStore();
+
+                Enumeration<String> enumeration = keyStore.aliases();
+                while (enumeration.hasMoreElements()) {
+                    String alias = enumeration.nextElement();
+                    if (keyStore.isKeyEntry(alias)) {
+                        Certificate publicCert = keyStore.getCertificate(alias);
+                        certificates.add(publicCert);
+                    }
+                }
+
+//                keyStore = keyStoreManager.getKeyStore(
+//                        generateKSNameFromDomainName(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME));
             }
-        } catch (UserStoreException | APIManagementException e) {
+
+        } catch (Exception e) {
             log.error("Encountered an error while retrieving certificates", e);
         }
-        return tenantCertificates;
+        return certificates;
     }
 }
