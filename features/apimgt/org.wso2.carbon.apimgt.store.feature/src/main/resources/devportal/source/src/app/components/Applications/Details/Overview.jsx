@@ -198,7 +198,7 @@ function Overview(props) {
                                 </div>
                             </TableCell>
                             <TableCell>
-                                {application.owner}
+                                {application.owner.toUpperCase()}
                             </TableCell>
                         </TableRow>
                         {application.attributes
