@@ -389,7 +389,7 @@
             <artifactId>org.wso2.carbon.user.mgt.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
