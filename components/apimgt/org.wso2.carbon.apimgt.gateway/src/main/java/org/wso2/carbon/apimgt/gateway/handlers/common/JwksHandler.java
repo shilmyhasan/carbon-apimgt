@@ -13,16 +13,14 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.common.gateway.util.JWTUtil;
-import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.core.util.KeyStoreManager;
-import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
-import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
-import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 
 import java.security.KeyStore;
 import java.security.cert.Certificate;
@@ -57,10 +55,8 @@ public class JwksHandler extends AbstractHandler {
             axis2MsgContext.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
             axis2MsgContext.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
             axis2MsgContext.removeProperty(APIConstants.NO_ENTITY_BODY);
-        } catch (ParseException | IdentityOAuth2Exception e) {
+        } catch (ParseException | AxisFault | APIManagementException e) {
             log.error("Error while generating payload " + axis2MsgContext.getLogIDString(), e);
-        } catch (AxisFault axisFault) {
-            log.error("Error while setting payload " + axis2MsgContext.getLogIDString(), axisFault);
         }
         return true;
     }
@@ -74,16 +70,12 @@ public class JwksHandler extends AbstractHandler {
      *
      * @return JWKS response
      */
-    public String getJwksEndpointResponse() throws IdentityOAuth2Exception, ParseException {
+    public String getJwksEndpointResponse() throws ParseException, APIManagementException {
         if (certificates.isEmpty()) {
-            this.jwtConfigurationDto =
-                    ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().getJwtConfigurationDto();
-//            if (jwtConfigurationDto.isTenantBasedSigningEnabled()) {
+            this.jwtConfigurationDto = org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder.getInstance()
+                    .getAPIManagerConfiguration().getJwtConfigurationDto();
             Set<Certificate> certificateSet = getCertificates(jwtConfigurationDto.isTenantBasedSigningEnabled());
             certificates.addAll(certificateSet);
-//            } else {
-//                certificates.add(ServiceReferenceHolder.getInstance().getPublicCert());
-//            }
         }
         return buildResponse(certificates);
     }
@@ -94,14 +86,13 @@ public class JwksHandler extends AbstractHandler {
      * @param certificates Set of certificates
      * @return JWKS response as a JSON string
      */
-    private String buildResponse(Set<Certificate> certificates) throws IdentityOAuth2Exception, ParseException {
+    private String buildResponse(Set<Certificate> certificates) throws ParseException, APIManagementException {
 
         JSONArray jwksArray = new JSONArray();
         JSONObject jwksJson = new JSONObject();
-        OAuthServerConfiguration config = OAuthServerConfiguration.getInstance();
-        JWSAlgorithm accessTokenSignAlgorithm =
-                OAuth2Util.mapSignatureAlgorithmForJWSAlgorithm(config.getSignatureAlgorithm());
-        List<JWSAlgorithm> diffAlgorithms = findDifferentAlgorithms(accessTokenSignAlgorithm, config);
+        JWSAlgorithm accessTokenSignAlgorithm = mapSignatureAlgorithmForJWSAlgorithm(
+                ServiceReferenceHolder.getInstance().getOauthServerConfiguration().getSignatureAlgorithm());
+        List<JWSAlgorithm> diffAlgorithms = findDifferentAlgorithms(accessTokenSignAlgorithm);
 
         for (Certificate certificate : certificates) {
             for (JWSAlgorithm algorithm : diffAlgorithms) {
@@ -124,22 +115,20 @@ public class JwksHandler extends AbstractHandler {
      * This method read identity.xml and find different signing algorithms
      *
      * @param accessTokenSignAlgorithm Access token signing algorithm
-     * @param config                   OAuthServerConfiguration object
      * @return List of different signing algorithms
-     * @throws IdentityOAuth2Exception exception
      */
     private List<JWSAlgorithm> findDifferentAlgorithms(
-            JWSAlgorithm accessTokenSignAlgorithm, OAuthServerConfiguration config) throws IdentityOAuth2Exception {
+            JWSAlgorithm accessTokenSignAlgorithm) throws APIManagementException {
 
         List<JWSAlgorithm> diffAlgorithms = new ArrayList<>();
         diffAlgorithms.add(accessTokenSignAlgorithm);
-        JWSAlgorithm idTokenSignAlgorithm =
-                OAuth2Util.mapSignatureAlgorithmForJWSAlgorithm(config.getIdTokenSignatureAlgorithm());
+        JWSAlgorithm idTokenSignAlgorithm = mapSignatureAlgorithmForJWSAlgorithm(
+                ServiceReferenceHolder.getInstance().getOauthServerConfiguration().getIdTokenSignatureAlgorithm());
         if (!accessTokenSignAlgorithm.equals(idTokenSignAlgorithm)) {
             diffAlgorithms.add(idTokenSignAlgorithm);
         }
-        JWSAlgorithm userInfoSignAlgorithm =
-                OAuth2Util.mapSignatureAlgorithmForJWSAlgorithm(config.getUserInfoJWTSignatureAlgorithm());
+        JWSAlgorithm userInfoSignAlgorithm = mapSignatureAlgorithmForJWSAlgorithm(
+                ServiceReferenceHolder.getInstance().getOauthServerConfiguration().getUserInfoJWTSignatureAlgorithm());
         if (!accessTokenSignAlgorithm.equals(userInfoSignAlgorithm)
                 && !idTokenSignAlgorithm.equals(userInfoSignAlgorithm)) {
             diffAlgorithms.add(userInfoSignAlgorithm);
@@ -189,8 +178,6 @@ public class JwksHandler extends AbstractHandler {
                                 certificates.add(publicCert);
                             }
                         }
-                        //                Certificate publicCert = SigningUtil.getPublicCertificate(tenantId);
-                        //                tenantCertificates.add(publicCert);
                     }
             } else {
                 // Get super tenant keyStore
@@ -206,14 +193,44 @@ public class JwksHandler extends AbstractHandler {
                         certificates.add(publicCert);
                     }
                 }
-
-//                keyStore = keyStoreManager.getKeyStore(
-//                        generateKSNameFromDomainName(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME));
             }
 
         } catch (Exception e) {
             log.error("Encountered an error while retrieving certificates", e);
         }
         return certificates;
+    }
+
+    /**
+     * Method to map signature algorithm for JWSAlgorithm
+     */
+    private static JWSAlgorithm mapSignatureAlgorithmForJWSAlgorithm(String signatureAlgorithm)
+            throws APIManagementException {
+        if ("NONE".equalsIgnoreCase(signatureAlgorithm)) {
+            return new JWSAlgorithm(JWSAlgorithm.NONE.getName());
+        } else if ("SHA256withRSA".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.RS256;
+        } else if ("SHA384withRSA".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.RS384;
+        } else if ("SHA512withRSA".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.RS512;
+        } else if ("SHA256withHMAC".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.HS256;
+        } else if ("SHA384withHMAC".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.HS384;
+        } else if ("SHA512withHMAC".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.HS512;
+        } else if ("SHA256withEC".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.ES256;
+        } else if ("SHA384withEC".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.ES384;
+        } else if ("SHA512withEC".equals(signatureAlgorithm)) {
+            return JWSAlgorithm.ES512;
+        } else if (!"SHA256withPS".equals(signatureAlgorithm) && !"PS256".equals(signatureAlgorithm)) {
+            log.error("Unsupported Signature Algorithm in identity.xml");
+            throw new APIManagementException("Unsupported Signature Algorithm in identity.xml");
+        } else {
+            return JWSAlgorithm.PS256;
+        }
     }
 }
