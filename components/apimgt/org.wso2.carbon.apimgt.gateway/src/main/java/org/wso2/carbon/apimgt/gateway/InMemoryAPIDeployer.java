@@ -239,6 +239,29 @@ public class InMemoryAPIDeployer {
                     if (gatewayRuntimeArtifacts.size() == errorCount) {
                         return false;
                     }
+
+                    // Deploying Synapse API for JWKS endpoint
+                    GatewayAPIDTO jwksAPIDto = new GatewayAPIDTO();
+                    String jwksSynapseAPI = "<api xmlns=\"http://ws.apache.org/ns/synapse\" name=\"_JwksEndpoint_\" "
+                            + "context=\"/jwks\">\n"
+                            + "    <resource methods=\"GET\" url-mapping=\"/*\" faultSequence=\"fault\">\n"
+                            + "        <inSequence>\n"
+                            + "            <respond/>\n"
+                            + "        </inSequence>\n"
+                            + "    </resource>\n"
+                            + "    <handlers>\n"
+                            + "        <handler class=\"org.wso2.carbon.apimgt.gateway.handlers.common.JwksHandler\"/>\n"
+                            + "    </handlers>\n"
+                            + "</api>\n";
+
+                    jwksAPIDto.setName("_JwksEndpoint_");
+                    jwksAPIDto.setTenantDomain(tenantDomain);
+                    jwksAPIDto.setApiDefinition(jwksSynapseAPI);
+
+                    log.info("Deploying synapse artifacts of " + jwksAPIDto.getName());
+                    apiGatewayAdmin.deployAPI(jwksAPIDto);
+                    DataHolder.getInstance().markAPIAsDeployed(jwksAPIDto);
+
                 } catch (ArtifactSynchronizerException | AxisFault e) {
                     String msg = "Error deploying APIs to the Gateway ";
                     log.error(msg, e);
