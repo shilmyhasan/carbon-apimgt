@@ -447,9 +447,9 @@ public class InMemoryAPIDeployer {
         GatewayAPIDTO jwksAPIDto = new GatewayAPIDTO();
         String jwksApiContext;
         if (tenantDomain != null && !APIConstants.SUPER_TENANT_DOMAIN.equals(tenantDomain)) {
-            jwksApiContext = "/t/" + tenantDomain + "/jwks";
+            jwksApiContext = "/t/" + tenantDomain + APIConstants.KeyManager.GATEWAY_JWKS_ENDPOINT;
         } else {
-            jwksApiContext = "/jwks";
+            jwksApiContext = APIConstants.KeyManager.GATEWAY_JWKS_ENDPOINT;
         }
         String jwksSynapseAPI = "<api xmlns=\"http://ws.apache.org/ns/synapse\" name=\"_JwksEndpoint_\" "
                 + "context=\"" + jwksApiContext + "\">\n"

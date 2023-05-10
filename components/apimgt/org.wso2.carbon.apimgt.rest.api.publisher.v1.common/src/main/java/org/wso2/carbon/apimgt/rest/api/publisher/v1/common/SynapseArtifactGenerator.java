@@ -148,29 +148,6 @@ public class SynapseArtifactGenerator implements GatewayArtifactGenerator {
                 }
             }
         }
-
-//        // Synapse API for JWKS endpoint
-//        GatewayAPIDTO jwksSynapseArtifact = new GatewayAPIDTO();
-//        String jwksSynapseAPI =
-//                "<api xmlns=\"http://ws.apache.org/ns/synapse\" name=\"_JwksEndpoint_\" context=\"/jwks\">\n"
-//                + "    <resource methods=\"GET\" url-mapping=\"/*\" faultSequence=\"fault\">\n"
-//                + "        <inSequence>\n"
-//                + "            <respond/>\n"
-//                + "        </inSequence>\n"
-//                + "    </resource>\n"
-//                + "    <handlers>\n"
-//                + "        <handler class=\"org.wso2.carbon.apimgt.gateway.handlers.common.JwksHandler\"/>\n"
-//                + "    </handlers>\n"
-//                + "</api>\n";
-//
-//        jwksSynapseArtifact.setName("_JwksEndpoint_");
-////        jwksSynapseArtifact.setProvider("admin-AT-a.com");
-////        jwksSynapseArtifact.setVersion("v1");
-//        jwksSynapseArtifact.setTenantDomain(apiRuntimeArtifactDtoList.get(0).getTenantDomain());
-////        jwksSynapseArtifact.setApiContext("/jwks");
-//        jwksSynapseArtifact.setApiDefinition(jwksSynapseAPI);
-//        synapseArtifacts.add(new Gson().toJson(jwksSynapseArtifact));
-
         runtimeArtifactDto.setFile(false);
         runtimeArtifactDto.setArtifact(synapseArtifacts);
         return runtimeArtifactDto;
