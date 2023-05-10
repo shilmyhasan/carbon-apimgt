@@ -273,6 +273,7 @@
                                 </bundleDef>
                                 <bundleDef>javax.validation:validation-api</bundleDef>
                                 <bundleDef>com.google.guava:guava:${google.guava.version}</bundleDef>
+                                <BundleDef>com.google.guava:failureaccess:${google.guava.failureaccess.version}</BundleDef>
                                 <bundleDef>io.swagger:swagger-core</bundleDef>
                                 <bundleDef>io.swagger:swagger-models</bundleDef>
                                 <bundleDef>io.swagger:swagger-annotations</bundleDef>
