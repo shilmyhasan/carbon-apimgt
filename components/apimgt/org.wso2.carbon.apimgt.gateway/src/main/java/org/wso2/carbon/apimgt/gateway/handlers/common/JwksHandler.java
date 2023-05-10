@@ -19,10 +19,11 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.KeyStoreManager;
 
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
@@ -156,49 +157,52 @@ public class JwksHandler extends AbstractHandler {
         Set<Certificate> certificates = new HashSet<>();
         try {
             if (isTenantFlow) {
-                // Get all tenant keyStores
-                    Set<String> tenantDomains = APIUtil.getActiveTenantDomains();
-                    for (String tenantDomain : tenantDomains) {
-                        KeyStore keyStore;
-                        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
-                            // get tenant's key store manager
-                            APIUtil.loadTenantRegistry(tenantId);
-                            KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
-                            keyStore = keyStoreManager.getKeyStore(generateKSNameFromDomainName(tenantDomain));
-                        } else {
-                            KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
-                            keyStore = keyStoreManager.getPrimaryKeyStore();
-                        }
-                        Enumeration<String> enumeration = keyStore.aliases();
-                        while (enumeration.hasMoreElements()) {
-                            String alias = enumeration.nextElement();
-                            if (keyStore.isKeyEntry(alias)) {
-                                Certificate publicCert = keyStore.getCertificate(alias);
-                                certificates.add(publicCert);
-                            }
-                        }
-                    }
+                String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+
+                KeyStore keyStore;
+                if (!APIConstants.SUPER_TENANT_DOMAIN.equals(tenantDomain)) {
+                    // get tenant's key store manager
+                    APIUtil.loadTenantRegistry(tenantId);
+                    KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
+                    keyStore = keyStoreManager.getKeyStore(generateKSNameFromDomainName(tenantDomain));
+                } else {
+                    KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
+                    keyStore = keyStoreManager.getPrimaryKeyStore();
+                }
+                certificates.addAll(getCertificatesFromKeyStore(keyStore));
             } else {
                 // Get super tenant keyStore
                 KeyStore keyStore;
-                KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
+                KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(
+                        APIUtil.getTenantIdFromTenantDomain(APIConstants.SUPER_TENANT_DOMAIN));
                 keyStore = keyStoreManager.getPrimaryKeyStore();
-
-                Enumeration<String> enumeration = keyStore.aliases();
-                while (enumeration.hasMoreElements()) {
-                    String alias = enumeration.nextElement();
-                    if (keyStore.isKeyEntry(alias)) {
-                        Certificate publicCert = keyStore.getCertificate(alias);
-                        certificates.add(publicCert);
-                    }
-                }
+                certificates.addAll(getCertificatesFromKeyStore(keyStore));
             }
-
         } catch (Exception e) {
             log.error("Encountered an error while retrieving certificates", e);
         }
         return certificates;
+    }
+
+    /**
+     * This method retrieves the certificates from the key store.
+     *
+     * @param keyStore Key store
+     * @return Set of certificates from the key store
+     * @throws KeyStoreException
+     */
+    private Set<Certificate> getCertificatesFromKeyStore(KeyStore keyStore) throws KeyStoreException {
+        Set<Certificate> certs = new HashSet<>();
+        Enumeration<String> enumeration = keyStore.aliases();
+        while (enumeration.hasMoreElements()) {
+            String alias = enumeration.nextElement();
+            if (keyStore.isKeyEntry(alias)) {
+                Certificate publicCert = keyStore.getCertificate(alias);
+                certs.add(publicCert);
+            }
+        }
+        return certs;
     }
 
     /**

@@ -157,6 +157,7 @@ import org.wso2.carbon.apimgt.api.quotalimiter.OnPremQuotaLimiter;
 import org.wso2.carbon.apimgt.api.quotalimiter.ResourceQuotaLimiter;
 import org.wso2.carbon.apimgt.common.gateway.dto.ClaimMappingDto;
 import org.wso2.carbon.apimgt.common.gateway.jwtgenerator.JWTSignatureAlg;
+import org.wso2.carbon.apimgt.common.gateway.util.JWTUtil;
 import org.wso2.carbon.apimgt.eventing.EventPublisher;
 import org.wso2.carbon.apimgt.eventing.EventPublisherEvent;
 import org.wso2.carbon.apimgt.eventing.EventPublisherException;
@@ -179,6 +180,7 @@ import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.APISubscriptionInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.ConditionDto;
+import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.JwtTokenInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.SubscribedApiDTO;
 import org.wso2.carbon.apimgt.impl.dto.SubscriptionPolicyDTO;
@@ -9535,6 +9537,9 @@ public final class APIUtil {
             String base64UrlEncodedThumbPrint;
             base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
                     .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+            ExtendedJWTConfigurationDto jwtConfigurationDto = ServiceReferenceHolder.getInstance()
+                    .getAPIManagerConfigurationService().getAPIManagerConfiguration().getJwtConfigurationDto();
+            java.security.cert.X509Certificate x509Certificate = (java.security.cert.X509Certificate) publicCert;
             StringBuilder jwtHeader = new StringBuilder();
             /*
              * Sample header
@@ -9549,7 +9554,13 @@ public final class APIUtil {
 
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64UrlEncodedThumbPrint);
-            jwtHeader.append("\"}");
+            jwtHeader.append("\"");
+            if (jwtConfigurationDto.useKid()) {
+                jwtHeader.append(",\"kid\":\"");
+                jwtHeader.append(JWTUtil.getKID(x509Certificate));
+                jwtHeader.append("\"");
+            }
+            jwtHeader.append("}");
             return jwtHeader.toString();
 
         } catch (Exception e) {

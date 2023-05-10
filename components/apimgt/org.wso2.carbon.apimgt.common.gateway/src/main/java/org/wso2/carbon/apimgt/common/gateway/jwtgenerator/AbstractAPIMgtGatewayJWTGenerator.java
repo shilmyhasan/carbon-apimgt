@@ -113,13 +113,11 @@ public abstract class AbstractAPIMgtGatewayJWTGenerator {
             jwtHeaderBuilder.append("\"alg\":\"");
             jwtHeaderBuilder.append(JWTUtil.getJWSCompliantAlgorithmCode(NONE));
             jwtHeaderBuilder.append('\"');
-
             if (jwtConfigurationDto.useKid()) {
                 jwtHeaderBuilder.append(",\"kid\":\"");
                 jwtHeaderBuilder.append(JWTUtil.getKID(x509Certificate));
                 jwtHeaderBuilder.append("\"");
             }
-
             jwtHeaderBuilder.append('}');
 
             jwtHeader = jwtHeaderBuilder.toString();

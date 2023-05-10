@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.common.gateway.util.JWTUtil;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -172,7 +174,12 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
         return buildHeader(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
     }
-        public String buildHeader(String tenantDomain) throws APIManagementException {
+
+    public String buildHeader(String tenantDomain) throws APIManagementException {
+        ExtendedJWTConfigurationDto jwtConfigurationDto =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                        .getJwtConfigurationDto();
+        X509Certificate x509Certificate = (X509Certificate) jwtConfigurationDto.getPublicCert();
         String jwtHeader = null;
 
         //if signature algo==NONE, header without cert
@@ -182,6 +189,13 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             jwtHeaderBuilder.append("\"alg\":\"");
             jwtHeaderBuilder.append(APIUtil.getJWSCompliantAlgorithmCode(NONE));
             jwtHeaderBuilder.append('\"');
+
+            if (jwtConfigurationDto.useKid()) {
+                jwtHeaderBuilder.append(",\"kid\":\"");
+                jwtHeaderBuilder.append(JWTUtil.getKID(x509Certificate));
+                jwtHeaderBuilder.append("\"");
+            }
+
             jwtHeaderBuilder.append('}');
 
             jwtHeader = jwtHeaderBuilder.toString();

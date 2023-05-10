@@ -205,6 +205,7 @@ public class InMemoryAPIDeployer {
                     MessageContext.setCurrentMessageContext(org.wso2.carbon.apimgt.gateway.utils.GatewayUtils.createAxis2MessageContext());
                     PrivilegedCarbonContext.startTenantFlow();
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                    deployJWKSSynapseAPI(tenantDomain); // Deploy JWKS API
                     List<String> gatewayRuntimeArtifacts = ServiceReferenceHolder.getInstance().getArtifactRetriever()
                             .retrieveAllArtifacts(encodedString, tenantDomain);
                     if (gatewayRuntimeArtifacts.size() == 0) {
@@ -239,29 +240,6 @@ public class InMemoryAPIDeployer {
                     if (gatewayRuntimeArtifacts.size() == errorCount) {
                         return false;
                     }
-
-                    // Deploying Synapse API for JWKS endpoint
-                    GatewayAPIDTO jwksAPIDto = new GatewayAPIDTO();
-                    String jwksSynapseAPI = "<api xmlns=\"http://ws.apache.org/ns/synapse\" name=\"_JwksEndpoint_\" "
-                            + "context=\"/jwks\">\n"
-                            + "    <resource methods=\"GET\" url-mapping=\"/*\" faultSequence=\"fault\">\n"
-                            + "        <inSequence>\n"
-                            + "            <respond/>\n"
-                            + "        </inSequence>\n"
-                            + "    </resource>\n"
-                            + "    <handlers>\n"
-                            + "        <handler class=\"org.wso2.carbon.apimgt.gateway.handlers.common.JwksHandler\"/>\n"
-                            + "    </handlers>\n"
-                            + "</api>\n";
-
-                    jwksAPIDto.setName("_JwksEndpoint_");
-                    jwksAPIDto.setTenantDomain(tenantDomain);
-                    jwksAPIDto.setApiDefinition(jwksSynapseAPI);
-
-                    log.info("Deploying synapse artifacts of " + jwksAPIDto.getName());
-                    apiGatewayAdmin.deployAPI(jwksAPIDto);
-                    DataHolder.getInstance().markAPIAsDeployed(jwksAPIDto);
-
                 } catch (ArtifactSynchronizerException | AxisFault e) {
                     String msg = "Error deploying APIs to the Gateway ";
                     log.error(msg, e);
@@ -458,5 +436,40 @@ public class InMemoryAPIDeployer {
                 unDeployAPI(deployAPIInGatewayEvent);
             }
         }
+    }
+
+    /**
+     * Deploy Synapse API for JWKS endpoint
+     *
+     * @param tenantDomain tenant domain
+     */
+    private void deployJWKSSynapseAPI(String tenantDomain) throws AxisFault {
+        GatewayAPIDTO jwksAPIDto = new GatewayAPIDTO();
+        String jwksApiContext;
+        if (tenantDomain != null && !APIConstants.SUPER_TENANT_DOMAIN.equals(tenantDomain)) {
+            jwksApiContext = "/t/" + tenantDomain + "/jwks";
+        } else {
+            jwksApiContext = "/jwks";
+        }
+        String jwksSynapseAPI = "<api xmlns=\"http://ws.apache.org/ns/synapse\" name=\"_JwksEndpoint_\" "
+                + "context=\"" + jwksApiContext + "\">\n"
+                + "    <resource methods=\"GET\" url-mapping=\"/*\" faultSequence=\"fault\">\n"
+                + "        <inSequence>\n"
+                + "            <respond/>\n"
+                + "        </inSequence>\n"
+                + "    </resource>\n"
+                + "    <handlers>\n"
+                + "        <handler class=\"org.wso2.carbon.apimgt.gateway.handlers.common.JwksHandler\"/>\n"
+                + "    </handlers>\n"
+                + "</api>\n";
+
+        jwksAPIDto.setName("_JwksEndpoint_");
+        jwksAPIDto.setTenantDomain(tenantDomain);
+        jwksAPIDto.setApiDefinition(jwksSynapseAPI);
+
+        log.info("Deploying synapse artifacts of " + jwksAPIDto.getName());
+        APIGatewayAdmin apiGatewayAdmin = new APIGatewayAdmin();
+        apiGatewayAdmin.deployAPI(jwksAPIDto);
+        DataHolder.getInstance().markAPIAsDeployed(jwksAPIDto);
     }
 }
