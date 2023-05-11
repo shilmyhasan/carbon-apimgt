@@ -1063,6 +1063,7 @@ public class OAS2Parser extends APIDefinition {
 
         //this is to ignore "responseSchema" in response schema objects
         mapper.addMixIn(Response.class, ResponseSchemaMixin.class);
+
         mapper.addMixIn(Operation.class, OperationMixin.class);
         try {
             return new String(mapper.writeValueAsBytes(swaggerObj));

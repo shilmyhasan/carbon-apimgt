@@ -30,9 +30,8 @@ public abstract class OperationMixin {
 
     }
     @JsonIgnore
-
     public abstract void setResponsesObject(Responses responsesObject);
-    @JsonIgnore
 
+    @JsonIgnore
     public abstract Responses getResponsesObject();
 }
