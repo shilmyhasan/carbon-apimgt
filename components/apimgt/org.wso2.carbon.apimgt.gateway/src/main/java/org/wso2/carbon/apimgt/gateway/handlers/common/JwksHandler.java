@@ -37,6 +37,7 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.KeyStoreManager;
 
@@ -48,8 +49,10 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -60,7 +63,7 @@ public class JwksHandler extends AbstractHandler {
     private static final Log log = LogFactory.getLog(JwksHandler.class);
     private static final String KEY_USE = "sig";
     private static final String KEYS = "keys";
-    private final Set<Certificate> certificates = new HashSet<>();
+    private final Map<String, Set<Certificate>> certificateMap = new HashMap<>();
     ExtendedJWTConfigurationDto jwtConfigurationDto;
 
     public boolean handleRequest(MessageContext messageContext) {
@@ -90,13 +93,31 @@ public class JwksHandler extends AbstractHandler {
      * @return JWKS response
      */
     public String getJwksEndpointResponse() throws ParseException, APIManagementException {
-        if (certificates.isEmpty()) {
-            this.jwtConfigurationDto = org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder.getInstance()
-                    .getAPIManagerConfiguration().getJwtConfigurationDto();
-            Set<Certificate> certificateSet = getCertificates(jwtConfigurationDto.isTenantBasedSigningEnabled());
-            certificates.addAll(certificateSet);
+        this.jwtConfigurationDto = org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfiguration().getJwtConfigurationDto();
+        boolean isTenantBasedSigningEnabled = jwtConfigurationDto.isTenantBasedSigningEnabled();
+        String certMapKey;
+        if (isTenantBasedSigningEnabled) {
+            certMapKey = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        } else {
+            certMapKey = APIConstants.SUPER_TENANT_DOMAIN;
         }
-        return buildResponse(certificates);
+
+        Set<Certificate> certificateSet = null;
+        if (certificateMap.containsKey(certMapKey)) {
+            certificateSet = certificateMap.get(certMapKey);
+        } else {
+            synchronized (this) {
+                if (!certificateMap.containsKey(certMapKey)) {
+                    certificateSet = getCertificates(certMapKey);
+                    certificateMap.put(certMapKey, certificateSet);
+                }
+            }
+        }
+        if (certificateSet != null) {
+            return buildResponse(certificateSet);
+        }
+        return null;
     }
 
     /**
@@ -166,37 +187,39 @@ public class JwksHandler extends AbstractHandler {
     }
 
     /**
-     * This method returns the set of certificates depending on whether tenant based signing is enabled.
+     * This method returns a set of certificates depending on the provided tenant domain.
      *
-     * @param isTenantFlow whether tenant flow or not
+     * @param tenantDomain tenant domain which is used to get the relevant key store and extract certificates
      * @return set of certificates
      */
-    private Set<Certificate> getCertificates(boolean isTenantFlow) {
+    private Set<Certificate> getCertificates(String tenantDomain) {
         Set<Certificate> certificates = new HashSet<>();
+        KeyStore keyStore;
         try {
-            if (isTenantFlow) {
-                String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            if (!APIConstants.SUPER_TENANT_DOMAIN.equals(tenantDomain)) {
+                // get tenant keyStore
                 int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
-
-                KeyStore keyStore;
-                if (!APIConstants.SUPER_TENANT_DOMAIN.equals(tenantDomain)) {
-                    // get tenant's key store manager
-                    APIUtil.loadTenantRegistry(tenantId);
-                    KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
-                    keyStore = keyStoreManager.getKeyStore(generateKSNameFromDomainName(tenantDomain));
-                } else {
-                    KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
-                    keyStore = keyStoreManager.getPrimaryKeyStore();
-                }
-                certificates.addAll(getCertificatesFromKeyStore(keyStore));
+                APIUtil.loadTenantRegistry(tenantId);
+                KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(tenantId);
+                keyStore = keyStoreManager.getKeyStore(generateKSNameFromDomainName(tenantDomain));
             } else {
-                // Get super tenant keyStore
-                KeyStore keyStore;
-                KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(
-                        APIUtil.getTenantIdFromTenantDomain(APIConstants.SUPER_TENANT_DOMAIN));
-                keyStore = keyStoreManager.getPrimaryKeyStore();
-                certificates.addAll(getCertificatesFromKeyStore(keyStore));
+                // get super tenant keyStore
+                boolean tenantFlowStarted = false;
+                try {
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                            .setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+                    tenantFlowStarted = true;
+                    KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(
+                            APIUtil.getTenantIdFromTenantDomain(APIConstants.SUPER_TENANT_DOMAIN));
+                    keyStore = keyStoreManager.getPrimaryKeyStore();
+                } finally {
+                    if (tenantFlowStarted) {
+                        PrivilegedCarbonContext.endTenantFlow();
+                    }
+                }
             }
+            certificates.addAll(getCertificatesFromKeyStore(keyStore));
         } catch (Exception e) {
             log.error("Encountered an error while retrieving certificates", e);
         }
@@ -208,7 +231,6 @@ public class JwksHandler extends AbstractHandler {
      *
      * @param keyStore Key store
      * @return Set of certificates from the key store
-     * @throws KeyStoreException
      */
     private Set<Certificate> getCertificatesFromKeyStore(KeyStore keyStore) throws KeyStoreException {
         Set<Certificate> certs = new HashSet<>();

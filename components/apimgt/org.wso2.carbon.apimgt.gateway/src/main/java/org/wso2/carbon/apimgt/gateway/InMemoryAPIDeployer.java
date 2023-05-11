@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.api.ApiUtils;
 import org.apache.synapse.transport.dynamicconfigurations.DynamicProfileReloaderHolder;
 import org.wso2.carbon.apimgt.api.gateway.GatewayAPIDTO;
 import org.wso2.carbon.apimgt.api.gateway.GatewayContentDTO;
@@ -37,9 +38,11 @@ import org.wso2.carbon.apimgt.api.gateway.GraphQLSchemaDTO;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIProductIdentifier;
+import org.wso2.carbon.apimgt.common.gateway.constants.JWTConstants;
 import org.wso2.carbon.apimgt.gateway.internal.DataHolder;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.service.APIGatewayAdmin;
+import org.wso2.carbon.apimgt.gateway.utils.RESTAPIAdminServiceProxy;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
 import org.wso2.carbon.apimgt.impl.dto.GatewayCleanupSkipList;
@@ -51,6 +54,7 @@ import org.wso2.carbon.apimgt.impl.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.keymgt.SubscriptionDataHolder;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataStore;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.rest.api.APIData;
 
 import java.io.File;
 import java.io.IOException;
@@ -443,13 +447,14 @@ public class InMemoryAPIDeployer {
      *
      * @param tenantDomain tenant domain
      */
-    private void deployJWKSSynapseAPI(String tenantDomain) throws AxisFault {
+    public static void deployJWKSSynapseAPI(String tenantDomain) throws AxisFault {
+//        check if already deployed
         GatewayAPIDTO jwksAPIDto = new GatewayAPIDTO();
         String jwksApiContext;
         if (tenantDomain != null && !APIConstants.SUPER_TENANT_DOMAIN.equals(tenantDomain)) {
-            jwksApiContext = "/t/" + tenantDomain + APIConstants.KeyManager.GATEWAY_JWKS_ENDPOINT;
+            jwksApiContext = "/t/" + tenantDomain + JWTConstants.GATEWAY_JWKS_ENDPOINT;
         } else {
-            jwksApiContext = APIConstants.KeyManager.GATEWAY_JWKS_ENDPOINT;
+            jwksApiContext = JWTConstants.GATEWAY_JWKS_ENDPOINT;
         }
         String jwksSynapseAPI = "<api xmlns=\"http://ws.apache.org/ns/synapse\" name=\"_JwksEndpoint_\" "
                 + "context=\"" + jwksApiContext + "\">\n"
@@ -471,5 +476,6 @@ public class InMemoryAPIDeployer {
         APIGatewayAdmin apiGatewayAdmin = new APIGatewayAdmin();
         apiGatewayAdmin.deployAPI(jwksAPIDto);
         DataHolder.getInstance().markAPIAsDeployed(jwksAPIDto);
+//        }
     }
 }

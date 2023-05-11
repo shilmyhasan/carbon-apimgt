@@ -51,4 +51,5 @@ public class JWTConstants {
 
     public static final String SUB = "sub";
     public static final String ORGANIZATIONS = "organizations";
+    public static final String GATEWAY_JWKS_ENDPOINT = "/jwks";
 }
