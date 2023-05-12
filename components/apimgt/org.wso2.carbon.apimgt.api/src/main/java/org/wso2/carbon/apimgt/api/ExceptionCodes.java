@@ -512,8 +512,7 @@ public enum ExceptionCodes implements ErrorHandler {
             " not allowed for user %s ", false),
     INVALID_KEY_MANAGER_REQUEST(902003, "Invalid Request sent to Key Manager.", 400, "Invalid Request sent to Key Manager.Error from Backend : %s", false),
     INTERNAL_SERVER_ERROR_FROM_KEY_MANAGER(902004, "Internal Server Error from Key Manager", 500, "Internal Server Error from Key Manager.Error from Backend : %s", true),
-    INVALID_ENDPOINT_CONFIG(902012, "Endpoint config value(s) is(are) not valid", 400, "Endpoint config value(s) is(are) not valid"),
-    ARTIFACT_SYNC_HTTP_REQUEST_FAILED(903009, "Error while retrieving from remote endpoint", 500, "Error while executing HTTP request to retrieve from remote endpoint");
+    INVALID_ENDPOINT_CONFIG(902012, "Endpoint config value(s) is(are) not valid", 400, "Endpoint config value(s) is(are) not valid");
     private final long errorCode;
     private final String errorMessage;
     private final int httpStatusCode;
