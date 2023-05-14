@@ -49,7 +49,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -87,6 +86,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
     private String userAttributeSeparator = APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT;
     private boolean tenantBasedSigningEnabled;
+    private boolean useKid;
 
     public AbstractJWTGenerator() {
 
@@ -121,6 +121,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             }
         }
         tenantBasedSigningEnabled = jwtConfigurationDto.isTenantBasedSigningEnabled();
+        useKid = jwtConfigurationDto.useKid();
     }
 
     public String getDialectURI() {
@@ -343,7 +344,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
                 publicCert = keyStoreManager.getDefaultPrimaryCertificate();
             }
-            return generateHeader(publicCert, signatureAlgorithm);
+            return generateHeader(publicCert, signatureAlgorithm, useKid);
         } catch (Exception e) {
             String error = "Error in obtaining keystore";
             throw new APIManagementException(error, e);
@@ -385,9 +386,11 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * Utility method to generate JWT header with public certificate thumbprint for signature verification.
      *
      * @param publicCert         The public certificate which needs to include in the header as thumbprint
-     * @param signatureAlgorithm signature algorithm which needs to include in the header
+     * @param signatureAlgorithm Signature algorithm which needs to include in the header
+     * @param useKid             Boolean to indicate whether to include kid property in the header
      */
-    public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws APIManagementException {
+    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid)
+            throws APIManagementException {
         try {
             //generate the SHA-1 thumbprint of the certificate
             MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
@@ -398,8 +401,6 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             String base64UrlEncodedThumbPrint;
             base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
                     .encodeToString(publicCertThumbprint.getBytes(StandardCharsets.UTF_8));
-            ExtendedJWTConfigurationDto jwtConfigurationDto = org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.getInstance()
-                    .getAPIManagerConfigurationService().getAPIManagerConfiguration().getJwtConfigurationDto();
             java.security.cert.X509Certificate x509Certificate = (java.security.cert.X509Certificate) publicCert;
             StringBuilder jwtHeader = new StringBuilder();
             /*
@@ -416,7 +417,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64UrlEncodedThumbPrint);
             jwtHeader.append("\"");
-            if (jwtConfigurationDto.useKid()) {
+            if (useKid) {
                 jwtHeader.append(",\"kid\":\"");
                 jwtHeader.append(JWTUtil.getKID(x509Certificate));
                 jwtHeader.append("\"");
