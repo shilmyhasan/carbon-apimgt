@@ -40,6 +40,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
+import org.wso2.carbon.apimgt.api.*;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityUtils;
@@ -251,9 +252,13 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
                     + msgCtx.getMessageID() + " started at "
                     + new SimpleDateFormat("[yyyy.MM.dd HH:mm:ss,SSS zzz]").format(new Date()));
         }
-        HttpClient client = APIUtil.getHttpClient(GoogleAnalyticsConstants.HTTP_ENDPOINT_HOST +
-                GoogleAnalyticsConstants.HTTP_ENDPOINT_URI + "?" + payload);
-        GoogleAnalyticsDataPublisher.publishGET(payload, userAgent, false, client);
+        try {
+            HttpClient client = APIUtil.getHttpClient(GoogleAnalyticsConstants.HTTP_ENDPOINT_HOST +
+                    GoogleAnalyticsConstants.HTTP_ENDPOINT_URI + "?" + payload);
+            GoogleAnalyticsDataPublisher.publishGET(payload, userAgent, false, client);
+        } catch (APIManagementException e) {
+            log.error("Error while getting http clinet detials.");
+        }
         if (log.isDebugEnabled()) {
             log.debug("Publishing https GET from gateway to Google analytics in UA format with ID: "
                     + msgCtx.getMessageID() + " ended at "
