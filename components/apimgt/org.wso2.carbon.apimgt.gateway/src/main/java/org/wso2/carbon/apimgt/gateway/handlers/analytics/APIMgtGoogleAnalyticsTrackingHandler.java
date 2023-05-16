@@ -251,6 +251,8 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
                     + msgCtx.getMessageID() + " started at "
                     + new SimpleDateFormat("[yyyy.MM.dd HH:mm:ss,SSS zzz]").format(new Date()));
         }
+        HttpClient client = APIUtil.getHttpClient(GoogleAnalyticsConstants.HTTP_ENDPOINT_HOST +
+                GoogleAnalyticsConstants.HTTP_ENDPOINT_URI + "?" + payload);
         GoogleAnalyticsDataPublisher.publishGET(payload, userAgent, false, client);
         if (log.isDebugEnabled()) {
             log.debug("Publishing https GET from gateway to Google analytics in UA format with ID: "
