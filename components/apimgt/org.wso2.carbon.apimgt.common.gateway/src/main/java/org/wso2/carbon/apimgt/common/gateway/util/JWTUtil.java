@@ -41,6 +41,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,14 +77,17 @@ public final class JWTUtil {
     /**
      * Utility method to generate JWT header with public certificate thumbprint for signature verification.
      *
-     * @param publicCert         - The public certificate which needs to include in the header as thumbprint
-     * @param signatureAlgorithm signature algorithm which needs to include in the header
+     * @param publicCert         The public certificate which needs to include in the header as thumbprint
+     * @param signatureAlgorithm Signature algorithm which needs to include in the header
+     * @param useKid             Specifies whether the header should include the kid property
      * @throws JWTGeneratorException
      */
-    public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws
-            JWTGeneratorException {
+    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid)
+            throws JWTGeneratorException {
 
         try {
+            X509Certificate x509Certificate = (X509Certificate) publicCert;
+
             //generate the SHA-1 thumbprint of the certificate
             MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
             byte[] der = publicCert.getEncoded();
@@ -107,7 +111,15 @@ public final class JWTUtil {
 
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64UrlEncodedThumbPrint);
-            jwtHeader.append("\"}");
+            jwtHeader.append("\"");
+
+            if (useKid) {
+                jwtHeader.append(",\"kid\":\"");
+                jwtHeader.append(getKID(x509Certificate));
+                jwtHeader.append("\"");
+            }
+
+            jwtHeader.append("}");
             return jwtHeader.toString();
 
         } catch (NoSuchAlgorithmException | CertificateEncodingException | UnsupportedEncodingException e) {
@@ -133,6 +145,20 @@ public final class JWTUtil {
         }
         return buf.toString();
     }
+
+    /**
+     * Helper method to add kid claim into to JWT_HEADER.
+     *
+     * @param cert X509 certificate
+     * @return KID
+     */
+    public static String getKID(X509Certificate cert) {
+        String serialNumber = cert.getSerialNumber().toString();
+        String issuerName = cert.getIssuerDN().getName();
+        String kid = issuerName + "#" + serialNumber;
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(kid.getBytes(StandardCharsets.UTF_8));
+    }
+
 
     /**
      * Utility method to sign a JWT assertion with a particular signature algorithm.
