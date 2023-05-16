@@ -53,6 +53,9 @@ import org.wso2.carbon.apimgt.tracing.Util;
 import org.wso2.carbon.ganalytics.publisher.GoogleAnalyticsConstants;
 import org.wso2.carbon.ganalytics.publisher.GoogleAnalyticsData;
 import org.wso2.carbon.ganalytics.publisher.GoogleAnalyticsDataPublisher;
+import org.wso2.carbon.ganalytics.publisher.ga4.GoogleAnalytics4Constants;
+import org.wso2.carbon.ganalytics.publisher.ga4.GoogleAnalytics4Data;
+import org.wso2.carbon.ganalytics.publisher.ga4.GoogleAnalytics4DataPublisher;
 import org.wso2.carbon.ganalytics.publisher.ga4.event.PageViewEvent;
 
 public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
