@@ -451,11 +451,13 @@ public class InMemoryAPIDeployer {
      * @param tenantDomain tenant domain
      */
     public static void deployJWKSSynapseAPI(String tenantDomain) throws APIManagementException {
-        String api = org.wso2.carbon.apimgt.gateway.utils.GatewayUtils.retrieveDeployedAPI(JWTConstants.GATEWAY_JWKS_API_NAME, null, tenantDomain);
+        String api = org.wso2.carbon.apimgt.gateway.utils.GatewayUtils.retrieveDeployedAPI(
+                JWTConstants.GATEWAY_JWKS_API_NAME, null, tenantDomain);
         if (api == null) {
             try {
                 // Deploy JWKS API for tenant
-                MessageContext.setCurrentMessageContext(org.wso2.carbon.apimgt.gateway.utils.GatewayUtils.createAxis2MessageContext());
+                MessageContext.setCurrentMessageContext(
+                        org.wso2.carbon.apimgt.gateway.utils.GatewayUtils.createAxis2MessageContext());
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
                 GatewayAPIDTO jwksAPIDto = new GatewayAPIDTO();

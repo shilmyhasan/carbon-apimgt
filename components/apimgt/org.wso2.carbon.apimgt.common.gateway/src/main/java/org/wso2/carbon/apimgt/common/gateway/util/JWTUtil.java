@@ -82,8 +82,8 @@ public final class JWTUtil {
      * @param useKid             Specifies whether the header should include the kid property
      * @throws JWTGeneratorException
      */
-    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid) throws
-            JWTGeneratorException {
+    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid)
+            throws JWTGeneratorException {
 
         try {
             X509Certificate x509Certificate = (X509Certificate) publicCert;
