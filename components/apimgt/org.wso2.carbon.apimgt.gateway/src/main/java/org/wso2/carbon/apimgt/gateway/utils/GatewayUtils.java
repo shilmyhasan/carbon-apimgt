@@ -1019,6 +1019,12 @@ public class GatewayUtils {
                 Map<String, Object> claims = jwtInfoDto.getJwtValidationInfo().getClaims();
                 if (claims.get(JWTConstants.SUB) != null) {
                     String sub = (String) jwtInfoDto.getJwtValidationInfo().getClaims().get(JWTConstants.SUB);
+
+                    // A system property is used to enable/disable getting the tenant aware username as sub claim.
+                    String tenantAwareSubClaim = System.getProperty(APIConstants.ENABLE_TENANT_AWARE_SUB_CLAIM);
+                    if (StringUtils.isNotEmpty(tenantAwareSubClaim) && Boolean.parseBoolean(tenantAwareSubClaim)) {
+                        sub = APIUtil.getUserNameWithoutTenantSuffix(sub);
+                    }
                     jwtInfoDto.setSub(sub);
                 }
                 if (claims.get(JWTConstants.ORGANIZATIONS) != null) {
@@ -1258,7 +1264,12 @@ public class GatewayUtils {
         try {
             MessageContext.setCurrentMessageContext(createAxis2MessageContext());
             RESTAPIAdminServiceProxy restapiAdminServiceProxy = new RESTAPIAdminServiceProxy(tenantDomain);
-            String qualifiedName = GatewayUtils.getQualifiedApiName(apiName, version);
+            String qualifiedName;
+            if (version != null) {
+                qualifiedName = GatewayUtils.getQualifiedApiName(apiName, version);
+            } else {
+                qualifiedName = apiName;
+            }
             OMElement api = restapiAdminServiceProxy.getApiContent(qualifiedName);
             if (api != null) {
                 return api.toString();

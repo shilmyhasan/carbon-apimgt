@@ -85,6 +85,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.DeprecatedRuntimeConstants;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.apache.xerces.util.SecurityManager;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
@@ -332,6 +333,7 @@ import javax.cache.Caching;
 import javax.net.ssl.SSLContext;
 import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.X509Certificate;
+import javax.validation.constraints.NotNull;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -356,6 +358,8 @@ public final class APIUtil {
     private static boolean isContextCacheInitialized = false;
 
     public static final String DISABLE_ROLE_VALIDATION_AT_SCOPE_CREATION = "disableRoleValidationAtScopeCreation";
+
+    public static final String DISABLE_API_CONTEXT_VALIDATION = "disableApiContextValidation";
 
     private static final int ENTITY_EXPANSION_LIMIT = 0;
 
@@ -388,7 +392,7 @@ public final class APIUtil {
 
     private static Schema tenantConfigJsonSchema;
     private static Schema operationPolicySpecSchema;
-
+    private static final String contextRegex = "^[a-zA-Z0-9_${}/.;()-]+$";
 
     private APIUtil() {
 
@@ -3449,6 +3453,95 @@ public final class APIUtil {
                     APIConstants.EMAIL_DOMAIN_SEPARATOR);
         }
         return input;
+    }
+
+    /**
+     * This method is used to get the APIProvider instance for a given username
+     *
+     * @param context API Context of the API
+     * @throws APIManagementException If the context is not valid
+     */
+    public static void validateAPIContext(String context, String apiName) throws APIManagementException {
+        String disableAPIContextValidation = System.getProperty(DISABLE_API_CONTEXT_VALIDATION);
+        if (Boolean.parseBoolean(disableAPIContextValidation)) {
+            return;
+        }
+        Pattern pattern = Pattern.compile(contextRegex);
+        String errorMsg = ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION.getErrorMessage();
+
+        if (context == null || context.isEmpty()) {
+            errorMsg = errorMsg + " For API " + apiName + ", context cannot be empty or null";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
+        }
+
+        if (context.endsWith("/")) {
+            errorMsg = errorMsg + " For API " + apiName + ", context " + context + " cannot end with /";
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
+        }
+
+        Matcher matcher = pattern.matcher(context);
+
+        // if the context has allowed characters
+        if (matcher.matches()) {
+            context = context.startsWith("/") ? context : "/".concat(context);
+            String split[] = context.split("/");
+
+            for (String param : split) {
+                if (param != null && !APIConstants.VERSION_PLACEHOLDER.equals(param)) {
+                    if (param.contains(APIConstants.VERSION_PLACEHOLDER)) {
+                        errorMsg = errorMsg + " For API " + apiName +
+                                ", {version} cannot exist as a substring of a sub-context";
+                        log.error(errorMsg);
+                        throw new APIManagementException(errorMsg);
+                    } else if (param.contains("{") || param.contains("}")) {
+                        errorMsg = errorMsg + " For API " + apiName +
+                                ", { or } cannot exist as a substring of a sub-context";
+                        log.error(errorMsg);
+                        throw new APIManagementException(errorMsg);
+                    }
+                }
+            }
+
+            //check whether the parentheses are balanced
+            boolean isBalanced = checkBalancedParentheses(context);
+            if (!isBalanced) {
+                errorMsg = errorMsg + " Unbalanced parenthesis cannot be used in context " + context + " for API "
+                        + apiName;
+                throw new APIManagementException(errorMsg);
+            }
+        } else {
+            errorMsg = errorMsg + " Special characters cannot be used in context " + context + " for API "+ apiName;
+            log.error(errorMsg);
+            throw new APIManagementException(errorMsg);
+        }
+    }
+
+    /**
+     * Check whether the parentheses are balanced
+     *
+     * @param input API Context
+     * @throws APIManagementException If parentheses are not balanced
+     */
+    public static boolean checkBalancedParentheses(@NotNull String input) throws APIManagementException {
+        int count = 0;
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '(') {
+                count++;
+            } else if (input.charAt(i) == ')') {
+                count--;
+            }
+            if (count < 0) {
+                log.error("Unbalanced parentheses in : " + input);
+                return false;
+            }
+        }
+        if (count != 0) {
+            log.error("Unbalanced parentheses in : " + input);
+            return false;
+        }
+        return true;
     }
 
     public static void copyResourcePermissions(String username, String sourceArtifactPath, String targetArtifactPath)
@@ -9518,47 +9611,6 @@ public final class APIUtil {
     }
 
     /**
-     * Utility method to generate JWT header with public certificate thumbprint for signature verification.
-     *
-     * @param publicCert         - The public certificate which needs to include in the header as thumbprint
-     * @param signatureAlgorithm signature algorithm which needs to include in the header
-     * @throws APIManagementException
-     */
-    public static String generateHeader(Certificate publicCert, String signatureAlgorithm) throws APIManagementException {
-
-        try {
-            //generate the SHA-1 thumbprint of the certificate
-            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
-            byte[] der = publicCert.getEncoded();
-            digestValue.update(der);
-            byte[] digestInBytes = digestValue.digest();
-            String publicCertThumbprint = hexify(digestInBytes);
-            String base64UrlEncodedThumbPrint;
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
-            StringBuilder jwtHeader = new StringBuilder();
-            /*
-             * Sample header
-             * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
-             * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256"}
-             * {"typ":"JWT", "alg":"[2]", "x5t":"[1]", "x5t":"[1]"}
-             * */
-            jwtHeader.append("{\"typ\":\"JWT\",");
-            jwtHeader.append("\"alg\":\"");
-            jwtHeader.append(getJWSCompliantAlgorithmCode(signatureAlgorithm));
-            jwtHeader.append("\",");
-
-            jwtHeader.append("\"x5t\":\"");
-            jwtHeader.append(base64UrlEncodedThumbPrint);
-            jwtHeader.append("\"}");
-            return jwtHeader.toString();
-
-        } catch (Exception e) {
-            throw new APIManagementException("Error in generating public certificate thumbprint", e);
-        }
-    }
-
-    /**
      * Get the JWS compliant signature algorithm code of the algorithm used to sign the JWT.
      *
      * @param signatureAlgorithm - The algorithm used to sign the JWT. If signing is disabled, the value will be NONE.
@@ -11578,7 +11630,8 @@ public final class APIUtil {
         velocityEngine.setProperty(RuntimeConstants.OLD_CHECK_EMPTY_OBJECTS, false);
         velocityEngine.setProperty(DeprecatedRuntimeConstants.OLD_SPACE_GOBBLING,"bc");
         velocityEngine.setProperty("runtime.conversion.handler", "none");
-
+        velocityEngine.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+        velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
     }
 
     /**
