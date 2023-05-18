@@ -38,7 +38,11 @@ function Download(props) {
         promised_get_content
             .then((done) => {
                 setIsSuccessful(true);
-                setIsFileAvailable(true);
+                if (done.data.size > 0) {
+                    setIsFileAvailable(true);
+                } else {
+                    setIsFileAvailable(false);
+                }
             })
             .catch((error) => {
                 setIsSuccessful(true);
@@ -65,7 +69,7 @@ function Download(props) {
 
     return (
         isSuccessful &&
-        <Button onClick={handleDownload} disabled={!isFileAvailable}>
+        <Button onClick={handleDownload} disabled={!isFileAvailable} aria-label={'Download ' + props.docName}>
             <Icon>arrow_downward</Icon>
             <FormattedMessage
                 id='Apis.Details.Documents.Download.documents.listing.download'
