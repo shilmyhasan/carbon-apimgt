@@ -383,7 +383,7 @@ class Listing extends React.Component {
                                     <table className={classes.actionTable}>
                                         <tr>
                                             <td>
-                                                <Download docId={docId} apiId={this.apiId} />
+                                                <Download docId={docId} apiId={this.apiId} docName={docName} />
                                             </td>
                                             <td>
                                                 <Edit

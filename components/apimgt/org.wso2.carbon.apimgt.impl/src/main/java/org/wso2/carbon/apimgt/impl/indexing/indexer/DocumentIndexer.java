@@ -94,7 +94,10 @@ public class DocumentIndexer extends RXTIndexer {
             try {
                 fetchRequiredDetailsFromAssociatedAPI(registry, documentResource, fields);
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(fetchDocumentContent(registry, documentResource));
+                String documentContent = fetchDocumentContent(registry, documentResource);
+                if (documentContent != null) {
+                    stringBuilder.append(documentContent);
+                }
                 if (fields.get(APIConstants.DOC_NAME) != null) {
                     stringBuilder.append(APIConstants.DOC_NAME + "=" + StringUtils
                             .join(fields.get(APIConstants.DOC_NAME), ","));
@@ -175,8 +178,10 @@ public class DocumentIndexer extends RXTIndexer {
 
             if (fileAssociations.length < 1) {
                 String error = "No document associated to API";
-                log.error(error);
-                throw new APIManagementException(error);
+                if (log.isDebugEnabled()) {
+                    log.debug(error);
+                }
+                return null;
             }
 
             //a file document can have one file association
