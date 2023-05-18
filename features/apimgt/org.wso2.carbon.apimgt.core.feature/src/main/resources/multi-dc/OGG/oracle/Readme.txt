@@ -33,4 +33,9 @@ CREATE SEQUENCE REG_LOG_SEQUENCE START WITH 2 INCREMENT BY 3 NOCACHE            
 DC3                                                                                             #
 CREATE SEQUENCE REG_LOG_SEQUENCE START WITH 3 INCREMENT BY 3 NOCACHE                            #
                                                                                                 #
+Change 3                                                                                        #
+--------------------                                                                            #
+The insertqueries.sql should be run finally but only in one DC when the replication is turned   #
+on.                                                                                             #
+                                                                                                #
 #################################################################################################
