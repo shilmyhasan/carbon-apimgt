@@ -19,6 +19,8 @@ package org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.impl.APIConstants;
@@ -44,6 +46,7 @@ import java.util.Set;
 
 public class RuntimeArtifactGeneratorUtil {
 
+    private static final Log log = LogFactory.getLog(RuntimeArtifactGeneratorUtil.class);
     private static final GatewayArtifactsMgtDAO gatewayArtifactsMgtDAO = GatewayArtifactsMgtDAO.getInstance();
 
     public static RuntimeArtifactDto generateRuntimeArtifact(String apiId, String name, String version,
@@ -134,7 +137,7 @@ public class RuntimeArtifactGeneratorUtil {
         }
         if (gatewayArtifacts != null) {
             if (gatewayArtifacts.isEmpty()) {
-                throw new APIManagementException("No API Artifacts", ExceptionCodes.NO_API_ARTIFACT_FOUND);
+                log.info("No API Artifacts");
             }
             for (APIRuntimeArtifactDto apiRuntimeArtifactDto: gatewayArtifacts) {
                 String organizationId = gatewayArtifactsMgtDAO.retrieveOrganization(apiRuntimeArtifactDto.getApiId());
@@ -142,9 +145,6 @@ public class RuntimeArtifactGeneratorUtil {
                     apiRuntimeArtifactDto.setOrganization(organizationId);
                 }
             }
-        }
-        if (gatewayArtifacts == null || gatewayArtifacts.isEmpty()) {
-            return null;
         }
         return gatewayArtifacts;
     }
