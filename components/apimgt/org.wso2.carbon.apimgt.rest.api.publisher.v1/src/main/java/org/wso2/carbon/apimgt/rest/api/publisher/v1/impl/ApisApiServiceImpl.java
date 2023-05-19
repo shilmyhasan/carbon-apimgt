@@ -2233,6 +2233,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             APIIdentifier apiIdentifier;
             if (ApiMgtDAO.getInstance().checkAPIUUIDIsARevisionUUID(apiId) != null) {
                 apiIdentifier = APIMappingUtil.getAPIInfoFromUUID(apiId, organization).getId();
+	    	apiIdentifier.setUuid(apiId);
             } else {
                 apiIdentifier = APIMappingUtil.getAPIIdentifierFromUUID(apiId);
             }
