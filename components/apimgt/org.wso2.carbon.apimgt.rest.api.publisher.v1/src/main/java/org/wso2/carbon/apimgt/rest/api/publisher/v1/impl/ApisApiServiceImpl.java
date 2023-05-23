@@ -4386,13 +4386,19 @@ public class ApisApiServiceImpl implements ApisApiService {
                 //Checking the vhost is included in the available vhost list
                 if (vhost.getHost().equals(apiRevisionDeploymentDTO.getVhost())) {
                     isVhostValidated = true;
+                    apiRevisionDeployment.setVhost(apiRevisionDeploymentDTO.getVhost());
+                } else if (vhost.getWsHost().equals(apiRevisionDeploymentDTO.getVhost())) {
+                    // This was added to preserve the functionality in case of Deploying a WebSocket API revision.
+                    // For WebSocket APIs apiRevisionDeploymentDTO.getVhost() returns the wsHost
+                    isVhostValidated = true;
+                    apiRevisionDeployment.setVhost(vhost.getHost());
                 }
             }
             if (!isVhostValidated) {
                 RestApiUtil.handleBadRequest("Invalid Vhost: " + apiRevisionDeploymentDTO.getVhost(), log);
             }
             apiRevisionDeployment.setDeployment(environment);
-            apiRevisionDeployment.setVhost(apiRevisionDeploymentDTO.getVhost());
+
             if (StringUtils.isEmpty(apiRevisionDeploymentDTO.getVhost())) {
                 // vhost is only required when deploying an revision, not required when un-deploying a revision
                 // since the same scheme 'APIRevisionDeployment' is used for deploy and undeploy, handle it here.
