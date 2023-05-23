@@ -4387,6 +4387,8 @@ public class ApisApiServiceImpl implements ApisApiService {
                     isVhostValidated = true;
                     apiRevisionDeployment.setVhost(apiRevisionDeploymentDTO.getVhost());
                 } else if (vhost.getWsHost().equals(apiRevisionDeploymentDTO.getVhost())) {
+                    // This was added to preserve the functionality in case of Deploying a WebSocket API revision.
+                    // For WebSocket APIs apiRevisionDeploymentDTO.getVhost() returns the wsHost
                     isVhostValidated = true;
                     apiRevisionDeployment.setVhost(vhost.getHost());
                 }

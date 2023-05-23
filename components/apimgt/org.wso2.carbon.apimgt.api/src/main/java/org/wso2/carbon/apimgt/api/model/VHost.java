@@ -29,6 +29,7 @@ import java.util.List;
  * This class represent an Virtual Host
  */
 public class VHost {
+    // host name from the http endpoint
     private String host;
     private String httpContext = "";
     private Integer httpPort = -1;
