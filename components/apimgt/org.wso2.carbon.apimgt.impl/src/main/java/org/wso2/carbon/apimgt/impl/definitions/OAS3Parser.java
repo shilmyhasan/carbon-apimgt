@@ -1060,6 +1060,7 @@ public class OAS3Parser extends APIDefinition {
         Map<String, SecurityScheme> securitySchemes = new HashMap<>();
         SecurityScheme securityScheme = null;
         List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
+        SecurityScheme secScheme = new SecurityScheme();
         String securityString = swaggerData.getSecurity();
         List<String> secList = new ArrayList<>();
         if (securityString != null) {
@@ -1096,30 +1097,33 @@ public class OAS3Parser extends APIDefinition {
             }
         }
         openAPI.setSecurity(security);
-
-        if (securityScheme.getFlows() == null) {
-            securityScheme.setFlows(new OAuthFlows());
-        }
-        OAuthFlow oAuthFlow = securityScheme.getFlows().getImplicit();
-        if (oAuthFlow == null) {
-            oAuthFlow = new OAuthFlow();
-            securityScheme.getFlows().setImplicit(oAuthFlow);
-        }
-        oAuthFlow.setAuthorizationUrl(authUrl);
-        Scopes oas3Scopes = new Scopes();
-        Set<Scope> scopes = swaggerData.getScopes();
-        if (scopes != null && !scopes.isEmpty()) {
-            Map<String, String> scopeBindings = new HashMap<>();
-            for (Scope scope : scopes) {
-                String description = scope.getDescription() != null ? scope.getDescription() : "";
-                oas3Scopes.put(scope.getKey(), description);
-                String roles = (StringUtils.isNotBlank(scope.getRoles())
-                        && scope.getRoles().trim().split(",").length > 0) ? scope.getRoles() : StringUtils.EMPTY;
-                scopeBindings.put(scope.getKey(), roles);
+        Map<String, SecurityScheme> swaggerSecuritySchemes = openAPI.getComponents().getSecuritySchemes();
+        openAPI.getComponents().setSecuritySchemes(securitySchemes);
+        SecurityScheme scheme = securitySchemes.get("default");
+        if (scheme != null) {
+            if (scheme.getFlows() == null) {
+                scheme.setFlows(new OAuthFlows());
             }
-            oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
+            // setting scopes id if it is null
+            // https://github.com/swagger-api/swagger-parser/issues/1202
+            OAuthFlow oAuthFlow = scheme.getFlows().getImplicit();
+            if (oAuthFlow == null) {
+                oAuthFlow = new OAuthFlow();
+                scheme.getFlows().setImplicit(oAuthFlow);
+            }
+            if (oAuthFlow.getScopes() == null) {
+                oAuthFlow.setScopes(new Scopes());
+            }
+            oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
         }
-        oAuthFlow.setScopes(oas3Scopes);
+
+        for (String pathKey : openAPI.getPaths().keySet()) {
+            PathItem pathItem = openAPI.getPaths().get(pathKey);
+            for (Map.Entry<PathItem.HttpMethod, Operation> entry : pathItem.readOperationsMap().entrySet()) {
+                Operation operation = entry.getValue();
+                operation.setSecurity(security);
+            }
+        }
     }
 
     /**
