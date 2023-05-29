@@ -113,10 +113,10 @@ public class BasicAuthAuthenticatorTest {
             String encodedUserNamePassword = DatatypeConverter.printBase64Binary(userNamePasswordByteArray);
             String basicAuthHeader = "Basic " + encodedUserNamePassword;
             String[] credentials = basicAuthAuthenticator.extractBasicAuthCredentials(basicAuthHeader);
-            Assert.assertEquals("The extracted username odes not match with " +
+            Assert.assertEquals("The extracted username does not match with " +
                    "the actual value : " + endpointUsername, endpointUsername, credentials[0]);
             Assert.assertEquals("The extracted password does not match with the actual " +
-                    "value : " + endpointPassword.toString(), String.valueOf(endpointPassword),
+                    "value : " + String.valueOf(endpointPassword), String.valueOf(endpointPassword),
                     credentials[1]);
         }
 
