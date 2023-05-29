@@ -8601,6 +8601,8 @@ components:
           example: APPROVED
         createdTime:
           type: string
+        lastUpdatedTimestamp:
+          type: string
         lastUpdatedTime:
           type: string
           x-otherScopes:
@@ -9209,6 +9211,8 @@ components:
         corsConfiguration:
           $ref: '#/components/schemas/APICorsConfiguration'
         createdTime:
+          type: string
+        lastUpdatedTimestamp:
           type: string
         lastUpdatedTime:
           type: string
