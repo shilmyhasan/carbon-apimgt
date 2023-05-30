@@ -80,6 +80,7 @@ public class SettingsMappingUtil {
                     APIUtil.isExternalStoresEnabled(RestApiCommonUtil.getLoggedInUserTenantDomain()));
             settingsDTO.setDocVisibilityEnabled(APIUtil.isDocVisibilityLevelsEnabled());
             settingsDTO.setCrossTenantSubscriptionEnabled(APIUtil.isCrossTenantSubscriptionsEnabled());
+            settingsDTO.setPassRequestParamsToLambdaEnabled(APIUtil.isPassRequestParamsToLambdaEnabled());
         }
         return settingsDTO;
     }

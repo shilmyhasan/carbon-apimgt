@@ -32,6 +32,7 @@ public class SettingsDTO   {
     private Boolean externalStoresEnabled = null;
     private Boolean docVisibilityEnabled = null;
     private Boolean crossTenantSubscriptionEnabled = false;
+    private Boolean passRequestParamsToLambdaEnabled = false;
 
   /**
    * The Developer Portal URL
@@ -176,6 +177,24 @@ public class SettingsDTO   {
     this.crossTenantSubscriptionEnabled = crossTenantSubscriptionEnabled;
   }
 
+  /**
+   * Defines whether or not the request params should be sent to lambda function 
+   **/
+  public SettingsDTO passRequestParamsToLambdaEnabled(Boolean passRequestParamsToLambdaEnabled) {
+    this.passRequestParamsToLambdaEnabled = passRequestParamsToLambdaEnabled;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "false", value = "Defines whether or not the request params should be sent to lambda function ")
+  @JsonProperty("passRequestParamsToLambdaEnabled")
+  public Boolean isPassRequestParamsToLambdaEnabled() {
+    return passRequestParamsToLambdaEnabled;
+  }
+  public void setPassRequestParamsToLambdaEnabled(Boolean passRequestParamsToLambdaEnabled) {
+    this.passRequestParamsToLambdaEnabled = passRequestParamsToLambdaEnabled;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -193,12 +212,13 @@ public class SettingsDTO   {
         Objects.equals(securityAuditProperties, settings.securityAuditProperties) &&
         Objects.equals(externalStoresEnabled, settings.externalStoresEnabled) &&
         Objects.equals(docVisibilityEnabled, settings.docVisibilityEnabled) &&
-        Objects.equals(crossTenantSubscriptionEnabled, settings.crossTenantSubscriptionEnabled);
+        Objects.equals(crossTenantSubscriptionEnabled, settings.crossTenantSubscriptionEnabled) &&
+        Objects.equals(passRequestParamsToLambdaEnabled, settings.passRequestParamsToLambdaEnabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(devportalUrl, environment, scopes, monetizationAttributes, securityAuditProperties, externalStoresEnabled, docVisibilityEnabled, crossTenantSubscriptionEnabled);
+    return Objects.hash(devportalUrl, environment, scopes, monetizationAttributes, securityAuditProperties, externalStoresEnabled, docVisibilityEnabled, crossTenantSubscriptionEnabled, passRequestParamsToLambdaEnabled);
   }
 
   @Override
@@ -214,6 +234,7 @@ public class SettingsDTO   {
     sb.append("    externalStoresEnabled: ").append(toIndentedString(externalStoresEnabled)).append("\n");
     sb.append("    docVisibilityEnabled: ").append(toIndentedString(docVisibilityEnabled)).append("\n");
     sb.append("    crossTenantSubscriptionEnabled: ").append(toIndentedString(crossTenantSubscriptionEnabled)).append("\n");
+    sb.append("    passRequestParamsToLambdaEnabled: ").append(toIndentedString(passRequestParamsToLambdaEnabled)).append("\n");
     sb.append("}");
     return sb.toString();
   }
