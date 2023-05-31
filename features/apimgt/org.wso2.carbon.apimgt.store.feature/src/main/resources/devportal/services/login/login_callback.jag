@@ -86,14 +86,22 @@
         }
         var clientId = systemApplicationDTO.getConsumerKey();
         var clientSecret = systemApplicationDTO.getConsumerSecret();
-        if (codeVerifier !== null) {
-          tokenRequestData = {
-              "grant_type": "authorization_code",
-              "code": request.getParameter("code", "UTF-8"),
-              "code_verifier": session.get("code_verifier"),
-              "redirect_uri": loginCallbackUrl,
-              "client_id": clientId
-          };
+        var isBypassClientCredentials = systemApplicationDAO.isBypassClientCredentials(clientId);
+        if (codeVerifier !== null && isBypassClientCredentials) {
+            tokenRequestData = {
+                "grant_type": "authorization_code",
+                "code": request.getParameter("code", "UTF-8"),
+                "code_verifier": session.get("code_verifier"),
+                "redirect_uri": loginCallbackUrl,
+                "client_id": clientId
+            };
+        } else if (codeVerifier !== null) {
+            tokenRequestData = {
+                "grant_type": "authorization_code",
+                "code": request.getParameter("code", "UTF-8"),
+                "code_verifier": session.get("code_verifier"),
+                "redirect_uri": loginCallbackUrl
+            };
         } else {
           tokenRequestData = {
               "grant_type": "authorization_code",
@@ -106,7 +114,6 @@
         var Integer = Packages.java.lang.Integer;
         var base64encoded = Base64.encode(new String(clientId + ":" + clientSecret).getBytes());
         var tokenEndpoint = appUtils.getLoopbackOrigin() + TOKEN_URL_SUFFIX;
-        var isBypassClientCredentials = systemApplicationDAO.isBypassClientCredentials(clientId);
         if (isBypassClientCredentials && codeVerifier !== null) {
             var result = post(tokenEndpoint, tokenRequestData, {});
         } else {

@@ -301,14 +301,16 @@ public class SystemApplicationDAO {
     }
 
     /**
-     * Method to check whether BypassClientCredentials is enabled for the application identified by the consumer key
+     * Method to check whether BypassClientCredentials is enabled for the application identified by the
+     * consumerkey.
+     *
      * @param consumerKey consumer key of the system app
      * @return true is Bypass Client Credentials is enabled, false otherwise
      * @throws APIMgtDAOException
      */
     public static boolean isBypassClientCredentials(String consumerKey) throws APIMgtDAOException {
         boolean bypassClientCredentials = false;
-        String sql = "SELECT PROPERTY_VALUE FROM IDN_OIDC_PROPERTY WHERE CONSUMER_KEY = ? AND PROPERTY_KEY = ? ";
+        String sql = SQLConstants.SystemApplicationConstants.GET_BYPASS_CLIENT_CREDENTIALS_ENABLED;
 
         try (Connection connection = APIMgtDBUtil.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -321,8 +323,8 @@ public class SystemApplicationDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new APIMgtDAOException("Error while checking for whether BypassClientCredentials " +
-                    "is enabled for System Application by consumer key: " + consumerKey, e);
+            throw new APIMgtDAOException("Error while checking for whether BypassClientCredentials "
+                    + "is enabled for System Application by consumer key: " + consumerKey, e);
         }
         return bypassClientCredentials;
     }
