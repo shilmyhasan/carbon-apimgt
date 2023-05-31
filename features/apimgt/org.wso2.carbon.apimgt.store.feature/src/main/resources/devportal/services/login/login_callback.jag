@@ -109,9 +109,6 @@
         var isBypassClientCredentials = systemApplicationDAO.isBypassClientCredentials(clientId);
         if (isBypassClientCredentials && codeVerifier !== null) {
             var result = post(tokenEndpoint, tokenRequestData, {});
-        } else if (isBypassClientCredentials && codeVerifier == null) {
-            log.error("Code verifier is null. Cannot bypass client credentials without making PKCE mandatory.");
-            return;
         } else {
             var result = post(tokenEndpoint, tokenRequestData, { "Authorization": "Basic " + base64encoded });
         }
