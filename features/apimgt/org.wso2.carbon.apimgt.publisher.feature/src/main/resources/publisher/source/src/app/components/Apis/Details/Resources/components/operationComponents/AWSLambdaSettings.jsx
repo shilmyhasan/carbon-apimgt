@@ -171,7 +171,8 @@ export default function IntegrationDownshift(props) {
     useEffect(() => {
         if (operation['x-amzn-resource-timeout']) {
             setTimeout(operation['x-amzn-resource-timeout']);
-        } else if (operation['x-amzn-resource-content-encode']) {
+        }
+        if (operation['x-amzn-resource-content-encode']) {
             setIsBase64Encoded(operation['x-amzn-resource-content-encode']);
         }
     }, []);
