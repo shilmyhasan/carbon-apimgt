@@ -73,20 +73,6 @@
             loginCallbackUrl = serverUrl + appContext + LOGIN_CALLBACK_URL_SUFFIX;
         }
         var codeVerifier = session.get("code_verifier");
-        if (codeVerifier !== null) {
-          tokenRequestData = {
-              "grant_type": "authorization_code",
-              "code": request.getParameter("code", "UTF-8"),
-              "code_verifier": session.get("code_verifier"),
-              "redirect_uri": loginCallbackUrl
-          };
-        } else {
-          tokenRequestData = {
-              "grant_type": "authorization_code",
-              "code": request.getParameter("code", "UTF-8"),
-              "redirect_uri": loginCallbackUrl
-          };
-        }
         var tenantDomain = "carbon.super";
         if (appUtils.isPerTenantServiceProviderEnabled()) {
             tenantDomain = appUtils.getTenantDomain();
@@ -100,12 +86,39 @@
         }
         var clientId = systemApplicationDTO.getConsumerKey();
         var clientSecret = systemApplicationDTO.getConsumerSecret();
+        var isBypassClientCredentials = systemApplicationDAO.isBypassClientCredentials(clientId);
+        if (codeVerifier !== null && isBypassClientCredentials) {
+            tokenRequestData = {
+                "grant_type": "authorization_code",
+                "code": request.getParameter("code", "UTF-8"),
+                "code_verifier": session.get("code_verifier"),
+                "redirect_uri": loginCallbackUrl,
+                "client_id": clientId
+            };
+        } else if (codeVerifier !== null) {
+            tokenRequestData = {
+                "grant_type": "authorization_code",
+                "code": request.getParameter("code", "UTF-8"),
+                "code_verifier": session.get("code_verifier"),
+                "redirect_uri": loginCallbackUrl
+            };
+        } else {
+          tokenRequestData = {
+              "grant_type": "authorization_code",
+              "code": request.getParameter("code", "UTF-8"),
+              "redirect_uri": loginCallbackUrl
+          };
+        }
         var Base64 = org.apache.axiom.om.util.Base64;
         var String = Packages.java.lang.String;
         var Integer = Packages.java.lang.Integer;
         var base64encoded = Base64.encode(new String(clientId + ":" + clientSecret).getBytes());
         var tokenEndpoint = appUtils.getLoopbackOrigin() + TOKEN_URL_SUFFIX;
-        var result = post(tokenEndpoint, tokenRequestData, { "Authorization": "Basic " + base64encoded });
+        if (isBypassClientCredentials && codeVerifier !== null) {
+            var result = post(tokenEndpoint, tokenRequestData, {});
+        } else {
+            var result = post(tokenEndpoint, tokenRequestData, { "Authorization": "Basic " + base64encoded });
+        }
         session.remove("code_verifier");
 
         response.contentType = "application/json";
