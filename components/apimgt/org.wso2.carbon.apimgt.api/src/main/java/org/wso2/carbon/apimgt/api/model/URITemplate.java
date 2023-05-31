@@ -48,6 +48,7 @@ public class URITemplate implements Serializable{
     private Set<APIProductIdentifier> usedByProducts = new HashSet<>();
     private String amznResourceName;
     private int amznResourceTimeout;
+    private boolean amznResourceContentEncoded;
 
     public ConditionGroupDTO[] getConditionGroups() {
         return conditionGroups;
@@ -434,5 +435,12 @@ public class URITemplate implements Serializable{
 
     public int getAmznResourceTimeout() {
         return amznResourceTimeout;
+    }
+    public void setAmznResourceContentEncoded(boolean amznResourceContentEncoded) {
+        this.amznResourceContentEncoded = amznResourceContentEncoded;
+    }
+
+    public boolean getAmznResourceContentEncoded() {
+        return amznResourceContentEncoded;
     }
 }

@@ -790,6 +790,10 @@ public final class APIUtil {
                                         operation.getAsJsonObject().get(APIConstants.SWAGGER_X_AMZN_RESOURCE_TIMEOUT)
                                                 .getAsInt());
                             }
+                            if (operation.getAsJsonObject().get(APIConstants.SWAGGER_X_AMZN_RESOURCE_CONTNET_ENCODING) != null) {
+                                uriTemplate.setAmznResourceContentEncoded(operation.getAsJsonObject().
+                                        get(APIConstants.SWAGGER_X_AMZN_RESOURCE_CONTNET_ENCODING).getAsBoolean());
+                            }
                         }
                     }
                 }
@@ -11663,6 +11667,18 @@ public final class APIUtil {
         String defaultReservedUsername =
                 apiManagerConfiguration.getFirstProperty(APIConstants.API_DEVPORTAL_DEFAULT_RESERVED_USERNAME);
         return defaultReservedUsername;
+    }
+
+    public static boolean isPassRequestParamsToLambdaEnabled() {
+
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String passRequestParamsToLambdaEnabled =
+                apiManagerConfiguration.getFirstProperty(APIConstants.PASS_REQUEST_PARAMS_TO_LAMBDA_FUNCTION);
+        if (StringUtils.isNotEmpty(passRequestParamsToLambdaEnabled)) {
+            return Boolean.parseBoolean(passRequestParamsToLambdaEnabled);
+        }
+        return false;
     }
 
 

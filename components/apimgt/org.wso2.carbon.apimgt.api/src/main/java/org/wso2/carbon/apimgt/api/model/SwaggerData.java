@@ -40,6 +40,7 @@ public class SwaggerData {
         private List<Scope> scopes = new ArrayList<>();
         private String amznResourceName;
         private int amznResourceTimeout;
+        private boolean amznResourceContentEncoded;
 
         public String getPath() {
             return path;
@@ -96,6 +97,13 @@ public class SwaggerData {
         public void setAmznResourceTimeout(int amznResourceTimeout) {
             this.amznResourceTimeout = amznResourceTimeout;
         }
+        public boolean isAmznResourceContentEncoded() {
+            return amznResourceContentEncoded;
+        }
+
+        public void setAmznResourceContentEncoded(boolean amznResourceContentEncoded) {
+            this.amznResourceContentEncoded = amznResourceContentEncoded;
+        }
 
         public List<Scope> getScopes() {
 
@@ -144,6 +152,7 @@ public class SwaggerData {
             resource.scopes = uriTemplate.retrieveAllScopes();
             resource.amznResourceName = uriTemplate.getAmznResourceName();
             resource.amznResourceTimeout = uriTemplate.getAmznResourceTimeout();
+            resource.amznResourceContentEncoded = uriTemplate.getAmznResourceContentEncoded();
             resources.add(resource);
         }
 
@@ -182,6 +191,7 @@ public class SwaggerData {
             resource.scopes = uriTemplate.retrieveAllScopes();
             resource.amznResourceName = uriTemplate.getAmznResourceName();
             resource.amznResourceTimeout = uriTemplate.getAmznResourceTimeout();
+            resource.amznResourceContentEncoded = uriTemplate.getAmznResourceContentEncoded();
             resources.add(resource);
         }
         Set<Scope> scopes = apiProduct.getScopes();

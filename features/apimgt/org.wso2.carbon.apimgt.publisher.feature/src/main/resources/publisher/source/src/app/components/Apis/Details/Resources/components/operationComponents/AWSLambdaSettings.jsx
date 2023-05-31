@@ -29,7 +29,12 @@ import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Icon from '@material-ui/core/Icon';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import { FormattedMessage } from 'react-intl';
+import { useAppContext } from 'AppComponents/Shared/AppContext';
 
 /**
  * The renderInput function.
@@ -161,9 +166,14 @@ export default function IntegrationDownshift(props) {
         arns,
     } = props;
     const [timeout, setTimeout] = useState(50000);
+    const [isBase64Encoded, setIsBase64Encoded] = useState(operation['x-amzn-resource-content-encode']);
+    const { settings } = useAppContext();
     useEffect(() => {
         if (operation['x-amzn-resource-timeout']) {
             setTimeout(operation['x-amzn-resource-timeout']);
+        }
+        if (operation['x-amzn-resource-content-encode']) {
+            setIsBase64Encoded(operation['x-amzn-resource-content-encode']);
         }
     }, []);
     const handleTimeoutMin = (event) => {
@@ -206,6 +216,16 @@ export default function IntegrationDownshift(props) {
             });
         }
     };
+
+    const handleIsBase64Encoded = (event) => {
+        setIsBase64Encoded(event.target.checked);
+        operationsDispatcher({
+            action: 'amznResourceContentEncode',
+            data: { target, verb, value: event.target.checked },
+        });
+        console.log('changing content encode ' + event.target.checked + ' dispatched');
+    };
+
     return (
         <>
             <Grid item md={12} xs={12}>
@@ -218,7 +238,7 @@ export default function IntegrationDownshift(props) {
                 </Typography>
             </Grid>
             <Grid item md={1} xs={1} />
-            <Grid item md={7} xs={7}>
+            <Grid item md={6} xs={6}>
                 <Downshift
                     id='downshift-options'
                     onSelect={(changes) => {
@@ -339,6 +359,34 @@ export default function IntegrationDownshift(props) {
                     }}
                 />
             </Grid>
+            {settings.passRequestParamsToLambdaEnabled ? (
+                <>
+                    <Grid item md={1} xs={1}>
+                        <FormControl component='fieldset' className={classes.formControl}>
+                            <FormControlLabel
+                                control={(
+                                    <Checkbox
+                                        checked={isBase64Encoded}
+                                        value={isBase64Encoded}
+                                        onChange={(event) => {
+                                            handleIsBase64Encoded(event);
+                                        }}
+                                    />
+                                )}
+                                label='Encode'
+                            />
+                            <FormHelperText>
+                                <FormattedMessage
+                                    id='Apis.Details.Resources.components.operationComponents.AWSLambdaSettings.encode'
+                                    defaultMessage='Check if request body should be base64 encoded'
+                                />
+                            </FormHelperText>
+                        </FormControl>
+                    </Grid>
+                </>
+            ) : (
+                <Grid item md={1} xs={1} />
+            )}
             <Grid item md={1} xs={1} />
         </>
     );
