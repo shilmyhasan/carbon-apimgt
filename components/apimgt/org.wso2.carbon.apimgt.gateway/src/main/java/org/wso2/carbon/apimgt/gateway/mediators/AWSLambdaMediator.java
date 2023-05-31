@@ -142,19 +142,14 @@ public class AWSLambdaMediator extends AbstractMediator {
                 }
                 payload.add(PATH_PARAMETERS, pathParameters);
                 payload.add(QUERY_STRING_PARAMETERS, queryStringParameters);
-                if (!isMultipartContent) {
-                    if (isContentEncodingEnabled) {
-                        payload.addProperty(BODY_PARAMETER, Base64.encodeBase64String(body.getBytes(
-                                StandardCharsets.UTF_8)));
+                if (isContentEncodingEnabled) {
+                    payload.addProperty(BODY_PARAMETER, Base64.encodeBase64String(body.getBytes(
+                            StandardCharsets.UTF_8)));
+                } else {
+                    if (isMultipartContent) {
+                        payload.addProperty(BODY_PARAMETER, body);
                     } else {
                         payload.add(BODY_PARAMETER, new JsonParser().parse(body).getAsJsonObject());
-                    }
-                } else {
-                    if (isContentEncodingEnabled) {
-                        payload.addProperty(BODY_PARAMETER, Base64.encodeBase64String(body.getBytes(
-                                StandardCharsets.UTF_8)));
-                    } else {
-                        payload.addProperty(BODY_PARAMETER, body);
                     }
                 }
                 payload.addProperty(IS_BASE64_ENCODED_PARAMETER, isContentEncodingEnabled);
