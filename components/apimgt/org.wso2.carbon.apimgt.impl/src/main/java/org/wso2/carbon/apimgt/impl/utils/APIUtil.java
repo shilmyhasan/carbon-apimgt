@@ -6647,7 +6647,8 @@ public final class APIUtil {
                     final String[] localhosts = { "::1", "127.0.0.1", "localhost", "localhost.localdomain" };
                     @Override
                     public boolean verify(String urlHostName, SSLSession session) {
-                        return Arrays.asList(localhosts).contains(urlHostName);
+                        return SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER.verify(urlHostName, session)
+                                || Arrays.asList(localhosts).contains(urlHostName);
                     }
                 };
             } else {
