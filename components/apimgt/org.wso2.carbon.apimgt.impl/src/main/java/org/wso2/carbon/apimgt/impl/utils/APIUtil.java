@@ -331,7 +331,9 @@ import javax.cache.Cache;
 import javax.cache.CacheConfiguration;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.security.cert.CertificateEncodingException;
 import javax.security.cert.X509Certificate;
 import javax.validation.constraints.NotNull;
@@ -6633,13 +6635,21 @@ public final class APIUtil {
             trustStore.load(new FileInputStream(keyStorePath), keyStorePassword.toCharArray());
             sslContext = SSLContexts.custom().loadTrustMaterial(trustStore).build();
 
-            X509HostnameVerifier hostnameVerifier;
+            HostnameVerifier hostnameVerifier;
             String hostnameVerifierOption = System.getProperty(HOST_NAME_VERIFIER);
 
             if (ALLOW_ALL.equalsIgnoreCase(hostnameVerifierOption)) {
                 hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
             } else if (STRICT.equalsIgnoreCase(hostnameVerifierOption)) {
                 hostnameVerifier = SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
+            } else if (DEFAULT_AND_LOCALHOST.equalsIgnoreCase(hostnameVerifierOption)) {
+                hostnameVerifier = new HostnameVerifier() {
+                    final String[] localhosts = { "::1", "127.0.0.1", "localhost", "localhost.localdomain" };
+                    @Override
+                    public boolean verify(String urlHostName, SSLSession session) {
+                        return Arrays.asList(localhosts).contains(urlHostName);
+                    }
+                };
             } else {
                 hostnameVerifier = SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
             }
