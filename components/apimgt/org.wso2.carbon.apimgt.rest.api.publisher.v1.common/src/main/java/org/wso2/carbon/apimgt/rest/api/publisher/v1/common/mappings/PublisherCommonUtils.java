@@ -29,6 +29,10 @@ import graphql.schema.idl.UnExecutableSchemaGenerator;
 import graphql.schema.idl.errors.SchemaProblem;
 import graphql.schema.validation.SchemaValidationError;
 import graphql.schema.validation.SchemaValidator;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -1307,6 +1311,7 @@ public class PublisherCommonUtils {
         API existingAPI = apiProvider.getAPIbyUUID(apiId, organization);
         APIDefinition oasParser = response.getParser();
         String apiDefinition = response.getJsonContent();
+        OpenAPI openAPI = getOpenAPI(apiDefinition);
         if (isServiceAPI) {
             apiDefinition = oasParser.copyVendorExtensions(existingAPI.getSwaggerDefinition(), apiDefinition);
         } else {
@@ -1367,6 +1372,15 @@ public class PublisherCommonUtils {
         String apiSwagger = apiProvider.getOpenAPIDefinition(apiId, organization); // TODO see why we need to get it
         // instead of passing same
         return oasParser.getOASDefinitionForPublisher(existingAPI, apiSwagger);
+    }
+
+    static OpenAPI getOpenAPI(String oasDefinition) {
+        OpenAPIV3Parser openAPIV3Parser = new OpenAPIV3Parser();
+        SwaggerParseResult parseAttemptForV3 = openAPIV3Parser.readContents(oasDefinition, null, null);
+        if (CollectionUtils.isNotEmpty(parseAttemptForV3.getMessages())) {
+            log.debug("Errors found when parsing OAS definition");
+        }
+        return parseAttemptForV3.getOpenAPI();
     }
 
     /**
