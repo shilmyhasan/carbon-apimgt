@@ -889,6 +889,7 @@ public class OAS3Parser extends APIDefinition {
         if (secList.contains(BASIC_AUTH)) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.HTTP);
+            securityScheme.setScheme("basic");
             securitySchemes.put(BASIC_AUTH, securityScheme);
             SecurityRequirement secReq = new SecurityRequirement();
             secReq.addList(BASIC_AUTH, new ArrayList<String>());
@@ -897,6 +898,8 @@ public class OAS3Parser extends APIDefinition {
         if (secList.contains(API_KEY)) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.APIKEY);
+            securityScheme.setIn(SecurityScheme.In.HEADER);
+            securityScheme.setName("API_KEY");
             securitySchemes.put(API_KEY, securityScheme);
             SecurityRequirement secReq = new SecurityRequirement();
             secReq.addList(API_KEY, new ArrayList<String>());
@@ -922,6 +925,21 @@ public class OAS3Parser extends APIDefinition {
                 oAuthFlow.setScopes(new Scopes());
             }
             oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
+            Scopes oas3Scopes = new Scopes();
+            Set<Scope> scopes = api.getScopes();
+            if (scopes != null && !scopes.isEmpty()) {
+                Map<String, String> scopeBindings = new HashMap<>();
+                for (Scope scope : scopes) {
+                    String description = scope.getDescription() != null ? scope.getDescription() : "";
+                    oas3Scopes.put(scope.getKey(), description);
+                    String roles = (StringUtils.isNotBlank(scope.getRoles())
+                            && scope.getRoles().trim().split(",").length > 0) ? scope.getRoles() :
+                            StringUtils.EMPTY;
+                    scopeBindings.put(scope.getKey(), roles);
+                }
+                oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
+            }
+            oAuthFlow.setScopes(oas3Scopes);
         }
 
         if (api.getAuthorizationHeader() != null) {
@@ -964,7 +982,40 @@ public class OAS3Parser extends APIDefinition {
             PathItem pathItem = openAPI.getPaths().get(pathKey);
             for (Map.Entry<PathItem.HttpMethod, Operation> entry : pathItem.readOperationsMap().entrySet()) {
                 Operation operation = entry.getValue();
-                operation.setSecurity(security);
+                List<SecurityRequirement> securityRequirements = operation.getSecurity();
+                SecurityRequirement secReq = new SecurityRequirement();
+                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
+                List<SecurityRequirement> rootSec = new ArrayList<SecurityRequirement>();
+                for(SecurityRequirement r : security) {
+                    rootSec.add(r);
+                }
+                List<SecurityRequirement> newSec = new ArrayList<SecurityRequirement>();
+                for(SecurityRequirement sr : rootSec) {
+                    if (sr.containsKey("default")) {
+                        for (SecurityRequirement opSec :securityRequirements) {
+                            if (opSec.containsKey("default")) {
+                                newSec.add(opSec);
+                            }
+                        }
+                    }
+                    if (sr.containsKey("basic_auth")) {
+                        newSec.add(sr);
+                    }
+                    if (sr.containsKey("api_key")) {
+                        newSec.add(sr);
+                    }
+
+                }
+//                for (SecurityRequirement sr: securityRequirements) {
+//                    if (sr.containsKey("default")) {
+//                        rootSec.remove(secReq);
+//                        break;
+//                    }
+//                }
+//                for (SecurityRequirement s : rootSec) {
+//                    securityRequirements.add(s);
+//                }
+                operation.setSecurity(newSec);;
                 operation.addExtension(APIConstants.X_WSO2_APP_SECURITY, appSecurityExtension);
             }
         }
@@ -1079,6 +1130,7 @@ public class OAS3Parser extends APIDefinition {
         if (secList.contains("basic_auth")) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.HTTP);
+            securityScheme.setScheme("basic");
             securitySchemes.put(BASIC_AUTH, securityScheme);
             SecurityRequirement secReq = new SecurityRequirement();
             if (!secReq.containsKey(BASIC_AUTH)) {
@@ -1089,6 +1141,8 @@ public class OAS3Parser extends APIDefinition {
         if (secList.contains("api_key")) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.APIKEY);
+            securityScheme.setIn(SecurityScheme.In.HEADER);
+            securityScheme.setName("API_KEY");
             securitySchemes.put(API_KEY, securityScheme);
             SecurityRequirement secReq = new SecurityRequirement();
             if (!secReq.containsKey(API_KEY)) {
@@ -1115,13 +1169,61 @@ public class OAS3Parser extends APIDefinition {
                 oAuthFlow.setScopes(new Scopes());
             }
             oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
+            Scopes oas3Scopes = new Scopes();
+            Set<Scope> scopes = swaggerData.getScopes();
+            if (scopes != null && !scopes.isEmpty()) {
+                Map<String, String> scopeBindings = new HashMap<>();
+                for (Scope scope : scopes) {
+                    String description = scope.getDescription() != null ? scope.getDescription() : "";
+                    oas3Scopes.put(scope.getKey(), description);
+                    String roles = (StringUtils.isNotBlank(scope.getRoles())
+                            && scope.getRoles().trim().split(",").length > 0) ? scope.getRoles() :
+                            StringUtils.EMPTY;
+                    scopeBindings.put(scope.getKey(), roles);
+                }
+                oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
+            }
+            oAuthFlow.setScopes(oas3Scopes);
         }
 
         for (String pathKey : openAPI.getPaths().keySet()) {
             PathItem pathItem = openAPI.getPaths().get(pathKey);
             for (Map.Entry<PathItem.HttpMethod, Operation> entry : pathItem.readOperationsMap().entrySet()) {
                 Operation operation = entry.getValue();
-                operation.setSecurity(security);
+                List<SecurityRequirement> securityRequirements = operation.getSecurity();
+                SecurityRequirement secReq = new SecurityRequirement();
+                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
+                List<SecurityRequirement> rootSec = new ArrayList<SecurityRequirement>();
+                for(SecurityRequirement r : security) {
+                    rootSec.add(r);
+                }
+                List<SecurityRequirement> newSec = new ArrayList<SecurityRequirement>();
+                for(SecurityRequirement sr : rootSec) {
+                    if (sr.containsKey("default")) {
+                        for (SecurityRequirement opSec :securityRequirements) {
+                            if (opSec.containsKey("default")) {
+                                newSec.add(opSec);
+                            }
+                        }
+                    }
+                    if (sr.containsKey("basic_auth")) {
+                        newSec.add(sr);
+                    }
+                    if (sr.containsKey("api_key")) {
+                        newSec.add(sr);
+                    }
+
+                }
+//                for (SecurityRequirement sr: securityRequirements) {
+//                    if (sr.containsKey("default")) {
+//                        rootSec.remove(secReq);
+//                        break;
+//                    }
+//                }
+//                for (SecurityRequirement s : rootSec) {
+//                    securityRequirements.add(s);
+//                }
+                operation.setSecurity(newSec);
             }
         }
     }
