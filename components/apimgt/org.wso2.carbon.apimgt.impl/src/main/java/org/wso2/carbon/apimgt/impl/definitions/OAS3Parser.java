@@ -94,8 +94,6 @@ import static org.wso2.carbon.apimgt.impl.APIConstants.APPLICATION_JSON_MEDIA_TY
 public class OAS3Parser extends APIDefinition {
     private static final Log log = LogFactory.getLog(OAS3Parser.class);
     static final String OPENAPI_SECURITY_SCHEMA_KEY = "default";
-    static final String BASIC_AUTH = "basic_auth";
-    static final String API_KEY = "api_key";
     static final String OPENAPI_DEFAULT_AUTHORIZATION_URL = "https://test.com";
     private List<String> otherSchemes;
     private List<String> getOtherSchemes() {
@@ -872,13 +870,13 @@ public class OAS3Parser extends APIDefinition {
         }
         Map<String, SecurityScheme> securitySchemes = new HashMap<>();
         List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
-        SecurityScheme securityScheme = new SecurityScheme();
-        String sec = api.getApiSecurity();
+        SecurityScheme securityScheme;
+        String apiSec = api.getApiSecurity();
         List<String> secList = new ArrayList<>();
-        if (sec != null) {
-            secList = Arrays.asList(sec.split(","));
+        if (apiSec != null) {
+            secList = Arrays.asList(apiSec.split(","));
         }
-        if ( secList.get(0).equals("") || secList.contains("oauth2")) {
+        if (secList.get(0).equals("") || secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.OAUTH2);
             securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
@@ -886,30 +884,28 @@ public class OAS3Parser extends APIDefinition {
             secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
             security.add(secReq);
         }
-        if (secList.contains(BASIC_AUTH)) {
+        if (secList.contains(APIConstants.API_SECURITY_BASIC_AUTH)) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.HTTP);
-            securityScheme.setScheme("basic");
-            securitySchemes.put(BASIC_AUTH, securityScheme);
+            securityScheme.setScheme(APIConstants.AUTHORIZATION_HEADER_BASIC);
+            securitySchemes.put(APIConstants.API_SECURITY_BASIC_AUTH, securityScheme);
             SecurityRequirement secReq = new SecurityRequirement();
-            secReq.addList(BASIC_AUTH, new ArrayList<String>());
+            secReq.addList(APIConstants.API_SECURITY_BASIC_AUTH, new ArrayList<String>());
             security.add(secReq);
         }
-        if (secList.contains(API_KEY)) {
+        if (secList.contains(APIConstants.API_SECURITY_API_KEY)) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.APIKEY);
             securityScheme.setIn(SecurityScheme.In.HEADER);
-            securityScheme.setName("API_KEY");
-            securitySchemes.put(API_KEY, securityScheme);
+            securityScheme.setName(APIConstants.API_SECURITY_API_KEY);
+            securitySchemes.put(APIConstants.API_SECURITY_API_KEY, securityScheme);
             SecurityRequirement secReq = new SecurityRequirement();
-            secReq.addList(API_KEY, new ArrayList<String>());
+            secReq.addList(APIConstants.API_SECURITY_API_KEY, new ArrayList<String>());
             security.add(secReq);
-
         }
         openAPI.setSecurity(security);
-        Map<String, SecurityScheme> swaggerSecuritySchemes = openAPI.getComponents().getSecuritySchemes();
         openAPI.getComponents().setSecuritySchemes(securitySchemes);
-        SecurityScheme scheme = securitySchemes.get("default");
+        SecurityScheme scheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
         if (scheme != null) {
             if (scheme.getFlows() == null) {
                 scheme.setFlows(new OAuthFlows());
@@ -985,37 +981,27 @@ public class OAS3Parser extends APIDefinition {
                 List<SecurityRequirement> securityRequirements = operation.getSecurity();
                 SecurityRequirement secReq = new SecurityRequirement();
                 secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-                List<SecurityRequirement> rootSec = new ArrayList<SecurityRequirement>();
-                for(SecurityRequirement r : security) {
-                    rootSec.add(r);
-                }
+//                List<SecurityRequirement> rootSec = new ArrayList<SecurityRequirement>();
+//                for(SecurityRequirement r : security) {
+//                    rootSec.add(r);
+//                }
                 List<SecurityRequirement> newSec = new ArrayList<SecurityRequirement>();
-                for(SecurityRequirement sr : rootSec) {
-                    if (sr.containsKey("default")) {
-                        for (SecurityRequirement opSec :securityRequirements) {
-                            if (opSec.containsKey("default")) {
+                for (SecurityRequirement securityRequirement : security) {
+                    if (securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
+                        for (SecurityRequirement opSec : securityRequirements) {
+                            if (opSec.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
                                 newSec.add(opSec);
                             }
                         }
                     }
-                    if (sr.containsKey("basic_auth")) {
-                        newSec.add(sr);
+                    if (securityRequirement.containsKey(APIConstants.API_SECURITY_BASIC_AUTH)) {
+                        newSec.add(securityRequirement);
                     }
-                    if (sr.containsKey("api_key")) {
-                        newSec.add(sr);
+                    if (securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY)) {
+                        newSec.add(securityRequirement);
                     }
-
                 }
-//                for (SecurityRequirement sr: securityRequirements) {
-//                    if (sr.containsKey("default")) {
-//                        rootSec.remove(secReq);
-//                        break;
-//                    }
-//                }
-//                for (SecurityRequirement s : rootSec) {
-//                    securityRequirements.add(s);
-//                }
-                operation.setSecurity(newSec);;
+                operation.setSecurity(newSec);
                 operation.addExtension(APIConstants.X_WSO2_APP_SECURITY, appSecurityExtension);
             }
         }
@@ -1109,14 +1095,13 @@ public class OAS3Parser extends APIDefinition {
             openAPI.setComponents(new Components());
         }
         Map<String, SecurityScheme> securitySchemes = new HashMap<>();
-        SecurityScheme securityScheme = null;
+        SecurityScheme securityScheme;
         List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
-        SecurityScheme secScheme = new SecurityScheme();
         String securityString = swaggerData.getSecurity();
         List<String> secList = new ArrayList<>();
         if (securityString != null) {
             secList = Arrays.asList(securityString.split(","));
-            if ((secList.get(0).equals("") || secList.contains("oauth2"))) {
+            if ((secList.get(0).equals("") || secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2))) {
                 securityScheme = new SecurityScheme();
                 securityScheme.setType(SecurityScheme.Type.OAUTH2);
                 securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
@@ -1126,26 +1111,26 @@ public class OAS3Parser extends APIDefinition {
                     security.add(secReq);
                 }
             }
-            if (secList.contains("basic_auth")) {
+            if (secList.contains(APIConstants.API_SECURITY_BASIC_AUTH)) {
                 securityScheme = new SecurityScheme();
                 securityScheme.setType(SecurityScheme.Type.HTTP);
-                securityScheme.setScheme("basic");
-                securitySchemes.put(BASIC_AUTH, securityScheme);
+                securityScheme.setScheme(APIConstants.AUTHORIZATION_HEADER_BASIC);
+                securitySchemes.put(APIConstants.API_SECURITY_BASIC_AUTH, securityScheme);
                 SecurityRequirement secReq = new SecurityRequirement();
-                if (!secReq.containsKey(BASIC_AUTH)) {
-                    secReq.addList(BASIC_AUTH, new ArrayList<String>());
+                if (!secReq.containsKey(APIConstants.API_SECURITY_BASIC_AUTH)) {
+                    secReq.addList(APIConstants.API_SECURITY_BASIC_AUTH, new ArrayList<String>());
                     security.add(secReq);
                 }
             }
-            if (secList.contains("api_key")) {
+            if (secList.contains(APIConstants.API_SECURITY_API_KEY)) {
                 securityScheme = new SecurityScheme();
                 securityScheme.setType(SecurityScheme.Type.APIKEY);
                 securityScheme.setIn(SecurityScheme.In.HEADER);
                 securityScheme.setName("API_KEY");
-                securitySchemes.put(API_KEY, securityScheme);
+                securitySchemes.put(APIConstants.API_SECURITY_API_KEY, securityScheme);
                 SecurityRequirement secReq = new SecurityRequirement();
-                if (!secReq.containsKey(API_KEY)) {
-                    secReq.addList(API_KEY, new ArrayList<String>());
+                if (!secReq.containsKey(APIConstants.API_SECURITY_API_KEY)) {
+                    secReq.addList(APIConstants.API_SECURITY_API_KEY, new ArrayList<String>());
                     security.add(secReq);
                 }
             }
@@ -1162,7 +1147,7 @@ public class OAS3Parser extends APIDefinition {
         openAPI.setSecurity(security);
         Map<String, SecurityScheme> swaggerSecuritySchemes = openAPI.getComponents().getSecuritySchemes();
         openAPI.getComponents().setSecuritySchemes(securitySchemes);
-        SecurityScheme scheme = securitySchemes.get("default");
+        SecurityScheme scheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
         if (scheme != null) {
             if (scheme.getFlows() == null) {
                 scheme.setFlows(new OAuthFlows());
@@ -1202,36 +1187,26 @@ public class OAS3Parser extends APIDefinition {
                 List<SecurityRequirement> securityRequirements = operation.getSecurity();
                 SecurityRequirement secReq = new SecurityRequirement();
                 secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-                List<SecurityRequirement> rootSec = new ArrayList<SecurityRequirement>();
-                for(SecurityRequirement r : security) {
-                    rootSec.add(r);
-                }
+//                List<SecurityRequirement> rootSec = new ArrayList<SecurityRequirement>();
+//                for(SecurityRequirement r : security) {
+//                    rootSec.add(r);
+//                }
                 List<SecurityRequirement> newSec = new ArrayList<SecurityRequirement>();
-                for(SecurityRequirement sr : rootSec) {
-                    if (sr.containsKey("default")) {
+                for(SecurityRequirement securityRequirement : security) {
+                    if (securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
                         for (SecurityRequirement opSec :securityRequirements) {
-                            if (opSec.containsKey("default")) {
+                            if (opSec.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
                                 newSec.add(opSec);
                             }
                         }
                     }
-                    if (sr.containsKey("basic_auth")) {
-                        newSec.add(sr);
+                    if (securityRequirement.containsKey(APIConstants.API_SECURITY_BASIC_AUTH)) {
+                        newSec.add(securityRequirement);
                     }
-                    if (sr.containsKey("api_key")) {
-                        newSec.add(sr);
+                    if (securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY)) {
+                        newSec.add(securityRequirement);
                     }
-
                 }
-//                for (SecurityRequirement sr: securityRequirements) {
-//                    if (sr.containsKey("default")) {
-//                        rootSec.remove(secReq);
-//                        break;
-//                    }
-//                }
-//                for (SecurityRequirement s : rootSec) {
-//                    securityRequirements.add(s);
-//                }
                 operation.setSecurity(newSec);
             }
         }
