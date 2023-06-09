@@ -2939,12 +2939,15 @@ public class ApisApiServiceImpl implements ApisApiService {
     @Override
     public Response getAPISwagger(String apiId, String ifNoneMatch, MessageContext messageContext) {
         try {
+            APIDTO apiDtoToReturn;
             APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
             String organization = RestApiUtil.getValidatedOrganization(messageContext);
             //this will fail if user does not have access to the API or the API does not exist
             API api = apiProvider.getAPIbyUUID(apiId, organization);
-            api.setOrganization(organization);
-            String updatedDefinition = RestApiCommonUtil.retrieveSwaggerDefinition(api, apiProvider);
+            apiDtoToReturn = APIMappingUtil.fromAPItoDTO(api, true, apiProvider);
+            API apiObj = APIMappingUtil.fromDTOtoAPI(apiDtoToReturn, apiDtoToReturn.getProvider());
+            apiObj.setOrganization(organization);
+            String updatedDefinition = RestApiCommonUtil.retrieveSwaggerDefinition(apiObj, apiProvider);
             return Response.ok().entity(updatedDefinition).header("Content-Disposition",
                     "attachment; filename=\"" + "swagger.json" + "\"" ).build();
         } catch (APIManagementException e) {
