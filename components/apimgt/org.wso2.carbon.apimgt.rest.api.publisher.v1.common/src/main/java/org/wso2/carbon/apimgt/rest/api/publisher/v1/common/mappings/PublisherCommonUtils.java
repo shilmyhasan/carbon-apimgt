@@ -1374,7 +1374,7 @@ public class PublisherCommonUtils {
         return oasParser.getOASDefinitionForPublisher(existingAPI, apiSwagger);
     }
 
-    static OpenAPI getOpenAPI(String oasDefinition) {
+    public static OpenAPI getOpenAPI(String oasDefinition) {
         OpenAPIV3Parser openAPIV3Parser = new OpenAPIV3Parser();
         SwaggerParseResult parseAttemptForV3 = openAPIV3Parser.readContents(oasDefinition, null, null);
         if (CollectionUtils.isNotEmpty(parseAttemptForV3.getMessages())) {
