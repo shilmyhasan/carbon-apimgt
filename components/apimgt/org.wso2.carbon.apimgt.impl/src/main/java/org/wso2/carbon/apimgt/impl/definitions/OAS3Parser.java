@@ -875,33 +875,42 @@ public class OAS3Parser extends APIDefinition {
         List<String> secList = new ArrayList<>();
         if (apiSec != null) {
             secList = Arrays.asList(apiSec.split(","));
-        }
-        if (secList.get(0).equals("") || secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
+            if ("".equals(apiSec) || secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
+                securityScheme = new SecurityScheme();
+                securityScheme.setType(SecurityScheme.Type.OAUTH2);
+                securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
+                SecurityRequirement secReq = new SecurityRequirement();
+                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
+                security.add(secReq);
+            }
+            if (secList.contains(APIConstants.API_SECURITY_BASIC_AUTH)) {
+                securityScheme = new SecurityScheme();
+                securityScheme.setType(SecurityScheme.Type.HTTP);
+                securityScheme.setScheme(APIConstants.AUTHORIZATION_HEADER_BASIC);
+                securitySchemes.put(APIConstants.API_SECURITY_BASIC_AUTH, securityScheme);
+                SecurityRequirement secReq = new SecurityRequirement();
+                secReq.addList(APIConstants.API_SECURITY_BASIC_AUTH, new ArrayList<String>());
+                security.add(secReq);
+            }
+            if (secList.contains(APIConstants.API_SECURITY_API_KEY)) {
+                securityScheme = new SecurityScheme();
+                securityScheme.setType(SecurityScheme.Type.APIKEY);
+                securityScheme.setIn(SecurityScheme.In.HEADER);
+                securityScheme.setName(APIConstants.API_SECURITY_API_KEY);
+                securitySchemes.put(APIConstants.API_SECURITY_API_KEY, securityScheme);
+                SecurityRequirement secReq = new SecurityRequirement();
+                secReq.addList(APIConstants.API_SECURITY_API_KEY, new ArrayList<String>());
+                security.add(secReq);
+            }
+        } else {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.OAUTH2);
             securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
             SecurityRequirement secReq = new SecurityRequirement();
-            secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-            security.add(secReq);
-        }
-        if (secList.contains(APIConstants.API_SECURITY_BASIC_AUTH)) {
-            securityScheme = new SecurityScheme();
-            securityScheme.setType(SecurityScheme.Type.HTTP);
-            securityScheme.setScheme(APIConstants.AUTHORIZATION_HEADER_BASIC);
-            securitySchemes.put(APIConstants.API_SECURITY_BASIC_AUTH, securityScheme);
-            SecurityRequirement secReq = new SecurityRequirement();
-            secReq.addList(APIConstants.API_SECURITY_BASIC_AUTH, new ArrayList<String>());
-            security.add(secReq);
-        }
-        if (secList.contains(APIConstants.API_SECURITY_API_KEY)) {
-            securityScheme = new SecurityScheme();
-            securityScheme.setType(SecurityScheme.Type.APIKEY);
-            securityScheme.setIn(SecurityScheme.In.HEADER);
-            securityScheme.setName(APIConstants.API_SECURITY_API_KEY);
-            securitySchemes.put(APIConstants.API_SECURITY_API_KEY, securityScheme);
-            SecurityRequirement secReq = new SecurityRequirement();
-            secReq.addList(APIConstants.API_SECURITY_API_KEY, new ArrayList<String>());
-            security.add(secReq);
+            if (!secReq.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
+                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
+                security.add(secReq);
+            }
         }
         openAPI.setSecurity(security);
         openAPI.getComponents().setSecuritySchemes(securitySchemes);
@@ -1097,7 +1106,7 @@ public class OAS3Parser extends APIDefinition {
         List<String> secList = new ArrayList<>();
         if (securityString != null) {
             secList = Arrays.asList(securityString.split(","));
-            if ((secList.get(0).equals("") || secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2))) {
+            if ("".equals(securityString) || secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
                 securityScheme = new SecurityScheme();
                 securityScheme.setType(SecurityScheme.Type.OAUTH2);
                 securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
