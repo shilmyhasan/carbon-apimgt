@@ -2071,7 +2071,7 @@
         <org.wso2.orbit.com.amazonaws.version>1.11.1034.wso2v1</org.wso2.orbit.com.amazonaws.version>
 
         <zipkin.version>2.20.1</zipkin.version>
-        <okhttp.wso2.version>4.2.0.wso2v1</okhttp.wso2.version>
+        <okhttp.wso2.version>4.2.0.wso2v2</okhttp.wso2.version>
         <okio.wso2.version>2.4.0.wso2v1</okio.wso2.version>
 
         <org.wso2.orbit.io.fabric8.kubernetes.version>4.6.4.wso2v1</org.wso2.orbit.io.fabric8.kubernetes.version>
