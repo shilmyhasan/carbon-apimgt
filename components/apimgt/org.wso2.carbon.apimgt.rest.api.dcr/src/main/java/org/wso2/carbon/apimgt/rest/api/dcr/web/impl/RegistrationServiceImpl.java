@@ -45,7 +45,10 @@ import org.wso2.carbon.identity.oauth.OAuthAdminService;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
+import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserCoreConstants;
+import org.wso2.carbon.user.core.config.*;
 import org.wso2.carbon.user.core.util.UserCoreUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
@@ -512,5 +515,17 @@ public class RegistrationServiceImpl implements RegistrationService {
             it.remove();
         }
         return updatingApp;
+    }
+
+    private boolean isUserSuperAdmin(String username) {
+
+        try {
+            RealmConfiguration realmConfig = new RealmConfigXMLProcessor().buildRealmConfigurationFromFile();
+            String adminUserName = realmConfig.getAdminUserName();
+            return adminUserName.equalsIgnoreCase(username);
+        } catch (UserStoreException e) {
+            log.error("Error while retrieving super admin username", e);
+            return false;
+        }
     }
 }
