@@ -786,6 +786,7 @@ public final class APIConstants {
         public static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
         public static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
         public static final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
+        public static final String ACCESS_CONTROL_REQUEST_METHOD = "Access-Control-Request-Method";
         public static final String ALLOW_HEADERS_HANDLER_VALUE = "allowHeaders";
         public static final String ALLOW_METHODS_HANDLER_VALUE = "allowedMethods";
         public static final String ALLOW_ORIGIN_HANDLER_VALUE = "allowedOrigins";
