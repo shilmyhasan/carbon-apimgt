@@ -221,7 +221,7 @@ public class CORSRequestHandler extends AbstractHandler implements ManagedLifecy
 
 		//If a resource with a matching URI was not found.
 		//Respond with a 404.
-        onResourceNotFoundError(messageContext, HttpStatus.SC_NOT_FOUND,
+		onResourceNotFoundError(messageContext, HttpStatus.SC_NOT_FOUND,
                 APIMgtGatewayConstants.RESOURCE_NOT_FOUND_ERROR_MSG);
 	}
 
