@@ -68,7 +68,6 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -164,6 +163,7 @@ import org.wso2.carbon.apimgt.impl.dto.SubscriptionPolicyDTO;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.UserRegistrationConfigDTO;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
+import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.exception.DataLoadingException;
 import org.wso2.carbon.apimgt.impl.internal.APIManagerComponent;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.kmclient.ApacheFeignHttpClient;
@@ -202,7 +202,6 @@ import org.wso2.carbon.governance.lcm.util.CommonUtil;
 import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
 import org.wso2.carbon.identity.oauth.OAuthAdminService;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
-import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
 import org.wso2.carbon.identity.user.profile.stub.UserProfileMgtServiceStub;
 import org.wso2.carbon.identity.user.profile.stub.UserProfileMgtServiceUserProfileExceptionException;
 import org.wso2.carbon.identity.user.profile.stub.types.UserProfileDTO;
@@ -382,6 +381,10 @@ public final class APIUtil {
     private static String hostAddress = null;
     private static final int timeoutInSeconds = 15;
     private static final int retries = 2;
+    private static long retrievalTimeout = 1500;
+    private static double retryProgressionFactor = 2.0;
+    private static int maxRetryCount = 5;
+    private static final long maxRetrievalTimeout = 1000 * 60 * 60;
 
     /**
      * To initialize the publisherRoleCache configurations, based on configurations.
@@ -394,6 +397,22 @@ public final class APIUtil {
                 .getFirstProperty(APIConstants.PUBLISHER_ROLE_CACHE_ENABLED);
         isPublisherRoleCacheEnabled = isPublisherRoleCacheEnabledConfiguration == null || Boolean
                 .parseBoolean(isPublisherRoleCacheEnabledConfiguration);
+        if (apiManagerConfiguration.getEventHubConfigurationDto().getRetryDuration() != -1) {
+            retrievalTimeout = apiManagerConfiguration.getEventHubConfigurationDto().getRetryDuration();
+        } else if (apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryDuration() != -1) {
+            retrievalTimeout = apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryDuration();
+        }
+        if (apiManagerConfiguration.getEventHubConfigurationDto().getMaxRetryCount() != -1) {
+            maxRetryCount = apiManagerConfiguration.getEventHubConfigurationDto().getMaxRetryCount();
+        } else if (apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryDuration() != -1) {
+            maxRetryCount = apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getMaxRetryCount();
+        }
+        if (apiManagerConfiguration.getEventHubConfigurationDto().getRetryProgressionFactor() != -1) {
+            retryProgressionFactor = apiManagerConfiguration.getEventHubConfigurationDto().getRetryProgressionFactor();
+        } else if (apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryDuration() != -1) {
+            retryProgressionFactor =
+                    apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryProgressionFactor();
+        }
     }
 
     /**
@@ -603,6 +622,56 @@ public final class APIUtil {
                         // Ignore
                     }
                 } else {
+                    throw ex;
+                }
+            }
+        } while (retry);
+        return httpResponse;
+    }
+
+    /**
+     * This method is used to execute an HTTP request with retry parameters obtained from configuration parameters.
+     *
+     * @param method       HttpRequest Type
+     * @param httpClient   HttpClient
+     * @return CloseableHttpResponse
+     */
+    public static CloseableHttpResponse executeHTTPRequestWithRetries(HttpRequestBase method, HttpClient httpClient)
+            throws IOException, APIManagementException {
+
+        CloseableHttpResponse httpResponse = null;
+        String path = method.getURI().getPath();
+        long retryDuration = retrievalTimeout;
+        int retryCount = 0;
+        boolean retry;
+        do {
+            try {
+                httpResponse = (CloseableHttpResponse) httpClient.execute(method);
+                if (HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
+                    throw new DataLoadingException("Error while retrieving "
+                                                           + path + ". Received response with status code "
+                                                           + httpResponse.getStatusLine().getStatusCode());
+                }
+                retry = false;
+            } catch (IOException | DataLoadingException ex) {
+                retryCount++;
+                if (retryCount <= maxRetryCount) {
+                    retry = true;
+                    log.error("Failed to retrieve " + path + " from remote endpoint: " + ex.getMessage()
+                                      + ". Retry attempt " + retryCount + " in " + (retryDuration / 1000) +
+                                      " seconds.");
+                    try {
+                        Thread.sleep(retryDuration);
+                        retryDuration = (long) (retryDuration * retryProgressionFactor);
+                        if (retryDuration > maxRetrievalTimeout) {
+                            retryDuration = maxRetrievalTimeout;
+                        }
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                } else {
+                    log.error("Failed to retrieve " + path + " from remote endpoint. Maximum retry count exceeded."
+                                      + ex.getMessage());
                     throw ex;
                 }
             }

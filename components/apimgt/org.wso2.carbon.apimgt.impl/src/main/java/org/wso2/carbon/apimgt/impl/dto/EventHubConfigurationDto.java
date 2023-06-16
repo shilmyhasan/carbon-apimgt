@@ -27,6 +27,9 @@ public class EventHubConfigurationDto {
     private char[] password;
     private EventHubReceiverConfiguration eventHubReceiverConfiguration;
     private EventHubPublisherConfiguration eventHubPublisherConfiguration ;
+    private long retryDuration = -1;
+    private int maxRetryCount = -1;
+    private double retryProgressionFactor = -1;
 
     private long eventWaitingTime = 0;
 
@@ -84,6 +87,35 @@ public class EventHubConfigurationDto {
     public boolean hasEventWaitingTime() {
 
         return eventWaitingTime > 0;
+    }
+
+    public long getRetryDuration() {
+
+        return retryDuration;
+    }
+    public void setRetryDuration(long retryDuration) {
+
+        this.retryDuration = retryDuration;
+    }
+
+    public int getMaxRetryCount() {
+
+        return maxRetryCount;
+    }
+
+    public void setMaxRetryCount(int maxRetryCount) {
+
+        this.maxRetryCount = maxRetryCount;
+    }
+
+    public double getRetryProgressionFactor() {
+
+        return retryProgressionFactor;
+    }
+
+    public void setRetryProgressionFactor(double retryProgressionFactor) {
+
+        this.retryProgressionFactor = retryProgressionFactor;
     }
 
     public String getUsername() {

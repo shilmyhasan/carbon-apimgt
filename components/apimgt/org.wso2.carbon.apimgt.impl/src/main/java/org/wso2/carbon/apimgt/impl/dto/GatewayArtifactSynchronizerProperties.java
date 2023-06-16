@@ -13,7 +13,9 @@ public class GatewayArtifactSynchronizerProperties {
     private String retrieverName = APIConstants.GatewayArtifactSynchronizer.DB_RETRIEVER_NAME;
     private Set<String> gatewayLabels = new HashSet<>();
     private String artifactSynchronizerDataSource = "jdbc/WSO2AM_DB";
-    private long retryDuartion = 15000 ;
+    private long retryDuration = -1;
+    private int maxRetryCount = -1;
+    private double retryProgressionFactor = -1;
     private String gatewayStartup = "sync";
     private long eventWaitingTime = 1;
     private boolean onDemandLoading;
@@ -99,14 +101,33 @@ public class GatewayArtifactSynchronizerProperties {
         this.saveArtifactsEnabled = saveArtifactsEnabled;
     }
 
-    public long getRetryDuartion() {
+    public long getRetryDuration() {
 
-        return retryDuartion;
+        return retryDuration;
     }
 
-    public void  setRetryDuartion(long retryDuartion) {
+    public void setRetryDuration(long retryDuration) {
 
-        this.retryDuartion = retryDuartion;
+        this.retryDuration = retryDuration;
+    }
+
+    public int getMaxRetryCount() {
+
+        return maxRetryCount;
+    }
+
+    public void setMaxRetryCount(int maxRetryCount) {
+
+        this.maxRetryCount = maxRetryCount;
+    }
+
+    public double getRetryProgressionFactor() {
+
+        return retryProgressionFactor;
+    }
+
+    public void setRetryProgressionFactor(double retryProgressionFactor) {
+        this.retryProgressionFactor = retryProgressionFactor;
     }
 
     public String getGatewayStartup() {
