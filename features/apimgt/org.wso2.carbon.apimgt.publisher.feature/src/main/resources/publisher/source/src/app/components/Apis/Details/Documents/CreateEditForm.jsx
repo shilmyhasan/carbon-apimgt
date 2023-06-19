@@ -521,19 +521,25 @@ class CreateEditForm extends React.Component {
                     onChange={this.handleChange('visibility')}
                     error={summeryEmpty}
                 >
-                    <MenuItem value='API_LEVEL'>
+                    <MenuItem
+                    id='public-visibility-selector'
+                    value='API_LEVEL'>
                         <FormattedMessage
                             id='Apis.Details.Documents.CreateEditForm.document.docVisibility.dropdown.public'
                             defaultMessage='Same as API Visibility'
                         />
                     </MenuItem>
-                    <MenuItem value='PRIVATE'>
+                    <MenuItem
+                    id='private-visibility-selector'
+                    value='PRIVATE'>
                         <FormattedMessage
                             id='Apis.Details.Documents.CreateEditForm.document.docVisibility.dropdown.private'
                             defaultMessage='Private'
                         />
                     </MenuItem>
-                    <MenuItem value='OWNER_ONLY'>
+                    <MenuItem
+                    id='owners-only-visibility-selector'
+                    value='OWNER_ONLY'>
                         <FormattedMessage
                             id='Apis.Details.Documents.CreateEditForm.document.docVisibility.dropdown.ownerOnly'
                             defaultMessage='Owner Only'
