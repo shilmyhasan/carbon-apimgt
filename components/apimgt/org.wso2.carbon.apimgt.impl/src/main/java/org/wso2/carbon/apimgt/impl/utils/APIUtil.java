@@ -11700,10 +11700,13 @@ public final class APIUtil {
         velocityEngine.setProperty(RuntimeConstants.OLD_CHECK_EMPTY_OBJECTS, false);
         velocityEngine.setProperty(DeprecatedRuntimeConstants.OLD_SPACE_GOBBLING,"bc");
         velocityEngine.setProperty("runtime.conversion.handler", "none");
+    }
+
+    public static void initializeVelocityContextClassPath(VelocityEngine velocityEngine){
+        initializeVelocityContext(velocityEngine);
         velocityEngine.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
         velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
     }
-
     /**
      * Handles gateway vendor for Choreo Connect before insert DB operations.
      *

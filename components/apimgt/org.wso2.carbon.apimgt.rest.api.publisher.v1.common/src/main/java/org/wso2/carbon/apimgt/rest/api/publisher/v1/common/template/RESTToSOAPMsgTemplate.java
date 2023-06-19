@@ -66,7 +66,7 @@ public class RESTToSOAPMsgTemplate {
             context.internalGetKeys();
 
             VelocityEngine velocityengine = new VelocityEngine();
-            APIUtil.initializeVelocityContext(velocityengine);
+            APIUtil.initializeVelocityContextClassPath(velocityengine);
             velocityengine.init();
             org.apache.velocity.Template t = velocityengine.getTemplate(this.getInSeqTemplatePath());
             t.merge(context, writer);
@@ -90,7 +90,7 @@ public class RESTToSOAPMsgTemplate {
             context.internalGetKeys();
 
             VelocityEngine velocityengine = new VelocityEngine();
-            APIUtil.initializeVelocityContext(velocityengine);
+            APIUtil.initializeVelocityContextClassPath(velocityengine);
 
             velocityengine.init();
             org.apache.velocity.Template template = velocityengine.getTemplate(this.getOutSeqTemplatePath());
