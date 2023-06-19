@@ -53,11 +53,11 @@ public class DefaultAPIHandler extends AbstractSynapseHandler {
         // Handle JWKS API calls
         boolean isJWKSEndpoint = false;
         if (APIConstants.SUPER_TENANT_DOMAIN.equalsIgnoreCase(tenantDomain)) {
-            if (path.startsWith(JWTConstants.GATEWAY_JWKS_API_CONTEXT)) {
+            if (path.equals(JWTConstants.GATEWAY_JWKS_API_CONTEXT)) {
                 isJWKSEndpoint = true;
             }
         } else {
-            if (path.startsWith(APIConstants.TENANT_PREFIX + tenantDomain + JWTConstants.GATEWAY_JWKS_API_CONTEXT)) {
+            if (path.equals(APIConstants.TENANT_PREFIX + tenantDomain + JWTConstants.GATEWAY_JWKS_API_CONTEXT)) {
                 isJWKSEndpoint = true;
             }
         }
