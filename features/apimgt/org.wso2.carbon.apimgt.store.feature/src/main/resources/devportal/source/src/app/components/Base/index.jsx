@@ -481,7 +481,10 @@ class Layout extends React.Component {
                                         onClick={() => setTenantDomain('INVALID')}
                                         id='gotoPubulicDevPortal'
                                     >
-                                        <Button className={classes.publicStore}>
+                                        <Button
+                                            className={classes.publicStore}
+                                            id='switchDevPortal'
+                                        >
                                             <Icon className={classes.icons}>public</Icon>
                                             <Hidden mdDown>
                                                 <FormattedMessage
