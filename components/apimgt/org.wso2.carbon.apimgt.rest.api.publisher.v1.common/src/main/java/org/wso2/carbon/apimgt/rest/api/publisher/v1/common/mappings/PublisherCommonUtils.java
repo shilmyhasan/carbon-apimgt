@@ -1987,8 +1987,8 @@ public class PublisherCommonUtils {
 
         for (int i = 0; i < customProperties.size(); i++) {
             JSONObject property = (JSONObject) customProperties.get(i);
-            String propertyName = (String) property.get("Name");
-            boolean isRequired = (boolean) property.get("Required");
+            String propertyName = (String) property.get(APIConstants.CustomPropertyAttributes.NAME);
+            boolean isRequired = (boolean) property.get(APIConstants.CustomPropertyAttributes.REQUIRED);
 
             if (isRequired) {
                 APIInfoAdditionalPropertiesMapDTO mapProperty = additionalPropertiesMap.get(propertyName);
