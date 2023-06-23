@@ -801,7 +801,11 @@ public class ApisApiServiceImpl implements ApisApiService {
                 throw new APIManagementException("Invalid/Malformed endpoint URL(s) detected",
                         ExceptionCodes.INVALID_ENDPOINT_URL);
             }
-
+            org.json.simple.JSONArray customProperties = APIUtil.getCustomProperties(username);
+            if (!PublisherCommonUtils.validateMandatoryProperties(customProperties, body)) {
+                throw new APIManagementException("Error occurred while updating required properties",
+                        ExceptionCodes.ERROR_WHILE_UPDATING_MANDATORY_PROPERTIES);
+            }
             APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
             API originalAPI = apiProvider.getAPIbyUUID(apiId, organization);
             originalAPI.setOrganization(organization);
