@@ -153,7 +153,7 @@ public class JWTValidator {
             parsedJWTToken = (SignedJWT) JWTParser.parse(jwtToken);
             net.minidev.json.JSONObject applivationNameJSONObject = (net.minidev.json.JSONObject) parsedJWTToken.
                     getJWTClaimsSet().getClaim(APIConstants.JwtTokenConstants.APPLICATION);
-            applicationName = (String) applivationNameJSONObject.get("name");
+            applicationName = (String) applivationNameJSONObject.get(APIConstants.JwtTokenConstants.APPLICATION_NAME);
         } catch (ParseException e) {
             log.error("Invalid JWT token. Failed to decode the token." + " API Context: " + apiContext +
                     " API Version: " + apiVersion + " Application Name: " + applicationName);
