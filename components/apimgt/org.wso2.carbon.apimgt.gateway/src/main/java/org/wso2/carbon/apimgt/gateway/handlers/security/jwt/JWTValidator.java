@@ -94,6 +94,9 @@ public class JWTValidator {
     private JWTClaimsSet extractedPayload;
     JWTConfigurationDto jwtConfigurationDto;
     private static ExecutorService executorService;
+    private String apiContext;
+    private String apiVersion;
+    private String applicationName;
 
     public JWTValidator(String apiLevelPolicy, APIKeyValidator apiKeyValidator) {
         this.apiLevelPolicy = apiLevelPolicy;
@@ -140,16 +143,20 @@ public class JWTValidator {
         String tokenIdentifier = "";
 
         String tokenSignature = splitToken[2];
-        String apiContext = (String) synCtx.getProperty(RESTConstants.REST_API_CONTEXT);
-        String apiVersion = (String) synCtx.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+        apiContext = (String) synCtx.getProperty(RESTConstants.REST_API_CONTEXT);
+        apiVersion = (String) synCtx.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
         String httpMethod = (String) ((Axis2MessageContext) synCtx).getAxis2MessageContext().
                 getProperty(Constants.Configuration.HTTP_METHOD);
         String matchingResource = (String) synCtx.getProperty(APIConstants.API_ELECTED_RESOURCE);
         SignedJWT parsedJWTToken = null;
         try {
             parsedJWTToken = (SignedJWT) JWTParser.parse(jwtToken);
+            net.minidev.json.JSONObject applivationNameJSONObject = (net.minidev.json.JSONObject) parsedJWTToken.
+                    getJWTClaimsSet().getClaim(APIConstants.JwtTokenConstants.APPLICATION);
+            applicationName = (String) applivationNameJSONObject.get(APIConstants.JwtTokenConstants.APPLICATION_NAME);
         } catch (ParseException e) {
-            log.error("Invalid JWT token. Failed to decode the token.");
+            log.error("Invalid JWT token. Failed to decode the token." + " API Context: " + apiContext +
+                    " API Version: " + apiVersion + " Application Name: " + applicationName);
             throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                     "Invalid JWT token. Failed to decode the token.", e);
         }
@@ -189,7 +196,8 @@ public class JWTValidator {
                     log.debug("Token retrieved from the invalid token cache. Token: " + GatewayUtils
                             .getMaskedToken(splitToken[0]));
                 }
-                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]));
+                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]) + " API Context: " +
+                        apiContext + " API Version: " + apiVersion + " Application Name: " + applicationName);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token");
             }
@@ -200,7 +208,8 @@ public class JWTValidator {
                     log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
                             getMaskedToken(splitToken[0]));
                 }
-                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]));
+                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]) + " API Context: " +
+                        apiContext + " API Version: " + apiVersion + " Application Name: " + applicationName);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token");
             }
@@ -211,7 +220,8 @@ public class JWTValidator {
                     log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
                             getMaskedToken(splitToken[0]));
                 }
-                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]));
+                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]) + " API Context: " +
+                        apiContext + " API Version: " + apiVersion + " Application Name: " + applicationName);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token");
             }
@@ -227,7 +237,8 @@ public class JWTValidator {
                 if (log.isDebugEnabled()) {
                     log.debug("Invalid JWT token. Token: " + GatewayUtils.getMaskedToken(splitToken[0]));
                 }
-                log.error("Invalid JWT token. Failed to decode the token.");
+                log.error("Invalid JWT token. Failed to decode the token." + " API Context: " + apiContext +
+                        " API Version: " + apiVersion + " Application Name: " + applicationName);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token. Failed to decode the token.", e);
             }
@@ -292,7 +303,8 @@ public class JWTValidator {
                             log.debug("Token decryption failure when retrieving payload. Token: "
                                     + GatewayUtils.getMaskedToken(splitToken[0]), e);
                         }
-                        log.error("Invalid JWT token. Failed to decode the token");
+                        log.error("Invalid JWT token. Failed to decode the token" + " API Context: " + apiContext +
+                                " API Version: " + apiVersion + " Application Name: " + applicationName);
                         throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                                 "Invalid JWT token");
                     }
@@ -638,7 +650,8 @@ public class JWTValidator {
         try {
             parsedJWTToken = (SignedJWT) JWTParser.parse(jwtToken);
         } catch (ParseException e) {
-            log.error("Invalid JWT token. Failed to decode the token.");
+            log.error("Invalid JWT token. Failed to decode the token." + " API Context: " + apiContext +
+                    " API Version: " + apiVersion + " Application Name: " + applicationName);
             throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                     "Invalid JWT token. Failed to decode the token.", e);
         }
@@ -679,7 +692,8 @@ public class JWTValidator {
                     log.debug("Token retrieved from the invalid token cache. Token: " + GatewayUtils
                             .getMaskedToken(splitToken[0]));
                 }
-                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]));
+                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]) + " API Context: " +
+                        apiContext + " API Version: " + apiVersion + " Application Name: " + applicationName);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token");
             }
@@ -690,7 +704,8 @@ public class JWTValidator {
                     log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
                             getMaskedToken(splitToken[0]));
                 }
-                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]));
+                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]) + " API Context: " +
+                        apiContext + " API Version: " + apiVersion + " Application Name: " + applicationName);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token");
             }
@@ -701,7 +716,8 @@ public class JWTValidator {
                     log.debug("Token retrieved from the revoked jwt token map. Token: " + GatewayUtils.
                             getMaskedToken(splitToken[0]));
                 }
-                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]));
+                log.error("Invalid JWT token. " + GatewayUtils.getMaskedToken(splitToken[0]) + " API Context: " +
+                        apiContext + " API Version: " + apiVersion + " Application Name: " + applicationName);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token");
             }
@@ -715,7 +731,8 @@ public class JWTValidator {
                 if (log.isDebugEnabled()) {
                     log.debug("Invalid JWT token. Token: " + GatewayUtils.getMaskedToken(splitToken[0]));
                 }
-                log.error("Invalid JWT token. Failed to decode the token.");
+                log.error("Invalid JWT token. Failed to decode the token." + " API Context: " + apiContext +
+                        " API Version: " + apiVersion + " Application Name: " + applicationName);
                 throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                         "Invalid JWT token. Failed to decode the token.", e);
             }
@@ -770,7 +787,8 @@ public class JWTValidator {
                             log.debug("Token decryption failure when retrieving payload. Token: "
                                     + GatewayUtils.getMaskedToken(splitToken[0]), e);
                         }
-                        log.error("Invalid JWT token. Failed to decode the token");
+                        log.error("Invalid JWT token. Failed to decode the token" + " API Context: " + apiContext +
+                                " API Version: " + apiVersion + " Application Name: " + applicationName);
                         throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                                 "Invalid JWT token");
                     }
@@ -821,7 +839,8 @@ public class JWTValidator {
         try {
             return parsedJWTToken.getJWTClaimsSet().getJWTID();
         } catch (ParseException e) {
-            log.error("Invalid JWT token. Failed to decode the token.");
+            log.error("Invalid JWT token. Failed to decode the token." + " API Context: " + apiContext +
+                    " API Version: " + apiVersion + " Application Name: " + applicationName);
             throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                     "Invalid JWT token. Failed to decode the token.", e);
         }
