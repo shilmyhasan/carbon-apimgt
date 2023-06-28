@@ -803,8 +803,9 @@ public class ApisApiServiceImpl implements ApisApiService {
             }
             org.json.simple.JSONArray customProperties = APIUtil.getCustomProperties(username);
             if (!PublisherCommonUtils.validateMandatoryProperties(customProperties, body)) {
-                throw new APIManagementException("Error occurred while updating required properties",
-                        ExceptionCodes.ERROR_WHILE_UPDATING_MANDATORY_PROPERTIES);
+                Long errorCode = ExceptionCodes.ERROR_WHILE_UPDATING_MANDATORY_PROPERTIES.getErrorCode();
+                RestApiUtil.handleBadRequest(
+                        ExceptionCodes.ERROR_WHILE_UPDATING_MANDATORY_PROPERTIES.getErrorMessage(), errorCode, log);
             }
             APIProvider apiProvider = RestApiCommonUtil.getProvider(username);
             API originalAPI = apiProvider.getAPIbyUUID(apiId, organization);
