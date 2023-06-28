@@ -1992,8 +1992,11 @@ public class PublisherCommonUtils {
 
             if (isRequired) {
                 APIInfoAdditionalPropertiesMapDTO mapProperty = additionalPropertiesMap.get(propertyName);
+                if (mapProperty == null) {
+                    return false;
+                }
                 String propertyValue = mapProperty.getValue();
-                if (mapProperty == null || propertyValue == null || propertyValue.isEmpty()) {
+                if (propertyValue == null || propertyValue.isEmpty()) {
                     return false;
                 }
             }
