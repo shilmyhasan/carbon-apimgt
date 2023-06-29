@@ -647,7 +647,8 @@ public final class APIUtil {
         do {
             try {
                 httpResponse = (CloseableHttpResponse) httpClient.execute(method);
-                if (HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
+                int httpStatusCode = httpResponse.getStatusLine().getStatusCode();
+                if (httpStatusCode != HttpStatus.SC_OK && httpStatusCode != HttpStatus.SC_NO_CONTENT  ) {
                     throw new DataLoadingException("Error while retrieving "
                                                            + path + ". Received response with status code "
                                                            + httpResponse.getStatusLine().getStatusCode());
