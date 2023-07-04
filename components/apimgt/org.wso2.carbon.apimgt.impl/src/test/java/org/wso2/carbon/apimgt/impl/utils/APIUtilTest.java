@@ -25,7 +25,13 @@ import org.apache.commons.collections.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpStatus;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.message.BasicStatusLine;
 import org.apache.juddi.v3.error.RegistryException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -87,6 +93,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -2596,5 +2603,30 @@ public class APIUtilTest {
         // test invalid types
         fileName = "test1.pdf";
         Assert.assertFalse("PDF type should not be allowed", APIUtil.isSupportedFileType(fileName));
+    }
+
+    @Test
+    public void testExecuteHTTPRequestWithRetries() throws Exception {
+        // Mock dependencies
+        HttpRequestBase method = Mockito.mock(HttpRequestBase.class);
+        HttpClient httpClient = Mockito.mock(HttpClient.class);
+        CloseableHttpResponse httpResponse = Mockito.mock(CloseableHttpResponse.class);
+
+        // Mock behavior
+        Mockito.when(method.getURI()).thenReturn(PowerMockito.mock(URI.class));
+        Mockito.when(method.getURI().getPath()).thenReturn("/test/path");
+        Mockito.when(httpClient.execute(method)).thenReturn(httpResponse);
+        Mockito.when(httpResponse.getStatusLine()).thenReturn(new BasicStatusLine(new ProtocolVersion("HTTPS", 1, 1),
+                HttpStatus.SC_OK, "OK"));
+
+        // Call the method under test
+        CloseableHttpResponse result = APIUtil.executeHTTPRequestWithRetries(method, httpClient);
+
+        // Verify the behavior
+        Mockito.verify(httpClient, Mockito.times(1)).execute(method);
+        Mockito.verify(httpResponse, Mockito.times(1)).getStatusLine();
+
+        // Assert the result
+        Assert.assertEquals(httpResponse, result);
     }
 }
