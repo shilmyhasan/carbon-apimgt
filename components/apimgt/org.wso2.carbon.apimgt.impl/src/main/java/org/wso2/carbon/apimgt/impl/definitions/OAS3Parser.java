@@ -992,7 +992,7 @@ public class OAS3Parser extends APIDefinition {
                 secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
                 List<SecurityRequirement> newSec = new ArrayList<SecurityRequirement>();
                 for (SecurityRequirement securityRequirement : security) {
-                    if (securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
+                    if (securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY) && securityRequirements != null ) {
                         for (SecurityRequirement opSec : securityRequirements) {
                             if (opSec.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
                                 newSec.add(opSec);
@@ -1194,7 +1194,7 @@ public class OAS3Parser extends APIDefinition {
                 secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
                 List<SecurityRequirement> newSec = new ArrayList<SecurityRequirement>();
                 for(SecurityRequirement securityRequirement : security) {
-                    if (securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
+                    if (securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY) && securityRequirements != null) {
                         for (SecurityRequirement opSec :securityRequirements) {
                             if (opSec.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
                                 newSec.add(opSec);
