@@ -48,23 +48,33 @@ public class ZipkinTracer implements OpenTracer {
     @Override
     public Tracer getTracer(String serviceName) {
 
-        String hostname = configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_HOST) != null ?
-                configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_HOST)
-                : TracingConstants.ZIPKIN_DEFAULT_HOST;
-
-        int port = configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_PORT) != null ?
-                Integer.parseInt(configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_PORT))
-                : TracingConstants.ZIPKIN_DEFAULT_PORT;
-
         boolean tracerLogEnabled =
                 Boolean.parseBoolean(configuration.getFirstProperty(TracingConstants.CONFIG_TRACER_LOG_ENABLED) != null
                         ? configuration.getFirstProperty(TracingConstants.CONFIG_TRACER_LOG_ENABLED)
                         : TracingConstants.DEFAULT_TRACER_LOG_ENABLED);
 
+        String hostname = configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_HOST) != null
+                ? configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_HOST)
+                : TracingConstants.ZIPKIN_DEFAULT_HOST;
+
+        int port = configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_PORT) != null
+                ? Integer.parseInt(configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_PORT))
+                : TracingConstants.ZIPKIN_DEFAULT_PORT;
+
+        // Read the configurable endpoint if available
+        String endpoint = configuration
+                .getFirstProperty(TracingConstants.ZIPKIN_CONFIG_CONFIGURABLE_ENDPOINT_URL) != null
+                ? configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_CONFIGURABLE_ENDPOINT_URL)
+                : TracingConstants.ZIPKIN_DEFAULT_ENDPOINT;
+
+        // Format the endpoint url based on whether is configurable or not
+        if (endpoint == null) {
+            endpoint = "http://" + hostname + ":" + port + TracingConstants.ZIPKIN_API_CONTEXT;
+        }
+
         // Read proxy configurations from the configuration file.
         String proxyHost = configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_PROXY_HOST);
         String proxyPort = configuration.getFirstProperty(TracingConstants.ZIPKIN_CONFIG_PROXY_PORT);
-        String endpoint = "http://" + hostname + ":" + port + TracingConstants.ZIPKIN_API_CONTEXT;
         OkHttpSender sender;
         if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && !proxyPort.isEmpty()) {
             // Configure proxy if the proxy configurations are available.
