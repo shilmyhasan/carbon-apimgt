@@ -1209,6 +1209,15 @@
         {% if apim.event_hub.event_waiting_time is defined %}
         <EventWaitingTime>{{apim.event_hub.event_waiting_time}}</EventWaitingTime>
         {% endif %}
+        {% if  apim.event_hub.deployment_retry_duration is defined %}
+        <RetryDuration>{{apim.event_hub.deployment_retry_duration}}</RetryDuration>
+        {% endif %}
+        {% if apim.event_hub.max_retry_count is defined %}
+        <MaxRetryCount>{{apim.event_hub.max_retry_count}}</MaxRetryCount>
+        {% endif %}
+        {% if apim.event_hub.retry_progression_factor is defined %}
+        <RetryProgressionFactor>{{apim.event_hub.retry_progression_factor}}</RetryProgressionFactor>
+        {% endif %}
          {% if apim.event_hub.init_delay is defined %}
         <InitDelay>{{apim.event_hub.init_delay}}</InitDelay>
           {% endif %}
@@ -1309,8 +1318,14 @@
         {% if apim.sync_runtime_artifacts.gateway.artifact_retriever is defined %}
         <ArtifactRetriever>{{apim.sync_runtime_artifacts.gateway.artifact_retriever}}</ArtifactRetriever>
         {% endif %}
-        {% if apim.sync_runtime_artifacts.gateway.deployment_retry_duration is defined %}
+        {% if  apim.event_hub.deployment_retry_duration is not defined and apim.sync_runtime_artifacts.gateway.deployment_retry_duration is defined %}
         <RetryDuration>{{apim.sync_runtime_artifacts.gateway.deployment_retry_duration}}</RetryDuration>
+        {% endif %}
+        {% if apim.event_hub.max_retry_count is not defined and apim.sync_runtime_artifacts.gateway.max_retry_count is defined %}
+        <MaxRetryCount>{{apim.sync_runtime_artifacts.gateway.max_retry_count}}</MaxRetryCount>
+        {% endif %}
+        {% if apim.event_hub.retry_progression_factor is not defined and apim.sync_runtime_artifacts.gateway.retry_progression_factor is defined %}
+        <RetryProgressionFactor>{{apim.sync_runtime_artifacts.gateway.retry_progression_factor}}</RetryProgressionFactor>
         {% endif %}
         {% if apim.sync_runtime_artifacts.gateway.data_retrieval_mode is defined %}
         <DataRetrievalMode>{{apim.sync_runtime_artifacts.gateway.data_retrieval_mode}}</DataRetrievalMode>

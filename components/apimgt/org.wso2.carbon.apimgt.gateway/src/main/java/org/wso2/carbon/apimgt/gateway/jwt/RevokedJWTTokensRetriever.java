@@ -22,15 +22,16 @@ import com.google.gson.Gson;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.gateway.dto.RevokedJWTTokenDTO;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.EventHubConfigurationDto;
-import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
+import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.exception.DataLoadingException;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 
 import java.io.IOException;
@@ -45,8 +46,6 @@ import java.util.TimerTask;
 public class RevokedJWTTokensRetriever extends TimerTask {
 
     private static final Log log = LogFactory.getLog(RevokedJWTTokensRetriever.class);
-    private static final int revokedJWTTokensRetrievalTimeoutInSeconds = 15;
-    private static final int revokedJWTTokensRetrievalRetries = 15;
 
     @Override
     public void run() {
@@ -74,32 +73,16 @@ public class RevokedJWTTokensRetriever extends TimerTask {
             int keyMgtPort = keyMgtURL.getPort();
             String keyMgtProtocol = keyMgtURL.getProtocol();
             HttpClient httpClient = APIUtil.getHttpClient(keyMgtPort, keyMgtProtocol);
-            HttpResponse httpResponse = null;
-            int retryCount = 0;
-            boolean retry;
-            do {
-                try {
-                    httpResponse = httpClient.execute(method);
-                    retry = false;
-                } catch (IOException ex) {
-                    retryCount++;
-                    if (retryCount < revokedJWTTokensRetrievalRetries) {
-                        retry = true;
-                        log.warn("Failed retrieving revoked JWT token signatures from remote endpoint: " +
-                                ex.getMessage() + ". Retrying after " + revokedJWTTokensRetrievalTimeoutInSeconds +
-                                " seconds...");
-                        Thread.sleep(revokedJWTTokensRetrievalTimeoutInSeconds * 1000);
-                    } else {
-                        throw ex;
-                    }
-                }
-            } while (retry);
-
-            String responseString = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+            String responseString;
+            try (CloseableHttpResponse httpResponse = APIUtil.executeHTTPRequestWithRetries(method, httpClient)) {
+                responseString = EntityUtils.toString(httpResponse.getEntity(), APIConstants.DigestAuthConstants.CHARSET);
+            } catch (APIManagementException e) {
+                throw new DataLoadingException("Error while retrieving revoked JWT tokens", e);
+            }
             if (responseString != null && !responseString.isEmpty()) {
                 return new Gson().fromJson(responseString, RevokedJWTTokenDTO[].class);
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | DataLoadingException e) {
             log.error("Exception when retrieving revoked JWT tokens from remote endpoint ", e);
         }
         return null;

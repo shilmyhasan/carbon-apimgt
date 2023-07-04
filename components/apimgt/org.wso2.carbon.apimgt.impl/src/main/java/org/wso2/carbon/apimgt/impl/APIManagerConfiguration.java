@@ -38,7 +38,6 @@ import org.wso2.carbon.apimgt.common.gateway.dto.JWKSConfigurationDTO;
 import org.wso2.carbon.apimgt.common.gateway.dto.TokenIssuerDto;
 import org.wso2.carbon.apimgt.common.gateway.extensionlistener.ExtensionListener;
 import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
-import org.wso2.carbon.apimgt.impl.definitions.OAS2Parser;
 import org.wso2.carbon.apimgt.impl.dto.EventHubConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
@@ -1761,6 +1760,32 @@ public class APIManagerConfiguration {
                 }
             }
 
+            OMElement retryDurationElement = omElement.getFirstChildWithName(
+                    new QName(APIConstants.GatewayArtifactSynchronizer.RETRY_DUARTION));
+            if (retryDurationElement != null) {
+                long retryDuration = Long.valueOf(retryDurationElement.getText());
+                eventHubConfigurationDto.setRetryDuration(retryDuration);
+            } else {
+                log.debug("Retry Duration Element is not set. Set to default duration");
+            }
+            OMElement maxRetryCountElement = omElement.getFirstChildWithName(
+                    new QName(APIConstants.GatewayArtifactSynchronizer.MAX_RETRY_COUNT));
+            if (maxRetryCountElement != null) {
+                int retryCount = Integer.parseInt(maxRetryCountElement.getText());
+                eventHubConfigurationDto.setMaxRetryCount(retryCount);
+            } else {
+                log.debug("Max Retry Count Element is not set. Set to default count");
+            }
+
+            OMElement retryProgressionFactorElement = omElement.getFirstChildWithName(
+                    new QName(APIConstants.GatewayArtifactSynchronizer.RETRY_PROGRESSION_FACTOR));
+            if (retryProgressionFactorElement != null) {
+                double retryProgressionFactor = Double.parseDouble(retryProgressionFactorElement.getText());
+                eventHubConfigurationDto.setRetryProgressionFactor(retryProgressionFactor);
+            } else {
+                log.debug("Retry Progression Factor Element is not set. Set to default value");
+            }
+
             OMElement configurationRetrieverElement =
                     omElement.getFirstChildWithName(new QName(APIConstants.KeyManager.EVENT_RECEIVER_CONFIGURATION));
             if (configurationRetrieverElement != null) {
@@ -1869,11 +1894,28 @@ public class APIManagerConfiguration {
 
         OMElement retryDurationElement = omElement.getFirstChildWithName(
                 new QName(APIConstants.GatewayArtifactSynchronizer.RETRY_DUARTION));
-        if (retrieverElement != null) {
+        if (retryDurationElement != null) {
             long retryDuration = Long.valueOf(retryDurationElement.getText());
-            gatewayArtifactSynchronizerProperties.setRetryDuartion(retryDuration);
+            gatewayArtifactSynchronizerProperties.setRetryDuration(retryDuration);
         } else {
-            log.debug("Retry Duration Element is not set. Set to default duaration");
+            log.debug("Retry Duration Element is not set. Set to default duration");
+        }
+        OMElement maxRetryCountElement = omElement.getFirstChildWithName(
+                new QName(APIConstants.GatewayArtifactSynchronizer.MAX_RETRY_COUNT));
+        if (maxRetryCountElement != null) {
+            int retryCount = Integer.parseInt(maxRetryCountElement.getText());
+            gatewayArtifactSynchronizerProperties.setMaxRetryCount(retryCount);
+        } else {
+            log.debug("Max Retry Count Element is not set. Set to default count");
+        }
+
+        OMElement retryProgressionFactorElement = omElement.getFirstChildWithName(
+                new QName(APIConstants.GatewayArtifactSynchronizer.RETRY_PROGRESSION_FACTOR));
+        if (retryProgressionFactorElement != null) {
+            double retryProgressionFactor = Double.parseDouble(retryProgressionFactorElement.getText());
+            gatewayArtifactSynchronizerProperties.setRetryProgressionFactor(retryProgressionFactor);
+        } else {
+            log.debug("Retry Progression Factor Element is not set. Set to default value");
         }
 
         OMElement dataRetrievalModeElement = omElement.getFirstChildWithName(

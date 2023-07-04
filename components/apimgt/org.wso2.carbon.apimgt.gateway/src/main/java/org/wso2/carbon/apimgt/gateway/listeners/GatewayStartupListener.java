@@ -292,7 +292,7 @@ public class GatewayStartupListener extends AbstractAxis2ConfigurationContextObs
             log.debug("Deploying Artifacts in asynchronous mode");
         }
 
-        long retryDuration = gatewayArtifactSynchronizerProperties.getRetryDuartion();
+        long retryDuration = gatewayArtifactSynchronizerProperties.getRetryDuration();
         double reconnectionProgressionFactor = 2.0;
         long maxReconnectDuration = 1000 * 60 * 60; // 1 hour
 
