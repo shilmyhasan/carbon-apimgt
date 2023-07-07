@@ -123,6 +123,9 @@ public class SettingsMappingUtil {
         settingsDTO.setPasswordPolicyPattern(passwordPolicyPattern);
         settingsDTO.setPasswordPolicyMinLength(passwordPolicyMinLength);
         settingsDTO.setPasswordPolicyMaxLength(passwordPolicyMaxLength);
+        boolean enableTokenHashing =
+                Boolean.parseBoolean(config.getFirstProperty(APIConstants.HASH_TOKENS_ON_PERSISTENCE));
+        settingsDTO.setHashEnabled(enableTokenHashing);
 
         if (isUserAvailable) {
             settingsDTO.setGrantTypes(APIUtil.getGrantTypes());
