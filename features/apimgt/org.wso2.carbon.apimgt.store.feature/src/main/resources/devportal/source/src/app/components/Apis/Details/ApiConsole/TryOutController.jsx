@@ -40,6 +40,7 @@ import Box from '@material-ui/core/Box';
 import WarningIcon from '@material-ui/icons/Warning';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { useSettingsContext } from 'AppComponents/Shared/SettingsContext';
 import Progress from '../../../Shared/Progress';
 import Api from '../../../../data/api';
 import Application from '../../../../data/Application';
@@ -131,6 +132,7 @@ function TryOutController(props) {
     const [ksGenerated, setKSGenerated] = useState(false);
     const apiID = api.id;
     const restApi = new Api();
+    const { settings: { hashEnabled } } = useSettingsContext();
 
     useEffect(() => {
         let subscriptionsList;
@@ -710,7 +712,8 @@ function TryOutController(props) {
                                             }}
                                         />
                                     )}
-                                    {securitySchemeType !== 'BASIC' && securitySchemeType !== 'TEST' && (
+                                    {securitySchemeType !== 'BASIC' && securitySchemeType !== 'TEST'
+                                    && !hashEnabled && (
                                         <>
                                             <Button
                                                 onClick={securitySchemeType === 'API-KEY' ? generateApiKey
