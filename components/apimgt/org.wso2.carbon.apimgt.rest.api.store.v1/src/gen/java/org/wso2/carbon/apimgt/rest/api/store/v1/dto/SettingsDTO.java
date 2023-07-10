@@ -38,7 +38,6 @@ public class SettingsDTO   {
     private String passwordPolicyPattern = null;
     private Integer passwordPolicyMinLength = null;
     private Integer passwordPolicyMaxLength = null;
-    private Boolean hashEnabled = false;
 
   /**
    **/
@@ -300,23 +299,6 @@ public class SettingsDTO   {
     this.passwordPolicyMaxLength = passwordPolicyMaxLength;
   }
 
-  /**
-   **/
-  public SettingsDTO hashEnabled(Boolean hashEnabled) {
-    this.hashEnabled = hashEnabled;
-    return this;
-  }
-
-  
-  @ApiModelProperty(value = "")
-  @JsonProperty("hashEnabled")
-  public Boolean isHashEnabled() {
-    return hashEnabled;
-  }
-  public void setHashEnabled(Boolean hashEnabled) {
-    this.hashEnabled = hashEnabled;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -341,13 +323,12 @@ public class SettingsDTO   {
         Objects.equals(userStorePasswordPattern, settings.userStorePasswordPattern) &&
         Objects.equals(passwordPolicyPattern, settings.passwordPolicyPattern) &&
         Objects.equals(passwordPolicyMinLength, settings.passwordPolicyMinLength) &&
-        Objects.equals(passwordPolicyMaxLength, settings.passwordPolicyMaxLength) &&
-        Objects.equals(hashEnabled, settings.hashEnabled);
+        Objects.equals(passwordPolicyMaxLength, settings.passwordPolicyMaxLength);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, monetizationEnabled, recommendationEnabled, isUnlimitedTierPaid, identityProvider, isAnonymousModeEnabled, isPasswordChangeEnabled, userStorePasswordPattern, passwordPolicyPattern, passwordPolicyMinLength, passwordPolicyMaxLength, hashEnabled);
+    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, monetizationEnabled, recommendationEnabled, isUnlimitedTierPaid, identityProvider, isAnonymousModeEnabled, isPasswordChangeEnabled, userStorePasswordPattern, passwordPolicyPattern, passwordPolicyMinLength, passwordPolicyMaxLength);
   }
 
   @Override
@@ -370,7 +351,6 @@ public class SettingsDTO   {
     sb.append("    passwordPolicyPattern: ").append(toIndentedString(passwordPolicyPattern)).append("\n");
     sb.append("    passwordPolicyMinLength: ").append(toIndentedString(passwordPolicyMinLength)).append("\n");
     sb.append("    passwordPolicyMaxLength: ").append(toIndentedString(passwordPolicyMaxLength)).append("\n");
-    sb.append("    hashEnabled: ").append(toIndentedString(hashEnabled)).append("\n");
     sb.append("}");
     return sb.toString();
   }
