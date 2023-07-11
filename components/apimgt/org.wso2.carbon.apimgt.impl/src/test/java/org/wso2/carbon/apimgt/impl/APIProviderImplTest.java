@@ -4076,7 +4076,7 @@ public class APIProviderImplTest {
                 APIConstants.DEFAULT_POLICY_VERSION, api.getUuid(), null, superTenantDomain, false)).thenReturn(null);
 
         PowerMockito.when(APIUtil.isSequenceDefined(Mockito.anyString())).thenReturn(true);
-        apiProvider.loadMediationPoliciesAsOperationPoliciesToAPI(api, superTenantDomain);
+        apiProvider.loadMediationPoliciesFromMigratedAPIToAPI(api, superTenantDomain);
 
         Assert.assertNotNull(uriTemplate1.getOperationPolicies());
         Assert.assertNotNull(uriTemplate2.getOperationPolicies());
@@ -4128,7 +4128,7 @@ public class APIProviderImplTest {
                 APIConstants.DEFAULT_POLICY_VERSION, api.getUuid(), null, superTenantDomain, false)).thenReturn(policyData);
 
         PowerMockito.when(APIUtil.isSequenceDefined(Mockito.anyString())).thenReturn(true);
-        apiProvider.loadMediationPoliciesAsOperationPoliciesToAPI(api, superTenantDomain);
+        apiProvider.loadMediationPoliciesFromMigratedAPIToAPI(api, superTenantDomain);
 
         for (URITemplate template : api.getUriTemplates()) {
             for (OperationPolicy policy : template.getOperationPolicies()) {

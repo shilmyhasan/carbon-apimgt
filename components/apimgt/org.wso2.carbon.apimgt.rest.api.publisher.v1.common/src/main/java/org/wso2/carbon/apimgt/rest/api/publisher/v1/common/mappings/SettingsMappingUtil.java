@@ -93,6 +93,7 @@ public class SettingsMappingUtil {
                 authorizationHeader = APIConstants.AUTHORIZATION_HEADER_DEFAULT;
             }
             settingsDTO.setAuthorizationHeader(authorizationHeader);
+            settingsDTO.setIsAPIPoliciesEnabled(APIUtil.isAPILevelPolicySupportEnabled());
         }
         return settingsDTO;
     }

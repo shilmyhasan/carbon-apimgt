@@ -75,6 +75,7 @@ public class ServiceReferenceHolder {
     private Map<String, ExternalGatewayDeployer> externalGatewayDeployers = new HashMap<>();
     private Map<String, ExternalEnvironment> externalEnvironmentsMap = new HashMap<>();
     private Map<String, APIDefinition> apiDefinitionMap = new HashMap<>();
+    private boolean isAPIPoliciesEnabled = false;
 
     private ServiceReferenceHolder() {
 
@@ -371,6 +372,14 @@ public class ServiceReferenceHolder {
     public void removeAPIDefinitionParser(String type) {
 
         apiDefinitionMap.remove(type);
+    }
+
+    public boolean isAPIPoliciesEnabled() {
+        return isAPIPoliciesEnabled;
+    }
+
+    public void setAPIPoliciesEnabled(boolean APIPoliciesEnabled) {
+        isAPIPoliciesEnabled = APIPoliciesEnabled;
     }
 
 }
