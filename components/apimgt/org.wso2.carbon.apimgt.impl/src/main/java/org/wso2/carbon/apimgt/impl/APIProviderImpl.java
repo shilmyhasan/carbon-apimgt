@@ -1240,7 +1240,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         }
 
-        addAPIPolicies(api, tenantDomain);
         String publishedDefaultVersion = getPublishedDefaultVersion(api.getId());
         String prevDefaultVersion = getDefaultVersion(api.getId());
 
@@ -1418,8 +1417,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         List<APIProductResource> productResources = apiMgtDAO.getProductMappingsForAPI(api);
         updateAPI(api, tenantId, userNameWithoutChange);
         updateProductResourceMappings(api, organization, productResources);
-
-        updateAPIPolicies(api, tenantDomain);
 
         if (log.isDebugEnabled()) {
             log.debug("Successfully updated the API: " + api.getId() + " in the database");
@@ -1660,6 +1657,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
         validateAndUpdateURITemplates(api, tenantId);
         apiMgtDAO.updateURITemplates(api, tenantId);
+        updateAPIPolicies(api, tenantDomain);
+
         if (log.isDebugEnabled()) {
             log.debug("Successfully updated the URI templates of API: " + apiIdentifier + " in the database");
         }
