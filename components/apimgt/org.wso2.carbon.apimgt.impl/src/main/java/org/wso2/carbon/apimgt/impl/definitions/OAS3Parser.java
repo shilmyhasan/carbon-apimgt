@@ -868,85 +868,36 @@ public class OAS3Parser extends APIDefinition {
         if (openAPI.getComponents() == null) {
             openAPI.setComponents(new Components());
         }
-        Map<String, SecurityScheme> securitySchemes = new HashMap<>();
-        List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
-        SecurityScheme securityScheme;
-        String apiSec = api.getApiSecurity();
-        List<String> secList = new ArrayList<>();
-        if (apiSec != null) {
-            secList = Arrays.asList(apiSec.split(","));
-            if ("".equals(apiSec) || secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
-                securityScheme = new SecurityScheme();
-                securityScheme.setType(SecurityScheme.Type.OAUTH2);
-                securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
-                SecurityRequirement secReq = new SecurityRequirement();
-                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-                security.add(secReq);
-            }
-            if (secList.contains(APIConstants.API_SECURITY_BASIC_AUTH)) {
-                securityScheme = new SecurityScheme();
-                securityScheme.setType(SecurityScheme.Type.HTTP);
-                securityScheme.setScheme(APIConstants.AUTHORIZATION_HEADER_BASIC);
-                securitySchemes.put(APIConstants.API_SECURITY_BASIC_AUTH, securityScheme);
-                SecurityRequirement secReq = new SecurityRequirement();
-                secReq.addList(APIConstants.API_SECURITY_BASIC_AUTH, new ArrayList<String>());
-                security.add(secReq);
-            }
-            if (secList.contains(APIConstants.API_SECURITY_API_KEY)) {
-                securityScheme = new SecurityScheme();
-                securityScheme.setType(SecurityScheme.Type.APIKEY);
-                securityScheme.setIn(SecurityScheme.In.HEADER);
-                securityScheme.setName(APIConstants.API_SECURITY_API_KEY);
-                securitySchemes.put(APIConstants.API_SECURITY_API_KEY, securityScheme);
-                SecurityRequirement secReq = new SecurityRequirement();
-                secReq.addList(APIConstants.API_SECURITY_API_KEY, new ArrayList<String>());
-                security.add(secReq);
-            }
-        } else {
+        Map<String, SecurityScheme> securitySchemes = openAPI.getComponents().getSecuritySchemes();
+        if (securitySchemes == null) {
+            securitySchemes = new HashMap<>();
+            openAPI.getComponents().setSecuritySchemes(securitySchemes);
+        }
+        SecurityScheme securityScheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
+        if (securityScheme == null) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.OAUTH2);
             securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
+            List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
             SecurityRequirement secReq = new SecurityRequirement();
-            if (!secReq.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
-                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-                security.add(secReq);
-            }
+            secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
+            security.add(secReq);
+            openAPI.setSecurity(security);
         }
-        openAPI.setSecurity(security);
-        openAPI.getComponents().setSecuritySchemes(securitySchemes);
-        SecurityScheme scheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
-        if (scheme != null) {
-            if (scheme.getFlows() == null) {
-                scheme.setFlows(new OAuthFlows());
-            }
-            // setting scopes id if it is null
-            // https://github.com/swagger-api/swagger-parser/issues/1202
-            OAuthFlow oAuthFlow = scheme.getFlows().getImplicit();
-            if (oAuthFlow == null) {
-                oAuthFlow = new OAuthFlow();
-                scheme.getFlows().setImplicit(oAuthFlow);
-            }
-            if (oAuthFlow.getScopes() == null) {
-                oAuthFlow.setScopes(new Scopes());
-            }
-            oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
-            Scopes oas3Scopes = new Scopes();
-            Set<Scope> scopes = api.getScopes();
-            if (scopes != null && !scopes.isEmpty()) {
-                Map<String, String> scopeBindings = new HashMap<>();
-                for (Scope scope : scopes) {
-                    String description = scope.getDescription() != null ? scope.getDescription() : "";
-                    oas3Scopes.put(scope.getKey(), description);
-                    String roles = (StringUtils.isNotBlank(scope.getRoles())
-                            && scope.getRoles().trim().split(",").length > 0) ? scope.getRoles() :
-                            StringUtils.EMPTY;
-                    scopeBindings.put(scope.getKey(), roles);
-                }
-                oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
-            }
-            oAuthFlow.setScopes(oas3Scopes);
+        if (securityScheme.getFlows() == null) {
+            securityScheme.setFlows(new OAuthFlows());
         }
-
+        // setting scopes id if it is null
+        // https://github.com/swagger-api/swagger-parser/issues/1202
+        OAuthFlow oAuthFlow = securityScheme.getFlows().getImplicit();
+        if (oAuthFlow == null) {
+            oAuthFlow = new OAuthFlow();
+            securityScheme.getFlows().setImplicit(oAuthFlow);
+        }
+        if (oAuthFlow.getScopes() == null) {
+            oAuthFlow.setScopes(new Scopes());
+        }
+        oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
         if (api.getAuthorizationHeader() != null) {
             openAPI.addExtension(APIConstants.X_WSO2_AUTH_HEADER, api.getAuthorizationHeader());
         }
@@ -987,26 +938,6 @@ public class OAS3Parser extends APIDefinition {
             PathItem pathItem = openAPI.getPaths().get(pathKey);
             for (Map.Entry<PathItem.HttpMethod, Operation> entry : pathItem.readOperationsMap().entrySet()) {
                 Operation operation = entry.getValue();
-                List<SecurityRequirement> securityRequirements = operation.getSecurity();
-                SecurityRequirement secReq = new SecurityRequirement();
-                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-                List<SecurityRequirement> newSec = new ArrayList<SecurityRequirement>();
-                for (SecurityRequirement securityRequirement : security) {
-                    if (securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
-                        for (SecurityRequirement opSec : securityRequirements) {
-                            if (opSec.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
-                                newSec.add(opSec);
-                            }
-                        }
-                    }
-                    if (securityRequirement.containsKey(APIConstants.API_SECURITY_BASIC_AUTH)) {
-                        newSec.add(securityRequirement);
-                    }
-                    if (securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY)) {
-                        newSec.add(securityRequirement);
-                    }
-                }
-                operation.setSecurity(newSec);
                 operation.addExtension(APIConstants.X_WSO2_APP_SECURITY, appSecurityExtension);
             }
         }
@@ -1099,118 +1030,45 @@ public class OAS3Parser extends APIDefinition {
         if (openAPI.getComponents() == null) {
             openAPI.setComponents(new Components());
         }
-        Map<String, SecurityScheme> securitySchemes = new HashMap<>();
-        SecurityScheme securityScheme;
-        List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
-        String securityString = swaggerData.getSecurity();
-        List<String> secList = new ArrayList<>();
-        if (securityString != null) {
-            secList = Arrays.asList(securityString.split(","));
-            if ("".equals(securityString) || secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
-                securityScheme = new SecurityScheme();
-                securityScheme.setType(SecurityScheme.Type.OAUTH2);
-                securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
-                SecurityRequirement secReq = new SecurityRequirement();
-                if (!secReq.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
-                    secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-                    security.add(secReq);
-                }
-            }
-            if (secList.contains(APIConstants.API_SECURITY_BASIC_AUTH)) {
-                securityScheme = new SecurityScheme();
-                securityScheme.setType(SecurityScheme.Type.HTTP);
-                securityScheme.setScheme(APIConstants.AUTHORIZATION_HEADER_BASIC);
-                securitySchemes.put(APIConstants.API_SECURITY_BASIC_AUTH, securityScheme);
-                SecurityRequirement secReq = new SecurityRequirement();
-                if (!secReq.containsKey(APIConstants.API_SECURITY_BASIC_AUTH)) {
-                    secReq.addList(APIConstants.API_SECURITY_BASIC_AUTH, new ArrayList<String>());
-                    security.add(secReq);
-                }
-            }
-            if (secList.contains(APIConstants.API_SECURITY_API_KEY)) {
-                securityScheme = new SecurityScheme();
-                securityScheme.setType(SecurityScheme.Type.APIKEY);
-                securityScheme.setIn(SecurityScheme.In.HEADER);
-                securityScheme.setName("API_KEY");
-                securitySchemes.put(APIConstants.API_SECURITY_API_KEY, securityScheme);
-                SecurityRequirement secReq = new SecurityRequirement();
-                if (!secReq.containsKey(APIConstants.API_SECURITY_API_KEY)) {
-                    secReq.addList(APIConstants.API_SECURITY_API_KEY, new ArrayList<String>());
-                    security.add(secReq);
-                }
-            }
-        } else {
+        Map<String, SecurityScheme> securitySchemes = openAPI.getComponents().getSecuritySchemes();
+            if (securitySchemes == null) {
+            securitySchemes = new HashMap<>();
+            openAPI.getComponents().setSecuritySchemes(securitySchemes);
+        }
+        SecurityScheme securityScheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
+        if (securityScheme == null) {
             securityScheme = new SecurityScheme();
             securityScheme.setType(SecurityScheme.Type.OAUTH2);
             securitySchemes.put(OPENAPI_SECURITY_SCHEMA_KEY, securityScheme);
+            List<SecurityRequirement> security = new ArrayList<SecurityRequirement>();
             SecurityRequirement secReq = new SecurityRequirement();
-            if (!secReq.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
-                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-                security.add(secReq);
-            }
+            secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
+            security.add(secReq);
+            openAPI.setSecurity(security);
         }
-        openAPI.setSecurity(security);
-        Map<String, SecurityScheme> swaggerSecuritySchemes = openAPI.getComponents().getSecuritySchemes();
-        openAPI.getComponents().setSecuritySchemes(securitySchemes);
-        SecurityScheme scheme = securitySchemes.get(OPENAPI_SECURITY_SCHEMA_KEY);
-        if (scheme != null) {
-            if (scheme.getFlows() == null) {
-                scheme.setFlows(new OAuthFlows());
-            }
-            // setting scopes id if it is null
-            // https://github.com/swagger-api/swagger-parser/issues/1202
-            OAuthFlow oAuthFlow = scheme.getFlows().getImplicit();
-            if (oAuthFlow == null) {
-                oAuthFlow = new OAuthFlow();
-                scheme.getFlows().setImplicit(oAuthFlow);
-            }
-            if (oAuthFlow.getScopes() == null) {
-                oAuthFlow.setScopes(new Scopes());
-            }
-            oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
-            Scopes oas3Scopes = new Scopes();
-            Set<Scope> scopes = swaggerData.getScopes();
-            if (scopes != null && !scopes.isEmpty()) {
-                Map<String, String> scopeBindings = new HashMap<>();
-                for (Scope scope : scopes) {
-                    String description = scope.getDescription() != null ? scope.getDescription() : "";
-                    oas3Scopes.put(scope.getKey(), description);
-                    String roles = (StringUtils.isNotBlank(scope.getRoles())
-                            && scope.getRoles().trim().split(",").length > 0) ? scope.getRoles() :
-                            StringUtils.EMPTY;
-                    scopeBindings.put(scope.getKey(), roles);
-                }
-                oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
-            }
-            oAuthFlow.setScopes(oas3Scopes);
+        if (securityScheme.getFlows() == null) {
+            securityScheme.setFlows(new OAuthFlows());
         }
-
-        for (String pathKey : openAPI.getPaths().keySet()) {
-            PathItem pathItem = openAPI.getPaths().get(pathKey);
-            for (Map.Entry<PathItem.HttpMethod, Operation> entry : pathItem.readOperationsMap().entrySet()) {
-                Operation operation = entry.getValue();
-                List<SecurityRequirement> securityRequirements = operation.getSecurity();
-                SecurityRequirement secReq = new SecurityRequirement();
-                secReq.addList(OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<String>());
-                List<SecurityRequirement> newSec = new ArrayList<SecurityRequirement>();
-                for(SecurityRequirement securityRequirement : security) {
-                    if (securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
-                        for (SecurityRequirement opSec :securityRequirements) {
-                            if (opSec.containsKey(OPENAPI_SECURITY_SCHEMA_KEY)) {
-                                newSec.add(opSec);
-                            }
-                        }
-                    }
-                    if (securityRequirement.containsKey(APIConstants.API_SECURITY_BASIC_AUTH)) {
-                        newSec.add(securityRequirement);
-                    }
-                    if (securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY)) {
-                        newSec.add(securityRequirement);
-                    }
-                }
-                operation.setSecurity(newSec);
-            }
+        OAuthFlow oAuthFlow = securityScheme.getFlows().getImplicit();
+        if (oAuthFlow == null) {
+                        oAuthFlow = new OAuthFlow();
+            securityScheme.getFlows().setImplicit(oAuthFlow);
         }
+        oAuthFlow.setAuthorizationUrl(authUrl);
+        Scopes oas3Scopes = new Scopes();
+        Set<Scope> scopes = swaggerData.getScopes();
+        if (scopes != null && !scopes.isEmpty()) {
+            Map<String, String> scopeBindings = new HashMap<>();
+            for (Scope scope : scopes) {
+                String description = scope.getDescription() != null ? scope.getDescription() : "";
+                oas3Scopes.put(scope.getKey(), description);
+                String roles = (StringUtils.isNotBlank(scope.getRoles())
+                        && scope.getRoles().trim().split(",").length > 0) ? scope.getRoles() : StringUtils.EMPTY;
+                scopeBindings.put(scope.getKey(), roles);
+            }
+            oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
+        }
+        oAuthFlow.setScopes(oas3Scopes);
     }
 
     /**

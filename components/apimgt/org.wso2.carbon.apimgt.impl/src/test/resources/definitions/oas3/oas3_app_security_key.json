@@ -19,8 +19,6 @@
   } ],
   "security" : [ {
     "default" : [ ]
-  }, {
-    "api_key" : [ ]
   } ],
   "paths" : {
     "/order" : {
@@ -81,8 +79,6 @@
         },
         "security" : [ {
           "default" : [ ]
-        }, {
-          "api_key" : [ ]
         } ],
         "x-auth-type" : "Application & Application User",
         "x-throttling-tier" : "Unlimited",
@@ -122,8 +118,6 @@
         },
         "security" : [ {
           "default" : [ ]
-        }, {
-          "api_key" : [ ]
         } ],
         "x-auth-type" : "Application & Application User",
         "x-throttling-tier" : "Unlimited",
@@ -182,8 +176,6 @@
         },
         "security" : [ {
           "default" : [ ]
-        }, {
-          "api_key" : [ ]
         } ],
         "x-auth-type" : "Application & Application User",
         "x-throttling-tier" : "Unlimited",
@@ -261,8 +253,6 @@
         },
         "security" : [ {
           "default" : [ ]
-        }, {
-          "api_key" : [ ]
         } ],
         "x-auth-type" : "Application & Application User",
         "x-throttling-tier" : "Unlimited",
@@ -302,8 +292,6 @@
         },
         "security" : [ {
           "default" : [ ]
-        }, {
-          "api_key" : [ ]
         } ],
         "x-auth-type" : "Application & Application User",
         "x-throttling-tier" : "Unlimited",
@@ -427,11 +415,6 @@
             "scopes" : { }
           }
         }
-      },
-      "api_key" : {
-        "type" : "apiKey",
-        "name" : "api_key",
-        "in" : "header"
       }
     }
   },
