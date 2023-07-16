@@ -18021,13 +18021,15 @@ public class ApiMgtDAO {
     /**
      * Add API level and Operation level policy mappings to the new API version.
      *
-     * @param uriTemplates              URITemplate Set with attached operation level policies
-     * @param extractedAPILevelPolicies List with attached API level policies
-     * @param newAPI                    API object of newly created API version
+     * @param uriTemplates                   URITemplate Set with attached operation level policies
+     * @param extractedAPILevelPolicies      List with attached API level policies
+     * @param newAPI                         API object of newly created API version
+     * @param isAPILevelPolicySupportEnabled Boolean to depict whether API level policy support feature is enabled
      * @throws APIManagementException If failed to add policy mapping for new API version
      */
     public void addPolicyMappingsForNewAPIVersion(Set<URITemplate> uriTemplates,
-            List<OperationPolicy> extractedAPILevelPolicies, API newAPI) throws APIManagementException {
+            List<OperationPolicy> extractedAPILevelPolicies, API newAPI, boolean isAPILevelPolicySupportEnabled)
+            throws APIManagementException {
 
         try (Connection connection = APIMgtDBUtil.getConnection()) {
             connection.setAutoCommit(false);
@@ -18038,7 +18040,8 @@ public class ApiMgtDAO {
             }
 
             // Handle API level policy mapping addition for new API version
-            if (extractedAPILevelPolicies != null && extractedAPILevelPolicies.size() != 0) {
+            if (extractedAPILevelPolicies != null && extractedAPILevelPolicies.size() != 0
+                    && isAPILevelPolicySupportEnabled) {
                 addAPILevelPolicies(extractedAPILevelPolicies, newAPI.getUuid(), null,
                         newAPI.getOrganization(), connection);
             }

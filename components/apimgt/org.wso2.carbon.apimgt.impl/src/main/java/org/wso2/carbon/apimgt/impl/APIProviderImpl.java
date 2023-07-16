@@ -3240,7 +3240,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         apiMgtDAO.cloneAPISpecificPoliciesForVersioning(oldAPIUuid, newAPI.getUuid(), newAPI.getOrganization(),
                 toBeClonedPolicyDetails);
 
-        apiMgtDAO.addPolicyMappingsForNewAPIVersion(uriTemplates, extractedAPILevelPolicies, newAPI);
+        apiMgtDAO.addPolicyMappingsForNewAPIVersion(uriTemplates, extractedAPILevelPolicies, newAPI,
+                isAPILevelPolicySupportEnabled);
     }
 
     public String retrieveServiceKeyByApiId(int apiId, int tenantId) throws APIManagementException {
