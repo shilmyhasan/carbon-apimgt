@@ -1636,8 +1636,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         // Update the resource scopes of the API in KM.
         // Need to remove the old local scopes and register new local scopes and, update the resource scope mappings
         // using the updated URI templates of the API.
-        deleteScopes(oldLocalScopeKeys, tenantId);
-        addScopes(newLocalScopes, tenantId);
+        if (!oldLocalScopeKeys.equals(newLocalScopeKeys)) {
+            deleteScopes(oldLocalScopeKeys, tenantId);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignore) {
+            }
+            addScopes(newLocalScopes, tenantId);
+        }
         Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
