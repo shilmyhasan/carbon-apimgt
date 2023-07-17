@@ -932,7 +932,8 @@ public class JWTValidator {
                 getGatewayJWTTokenCache().remove(tokenIdentifier);
                 getInvalidTokenCache().put(tokenIdentifier, tenantDomain);
             }
-            log.error("JWT token is expired :" + GatewayUtils.getMaskedToken(tokenIdentifier));
+            log.error("JWT token is expired :" + GatewayUtils.getMaskedToken(tokenIdentifier) + " API Context: " +
+                    apiContext + " API Version: " + apiVersion + " Application Name: " + applicationName);
             throw new APISecurityException(APISecurityConstants.API_AUTH_INVALID_CREDENTIALS,
                     APISecurityConstants.API_AUTH_INVALID_CREDENTIALS_MESSAGE);
         }
