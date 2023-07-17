@@ -440,6 +440,7 @@ public final class APIConstants {
     public static final String JWT_DEFAULT_AUDIENCE = "http://org.wso2.apimgt/gateway";
     public static final String JWT_CONFIGS = "JWTConfiguration";
     public static final String JWT_HEADER = "JWTHeader";
+    public static final String JWT_DECODING = "JWTDecoding";
     public static final String ENABLE_USER_CLAIMS = "EnableUserClaims";
     public static final String BINDING_FEDERATED_USER_CLAIMS = "EnableBindingFederatedUserClaims";
     public static final String TOKEN_GENERATOR_IMPL = "JWTGeneratorImpl";
@@ -569,6 +570,9 @@ public final class APIConstants {
 
     //Property for enabling tenant aware sub claims when invoking APIs with API key
     public static final String ENABLE_TENANT_AWARE_SUB_CLAIM= "enable.tenant.aware.subclaim";
+
+    // Property for enabling API level policy support feature
+    public static final String ENABLE_API_POLICIES = "EnableAPIPolicies";
 
     // Constants for obtaining organization claims
     public static final String READ_ORGANIZATION_FROM_SAML_ASSERTION = "readOrganizationClaimFromSamlAssertion";
