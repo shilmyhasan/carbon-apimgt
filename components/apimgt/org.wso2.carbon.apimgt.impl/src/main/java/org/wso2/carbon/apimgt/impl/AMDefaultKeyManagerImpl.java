@@ -165,7 +165,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
      * @throws JSONException for errors in parsing the OAuthApplicationInfo json string
      */
     private ClientInfo createClientInfo(OAuthApplicationInfo info, String oauthClientName, boolean isUpdate)
-            throws JSONException {
+            throws JSONException, APIManagementException {
 
         ClientInfo clientInfo = new ClientInfo();
         JSONObject infoJson = new JSONObject(info.getJsonString());
@@ -196,8 +196,9 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
 
         // Use a generated user as the app owner for cross tenant subscription scenarios, to avoid the tenant admin
         // being exposed in the JWT token.
+        String kmName = getKeyManagerConfiguration().getName();
         if (APIUtil.isCrossTenantSubscriptionsEnabled()
-                && !tenantDomain.equals(MultitenantUtils.getTenantDomain(applicationOwner))) {
+                && !tenantDomain.equals(MultitenantUtils.getTenantDomain(applicationOwner)) && !kmName.equals("Global Key Manager")) {
             clientInfo.setApplication_owner(APIUtil.retrieveDefaultReservedUsername());
         } else {
             clientInfo.setApplication_owner(MultitenantUtils.getTenantAwareUsername(applicationOwner));
@@ -1083,7 +1084,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
 
     private String getTenantAwareContext() {
 
-        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && !"global".equals(tenantDomain)) {
             return "/t/".concat(tenantDomain);
         }
         return "";

@@ -11615,7 +11615,7 @@ public final class APIUtil {
 
     private static String getTenantAwareContext(String tenantDomain) {
 
-        if (!org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+        if (!org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && !"global".equals(tenantDomain)) {
             return "/t/".concat(tenantDomain);
         }
         return "";

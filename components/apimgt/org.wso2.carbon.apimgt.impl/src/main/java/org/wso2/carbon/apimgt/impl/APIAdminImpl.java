@@ -323,17 +323,25 @@ public class APIAdminImpl implements APIAdmin {
                 apiMgtDAO.getKeyManagerConfigurationsByTenant(tenantDomain);
         Iterator<KeyManagerConfigurationDTO> iterator = keyManagerConfigurationsByTenant.iterator();
         KeyManagerConfigurationDTO defaultKeyManagerConfiguration = null;
+        KeyManagerConfigurationDTO globalKeyManagerConfiguration = null;
         while (iterator.hasNext()) {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO = iterator.next();
+            if ("Global Key Manager".equals(keyManagerConfigurationDTO.getName())) {
+                globalKeyManagerConfiguration = keyManagerConfigurationDTO;
+                iterator.remove();
+            }
             if (APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
                 defaultKeyManagerConfiguration = keyManagerConfigurationDTO;
                 iterator.remove();
-                break;
             }
         }
         if (defaultKeyManagerConfiguration != null) {
             APIUtil.getAndSetDefaultKeyManagerConfiguration(defaultKeyManagerConfiguration);
             keyManagerConfigurationsByTenant.add(defaultKeyManagerConfiguration);
+        }
+        if (globalKeyManagerConfiguration != null) {
+            APIUtil.getAndSetDefaultKeyManagerConfiguration(globalKeyManagerConfiguration);
+            keyManagerConfigurationsByTenant.add(globalKeyManagerConfiguration);
         }
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByTenant) {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);

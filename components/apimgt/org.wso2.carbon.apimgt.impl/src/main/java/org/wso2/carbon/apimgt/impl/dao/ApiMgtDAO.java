@@ -8682,10 +8682,12 @@ public class ApiMgtDAO {
             throws APIManagementException {
 
         List<KeyManagerConfigurationDTO> keyManagerConfigurationDTOS = new ArrayList<>();
-        final String query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ? ";
+        String globalKM = "global";
+        final String query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ? UNION SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ?";
         try (Connection conn = APIMgtDBUtil.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
             preparedStatement.setString(1, tenantDomain);
+            preparedStatement.setString(2, globalKM);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     KeyManagerConfigurationDTO keyManagerConfigurationDTO = new KeyManagerConfigurationDTO();
@@ -8696,7 +8698,12 @@ public class ApiMgtDAO {
                     keyManagerConfigurationDTO.setDescription(resultSet.getString("DESCRIPTION"));
                     keyManagerConfigurationDTO.setType(resultSet.getString("TYPE"));
                     keyManagerConfigurationDTO.setEnabled(resultSet.getBoolean("ENABLED"));
-                    keyManagerConfigurationDTO.setTenantDomain(tenantDomain);
+                    keyManagerConfigurationDTO.setTenantDomain(resultSet.getString("TENANT_DOMAIN"));
+//                    if ("Global Key Manager".equals(resultSet.getString("NAME"))) {
+//                        keyManagerConfigurationDTO.setTenantDomain("carbon.super");
+//                    } else {
+//                        keyManagerConfigurationDTO.setTenantDomain(tenantDomain);
+//                    }
                     try (InputStream configuration = resultSet.getBinaryStream("CONFIGURATION")) {
                         String configurationContent = IOUtils.toString(configuration);
                         Map map = new Gson().fromJson(configurationContent, Map.class);

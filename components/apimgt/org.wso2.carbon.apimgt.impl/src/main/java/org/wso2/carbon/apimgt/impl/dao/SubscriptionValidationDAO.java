@@ -985,6 +985,9 @@ public class SubscriptionValidationDAO {
      * */
     public ApplicationKeyMapping getApplicationKeyMapping(String consumerKey, String keymanager, String tenantDomain) {
 
+//        if ("Global Key Manager".equals(keymanager)) {
+//            tenantDomain = "global";
+//        }
         try (Connection conn = APIMgtDBUtil.getConnection();
              PreparedStatement ps =
                      conn.prepareStatement(SubscriptionValidationSQLConstants.GET_AM_KEY_MAPPING_BY_CONSUMER_KEY_SQL)) {
