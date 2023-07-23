@@ -8285,6 +8285,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     }
 
+    /**
+     * This method updates scopes in the database and notify the SCOPE_DELETE and SCOPE_CREATE events as a consolidated event.
+     */
     private void updateScopes(Set<Scope> addedScopes, Set<String> deletedScopes, int tenantId) throws APIManagementException {
 
         ScopesEvent scopesEvent = new ScopesEvent(UUID.randomUUID().toString(), System.currentTimeMillis(),
@@ -8296,6 +8299,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     scopesDAO.deleteScope(scopeKey, tenantId);
                     scopesEvent.addScopeEvent(new ScopeEvent(UUID.randomUUID().toString(), System.currentTimeMillis(),
                             APIConstants.EventType.SCOPE_DELETE.name(), tenantId, tenantDomain, scopeKey, null, null));
+                    if (log.isDebugEnabled()) {
+                        log.debug("Scope :" + scopeKey + " deleted successfully.");
+                    }
                 }
             }
         }
@@ -8310,6 +8316,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     scopeEvent.setRoles(Arrays.asList(scope.getRoles().split(",")));
                 }
                 scopesEvent.addScopeEvent(scopeEvent);
+                if (log.isDebugEnabled()) {
+                    log.debug("Scope :" + scope.getKey() + " added successfully.");
+                }
             }
         }
         if (scopesEvent.getScopeEvents().size() > 0) {

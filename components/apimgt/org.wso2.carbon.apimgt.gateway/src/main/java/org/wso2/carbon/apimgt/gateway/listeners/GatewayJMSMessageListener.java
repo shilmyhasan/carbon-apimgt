@@ -239,11 +239,9 @@ public class GatewayJMSMessageListener implements MessageListener {
         } else if (EventType.SCOPES_UPDATE.toString().equals(eventType)) {
             ScopesEvent event = new Gson().fromJson(eventJson, ScopesEvent.class);
             for (ScopeEvent scopeEvent : event.getScopeEvents()) {
-                if (scopeEvent.getType().equals(EventType.SCOPE_CREATE.toString())) {
+                if (EventType.SCOPE_CREATE.toString().equals(scopeEvent.getType())) {
                     ServiceReferenceHolder.getInstance().getKeyManagerDataService().addScope(scopeEvent);
-                } else if (scopeEvent.getType().equals(EventType.SCOPE_UPDATE.toString())) {
-                    ServiceReferenceHolder.getInstance().getKeyManagerDataService().addScope(scopeEvent);
-                } else if (scopeEvent.getType().equals(EventType.SCOPE_DELETE.toString())) {
+                } else if (EventType.SCOPE_DELETE.toString().equals(scopeEvent.getType())) {
                     ServiceReferenceHolder.getInstance().getKeyManagerDataService().deleteScope(scopeEvent);
                 }
             }
