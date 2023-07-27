@@ -128,9 +128,18 @@ public class JWTValidatorImpl implements JWTValidator {
                 }
             }
             return JWTUtil.verifyTokenSignature(signedJWT, certificateAlias);
-        } catch (ParseException | JOSEException | IOException e) {
-            log.error("Error while parsing JWT", e);
+        } catch (ParseException e) {
+            log.error("Error while parsing JWKS information", e);
             throw new APIManagementException("Error while parsing JWT", e);
+        } catch (JOSEException e) {
+            log.error("Error while verifying token signature", e);
+            throw new APIManagementException("Error while parsing JWT", e);
+        } catch (IOException e) {
+            log.error("Error while connecting to JWKS endpoint", e);
+            throw new APIManagementException("Error while parsing JWT", e);
+        } catch (APIManagementException e) {
+            log.error("Error while retrieving JWKS information", e);
+            throw new APIManagementException(e.getMessage(), e);
         }
 
     }
@@ -178,10 +187,14 @@ public class JWTValidatorImpl implements JWTValidator {
         jwtValidationInfo.setUser(jwtClaimsSet.getSubject());
         jwtValidationInfo.setJti(jwtClaimsSet.getJWTID());
     }
-    private JWKSet retrieveJWKSet() throws IOException, ParseException {
+    private JWKSet retrieveJWKSet() throws IOException, ParseException, APIManagementException {
         String jwksInfo = JWTUtil
                 .retrieveJWKSConfiguration(tokenIssuer.getJwksConfigurationDTO().getUrl());
-        jwkSet = JWKSet.parse(jwksInfo);
+        if (jwksInfo != null) {
+            jwkSet = JWKSet.parse(jwksInfo);
+        } else {
+            throw new APIManagementException("Error retrieving JWKS information. The retrieved JWKS info is null.");
+        }
         return jwkSet;
     }
 }
