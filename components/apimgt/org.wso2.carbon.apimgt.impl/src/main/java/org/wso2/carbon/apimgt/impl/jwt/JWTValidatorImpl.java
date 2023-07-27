@@ -193,7 +193,7 @@ public class JWTValidatorImpl implements JWTValidator {
         if (jwksInfo != null) {
             jwkSet = JWKSet.parse(jwksInfo);
         } else {
-            throw new APIManagementException("Error retrieving JWKS information. The retrieved JWKS info is null.");
+            throw new APIManagementException("Invalid JWKS endpoint.");
         }
         return jwkSet;
     }
