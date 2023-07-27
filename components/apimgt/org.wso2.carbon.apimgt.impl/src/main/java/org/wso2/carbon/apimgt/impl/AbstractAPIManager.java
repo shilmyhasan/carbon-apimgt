@@ -3436,8 +3436,8 @@ public abstract class AbstractAPIManager implements APIManager {
                     continue;
                 }
             }
-            if (tenantDomain != null && !tenantDomain.equalsIgnoreCase(
-                    keyManagerConfigurationDTO.getTenantDomain()) && !"global".equals(keyManagerConfigurationDTO.getTenantDomain())) {
+            if (tenantDomain != null && !tenantDomain.equalsIgnoreCase(keyManagerConfigurationDTO.getTenantDomain())
+                    && !APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TENANT_DOMAIN.equals(keyManagerConfigurationDTO.getTenantDomain())) {
                 continue;
             }
             KeyManager keyManager = null;

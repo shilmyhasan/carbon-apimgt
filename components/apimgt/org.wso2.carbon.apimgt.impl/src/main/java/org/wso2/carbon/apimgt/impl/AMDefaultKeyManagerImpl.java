@@ -1084,7 +1084,8 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
 
     private String getTenantAwareContext() {
 
-        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && !"global".equals(tenantDomain)) {
+        if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) &&
+                !APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TENANT_DOMAIN.equals(tenantDomain)) {
             return "/t/".concat(tenantDomain);
         }
         return "";

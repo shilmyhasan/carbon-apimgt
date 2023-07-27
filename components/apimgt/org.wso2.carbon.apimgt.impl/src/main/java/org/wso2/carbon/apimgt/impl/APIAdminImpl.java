@@ -319,6 +319,9 @@ public class APIAdminImpl implements APIAdmin {
             throws APIManagementException {
 
         KeyMgtRegistrationService.registerDefaultKeyManager(tenantDomain);
+        if (APIUtil.isCrossTenantSubscriptionsEnabled() && APIUtil.isGlobalKMEnabled()) {
+            KeyMgtRegistrationService.registerGlobalKeyManager(tenantDomain);
+        }
         List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
                 apiMgtDAO.getKeyManagerConfigurationsByTenant(tenantDomain);
         Iterator<KeyManagerConfigurationDTO> iterator = keyManagerConfigurationsByTenant.iterator();
@@ -326,7 +329,7 @@ public class APIAdminImpl implements APIAdmin {
         KeyManagerConfigurationDTO globalKeyManagerConfiguration = null;
         while (iterator.hasNext()) {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO = iterator.next();
-            if ("Global Key Manager".equals(keyManagerConfigurationDTO.getName())) {
+            if (APIConstants.KeyManager.GLOBAL_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
                 globalKeyManagerConfiguration = keyManagerConfigurationDTO;
                 iterator.remove();
             }

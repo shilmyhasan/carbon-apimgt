@@ -11615,7 +11615,8 @@ public final class APIUtil {
 
     private static String getTenantAwareContext(String tenantDomain) {
 
-        if (!org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && !"global".equals(tenantDomain)) {
+        if (!org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) &&
+                !APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TENANT_DOMAIN.equals(tenantDomain)) {
             return "/t/".concat(tenantDomain);
         }
         return "";
@@ -11729,6 +11730,16 @@ public final class APIUtil {
                 apiManagerConfiguration.getFirstProperty(APIConstants.API_DEVPORTAL_ENABLE_CROSS_TENANT_SUBSCRIPTION);
         if (StringUtils.isNotEmpty(crossTenantSubscriptionProperty)) {
             return Boolean.parseBoolean(crossTenantSubscriptionProperty);
+        }
+        return false;
+    }
+
+    public static boolean isGlobalKMEnabled() {
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String isGlobalKMEnabledProperty = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.ENABLED);
+        if (StringUtils.isNotEmpty(isGlobalKMEnabledProperty)) {
+            return  Boolean.parseBoolean(isGlobalKMEnabledProperty);
         }
         return false;
     }

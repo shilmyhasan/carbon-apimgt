@@ -92,6 +92,12 @@ public class KeyManagerHolder {
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_PASSWORD,
                                     apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_PASSWORD));
                         }
+                        if (APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER.equals(keyManagerConfiguration.getName())) {
+                            keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_USERNAME,
+                                    apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.USERNAME));
+                            keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_PASSWORD,
+                                    apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.PASSWORD));
+                        }
                         keyManager.loadConfiguration(keyManagerConfiguration);
                     } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
                         throw new APIManagementException("Error while loading keyManager configuration", e);

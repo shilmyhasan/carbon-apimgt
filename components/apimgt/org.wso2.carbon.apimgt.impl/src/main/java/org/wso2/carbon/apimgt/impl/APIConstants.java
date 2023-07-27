@@ -2437,6 +2437,11 @@ public final class APIConstants {
         public static final String DEFAULT_KEY_MANAGER_TYPE = "default";
         public static final String DEFAULT_KEY_MANAGER_DESCRIPTION = "This is Resident Key Manager";
 
+        public static final String GLOBAL_KEY_MANAGER = "Global Key Manager";
+        public static final String GLOBAL_KEY_MANAGER_TYPE = "global";
+        public static final String GLOBAL_KEY_MANAGER_DESCRIPTION = "This is Global Key Manager";
+        public static final String GLOBAL_KEY_MANAGER_TENANT_DOMAIN = "WSO2/System";
+
         public static final String ISSUER = "issuer";
         public static final String JWKS_ENDPOINT = "jwks_endpoint";
         public static final String USERINFO_ENDPOINT = "userinfo_endpoint";
@@ -2778,5 +2783,13 @@ public final class APIConstants {
         public static final String OPEN_TRACER_CUSTOM_TAG_CONFIG = "CustomTag";
         public static final String OPEN_TRACER_CUSTOM_TAG_NAME_CONFIG = "Name";
         public static final String OPEN_TRACER_CUSTOM_TAG_VALUE_CONFIG = "Value";
+    }
+
+    public static class GlobalKMConstants {
+        public static final String GLOBAL_KEY_MANAGER = "GlobalKeyManager.";
+        public static final String ENABLED = GLOBAL_KEY_MANAGER + "Enabled";
+        public static final String SERVER_URL = GLOBAL_KEY_MANAGER + "ServerURL";
+        public static final String USERNAME = GLOBAL_KEY_MANAGER + "Username";
+        public static final String PASSWORD = GLOBAL_KEY_MANAGER + "Password";
     }
 }
