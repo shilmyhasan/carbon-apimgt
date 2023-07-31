@@ -17,6 +17,7 @@ import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.KeyManagerInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.KeyManagerListDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.KeyManagerWellKnownResponseDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.TokenValidationDTO;
+import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,10 +29,13 @@ public class KeyManagerMappingUtil {
 
     public static KeyManagerListDTO toKeyManagerListDTO(List<KeyManagerConfigurationDTO> keyManagerDTOList) {
 
+        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
         KeyManagerListDTO keyManagerListDTO = new KeyManagerListDTO();
         List<KeyManagerInfoDTO> keyManagerDTOS = new ArrayList<>();
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerDTOList) {
-            keyManagerDTOS.add(toKeyManagerInfoDTO(keyManagerConfigurationDTO));
+            if (tenantDomain.equals(keyManagerConfigurationDTO.getTenantDomain())) {
+                keyManagerDTOS.add(toKeyManagerInfoDTO(keyManagerConfigurationDTO));
+            }
         }
         keyManagerListDTO.setList(keyManagerDTOS);
         keyManagerListDTO.setCount(keyManagerDTOS.size());
