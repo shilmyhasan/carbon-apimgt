@@ -8685,7 +8685,7 @@ public class ApiMgtDAO {
         String query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ?";
         if (APIUtil.isCrossTenantSubscriptionsEnabled() && APIUtil.isGlobalKMEnabled()) {
             query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ? UNION SELECT * FROM AM_KEY_MANAGER WHERE " +
-                    "TENANT_DOMAIN = '" + APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TENANT_DOMAIN + "'";
+                    "NAME = '" + APIUtil.getGlobalKMName() + "'";
         }
         try (Connection conn = APIMgtDBUtil.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {

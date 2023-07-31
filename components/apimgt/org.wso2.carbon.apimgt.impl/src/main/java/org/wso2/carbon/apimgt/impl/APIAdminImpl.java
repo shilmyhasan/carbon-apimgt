@@ -319,9 +319,13 @@ public class APIAdminImpl implements APIAdmin {
             throws APIManagementException {
 
         KeyMgtRegistrationService.registerDefaultKeyManager(tenantDomain);
-        if (APIUtil.isCrossTenantSubscriptionsEnabled() && APIUtil.isGlobalKMEnabled()) {
-            KeyMgtRegistrationService.registerGlobalKeyManager(tenantDomain);
-        }
+//        String globalKMTenantDomain = APIUtil.getGlobalKMTenantDomain();
+//        if (!globalKMTenantDomain.equals(tenantDomain)) {
+//
+//        }
+//        if (APIUtil.isCrossTenantSubscriptionsEnabled() && APIUtil.isGlobalKMEnabled()) {
+//            KeyMgtRegistrationService.registerGlobalKeyManager(APIUtil.getGlobalKMTenantDomain());
+//        }
         List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
                 apiMgtDAO.getKeyManagerConfigurationsByTenant(tenantDomain);
         Iterator<KeyManagerConfigurationDTO> iterator = keyManagerConfigurationsByTenant.iterator();
@@ -329,23 +333,24 @@ public class APIAdminImpl implements APIAdmin {
         KeyManagerConfigurationDTO globalKeyManagerConfiguration = null;
         while (iterator.hasNext()) {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO = iterator.next();
-            if (APIConstants.KeyManager.GLOBAL_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
-                globalKeyManagerConfiguration = keyManagerConfigurationDTO;
-                iterator.remove();
-            }
+//            if (APIUtil.getGlobalKMTenantDomain().equals(keyManagerConfigurationDTO.getTenantDomain())) {
+//                globalKeyManagerConfiguration = keyManagerConfigurationDTO;
+//                iterator.remove();
+//            }
             if (APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
                 defaultKeyManagerConfiguration = keyManagerConfigurationDTO;
                 iterator.remove();
+                break;
             }
         }
         if (defaultKeyManagerConfiguration != null) {
             APIUtil.getAndSetDefaultKeyManagerConfiguration(defaultKeyManagerConfiguration);
             keyManagerConfigurationsByTenant.add(defaultKeyManagerConfiguration);
         }
-        if (globalKeyManagerConfiguration != null) {
-            APIUtil.getAndSetDefaultKeyManagerConfiguration(globalKeyManagerConfiguration);
-            keyManagerConfigurationsByTenant.add(globalKeyManagerConfiguration);
-        }
+//        if (globalKeyManagerConfiguration != null) {
+//            APIUtil.getAndSetDefaultKeyManagerConfiguration(globalKeyManagerConfiguration);
+//            keyManagerConfigurationsByTenant.add(globalKeyManagerConfiguration);
+//        }
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByTenant) {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
         }

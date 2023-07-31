@@ -11615,8 +11615,7 @@ public final class APIUtil {
 
     private static String getTenantAwareContext(String tenantDomain) {
 
-        if (!org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) &&
-                !APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TENANT_DOMAIN.equals(tenantDomain)) {
+        if (!org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
             return "/t/".concat(tenantDomain);
         }
         return "";
@@ -11739,9 +11738,21 @@ public final class APIUtil {
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String isGlobalKMEnabledProperty = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.ENABLED);
         if (StringUtils.isNotEmpty(isGlobalKMEnabledProperty)) {
-            return  Boolean.parseBoolean(isGlobalKMEnabledProperty);
+            return Boolean.parseBoolean(isGlobalKMEnabledProperty);
         }
         return false;
+    }
+
+    public static String getGlobalKMTenantDomain() {
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        return apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.TENANT_DOMAIN);
+    }
+
+    public static String getGlobalKMName() {
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        return apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.NAME);
     }
 
     public static String retrieveDefaultReservedUsername() {

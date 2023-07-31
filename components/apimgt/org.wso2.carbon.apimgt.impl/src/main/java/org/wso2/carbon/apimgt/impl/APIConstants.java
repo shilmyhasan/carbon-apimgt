@@ -2440,7 +2440,6 @@ public final class APIConstants {
         public static final String GLOBAL_KEY_MANAGER = "Global Key Manager";
         public static final String GLOBAL_KEY_MANAGER_TYPE = "global";
         public static final String GLOBAL_KEY_MANAGER_DESCRIPTION = "This is Global Key Manager";
-        public static final String GLOBAL_KEY_MANAGER_TENANT_DOMAIN = "WSO2/System";
 
         public static final String ISSUER = "issuer";
         public static final String JWKS_ENDPOINT = "jwks_endpoint";
@@ -2788,8 +2787,26 @@ public final class APIConstants {
     public static class GlobalKMConstants {
         public static final String GLOBAL_KEY_MANAGER = "GlobalKeyManager.";
         public static final String ENABLED = GLOBAL_KEY_MANAGER + "Enabled";
+
+        public static final String TENANT_DOMAIN = GLOBAL_KEY_MANAGER + "TenantDomain";
+
+        public static final String NAME = GLOBAL_KEY_MANAGER + "Name";
         public static final String SERVER_URL = GLOBAL_KEY_MANAGER + "ServerURL";
         public static final String USERNAME = GLOBAL_KEY_MANAGER + "Username";
         public static final String PASSWORD = GLOBAL_KEY_MANAGER + "Password";
+        public static final String CLIENT_REGISTRATION_ENDPOINT = GLOBAL_KEY_MANAGER + "DCREndpoint";
+        public static final String INTROSPECTION_ENDPOINT = GLOBAL_KEY_MANAGER + "IntrospectionEndpoint";
+        public static final String TOKEN_ENDPOINT = GLOBAL_KEY_MANAGER + "TokenEndpoint";
+        public static final String USERINFO_ENDPOINT = GLOBAL_KEY_MANAGER + "UserInfoEndpoint";
+        public static final String REVOKE_ENDPOINT = GLOBAL_KEY_MANAGER + "RevokeEndpoint";
+        public static final String SCOPE_ENDPOINT = GLOBAL_KEY_MANAGER + "ScopeEndpoint";
+        public static final String ISSUER = GLOBAL_KEY_MANAGER + "Issuer";
+        public static final String GRANT_TYPES = GLOBAL_KEY_MANAGER + "GrantTypes";
+        public static final String ENABLE_OAUTH_APP_CREATION = GLOBAL_KEY_MANAGER + "EnabledOAuthAppCreation";
+        public static final String ENABLE_TOKEN_GENERATION = GLOBAL_KEY_MANAGER + "EnabledTokenGeneration";
+        public static final String SELF_VALIDATE_JWT = GLOBAL_KEY_MANAGER + "SelfValidateJWT";
+        public static final String CERTIFICATES = GLOBAL_KEY_MANAGER + "Certificates.";
+        public static final String CERTIFICATE_TYPE = CERTIFICATES + "Type";
+        public static final String CERTIFICATE_VALUE = CERTIFICATES + "Value";
     }
 }

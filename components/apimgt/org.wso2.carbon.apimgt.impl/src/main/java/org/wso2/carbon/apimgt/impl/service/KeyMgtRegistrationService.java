@@ -83,7 +83,6 @@ public final class KeyMgtRegistrationService {
 
     public static void registerGlobalKeyManager(String tenantDomain) throws APIManagementException {
 
-        tenantDomain = APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TENANT_DOMAIN;
         synchronized (KeyMgtRegistrationService.class.getName().concat(tenantDomain)) {
             ApiMgtDAO instance = ApiMgtDAO.getInstance();
             if (instance.getKeyManagerConfigurationByName(tenantDomain, APIConstants.KeyManager.GLOBAL_KEY_MANAGER) ==
