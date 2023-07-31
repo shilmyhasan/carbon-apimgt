@@ -173,8 +173,18 @@ public class ServerStartupListener implements ServerStartupObserver {
 
         APIAdmin apiAdmin = new APIAdminImpl();
         try {
+            KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO =
+                    apiAdmin.getKeyManagerConfigurationByName(APIUtil.getGlobalKMTenantDomain(), APIUtil.getGlobalKMName());
             KeyManagerConfigurationDTO keyManagerConfigurationDTO = loadGlobalKeyManagerConfigurations();
-            apiAdmin.addKeyManagerConfiguration(keyManagerConfigurationDTO);
+            if (oldKeyManagerConfigurationDTO == null) {
+                apiAdmin.addKeyManagerConfiguration(keyManagerConfigurationDTO);
+            } else {
+                if (!oldKeyManagerConfigurationDTO.getName().equals(keyManagerConfigurationDTO.getName())) {
+                    throw new APIManagementException("Cannot change Global Key Manager name");
+                }
+                keyManagerConfigurationDTO.setUuid(oldKeyManagerConfigurationDTO.getUuid());
+                apiAdmin.updateKeyManagerConfiguration(keyManagerConfigurationDTO);
+            }
         } catch (APIManagementException e) {
             if (!e.getMessage().contains("Key manager Already Exist by Name")) {
                 log.error("Error while adding global key manager configurations", e);
@@ -186,11 +196,11 @@ public class ServerStartupListener implements ServerStartupObserver {
         KeyManagerConfigurationDTO keyManagerConfigurationDTO = new KeyManagerConfigurationDTO();
         APIManagerConfiguration apiManagerConfiguration =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        keyManagerConfigurationDTO.setName("Global Key Manager");
-        keyManagerConfigurationDTO.setDisplayName("Global Key Manager");
-        keyManagerConfigurationDTO.setDescription("This is Global Key Manager");
+        keyManagerConfigurationDTO.setName(apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.NAME));
+        keyManagerConfigurationDTO.setDisplayName(apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.DISPLAY_NAME));
+        keyManagerConfigurationDTO.setDescription(apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.DESCRIPTION));
         keyManagerConfigurationDTO.setEnabled(APIUtil.isGlobalKMEnabled());
-        keyManagerConfigurationDTO.setType("default");
+        keyManagerConfigurationDTO.setType(apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.TYPE));
         keyManagerConfigurationDTO.setTenantDomain(APIUtil.getGlobalKMTenantDomain());
         String dcrEndpoint = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.CLIENT_REGISTRATION_ENDPOINT);
         String introspectionEndpoint = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.INTROSPECTION_ENDPOINT);

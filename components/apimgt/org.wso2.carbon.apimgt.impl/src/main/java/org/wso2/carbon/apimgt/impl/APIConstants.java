@@ -2791,6 +2791,9 @@ public final class APIConstants {
         public static final String TENANT_DOMAIN = GLOBAL_KEY_MANAGER + "TenantDomain";
 
         public static final String NAME = GLOBAL_KEY_MANAGER + "Name";
+        public static final String DISPLAY_NAME = GLOBAL_KEY_MANAGER + "DisplayName";
+        public static final String DESCRIPTION = GLOBAL_KEY_MANAGER + "Description";
+        public static final String TYPE = GLOBAL_KEY_MANAGER + "Type";
         public static final String SERVER_URL = GLOBAL_KEY_MANAGER + "ServerURL";
         public static final String USERNAME = GLOBAL_KEY_MANAGER + "Username";
         public static final String PASSWORD = GLOBAL_KEY_MANAGER + "Password";
