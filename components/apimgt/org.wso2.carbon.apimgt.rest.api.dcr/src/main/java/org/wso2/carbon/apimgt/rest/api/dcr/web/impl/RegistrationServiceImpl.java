@@ -68,6 +68,11 @@ import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.OAUTH_CLIENT
 import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.OAUTH_CLIENT_NAME;
 import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.OAUTH_CLIENT_USERNAME;
 import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.OAUTH_REDIRECT_URIS;
+import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.ENABLE_USERNAME_APPEND_TO_SP;
+
+import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.PUBLISHER_PORTAL_CLIENT_APP_NAME;
+import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.DEVELOPER_PORTAL_CLIENT_APP_NAME;
+import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.ADMIN_PORTAL_CLIENT_APP_NAME;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -173,14 +178,24 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
                 applicationName = profile.getClientName();
 
-                ApplicationManagementService applicationManagementService =
-                        ApplicationManagementService.getInstance();
+                String enableUsernameAppendToOauthAppName = System.getProperty(ENABLE_USERNAME_APPEND_TO_SP);
+                boolean isPortalSP = PUBLISHER_PORTAL_CLIENT_APP_NAME.equals(
+                        applicationName) || DEVELOPER_PORTAL_CLIENT_APP_NAME.equals(
+                        applicationName) || ADMIN_PORTAL_CLIENT_APP_NAME.equals(applicationName);
+
+                if (!isPortalSP && enableUsernameAppendToOauthAppName != null &&
+                        !enableUsernameAppendToOauthAppName.isEmpty() && Boolean.parseBoolean(
+                        enableUsernameAppendToOauthAppName)) {
+                    applicationName = String.format("%s_%s", APIUtil.replaceEmailDomain(userNameForSP),
+                            applicationName);
+                }
+
+                ApplicationManagementService applicationManagementService = ApplicationManagementService.getInstance();
 
                 //Check if the application is already exists
                 ServiceProvider appServiceProvider = null;
                 try {
-                    appServiceProvider =
-                            applicationManagementService.getApplicationExcludingFileBasedSPs(
+                    appServiceProvider = applicationManagementService.getApplicationExcludingFileBasedSPs(
                                     applicationName, loggedInUserTenantDomain);
                 } catch (IdentityApplicationManagementException e) {
                     log.error("Error occurred while checking the existence of the application " +
@@ -193,6 +208,10 @@ public class RegistrationServiceImpl implements RegistrationService {
                     //create a new application if the application doesn't exists.
                     returnedAPP = this.createApplication(applicationName, appRequest, grantTypes);
                 }
+
+                String tenantAwareAuthUsername = MultitenantUtils.getTenantAwareUsername(authUserName);
+                String tenantAwareOwner = MultitenantUtils.getTenantAwareUsername(owner);
+
                 //ReturnedAPP is null
                 if (returnedAPP == null) {
                     String errorMsg = "OAuth app '" + profile.getClientName() +
@@ -203,8 +222,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                             (RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 500L, errorMsg);
                     response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                             entity(errorDTO).build();
-                } else if ((authUserName.equals(returnedAPP.getAppOwner())) ||
-                        (isUserSuperAdmin(authUserName) && owner != null && owner.equals(returnedAPP.getAppOwner()))) {
+                } else if ((tenantAwareAuthUsername.equals(returnedAPP.getAppOwner())) || (isUserSuperAdmin(
+                        tenantAwareAuthUsername) && owner != null && tenantAwareOwner.equals(
+                        returnedAPP.getAppOwner()))) {
                     // Permitting only the owner of the application to create/get the OAuth app and admin user to
                     // create/get the app info if the created app owner equals the payload app owner.
                     if (log.isDebugEnabled()) {
