@@ -305,9 +305,9 @@ public class SubscriptionDataLoaderImpl implements SubscriptionDataLoader {
         String responseString;
         String endPoint = null;
         try {
-            if (APIConstants.KeyManager.GLOBAL_KEY_MANAGER.equals(keymanager)) {
-                tenantDomain = APIUtil.getGlobalKMTenantDomain();
-            }
+//            if (APIConstants.KeyManager.GLOBAL_KEY_MANAGER.equals(keymanager)) {
+//                tenantDomain = APIUtil.getGlobalKMTenantDomain();
+//            }
             keymanager = URLEncoder.encode(keymanager, APIConstants.DigestAuthConstants.CHARSET);
             keymanager = keymanager.replace("\\+", "%20");
             endPoint = APIConstants.SubscriptionValidationResources.APPLICATION_KEY_MAPPINGS + "?consumerKey="

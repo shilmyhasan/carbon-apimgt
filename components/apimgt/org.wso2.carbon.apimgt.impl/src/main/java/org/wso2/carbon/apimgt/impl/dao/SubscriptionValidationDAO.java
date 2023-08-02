@@ -994,6 +994,7 @@ public class SubscriptionValidationDAO {
             ps.setString(1, consumerKey);
             ps.setString(2, keymanager);
             ps.setString(3, tenantDomain);
+            ps.setString(4, APIUtil.getGlobalKMTenantDomain());
             try (ResultSet resultSet = ps.executeQuery()) {
                 if (resultSet.next()) {
                     ApplicationKeyMapping keyMapping = new ApplicationKeyMapping();

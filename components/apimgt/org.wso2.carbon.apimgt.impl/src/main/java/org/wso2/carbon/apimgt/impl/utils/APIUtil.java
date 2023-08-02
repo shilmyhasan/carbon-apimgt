@@ -11746,7 +11746,11 @@ public final class APIUtil {
     public static String getGlobalKMTenantDomain() {
         APIManagerConfiguration apiManagerConfiguration =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        return apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.TENANT_DOMAIN);
+        String tenantDomain = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.TENANT_DOMAIN);
+        if (StringUtils.isEmpty(tenantDomain)) {
+            tenantDomain = APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN;
+        }
+        return tenantDomain;
     }
 
     public static String getGlobalKMName() {

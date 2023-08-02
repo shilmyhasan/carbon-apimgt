@@ -140,8 +140,8 @@ public abstract class AbstractApplicationRegistrationWorkflowExecutor extends Wo
             String tenantDomain = km.getTenantDomain();
             String keyManagerName = km.getName();
             KeyManager keyManager;
-            if (APIConstants.KeyManager.GLOBAL_KEY_MANAGER.equals(keyManagerName)) {
-                keyManager = KeyManagerHolder.getKeyManagerInstance(APIUtil.getGlobalKMTenantDomain(), keyManagerName);
+            if (APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
+                keyManager = KeyManagerHolder.getKeyManagerInstance(workflowDTO.getTenantDomain(), keyManagerName);
             } else {
                 keyManager = KeyManagerHolder.getKeyManagerInstance(tenantDomain, keyManagerName);
             }
