@@ -1038,7 +1038,7 @@ public class OASParserUtil {
      * @return JsonNode
      */
     public static JsonNode generateOASConfigForEndpoints(API api, boolean isProduction) {
-        if (api.getEndpointConfig(  ) == null || api.getEndpointConfig().trim().isEmpty()) {
+        if (api.getEndpointConfig() == null || api.getEndpointConfig().trim().isEmpty()) {
             return null;
         }
         JSONObject endpointConfig = new JSONObject(api.getEndpointConfig());
@@ -1062,7 +1062,6 @@ public class OASParserUtil {
         } else {
             return null;
         }
-
         if (endpointResult != null) {
             populateEndpointSecurity(api, endpointResult);
         }
