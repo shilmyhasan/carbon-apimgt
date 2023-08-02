@@ -1345,7 +1345,7 @@ public class OAS2Parser extends APIDefinition {
             }
             OASParserUtil.addSecurityRequirementToSwagger(swagger, APIConstants.API_SECURITY_API_KEY);
             ApiKeyAuthDefinition apiKeyAuthDefinition = new ApiKeyAuthDefinition();
-            apiKeyAuthDefinition.setName(APIConstants.API_KEY_AUTH_TYPE);
+            apiKeyAuthDefinition.setName(APIConstants.API_KEY_HEADER_QUERY_PARAM);
             apiKeyAuthDefinition.setIn(In.HEADER);
             swagger.addSecurityDefinition(APIConstants.API_SECURITY_API_KEY, apiKeyAuthDefinition);
         }
