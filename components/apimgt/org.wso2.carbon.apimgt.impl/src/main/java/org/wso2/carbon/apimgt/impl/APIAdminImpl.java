@@ -552,11 +552,12 @@ public class APIAdminImpl implements APIAdmin {
 
         KeyManagerConfigurationDTO keyManagerConfiguration =
                 apiMgtDAO.getKeyManagerConfigurationByName(tenantDomain, name);
-        if (keyManagerConfiguration != null &&
-                APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfiguration.getName())) {
-            APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfiguration);
+        if (keyManagerConfiguration != null) {
+            if (APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfiguration.getName())) {
+                APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfiguration);
+            }
+            maskValues(keyManagerConfiguration);
         }
-        maskValues(keyManagerConfiguration);
         return keyManagerConfiguration;
     }
 
