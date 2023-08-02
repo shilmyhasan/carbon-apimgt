@@ -1038,7 +1038,7 @@ public class OASParserUtil {
      * @return JsonNode
      */
     public static JsonNode generateOASConfigForEndpoints(API api, boolean isProduction) {
-        if (api.getEndpointConfig() == null || api.getEndpointConfig().trim().isEmpty()) {
+        if (api.getEndpointConfig(  ) == null || api.getEndpointConfig().trim().isEmpty()) {
             return null;
         }
         JSONObject endpointConfig = new JSONObject(api.getEndpointConfig());
@@ -1062,6 +1062,7 @@ public class OASParserUtil {
         } else {
             return null;
         }
+
         if (endpointResult != null) {
             populateEndpointSecurity(api, endpointResult);
         }
@@ -1187,6 +1188,16 @@ public class OASParserUtil {
             ObjectNode endpointResult = objectMapper.createObjectNode();
             endpointResult.set(APIConstants.ENDPOINT_URLS, endpointsArray);
             endpointResult.put(APIConstants.X_WSO2_ENDPOINT_TYPE, type);
+            if(primaryEndpoints.has(APIConstants.ADVANCE_ENDPOINT_CONFIG)){
+                JSONObject adba = primaryEndpoints.getJSONObject(APIConstants.ADVANCE_ENDPOINT_CONFIG);
+                ObjectNode advanceEndpointsObject = objectMapper.createObjectNode();
+                if(adba.has(APIConstants.ADVANCE_ENDPOINT_TIMEOUT_CONFIG)){
+                    advanceEndpointsObject.put(APIConstants.ADVANCE_ENDPOINT_TIMEOUT_CONFIG,
+                            adba.getInt(APIConstants.ADVANCE_ENDPOINT_TIMEOUT_CONFIG));
+                }
+                endpointResult.set(APIConstants.ADVANCE_ENDPOINT_CONFIG,
+                        advanceEndpointsObject);
+            }
             return endpointResult;
         }
         return null;
