@@ -53,7 +53,7 @@ public final class  ApplicationConstants {
     public static final String AUTHORIZATION_CODE = "authorization_code";
     public static final String INBOUNT_AUTH_CONSUMER_SECRET = "oauthConsumerSecret";
 
-    public static final String ENABLE_USERNAME_APPEND_TO_SP = "EnableUsernameAppendToSP";
+    public static final String ENABLE_USERNAME_APPEND_TO_SP = "enableUsernameAppendToSP";
 
     public static final String PUBLISHER_PORTAL_CLIENT_APP_NAME = "apim_publisher";
     public static final String DEVELOPER_PORTAL_CLIENT_APP_NAME = "apim_devportal";
