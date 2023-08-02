@@ -1317,7 +1317,7 @@ public class OAS3Parser extends APIDefinition {
                     key -> {
                         SecurityScheme scheme = new SecurityScheme();
                         scheme.setType(SecurityScheme.Type.HTTP);
-                        scheme.setScheme(APIConstants.AUTHORIZATION_HEADER_BASIC);
+                        scheme.setScheme(APIConstants.SWAGGER_API_SECURITY_BASIC_AUTH_TYPE);
                         return scheme;
                     });
             // Set the scopes defined in the API to the OAS definition.
@@ -1335,7 +1335,7 @@ public class OAS3Parser extends APIDefinition {
                         SecurityScheme scheme = new SecurityScheme();
                         scheme.setType(SecurityScheme.Type.APIKEY);
                         scheme.setIn(SecurityScheme.In.HEADER);
-                        scheme.setName(APIConstants.API_KEY_AUTH_TYPE);
+                        scheme.setName(APIConstants.API_KEY_HEADER_QUERY_PARAM);
                         return scheme;
                     });
             // Add global api key security requirement to the OAS definition.
