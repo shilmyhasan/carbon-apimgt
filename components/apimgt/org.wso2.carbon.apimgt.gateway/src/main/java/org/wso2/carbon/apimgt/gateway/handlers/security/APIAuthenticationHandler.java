@@ -573,7 +573,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         StringBuilder challengeString = new StringBuilder();
         if (authenticators != null) {
             for (Authenticator authenticator : authenticators) {
-                challengeString.append(authenticator.getChallengeString()).append(" ");
+                challengeString.append(authenticator.getChallengeString()).append(", ");
             }
         }
         return challengeString.toString().trim();
