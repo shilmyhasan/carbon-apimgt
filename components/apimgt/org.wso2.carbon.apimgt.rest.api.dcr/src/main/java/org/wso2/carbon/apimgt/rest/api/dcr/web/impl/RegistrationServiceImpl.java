@@ -209,9 +209,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                     returnedAPP = this.createApplication(applicationName, appRequest, grantTypes);
                 }
 
-                String tenantAwareAuthUsername = MultitenantUtils.getTenantAwareUsername(authUserName);
-                String tenantAwareOwner = MultitenantUtils.getTenantAwareUsername(owner);
-
                 //ReturnedAPP is null
                 if (returnedAPP == null) {
                     String errorMsg = "OAuth app '" + profile.getClientName() +
@@ -222,9 +219,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                             (RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 500L, errorMsg);
                     response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                             entity(errorDTO).build();
-                } else if ((tenantAwareAuthUsername.equals(returnedAPP.getAppOwner())) || (isUserSuperAdmin(
-                        tenantAwareAuthUsername) && owner != null && tenantAwareOwner.equals(
-                        returnedAPP.getAppOwner()))) {
+                } else if ((authUserName.equals(returnedAPP.getAppOwner())) || (isUserSuperAdmin(authUserName)
+                        && owner != null && owner.equals(returnedAPP.getAppOwner()))) {
                     // Permitting only the owner of the application to create/get the OAuth app and admin user to
                     // create/get the app info if the created app owner equals the payload app owner.
                     if (log.isDebugEnabled()) {
