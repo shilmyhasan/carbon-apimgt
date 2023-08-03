@@ -120,6 +120,11 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
             }
 
+            //When the app owner is appended with @carbon.super,take the tenantAware owner value
+            if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(MultitenantUtils.getTenantDomain(owner))) {
+                owner = MultitenantUtils.getTenantAwareUsername(owner);
+            }
+
             //Validates if the application owner and logged in username is same.
             if (authUserName != null && ((authUserName.equals(owner))|| isUserSuperAdmin(authUserName))) {
                 if (!isUserAccessAllowed(authUserName)) {
@@ -322,8 +327,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             appToReturn = this.fromAppDTOToApplicationInfo(consumerAppDTO.getOauthConsumerKey(),
                     consumerAppDTO.getApplicationName(), consumerAppDTO.getCallbackUrl(),
-                    consumerAppDTO.getOauthConsumerSecret(), saasApp,
-                    MultitenantUtils.getTenantAwareUsername(consumerAppDTO.getUsername()), valueMap);
+                    consumerAppDTO.getOauthConsumerSecret(), saasApp, consumerAppDTO.getUsername(), valueMap);
 
         } catch (IdentityOAuthAdminException e) {
             log.error("error occurred while trying to get OAuth Application data", e);
