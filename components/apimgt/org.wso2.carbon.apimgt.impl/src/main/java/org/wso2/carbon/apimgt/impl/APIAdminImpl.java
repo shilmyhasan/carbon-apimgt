@@ -319,24 +319,12 @@ public class APIAdminImpl implements APIAdmin {
             throws APIManagementException {
 
         KeyMgtRegistrationService.registerDefaultKeyManager(tenantDomain);
-//        String globalKMTenantDomain = APIUtil.getGlobalKMTenantDomain();
-//        if (!globalKMTenantDomain.equals(tenantDomain)) {
-//
-//        }
-//        if (APIUtil.isCrossTenantSubscriptionsEnabled() && APIUtil.isGlobalKMEnabled()) {
-//            KeyMgtRegistrationService.registerGlobalKeyManager(APIUtil.getGlobalKMTenantDomain());
-//        }
         List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
                 apiMgtDAO.getKeyManagerConfigurationsByTenant(tenantDomain);
         Iterator<KeyManagerConfigurationDTO> iterator = keyManagerConfigurationsByTenant.iterator();
         KeyManagerConfigurationDTO defaultKeyManagerConfiguration = null;
-        KeyManagerConfigurationDTO globalKeyManagerConfiguration = null;
         while (iterator.hasNext()) {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO = iterator.next();
-//            if (APIUtil.getGlobalKMTenantDomain().equals(keyManagerConfigurationDTO.getTenantDomain())) {
-//                globalKeyManagerConfiguration = keyManagerConfigurationDTO;
-//                iterator.remove();
-//            }
             if (APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
                 defaultKeyManagerConfiguration = keyManagerConfigurationDTO;
                 iterator.remove();
@@ -347,10 +335,6 @@ public class APIAdminImpl implements APIAdmin {
             APIUtil.getAndSetDefaultKeyManagerConfiguration(defaultKeyManagerConfiguration);
             keyManagerConfigurationsByTenant.add(defaultKeyManagerConfiguration);
         }
-//        if (globalKeyManagerConfiguration != null) {
-//            APIUtil.getAndSetDefaultKeyManagerConfiguration(globalKeyManagerConfiguration);
-//            keyManagerConfigurationsByTenant.add(globalKeyManagerConfiguration);
-//        }
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByTenant) {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
         }

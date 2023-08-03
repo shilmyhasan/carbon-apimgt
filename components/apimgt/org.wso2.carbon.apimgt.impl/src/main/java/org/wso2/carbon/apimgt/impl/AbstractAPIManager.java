@@ -3442,11 +3442,6 @@ public abstract class AbstractAPIManager implements APIManager {
             }
             KeyManager keyManager = null;
             if (keyManagerConfigurationDTO.isEnabled()) {
-//                if (APIConstants.KeyManager.GLOBAL_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
-//                    keyManager = KeyManagerHolder.getKeyManagerInstance(APIUtil.getGlobalKMTenantDomain(), keyManagerName);
-//                } else {
-//                    keyManager = KeyManagerHolder.getKeyManagerInstance(tenantDomain, keyManagerName);
-//                }
                 keyManager = KeyManagerHolder.getKeyManagerInstance(tenantDomain, keyManagerName);
             } else {
                 continue;
