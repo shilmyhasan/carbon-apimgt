@@ -4853,9 +4853,14 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 String applicationName = application.getName();
                 if (!APIUtil.isApplicationOwnedBySubscriber(userId, applicationName)) {
                     for (APIKey apiKey : application.getKeys()) {
+                        String keyManagerName = apiKey.getKeyManager();
                         KeyManager keyManager =
-                                KeyManagerHolder.getKeyManagerInstance(tenantDomain, apiKey.getKeyManager());
-                             /* retrieving OAuth application information for specific consumer key */
+                                KeyManagerHolder.getKeyManagerInstance(tenantDomain, keyManagerName);
+                        // Skip updating the owner of the OAuth application for global key manager
+                        if (APIUtil.isGlobalKMEnabled() && APIUtil.getGlobalKMName().equals(keyManagerName)) {
+                            continue;
+                        }
+                        /* retrieving OAuth application information for specific consumer key */
                         consumerKey = apiKey.getConsumerKey();
                         OAuthApplicationInfo oAuthApplicationInfo = keyManager.retrieveApplication(consumerKey);
                         if (oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_NAME) != null) {
