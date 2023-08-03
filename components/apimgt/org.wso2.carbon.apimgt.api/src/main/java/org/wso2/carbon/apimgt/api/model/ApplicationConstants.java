@@ -58,5 +58,4 @@ public final class  ApplicationConstants {
     public static final String PUBLISHER_PORTAL_CLIENT_APP_NAME = "apim_publisher";
     public static final String DEVELOPER_PORTAL_CLIENT_APP_NAME = "apim_devportal";
     public static final String ADMIN_PORTAL_CLIENT_APP_NAME = "apim_admin_portal";
-
 }
