@@ -183,8 +183,8 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         if (log.isDebugEnabled()) {
             log.debug("Initializing API authentication handler instance");
         }
+        initializeAuthenticators();
         if (getApiManagerConfigurationService() != null) {
-            initializeAuthenticators();
             initOAuthParams();
         }
         if (StringUtils.isNotEmpty(keyManagers)) {
@@ -325,19 +325,6 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         }
         if (!isBasicAuthProtected && !isOAuthProtected && !isMutualSSLMandatory && !isApiKeyProtected) {
             isMutualSSLMandatory = true;
-        }
-
-        // Retrieve authorization header name
-        if (authorizationHeader == null) {
-            try {
-                authorizationHeader = APIUtil
-                        .getOAuthConfigurationFromAPIMConfig(APIConstants.AUTHORIZATION_HEADER);
-                if (authorizationHeader == null) {
-                    authorizationHeader = HttpHeaders.AUTHORIZATION;
-                }
-            } catch (APIManagementException e) {
-                log.error("Error while reading authorization header from API-M configurations", e);
-            }
         }
 
         // Set authenticators
