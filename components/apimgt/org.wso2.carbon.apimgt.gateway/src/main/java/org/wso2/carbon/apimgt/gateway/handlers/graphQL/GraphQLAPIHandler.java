@@ -53,6 +53,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.util.Locale;
 import java.util.*;
 
 import static org.apache.axis2.Constants.Configuration.HTTP_METHOD;
@@ -342,7 +343,7 @@ public class GraphQLAPIHandler extends AbstractHandler {
             }
         }
 
-        validationErrors = validator.validateDocument(schema, document);
+        validationErrors = validator.validateDocument(schema, document, Locale.ENGLISH);
         if (validationErrors != null && validationErrors.size() > 0) {
             if (log.isDebugEnabled()) {
                 log.debug("Validation failed for " + document);
