@@ -120,13 +120,24 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
             }
 
+            if (authUserName != null && !authUserName.equals(owner)) {
+                loggedInUserTenantDomain = MultitenantUtils.getTenantDomain(owner);
+            } else {
+                loggedInUserTenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
+            }
+
             //When the app owner is appended with @carbon.super,take the tenantAware owner value
             if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(MultitenantUtils.getTenantDomain(owner))) {
                 owner = MultitenantUtils.getTenantAwareUsername(owner);
             }
 
-            //Validates if the application owner and logged in username is same.
-            if (authUserName != null && ((authUserName.equals(owner))|| isUserSuperAdmin(authUserName))) {
+            //Validates if the application owner and logged-in username is same.
+            if (authUserName != null && ((!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    loggedInUserTenantDomain)) && (authUserName.equals(
+                    owner))) || (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    loggedInUserTenantDomain) && (MultitenantUtils.getTenantAwareUsername(authUserName)
+                    .equals(owner))) || isUserSuperAdmin(authUserName)) {
+
                 if (!isUserAccessAllowed(authUserName)) {
                     String errorMsg = "You do not have enough privileges to create an OAuth app";
                     log.error("User " + authUserName +
@@ -164,11 +175,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 oauthApplicationInfo.setIsSaasApplication(profile.isSaasApp());
                 oauthApplicationInfo.setTokenType(tokenType);
                 appRequest.setOAuthApplicationInfo(oauthApplicationInfo);
-                if (!authUserName.equals(owner)){
-                    loggedInUserTenantDomain = MultitenantUtils.getTenantDomain(owner);
-                }else{
-                    loggedInUserTenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
-                }
+
                 String userId = (String) oauthApplicationInfo.getParameter(OAUTH_CLIENT_USERNAME);
                 String userNameForSP = MultitenantUtils.getTenantAwareUsername(userId);
                 // Replace domain separator by "_" if user is coming from a secondary userstore.
@@ -337,10 +344,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             Map<String, String> valueMap = new HashMap<String, String>();
             valueMap.put(OAUTH_CLIENT_GRANT, consumerAppDTO.getGrantTypes());
 
+           String appOwner = consumerAppDTO.getUsername();
+            if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    MultitenantUtils.getTenantDomain(consumerAppDTO.getUsername()))) {
+                appOwner = MultitenantUtils.getTenantAwareUsername(appOwner);
+            }
             appToReturn = this.fromAppDTOToApplicationInfo(consumerAppDTO.getOauthConsumerKey(),
                     consumerAppDTO.getApplicationName(), consumerAppDTO.getCallbackUrl(),
-                    consumerAppDTO.getOauthConsumerSecret(), saasApp, consumerAppDTO.getUsername(), valueMap);
-
+                    consumerAppDTO.getOauthConsumerSecret(), saasApp, appOwner, valueMap);
         } catch (IdentityOAuthAdminException e) {
             log.error("error occurred while trying to get OAuth Application data", e);
         }
