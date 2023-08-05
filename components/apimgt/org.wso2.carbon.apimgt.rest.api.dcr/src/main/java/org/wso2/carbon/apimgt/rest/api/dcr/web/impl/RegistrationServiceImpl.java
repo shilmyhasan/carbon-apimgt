@@ -129,8 +129,23 @@ public class RegistrationServiceImpl implements RegistrationService {
                 owner = MultitenantUtils.getTenantAwareUsername(owner);
             }
 
+            if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(MultitenantUtils.getTenantDomain(authUserName))) {
+                authUserName = MultitenantUtils.getTenantAwareUsername(authUserName);
+            }
+
+            if (authUserName != null && !authUserName.equals(owner)) {
+                loggedInUserTenantDomain = MultitenantUtils.getTenantDomain(owner);
+            } else {
+                loggedInUserTenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            }
+
             //Validates if the application owner and logged in username is same.
-            if (authUserName != null && ((authUserName.equals(owner))|| isUserSuperAdmin(authUserName))) {
+            if (authUserName != null && ((!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    loggedInUserTenantDomain) && authUserName.equals(
+                    owner)) || (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    loggedInUserTenantDomain) && MultitenantUtils.getTenantAwareUsername(authUserName)
+                    .equals(owner)) || isUserSuperAdmin(authUserName))) {
+
                 if (!isUserAccessAllowed(authUserName)) {
                     String errorMsg = "You do not have enough privileges to create an OAuth app";
                     log.error("User " + authUserName +
@@ -162,17 +177,14 @@ public class RegistrationServiceImpl implements RegistrationService {
                 if (StringUtils.isNotEmpty(profileTokenType)) {
                     tokenType = profileTokenType;
                 }
+
                 oauthApplicationInfo.addParameter(OAUTH_CLIENT_USERNAME, owner);
                 oauthApplicationInfo.setClientId("");
                 oauthApplicationInfo.setClientSecret("");
                 oauthApplicationInfo.setIsSaasApplication(profile.isSaasApp());
                 oauthApplicationInfo.setTokenType(tokenType);
                 appRequest.setOAuthApplicationInfo(oauthApplicationInfo);
-                if (!authUserName.equals(owner)){
-                    loggedInUserTenantDomain = MultitenantUtils.getTenantDomain(owner);
-                }else{
-                    loggedInUserTenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
-                }
+
                 String userId = (String) oauthApplicationInfo.getParameter(OAUTH_CLIENT_USERNAME);
                 String userNameForSP = MultitenantUtils.getTenantAwareUsername(userId);
                 // Replace domain separator by "_" if user is coming from a secondary userstore.
@@ -214,6 +226,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                     returnedAPP = this.createApplication(applicationName, appRequest, grantTypes);
                 }
 
+                String tenantAwareAuthUsername = MultitenantUtils.getTenantAwareUsername(authUserName);
+                String tenantAwareOwner = MultitenantUtils.getTenantAwareUsername(owner);
+
                 //ReturnedAPP is null
                 if (returnedAPP == null) {
                     String errorMsg = "OAuth app '" + profile.getClientName() +
@@ -224,8 +239,10 @@ public class RegistrationServiceImpl implements RegistrationService {
                             (RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 500L, errorMsg);
                     response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                             entity(errorDTO).build();
-                } else if ((authUserName.equals(returnedAPP.getAppOwner())) || (isUserSuperAdmin(authUserName)
-                        && owner != null && owner.equals(returnedAPP.getAppOwner()))) {
+                } else if (tenantAwareAuthUsername.equals(
+                        MultitenantUtils.getTenantAwareUsername(returnedAPP.getAppOwner())) || (isUserSuperAdmin(
+                        tenantAwareAuthUsername) && owner != null && tenantAwareOwner.equals(
+                        MultitenantUtils.getTenantAwareUsername(returnedAPP.getAppOwner())))) {
                     // Permitting only the owner of the application to create/get the OAuth app and admin user to
                     // create/get the app info if the created app owner equals the payload app owner.
                     if (log.isDebugEnabled()) {
@@ -233,12 +250,19 @@ public class RegistrationServiceImpl implements RegistrationService {
                     }
                     response = Response.status(Response.Status.OK).entity(returnedAPP).build();
                 } else {
+                    String tenantAwareAppOwner = MultitenantUtils.getTenantAwareUsername(returnedAPP.getAppOwner());
                     String errMsg = "Access is forbidden to the application";
                     if (log.isDebugEnabled()) {
-                        log.debug("OAuth app owner: " + returnedAPP.getAppOwner() + " is different from payload " +
-                                "owner: " + owner + " and " + errMsg);
+                        log.debug(
+                                "tenant aware authUser " + tenantAwareAuthUsername +
+                                        " is different from the oAuth app owner: " + tenantAwareAppOwner +
+                                        " or Tenant aware oAuth app owner: " + tenantAwareAppOwner +
+                                        " is different from the tenant aware payload owner: " + tenantAwareOwner
+                                        + " and tenant aware authUser is a super admin:  "
+                                        + isUserSuperAdmin(tenantAwareAuthUsername) + "." + errMsg);
                     }
-                    errorDTO = RestApiUtil.getErrorDTO(RestApiConstants.STATUS_FORBIDDEN_MESSAGE_DEFAULT, 403L, errMsg);
+                    errorDTO = RestApiUtil.getErrorDTO(RestApiConstants.STATUS_FORBIDDEN_MESSAGE_DEFAULT, 403L,
+                            errMsg);
                     response = Response.status(Response.Status.FORBIDDEN).entity(errorDTO).build();
                 }
             } else {
@@ -340,9 +364,16 @@ public class RegistrationServiceImpl implements RegistrationService {
             Map<String, String> valueMap = new HashMap<String, String>();
             valueMap.put(OAUTH_CLIENT_GRANT, consumerAppDTO.getGrantTypes());
 
+            String appOwner = consumerAppDTO.getUsername();
+
+            if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    MultitenantUtils.getTenantDomain(consumerAppDTO.getUsername()))) {
+                appOwner = MultitenantUtils.getTenantAwareUsername(appOwner);
+            }
+
             appToReturn = this.fromAppDTOToApplicationInfo(consumerAppDTO.getOauthConsumerKey(),
                     consumerAppDTO.getApplicationName(), consumerAppDTO.getCallbackUrl(),
-                    consumerAppDTO.getOauthConsumerSecret(), saasApp, consumerAppDTO.getUsername(), valueMap);
+                    consumerAppDTO.getOauthConsumerSecret(), saasApp, appOwner, valueMap);
 
         } catch (IdentityOAuthAdminException e) {
             log.error("error occurred while trying to get OAuth Application data", e);
