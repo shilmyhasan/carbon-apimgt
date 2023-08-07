@@ -207,7 +207,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
                 //Retrieving the existing application
                 if (appServiceProvider != null) {
-                    returnedAPP = this.getExistingApp(applicationName, appServiceProvider.isSaasApp());
+                    returnedAPP = this.getExistingApp(applicationName, appServiceProvider.isSaasApp(), owner);
                 } else {
                     //create a new application if the application doesn't exists.
                     returnedAPP = this.createApplication(applicationName, appRequest, grantTypes);
@@ -352,7 +352,7 @@ public class RegistrationServiceImpl implements RegistrationService {
      * @param saasApp         value of IsSaasApp attribute of application.
      * @return existing Application
      */
-    private OAuthApplicationInfo getExistingApp(String applicationName, boolean saasApp) {
+    private OAuthApplicationInfo getExistingApp(String applicationName, boolean saasApp, String applicationOwner) {
 
         OAuthApplicationInfo appToReturn = null;
         OAuthAdminService oAuthAdminService = new OAuthAdminService();
@@ -361,12 +361,12 @@ public class RegistrationServiceImpl implements RegistrationService {
                     getOAuthApplicationDataByAppName(applicationName);
             Map<String, String> valueMap = new HashMap<String, String>();
             valueMap.put(OAUTH_CLIENT_GRANT, consumerAppDTO.getGrantTypes());
-
             String appOwner = consumerAppDTO.getUsername();
 
             if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
-                    MultitenantUtils.getTenantDomain(consumerAppDTO.getUsername()))) {
-                appOwner = MultitenantUtils.getTenantAwareUsername(appOwner);
+                    MultitenantUtils.getTenantDomain(consumerAppDTO.getUsername())) &&
+                    appOwner.equals(MultitenantUtils.getTenantAwareUsername(consumerAppDTO.getUsername()))) {
+                appOwner = applicationOwner;
             }
 
             appToReturn = this.fromAppDTOToApplicationInfo(consumerAppDTO.getOauthConsumerKey(),
