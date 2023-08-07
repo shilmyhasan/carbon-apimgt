@@ -31,8 +31,8 @@ const Settings = {
             syntaxHighlighterDarkTheme: false,
         },
         sanitizeHtml: {
-            allowedTags: false, // You can pass the properties described at https://www.npmjs.com/package/sanitize-html
-            allowedAttributes: false,
+            allowedTags: [], // You can pass the properties described at https://www.npmjs.com/package/sanitize-html
+            allowedAttributes: {},
         }
     },
     grantTypes: {
