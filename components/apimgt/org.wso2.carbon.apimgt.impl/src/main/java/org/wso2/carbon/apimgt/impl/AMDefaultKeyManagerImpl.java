@@ -658,7 +658,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                             (APIConstants.KeyManager.KEY_MANAGER_OPERATIONS_USERINFO_ENDPOINT);
         }
 
-        if (configuration.getParameter(APIConstants.GlobalKMConstants.LOGGED_IN_TENANT_DOMAIN) != null) {
+        if (configuration.getParameter(APIConstants.KEY_MANAGER_TENANT_DOMAIN) != null) {
             dcrClient = Feign.builder()
                     .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(dcrEndpoint)))
                     .encoder(new GsonEncoder())

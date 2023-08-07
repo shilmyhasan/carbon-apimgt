@@ -86,17 +86,13 @@ public class KeyManagerHolder {
                         keyManager = (KeyManager) Class
                                 .forName(keyManagerConnectorConfiguration.getImplementation()).newInstance();
                         keyManager.setTenantDomain(tenantDomain);
-                        if (APIUtil.isGlobalKMEnabled() && APIUtil.getGlobalKMName().equals(keyManagerConfiguration.getName())) {
+                        if (StringUtils.isNotEmpty(defaultKeyManagerType) && defaultKeyManagerType.equals(type) &&
+                                APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfiguration.getName())) {
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_USERNAME,
-                                    apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.USERNAME));
+                                        apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_USERNAME));
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_PASSWORD,
-                                    apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.PASSWORD));
-                        } else if (StringUtils.isNotEmpty(defaultKeyManagerType) && defaultKeyManagerType.equals(type)){
-                            keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_USERNAME,
-                                    apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_USERNAME));
-                            keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_PASSWORD,
-                                    apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_PASSWORD));
-                            keyManagerConfiguration.addParameter(APIConstants.GlobalKMConstants.LOGGED_IN_TENANT_DOMAIN, tenantDomain);
+                                        apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_PASSWORD));
+                            keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_TENANT_DOMAIN, tenantDomain);
                         }
                         keyManager.loadConfiguration(keyManagerConfiguration);
                     } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {

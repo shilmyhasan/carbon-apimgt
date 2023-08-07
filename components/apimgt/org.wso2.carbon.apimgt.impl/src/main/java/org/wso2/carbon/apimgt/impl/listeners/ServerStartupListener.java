@@ -213,6 +213,9 @@ public class ServerStartupListener implements ServerStartupObserver {
         String selfValidateJWT = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.SELF_VALIDATE_JWT);
         String certificateType = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.CERTIFICATE_TYPE);
         String certificateValue = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.CERTIFICATE_VALUE);
+        String username = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.USERNAME);
+        String password = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.PASSWORD);
+
         List<String> grantTypesList = Arrays.asList(grantTypes.split(","));
         Map<String,Object> additionalProperties = new HashMap<>();
         if (StringUtils.isNotEmpty(dcrEndpoint)) {
@@ -263,6 +266,12 @@ public class ServerStartupListener implements ServerStartupObserver {
         if (StringUtils.isNotEmpty(certificateValue)) {
             additionalProperties
                     .put(APIConstants.KeyManager.CERTIFICATE_VALUE, certificateValue);
+        }
+        if (StringUtils.isNotEmpty(username)) {
+            additionalProperties.put(APIConstants.KeyManager.USERNAME, username);
+        }
+        if (StringUtils.isNotEmpty(password)) {
+            additionalProperties.put(APIConstants.KeyManager.PASSWORD, password);
         }
         keyManagerConfigurationDTO.setAdditionalProperties(additionalProperties);
         return keyManagerConfigurationDTO;

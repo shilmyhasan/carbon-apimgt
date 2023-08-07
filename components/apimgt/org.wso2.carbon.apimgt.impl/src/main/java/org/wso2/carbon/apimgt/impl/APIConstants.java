@@ -740,6 +740,7 @@ public final class APIConstants {
     public static final String KEY_MANAGER = "KeyManager";
     public static final String KEY_MANAGER_USERNAME = "Username";
     public static final String KEY_MANAGER_PASSWORD = "Password";
+    public static final String KEY_MANAGER_TENANT_DOMAIN = "KeyManagerTenantDomain";
     public static final String AUTHSERVER_URL = "ServerURL";
     public static final String API_KEY_VALIDATOR_ENABLE_PROVISION_APP_VALIDATION =
             API_KEY_VALIDATOR + "EnableProvisionedAppValidation";
@@ -2806,6 +2807,5 @@ public final class APIConstants {
         public static final String CERTIFICATE_TYPE = CERTIFICATES + "Type";
         public static final String CERTIFICATE_VALUE = CERTIFICATES + "Value";
         public static final String GLOBAL_KEY_MANAGER_TENANT_DOMAIN = "WSO2/System";
-        public static final String LOGGED_IN_TENANT_DOMAIN = "LoggedInTenantDomain";
     }
 }
