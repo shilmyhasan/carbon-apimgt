@@ -91,12 +91,12 @@ public class KeyManagerHolder {
                                     apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.USERNAME));
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_PASSWORD,
                                     apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.PASSWORD));
-                            keyManager.setTenantDomain(APIUtil.getGlobalKMTenantDomain());
                         } else if (StringUtils.isNotEmpty(defaultKeyManagerType) && defaultKeyManagerType.equals(type)){
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_USERNAME,
                                     apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_USERNAME));
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_PASSWORD,
                                     apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_PASSWORD));
+                            keyManagerConfiguration.addParameter(APIConstants.GlobalKMConstants.LOGGED_IN_TENANT_DOMAIN, tenantDomain);
                         }
                         keyManager.loadConfiguration(keyManagerConfiguration);
                     } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {

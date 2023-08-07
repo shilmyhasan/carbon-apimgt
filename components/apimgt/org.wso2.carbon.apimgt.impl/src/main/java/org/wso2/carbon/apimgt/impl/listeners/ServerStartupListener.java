@@ -186,9 +186,7 @@ public class ServerStartupListener implements ServerStartupObserver {
                 apiAdmin.updateKeyManagerConfiguration(keyManagerConfigurationDTO);
             }
         } catch (APIManagementException e) {
-            if (!e.getMessage().contains("Key manager Already Exist by Name")) {
-                log.error("Error while initializing global key manager configurations", e);
-            }
+            log.error("Error while initializing global key manager configurations", e);
         }
     }
 

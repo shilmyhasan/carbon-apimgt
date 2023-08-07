@@ -658,15 +658,86 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                             (APIConstants.KeyManager.KEY_MANAGER_OPERATIONS_USERINFO_ENDPOINT);
         }
 
-        dcrClient = Feign.builder()
-                .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(dcrEndpoint)))
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .logger(new Slf4jLogger())
-                .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
-                .requestInterceptor(new TenantHeaderInterceptor(tenantDomain))
-                .errorDecoder(new KMClientErrorDecoder())
-                .target(DCRClient.class, dcrEndpoint);
+        if (configuration.getParameter(APIConstants.GlobalKMConstants.LOGGED_IN_TENANT_DOMAIN) != null) {
+            dcrClient = Feign.builder()
+                    .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(dcrEndpoint)))
+                    .encoder(new GsonEncoder())
+                    .decoder(new GsonDecoder())
+                    .logger(new Slf4jLogger())
+                    .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                    .requestInterceptor(new TenantHeaderInterceptor(tenantDomain))
+                    .errorDecoder(new KMClientErrorDecoder())
+                    .target(DCRClient.class, dcrEndpoint);
+
+            introspectionClient = Feign.builder()
+                    .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(introspectionEndpoint)))
+                    .encoder(new GsonEncoder())
+                    .decoder(new GsonDecoder())
+                    .logger(new Slf4jLogger())
+                    .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                    .requestInterceptor(new TenantHeaderInterceptor(tenantDomain))
+                    .errorDecoder(new KMClientErrorDecoder())
+                    .encoder(new FormEncoder())
+                    .target(IntrospectionClient.class, introspectionEndpoint);
+
+            scopeClient = Feign.builder()
+                    .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(scopeEndpoint)))
+                    .encoder(new GsonEncoder())
+                    .decoder(new GsonDecoder())
+                    .logger(new Slf4jLogger())
+                    .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                    .requestInterceptor(new TenantHeaderInterceptor(tenantDomain))
+                    .errorDecoder(new KMClientErrorDecoder())
+                    .target(ScopeClient.class, scopeEndpoint);
+
+            userClient = Feign.builder()
+                    .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(userInfoEndpoint)))
+                    .encoder(new GsonEncoder())
+                    .decoder(new GsonDecoder())
+                    .logger(new Slf4jLogger())
+                    .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                    .requestInterceptor(new TenantHeaderInterceptor(tenantDomain))
+                    .errorDecoder(new KMClientErrorDecoder())
+                    .target(UserClient.class, userInfoEndpoint);
+        } else {
+            dcrClient = Feign.builder()
+                    .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(dcrEndpoint)))
+                    .encoder(new GsonEncoder())
+                    .decoder(new GsonDecoder())
+                    .logger(new Slf4jLogger())
+                    .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                    .errorDecoder(new KMClientErrorDecoder())
+                    .target(DCRClient.class, dcrEndpoint);
+
+            introspectionClient = Feign.builder()
+                    .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(introspectionEndpoint)))
+                    .encoder(new GsonEncoder())
+                    .decoder(new GsonDecoder())
+                    .logger(new Slf4jLogger())
+                    .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                    .errorDecoder(new KMClientErrorDecoder())
+                    .encoder(new FormEncoder())
+                    .target(IntrospectionClient.class, introspectionEndpoint);
+
+            scopeClient = Feign.builder()
+                    .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(scopeEndpoint)))
+                    .encoder(new GsonEncoder())
+                    .decoder(new GsonDecoder())
+                    .logger(new Slf4jLogger())
+                    .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                    .errorDecoder(new KMClientErrorDecoder())
+                    .target(ScopeClient.class, scopeEndpoint);
+
+            userClient = Feign.builder()
+                    .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(userInfoEndpoint)))
+                    .encoder(new GsonEncoder())
+                    .decoder(new GsonDecoder())
+                    .logger(new Slf4jLogger())
+                    .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
+                    .errorDecoder(new KMClientErrorDecoder())
+                    .target(UserClient.class, userInfoEndpoint);
+        }
+
         authClient = Feign.builder()
                 .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(tokenEndpoint)))
                 .encoder(new GsonEncoder())
@@ -675,35 +746,6 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                 .errorDecoder(new KMClientErrorDecoder())
                 .encoder(new FormEncoder())
                 .target(AuthClient.class, tokenEndpoint);
-
-        introspectionClient = Feign.builder()
-                .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(introspectionEndpoint)))
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .logger(new Slf4jLogger())
-                .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
-                .requestInterceptor(new TenantHeaderInterceptor(tenantDomain))
-                .errorDecoder(new KMClientErrorDecoder())
-                .encoder(new FormEncoder())
-                .target(IntrospectionClient.class, introspectionEndpoint);
-        scopeClient = Feign.builder()
-                .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(scopeEndpoint)))
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .logger(new Slf4jLogger())
-                .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
-                .requestInterceptor(new TenantHeaderInterceptor(tenantDomain))
-                .errorDecoder(new KMClientErrorDecoder())
-                .target(ScopeClient.class, scopeEndpoint);
-        userClient = Feign.builder()
-                .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(userInfoEndpoint)))
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .logger(new Slf4jLogger())
-                .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
-                .requestInterceptor(new TenantHeaderInterceptor(tenantDomain))
-                .errorDecoder(new KMClientErrorDecoder())
-                .target(UserClient.class, userInfoEndpoint);
         isConsumerKeyEncoded = Boolean.parseBoolean(System.getProperty(ENCODE_CONSUMER_KEY, "false"));
     }
 
