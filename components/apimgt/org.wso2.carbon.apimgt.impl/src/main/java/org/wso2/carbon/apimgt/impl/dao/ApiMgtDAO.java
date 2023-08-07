@@ -8682,11 +8682,8 @@ public class ApiMgtDAO {
             throws APIManagementException {
 
         List<KeyManagerConfigurationDTO> keyManagerConfigurationDTOS = new ArrayList<>();
-        String query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ?";
-        if (APIUtil.isCrossTenantSubscriptionsEnabled() && APIUtil.isGlobalKMEnabled()) {
-            query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ? UNION SELECT * FROM AM_KEY_MANAGER WHERE " +
-                    "NAME = '" + APIUtil.getGlobalKMName() + "'";
-        }
+        String query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ? UNION SELECT * FROM AM_KEY_MANAGER WHERE " +
+                "TENANT_DOMAIN = '" + APIUtil.getGlobalKMTenantDomain() + "'";
         try (Connection conn = APIMgtDBUtil.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
             preparedStatement.setString(1, tenantDomain);
