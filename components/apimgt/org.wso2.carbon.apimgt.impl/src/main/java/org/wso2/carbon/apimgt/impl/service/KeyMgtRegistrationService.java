@@ -80,29 +80,4 @@ public final class KeyMgtRegistrationService {
             }
         }
     }
-
-    public static void registerGlobalKeyManager(String tenantDomain) throws APIManagementException {
-
-        synchronized (KeyMgtRegistrationService.class.getName().concat(tenantDomain)) {
-            ApiMgtDAO instance = ApiMgtDAO.getInstance();
-            if (instance.getKeyManagerConfigurationByName(tenantDomain, APIConstants.KeyManager.GLOBAL_KEY_MANAGER) ==
-                    null) {
-
-                KeyManagerConfigurationDTO keyManagerConfigurationDTO = new KeyManagerConfigurationDTO();
-                keyManagerConfigurationDTO.setName(APIConstants.KeyManager.GLOBAL_KEY_MANAGER);
-                keyManagerConfigurationDTO.setEnabled(true);
-                keyManagerConfigurationDTO.setUuid(UUID.randomUUID().toString());
-                keyManagerConfigurationDTO.setTenantDomain(tenantDomain);
-                keyManagerConfigurationDTO.setDescription(APIConstants.KeyManager.GLOBAL_KEY_MANAGER_DESCRIPTION);
-                keyManagerConfigurationDTO.setType(APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TYPE);
-                TokenHandlingDto tokenHandlingDto = new TokenHandlingDto();
-                tokenHandlingDto.setEnable(true);
-                tokenHandlingDto.setType(TokenHandlingDto.TypeEnum.REFERENCE);
-                tokenHandlingDto.setValue(APIConstants.KeyManager.UUID_REGEX);
-                keyManagerConfigurationDTO.addProperty(APIConstants.KeyManager.TOKEN_FORMAT_STRING,
-                        new Gson().toJson(Arrays.asList(tokenHandlingDto)));
-                instance.addKeyManagerConfiguration(keyManagerConfigurationDTO);
-            }
-        }
-    }
 }

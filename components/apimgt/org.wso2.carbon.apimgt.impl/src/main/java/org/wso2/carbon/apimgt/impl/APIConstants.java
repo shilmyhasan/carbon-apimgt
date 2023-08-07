@@ -2437,10 +2437,6 @@ public final class APIConstants {
         public static final String DEFAULT_KEY_MANAGER_TYPE = "default";
         public static final String DEFAULT_KEY_MANAGER_DESCRIPTION = "This is Resident Key Manager";
 
-        public static final String GLOBAL_KEY_MANAGER = "Global Key Manager";
-        public static final String GLOBAL_KEY_MANAGER_TYPE = "global";
-        public static final String GLOBAL_KEY_MANAGER_DESCRIPTION = "This is Global Key Manager";
-
         public static final String ISSUER = "issuer";
         public static final String JWKS_ENDPOINT = "jwks_endpoint";
         public static final String USERINFO_ENDPOINT = "userinfo_endpoint";
@@ -2787,9 +2783,7 @@ public final class APIConstants {
     public static class GlobalKMConstants {
         public static final String GLOBAL_KEY_MANAGER = "GlobalKeyManager.";
         public static final String ENABLED = GLOBAL_KEY_MANAGER + "Enabled";
-
         public static final String TENANT_DOMAIN = GLOBAL_KEY_MANAGER + "TenantDomain";
-
         public static final String NAME = GLOBAL_KEY_MANAGER + "Name";
         public static final String DISPLAY_NAME = GLOBAL_KEY_MANAGER + "DisplayName";
         public static final String DESCRIPTION = GLOBAL_KEY_MANAGER + "Description";
