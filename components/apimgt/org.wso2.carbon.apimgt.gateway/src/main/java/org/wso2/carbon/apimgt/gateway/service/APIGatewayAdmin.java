@@ -248,7 +248,7 @@ public class APIGatewayAdmin extends org.wso2.carbon.core.AbstractAdmin {
                                           String tenantDomain) throws AxisFault {
 
         GatewayUtils.deleteRegistryProperty(GatewayUtils.getAPIEndpointSecretAlias(apiProviderName, apiName,
-                        version),
+                version),
                 APIConstants.API_SYSTEM_CONFIG_SECURE_VAULT_LOCATION, tenantDomain);
     }
 
