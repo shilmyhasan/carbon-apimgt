@@ -1345,6 +1345,9 @@ public class OAS3Parser extends APIDefinition {
         for (Map.Entry<String, PathItem> pathEntry : openAPI.getPaths().entrySet()) {
             for (Operation operation : pathEntry.getValue().readOperations()) {
                 List<SecurityRequirement> oldSecList = operation.getSecurity();
+                if (oldSecList == null) {
+                    oldSecList = new ArrayList<>();
+                }
                 List<String> operationScopes = oldSecList.stream()
                         .filter(securityRequirement -> securityRequirement.containsKey(OPENAPI_SECURITY_SCHEMA_KEY))
                         .findFirst()
@@ -1356,7 +1359,8 @@ public class OAS3Parser extends APIDefinition {
                         APIConstants.API_SECURITY_BASIC_AUTH, new ArrayList<>());
                 OASParserUtil.addOASOperationSecurityReqFromAPI(oldSecList, secList, APIConstants.API_SECURITY_API_KEY,
                         new ArrayList<>());
-                if (!secList.isEmpty() && !secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)) {
+                if (!secList.isEmpty() && !secList.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2)
+                        && operation.getSecurity() != null) {
                     // If oauth2 is not set for the API, remove oauth security scheme from resource level if exists.
                     operation.setSecurity(operation.getSecurity().stream()
                             .filter(securityRequirement -> !securityRequirement
