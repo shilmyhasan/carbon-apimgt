@@ -324,26 +324,6 @@
 
     <repositories>
         <repository>
-            <id>updates2-nexus</id>
-            <name>Support Nexus Repository of WSO2</name>
-            <url>https://support-maven.wso2.org/nexus/content/repositories/updates-2.0/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-        </repository>
-        <repository>
-            <id>wso2-nexus-support</id>
-            <name>WSO2 internal Repository</name>
-            <url>https://support-maven.wso2.org/nexus/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
-        <repository>
             <id>wso2-nexus</id>
             <name>WSO2 internal Repository</name>
             <url>https://maven.wso2.org/nexus/content/groups/wso2-public/</url>
@@ -1949,7 +1929,7 @@
         <imp.package.version.osgi.framework>[1.6.0, 2.0.0)</imp.package.version.osgi.framework>
 
         <!-- Misc Versions -->
-	    <synapse.version>2.1.7-wso2v227.62-SNAPSHOT</synapse.version>
+	    <synapse.version>2.1.7-wso2v227.52</synapse.version>
 
         <orbit.version.json>3.0.0.wso2v1</orbit.version.json>
 
