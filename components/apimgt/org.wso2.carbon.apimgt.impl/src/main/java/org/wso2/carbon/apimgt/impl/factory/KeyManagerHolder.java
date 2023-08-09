@@ -56,14 +56,15 @@ public class KeyManagerHolder {
 
     private static Log log = LogFactory.getLog(KeyManagerHolder.class);
     private static Map<String, TenantKeyManagerDto> tenantWiseMap = new HashMap<>();
+
+    private static Map<String, TenantKeyManagerDto> globalKMMap = new HashMap<>();
     private static Map<String, KeyManagerDto> globalJWTValidatorMap = new HashMap<>();
     public static void addKeyManagerConfiguration(String tenantDomain, String name, String type,
                                                   KeyManagerConfiguration keyManagerConfiguration)
             throws APIManagementException {
 
         String issuer = (String) keyManagerConfiguration.getParameter(APIConstants.KeyManager.ISSUER);
-
-        TenantKeyManagerDto tenantKeyManagerDto = tenantWiseMap.get(tenantDomain);
+        TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDtoFromMap(tenantDomain);
         if (tenantKeyManagerDto == null) {
             tenantKeyManagerDto = new TenantKeyManagerDto();
         }
@@ -115,9 +116,13 @@ public class KeyManagerHolder {
             keyManagerDto.setJwtValidator(jwtValidator);
             keyManagerDto.setKeyManager(keyManager);
             tenantKeyManagerDto.putKeyManagerDto(keyManagerDto);
-            tenantWiseMap.put(tenantDomain, tenantKeyManagerDto);
+            if (APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
+                globalKMMap.put(tenantDomain, tenantKeyManagerDto);
+                globalJWTValidatorMap.put(issuer, keyManagerDto);
+            } else {
+                tenantWiseMap.put(tenantDomain, tenantKeyManagerDto);
+            }
         }
-
     }
 
 
@@ -147,7 +152,7 @@ public class KeyManagerHolder {
 
     public static void removeKeyManagerConfiguration(String tenantDomain, String name) {
 
-        TenantKeyManagerDto tenantKeyManagerDto = tenantWiseMap.get(tenantDomain);
+        TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDtoFromMap(tenantDomain);
         if (tenantKeyManagerDto != null) {
             tenantKeyManagerDto.removeKeyManagerDtoByName(name);
         }
@@ -251,14 +256,22 @@ public class KeyManagerHolder {
 
     private static TenantKeyManagerDto getTenantKeyManagerDto(String tenantDomain) {
 
-        TenantKeyManagerDto tenantKeyManagerDto = tenantWiseMap.get(tenantDomain);
+        TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDtoFromMap(tenantDomain);
         if (tenantKeyManagerDto == null) {
             synchronized ("KeyManagerHolder".concat(tenantDomain)) {
                 if (tenantKeyManagerDto == null) {
                     new KeyManagerConfigurationDataRetriever(tenantDomain).run();
-                    tenantKeyManagerDto = tenantWiseMap.get(tenantDomain);
+                    tenantKeyManagerDto = getTenantKeyManagerDtoFromMap(tenantDomain);
                 }
             }
+        }
+        return tenantKeyManagerDto;
+    }
+
+    private static TenantKeyManagerDto getTenantKeyManagerDtoFromMap(String tenantDomain) {
+        TenantKeyManagerDto tenantKeyManagerDto = globalKMMap.get(tenantDomain);
+        if (tenantKeyManagerDto == null) {
+            tenantKeyManagerDto = tenantWiseMap.get(tenantDomain);
         }
         return tenantKeyManagerDto;
     }
