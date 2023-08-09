@@ -2450,6 +2450,7 @@ public final class APIConstants {
         public static final String ENABLE = "Enable";
         public static final String USERNAME = "Username";
         public static final String PASSWORD = "Password";
+        public static final String KM_ADMIN_AS_APP_OWNER = "km_admin_as_app_owner";
         public static final String SELF_VALIDATE_JWT = "self_validate_jwt";
         public static final String CLAIM_MAPPING = "claim_mappings";
         public static final String VALIDATION_TYPE = "validation_type";
@@ -2792,6 +2793,8 @@ public final class APIConstants {
         public static final String SERVER_URL = GLOBAL_KEY_MANAGER + "ServerURL";
         public static final String USERNAME = GLOBAL_KEY_MANAGER + "Username";
         public static final String PASSWORD = GLOBAL_KEY_MANAGER + "Password";
+
+        public static final String KM_ADMIN_AS_APP_OWNER = GLOBAL_KEY_MANAGER + "KMAdminAsAppOwner";
         public static final String CLIENT_REGISTRATION_ENDPOINT = GLOBAL_KEY_MANAGER + "DCREndpoint";
         public static final String INTROSPECTION_ENDPOINT = GLOBAL_KEY_MANAGER + "IntrospectionEndpoint";
         public static final String TOKEN_ENDPOINT = GLOBAL_KEY_MANAGER + "TokenEndpoint";

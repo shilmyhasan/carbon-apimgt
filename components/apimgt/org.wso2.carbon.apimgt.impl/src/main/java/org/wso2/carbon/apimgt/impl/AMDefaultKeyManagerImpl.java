@@ -103,6 +103,8 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
     private Boolean encoded;
     private Boolean isConsumerKeyEncoded;
 
+    private Boolean kmAdminAsAppOwner = false;
+
     @Override
     public OAuthApplicationInfo createApplication(OAuthAppRequest oauthAppRequest) throws APIManagementException {
         // OAuthApplications are created by calling to APIKeyMgtSubscriber Service
@@ -134,6 +136,10 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         String tokenScope = (String) oAuthApplicationInfo.getParameter("tokenScope");
         String[] tokenScopes = new String[1];
         tokenScopes[0] = tokenScope;
+
+        if (kmAdminAsAppOwner) {
+            overrideKMAdminAsAppOwnerProperties(oauthAppRequest);
+        }
 
         ClientInfo request = createClientInfo(oAuthApplicationInfo, oauthClientName, false);
         ClientInfo createdClient;
@@ -196,9 +202,8 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
 
         // Use a generated user as the app owner for cross tenant subscription scenarios, to avoid the tenant admin
         // being exposed in the JWT token.
-        String kmName = getKeyManagerConfiguration().getName();
         if (APIUtil.isCrossTenantSubscriptionsEnabled()
-                && !tenantDomain.equals(MultitenantUtils.getTenantDomain(applicationOwner)) && !kmName.equals("Global Key Manager")) {
+                && !tenantDomain.equals(MultitenantUtils.getTenantDomain(applicationOwner))) {
             clientInfo.setApplication_owner(APIUtil.retrieveDefaultReservedUsername());
         } else {
             clientInfo.setApplication_owner(MultitenantUtils.getTenantAwareUsername(applicationOwner));
@@ -335,6 +340,10 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         }
         if (log.isDebugEnabled() && applicationName != null) {
             log.debug("Client Name : " + oauthClientName);
+        }
+
+        if (kmAdminAsAppOwner) {
+            overrideKMAdminAsAppOwnerProperties(appInfoDTO);
         }
 
         ClientInfo request = createClientInfo(oAuthApplicationInfo, oauthClientName, true);
@@ -609,6 +618,10 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         String username = (String) configuration.getParameter(APIConstants.KEY_MANAGER_USERNAME);
         String password = (String) configuration.getParameter(APIConstants.KEY_MANAGER_PASSWORD);
         String keyManagerServiceUrl = (String) configuration.getParameter(APIConstants.AUTHSERVER_URL);
+        Object kmAdminAsAppOwnerParameter = configuration.getParameter(APIConstants.KeyManager.KM_ADMIN_AS_APP_OWNER);
+        if (kmAdminAsAppOwnerParameter != null) {
+            kmAdminAsAppOwner = (boolean) kmAdminAsAppOwnerParameter;
+        }
 
         String dcrEndpoint;
         if (configuration.getParameter(APIConstants.KeyManager.CLIENT_REGISTRATION_ENDPOINT) != null) {
@@ -1228,5 +1241,17 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                 }
             }
         }
+    }
+
+    /**
+     * Override the OAuth app username with the KM admin username and tenant domain
+     * with the KM admin user's tenant domain
+     */
+    private void overrideKMAdminAsAppOwnerProperties(OAuthAppRequest oauthAppRequest) {
+        String kmAdminUsername = this.getConfigurationParamValue(APIConstants.KEY_MANAGER_USERNAME);
+        OAuthApplicationInfo oAuthApplicationInfo = oauthAppRequest.getOAuthApplicationInfo();
+        oAuthApplicationInfo.addParameter(ApplicationConstants.OAUTH_CLIENT_USERNAME, kmAdminUsername);
+        String kmAdminTenantDomain = MultitenantUtils.getTenantDomain(kmAdminUsername);
+        this.setTenantDomain(kmAdminTenantDomain);
     }
 }
