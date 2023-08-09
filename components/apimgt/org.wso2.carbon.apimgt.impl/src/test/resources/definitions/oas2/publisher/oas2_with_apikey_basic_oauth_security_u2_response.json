@@ -87,13 +87,13 @@
             ]
           }
         ],
-        "x-auth-type": "Application & Application User",
+        "x-auth-type": "Application \u0026 Application User",
         "x-throttling-tier": "Unlimited",
         "x-wso2-application-security": {
           "security-types": [
-            "oauth2",
+            "api_key",
             "basic_auth",
-            "api_key"
+            "oauth2"
           ],
           "optional": false
         }
@@ -142,13 +142,13 @@
             ]
           }
         ],
-        "x-auth-type": "Application & Application User",
+        "x-auth-type": "Application \u0026 Application User",
         "x-throttling-tier": "Unlimited",
         "x-wso2-application-security": {
           "security-types": [
-            "oauth2",
+            "api_key",
             "basic_auth",
-            "api_key"
+            "oauth2"
           ],
           "optional": false
         }
@@ -248,9 +248,9 @@
   },
   "x-wso2-application-security": {
     "security-types": [
-      "oauth2",
+      "api_key",
       "basic_auth",
-      "api_key"
+      "oauth2"
     ],
     "optional": false
   },
