@@ -229,7 +229,7 @@ public class KeyManagerHolder {
         return null;
     }
 
-    public static KeyManager getKeyManagerInstance(String tenantDomain, String keyManagerName) {
+    public static KeyManager getTenantKeyManagerInstance(String tenantDomain, String keyManagerName) {
 
         TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDto(tenantDomain);
         if (tenantKeyManagerDto != null) {
@@ -240,6 +240,15 @@ public class KeyManagerHolder {
             return keyManagerDto.getKeyManager();
         }
         return null;
+    }
+
+    public static KeyManager getKeyManagerInstance(String tenantDomain, String keyManagerName) {
+
+        KeyManager keyManager = getTenantKeyManagerInstance(APIUtil.getGlobalKMTenantDomain(), keyManagerName);
+        if (keyManager == null) {
+            keyManager = getTenantKeyManagerInstance(tenantDomain, keyManagerName);
+        }
+        return keyManager;
     }
 
     public static KeyManagerDto getKeyManagerByIssuer(String tenantDomain, String issuer) {
