@@ -1837,20 +1837,27 @@ public class OASParserUtil {
                             !securityRequirement.getRequirements().containsKey(APIConstants.API_SECURITY_API_KEY))
                     .collect(Collectors.toList()));
         }
-        swagger.getSecurityDefinitions().remove(APIConstants.API_SECURITY_BASIC_AUTH);
-        swagger.getSecurityDefinitions().remove(APIConstants.API_SECURITY_API_KEY);
+        if (swagger.getSecurityDefinitions() != null) {
+            swagger.getSecurityDefinitions().remove(APIConstants.API_SECURITY_BASIC_AUTH);
+            swagger.getSecurityDefinitions().remove(APIConstants.API_SECURITY_API_KEY);
+        }
         if (swagger.getPaths() != null) {
             for (Map.Entry<String, Path> pathEntry : swagger.getPaths().entrySet()) {
                 for (io.swagger.models.Operation operation : pathEntry.getValue().getOperations()) {
-                    operation.setSecurity(operation.getSecurity().stream()
-                            .filter(securityRequirement -> !securityRequirement
-                                    .containsKey(APIConstants.API_SECURITY_BASIC_AUTH)
-                                    && !securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY))
-                            .collect(Collectors.toList()));
+                    if (operation.getSecurity() != null) {
+                        operation.setSecurity(operation.getSecurity().stream()
+                                .filter(securityRequirement -> !securityRequirement
+                                        .containsKey(APIConstants.API_SECURITY_BASIC_AUTH)
+                                        && !securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY))
+                                .collect(Collectors.toList()));
+                    }
                     // Remove basic auth specific scopes if any.
-                    operation.getVendorExtensions().remove(APIConstants.SWAGGER_X_BASIC_AUTH_RESOURCE_SCOPES);
-                    if (operation.getSecurity().isEmpty() && swagger.getSecurityDefinitions()
-                            .containsKey(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY)) {
+                    if (operation.getVendorExtensions() != null) {
+                        operation.getVendorExtensions().remove(APIConstants.SWAGGER_X_BASIC_AUTH_RESOURCE_SCOPES);
+                    }
+                    if (operation.getSecurity() != null && operation.getSecurity().isEmpty()
+                            && swagger.getSecurityDefinitions() != null
+                            && swagger.getSecurityDefinitions().containsKey(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY)) {
                         operation.addSecurity(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY, new ArrayList<>());
                     }
                 }
@@ -1871,19 +1878,27 @@ public class OASParserUtil {
                                     && !securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY))
                     .collect(Collectors.toList()));
         }
-        openAPI.getComponents().getSecuritySchemes().remove(APIConstants.API_SECURITY_API_KEY);
-        openAPI.getComponents().getSecuritySchemes().remove(APIConstants.API_SECURITY_BASIC_AUTH);
+        if (openAPI.getComponents() != null && openAPI.getComponents().getSecuritySchemes() != null) {
+            openAPI.getComponents().getSecuritySchemes().remove(APIConstants.API_SECURITY_API_KEY);
+            openAPI.getComponents().getSecuritySchemes().remove(APIConstants.API_SECURITY_BASIC_AUTH);
+        }
         if (openAPI.getPaths() != null) {
             for (Map.Entry<String, PathItem> pathEntry : openAPI.getPaths().entrySet()) {
                 for (Operation operation : pathEntry.getValue().readOperations()) {
-                    operation.setSecurity(operation.getSecurity().stream()
-                            .filter(securityRequirement -> !securityRequirement.containsKey(
-                                    APIConstants.API_SECURITY_BASIC_AUTH) &&
-                                    !securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY))
-                            .collect(Collectors.toList()));
-                    // Remove basic auth specific scopes if any.
-                    operation.getExtensions().remove(APIConstants.SWAGGER_X_BASIC_AUTH_RESOURCE_SCOPES);
-                    if (operation.getSecurity().isEmpty()
+                    if (operation.getSecurity() != null) {
+                        operation.setSecurity(operation.getSecurity().stream()
+                                .filter(securityRequirement -> !securityRequirement.containsKey(
+                                        APIConstants.API_SECURITY_BASIC_AUTH) &&
+                                        !securityRequirement.containsKey(APIConstants.API_SECURITY_API_KEY))
+                                .collect(Collectors.toList()));
+                    }
+                    if (operation.getExtensions() != null) {
+                        // Remove basic auth specific scopes if any.
+                        operation.getExtensions().remove(APIConstants.SWAGGER_X_BASIC_AUTH_RESOURCE_SCOPES);
+                    }
+                    if (operation.getSecurity() != null && operation.getSecurity().isEmpty()
+                            && openAPI.getComponents() != null
+                            && openAPI.getComponents().getSecuritySchemes() != null
                             && openAPI.getComponents().getSecuritySchemes()
                             .containsKey(APIConstants.OPENAPI_SECURITY_SCHEMA_KEY)) {
                         // If updating API had only Basic Auth or API Security before.
