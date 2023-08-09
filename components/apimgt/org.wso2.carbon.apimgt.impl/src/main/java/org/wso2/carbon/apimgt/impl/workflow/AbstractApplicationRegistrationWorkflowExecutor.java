@@ -139,12 +139,7 @@ public abstract class AbstractApplicationRegistrationWorkflowExecutor extends Wo
             KeyManagerConfigurationDTO km = dao.getKeyManagerConfigurationByUUID(keyManagerId);
             String tenantDomain = km.getTenantDomain();
             String keyManagerName = km.getName();
-            KeyManager keyManager;
-            if (APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
-                keyManager = KeyManagerHolder.getKeyManagerInstance(workflowDTO.getTenantDomain(), keyManagerName);
-            } else {
-                keyManager = KeyManagerHolder.getKeyManagerInstance(tenantDomain, keyManagerName);
-            }
+            KeyManager keyManager = KeyManagerHolder.getKeyManagerInstance(tenantDomain, keyManagerName);
             if (keyManager == null){
                 throw new APIManagementException("Key Manager " + keyManagerName + " not configured");
             }
