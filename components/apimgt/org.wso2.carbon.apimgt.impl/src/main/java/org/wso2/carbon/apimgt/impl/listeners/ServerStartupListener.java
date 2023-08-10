@@ -215,6 +215,7 @@ public class ServerStartupListener implements ServerStartupObserver {
         String certificateValue = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.CERTIFICATE_VALUE);
         String username = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.USERNAME);
         String password = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.PASSWORD);
+        String kmAdminAsAppOwner = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.KM_ADMIN_AS_APP_OWNER);
 
         List<String> grantTypesList = Arrays.asList(grantTypes.split(","));
         Map<String,Object> additionalProperties = new HashMap<>();
@@ -273,6 +274,7 @@ public class ServerStartupListener implements ServerStartupObserver {
         if (StringUtils.isNotEmpty(password)) {
             additionalProperties.put(APIConstants.KeyManager.PASSWORD, password);
         }
+        additionalProperties.put(APIConstants.KeyManager.KM_ADMIN_AS_APP_OWNER, Boolean.parseBoolean(kmAdminAsAppOwner));
         keyManagerConfigurationDTO.setAdditionalProperties(additionalProperties);
         return keyManagerConfigurationDTO;
     }
