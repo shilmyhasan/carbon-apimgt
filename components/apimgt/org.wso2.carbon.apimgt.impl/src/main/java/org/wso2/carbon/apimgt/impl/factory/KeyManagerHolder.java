@@ -90,9 +90,9 @@ public class KeyManagerHolder {
                         if (StringUtils.isNotEmpty(defaultKeyManagerType) && defaultKeyManagerType.equals(type) &&
                                 APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfiguration.getName())) {
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_USERNAME,
-                                        apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_USERNAME));
+                                    apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_USERNAME));
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_PASSWORD,
-                                        apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_PASSWORD));
+                                    apiManagerConfiguration.getFirstProperty(APIConstants.API_KEY_VALIDATOR_PASSWORD));
                             keyManagerConfiguration.addParameter(APIConstants.KEY_MANAGER_TENANT_DOMAIN, tenantDomain);
                         }
                         keyManager.loadConfiguration(keyManagerConfiguration);
