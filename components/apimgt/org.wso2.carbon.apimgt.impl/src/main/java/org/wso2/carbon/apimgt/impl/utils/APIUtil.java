@@ -11382,7 +11382,10 @@ public final class APIUtil {
 
         Map<String, Scope> scopeToKeyMap = new HashMap<>();
         for (String scopeKey : scopeKeys) {
-            Scope scope = getScopeByName(scopeKey, tenantDomain);
+            Scope scope = new Scope();
+            scope.setName(scopeKey);
+            scope.setDescription(scopeKey);
+            scope.setKey(scopeKey);
             scopeToKeyMap.put(scopeKey, scope);
         }
         return scopeToKeyMap;
