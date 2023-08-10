@@ -41,7 +41,10 @@ import org.wso2.carbon.apimgt.impl.jwt.JWTValidatorImpl;
 import org.wso2.carbon.apimgt.impl.loader.KeyManagerConfigurationDataRetriever;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.security.cert.X509Certificate;
 
@@ -52,7 +55,7 @@ import javax.security.cert.X509Certificate;
 public class KeyManagerHolder {
 
     private static Log log = LogFactory.getLog(KeyManagerHolder.class);
-    private static Map<String, TenantKeyManagerDto> tenantWiseMap = new LinkedHashMap<>();
+    private static Map<String, TenantKeyManagerDto> tenantWiseMap = new HashMap<>();
     private static Map<String, KeyManagerDto> globalJWTValidatorMap = new HashMap<>();
     public static void addKeyManagerConfiguration(String tenantDomain, String name, String type,
                                                   KeyManagerConfiguration keyManagerConfiguration)
