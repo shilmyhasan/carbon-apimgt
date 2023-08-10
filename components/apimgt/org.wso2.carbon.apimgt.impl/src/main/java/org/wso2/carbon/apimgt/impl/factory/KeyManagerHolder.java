@@ -273,7 +273,7 @@ public class KeyManagerHolder {
     private static TenantKeyManagerDto getTenantKeyManagerDto(String tenantDomain) {
 
         TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDtoFromMap(tenantDomain);
-        if (tenantKeyManagerDto == null) {
+        if (tenantKeyManagerDto == null && !APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
             synchronized ("KeyManagerHolder".concat(tenantDomain)) {
                 if (tenantKeyManagerDto == null) {
                     new KeyManagerConfigurationDataRetriever(tenantDomain).run();
