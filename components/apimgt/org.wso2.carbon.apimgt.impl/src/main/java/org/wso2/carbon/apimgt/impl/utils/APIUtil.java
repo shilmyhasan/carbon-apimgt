@@ -11736,24 +11736,8 @@ public final class APIUtil {
         return false;
     }
 
-    public static boolean isGlobalKMEnabled() {
-        APIManagerConfiguration apiManagerConfiguration =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String isGlobalKMEnabledProperty = apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.ENABLED);
-        if (StringUtils.isNotEmpty(isGlobalKMEnabledProperty)) {
-            return Boolean.parseBoolean(isGlobalKMEnabledProperty);
-        }
-        return false;
-    }
-
     public static String getGlobalKMTenantDomain() {
-        return APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN;
-    }
-
-    public static String getGlobalKMName() {
-        APIManagerConfiguration apiManagerConfiguration =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        return apiManagerConfiguration.getFirstProperty(APIConstants.GlobalKMConstants.NAME);
+        return APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TENANT_DOMAIN;
     }
 
     public static String retrieveDefaultReservedUsername() {
