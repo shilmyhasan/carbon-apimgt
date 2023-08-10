@@ -285,11 +285,11 @@ public class KeyManagerHolder {
     }
 
     private static TenantKeyManagerDto getTenantKeyManagerDtoFromMap(String tenantDomain) {
-        TenantKeyManagerDto tenantKeyManagerDto = globalKMMap.get(tenantDomain);
-        if (tenantKeyManagerDto == null) {
-            tenantKeyManagerDto = tenantWiseMap.get(tenantDomain);
+        if (APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
+            return globalKMMap.get(tenantDomain);
+        } else {
+            return tenantWiseMap.get(tenantDomain);
         }
-        return tenantKeyManagerDto;
     }
     public static void addGlobalJWTValidators(TokenIssuerDto tokenIssuerDto) {
 
