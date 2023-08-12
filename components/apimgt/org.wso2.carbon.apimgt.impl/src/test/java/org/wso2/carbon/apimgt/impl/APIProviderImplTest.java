@@ -222,7 +222,7 @@ public class APIProviderImplTest {
         keyManagerDto.setIssuer("https://localhost");
         Map<String, KeyManagerDto> tenantKeyManagerDtoMap = new HashMap<>();
         tenantKeyManagerDtoMap.put("default", keyManagerDto);
-        PowerMockito.when(KeyManagerHolder.getTenantKeyManagers("carbon.super")).thenReturn(tenantKeyManagerDtoMap);
+        PowerMockito.when(KeyManagerHolder.getGlobalAndTenantKeyManagers("carbon.super")).thenReturn(tenantKeyManagerDtoMap);
         PowerMockito.when(CertificateManagerImpl.getInstance()).thenReturn(certificateManager);
 
         PowerMockito.when(APIUtil.isAPIManagementEnabled()).thenReturn(false);

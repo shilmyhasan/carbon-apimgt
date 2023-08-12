@@ -57,7 +57,7 @@ public class KeyManagerHolder {
     private static Log log = LogFactory.getLog(KeyManagerHolder.class);
     private static Map<String, TenantKeyManagerDto> tenantWiseMap = new HashMap<>();
 
-    private static Map<String, TenantKeyManagerDto> globalKMMap = new HashMap<>();
+    private static TenantKeyManagerDto globalKMMap = new TenantKeyManagerDto();
     private static Map<String, KeyManagerDto> globalJWTValidatorMap = new HashMap<>();
     public static void addKeyManagerConfiguration(String tenantDomain, String name, String type,
                                                   KeyManagerConfiguration keyManagerConfiguration)
@@ -117,7 +117,7 @@ public class KeyManagerHolder {
             keyManagerDto.setKeyManager(keyManager);
             tenantKeyManagerDto.putKeyManagerDto(keyManagerDto);
             if (APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
-                globalKMMap.put(tenantDomain, tenantKeyManagerDto);
+                globalKMMap.putKeyManagerDto(keyManagerDto);
                 globalJWTValidatorMap.put(issuer, keyManagerDto);
             } else {
                 tenantWiseMap.put(tenantDomain, tenantKeyManagerDto);
@@ -125,8 +125,17 @@ public class KeyManagerHolder {
         }
     }
 
-
     public static Map<String, KeyManagerDto> getTenantKeyManagers(String tenantDomain) {
+
+        TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDto(tenantDomain);
+        if (tenantKeyManagerDto != null) {
+            return tenantKeyManagerDto.getKeyManagerMap();
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    public static Map<String, KeyManagerDto> getGlobalAndTenantKeyManagers(String tenantDomain) {
 
         TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDto(tenantDomain);
         TenantKeyManagerDto globalKeyManagerDto = getTenantKeyManagerDto(APIUtil.getGlobalKMTenantDomain());
@@ -286,7 +295,7 @@ public class KeyManagerHolder {
 
     private static TenantKeyManagerDto getTenantKeyManagerDtoFromMap(String tenantDomain) {
         if (APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
-            return globalKMMap.get(tenantDomain);
+            return globalKMMap;
         } else {
             return tenantWiseMap.get(tenantDomain);
         }
