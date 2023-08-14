@@ -278,6 +278,11 @@ public class LogsHandler extends AbstractSynapseHandler {
                 return false;
             }
         }
+        // if PER API logging is available
+        String log = (String) messageContext.getProperty("LOG_LEVEL");
+        if (log != null) {
+            PerAPILogHandler.logAPI(RESPONSE_IN, messageContext);
+        }
         return true;
     }
 
@@ -311,6 +316,11 @@ public class LogsHandler extends AbstractSynapseHandler {
                 messageTrackLog.error(MESSAGE_TRACK_BUILD_MESSAGE_ERROR + e.getMessage(), e);
                 return false;
             }
+        }
+        // if PER API logging is available
+        String log = (String) messageContext.getProperty("LOG_LEVEL");
+        if (log != null) {
+            PerAPILogHandler.logAPI(RESPONSE_OUT, messageContext);
         }
         return true;
     }
