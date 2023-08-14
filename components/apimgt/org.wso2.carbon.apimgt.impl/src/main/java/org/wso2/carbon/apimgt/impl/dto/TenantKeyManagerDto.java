@@ -44,12 +44,8 @@ public class TenantKeyManagerDto {
         if (APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerDto.getName())) {
             Map<String, KeyManagerDto> newKeyManagerMap = new LinkedHashMap<>();
             newKeyManagerMap.put(keyManagerDto.getName(), keyManagerDto);
-
-            for (Map.Entry<String, KeyManagerDto> entry : keyManagerMap.entrySet()) {
-                if (!entry.getKey().equals(keyManagerDto.getName())) {
-                    newKeyManagerMap.put(entry.getKey(), entry.getValue());
-                }
-            }
+            keyManagerMap.remove(keyManagerDto.getName());
+            newKeyManagerMap.putAll(keyManagerMap);
             keyManagerMap = newKeyManagerMap;
         } else {
             keyManagerMap.put(keyManagerDto.getName(), keyManagerDto);
