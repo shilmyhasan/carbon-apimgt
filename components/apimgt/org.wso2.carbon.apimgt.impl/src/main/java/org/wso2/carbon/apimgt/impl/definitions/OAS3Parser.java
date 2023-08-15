@@ -754,12 +754,15 @@ public class OAS3Parser extends APIDefinition {
      * @return OAS definition
      */
     @Override
-    public String getOASDefinitionForStore(API api, String oasDefinition, Map<String, String> hostsWithSchemes) {
+    public String getOASDefinitionForStore(API api, String oasDefinition, Map<String, String> hostsWithSchemes)
+            throws APIManagementException {
 
         OpenAPI openAPI = getOpenAPI(oasDefinition);
         updateOperations(openAPI);
         updateEndpoints(api, hostsWithSchemes, openAPI);
-        return updateSwaggerSecurityDefinitionForStore(openAPI, new SwaggerData(api), hostsWithSchemes);
+        String definition = updateSwaggerSecurityDefinitionForStore(openAPI, new SwaggerData(api), hostsWithSchemes);
+        // remove publisher specific extensions if they are available in the definition
+        return populateCustomManagementInfo(definition, new SwaggerData(api));
     }
 
     /**
@@ -772,12 +775,15 @@ public class OAS3Parser extends APIDefinition {
      */
     @Override
     public String getOASDefinitionForStore(APIProduct product, String oasDefinition,
-                                           Map<String, String> hostsWithSchemes) {
+                                           Map<String, String> hostsWithSchemes) throws APIManagementException {
 
         OpenAPI openAPI = getOpenAPI(oasDefinition);
         updateOperations(openAPI);
         updateEndpoints(product, hostsWithSchemes, openAPI);
-        return updateSwaggerSecurityDefinitionForStore(openAPI, new SwaggerData(product), hostsWithSchemes);
+        String definition =  updateSwaggerSecurityDefinitionForStore(openAPI, new SwaggerData(product),
+                hostsWithSchemes);
+        // remove publisher specific extensions if they are available in the definition
+        return populateCustomManagementInfo(definition, new SwaggerData(product));
     }
 
     /**

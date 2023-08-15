@@ -775,7 +775,9 @@ public class OAS2Parser extends APIDefinition {
         Swagger swagger = getSwagger(oasDefinition);
         updateOperations(swagger);
         updateEndpoints(api, hostsWithSchemes, swagger);
-        return updateSwaggerSecurityDefinitionForStore(swagger, new SwaggerData(api), hostsWithSchemes);
+        String definition = updateSwaggerSecurityDefinitionForStore(swagger, new SwaggerData(api), hostsWithSchemes);
+        // remove publisher specific extensions if they are available in the definition
+        return populateCustomManagementInfo(definition, new SwaggerData(api));
     }
 
     /**
@@ -794,7 +796,10 @@ public class OAS2Parser extends APIDefinition {
         Swagger swagger = getSwagger(oasDefinition);
         updateOperations(swagger);
         updateEndpoints(product, hostsWithSchemes, swagger);
-        return updateSwaggerSecurityDefinitionForStore(swagger, new SwaggerData(product), hostsWithSchemes);
+        String definition = updateSwaggerSecurityDefinitionForStore(swagger, new SwaggerData(product),
+                hostsWithSchemes);
+        // remove publisher specific extensions if they are available in the definition
+        return populateCustomManagementInfo(definition, new SwaggerData(product));
     }
 
     /**
