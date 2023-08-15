@@ -1390,7 +1390,7 @@
                 <version>${javax.validation-api}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.orbit.io.swagger</groupId>
+                <groupId>org.wso2.orbit.io.swagger.core</groupId>
                 <artifactId>swagger-core</artifactId>
                 <version>${swagger.core.version}</version>
             </dependency>

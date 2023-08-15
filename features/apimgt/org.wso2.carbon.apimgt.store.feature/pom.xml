@@ -127,7 +127,7 @@
             <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.io.swagger</groupId>
+            <groupId>org.wso2.orbit.io.swagger.core</groupId>
             <artifactId>swagger-core</artifactId>
         </dependency>
         <dependency>
@@ -171,7 +171,7 @@
                             <bundles>
                                 <bundleDef>javax.validation:validation-api</bundleDef>
                                 <bundleDef>com.google.guava:guava:${google.guava.version}</bundleDef>
-                                <bundleDef>org.wso2.orbit.io.swagger:swagger-core</bundleDef>
+                                <bundleDef>org.wso2.orbit.io.swagger.core:swagger-core</bundleDef>
                                 <bundleDef>io.swagger:swagger-models</bundleDef>
                                 <bundleDef>io.swagger:swagger-annotations</bundleDef>
                                 <bundleDef>com.samskivert:jmustache</bundleDef>
