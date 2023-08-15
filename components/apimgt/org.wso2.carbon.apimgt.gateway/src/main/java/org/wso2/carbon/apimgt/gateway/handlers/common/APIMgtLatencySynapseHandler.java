@@ -99,8 +99,12 @@ public class APIMgtLatencySynapseHandler extends AbstractSynapseHandler {
                     (TracingSpan) messageContext.getProperty(APIMgtGatewayConstants.RESPONSE_LATENCY);
             GatewayUtils.setAPIRelatedTags(responseLatencySpan, messageContext);
             API api = GatewayUtils.getAPI(messageContext);
+            String tenantDomain = GatewayUtils.getTenantDomain();
+            if (tenantDomain == null) {
+                tenantDomain = (String) messageContext.getProperty(APIMgtGatewayConstants.TENANT_DOMAIN);
+            }
             if (api!= null){
-                Util.updateOperation(responseLatencySpan, api.getApiName().concat("--").concat(api.getApiVersion()).concat("--").concat(GatewayUtils.getTenantDomain()));
+                Util.updateOperation(responseLatencySpan, api.getApiName().concat("--").concat(api.getApiVersion()).concat("--").concat(tenantDomain));
             }
             Util.finishSpan(responseLatencySpan);
         }
