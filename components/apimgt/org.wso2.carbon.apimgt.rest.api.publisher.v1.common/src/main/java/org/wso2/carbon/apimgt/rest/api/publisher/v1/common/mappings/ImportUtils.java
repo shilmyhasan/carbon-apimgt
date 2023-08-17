@@ -236,8 +236,8 @@ public class ImportUtils {
                 if (importedApiDTO.getOperations().isEmpty()) {
                     setOperationsToDTO(importedApiDTO, validationResponse);
                 }
-                importedApi = PublisherCommonUtils
-                        .updateApi(targetApi, importedApiDTO, RestApiCommonUtil.getLoggedInUserProvider(), tokenScopes);
+                importedApi = PublisherCommonUtils.updateApiAndDefinition(targetApi, importedApiDTO,
+                        RestApiCommonUtil.getLoggedInUserProvider(), tokenScopes, validationResponse);
             } else {
                 if (targetApi == null && Boolean.TRUE.equals(overwrite)) {
                     log.info("Cannot find : " + importedApiDTO.getName() + "-" + importedApiDTO.getVersion()
@@ -249,17 +249,17 @@ public class ImportUtils {
                 importedApi = PublisherCommonUtils
                         .addAPIWithGeneratedSwaggerDefinition(importedApiDTO, ImportExportConstants.OAS_VERSION_3,
                                 importedApiDTO.getProvider());
+                // Add/update swagger content except for streaming APIs and GraphQL APIs
+                if (!PublisherCommonUtils.isStreamingAPI(importedApiDTO)
+                        && !APIConstants.APITransportType.GRAPHQL.toString().equalsIgnoreCase(apiType)) {
+                    // Add the validated swagger separately since the UI does the same procedure
+                    PublisherCommonUtils.updateSwagger(importedApi.getUuid(), validationResponse, false);
+                }
             }
 
             // Retrieving the life cycle action to do the lifecycle state change explicitly later
             lifecycleAction = getLifeCycleAction(currentTenantDomain, currentStatus, targetStatus, apiProvider);
 
-            // Add/update swagger content except for streaming APIs and GraphQL APIs
-            if (!PublisherCommonUtils.isStreamingAPI(importedApiDTO)
-                    && !APIConstants.APITransportType.GRAPHQL.toString().equalsIgnoreCase(apiType)) {
-                // Add the validated swagger separately since the UI does the same procedure
-                PublisherCommonUtils.updateSwagger(importedApi.getUuid(), validationResponse, false);
-            }
             // Add the GraphQL schema
             if (APIConstants.APITransportType.GRAPHQL.toString().equalsIgnoreCase(apiType)) {
                 PublisherCommonUtils.addGraphQLSchema(importedApi, graphQLSchema, apiProvider);

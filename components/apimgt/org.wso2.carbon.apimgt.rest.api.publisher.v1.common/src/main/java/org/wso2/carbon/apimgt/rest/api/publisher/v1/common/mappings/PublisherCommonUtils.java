@@ -104,6 +104,37 @@ public class PublisherCommonUtils {
     private static final Log log = LogFactory.getLog(PublisherCommonUtils.class);
 
     /**
+     * Update API and API definition.
+     *
+     * @param originalAPI       existing API
+     * @param apiDtoToUpdate    DTO object with updated API data
+     * @param apiProvider       API Provider
+     * @param tokenScopes       token scopes
+     * @param response          response of the API definition validation
+     * @return                  updated API
+     * @throws APIManagementException   If an error occurs while updating the API and API definition
+     * @throws ParseException           If an error occurs while parsing the endpoint configuration
+     * @throws CryptoException          If an error occurs while encrypting the secret key of API
+     * @throws FaultGatewaysException   If an error occurs while updating manage of an existing API
+     */
+    public static API updateApiAndDefinition(API originalAPI, APIDTO apiDtoToUpdate, APIProvider apiProvider,
+                                             String[] tokenScopes, APIDefinitionValidationResponse response)
+            throws APIManagementException, ParseException, CryptoException, FaultGatewaysException {
+
+        API apiToUpdate = prepareForUpdateApi(originalAPI, apiDtoToUpdate, apiProvider, tokenScopes);
+        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
+        if (!PublisherCommonUtils.isStreamingAPI(apiDtoToUpdate)
+                && !APIConstants.APITransportType.GRAPHQL.toString()
+                .equalsIgnoreCase(apiDtoToUpdate.getType().toString())) {
+            prepareForUpdateSwagger(response, false, apiProvider, tenantDomain, response.getParser(), apiToUpdate);
+        }
+
+        apiProvider.updateAPI(apiToUpdate, originalAPI);
+        return apiProvider.getAPIbyUUID(originalAPI.getUuid(),
+                CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+    }
+
+    /**
      * Update an API.
      *
      * @param originalAPI    Existing API
@@ -117,7 +148,29 @@ public class PublisherCommonUtils {
      */
     public static API updateApi(API originalAPI, APIDTO apiDtoToUpdate, APIProvider apiProvider, String[] tokenScopes)
             throws ParseException, CryptoException, APIManagementException, FaultGatewaysException {
+        API apiToUpdate = prepareForUpdateApi(originalAPI, apiDtoToUpdate, apiProvider, tokenScopes);
 
+        apiProvider.updateAPI(apiToUpdate, originalAPI);
+
+        return apiProvider.getAPIbyUUID(originalAPI.getUuid(),
+                CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        // TODO use returend api
+    }
+
+    /**
+     * Prepare for API object before updating the API.
+     *
+     * @param originalAPI    Existing API
+     * @param apiDtoToUpdate New API DTO to update
+     * @param apiProvider    API Provider
+     * @param tokenScopes    Scopes of the token
+     * @throws ParseException         If an error occurs while parsing the endpoint configuration
+     * @throws CryptoException        If an error occurs while encrypting the secret key of API
+     * @throws APIManagementException If an error occurs while updating the API
+     */
+    private static API prepareForUpdateApi(API originalAPI, APIDTO apiDtoToUpdate, APIProvider apiProvider,
+                                           String[] tokenScopes)
+            throws APIManagementException, ParseException, CryptoException {
         APIIdentifier apiIdentifier = originalAPI.getId();
         // Validate if the USER_REST_API_SCOPES is not set in WebAppAuthenticator when scopes are validated
         if (tokenScopes == null) {
@@ -316,11 +369,7 @@ public class PublisherCommonUtils {
             }
         }
 
-        apiProvider.updateAPI(apiToUpdate, originalAPI);
-
-        return apiProvider.getAPIbyUUID(originalAPI.getUuid(),
-                CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-        // TODO use returend api
+        return apiToUpdate;
     }
 
     /**
@@ -1112,6 +1161,31 @@ public class PublisherCommonUtils {
         //this will fail if user does not have access to the API or the API does not exist
         API existingAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
         APIDefinition oasParser = response.getParser();
+        prepareForUpdateSwagger(response, isServiceAPI, apiProvider, tenantDomain, oasParser, existingAPI);
+        API unModifiedAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
+        existingAPI.setStatus(unModifiedAPI.getStatus());
+        apiProvider.updateAPI(existingAPI, unModifiedAPI);
+        //retrieves the updated swagger definition
+        String apiSwagger = apiProvider.getOpenAPIDefinition(apiId, tenantDomain); // TODO see why we need to get it
+        // instead of passing same
+        return oasParser.getOASDefinitionForPublisher(existingAPI, apiSwagger);
+    }
+
+    /**
+     * Prepare the API object before updating swagger.
+     *
+     * @param response      response of a swagger definition validation call
+     * @param isServiceAPI  whether the API is a service API or not
+     * @param apiProvider   API Provider
+     * @param tenantDomain  tenant domain
+     * @param oasParser     OASParser for the API definition
+     * @param existingAPI   existing API
+     * @throws APIManagementException when error occurred updating swagger
+     */
+    private static void prepareForUpdateSwagger(APIDefinitionValidationResponse response, boolean isServiceAPI,
+                                                APIProvider apiProvider, String tenantDomain, APIDefinition oasParser,
+                                                API existingAPI) throws APIManagementException {
+
         String apiDefinition = response.getJsonContent();
         if (isServiceAPI) {
             apiDefinition = oasParser.copyVendorExtensions(existingAPI.getSwaggerDefinition(), apiDefinition);
@@ -1162,13 +1236,6 @@ public class PublisherCommonUtils {
         String updatedApiDefinition = oasParser.populateCustomManagementInfo(apiDefinition, swaggerData);
         apiProvider.saveSwaggerDefinition(existingAPI, updatedApiDefinition, tenantDomain);
         existingAPI.setSwaggerDefinition(updatedApiDefinition);
-        API unModifiedAPI = apiProvider.getAPIbyUUID(apiId, tenantDomain);
-        existingAPI.setStatus(unModifiedAPI.getStatus());
-        apiProvider.updateAPI(existingAPI, unModifiedAPI);
-        //retrieves the updated swagger definition
-        String apiSwagger = apiProvider.getOpenAPIDefinition(apiId, tenantDomain); // TODO see why we need to get it
-        // instead of passing same
-        return oasParser.getOASDefinitionForPublisher(existingAPI, apiSwagger);
     }
 
     /**
