@@ -31,7 +31,6 @@ import org.wso2.carbon.apimgt.api.gateway.GatewayContentDTO;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.utils.EndpointAdminServiceProxy;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
-import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.utils.LocalEntryServiceProxy;
 import org.wso2.carbon.apimgt.gateway.utils.MediationSecurityAdminServiceProxy;
 import org.wso2.carbon.apimgt.gateway.utils.RESTAPIAdminServiceProxy;
