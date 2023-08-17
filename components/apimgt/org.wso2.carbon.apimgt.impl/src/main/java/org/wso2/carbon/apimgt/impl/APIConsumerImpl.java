@@ -2812,8 +2812,13 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             throws APIManagementException {
 
         Subscriber subscriber = new Subscriber(username);
-        Set<String> scopeKeySet = apiMgtDAO.getScopesForApplicationSubscription(subscriber, applicationId);
-        return new LinkedHashSet<>(APIUtil.getScopes(scopeKeySet, tenantDomain).values());
+        Set<Pair<String, String>> scopeKeySet = apiMgtDAO.getScopesForApplicationSubscription(subscriber, applicationId);
+        Map<String, Scope> scopeToKeyMap = new HashMap<>();
+        for (Pair<String, String> scopeEntry : scopeKeySet) {
+            Scope scope = APIUtil.getScopeByName(scopeEntry.getRight(), scopeEntry.getLeft());
+            scopeToKeyMap.put(scopeEntry.getRight(), scope);
+        }
+        return new LinkedHashSet<>(scopeToKeyMap.values());
     }
 
     @Override
