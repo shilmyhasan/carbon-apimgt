@@ -659,7 +659,11 @@ public class WebsocketUtil extends GraphQLProcessor {
 			requestPublisherDTO.setUserTenantDomain(inboundMessageContext.getTenantDomain());
 			requestPublisherDTO.setApiTier(infoDTO.getTier());
 			requestPublisherDTO.setApiVersion(inboundMessageContext.getVersion());
-			requestPublisherDTO.setMetaClientType(keyType);
+			org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
+			obj.put("keyType", keyType);
+			obj.put("correlationID", correlationID);
+			String metaClientType = obj.toJSONString();
+			requestPublisherDTO.setMetaClientType(metaClientType);
 			requestPublisherDTO.setCorrelationID(correlationID);
 			requestPublisherDTO.setUserAgent(useragent);
 			requestPublisherDTO.setCorrelationID(correlationID);
@@ -719,6 +723,7 @@ public class WebsocketUtil extends GraphQLProcessor {
 										 InboundMessageContext inboundMessageContext,
 										 APIMgtUsageDataPublisher usageDataPublisher){
 
+		String correlationID = UUID.randomUUID().toString();
 		FaultPublisherDTO faultPublisherDTO = new FaultPublisherDTO();
 		long requestTime = System.currentTimeMillis();
 		faultPublisherDTO.setApiMethod(EMPTY_PROPERTY);
@@ -738,7 +743,11 @@ public class WebsocketUtil extends GraphQLProcessor {
 		faultPublisherDTO.setApplicationConsumerKey(inboundMessageContext.getInfoDTO().getConsumerKey());
 		faultPublisherDTO.setApiCreatorTenantDomain(MultitenantUtils.getTenantDomain(inboundMessageContext
 				.getInfoDTO().getApiPublisher()));
-		faultPublisherDTO.setMetaClientType(inboundMessageContext.getInfoDTO().getType());
+		org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
+		obj.put("keyType", inboundMessageContext.getInfoDTO().getType());
+		obj.put("correlationID", correlationID);
+		String metaClientType = obj.toJSONString();
+		faultPublisherDTO.setMetaClientType(metaClientType);
 		faultPublisherDTO.setUsername(inboundMessageContext.getInfoDTO().getEndUserName());
 		faultPublisherDTO.setProtocol(WEBSOCKET_KEYWORD);
 		faultPublisherDTO.setRequestTimestamp(requestTime);
@@ -867,6 +876,11 @@ public class WebsocketUtil extends GraphQLProcessor {
 			throttlePublisherDTO.setCorrelationID(correlationID);
 			throttlePublisherDTO.setHostName(DataPublisherUtil.getHostAddress());
 			throttlePublisherDTO.setAccessToken(EMPTY_PROPERTY);
+			if (log.isDebugEnabled()) {
+				log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() + "_" +
+						Thread.currentThread().getId() + " --- Protocol: WebSocket" +
+						" --- Before publishing throttle event --- " + throttlePublisherDTO);
+			}
 			usageDataPublisher.publishEvent(throttlePublisherDTO);
 		} catch (Exception e) {
 			// flow should not break if event publishing failed

@@ -55,6 +55,11 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
     public void publishEvent(FaultPublisherDTO faultPublisherDTO) {
         DataBridgeFaultPublisherDTO dataBridgeFaultPublisherDTO = new DataBridgeFaultPublisherDTO(faultPublisherDTO);
         List<String> missingMandatoryValues = dataBridgeFaultPublisherDTO.getMissingMandatoryValues();
+        if (log.isDebugEnabled()) {
+            log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() + "_" +
+                    Thread.currentThread().getId() + " --- Protocol: " + faultPublisherDTO.getProtocol() +
+                    " --- Before publishing fault event --- " + faultPublisherDTO);
+        }
         if (missingMandatoryValues.isEmpty()) {
             try {
                 String streamID = DataPublisherUtil.getApiManagerAnalyticsConfiguration().getFaultStreamName() + ":"
@@ -63,6 +68,11 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
                 dataPublisher.tryPublish(streamID, System.currentTimeMillis(),
                         (Object[]) dataBridgeFaultPublisherDTO.createMetaData(), null,
                         (Object[]) dataBridgeFaultPublisherDTO.createPayload());
+                if (log.isDebugEnabled()) {
+                    log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() + "_" +
+                            Thread.currentThread().getId() + " --- Protocol: " + faultPublisherDTO.getProtocol() +
+                            " --- After publishing fault event --- " + faultPublisherDTO);
+                }
 
             } catch (Exception e) {
                 log.error("Error while publishing Fault event", e);
@@ -70,7 +80,9 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
 
         } else {
             log.error("Faulty invocation event dropped due to missing mandatory data: "
-                    + missingMandatoryValues.toString() + " in event: " + dataBridgeFaultPublisherDTO.toString());
+                    + missingMandatoryValues.toString() + " in event: " + dataBridgeFaultPublisherDTO.toString()
+                    + " Thread Name_ID: " + Thread.currentThread().getName() + "_" + Thread.currentThread().getId() +
+                    " Protocol: " + dataBridgeFaultPublisherDTO.getProtocol());
         }
     }
 
@@ -78,6 +90,11 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
         DataBridgeThrottlePublisherDTO dataBridgeThrottlePublisherDTO = new
                 DataBridgeThrottlePublisherDTO(throttPublisherDTO);
         List<String> missingMandatoryValues = dataBridgeThrottlePublisherDTO.getMissingMandatoryValues();
+        if (log.isDebugEnabled()) {
+            log.debug("Publish Analytics Event ---" + " Thread Name_ID: " + Thread.currentThread().getName() + "_"
+                    + Thread.currentThread().getId() + " --- Before publishing throttle event --- "
+                    + throttPublisherDTO);
+        }
         if (missingMandatoryValues.isEmpty()) {
             try {
                 String streamID = DataPublisherUtil.getApiManagerAnalyticsConfiguration().getThrottleStreamName() + ":" +
@@ -86,13 +103,18 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
                 dataPublisher.tryPublish(streamID, System.currentTimeMillis(),
                         (Object[]) dataBridgeThrottlePublisherDTO.createMetaData(), null,
                         (Object[]) dataBridgeThrottlePublisherDTO.createPayload());
+                if (log.isDebugEnabled()) {
+                    log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() + "_"
+                            + Thread.currentThread().getId() + " --- After publishing throttle event --- ");
+                }
 
             } catch (Exception e) {
                 log.error("Error while publishing Throttle exceed event", e);
             }
         } else {
             log.error("Throttling event dropped due to missing mandatory data: "
-                    + missingMandatoryValues.toString() + " in event: " + dataBridgeThrottlePublisherDTO.toString());
+                    + missingMandatoryValues.toString() + " in event: " + dataBridgeThrottlePublisherDTO.toString()
+                    + " Thread Name_ID: " + Thread.currentThread().getName() + "_" + Thread.currentThread().getId());
         }
     }
 
@@ -160,6 +182,11 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
     public void publishEvent(RequestResponseStreamDTO requestStream) {
         DataBridgeRequestResponseStreamPublisherDTO dataBridgeRequestStreamPublisherDTO = new DataBridgeRequestResponseStreamPublisherDTO(requestStream);
         List<String> missingMandatoryValues = dataBridgeRequestStreamPublisherDTO.getMissingMandatoryValues();
+        if (log.isDebugEnabled()) {
+            log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() + "_" +
+                    Thread.currentThread().getId() + " --- Protocol: " + requestStream.getProtocol() +
+                    " --- Before publishing request response event --- " + requestStream);
+        }
         if (missingMandatoryValues.isEmpty()) {
             try {
                 String streamID = DataPublisherUtil.getApiManagerAnalyticsConfiguration().getRequestStreamName() + ":"
@@ -168,12 +195,19 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
                 dataPublisher.tryPublish(streamID, System.currentTimeMillis(),
                         (Object[]) dataBridgeRequestStreamPublisherDTO.createMetaData(), null,
                         (Object[]) dataBridgeRequestStreamPublisherDTO.createPayload());
+                if (log.isDebugEnabled()) {
+                    log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() + "_" +
+                            Thread.currentThread().getId() + " --- Protocol: " + requestStream.getProtocol() +
+                            " --- After publishing request response event --- " + requestStream);
+                }
             } catch(Exception e){
                 log.error("Error while publishing Request event", e);
             }
         } else {
             log.error("RequestResponse event dropped due to unavailability of mandatory data: "
-            + missingMandatoryValues.toString() + " in event: " + dataBridgeRequestStreamPublisherDTO.toString());
+            + missingMandatoryValues.toString() + " in event: " + dataBridgeRequestStreamPublisherDTO.toString()
+                    + " Thread Name_ID: " + Thread.currentThread().getName() + "_" + Thread.currentThread().getId() +
+                    " Protocol: " + dataBridgeRequestStreamPublisherDTO.getProtocol());
         }
     }
 
