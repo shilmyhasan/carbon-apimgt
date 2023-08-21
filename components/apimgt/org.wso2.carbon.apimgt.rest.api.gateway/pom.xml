@@ -94,6 +94,20 @@
                     <groupId>javax.ws.rs</groupId>
                     <artifactId>jsr311-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.io.swagger.core</groupId>
+            <artifactId>swagger-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
