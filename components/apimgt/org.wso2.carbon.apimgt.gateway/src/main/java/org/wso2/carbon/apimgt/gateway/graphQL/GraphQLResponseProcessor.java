@@ -54,6 +54,8 @@ public class GraphQLResponseProcessor extends GraphQLProcessor {
 
         String subscriptionOperation = null;
         InboundProcessorResponseDTO responseDTO = new InboundProcessorResponseDTO();
+        String correlationId = WebsocketUtil.getWebSocketCorrelationId(ctx);
+        inboundMessageContext.setWebSocketCorrelationId(correlationId);
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext()

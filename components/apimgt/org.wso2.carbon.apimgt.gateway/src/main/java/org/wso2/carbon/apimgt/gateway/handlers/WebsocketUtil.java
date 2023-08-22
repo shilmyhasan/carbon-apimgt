@@ -83,7 +83,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -638,7 +640,10 @@ public class WebsocketUtil extends GraphQLProcessor {
 			APIKeyValidationInfoDTO infoDTO = inboundMessageContext.getInfoDTO();
 			String appOwner = infoDTO.getSubscriber();
 			String keyType = infoDTO.getType();
-			String correlationID = UUID.randomUUID().toString();
+			String correlationID = inboundMessageContext.getWebSocketCorrelationId();
+			if (correlationID == null) {
+				correlationID = UUID.randomUUID().toString();
+			}
 
 			requestPublisherDTO.setApiName(infoDTO.getApiName());
 			requestPublisherDTO.setApiCreator(infoDTO.getApiPublisher());
@@ -723,7 +728,10 @@ public class WebsocketUtil extends GraphQLProcessor {
 										 InboundMessageContext inboundMessageContext,
 										 APIMgtUsageDataPublisher usageDataPublisher){
 
-		String correlationID = UUID.randomUUID().toString();
+		String correlationID = inboundMessageContext.getWebSocketCorrelationId();
+		if (correlationID == null) {
+			correlationID = UUID.randomUUID().toString();
+		}
 		FaultPublisherDTO faultPublisherDTO = new FaultPublisherDTO();
 		long requestTime = System.currentTimeMillis();
 		faultPublisherDTO.setApiMethod(EMPTY_PROPERTY);
@@ -856,7 +864,10 @@ public class WebsocketUtil extends GraphQLProcessor {
 			APIMgtUsageDataPublisher usageDataPublisher, ThrottlePublisherDTO throttlePublisherDTO,
 											String throttleOutReason) {
 		long requestTime = System.currentTimeMillis();
-		String correlationID = UUID.randomUUID().toString();
+		String correlationID = inboundMessageContext.getWebSocketCorrelationId();
+		if (correlationID == null) {
+			correlationID = UUID.randomUUID().toString();
+		}
 		try {
 			APIKeyValidationInfoDTO infoDTO = inboundMessageContext.getInfoDTO();
 			throttlePublisherDTO.setKeyType(infoDTO.getType());
@@ -876,11 +887,12 @@ public class WebsocketUtil extends GraphQLProcessor {
 			throttlePublisherDTO.setCorrelationID(correlationID);
 			throttlePublisherDTO.setHostName(DataPublisherUtil.getHostAddress());
 			throttlePublisherDTO.setAccessToken(EMPTY_PROPERTY);
-			if (log.isDebugEnabled()) {
-				log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() + "_" +
-						Thread.currentThread().getId() + " --- Protocol: WebSocket" +
-						" --- Before publishing throttle event --- " + throttlePublisherDTO);
+			Map<String, String> properties = throttlePublisherDTO.getProperties();
+			if (properties == null) {
+				properties = new HashMap<>();
 			}
+			properties.put("protocol", "WebSocket");
+			throttlePublisherDTO.setProperties(properties);
 			usageDataPublisher.publishEvent(throttlePublisherDTO);
 		} catch (Exception e) {
 			// flow should not break if event publishing failed
@@ -1067,5 +1079,9 @@ public class WebsocketUtil extends GraphQLProcessor {
 		inboundProcessorResponseDTO.setErrorCode(errorCode);
 		inboundProcessorResponseDTO.setErrorMessage(errorMessage);
 		return inboundProcessorResponseDTO;
+	}
+
+	public static String getWebSocketCorrelationId(ChannelHandlerContext channelHandlerContext) {
+		return channelHandlerContext.channel().id().asLongText();
 	}
 }

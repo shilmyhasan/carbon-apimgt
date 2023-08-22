@@ -30,6 +30,7 @@ import org.wso2.carbon.databridge.commons.exception.TransportException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublisher{
 
@@ -90,10 +91,15 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
         DataBridgeThrottlePublisherDTO dataBridgeThrottlePublisherDTO = new
                 DataBridgeThrottlePublisherDTO(throttPublisherDTO);
         List<String> missingMandatoryValues = dataBridgeThrottlePublisherDTO.getMissingMandatoryValues();
+        String protocol = null;
+        Map<String, String> properties = throttPublisherDTO.getProperties();
+        if (properties != null) {
+            protocol = properties.get("protocol");
+        }
         if (log.isDebugEnabled()) {
             log.debug("Publish Analytics Event ---" + " Thread Name_ID: " + Thread.currentThread().getName() + "_"
-                    + Thread.currentThread().getId() + " --- Before publishing throttle event --- "
-                    + throttPublisherDTO);
+                    + Thread.currentThread().getId() + " --- Protocol: " + protocol +
+                    " --- Before publishing throttle event --- " + throttPublisherDTO);
         }
         if (missingMandatoryValues.isEmpty()) {
             try {
@@ -105,7 +111,8 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
                         (Object[]) dataBridgeThrottlePublisherDTO.createPayload());
                 if (log.isDebugEnabled()) {
                     log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() + "_"
-                            + Thread.currentThread().getId() + " --- After publishing throttle event --- ");
+                            + Thread.currentThread().getId() + " --- Protocol: " + protocol +
+                            " --- After publishing throttle event --- " + throttPublisherDTO);
                 }
 
             } catch (Exception e) {
@@ -114,7 +121,8 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
         } else {
             log.error("Throttling event dropped due to missing mandatory data: "
                     + missingMandatoryValues.toString() + " in event: " + dataBridgeThrottlePublisherDTO.toString()
-                    + " Thread Name_ID: " + Thread.currentThread().getName() + "_" + Thread.currentThread().getId());
+                    + " Thread Name_ID: " + Thread.currentThread().getName() + "_" + Thread.currentThread().getId()
+                    + " Protocol: " + protocol);
         }
     }
 

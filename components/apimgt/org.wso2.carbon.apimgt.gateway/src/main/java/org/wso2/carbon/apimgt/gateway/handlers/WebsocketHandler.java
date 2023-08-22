@@ -72,6 +72,7 @@ public class WebsocketHandler extends CombinedChannelDuplexHandler<WebsocketInbo
         if (inboundMessageContext == null) {
             inboundMessageContext = inboundMessageContextN;
         }
+        inboundMessageContext.setWebSocketCorrelationId(channelId);
 
         if (msg instanceof CloseWebSocketFrame) {
             if (((CloseWebSocketFrame) msg).statusCode() > 1001) {
@@ -206,6 +207,8 @@ public class WebsocketHandler extends CombinedChannelDuplexHandler<WebsocketInbo
         // publish analytics events if analytics is enabled
         if (APIUtil.isAnalyticsEnabled()) {
             String clientIp = getClientIp(ctx);
+            String correlationId = WebsocketUtil.getWebSocketCorrelationId(ctx);
+            inboundMessageContext.setWebSocketCorrelationId(correlationId);
             WebsocketUtil.publishWSRequestEvent(clientIp, true, inboundMessageContext,
                     inboundHandler().getUsageDataPublisher(), serviceTime);
         }
@@ -214,6 +217,8 @@ public class WebsocketHandler extends CombinedChannelDuplexHandler<WebsocketInbo
     protected boolean isAllowed(ChannelHandlerContext ctx, WebSocketFrame msg,
                                 InboundMessageContext inboundMessageContext,
                                 APIMgtUsageDataPublisher usageDataPublisher) {
+        String correlationId = WebsocketUtil.getWebSocketCorrelationId(ctx);
+        inboundMessageContext.setWebSocketCorrelationId(correlationId);
         WebSocketThrottleResponseDTO webSocketThrottleResponseDTO =
                 WebsocketUtil.doThrottle(ctx, msg, null, inboundMessageContext);
         if (webSocketThrottleResponseDTO.isThrottled()) {
