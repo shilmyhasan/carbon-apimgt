@@ -128,6 +128,8 @@ public abstract class GraphQLProcessor {
         String operationName = null;
         InboundProcessorResponseDTO responseDTO = new InboundProcessorResponseDTO();
         responseDTO.setId(operationId);
+        String correlationId = WebsocketUtil.getWebSocketCorrelationId(ctx);
+        inboundMessageContext.setWebSocketCorrelationId(correlationId);
         WebSocketThrottleResponseDTO throttleResponseDTO =
                 WebsocketUtil.doThrottle(ctx, msg, verbInfoDTO, inboundMessageContext);
 

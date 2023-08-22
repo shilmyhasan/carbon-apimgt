@@ -201,4 +201,24 @@ public class ThrottlePublisherDTO {
     public void setApiMethod(String apiMethod) {
         this.apiMethod = apiMethod;
     }
+
+    @Override
+    public String toString() {
+        // Use reflection to get all fields of the object and their values
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ ");
+        java.lang.reflect.Field[] fields = this.getClass().getDeclaredFields();
+        for (java.lang.reflect.Field field : fields) {
+            try {
+                field.setAccessible(true);
+                sb.append(field.getName()).append("=").append(field.get(this)).append(", ");
+            } catch (IllegalAccessException e) {
+                // Handle exception if needed
+            }
+        }
+        sb.setLength(sb.length() - 2); // Remove trailing comma and space
+        sb.append(" }");
+        return sb.toString();
+    }
+
 }
