@@ -118,11 +118,6 @@ public class APIMgtThrottleUsageHandler extends APIMgtCommonExecutionPublisher {
                             + messageContext.getProperty(APIMgtGatewayConstants.CONTEXT) + " with ID: "
                             + messageContext.getMessageID() + " started" + " at "
                             + new SimpleDateFormat("[yyyy.MM.dd HH:mm:ss,SSS zzz]").format(new Date()));
-                    String protocol = (String) messageContext.getProperty(
-                            SynapseConstants.TRANSPORT_IN_NAME);
-                    log.debug("Publish Analytics Event --- Thread Name_ID: " + Thread.currentThread().getName() +
-                            "_" + Thread.currentThread().getId() + " --- Protocol: " + protocol +
-                            " --- Before publishing throttle event --- " + throttlePublisherDTO);
                 }
                 publisher.publishEvent(throttlePublisherDTO);
                 if (log.isDebugEnabled()) {
