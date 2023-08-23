@@ -1187,7 +1187,8 @@ public class OASParserUtil {
             ObjectNode endpointResult = objectMapper.createObjectNode();
             endpointResult.set(APIConstants.ENDPOINT_URLS, endpointsArray);
             endpointResult.put(APIConstants.X_WSO2_ENDPOINT_TYPE, type);
-            if (primaryEndpoints.has(APIConstants.ADVANCE_ENDPOINT_CONFIG)) {
+            if (primaryEndpoints.has(APIConstants.ADVANCE_ENDPOINT_CONFIG)
+                    && primaryEndpoints.get(APIConstants.ADVANCE_ENDPOINT_CONFIG) != JSONObject.NULL) {
                 JSONObject advanceEndpointConfig = primaryEndpoints.getJSONObject(APIConstants.ADVANCE_ENDPOINT_CONFIG);
                 ObjectNode advanceEndpointsObject = objectMapper.createObjectNode();
                 if (advanceEndpointConfig.has(APIConstants.TIMEOUT_IN_MILLIS)
