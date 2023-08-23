@@ -35,5 +35,7 @@ public class WebSocketApiConstants {
         public static final String ERROR_MESSAGE = "message";
         public static final int BAD_REQUEST = 4005;
         public static final String BAD_REQUEST_MESSAGE = "Bad request";
+        public static final int CONTEXT_NOT_FOUND = 4007;
+        public static final String CONTEXT_NOT_FOUND_MESSAGE = "Context Not Found";
     }
 }
