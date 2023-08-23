@@ -121,12 +121,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         String keyType = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.APP_KEY_TYPE);
 
         if (StringUtils.isNotEmpty(applicationName) && StringUtils.isNotEmpty(keyType)) {
-            String domain = UserCoreUtil.extractDomainFromName(userId);
-            if (domain != null && !domain.isEmpty() && !UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals(domain)) {
-                userId = userId.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
-            }
-            oauthClientName = String.format("%s_%s_%s", APIUtil.replaceEmailDomain(MultitenantUtils.
-                    getTenantAwareUsername(userId)), oauthClientName, keyType);
+            oauthClientName = generateOAuthClientName(userId, oauthClientName, keyType);
         } else {
             throw new APIManagementException("Missing required information for OAuth application creation.");
         }
@@ -289,6 +284,31 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         return clientInfo;
     }
 
+    /**
+     * Generate OAuth application name based on the provided parameters
+     *
+     * @param userId          The OAuth client username
+     * @param oauthClientName The application UUID
+     * @param keyType         The key type for which OAuth application is created
+     * @return generated oauth application name
+     */
+    protected String generateOAuthClientName(String userId, String oauthClientName, String keyType) {
+        // Replace the domain name separator with an underscore for secondary user stores
+        String domain = UserCoreUtil.extractDomainFromName(userId);
+        if (domain != null && !domain.isEmpty()) {
+            if (!UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals(domain)) {
+                userId = userId.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
+            } else if (userId.contains(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME + UserCoreConstants.DOMAIN_SEPARATOR)) {
+                // If the user logs-in by including the PRIMARY domain in the username (eg: PRIMARY/admin),
+                // then also we need to replace the "/" with "_" to construct the oauth client name.
+                userId = userId.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
+            }
+        }
+        // Construct the application name after replacing email domain separator
+        return String.format("%s_%s_%s", APIUtil.replaceEmailDomain(MultitenantUtils.
+                getTenantAwareUsername(userId)), oauthClientName, keyType);
+    }
+
     @Override
     public OAuthApplicationInfo updateApplication(OAuthAppRequest appInfoDTO) throws APIManagementException {
 
@@ -303,14 +323,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         // from the ThreadLocalCarbonContext
 
         if (StringUtils.isNotEmpty(applicationName) && StringUtils.isNotEmpty(keyType)) {
-            // Replace the domain name separator with an underscore for secondary user stores
-            String domain = UserCoreUtil.extractDomainFromName(userId);
-            if (domain != null && !domain.isEmpty() && !UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals(domain)) {
-                userId = userId.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
-            }
-            // Construct the application name subsequent to replacing email domain separator
-            oauthClientName = String.format("%s_%s_%s", APIUtil.replaceEmailDomain(MultitenantUtils.
-                    getTenantAwareUsername(userId)), oauthClientName, keyType);
+            oauthClientName = generateOAuthClientName(userId, oauthClientName, keyType);
         } else {
             throw new APIManagementException("Missing required information for OAuth application update.");
         }
