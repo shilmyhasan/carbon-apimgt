@@ -292,7 +292,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
      * @param keyType         The key type for which OAuth application is created
      * @return generated oauth application name
      */
-    private String generateOAuthClientName(String userId, String oauthClientName, String keyType) {
+    protected String generateOAuthClientName(String userId, String oauthClientName, String keyType) {
         // Replace the domain name separator with an underscore for secondary user stores
         String domain = UserCoreUtil.extractDomainFromName(userId);
         if (domain != null && !domain.isEmpty()) {
