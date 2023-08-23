@@ -298,7 +298,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         if (domain != null && !domain.isEmpty()) {
             if (!UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals(domain)) {
                 userId = userId.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
-            } else if (userId.contains(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME)) {
+            } else if (userId.contains(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME + UserCoreConstants.DOMAIN_SEPARATOR)) {
                 // If the user logs-in by including the PRIMARY domain in the username (eg: PRIMARY/admin),
                 // then also we need to replace the "/" with "_" to construct the oauth client name.
                 userId = userId.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
