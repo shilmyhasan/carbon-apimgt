@@ -178,6 +178,7 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
             inboundMessageContext = inboundMessageContextN;
         }
         inboundMessageContext.setUserIP(WebsocketUtil.getRemoteIP(ctx));
+        inboundMessageContext.setWebSocketCorrelationId(channelId);
 
         //check if the request is a handshake
         if (msg instanceof FullHttpRequest) {
@@ -802,6 +803,8 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
         long serviceTime = endTime - startTime;
         // publish analytics events if analytics is enabled
         if (APIUtil.isAnalyticsEnabled()) {
+            String correlationId = WebsocketUtil.getWebSocketCorrelationId(ctx);
+            inboundMessageContext.setWebSocketCorrelationId(correlationId);
             WebsocketUtil.publishWSRequestEvent(inboundMessageContext.getUserIP(), true, inboundMessageContext,
                     usageDataPublisher, serviceTime);
         }
