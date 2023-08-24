@@ -603,11 +603,8 @@ public class WebsocketUtil extends GraphQLProcessor {
 
 		if (!isValidContext) {
 			responseDTO = getFrameErrorDTO(
-					WebSocketApiConstants.FrameErrorConstants.BAD_REQUEST,
-					WebSocketApiConstants.FrameErrorConstants.BAD_REQUEST_MESSAGE, true);
-			if (APIUtil.isAnalyticsEnabled()) {
-				WebsocketUtil.publishFaultEvent(responseDTO, inboundMessageContext, usageDataPublisher);
-			}
+					WebSocketApiConstants.FrameErrorConstants.CONTEXT_NOT_FOUND,
+					WebSocketApiConstants.FrameErrorConstants.CONTEXT_NOT_FOUND_MESSAGE, true);
 		}
 		return responseDTO;
 	}
@@ -1083,5 +1080,23 @@ public class WebsocketUtil extends GraphQLProcessor {
 
 	public static String getWebSocketCorrelationId(ChannelHandlerContext channelHandlerContext) {
 		return channelHandlerContext.channel().id().asLongText();
+	}
+
+	public static int resolveHttpCodeForWebSocketErrorCode(int websocketErrorCode) {
+		switch (websocketErrorCode) {
+			case WebSocketApiConstants.FrameErrorConstants.API_AUTH_INVALID_CREDENTIALS:
+				return HttpResponseStatus.UNAUTHORIZED.code();
+			case WebSocketApiConstants.FrameErrorConstants.THROTTLED_OUT_ERROR:
+				return HttpResponseStatus.TOO_MANY_REQUESTS.code();
+			case GraphQLConstants.FrameErrorConstants.RESOURCE_FORBIDDEN_ERROR:
+			case GraphQLConstants.FrameErrorConstants.BLOCKED_REQUEST:
+				return HttpResponseStatus.FORBIDDEN.code();
+			case WebSocketApiConstants.FrameErrorConstants.BAD_REQUEST:
+				return HttpResponseStatus.BAD_REQUEST.code();
+			case WebSocketApiConstants.FrameErrorConstants.CONTEXT_NOT_FOUND:
+				return HttpResponseStatus.NOT_FOUND.code();
+			default:
+				return HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
+		}
 	}
 }

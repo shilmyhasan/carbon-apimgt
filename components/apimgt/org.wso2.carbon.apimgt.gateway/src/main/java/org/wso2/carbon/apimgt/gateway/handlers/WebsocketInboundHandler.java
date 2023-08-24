@@ -226,7 +226,7 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                 handleHandshakeError(channelId, responseDTO, ctx, inboundMessageContext, msg,
                         APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE_MESSAGE,
                         APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE,
-                        HttpResponseStatus.BAD_REQUEST.code());
+                        WebsocketUtil.resolveHttpCodeForWebSocketErrorCode(responseDTO.getErrorCode()));
             }
             setResourcesMapToContext(inboundMessageContext);
 
