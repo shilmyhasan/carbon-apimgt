@@ -53,16 +53,10 @@ public class MutualSSLAuthenticator implements Authenticator {
     private static final Log log = LogFactory.getLog(MutualSSLAuthenticator.class);
     private String apiLevelPolicy;
     private String requestOrigin;
-    private static String challengeString;
     private boolean isMandatory;
 
     // <UniqueIdentifierName,Tier> -Format
     private HashMap<String, String> certificates;
-
-    static {
-        challengeString = "Mutual SSL realm=\"" + ServiceReferenceHolder.getInstance().getServerConfigurationService()
-                .getFirstProperty("Name") + "\"";
-    }
 
     /**
      * Initialized the mutual SSL authenticator.
@@ -221,7 +215,8 @@ public class MutualSSLAuthenticator implements Authenticator {
 
     @Override
     public String getChallengeString() {
-        return challengeString;
+        return "Mutual SSL realm=\"" + ServiceReferenceHolder.getInstance().getServerConfigurationService()
+                .getFirstProperty("Name") + "\"";
     }
 
     @Override
