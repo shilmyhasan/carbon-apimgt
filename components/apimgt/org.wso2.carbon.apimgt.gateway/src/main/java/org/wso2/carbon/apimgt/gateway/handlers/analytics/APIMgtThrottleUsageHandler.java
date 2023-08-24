@@ -16,6 +16,7 @@
 package org.wso2.carbon.apimgt.gateway.handlers.analytics;
 
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.rest.RESTConstants;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.Utils;
@@ -108,6 +109,8 @@ public class APIMgtThrottleUsageHandler extends APIMgtCommonExecutionPublisher {
                 throttlePublisherDTO.setGatewayType(APIMgtGatewayConstants.GATEWAY_TYPE);
                 throttlePublisherDTO.setHostName(GatewayUtils.getHostName(messageContext));
                 Map<String, String> properties = Utils.getCustomAnalyticsProperties(messageContext);
+                String protocol = (String) messageContext.getProperty(SynapseConstants.TRANSPORT_IN_NAME);
+                properties.put("protocol", protocol);
                 throttlePublisherDTO.setProperties(properties);
 
                 if (log.isDebugEnabled()) {

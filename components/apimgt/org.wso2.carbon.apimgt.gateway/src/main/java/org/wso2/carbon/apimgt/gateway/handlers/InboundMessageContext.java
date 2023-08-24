@@ -52,6 +52,9 @@ public class InboundMessageContext {
     // Graphql Subscription specific connection context information
     private Map<String, GraphQLOperationDTO> graphQLMsgIdToVerbInfo = new HashMap<>();
 
+    // Represents the Websocket correlation ID
+    private String webSocketCorrelationId;
+
     public InboundMessageContext() {
     }
 
@@ -174,5 +177,13 @@ public class InboundMessageContext {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public String getWebSocketCorrelationId() {
+        return webSocketCorrelationId;
+    }
+
+    public void setWebSocketCorrelationId(String webSocketCorrelationId) {
+        this.webSocketCorrelationId = webSocketCorrelationId;
     }
 }
