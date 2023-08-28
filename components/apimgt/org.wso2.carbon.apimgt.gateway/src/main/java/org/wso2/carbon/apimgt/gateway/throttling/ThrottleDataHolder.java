@@ -78,9 +78,7 @@ public class ThrottleDataHolder {
             conditionMap = new ConcurrentHashMap<>();
             conditionDtoMap.put(key, conditionMap);
         }
-        if (!conditionMap.containsKey(conditionKey)) {
-            conditionMap.put(conditionKey, conditionValue);
-        }
+        conditionMap.put(conditionKey, conditionValue);
     }
 
     public void removeThrottledApiConditions(String key, String conditionKey) {
