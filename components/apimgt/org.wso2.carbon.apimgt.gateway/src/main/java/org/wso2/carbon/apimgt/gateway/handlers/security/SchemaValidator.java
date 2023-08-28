@@ -51,6 +51,7 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -537,24 +538,24 @@ public class SchemaValidator extends AbstractHandler {
      * @param entry Array reference to be replaced from actual value.
      */
     private void generateArraySchemas(Map.Entry<String, JsonElement> entry) throws APIManagementException {
-        JsonElement entryRef;
-        JsonElement ref;
-        JsonElement schemaProperty;
         if (entry.getValue() != null) {
-            schemaProperty = entry.getValue();
+            JsonElement schemaProperty = entry.getValue();
             if (schemaProperty == null) {
                 return;
             }
-            Iterator<JsonElement> arrayElements = schemaProperty.getAsJsonArray().iterator();
-            List<JsonElement> nodeList = Lists.newArrayList(arrayElements);
-            for (int i = 0; i < nodeList.size(); i++) {
-                entryRef = nodeList.get(i);
-                if (entryRef.isJsonObject() && entryRef.getAsJsonObject().has(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
-                    ref = extractSchemaObject(entryRef);
-                    nodeList.remove(i);
-                    nodeList.add(i, ref);
+            JsonArray jsonArray = schemaProperty.getAsJsonArray();
+            List nodeList = new ArrayList(jsonArray.size());
+            for (JsonElement entryRef : jsonArray) {
+                if (entryRef.isJsonObject() && entryRef.getAsJsonObject()
+                        .has(APIMgtGatewayConstants.SCHEMA_REFERENCE)) {
+                    JsonElement ref = extractSchemaObject(entryRef);
+                    generateSchema(ref);
+                    nodeList.add(ref);
                 } else if (entryRef.isJsonObject()) {
                     generateSchema(entryRef);
+                    nodeList.add(entryRef);
+                } else {
+                    nodeList.add(entryRef);
                 }
             }
             Gson gson = new Gson();
