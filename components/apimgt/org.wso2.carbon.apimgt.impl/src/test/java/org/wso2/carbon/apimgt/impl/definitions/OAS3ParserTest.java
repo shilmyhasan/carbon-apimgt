@@ -186,12 +186,14 @@ public class OAS3ParserTest extends OASTestBase {
         Assert.assertThat(openAPI.getSecurity(), hasItems(secReq));
     }
 
-    // Test case for an API with clientCredentials security scheme
-    @Test
-    public void testProcessOtherSchemeScopesWithClientCredentialsScheme() throws Exception {
+    /**
+     * Test case for an API with clientCredentials security scheme
+     *
+     */
+    @Test public void testProcessOtherSchemeScopesWithClientCredentialsScheme() throws Exception {
+        String securitySchemeFile = "oas3_client_credential_security_scheme.yaml";
         //Read the API definition file
-        String relativePath = "definitions" + File.separator + "oas3" + File.separator
-                + "oas3_client_credential_security_scheme.yaml";
+        String relativePath = "definitions" + File.separator + "oas3" + File.separator + securitySchemeFile;
         String swaggerContent = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath),
                 "UTF-8");
         swaggerContent = oas3Parser.processOtherSchemeScopes(swaggerContent);
@@ -209,5 +211,4 @@ public class OAS3ParserTest extends OASTestBase {
         Assert.assertNull(defaultSecScheme.getFlows().getClientCredentials().getAuthorizationUrl());
         Assert.assertNull(defaultSecScheme.getFlows().getClientCredentials().getScopes());
     }
-
 }
