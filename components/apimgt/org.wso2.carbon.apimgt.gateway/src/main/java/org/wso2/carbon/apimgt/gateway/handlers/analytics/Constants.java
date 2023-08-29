@@ -33,6 +33,10 @@ public class Constants {
     public static final String API_USER_NAME_KEY = "userName";
     public static final String API_CONTEXT_KEY = "apiContext";
     public static final String API_ANALYTICS_CUSTOM_DATA_PROVIDER_CLASS = "publisher.custom.data.provider.class";
+    public static final String RESPONSE_SIZE = "responseSize";
+    public static final String RESPONSE_CONTENT_TYPE = "responseContentType";
+    public static final String BUILD_RESPONSE_MESSAGE_CONFIG = "build_response_message";
+
 
     public static final String REGION_ID_PROP = "apim.gw.region";
     public static final String DEFAULT_REGION_ID = "default";
