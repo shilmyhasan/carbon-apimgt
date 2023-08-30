@@ -134,6 +134,21 @@ public class ImportUtils {
     private static final Log log = LogFactory.getLog(ImportUtils.class);
     private static final String SOAPTOREST = "SoapToRest";
 
+    public static APIDTO getImportAPIDto(String extractedFolderPath, APIDTO importedApiDTO, Boolean preserveProvider,
+                                         String userName) throws APIManagementException {
+        try {
+            if (importedApiDTO == null) {
+                JsonElement jsonObject = retrieveValidatedDTOObject(extractedFolderPath, preserveProvider,
+                        userName, ImportExportConstants.TYPE_API);
+                importedApiDTO = new Gson().fromJson(jsonObject, APIDTO.class);
+            }
+        } catch (IOException e) {
+            throw new APIManagementException(
+                    "Error while reading API meta information from path: " + extractedFolderPath, e,
+                    ExceptionCodes.ERROR_READING_META_DATA);
+        }
+        return importedApiDTO;
+    }
     /**
      * This method imports an API.
      *
@@ -167,11 +182,6 @@ public class ImportUtils {
         JsonObject paramsConfigObject;
 
         try {
-            if (importedApiDTO == null) {
-                JsonElement jsonObject = retrieveValidatedDTOObject(extractedFolderPath, preserveProvider, userName,
-                        ImportExportConstants.TYPE_API);
-                importedApiDTO = new Gson().fromJson(jsonObject, APIDTO.class);
-            }
 
             // If the provided dependent APIs params config is null, it means this happening when importing an API (not
             // because when importing a dependent API of an API Product). Hence, try to retrieve the definition from
@@ -2404,9 +2414,9 @@ public class ImportUtils {
                 String apiDirectoryPath =
                         path + File.separator + ImportExportConstants.APIS_DIRECTORY + File.separator + apiDirectory
                                 .getName();
-                JsonElement jsonObject = retrieveValidatedDTOObject(apiDirectoryPath, preserveProvider, currentUser,
-                        ImportExportConstants.TYPE_API);
-                APIDTO apiDto = new Gson().fromJson(jsonObject, APIDTO.class);
+                APIDTO apiDto = ImportUtils.getImportAPIDto(apiDirectoryPath, null,
+                        preserveProvider, currentUser);
+
                 String apiName = apiDto.getName();
                 String apiVersion = apiDto.getVersion();
 
@@ -2521,9 +2531,8 @@ public class ImportUtils {
                     }
                 }
 
-                JsonElement jsonObject = retrieveValidatedDTOObject(apiDirectoryPath, isDefaultProviderAllowed,
-                        currentUser, ImportExportConstants.TYPE_API);
-                APIDTO apiDtoToImport = new Gson().fromJson(jsonObject, APIDTO.class);
+                APIDTO apiDtoToImport = getImportAPIDto(apiDirectoryPath, null,
+                        isDefaultProviderAllowed, currentUser);
                 API importedApi = null;
                 String apiName = apiDtoToImport.getName();
                 String apiVersion = apiDtoToImport.getVersion();

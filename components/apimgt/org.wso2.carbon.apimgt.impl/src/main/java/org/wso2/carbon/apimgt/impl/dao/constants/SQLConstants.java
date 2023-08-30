@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.apimgt.impl.dao.constants;
 
-import org.wso2.carbon.apimgt.api.model.OperationPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
@@ -32,8 +31,11 @@ public class SQLConstants {
             " WHERE " +
             "   API.CONTEXT_TEMPLATE = ? ";
 
-    public static final String GET_VERSIONS_MATCHES_API_NAME_AND_ORGANIZATION_SQL=
+    public static final String GET_VERSIONS_MATCHES_API_NAME_PROVIDER_AND_ORGANIZATION_SQL =
             "SELECT API_VERSION FROM AM_API WHERE API_NAME = ? AND API_PROVIDER = ? AND ORGANIZATION = ?";
+
+    public static final String GET_VERSIONS_MATCHES_API_NAME_AND_ORGANIZATION_SQL=
+            "SELECT API_VERSION FROM AM_API WHERE API_NAME = ? AND ORGANIZATION = ?";
 
     public static final String GET_APPLICATION_REGISTRATION_SQL =
             " SELECT REG_ID FROM AM_APPLICATION_REGISTRATION WHERE SUBSCRIBER_ID = ? AND APP_ID = ? AND TOKEN_TYPE = " +

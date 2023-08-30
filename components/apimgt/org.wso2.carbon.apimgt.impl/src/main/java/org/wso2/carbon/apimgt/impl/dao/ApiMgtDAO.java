@@ -33,8 +33,6 @@ import org.wso2.carbon.apimgt.api.BlockConditionAlreadyExistsException;
 import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.SubscriptionAlreadyExistingException;
 import org.wso2.carbon.apimgt.api.SubscriptionBlockedException;
-import org.wso2.carbon.apimgt.api.BlockConditionAlreadyExistsException;
-import org.wso2.carbon.apimgt.api.APIMgtResourceNotFoundException;
 import org.wso2.carbon.apimgt.api.dto.ClientCertificateDTO;
 import org.wso2.carbon.apimgt.api.dto.ClonePolicyMetadataDTO;
 import org.wso2.carbon.apimgt.api.dto.ConditionDTO;
@@ -5224,12 +5222,48 @@ public class ApiMgtDAO {
         List<String> versionList = new ArrayList<String>();
         try (Connection connection = APIMgtDBUtil.getConnection();
                 PreparedStatement ps = connection
-                        .prepareStatement(SQLConstants.GET_VERSIONS_MATCHES_API_NAME_AND_ORGANIZATION_SQL)) {
+                        .prepareStatement(SQLConstants.GET_VERSIONS_MATCHES_API_NAME_PROVIDER_AND_ORGANIZATION_SQL)) {
             boolean initialAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
             ps.setString(1, apiName);
             ps.setString(2, username);
             ps.setString(3, organization);
+            try (ResultSet resultSet = ps.executeQuery()) {
+                while (resultSet.next()) {
+                    versionList.add(resultSet.getString("API_VERSION"));
+                }
+                connection.commit();
+            } catch (SQLException e) {
+                APIMgtDBUtil.rollbackConnection(connection,
+                        "Failed to rollback get API versions matches API name " + apiName, e);
+            } finally {
+                APIMgtDBUtil.setAutoCommit(connection, initialAutoCommit);
+            }
+        } catch (SQLException e) {
+            handleException("Failed to get API versions matches API name" + apiName, e);
+        }
+        return versionList;
+    }
+
+    /**
+     * Returns whether a given API Name already exists
+     *
+     * @param apiName      Name of the API
+     * @param organization Identifier of an Organization
+     * @return true/false
+     * @throws APIManagementException if failed to get API Names
+     */
+    public List<String> getAPIVersionsMatchingApiNameAndOrganization(String apiName, String organization)
+            throws APIManagementException {
+
+        List<String> versionList = new ArrayList<String>();
+        try (Connection connection = APIMgtDBUtil.getConnection();
+             PreparedStatement ps = connection
+                     .prepareStatement(SQLConstants.GET_VERSIONS_MATCHES_API_NAME_AND_ORGANIZATION_SQL)) {
+            boolean initialAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
+            ps.setString(1, apiName);
+            ps.setString(2, organization);
             try (ResultSet resultSet = ps.executeQuery()) {
                 while (resultSet.next()) {
                     versionList.add(resultSet.getString("API_VERSION"));
