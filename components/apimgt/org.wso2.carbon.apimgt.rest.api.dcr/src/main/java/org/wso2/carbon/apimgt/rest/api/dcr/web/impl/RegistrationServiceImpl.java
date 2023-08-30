@@ -124,15 +124,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
             }
 
-            //When the app owner is appended with @carbon.super,take the tenantAware owner value
-            if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(MultitenantUtils.getTenantDomain(owner))) {
-                owner = MultitenantUtils.getTenantAwareUsername(owner);
-            }
-
-            if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(MultitenantUtils.getTenantDomain(authUserName))) {
-                authUserName = MultitenantUtils.getTenantAwareUsername(authUserName);
-            }
-
             if (authUserName != null && !authUserName.equals(owner)) {
                 loggedInUserTenantDomain = MultitenantUtils.getTenantDomain(owner);
             } else {
@@ -140,12 +131,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
 
             //Validates if the application owner and logged in username is same.
-            if (authUserName != null && ((!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
-                    loggedInUserTenantDomain) && authUserName.equals(
-                    owner)) || (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
-                    loggedInUserTenantDomain) && MultitenantUtils.getTenantAwareUsername(authUserName)
-                    .equals(owner)) || isUserSuperAdmin(authUserName))) {
-
+            if (authUserName != null && ((getSuperTenantAwareUsername(authUserName).equals(
+                    getSuperTenantAwareUsername(owner)) || isUserSuperAdmin(authUserName)))) {
                 if (!isUserAccessAllowed(authUserName)) {
                     String errorMsg = "You do not have enough privileges to create an OAuth app";
                     log.error("User " + authUserName +
@@ -220,7 +207,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
                 //Retrieving the existing application
                 if (appServiceProvider != null) {
-                    returnedAPP = this.getExistingApp(applicationName, appServiceProvider.isSaasApp());
+                    returnedAPP = this.getExistingApp(applicationName, appServiceProvider.isSaasApp(), owner);
                 } else {
                     //create a new application if the application doesn't exists.
                     returnedAPP = this.createApplication(applicationName, appRequest, grantTypes);
@@ -228,6 +215,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
                 String tenantAwareAuthUsername = MultitenantUtils.getTenantAwareUsername(authUserName);
                 String tenantAwareOwner = MultitenantUtils.getTenantAwareUsername(owner);
+
+                boolean isLoginUserSameAsReturnedAppOwner = returnedAPP!= null && tenantAwareAuthUsername.equals(
+                        MultitenantUtils.getTenantAwareUsername(returnedAPP.getAppOwner()));
+
+                boolean isPayloadAppOwnerSameAsReturnedAppOwner = returnedAPP!= null && owner != null
+                        && tenantAwareOwner.equals(MultitenantUtils.getTenantAwareUsername(returnedAPP.getAppOwner()));
 
                 //ReturnedAPP is null
                 if (returnedAPP == null) {
@@ -239,10 +232,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                             (RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 500L, errorMsg);
                     response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                             entity(errorDTO).build();
-                } else if (tenantAwareAuthUsername.equals(
-                        MultitenantUtils.getTenantAwareUsername(returnedAPP.getAppOwner())) || (isUserSuperAdmin(
-                        tenantAwareAuthUsername) && owner != null && tenantAwareOwner.equals(
-                        MultitenantUtils.getTenantAwareUsername(returnedAPP.getAppOwner())))) {
+                } else if ((isLoginUserSameAsReturnedAppOwner && isPayloadAppOwnerSameAsReturnedAppOwner)
+                        || (isUserSuperAdmin(tenantAwareAuthUsername) && isPayloadAppOwnerSameAsReturnedAppOwner)) {
                     // Permitting only the owner of the application to create/get the OAuth app and admin user to
                     // create/get the app info if the created app owner equals the payload app owner.
                     if (log.isDebugEnabled()) {
@@ -281,6 +272,13 @@ public class RegistrationServiceImpl implements RegistrationService {
             response = Response.status(Response.Status.BAD_REQUEST).entity(errorDTO).build();
         }
         return response;
+    }
+
+    private String getSuperTenantAwareUsername(String username) {
+        if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(MultitenantUtils.getTenantDomain(username))) {
+            username = MultitenantUtils.getTenantAwareUsername(username);
+        }
+        return username;
     }
 
     @DELETE
@@ -354,7 +352,7 @@ public class RegistrationServiceImpl implements RegistrationService {
      * @param saasApp         value of IsSaasApp attribute of application.
      * @return existing Application
      */
-    private OAuthApplicationInfo getExistingApp(String applicationName, boolean saasApp) {
+    private OAuthApplicationInfo getExistingApp(String applicationName, boolean saasApp, String applicationOwner) {
 
         OAuthApplicationInfo appToReturn = null;
         OAuthAdminService oAuthAdminService = new OAuthAdminService();
@@ -363,12 +361,12 @@ public class RegistrationServiceImpl implements RegistrationService {
                     getOAuthApplicationDataByAppName(applicationName);
             Map<String, String> valueMap = new HashMap<String, String>();
             valueMap.put(OAUTH_CLIENT_GRANT, consumerAppDTO.getGrantTypes());
-
             String appOwner = consumerAppDTO.getUsername();
 
             if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
-                    MultitenantUtils.getTenantDomain(consumerAppDTO.getUsername()))) {
-                appOwner = MultitenantUtils.getTenantAwareUsername(appOwner);
+                    MultitenantUtils.getTenantDomain(consumerAppDTO.getUsername())) &&
+                    appOwner.equals(MultitenantUtils.getTenantAwareUsername(consumerAppDTO.getUsername()))) {
+                appOwner = applicationOwner;
             }
 
             appToReturn = this.fromAppDTOToApplicationInfo(consumerAppDTO.getOauthConsumerKey(),
