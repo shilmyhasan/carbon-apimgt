@@ -5222,7 +5222,7 @@ public class ApiMgtDAO {
         List<String> versionList = new ArrayList<String>();
         try (Connection connection = APIMgtDBUtil.getConnection();
                 PreparedStatement ps = connection
-                        .prepareStatement(SQLConstants.GET_VERSIONS_MATCHES_API_NAME_PROVIDER_AND_ORGANIZATION_SQL)) {
+                        .prepareStatement(SQLConstants.GET_VERSIONS_MATCHES_API_NAME_AND_ORGANIZATION_SQL)) {
             boolean initialAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
             ps.setString(1, apiName);
@@ -5250,23 +5250,25 @@ public class ApiMgtDAO {
      *
      * @param apiName      Name of the API
      * @param organization Identifier of an Organization
-     * @return true/false
+     * @return String Provider or null
      * @throws APIManagementException if failed to get API Names
      */
-    public List<String> getAPIVersionsMatchingApiNameAndOrganization(String apiName, String organization)
+    public String
+    getAPIProviderByNameAndOrganization(String apiName, String organization)
             throws APIManagementException {
 
-        List<String> versionList = new ArrayList<String>();
+        String providerName = null;
         try (Connection connection = APIMgtDBUtil.getConnection();
              PreparedStatement ps = connection
-                     .prepareStatement(SQLConstants.GET_VERSIONS_MATCHES_API_NAME_AND_ORGANIZATION_SQL)) {
+                     .prepareStatement(SQLConstants.GET_API_PROVIDER_MATCHES_API_NAME_AND_ORGANIZATION_SQL)) {
             boolean initialAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
             ps.setString(1, apiName);
             ps.setString(2, organization);
             try (ResultSet resultSet = ps.executeQuery()) {
                 while (resultSet.next()) {
-                    versionList.add(resultSet.getString("API_VERSION"));
+                    providerName = resultSet.getString("API_PROVIDER");
+                    break;
                 }
                 connection.commit();
             } catch (SQLException e) {
@@ -5278,9 +5280,8 @@ public class ApiMgtDAO {
         } catch (SQLException e) {
             handleException("Failed to get API versions matches API name" + apiName, e);
         }
-        return versionList;
+        return providerName;
     }
-
     /**
      * Returns whether a given API Context already exists
      *

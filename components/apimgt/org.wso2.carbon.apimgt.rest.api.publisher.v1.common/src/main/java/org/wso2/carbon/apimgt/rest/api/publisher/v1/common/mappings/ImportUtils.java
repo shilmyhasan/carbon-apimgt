@@ -181,6 +181,29 @@ public class ImportUtils {
         JsonArray deploymentInfoArray = null;
         JsonObject paramsConfigObject;
 
+        importedApiDTO = ImportUtils.getImportAPIDto(extractedFolderPath, importedApiDTO, preserveProvider,
+                RestApiCommonUtil.getLoggedInUsername());
+
+        APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
+
+        // get the api provider of the 1st row of the resultset matching the API name and organization
+        // (revisions list for the logged in tenant)
+        String previousApiProvider = apiProvider.getAPIProviderByNameAndOrganization(importedApiDTO.getName(),
+                RestApiCommonUtil.getLoggedInUserTenantDomain());
+
+        if (!StringUtils.isEmpty(previousApiProvider)) {
+            //current provider is updated based on the preserve-provider input.
+            //tenant domain is verified already
+            // [only allows preserve-provider = false in cross tenant. (provider is set to logged-in user)]
+            //check if current provider not equals to previous provider and throw error
+
+            if (!(previousApiProvider.equalsIgnoreCase(importedApiDTO.getProvider()))) {
+                throw new APIManagementException(
+                        "Cannot create a new version of an API from a different provider. ",
+                        ExceptionCodes.CANNOT_CREATE_API_VERSION);
+            }
+        }
+
         try {
 
             // If the provided dependent APIs params config is null, it means this happening when importing an API (not
@@ -204,7 +227,6 @@ public class ImportUtils {
 
             String apiType = importedApiDTO.getType().toString();
 
-            APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
 
             // Validate swagger content except for streaming APIs
             if (!PublisherCommonUtils.isStreamingAPI(importedApiDTO)

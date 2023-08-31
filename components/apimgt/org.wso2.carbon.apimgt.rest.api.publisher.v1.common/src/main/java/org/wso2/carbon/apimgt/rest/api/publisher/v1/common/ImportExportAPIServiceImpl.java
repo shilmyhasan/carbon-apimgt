@@ -29,7 +29,6 @@ import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIProduct;
 import org.wso2.carbon.apimgt.api.model.APIProductIdentifier;
-import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.importexport.APIImportExportException;
 import org.wso2.carbon.apimgt.impl.importexport.ExportFormat;
 import org.wso2.carbon.apimgt.impl.importexport.ImportExportAPI;
@@ -44,7 +43,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * Osgi Service implementation for import export API.
@@ -203,29 +201,7 @@ public class ImportExportAPIServiceImpl implements ImportExportAPI {
         } catch (APIImportExportException e) {
             throw new APIManagementException(e);
         }
-        APIDTO importedApiDTO = ImportUtils.getImportAPIDto(extractedFolderPath, null, preserveProvider,
-                RestApiCommonUtil.getLoggedInUsername());
-
-        APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
-
-        List<String> apiVersions = apiProvider.getApiVersionsMatchingApiNameAndOrganization(importedApiDTO.getName(), organization);
-
-        if (apiVersions.size() > 0) {
-            //get the API for the version in 0th index since it should be same for all versions
-            //current provider is updated based on the preserve-provider input.
-            //tenant domain is verified already[only allows preserve-provider = false in cross tenant. (provider is set to logged-in user)]
-            //check if current provider not equals to previous provider and throw error
-            String prevProvider = ApiMgtDAO.getInstance().getAPIProviderByNameAndVersion(importedApiDTO.getName(),
-                    apiVersions.get(0), RestApiCommonUtil.getLoggedInUserTenantDomain());
-
-            if (!(prevProvider.equalsIgnoreCase(importedApiDTO.getProvider()))) {
-                throw new APIManagementException(
-                        "Cannot create a new version of an API from a different provider. ",
-                        ExceptionCodes.CANNOT_CREATE_API_VERSION);
-            }
-        }
-
-        return ImportUtils.importApi(extractedFolderPath, importedApiDTO, preserveProvider, rotateRevision,
+        return ImportUtils.importApi(extractedFolderPath, null, preserveProvider, rotateRevision,
                 overwrite, false, tokenScopes, null, organization);
     }
 
