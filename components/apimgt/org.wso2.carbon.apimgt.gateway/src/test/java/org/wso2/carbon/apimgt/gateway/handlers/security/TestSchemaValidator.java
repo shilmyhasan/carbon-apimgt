@@ -225,6 +225,76 @@ public class TestSchemaValidator {
         assertBadRequest();
     }
 
+    @Test
+    public void testValidResponseGetPetFindByStatus() throws IOException, XMLStreamException {
+        // Happy Path: Valid Pet
+        setMockedResponse("GET", "/pet/findByStatus", "/pet/findByStatus",
+                "<jsonArray>" +
+                        "<jsonElement>" +
+                        "<id>9223372036854774000</id>" +
+                        "<category>" +
+                        "<id>0</id>" +
+                        "<name>string</name>" +
+                        "</category>" +
+                        "<name>doggie</name>" +
+                        "<photoUrls>https://mydog_1.jpg</photoUrls>" +
+                        "<photoUrls>https://mydog_2.jpg</photoUrls>" +
+                        "<tags><id>12</id><name>Black</name></tags>" +
+                        "<tags><id>43</id><name>German Shepherd</name></tags>" +
+                        "<status>available</status>" +
+                        "</jsonElement>" +
+                        "<jsonElement>" +
+                        "<id>9223372036854774000</id>" +
+                        "<category>" +
+                        "<id>0</id>" +
+                        "<name>string</name>" +
+                        "</category>" +
+                        "<name>doggie</name>" +
+                        "<photoUrls>https://mydog_1.jpg</photoUrls>" +
+                        "<photoUrls>https://mydog_2.jpg</photoUrls>" +
+                        "<tags><id>12</id><name>Black</name></tags>" +
+                        "<tags><id>43</id><name>German Shepherd</name></tags>" +
+                        "<status>available</status>" +
+                        "</jsonElement>" +
+                        "</jsonArray>");
+        assertValidResponse();
+    }
+
+    @Test
+    public void testBadResponseGetPetFindByStatusMissRequiredField() throws IOException, XMLStreamException {
+        // Missing required field - Name of Pet
+        setMockedResponse("GET", "/pet/findByStatus", "/pet/findByStatus",
+                "<jsonArray>" +
+                        "<jsonElement>" +
+                        "<id>9223372036854774000</id>" +
+                        "<category>" +
+                        "<id>0</id>" +
+                        "<name>string</name>" +
+                        "</category>" +
+                        //"<name>doggie</name>" +
+                        "<photoUrls>https://mydog_1.jpg</photoUrls>" +
+                        "<photoUrls>https://mydog_2.jpg</photoUrls>" +
+                        "<tags><id>12</id><name>Black</name></tags>" +
+                        "<tags><id>43</id><name>German Shepherd</name></tags>" +
+                        "<status>available</status>" +
+                        "</jsonElement>" +
+                        "<jsonElement>" +
+                        "<id>9223372036854774000</id>" +
+                        "<category>" +
+                        "<id>0</id>" +
+                        "<name>string</name>" +
+                        "</category>" +
+                        "<name>doggie</name>" +
+                        "<photoUrls>https://mydog_1.jpg</photoUrls>" +
+                        "<photoUrls>https://mydog_2.jpg</photoUrls>" +
+                        "<tags><id>12</id><name>Black</name></tags>" +
+                        "<tags><id>43</id><name>German Shepherd</name></tags>" +
+                        "<status>available</status>" +
+                        "</jsonElement>" +
+                        "</jsonArray>");
+        assertBadResponse();
+    }
+
     private void assertValidRequest() {
         Assert.assertTrue(schemaValidator.handleRequest(messageContext));
         Mockito.verify(messageContext, Mockito.times(0))
@@ -269,6 +339,70 @@ public class TestSchemaValidator {
         Mockito.when(synapseConfiguration.getLocalRegistry()).thenReturn(map);
         Mockito.when(map.get(ApiId)).thenReturn(entry);
         Mockito.when((String) entry.getValue()).thenReturn(swaggerValue);
+        Mockito.when((String) messageContext.getProperty(APIMgtGatewayConstants.ELECTED_REQUEST_METHOD)).
+                thenReturn(httpMethod);
+        Mockito.when((String) axis2MsgContext.getProperty(APIMgtGatewayConstants.HTTP_REQUEST_METHOD)).
+                thenReturn(httpMethod);
+        Mockito.when((String) messageContext.getProperty(APIMgtGatewayConstants.OPEN_API_STRING))
+                .thenReturn(swaggerValue);
+    }
+
+    private void assertValidResponse() {
+        try {
+            // to set swagger private variable
+            schemaValidator.handleRequest(messageContext);
+        } catch (Exception e) {
+            log.info("Ignore the exception as it is not related to the test case : " + e.getMessage());
+        } finally {
+            log.info("Continuing the test case to validate the response content against the defined schemas.");
+            Mockito.verify(messageContext, Mockito.times(0))
+                    .setProperty(APIMgtGatewayConstants.THREAT_FOUND, true);
+        }
+        Assert.assertTrue(schemaValidator.handleResponse(messageContext));
+        Mockito.verify(messageContext, Mockito.times(0))
+                .setProperty(APIMgtGatewayConstants.THREAT_FOUND, true);
+    }
+
+    private void assertBadResponse() {
+        try {
+            // to set swagger private variable
+            schemaValidator.handleRequest(messageContext);
+        } catch (Exception e) {
+            log.info("Ignore the exception as it is not related to the test case : " + e.getMessage());
+        } finally {
+            log.info("Continuing the test case to validate the bad response content against the defined schemas.");
+            Mockito.verify(messageContext, Mockito.times(0))
+                    .setProperty(APIMgtGatewayConstants.THREAT_FOUND, true);
+        }
+        Assert.assertTrue(schemaValidator.handleResponse(messageContext));
+        Mockito.verify(messageContext)
+                .setProperty(APIMgtGatewayConstants.THREAT_FOUND, true);
+    }
+
+    private void setMockedResponse(String httpMethod, String resourcePath, String subPath, String xmlMessage) throws IOException, XMLStreamException {
+        SOAPFactory fac = OMAbstractFactory.getSOAP12Factory();
+        SOAPEnvelope env = fac.createSOAPEnvelope();
+        fac.createSOAPBody(env);
+        OMElement messageStore = AXIOMUtil.stringToOM(xmlMessage);
+        env.getBody().addChild(messageStore);
+        log.info(" Running the test case to validate the response content against the defined schemas.");
+        String contentType = "application/json";
+        String ApiId = "admin-SwaggerPetstore-1.0.0";
+        File swaggerJsonFile = new File(Thread.currentThread().getContextClassLoader().
+                getResource("swaggerEntry/swagger.json").getFile());
+        String swaggerValue = FileUtils.readFileToString(swaggerJsonFile);
+
+        Mockito.doReturn(true).when(messageContext).isResponse();
+        Mockito.doReturn(env).when(messageContext).getEnvelope();
+        Mockito.when(((Axis2MessageContext) messageContext).getAxis2MessageContext()).thenReturn(axis2MsgContext);
+        Mockito.when((String) axis2MsgContext.getProperty(APIMgtGatewayConstants.REST_CONTENT_TYPE))
+                .thenReturn(contentType);
+        Mockito.when((String) axis2MsgContext.getProperty(APIMgtGatewayConstants.HTTP_REQUEST_METHOD)).
+                thenReturn(httpMethod);
+        Mockito.when((String) messageContext.getProperty((APIMgtGatewayConstants.API_ELECTED_RESOURCE))).
+                thenReturn(resourcePath);
+        Mockito.when((String) axis2MsgContext.getProperty(APIMgtGatewayConstants.HTTP_SC)).
+                thenReturn("200");
         Mockito.when((String) messageContext.getProperty(APIMgtGatewayConstants.ELECTED_REQUEST_METHOD)).
                 thenReturn(httpMethod);
         Mockito.when((String) axis2MsgContext.getProperty(APIMgtGatewayConstants.HTTP_REQUEST_METHOD)).
