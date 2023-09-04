@@ -687,17 +687,6 @@ public interface APIManager {
             throws APIManagementException;
 
     /**
-     * Get the provider of a given API or set of API Revisions, given the API name and the organization
-     *
-     * @param name , name of the API
-     * @param organization
-     * @return String APIProvider
-     * @throws APIManagementException if failed to get set of API
-     */
-    String getAPIProviderByNameAndOrganization(String name, String organization) throws APIManagementException;
-
-
-    /**
      * Returns list of wsdls
      *
      * @return list of wsdl objects or null
