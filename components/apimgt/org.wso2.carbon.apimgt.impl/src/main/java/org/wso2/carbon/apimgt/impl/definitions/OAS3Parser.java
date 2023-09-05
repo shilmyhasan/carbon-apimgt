@@ -105,12 +105,7 @@ public class OAS3Parser extends APIDefinition {
      */
     @Override
     public Map<String, Object> generateExample(String apiDefinition) {
-        OpenAPIV3Parser openAPIV3Parser = new OpenAPIV3Parser();
-        SwaggerParseResult parseAttemptForV3 = openAPIV3Parser.readContents(apiDefinition, null, null);
-        if (CollectionUtils.isNotEmpty(parseAttemptForV3.getMessages())) {
-            log.debug("Errors found when parsing OAS definition");
-        }
-        OpenAPI swagger = parseAttemptForV3.getOpenAPI();
+        OpenAPI swagger = getOpenAPI(apiDefinition);
         //return map
         Map<String, Object> returnMap = new HashMap<>();
         //List for APIResMedPolicyList
@@ -604,6 +599,8 @@ public class OAS3Parser extends APIDefinition {
                 }
             }
         } else {
+            // Workaround to populate the null descriptions of response objects with the empty string.
+            populateNullDescriptions(parseAttemptForV3.getOpenAPI());
             OpenAPI openAPI = parseAttemptForV3.getOpenAPI();
             io.swagger.v3.oas.models.info.Info info = openAPI.getInfo();
             OASParserUtil.updateValidationResponseAsSuccess(validationResponse, apiDefinition, openAPI.getOpenapi(),
@@ -1196,7 +1193,45 @@ public class OAS3Parser extends APIDefinition {
         if (CollectionUtils.isNotEmpty(parseAttemptForV3.getMessages())) {
             log.debug("Errors found when parsing OAS definition");
         }
+        // Workaround to populate the null descriptions of response objects with the empty string.
+        populateNullDescriptions(parseAttemptForV3.getOpenAPI());
         return parseAttemptForV3.getOpenAPI();
+    }
+
+    /**
+     * When parsing an OAS definition which has the empty string ("") as the description of response objects, during
+     * the parsing operation, these empty strings gets converted to null. This method will populate the null
+     * descriptions with the empty string.
+     *
+     * @param openAPI OpenAPI object to be updated
+     */
+    private void populateNullDescriptions(OpenAPI openAPI) {
+
+        // Populate null descriptions of OpenAPI response objects under resources
+        Paths paths = openAPI.getPaths();
+        for (String pathKey : paths.keySet()) {
+            Map<PathItem.HttpMethod, Operation> operationsMap = paths.get(pathKey).readOperationsMap();
+            for (Map.Entry<PathItem.HttpMethod, Operation> entry : operationsMap.entrySet()) {
+                Operation operation = entry.getValue();
+                for (String responseEntry : operation.getResponses().keySet()) {
+                    String description = operation.getResponses().get(responseEntry).getDescription();
+                    if (description == null) {
+                        operation.getResponses().get(responseEntry).setDescription("");
+                    }
+                }
+            }
+        }
+
+        // Populate null descriptions of OpenAPI response objects under components
+        Components components = openAPI.getComponents();
+        if (components != null && components.getResponses() != null) {
+            for (String responseEntry : components.getResponses().keySet()) {
+                String description = components.getResponses().get(responseEntry).getDescription();
+                if (description == null) {
+                    components.getResponses().get(responseEntry).setDescription("");
+                }
+            }
+        }
     }
 
     /**
@@ -1247,12 +1282,7 @@ public class OAS3Parser extends APIDefinition {
     @Override
     public String getOASDefinitionWithTierContentAwareProperty(String oasDefinition, List<String> contentAwareTiersList,
             String apiLevelTier) throws APIManagementException {
-        OpenAPIV3Parser openAPIV3Parser = new OpenAPIV3Parser();
-        SwaggerParseResult parseAttemptForV3 = openAPIV3Parser.readContents(oasDefinition, null, null);
-        if (CollectionUtils.isNotEmpty(parseAttemptForV3.getMessages())) {
-            log.debug("Errors found when parsing OAS definition");
-        }
-        OpenAPI swagger = parseAttemptForV3.getOpenAPI();
+        OpenAPI swagger = getOpenAPI(oasDefinition);
         // check if API Level tier is content aware. if so, we set a extension as a global property
         if (contentAwareTiersList.contains(apiLevelTier)) {
             swagger.addExtension(APIConstants.SWAGGER_X_THROTTLING_BANDWIDTH, true);
