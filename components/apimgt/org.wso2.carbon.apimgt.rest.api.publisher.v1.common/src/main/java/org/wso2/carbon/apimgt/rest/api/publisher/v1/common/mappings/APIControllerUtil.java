@@ -1175,9 +1175,9 @@ public class APIControllerUtil {
 
         AdvertiseInfoDTO advertiseInfoDTO = importedApiDto.getAdvertiseInfo();
         JsonElement externalProductionEndpoint = (((JsonObject) thirdPartyEndpointConfigs).get(
-                "apiExternalProductionEndpoint"));
+                ImportExportConstants.API_EXTERNAL_PRODUCTION_ENDPOINTS_FIELD));
         JsonElement externalSandboxEndpoint = (((JsonObject) thirdPartyEndpointConfigs).get(
-                "apiExternalSandboxEndpoint"));
+                ImportExportConstants.API_EXTERNAL_SANDBOX_ENDPOINTS_FIELD));
         advertiseInfoDTO.setApiExternalProductionEndpoint(externalProductionEndpoint.getAsString());
         advertiseInfoDTO.setApiExternalSandboxEndpoint(externalSandboxEndpoint.getAsString());
         importedApiDto.setAdvertiseInfo(advertiseInfoDTO);

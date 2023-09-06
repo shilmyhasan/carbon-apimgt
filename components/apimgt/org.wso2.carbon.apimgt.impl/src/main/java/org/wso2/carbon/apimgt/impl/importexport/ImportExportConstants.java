@@ -224,7 +224,9 @@ public final class ImportExportConstants {
     public static final String POLICIES_FIELD = "policies";
     public static final String ROUTING_POLICY_FIELD = "endpointRoutingPolicy";
     public static final String ENDPOINTS_FIELD = "endpoints";
-    public static final String THIRD_PARTY_ENDPOINTS_FIELD = "thirdpartyapiendpoints";
+    public static final String THIRD_PARTY_ENDPOINTS_FIELD = "thirdPartyApiEndpoints";
+    public static final String API_EXTERNAL_PRODUCTION_ENDPOINTS_FIELD = "apiExternalProductionEndpoint";
+    public static final String API_EXTERNAL_SANDBOX_ENDPOINTS_FIELD = "apiExternalSandboxEndpoint";
     public static final String LOAD_BALANCE_ENDPOINTS_FIELD = "loadBalanceEndpoints";
     public static final String FAILOVER_ENDPOINTS_FIELD = "failoverEndpoints";
     public static final String DEPENDENT_APIS_FIELD = "dependentAPIs";
