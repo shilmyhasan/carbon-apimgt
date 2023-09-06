@@ -1178,9 +1178,12 @@ public class APIControllerUtil {
                 ImportExportConstants.API_EXTERNAL_PRODUCTION_ENDPOINTS_FIELD));
         JsonElement externalSandboxEndpoint = (((JsonObject) thirdPartyEndpointConfigs).get(
                 ImportExportConstants.API_EXTERNAL_SANDBOX_ENDPOINTS_FIELD));
-        advertiseInfoDTO.setApiExternalProductionEndpoint(externalProductionEndpoint.getAsString());
-        advertiseInfoDTO.setApiExternalSandboxEndpoint(externalSandboxEndpoint.getAsString());
+        if (externalProductionEndpoint != null && !externalProductionEndpoint.isJsonNull()) {
+            advertiseInfoDTO.setApiExternalProductionEndpoint(externalProductionEndpoint.getAsString());
+        }
+        if (externalSandboxEndpoint != null && !externalSandboxEndpoint.isJsonNull()) {
+            advertiseInfoDTO.setApiExternalSandboxEndpoint(externalSandboxEndpoint.getAsString());
+        }
         importedApiDto.setAdvertiseInfo(advertiseInfoDTO);
-
     }
 }
