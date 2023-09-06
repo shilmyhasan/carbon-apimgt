@@ -43,6 +43,7 @@ import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoAdditionalPropertiesDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoAdditionalPropertiesMapDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIProductDTO;
+import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.AdvertiseInfoDTO;
 
 import java.io.File;
 import java.io.IOException;
@@ -185,6 +186,13 @@ public class APIControllerUtil {
         if (additionalProperties != null && !additionalProperties.isJsonNull()) {
             handleAdditionalProperties(additionalProperties, importedApiDto, null);
         }
+
+        // Handle third party endpoint configs
+        JsonElement thirdPartyEndpointConfigs = envParams.get(ImportExportConstants.THIRD_PARTY_ENDPOINTS_FIELD);
+        if (thirdPartyEndpointConfigs != null && !thirdPartyEndpointConfigs.isJsonNull()) {
+            handleThirdPartyEndpoints(thirdPartyEndpointConfigs, importedApiDto);
+        }
+
         return importedApiDto;
     }
 
@@ -1155,5 +1163,27 @@ public class APIControllerUtil {
                 importedApiProductDto.setAdditionalPropertiesMap(additionalPropertiesMap);
             }
         }
+    }
+
+    /**
+     * This method will add the defined available Third Party API Endpoints to the particular imported API.
+     *
+     * @param importedApiDto            API DTO object to be updated
+     * @param thirdPartyEndpointConfigs Endpoints
+     */
+    private static void handleThirdPartyEndpoints(JsonElement thirdPartyEndpointConfigs, APIDTO importedApiDto) {
+
+        AdvertiseInfoDTO advertiseInfoDTO = importedApiDto.getAdvertiseInfo();
+        JsonElement externalProductionEndpoint = (((JsonObject) thirdPartyEndpointConfigs).get(
+                ImportExportConstants.API_EXTERNAL_PRODUCTION_ENDPOINTS_FIELD));
+        JsonElement externalSandboxEndpoint = (((JsonObject) thirdPartyEndpointConfigs).get(
+                ImportExportConstants.API_EXTERNAL_SANDBOX_ENDPOINTS_FIELD));
+        if (externalProductionEndpoint != null && !externalProductionEndpoint.isJsonNull()) {
+            advertiseInfoDTO.setApiExternalProductionEndpoint(externalProductionEndpoint.getAsString());
+        }
+        if (externalSandboxEndpoint != null && !externalSandboxEndpoint.isJsonNull()) {
+            advertiseInfoDTO.setApiExternalSandboxEndpoint(externalSandboxEndpoint.getAsString());
+        }
+        importedApiDto.setAdvertiseInfo(advertiseInfoDTO);
     }
 }
