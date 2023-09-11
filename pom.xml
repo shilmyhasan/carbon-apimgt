@@ -2174,7 +2174,7 @@
 
         <zipkin.version>2.20.1</zipkin.version>
         <okhttp.wso2.version>4.11.0.wso2v1</okhttp.wso2.version>
-        <okio.wso2.version>2.4.0.wso2v1</okio.wso2.version>
+        <okio.wso2.version>3.5.0.wso2v1</okio.wso2.version>
 
         <openfeign.version>11.0</openfeign.version>
         <maven.spotbugsplugin.version>3.1.10</maven.spotbugsplugin.version>
