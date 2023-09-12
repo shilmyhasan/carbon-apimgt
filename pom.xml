@@ -2078,7 +2078,7 @@
 
         <zipkin.version>2.24.3</zipkin.version>
         <okhttp.wso2.version>4.11.0.wso2v1</okhttp.wso2.version>
-        <okio.wso2.version>2.4.0.wso2v1</okio.wso2.version>
+        <okio.wso2.version>3.5.0.wso2v1</okio.wso2.version>
 
         <org.wso2.orbit.io.fabric8.kubernetes.version>4.6.4.wso2v1</org.wso2.orbit.io.fabric8.kubernetes.version>
         <org.wso2.orbit.org.apache.commons.compress.version>1.18.0.wso2v1</org.wso2.orbit.org.apache.commons.compress.version>
