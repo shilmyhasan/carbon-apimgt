@@ -1063,6 +1063,16 @@ public class GatewayUtils {
         }
     }
 
+    public static void setCustomTags(TracingSpan tracingSpan) {
+        Map<String, String> customTags = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().
+                getOpenTracerProperties();
+        if (customTags.size() > 0) {
+            for (Map.Entry<String, String> entry : customTags.entrySet()) {
+                Util.setTag(tracingSpan, entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
     private static void setTracingId(TracingSpan tracingSpan, MessageContext axis2MessageContext) {
 
         Map headersMap =

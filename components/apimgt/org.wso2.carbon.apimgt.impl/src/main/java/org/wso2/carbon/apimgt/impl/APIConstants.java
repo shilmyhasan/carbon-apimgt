@@ -2771,4 +2771,12 @@ public final class APIConstants {
 
     // Constants related to basic health check APIs
     public static final String WEB_SOCKET_HEALTH_CHECK_PATH = "/health";
+
+    public static class OpenTracerConstants {
+        public static final String OPEN_TRACER_CONFIG = "OpenTracer";
+        public static final String OPEN_TRACER_CUSTOM_TAGS_CONFIG = "CustomTags";
+        public static final String OPEN_TRACER_CUSTOM_TAG_CONFIG = "CustomTag";
+        public static final String OPEN_TRACER_CUSTOM_TAG_NAME_CONFIG = "Name";
+        public static final String OPEN_TRACER_CUSTOM_TAG_VALUE_CONFIG = "Value";
+    }
 }

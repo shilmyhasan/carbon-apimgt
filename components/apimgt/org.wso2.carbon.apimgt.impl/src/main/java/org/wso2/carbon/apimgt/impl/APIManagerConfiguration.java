@@ -120,6 +120,7 @@ public class APIManagerConfiguration {
     private static String certificateBoundAccessEnabled;
     private GatewayCleanupSkipList gatewayCleanupSkipList = new GatewayCleanupSkipList();
     private RedisConfig redisConfig = new RedisConfig();
+    private Map<String, String> openTracerCustomTags = new HashMap<String, String>();
     public Map<String, ExtensionListener> getExtensionListenerMap() {
 
         return extensionListenerMap;
@@ -610,6 +611,8 @@ public class APIManagerConfiguration {
                 setExtensionListenerConfigurations(element);
             } else if (APIConstants.SWAGGER_VALIDATION.equals(localName)) {
                 setSwaggerValidationProperties(element);
+            } else if (APIConstants.OpenTracerConstants.OPEN_TRACER_CONFIG.equals(localName)) {
+                setOpenTracerCustomTags(element);
             }
             readChildElements(element, nameStack);
             nameStack.pop();
@@ -2001,5 +2004,33 @@ public class APIManagerConfiguration {
                 }
             }
         }
+    }
+
+    /**
+     * Set Open Tracer Custom Tags.
+     *
+     * @param omElement XML Config
+     */
+    public void setOpenTracerCustomTags(OMElement omElement) {
+        OMElement customProperties = omElement.getFirstChildWithName(new QName(
+                APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAGS_CONFIG));
+        if (customProperties != null) {
+            Iterator iterator = customProperties.getChildrenWithLocalName(
+                    APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAG_CONFIG);
+            while (iterator.hasNext()) {
+                OMElement property = (OMElement) iterator.next();
+                String name = property.getFirstChildWithName(new QName(
+                        APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAG_NAME_CONFIG)).getText();
+                String value = property.getFirstChildWithName(new QName(
+                        APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAG_VALUE_CONFIG)).getText();
+                if (name != null && value != null)  {
+                    openTracerCustomTags.put(name, value);
+                }
+            }
+        }
+    }
+
+    public Map<String, String> getOpenTracerProperties() {
+        return openTracerCustomTags;
     }
 }
