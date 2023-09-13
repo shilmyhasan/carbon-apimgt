@@ -54,7 +54,7 @@
         "material-design-icons": "^3.0.1",
         "material-ui-chip-input": "^1.0.0",
         "mui-datatables": "^2.8.1",
-        "openapi-to-postmanv2": "^4.16.0",
+        "openapi-to-postmanv2": "^2.12.0",
         "prop-types": "^15.6.0",
         "qs": "^6.11.1",
         "query-string": "^6.8.2",
