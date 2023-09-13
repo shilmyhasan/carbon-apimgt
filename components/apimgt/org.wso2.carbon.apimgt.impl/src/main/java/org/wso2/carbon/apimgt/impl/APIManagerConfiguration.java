@@ -2030,7 +2030,7 @@ public class APIManagerConfiguration {
         }
     }
 
-    public Map<String, String> getOpenTracerProperties() {
+    public Map<String, String> getOpenTracerCustomTags() {
         return openTracerCustomTags;
     }
 }
