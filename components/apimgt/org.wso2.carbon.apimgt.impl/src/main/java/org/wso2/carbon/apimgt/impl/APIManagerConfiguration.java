@@ -124,6 +124,7 @@ public class APIManagerConfiguration {
     private GatewayCleanupSkipList gatewayCleanupSkipList = new GatewayCleanupSkipList();
     private RedisConfig redisConfig = new RedisConfig();
     private Map<String, List<String>> restApiJWTAuthAudiences = new HashMap<>();
+    private Map<String, String> openTracerCustomTags = new HashMap<String, String>();
 
     public Map<String, List<String>> getRestApiJWTAuthAudiences() {
         return restApiJWTAuthAudiences;
@@ -611,6 +612,8 @@ public class APIManagerConfiguration {
                     jsonObject.put(APIConstants.CustomPropertyAttributes.REQUIRED, isRequired);
                     customProperties.add(jsonObject);
                 }
+            }  else if (APIConstants.OpenTracerConstants.OPEN_TRACER_CONFIG.equals(localName)) {
+                setOpenTracerCustomTags(element);
             }
             readChildElements(element, nameStack);
             nameStack.pop();
@@ -2257,6 +2260,34 @@ public class APIManagerConfiguration {
             audienceForPath.add(jwtAudienceElement.getFirstChildWithName(new QName(APIConstants.AUDIENCE)).getText());
             restApiJWTAuthAudiences.put(basePath, audienceForPath);
         }
+    }
+
+    /**
+     * Set Open Tracer Custom Tags.
+     *
+     * @param omElement XML Config
+     */
+    public void setOpenTracerCustomTags(OMElement omElement) {
+        OMElement customProperties = omElement.getFirstChildWithName(new QName(
+                APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAGS_CONFIG));
+        if (customProperties != null) {
+            Iterator iterator = customProperties.getChildrenWithLocalName(
+                    APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAG_CONFIG);
+            while (iterator.hasNext()) {
+                OMElement property = (OMElement) iterator.next();
+                String name = property.getFirstChildWithName(new QName(
+                        APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAG_NAME_CONFIG)).getText();
+                String value = property.getFirstChildWithName(new QName(
+                        APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAG_VALUE_CONFIG)).getText();
+                if (name != null && value != null)  {
+                    openTracerCustomTags.put(name, value);
+                }
+            }
+        }
+    }
+
+    public Map<String, String> getOpenTracerCustomTags() {
+        return openTracerCustomTags;
     }
 
     public Map<String, Environment> getGatewayEnvironments() {
