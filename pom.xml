@@ -1847,7 +1847,7 @@
         <org.wso2.orbit.com.amazonaws.version>1.11.253.wso2v1</org.wso2.orbit.com.amazonaws.version>
         <zipkin.version>2.24.3</zipkin.version>
         <okhttp.wso2.version>4.11.0.wso2v1</okhttp.wso2.version>
-        <okio.wso2.version>2.4.0.wso2v1</okio.wso2.version>
+        <okio.wso2.version>3.5.0.wso2v1</okio.wso2.version>
     <project.scm.id>wso2-scm-server</project.scm.id></properties>
 <scm><url>https://github.com/wso2-support/carbon-apimgt</url><developerConnection>scm:git:https://github.com/wso2-support/carbon-apimgt</developerConnection><connection>scm:git:https://github.com/wso2-support/carbon-apimgt</connection>  <tag>HEAD</tag>
   </scm></project>
