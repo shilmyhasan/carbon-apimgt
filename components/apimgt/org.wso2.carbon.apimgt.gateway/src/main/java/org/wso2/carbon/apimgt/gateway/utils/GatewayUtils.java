@@ -1115,6 +1115,14 @@ public class GatewayUtils {
         }
     }
 
+    public static void setCustomTags(TracingSpan tracingSpan) {
+        Map<String, String> customTags = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().
+                getOpenTracerCustomTags();
+        for (Map.Entry<String, String> entry : customTags.entrySet()) {
+            Util.setTag(tracingSpan, entry.getKey(), entry.getValue());
+        }
+    }
+
     public static void setAPIResource(TracingSpan tracingSpan, org.apache.synapse.MessageContext messageContext) {
         Object electedResource = messageContext.getProperty(APIMgtGatewayConstants.API_ELECTED_RESOURCE);
         org.apache.axis2.context.MessageContext axis2MessageContext =

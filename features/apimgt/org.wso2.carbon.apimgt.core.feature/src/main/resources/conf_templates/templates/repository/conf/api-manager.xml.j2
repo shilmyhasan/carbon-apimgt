@@ -1085,6 +1085,16 @@
         <LogTracer>
             <Enabled>{{apim.open_tracer.log_tracer.enable}}</Enabled>
         </LogTracer>
+        {% if apim.open_tracer.custom_tag is defined %}
+        <CustomTags>
+           {% for tag in apim.open_tracer.custom_tag %}
+           <CustomTag>
+               <Name>{{tag.name}}</Name>
+               <Value>{{tag.value}}</Value>
+           </CustomTag>
+           {% endfor %}
+        </CustomTags>
+        {% endif %}
     </OpenTracer>
 
     {% if security_audit is defined %}
