@@ -63,7 +63,8 @@ class SubscriptionPoliciesManage extends Component {
         const { api } = this.props;
         const isAsyncAPI = (api.type === 'WS' || api.type === 'WEBSUB' || api.type === 'SSE');
         const limit = Configurations.app.subscriptionPolicyLimit;
-        const policyPromise = isAsyncAPI ? API.asyncAPIPolicies() : API.policies('subscription', limit);
+        const policyPromise = isAsyncAPI ? API.asyncAPIPolicies() :
+            (limit ? API.policies('subscription', limit) : API.policies('subscription'));
         policyPromise
             .then((res) => {
                 this.setState({ subscriptionPolicies: res.body.list });
