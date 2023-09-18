@@ -29,6 +29,7 @@ const AppConfig = {
         },
         mediationPolicyCount: 50,
         throttlingPolicyLimit: 80, // Used in the limit of /api/am/publisher/v1/throttling-policies/api?limit=80
+        subscriptionPolicyLimit: 80, // Used in the limit of /api/am/publisher/v1/subscription-policies?limit=80
         propertyDisplaySuffix: '__display',
         loadDefaultLocales: true, // If false, Default en.json file will not be used/loaded in app.
         supportedDocTypes: 'application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document,'
