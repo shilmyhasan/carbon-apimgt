@@ -29,6 +29,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Paper from '@material-ui/core/Paper';
 import API from 'AppData/api';
 import { isRestricted } from 'AppData/AuthManager';
+import Configurations from 'Config';
 
 const styles = (theme) => ({
     subscriptionPoliciesPaper: {
@@ -61,7 +62,9 @@ class SubscriptionPoliciesManage extends Component {
     componentDidMount() {
         const { api } = this.props;
         const isAsyncAPI = (api.type === 'WS' || api.type === 'WEBSUB' || api.type === 'SSE');
-        const policyPromise = isAsyncAPI ? API.asyncAPIPolicies() : API.policies('subscription');
+        const limit = Configurations.app.subscriptionPolicyLimit;
+        const policyPromise = isAsyncAPI ? API.asyncAPIPolicies() :
+            (limit ? API.policies('subscription', limit) : API.policies('subscription'));
         policyPromise
             .then((res) => {
                 this.setState({ subscriptionPolicies: res.body.list });
