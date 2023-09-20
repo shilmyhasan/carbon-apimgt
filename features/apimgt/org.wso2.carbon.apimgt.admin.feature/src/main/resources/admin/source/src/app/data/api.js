@@ -869,9 +869,10 @@ class API extends Resource {
      * Get workflow pending request according to external workflow reference
      */
     workflowGet(externalWorkflowReference) {
+        var limit = Configurations.app.workflows.limit;
         return this.client.then((client) => {
             return client.apis['Workflows (Individual)'].get_workflows__externalWorkflowRef_(
-                { externalWorkflowReference: externalWorkflowReference },
+                { externalWorkflowReference: externalWorkflowReference, limit: limit },
                 this._requestMetaData(),
             );
         });
