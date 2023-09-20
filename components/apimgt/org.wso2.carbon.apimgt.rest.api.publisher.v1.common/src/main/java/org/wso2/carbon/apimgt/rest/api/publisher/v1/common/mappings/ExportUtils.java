@@ -447,7 +447,7 @@ public class ExportUtils {
                         } else if (Documentation.DocumentSourceType.INLINE.toString().equalsIgnoreCase(sourceType)
                                 || Documentation.DocumentSourceType.MARKDOWN.toString().equalsIgnoreCase(sourceType)) {
                             // Inline/Markdown content file name would be same as the documentation name
-                            localFileName = individualDocument.getName();
+                            localFileName = cleanFolderName(individualDocument.getName());
                             inputStream = new ByteArrayInputStream(documentationContent.getTextContent().getBytes());
                         }
                     }
