@@ -1270,9 +1270,7 @@ public class ImportUtils {
 
         File documentsFolder = new File(docDirectoryPath);
         File[] fileArray = documentsFolder.listFiles();
-        String provider = (apiTypeWrapper.isAPIProduct()) ? apiTypeWrapper.getApiProduct().getId().getProviderName() :
-                apiTypeWrapper.getApi().getId().getProviderName();
-        String tenantDomain = MultitenantUtils.getTenantDomain(provider);
+        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
 
         try {
             // Remove all documents associated with the API before update
