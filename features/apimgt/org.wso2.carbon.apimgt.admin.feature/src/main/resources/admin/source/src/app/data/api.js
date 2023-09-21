@@ -857,9 +857,10 @@ class API extends Resource {
      * Get list of workflow pending requests
      */
     workflowsGet(workflowType) {
+        var limit = Configurations.app.workflows.limit;
         return this.client.then((client) => {
             return client.apis['Workflow (Collection)'].get_workflows(
-                { workflowType: workflowType },
+                { workflowType: workflowType, limit: limit },
                 this._requestMetaData(),
             );
         });
