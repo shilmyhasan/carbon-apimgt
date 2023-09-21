@@ -13,6 +13,7 @@ import org.wso2.carbon.apimgt.api.APIAdmin;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.dto.KeyManagerConfigurationDTO;
 import org.wso2.carbon.apimgt.impl.APIAdminImpl;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.kmclient.ApacheFeignHttpClient;
 import org.wso2.carbon.apimgt.impl.kmclient.KMClientErrorDecoder;
 import org.wso2.carbon.apimgt.impl.kmclient.model.OpenIDConnectDiscoveryClient;
@@ -32,6 +33,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
 
 public class KeyManagersApiServiceImpl implements KeyManagersApiService {
 
@@ -65,10 +68,10 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
 
         String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
         APIAdmin apiAdmin = new APIAdminImpl();
-        List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
-                apiAdmin.getKeyManagerConfigurationsByTenant(tenantDomain);
+        List<KeyManagerConfigurationDTO> keyManagerConfigurations =
+                apiAdmin.getKeyManagerConfigurationsByTenant(tenantDomain, true);
         KeyManagerListDTO keyManagerListDTO =
-                KeyManagerMappingUtil.toKeyManagerListDTO(keyManagerConfigurationsByTenant);
+                KeyManagerMappingUtil.toKeyManagerListDTO(keyManagerConfigurations);
         return Response.ok().entity(keyManagerListDTO).build();
     }
 
@@ -104,8 +107,13 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO =
                     KeyManagerMappingUtil.toKeyManagerConfigurationDTO(tenantDomain, body);
             keyManagerConfigurationDTO.setUuid(keyManagerId);
-            KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO =
-                    apiAdmin.getKeyManagerConfigurationById(tenantDomain, keyManagerId);
+            KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO;
+            if (body.isGlobal() != null && body.isGlobal()) {
+                oldKeyManagerConfigurationDTO =
+                        apiAdmin.getKeyManagerConfigurationById(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN, keyManagerId);
+            } else {
+                oldKeyManagerConfigurationDTO = apiAdmin.getKeyManagerConfigurationById(tenantDomain, keyManagerId);
+            }
             if (oldKeyManagerConfigurationDTO == null) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_KEY_MANAGER, keyManagerId, log);
             } else {
@@ -122,6 +130,42 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
                             tenantDomain;
             RestApiUtil.handleInternalServerError(error, e, log);
         }
+        return null;
+    }
+
+    @Override
+    public Response keyManagersGlobalKeyManagerIdDelete(String keyManagerId, MessageContext messageContext)
+            throws APIManagementException {
+        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
+        if (!SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            String error = "Error while Deleting Key Manager configuration for " + keyManagerId + " in tenant " +
+                    tenantDomain;
+            RestApiUtil.handleInternalServerError(error, log);
+            return null;
+        }
+        APIAdmin apiAdmin = new APIAdminImpl();
+        apiAdmin.deleteKeyManagerConfigurationById(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN, keyManagerId);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response keyManagersGlobalKeyManagerIdGet(String keyManagerId, MessageContext messageContext)
+            throws APIManagementException {
+        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
+        if (!SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            String error = "Error while Retrieving Key Manager configuration for " + keyManagerId + " in tenant " +
+                    tenantDomain;
+            RestApiUtil.handleInternalServerError(error, log);
+            return null;
+        }
+        APIAdmin apiAdmin = new APIAdminImpl();
+        KeyManagerConfigurationDTO keyManagerConfigurationDTO =
+                apiAdmin.getKeyManagerConfigurationById(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN, keyManagerId);
+        if (keyManagerConfigurationDTO != null) {
+            KeyManagerDTO keyManagerDTO = KeyManagerMappingUtil.toKeyManagerDTO(keyManagerConfigurationDTO);
+            return Response.ok(keyManagerDTO).build();
+        }
+        RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_KEY_MANAGER, keyManagerId, log);
         return null;
     }
 

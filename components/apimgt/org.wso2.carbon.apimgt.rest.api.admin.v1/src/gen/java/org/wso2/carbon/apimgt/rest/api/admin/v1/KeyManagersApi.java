@@ -71,6 +71,41 @@ KeyManagersApiService delegate = new KeyManagersApiServiceImpl();
     }
 
     @DELETE
+    @Path("/global/{keyManagerId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete a global Key Manager", notes = "Delete a global Key Manager by keyManager id ", response = Void.class, authorizations = {
+        @Authorization(value = "OAuth2Security", scopes = {
+            @AuthorizationScope(scope = "apim:admin", description = "Manage all admin operations"),
+            @AuthorizationScope(scope = "apim:admin_operations", description = "Manage API categories and Key Managers related operations")
+        })
+    }, tags={ "Key Manager (Individual)",  })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK. Key Manager successfully deleted. ", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found. The specified resource does not exist.", response = ErrorDTO.class) })
+    public Response keyManagersGlobalKeyManagerIdDelete(@ApiParam(value = "Key Manager UUID ",required=true) @PathParam("keyManagerId") String keyManagerId) throws APIManagementException{
+        return delegate.keyManagersGlobalKeyManagerIdDelete(keyManagerId, securityContext);
+    }
+
+    @GET
+    @Path("/global/{keyManagerId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get the global Key Manager Configuration", notes = "Retrieve a single global Key Manager Configuration. We should provide the Id of the KeyManager as a path  parameter. ", response = KeyManagerDTO.class, authorizations = {
+        @Authorization(value = "OAuth2Security", scopes = {
+            @AuthorizationScope(scope = "apim:admin", description = "Manage all admin operations"),
+            @AuthorizationScope(scope = "apim:admin_operations", description = "Manage API categories and Key Managers related operations")
+        })
+    }, tags={ "Key Manager (Individual)",  })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK. KeyManager Configuration returned ", response = KeyManagerDTO.class),
+        @ApiResponse(code = 404, message = "Not Found. The specified resource does not exist.", response = ErrorDTO.class),
+        @ApiResponse(code = 406, message = "Not Acceptable. The requested media type is not supported.", response = ErrorDTO.class) })
+    public Response keyManagersGlobalKeyManagerIdGet(@ApiParam(value = "Key Manager UUID ",required=true) @PathParam("keyManagerId") String keyManagerId) throws APIManagementException{
+        return delegate.keyManagersGlobalKeyManagerIdGet(keyManagerId, securityContext);
+    }
+
+    @DELETE
     @Path("/{keyManagerId}")
     
     @Produces({ "application/json" })

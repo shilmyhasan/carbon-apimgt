@@ -2924,6 +2924,72 @@ paths:
           -H "Content-Type: application/json" -d @data.json "https://127.0.0.1:9443/api/am/admin/v2/key-managers"'
 
   ######################################################
+  # The "Global KeyManager" resource APIs
+  ######################################################
+  /key-managers/global/{keyManagerId}:
+    get:
+      tags:
+        - Key Manager (Individual)
+      summary: Get the global Key Manager Configuration
+      description: |
+        Retrieve a single global Key Manager Configuration. We should provide the Id of the KeyManager as a path 
+        parameter.
+      parameters:
+        - $ref: '#/components/parameters/keyManagerId'
+      responses:
+        200:
+          description: |
+            OK.
+            KeyManager Configuration returned
+          headers:
+            Content-Type:
+              description: |
+                The content type of the body.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyManager'
+        404:
+          $ref: '#/components/responses/NotFound'
+        406:
+          $ref: '#/components/responses/NotAcceptable'
+      security:
+        - OAuth2Security:
+            - apim:admin
+            - apim:admin_operations
+      x-code-samples:
+        - lang: Shell
+          source: 'curl -k -H "Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8"
+          "https://127.0.0.1:9443/api/am/admin/v2/key-managers/global/8d263942-a6df-4cc2-a804-7a2525501450"'
+
+    delete:
+      tags:
+        - Key Manager (Individual)
+      summary: Delete a global Key Manager
+      description: |
+        Delete a global Key Manager by keyManager id
+      parameters:
+        - $ref: '#/components/parameters/keyManagerId'
+      responses:
+        200:
+          description: |
+            OK.
+            Key Manager successfully deleted.
+          content: { }
+        404:
+          $ref: '#/components/responses/NotFound'
+      security:
+        - OAuth2Security:
+            - apim:admin
+            - apim:admin_operations
+      x-code-samples:
+        - lang: Shell
+          source: 'curl -k -X DELETE -H "Authorization: Bearer ae4eae22-3f65-387b-a171-d37eaa366fa8"
+          "https://127.0.0.1:9443/api/am/admin/v2/key-managers/global/8d263942-a6df-4cc2-a804-7a2525501450"'
+
+  ######################################################
   # The "Individual KeyManager" resource APIs
   ######################################################
   /key-managers/{keyManagerId}:
@@ -4216,6 +4282,9 @@ components:
         enabled:
           type: boolean
           example: true
+        global:
+          type: boolean
+          example: true
         additionalProperties:
           type: object
           properties: {}
@@ -4243,6 +4312,9 @@ components:
           type: string
           example: This is a key manager for Developers
         enabled:
+          type: boolean
+          example: true
+        isGlobal:
           type: boolean
           example: true
     KeyManagerConfiguration:

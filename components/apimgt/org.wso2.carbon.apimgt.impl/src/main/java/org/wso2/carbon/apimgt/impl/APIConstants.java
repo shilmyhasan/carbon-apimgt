@@ -2811,4 +2811,6 @@ public final class APIConstants {
         public static final String CERTIFICATE_VALUE = CERTIFICATES + "Value";
         public static final String GLOBAL_KEY_MANAGER_TENANT_DOMAIN = "WSO2/System";
     }
+    
+    public static final String WSO2_SYSTEM_TENANT_DOMAIN = "WSO2/System";
 }

@@ -812,12 +812,24 @@ class API extends Resource {
             );
         });
     }
-        /**
-     * Get details of an Application Throttling Policy
-     */
+
     keyManagerGet(keyManagerId) {
         return this.client.then((client) => {
             return client.apis['Key Manager (Individual)'].get_key_managers__keyManagerId_(
+                { keyManagerId: keyManagerId },
+                this._requestMetaData(),
+            );
+        });
+    }
+
+    /**
+     * Get global keymanager
+     * @param keyManagerId keymanager id
+     * @returns {*}
+     */
+    globalKeyManagerGet(keyManagerId) {
+        return this.client.then((client) => {
+            return client.apis['Key Manager (Individual)'].get_key_managers_global__keyManagerId_(
                 { keyManagerId: keyManagerId },
                 this._requestMetaData(),
             );
@@ -867,6 +879,21 @@ class API extends Resource {
             );
         });
     }
+
+    /**
+     * Delete a Global Key Manager
+     * @param keyManagerId {string} UUID of the key manager
+     * @returns {*}
+     */
+    deleteGlobalKeyManager(keyManagerId) {
+        return this.client.then((client) => {
+            return client.apis['Key Manager (Individual)'].delete_key_managers_global__keyManagerId_(
+                {keyManagerId:keyManagerId},
+                this._requestMetaData(),
+            );
+        });
+    }
+
 
     /**
      * Get list of workflow pending requests

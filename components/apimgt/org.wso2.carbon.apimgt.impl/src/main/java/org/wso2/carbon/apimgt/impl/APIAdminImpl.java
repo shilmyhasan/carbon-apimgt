@@ -314,10 +314,8 @@ public class APIAdminImpl implements APIAdmin {
         return time;
     }
 
-    @Override
-    public List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(String tenantDomain)
-            throws APIManagementException {
-
+    public List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(
+            String tenantDomain, boolean addGlobalKeyManager) throws APIManagementException {
         KeyMgtRegistrationService.registerDefaultKeyManager(tenantDomain);
         List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
                 apiMgtDAO.getKeyManagerConfigurationsByTenant(tenantDomain);
@@ -335,10 +333,25 @@ public class APIAdminImpl implements APIAdmin {
             APIUtil.getAndSetDefaultKeyManagerConfiguration(defaultKeyManagerConfiguration);
             keyManagerConfigurationsByTenant.add(defaultKeyManagerConfiguration);
         }
+
+        if (addGlobalKeyManager) {
+            List<KeyManagerConfigurationDTO> globalKeyManagerConfigurations =
+                    apiMgtDAO.getKeyManagerConfigurationsByTenant(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN);
+            if (globalKeyManagerConfigurations != null && !globalKeyManagerConfigurations.isEmpty()) {
+                keyManagerConfigurationsByTenant.add(globalKeyManagerConfigurations.get(0));
+            }
+        }
+
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByTenant) {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
         }
         return keyManagerConfigurationsByTenant;
+    }
+
+    @Override
+    public List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(String tenantDomain)
+            throws APIManagementException {
+        return getKeyManagerConfigurationsByTenant(tenantDomain, false);
     }
 
     @Override

@@ -47,7 +47,7 @@ import KeyValidations from 'AppComponents/KeyManagers/KeyValidations';
 import PropTypes from 'prop-types';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import cloneDeep from 'lodash.clonedeep';
@@ -126,6 +126,7 @@ const useStyles = makeStyles((theme) => ({
 
 const residentKeyManagerName = 'Resident Key Manager';
 
+
 /**
  * Reducer
  * @param {JSON} state The second number.
@@ -182,6 +183,8 @@ function AddEditKeyManager(props) {
     const [isResidentKeyManager, setIsResidentKeyManager] = useState(false);
     const { match: { params: { id } }, history } = props;
     const { settings } = useAppContext();
+    const location = useLocation();
+    const { isGlobal } = (location && location.state) || false;
 
     const defaultKMType = (settings.keyManagerConfiguration
         && settings.keyManagerConfiguration.length > 0)
@@ -214,6 +217,7 @@ function AddEditKeyManager(props) {
             },
         ],
         enabled: true,
+        global: isGlobal,
         scopesClaim: '',
         consumerKeyClaim: '',
         additionalProperties: { },
@@ -260,7 +264,8 @@ function AddEditKeyManager(props) {
     };
     useEffect(() => {
         if (id) {
-            restApi.keyManagerGet(id).then((result) => {
+            const api = isGlobal ? restApi.globalKeyManagerGet(id) : restApi.keyManagerGet(id);
+            api.then((result) => {
                 let editState;
                 if (result.body.name !== null) {
                     const newTokenValidation = (result.body.tokenValidation.length === 0)
@@ -490,19 +495,29 @@ function AddEditKeyManager(props) {
         setExpanded(!expanded);
     };
 
+    let pageTitle;
+    if (isGlobal) {
+        pageTitle = id ? `${intl.formatMessage({
+            id: 'KeyManagers.AddEditKeyManager.title.editGlobal',
+            defaultMessage: 'Global Key Manager - Edit ',
+        })} ${name}` : intl.formatMessage({
+            id: 'KeyManagers.AddEditKeyManager.title.newGlobal',
+            defaultMessage: 'Global Key Manager - Create new',
+        });
+    } else {
+        pageTitle = id ? `${intl.formatMessage({
+            id: 'KeyManagers.AddEditKeyManager.title.edit',
+            defaultMessage: 'Key Manager - Edit ',
+        })} ${name}` : intl.formatMessage({
+            id: 'KeyManagers.AddEditKeyManager.title.new',
+            defaultMessage: 'Key Manager - Create new',
+        });
+    }
 
     return (
         <ContentBase
             pageStyle='half'
-            title={
-                id ? `${intl.formatMessage({
-                    id: 'KeyManagers.AddEditKeyManager.title.edit',
-                    defaultMessage: 'Key Manager - Edit ',
-                })} ${name}` : intl.formatMessage({
-                    id: 'KeyManagers.AddEditKeyManager.title.new',
-                    defaultMessage: 'Key Manager - Create new',
-                })
-            }
+            title={pageTitle}
             help={<div />}
         >
             {importingConfig && (
