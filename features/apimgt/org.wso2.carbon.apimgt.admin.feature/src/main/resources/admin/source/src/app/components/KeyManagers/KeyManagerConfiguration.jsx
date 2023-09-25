@@ -59,6 +59,9 @@ export default function KeyManagerConfiguration(props) {
         }
         setAdditionalProperties(name, finalValue);
     };
+    const onChangeCheckBox = (e) => {
+        setAdditionalProperties(e.target.name, e.target.checked);
+    };
     const getComponent = (keymanagerConnectorConfiguration) => {
         let value = '';
         if (additionalProperties[keymanagerConnectorConfiguration.name]) {
@@ -149,6 +152,28 @@ export default function KeyManagerConfiguration(props) {
                     <FormHelperText>
                         {hasErrors('keyconfig', value, true) || keymanagerConnectorConfiguration.tooltip}
                     </FormHelperText>
+                </FormControl>
+            );
+        } else if (keymanagerConnectorConfiguration.type === 'checkbox') {
+            return (
+                <FormControl component='fieldset'>
+                    <FormLabel component='legend'>{keymanagerConnectorConfiguration.label}</FormLabel>
+                    <FormGroup>
+                        {keymanagerConnectorConfiguration.values.map((selection) => (
+                            <FormControlLabel
+                                control={(
+                                    <Checkbox
+                                        checked={value === '' ? false : value}
+                                        onChange={onChangeCheckBox}
+                                        value={selection}
+                                        color='primary'
+                                        name={keymanagerConnectorConfiguration.name}
+                                    />
+                                )}
+                                label={selection}
+                            />
+                        ))}
+                    </FormGroup>
                 </FormControl>
             );
         } else if (keymanagerConnectorConfiguration.type === 'options') {

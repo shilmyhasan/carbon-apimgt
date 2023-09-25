@@ -334,14 +334,6 @@ public class APIAdminImpl implements APIAdmin {
             keyManagerConfigurationsByTenant.add(defaultKeyManagerConfiguration);
         }
 
-        if (addGlobalKeyManager) {
-            List<KeyManagerConfigurationDTO> globalKeyManagerConfigurations =
-                    apiMgtDAO.getKeyManagerConfigurationsByTenant(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN);
-            if (globalKeyManagerConfigurations != null && !globalKeyManagerConfigurations.isEmpty()) {
-                keyManagerConfigurationsByTenant.add(globalKeyManagerConfigurations.get(0));
-            }
-        }
-
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByTenant) {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
         }

@@ -28,14 +28,10 @@ import java.util.Map;
 public class KeyManagerMappingUtil {
 
     public static KeyManagerListDTO toKeyManagerListDTO(List<KeyManagerConfigurationDTO> keyManagerDTOList) {
-
-        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
         KeyManagerListDTO keyManagerListDTO = new KeyManagerListDTO();
         List<KeyManagerInfoDTO> keyManagerDTOS = new ArrayList<>();
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerDTOList) {
-            if (tenantDomain.equals(keyManagerConfigurationDTO.getTenantDomain())) {
                 keyManagerDTOS.add(toKeyManagerInfoDTO(keyManagerConfigurationDTO));
-            }
         }
         keyManagerListDTO.setList(keyManagerDTOS);
         keyManagerListDTO.setCount(keyManagerDTOS.size());

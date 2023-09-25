@@ -449,7 +449,7 @@ export default function ListKeyManagers() {
                                 state: { isGlobal: true },
                             }}
                         >
-                            <Button variant='contained' color='primary' size='small'>
+                            <Button variant='contained' color='primary' size='small' disabled={!isSuperAdmin}>
                                 <FormattedMessage
                                     id='KeyManagers.ListKeyManagers.addGlobalKeyManager'
                                     defaultMessage='Add Global Key Manager'

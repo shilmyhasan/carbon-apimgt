@@ -182,9 +182,10 @@ function AddEditKeyManager(props) {
     const [importingConfig, setImportingConfig] = useState(false);
     const [isResidentKeyManager, setIsResidentKeyManager] = useState(false);
     const { match: { params: { id } }, history } = props;
-    const { settings } = useAppContext();
+    const { settings, isSuperTenant, user: { _scopes } } = useAppContext();
     const location = useLocation();
     const { isGlobal } = (location && location.state) || false;
+    const isSuperAdmin = isSuperTenant && _scopes.includes('apim:admin_settings');
 
     const defaultKMType = (settings.keyManagerConfiguration
         && settings.keyManagerConfiguration.length > 0)
@@ -1386,7 +1387,8 @@ function AddEditKeyManager(props) {
                     </Grid>
                     <Grid item xs={12}>
                         <Box component='span' m={1}>
-                            <Button variant='contained' color='primary' onClick={formSaveCallback}>
+                            <Button variant='contained' color='primary' onClick={formSaveCallback}
+                                    disabled={isGlobal && !isSuperAdmin}>
                                 {saving ? (<CircularProgress size={16} />) : (
                                     <>
                                         {id ? (

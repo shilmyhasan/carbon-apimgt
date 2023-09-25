@@ -102,13 +102,19 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
     public Response keyManagersKeyManagerIdPut(String keyManagerId, KeyManagerDTO body, MessageContext messageContext) {
 
         String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
+        boolean isGlobal = body.isGlobal() != null && body.isGlobal();
+        if (isGlobal && !SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            String error = "Error while creating Global Key Manager via tenant " + tenantDomain;
+            RestApiUtil.handleInternalServerError(error, log);
+            return null;
+        }
         APIAdmin apiAdmin = new APIAdminImpl();
         try {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO =
                     KeyManagerMappingUtil.toKeyManagerConfigurationDTO(tenantDomain, body);
             keyManagerConfigurationDTO.setUuid(keyManagerId);
             KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO;
-            if (body.isGlobal() != null && body.isGlobal()) {
+            if (isGlobal) {
                 oldKeyManagerConfigurationDTO =
                         apiAdmin.getKeyManagerConfigurationById(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN, keyManagerId);
             } else {
@@ -151,13 +157,6 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
     @Override
     public Response keyManagersGlobalKeyManagerIdGet(String keyManagerId, MessageContext messageContext)
             throws APIManagementException {
-        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
-        if (!SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-            String error = "Error while Retrieving Key Manager configuration for " + keyManagerId + " in tenant " +
-                    tenantDomain;
-            RestApiUtil.handleInternalServerError(error, log);
-            return null;
-        }
         APIAdmin apiAdmin = new APIAdminImpl();
         KeyManagerConfigurationDTO keyManagerConfigurationDTO =
                 apiAdmin.getKeyManagerConfigurationById(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN, keyManagerId);
