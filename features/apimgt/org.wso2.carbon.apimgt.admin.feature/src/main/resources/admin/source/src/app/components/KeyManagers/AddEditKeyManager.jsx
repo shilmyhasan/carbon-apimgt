@@ -218,7 +218,6 @@ function AddEditKeyManager(props) {
             },
         ],
         enabled: true,
-        global: isGlobal,
         scopesClaim: '',
         consumerKeyClaim: '',
         additionalProperties: { },
@@ -395,7 +394,7 @@ function AddEditKeyManager(props) {
 
 
         const keymanager = {
-            ...state, tokenValidation: newTokenValidation,
+            ...state, tokenValidation: newTokenValidation, global: isGlobal
         };
 
         if (id) {
