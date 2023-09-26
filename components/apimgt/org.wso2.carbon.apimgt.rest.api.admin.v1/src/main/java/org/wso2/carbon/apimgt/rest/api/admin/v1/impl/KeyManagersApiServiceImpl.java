@@ -115,8 +115,8 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
             keyManagerConfigurationDTO.setUuid(keyManagerId);
             KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO;
             if (isGlobal) {
-                oldKeyManagerConfigurationDTO =
-                        apiAdmin.getKeyManagerConfigurationById(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN, keyManagerId);
+                oldKeyManagerConfigurationDTO = apiAdmin.getKeyManagerConfigurationById(
+                        APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerId);
             } else {
                 oldKeyManagerConfigurationDTO = apiAdmin.getKeyManagerConfigurationById(tenantDomain, keyManagerId);
             }
@@ -150,7 +150,8 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
             return null;
         }
         APIAdmin apiAdmin = new APIAdminImpl();
-        apiAdmin.deleteKeyManagerConfigurationById(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN, keyManagerId);
+        apiAdmin.deleteKeyManagerConfigurationById(
+                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerId);
         return Response.ok().build();
     }
 
@@ -158,8 +159,8 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
     public Response keyManagersGlobalKeyManagerIdGet(String keyManagerId, MessageContext messageContext)
             throws APIManagementException {
         APIAdmin apiAdmin = new APIAdminImpl();
-        KeyManagerConfigurationDTO keyManagerConfigurationDTO =
-                apiAdmin.getKeyManagerConfigurationById(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN, keyManagerId);
+        KeyManagerConfigurationDTO keyManagerConfigurationDTO = apiAdmin.getKeyManagerConfigurationById(
+                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerId);
         if (keyManagerConfigurationDTO != null) {
             KeyManagerDTO keyManagerDTO = KeyManagerMappingUtil.toKeyManagerDTO(keyManagerConfigurationDTO);
             return Response.ok(keyManagerDTO).build();

@@ -47,7 +47,7 @@ public class KeyManagerMappingUtil {
         keyManagerInfoDTO.setType(keyManagerConfigurationDTO.getType());
         keyManagerInfoDTO.setEnabled(keyManagerConfigurationDTO.isEnabled());
         keyManagerInfoDTO.setIsGlobal(keyManagerConfigurationDTO.getTenantDomain().equals(
-                APIConstants.WSO2_SYSTEM_TENANT_DOMAIN));
+                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN));
         return keyManagerInfoDTO;
     }
 
@@ -62,7 +62,7 @@ public class KeyManagerMappingUtil {
         keyManagerDTO.setType(keyManagerConfigurationDTO.getType());
         keyManagerDTO.setEnabled(keyManagerConfigurationDTO.isEnabled());
         keyManagerDTO.setGlobal(keyManagerConfigurationDTO.getTenantDomain().equals(
-                APIConstants.WSO2_SYSTEM_TENANT_DOMAIN));
+                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN));
         JsonObject jsonObject = fromConfigurationMapToJson(keyManagerConfigurationDTO.getAdditionalProperties());
         JsonElement clientRegistrationElement = jsonObject.get(APIConstants.KeyManager.CLIENT_REGISTRATION_ENDPOINT);
         if (clientRegistrationElement != null) {
@@ -204,7 +204,7 @@ public class KeyManagerMappingUtil {
         keyManagerConfigurationDTO.setEnabled(keyManagerDTO.isEnabled());
         keyManagerConfigurationDTO.setType(keyManagerDTO.getType());
         if (keyManagerDTO.isGlobal() != null && keyManagerDTO.isGlobal()) {
-            keyManagerConfigurationDTO.setTenantDomain(APIConstants.WSO2_SYSTEM_TENANT_DOMAIN);
+            keyManagerConfigurationDTO.setTenantDomain(APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
         } else {
             keyManagerConfigurationDTO.setTenantDomain(tenantDomain);
         }
