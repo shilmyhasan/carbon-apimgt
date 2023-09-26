@@ -1387,8 +1387,12 @@ function AddEditKeyManager(props) {
                     </Grid>
                     <Grid item xs={12}>
                         <Box component='span' m={1}>
-                            <Button variant='contained' color='primary' onClick={formSaveCallback}
-                                    disabled={isGlobal && !isSuperAdmin}>
+                            <Button
+                                variant='contained'
+                                color='primary'
+                                onClick={formSaveCallback}
+                                disabled={isGlobal && !isSuperAdmin}
+                            >
                                 {saving ? (<CircularProgress size={16} />) : (
                                     <>
                                         {id ? (
