@@ -8,7 +8,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Icon from '@material-ui/core/Icon';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import Settings, { app } from 'Settings';
+import { app } from 'Settings';
 import Loading from 'AppComponents/Base/Loading/Loading';
 import API from 'AppData/api';
 import ResourceNotFound from 'AppComponents/Base/Errors/ResourceNotFound';
@@ -212,7 +212,7 @@ function Overview(props) {
                                 {application.owner.toUpperCase()}
                             </TableCell>
                         </TableRow>
-                        {(Settings.displayTokenType && tokenTypeValue)
+                        {tokenTypeValue
                             && (
                                 <TableRow className='app-owner-row'>
                                     <TableCell component='th' scope='row' className={classes.leftCol}>
