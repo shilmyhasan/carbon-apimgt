@@ -285,6 +285,7 @@
   "Applications.Details.Invoice.pending.invoice.data": "Pending invoice data not found for this subscription.",
   "Applications.Details.Invoice.view.btn": "View Invoice",
   "Applications.Details.Overview.application.owner": "Application Owner",
+  "Applications.Details.Overview.application.token.type": "Token Type",
   "Applications.Details.Overview.description": "Description",
   "Applications.Details.Overview.workflow.status": "Workflow Status",
   "Applications.Details.SubscriptionTableData.cancel": "Cancel",

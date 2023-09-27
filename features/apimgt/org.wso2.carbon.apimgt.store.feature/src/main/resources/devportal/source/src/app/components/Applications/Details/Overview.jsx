@@ -8,7 +8,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import Icon from '@material-ui/core/Icon';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { app } from 'Settings';
+import Settings, { app } from 'Settings';
 import Loading from 'AppComponents/Base/Loading/Loading';
 import API from 'AppData/api';
 import ResourceNotFound from 'AppComponents/Base/Errors/ResourceNotFound';
@@ -109,12 +109,23 @@ function Overview(props) {
                     setNotFound(false);
                 }
             });
-    }, []);
+    }, [applicationId]);
     if (notFound) {
         return <ResourceNotFound />;
     }
     if (!application) {
         return <Loading />;
+    }
+
+    const applicationtokenType = application.tokenType;
+
+    let tokenTypeValue;
+    if (applicationtokenType.trim().length !== 0) {
+        if (applicationtokenType.toUpperCase() === 'JWT') {
+            tokenTypeValue = 'Self-contained (JWT)';
+        } else if (applicationtokenType.toUpperCase() === 'DEFAULT' || applicationtokenType.toUpperCase() === 'OAUTH') {
+            tokenTypeValue = 'Reference (Opaque)';
+        }
     }
     return (
         <>
@@ -201,6 +212,27 @@ function Overview(props) {
                                 {application.owner.toUpperCase()}
                             </TableCell>
                         </TableRow>
+                        {(Settings.displayTokenType && tokenTypeValue)
+                            && (
+                                <TableRow className='app-owner-row'>
+                                    <TableCell component='th' scope='row' className={classes.leftCol}>
+                                        <div className={classes.iconAligner}>
+                                            <Icon className={classes.iconEven}>vpn_key</Icon>
+                                            <span className={classes.iconTextWrapper}>
+                                                <Typography variant='caption' gutterBottom align='left'>
+                                                    <FormattedMessage
+                                                        id='Applications.Details.Overview.application.token.type'
+                                                        defaultMessage='Token Type'
+                                                    />
+                                                </Typography>
+                                            </span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        {tokenTypeValue}
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         {application.attributes
                             && (
                                 Object.keys(application.attributes).map((attr, index) => {
