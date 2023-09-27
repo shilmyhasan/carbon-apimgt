@@ -85,8 +85,6 @@ function Overview(props) {
     const [tierDescription, setTierDescription] = useState(null);
     const [notFound, setNotFound] = useState(false);
     const { match: { params: { applicationId } } } = props;
-
-
     useEffect(() => {
         const client = new API();
         // Get application
