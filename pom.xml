@@ -1457,9 +1457,9 @@
                 <version>${jaeger.client.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.zipkin.reporter2</groupId>
+                <groupId>org.wso2.orbit.io.zipkin.reporter2</groupId>
                 <artifactId>zipkin-sender-okhttp3</artifactId>
-                <version>${zipkin.sender.okhttp3.version}</version>
+                <version>${zipkin.sender.okhttp3.orbit.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -1775,7 +1775,7 @@
         <jaeger.core.version>0.30.0</jaeger.core.version>
         <jaeger.thrift.version>0.30.4</jaeger.thrift.version>
         <jaeger.client.version>0.30.4</jaeger.client.version>
-        <zipkin.sender.okhttp3.version>2.8.2</zipkin.sender.okhttp3.version>
+        <zipkin.sender.okhttp3.orbit.version>2.16.4.wso2v2</zipkin.sender.okhttp3.orbit.version>
         <brave.opentracing.version>0.32.0</brave.opentracing.version>
         <opentracing.api.version>0.31.0</opentracing.api.version>
         <span.reporter.version>0.1.0</span.reporter.version>
