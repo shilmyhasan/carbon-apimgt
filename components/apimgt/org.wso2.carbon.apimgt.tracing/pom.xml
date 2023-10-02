@@ -154,7 +154,8 @@
                             okhttp3.*,
                             com.google.common.*,
                             org.apache.log4j.*,
-                            com.fasterxml.jackson.core.*
+                            com.fasterxml.jackson.core.*,
+                            kotlin.*
                         </Private-Package>
                         <Import-Package>
                             org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
