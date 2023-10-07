@@ -216,6 +216,32 @@ public class SubscriptionDataStoreImpl implements SubscriptionDataStore {
         return api;
     }
 
+    public API getApiForTracingByContextAndVersion(String context, String version) {
+
+        String key = context + DELEM_PERIOD + version;
+        String synchronizeKey = "SubscriptionDataStoreImpl-API-" + key;
+        API api = apiMap.get(key);
+        if (api == null) {
+            synchronized (synchronizeKey.intern()) {
+                api = apiMap.get(key);
+                if (api != null) {
+                    return api;
+                }
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving API information with Context " + context + " and Version : " + version);
+            if (api != null) {
+                log.debug("Retrieved API information with Context  : " + context + " and Version : " + version + " is"
+                                  + " " + api.toString());
+            } else {
+                log.debug("Retrieved API information with Context  : " + context + " and Version : " + version + " is"
+                                  + " empty");
+            }
+        }
+        return api;
+    }
+
     @Override
     public API getApiByNameAndVersion(String name, String version) {
 
