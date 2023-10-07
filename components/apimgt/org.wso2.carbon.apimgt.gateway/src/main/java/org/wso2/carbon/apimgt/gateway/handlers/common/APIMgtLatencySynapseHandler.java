@@ -130,7 +130,7 @@ public class APIMgtLatencySynapseHandler extends AbstractSynapseHandler {
             TelemetrySpan responseLatencySpan =
                     (TelemetrySpan) messageContext.getProperty(APIMgtGatewayConstants.RESPONSE_LATENCY);
             GatewayUtils.setAPIRelatedTags(responseLatencySpan, messageContext);
-            API api = GatewayUtils.getAPI(messageContext);
+            API api = GatewayUtils.getAPIForTracing(messageContext);
             if (api != null) {
                 TelemetryUtil.updateOperation(responseLatencySpan,
                         api.getApiName().concat("--").concat(api.getApiVersion()).concat("--")
@@ -146,7 +146,7 @@ public class APIMgtLatencySynapseHandler extends AbstractSynapseHandler {
             TracingSpan responseLatencySpan =
                     (TracingSpan) messageContext.getProperty(APIMgtGatewayConstants.RESPONSE_LATENCY);
             GatewayUtils.setAPIRelatedTags(responseLatencySpan, messageContext);
-            API api = GatewayUtils.getAPI(messageContext);
+            API api = GatewayUtils.getAPIForTracing(messageContext);
             if (api != null) {
                 Util.updateOperation(responseLatencySpan, api.getApiName().concat("--").concat(api
                         .getApiVersion()).concat("--").concat(GatewayUtils.getTenantDomain()));

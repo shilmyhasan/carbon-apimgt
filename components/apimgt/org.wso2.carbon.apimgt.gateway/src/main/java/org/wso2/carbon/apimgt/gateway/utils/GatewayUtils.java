@@ -1095,7 +1095,7 @@ public class GatewayUtils {
     //for OpenTracing
     public static void setAPIRelatedTags(TracingSpan tracingSpan, org.apache.synapse.MessageContext messageContext) {
 
-        API api = GatewayUtils.getAPI(messageContext);
+        API api = GatewayUtils.getAPIForTracing(messageContext);
         Object electedResource = messageContext.getProperty(APIMgtGatewayConstants.API_ELECTED_RESOURCE);
         if (electedResource != null) {
             Util.setTag(tracingSpan, APIMgtGatewayConstants.SPAN_RESOURCE, (String) electedResource);
@@ -1126,7 +1126,7 @@ public class GatewayUtils {
     //for OpenTelemetry
     public static void setAPIRelatedTags(TelemetrySpan tracingSpan, org.apache.synapse.MessageContext messageContext) {
 
-        API api = GatewayUtils.getAPI(messageContext);
+        API api = GatewayUtils.getAPIForTracing(messageContext);
         Object electedResource = messageContext.getProperty(APIMgtGatewayConstants.API_ELECTED_RESOURCE);
         if (electedResource != null) {
             TelemetryUtil.setTag(tracingSpan, APIMgtGatewayConstants.SPAN_RESOURCE, (String) electedResource);
@@ -1417,6 +1417,31 @@ public class GatewayUtils {
                     SubscriptionDataHolder.getInstance().getTenantSubscriptionStore(getTenantDomain());
             if (tenantSubscriptionStore != null) {
                 API api1 = tenantSubscriptionStore.getApiByContextAndVersion(context, version);
+                if (api1 != null) {
+                    messageContext.setProperty(APIMgtGatewayConstants.API_OBJECT, api1);
+                    return api1;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static API getAPIForTracing(org.apache.synapse.MessageContext messageContext) {
+
+        Object api = messageContext.getProperty(APIMgtGatewayConstants.API_OBJECT);
+        if (api != null) {
+            return (API) api;
+        } else {
+            api = messageContext.getProperty(APIMgtGatewayConstants.API_OBJECT);
+            if (api != null) {
+                return (API) api;
+            }
+            String context = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
+            String version = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+            SubscriptionDataStore tenantSubscriptionStore =
+                    SubscriptionDataHolder.getInstance().getTenantSubscriptionStore(getTenantDomain());
+            if (tenantSubscriptionStore != null) {
+                API api1 = tenantSubscriptionStore.getApiForTracingByContextAndVersion(context, version);
                 if (api1 != null) {
                     messageContext.setProperty(APIMgtGatewayConstants.API_OBJECT, api1);
                     return api1;
