@@ -67,6 +67,15 @@ public interface SubscriptionDataStore {
     API getApiByContextAndVersion(String context, String version);
 
     /**
+     * Get API by Context and Version for Tracing
+     *
+     * @param context Context of the API
+     * @param version Version of the API
+     * @return {@link API} entry represented by Context and Version.
+     */
+    API getApiForTracingByContextAndVersion(String context, String version);
+
+    /**
      * Get API by Name and Version
      *
      * @param name Name of the API
