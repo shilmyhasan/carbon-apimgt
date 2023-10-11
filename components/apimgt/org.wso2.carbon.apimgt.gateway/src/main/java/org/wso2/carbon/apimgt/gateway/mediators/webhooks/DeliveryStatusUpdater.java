@@ -28,6 +28,7 @@ import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.wso2.carbon.apimgt.common.analytics.collectors.AnalyticsDataProvider;
 import org.wso2.carbon.apimgt.common.analytics.collectors.impl.GenericRequestDataCollector;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
+import org.wso2.carbon.apimgt.gateway.exception.DataNotFoundException;
 import org.wso2.carbon.apimgt.gateway.handlers.analytics.Constants;
 import org.wso2.carbon.apimgt.gateway.handlers.streaming.AsyncAnalyticsDataProvider;
 import org.wso2.carbon.apimgt.gateway.handlers.streaming.webhook.WebhooksAnalyticsDataProvider;
@@ -77,7 +78,7 @@ public class DeliveryStatusUpdater extends AbstractMediator {
                 WebhooksUtils.publishAnalyticsData(messageContext);
             }
             WebhooksUtils.persistData(requestBody, deliveryDataPersisRetries, APIConstants.Webhooks.DELIVERY_EVENT_TYPE);
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException | IOException | DataNotFoundException e) {
             log.error("Error while persisting delivery status", e);
         }
         return true;
