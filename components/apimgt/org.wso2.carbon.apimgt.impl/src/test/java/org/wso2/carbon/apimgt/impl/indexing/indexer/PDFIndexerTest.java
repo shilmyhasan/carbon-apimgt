@@ -19,12 +19,13 @@ package org.wso2.carbon.apimgt.impl.indexing.indexer;
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.solr.common.SolrException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.wso2.carbon.apimgt.impl.indexing.indexer.util.PDFIndexerWrapper;
 import org.wso2.carbon.registry.indexing.AsyncIndexer;
 import org.wso2.carbon.registry.indexing.solr.IndexDocument;
@@ -45,10 +46,12 @@ public class PDFIndexerTest {
         String mediaType = "application/pdf+test";
         final String MEDIA_TYPE = "mediaType";
         PDFParser parser = Mockito.mock(PDFParser.class);
+        PDDocument pdDocument = Mockito.mock(PDDocument.class);
         COSDocument cosDoc = Mockito.mock(COSDocument.class);
         PDFTextStripper pdfTextStripper = Mockito.mock(PDFTextStripper.class);
         Mockito.doThrow(IOException.class).when(cosDoc).close();
-        Mockito.when(parser.getDocument()).thenReturn(new COSDocument()).thenReturn(cosDoc);
+        Mockito.when(parser.parse()).thenReturn(new PDDocument());
+        Mockito.when(pdDocument.getDocument()).thenReturn(new COSDocument()).thenReturn(cosDoc);
         Mockito.when(pdfTextStripper.getText(new PDDocument())).thenReturn("");
         PDFIndexer pdfIndexer = new PDFIndexerWrapper(parser, pdfTextStripper);
 
