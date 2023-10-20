@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -77,7 +78,7 @@ public class ReportGenUtil {
 
         try {
             pdfInputStream =  generator.generateMGRequestSummeryPDF(table);
-        } catch (IOException e) {
+        } catch (COSVisitorException | IOException e) {
             String msg = "Error while generating the pdf for micro gateway request summary";
             log.error(msg, e);
             throw new APIManagementException(msg, e);
