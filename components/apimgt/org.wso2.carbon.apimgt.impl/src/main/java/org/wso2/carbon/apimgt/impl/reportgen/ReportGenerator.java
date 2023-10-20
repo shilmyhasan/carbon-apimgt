@@ -18,15 +18,13 @@ package org.wso2.carbon.apimgt.impl.reportgen;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
-import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDJpeg;
 import org.wso2.carbon.apimgt.impl.internal.APIManagerComponent;
 import org.wso2.carbon.apimgt.impl.reportgen.model.RowEntry;
 import org.wso2.carbon.apimgt.impl.reportgen.model.TableData;
@@ -61,7 +59,7 @@ public class ReportGenerator {
     private static final float TABLE_TOP_Y = 700;
 
     // Font configuration
-    private static final PDFont TEXT_FONT = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+    private static final PDFont TEXT_FONT = PDType1Font.HELVETICA;
     private static final float FONT_SIZE = 9;
 
     /**
@@ -70,36 +68,37 @@ public class ReportGenerator {
      * @param table object containing table headers and row data
      * @return InputStream pdf as a stream
      * @throws IOException
+     * @throws COSVisitorException
      */
-    public InputStream generateMGRequestSummeryPDF(TableData table) throws IOException {
+    public InputStream generateMGRequestSummeryPDF(TableData table) throws IOException, COSVisitorException {
 
         String[] columnHeaders = table.getColumnHeaders();
 
         PDDocument document = new PDDocument();
         PDPage page = new PDPage();
-        page.setMediaBox(PDRectangle.A4);
+        page.setMediaBox(PDPage.PAGE_SIZE_A4);
         page.setRotation(0);
         document.addPage(page);
 
-        PDPageContentStream contentStream = new PDPageContentStream(document, page, null, false);
+        PDPageContentStream contentStream = new PDPageContentStream(document, page, false, false);
 
         // add logo
         InputStream in = APIManagerComponent.class.getResourceAsStream("/report/wso2-logo.jpg");
-        PDImageXObject img = JPEGFactory.createFromStream(document, in);
+        PDJpeg img = new PDJpeg(document, in);
         contentStream.drawImage(img, 375, 755);
 
         // Add topic
-        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 16);
+        contentStream.setFont(PDType1Font.HELVETICA_BOLD, 16);
         writeContent(contentStream, CELL_MARGIN, 770, "API Microgateway request summary");
 
         // Add generated time
-        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), FONT_SIZE);
+        contentStream.setFont(PDType1Font.HELVETICA_BOLD, FONT_SIZE);
         writeContent(contentStream, CELL_MARGIN, 730, "Report generated on: " + new Date().toString());
 
         contentStream.setFont(TEXT_FONT, FONT_SIZE);
 
         // add table with data
-        drawTableGrid(contentStream, table.getRows().size());
+        drowTableGrid(contentStream, table.getRows().size());
         writeRowsContent(contentStream, columnHeaders, table.getRows());
 
         // Add meta data
@@ -134,12 +133,11 @@ public class ReportGenerator {
         return count;
     }
 
-    private void drawTableGrid(PDPageContentStream contentStream, int numberOfRows) throws IOException {
+    private void drowTableGrid(PDPageContentStream contentStream, int numberOfRows) throws IOException {
         float nextY = TABLE_TOP_Y;
         // draw horizontal lines
         for (int i = 0; i <= numberOfRows + 1; i++) {
-            contentStream.moveTo(CELL_MARGIN, nextY);
-            contentStream.lineTo(CELL_MARGIN + TABLE_WIDTH, nextY);
+            contentStream.drawLine(CELL_MARGIN, nextY, CELL_MARGIN + TABLE_WIDTH, nextY);
             nextY -= ROW_HEIGHT;
         }
 
@@ -148,19 +146,17 @@ public class ReportGenerator {
         final float tableBottomY = TABLE_TOP_Y - tableYLength;
         float nextX = CELL_MARGIN;
         for (int i = 0; i < COLUMN_WIDTH.length; i++) {
-            contentStream.moveTo(nextX, TABLE_TOP_Y);
-            contentStream.lineTo(nextX, tableBottomY);
+            contentStream.drawLine(nextX, TABLE_TOP_Y, nextX, tableBottomY);
             nextX += COLUMN_WIDTH[i];
         }
-        contentStream.moveTo(CELL_MARGIN + TABLE_WIDTH, TABLE_TOP_Y);
-        contentStream.lineTo(CELL_MARGIN + TABLE_WIDTH, tableBottomY);
+        contentStream.drawLine(CELL_MARGIN + TABLE_WIDTH, TABLE_TOP_Y, CELL_MARGIN + TABLE_WIDTH, tableBottomY);
     }
 
     private void writeContent(PDPageContentStream contentStream, float positionX, float positionY, String text)
             throws IOException {
         contentStream.beginText();
-        contentStream.moveTo(positionX, positionY);
-        contentStream.showText(text != null ? text : "");
+        contentStream.moveTextPositionByAmount(positionX, positionY);
+        contentStream.drawString(text != null ? text : "");
         contentStream.endText();
     }
 
