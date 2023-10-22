@@ -1666,6 +1666,12 @@
                 <groupId>org.wso2.orbit.org.openapitools</groupId>
                 <artifactId>openapi-generator</artifactId>
                 <version>${openapi.generator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.swagger.parser.v3</groupId>
+                        <artifactId>swagger-parser</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.io.swagger</groupId>
@@ -2102,5 +2108,6 @@
         <javax.jms.version>2.0.1</javax.jms.version>
         <com.damnhandy.version>2.1.6</com.damnhandy.version>
         <damnhandy.version>${com.damnhandy.version}.wso2v2</damnhandy.version>
+        <java-json-tools.json-schema-validator.version>2.2.14</java-json-tools.json-schema-validator.version>
     </properties>
 </project>
