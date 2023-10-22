@@ -26,7 +26,6 @@
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - API Gateway</name>
     <url>http://wso2.org</url>
-
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
@@ -59,6 +58,11 @@
                     <artifactId>jetty-bundle</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.java-json-tools</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${java-json-tools.json-schema-validator.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
@@ -343,6 +347,7 @@
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>org.ops4j.pax.logging:pax-logging-api</classpathDependencyExclude>
                         <classpathDependencyExclude>org.wso2.orbit.com.fasterxml.jackson.core:jackson-core</classpathDependencyExclude>
+                        <classpathDependencyExclude>io.swagger.parser.v3:swagger-parser-v2-converter</classpathDependencyExclude>
                     </classpathDependencyExcludes>
                     <systemProperties>
                         <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
