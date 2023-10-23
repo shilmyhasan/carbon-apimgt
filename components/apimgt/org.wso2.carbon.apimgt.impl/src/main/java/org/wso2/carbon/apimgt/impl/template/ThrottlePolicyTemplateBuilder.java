@@ -26,6 +26,8 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.log.CommonsLogLogChute;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.apimgt.api.model.policy.APIPolicy;
@@ -40,6 +42,9 @@ import org.wso2.carbon.apimgt.api.model.policy.Pipeline;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.api.model.policy.QueryParameterCondition;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
+import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -97,7 +102,12 @@ public class ThrottlePolicyTemplateBuilder {
 
         try {
             VelocityEngine velocityengine = new VelocityEngine();
-            APIUtil.initializeVelocityContext(velocityengine);
+            velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                    CommonsLogLogChute.class.getName());
+            if (!"not-defined".equalsIgnoreCase(getVelocityLogger())) {
+                velocityengine.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+                velocityengine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            }
             velocityengine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, CarbonUtils.getCarbonHome());
             velocityengine.init();
             Template template = velocityengine.getTemplate(getTemplatePathForAPI());
@@ -165,7 +175,12 @@ public class ThrottlePolicyTemplateBuilder {
 
         try {
             VelocityEngine velocityengine = new VelocityEngine();
-            APIUtil.initializeVelocityContext(velocityengine);
+            velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                    CommonsLogLogChute.class.getName());
+            if (!"not-defined".equalsIgnoreCase(getVelocityLogger())) {
+                velocityengine.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+                velocityengine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            }
             velocityengine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, CarbonUtils.getCarbonHome());
             velocityengine.init();
             Template template = velocityengine.getTemplate(getTemplatePathForAPIDefaultPolicy());
@@ -231,7 +246,12 @@ public class ThrottlePolicyTemplateBuilder {
         }
         try {
             VelocityEngine velocityengine = new VelocityEngine();
-            APIUtil.initializeVelocityContext(velocityengine);
+            velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                    CommonsLogLogChute.class.getName());
+            if (!"not-defined".equalsIgnoreCase(getVelocityLogger())) {
+                velocityengine.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+                velocityengine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            }
             velocityengine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, CarbonUtils.getCarbonHome());
             velocityengine.init();
 
@@ -278,7 +298,12 @@ public class ThrottlePolicyTemplateBuilder {
         }
         try {
             VelocityEngine velocityengine = new VelocityEngine();
-            APIUtil.initializeVelocityContext(velocityengine);
+            velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                    CommonsLogLogChute.class.getName());
+            if (!"not-defined".equalsIgnoreCase(getVelocityLogger())) {
+                velocityengine.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+                velocityengine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            }
             velocityengine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, CarbonUtils.getCarbonHome());
             velocityengine.init();
             Template template = velocityengine.getTemplate(getTemplatePathForApplication());
@@ -319,8 +344,13 @@ public class ThrottlePolicyTemplateBuilder {
         }
         try {
             VelocityEngine velocityengine = new VelocityEngine();
+            velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                    CommonsLogLogChute.class.getName());
+            if (!"not-defined".equalsIgnoreCase(getVelocityLogger())) {
+                velocityengine.setProperty(VelocityEngine.RESOURCE_LOADER, "classpath");
+                velocityengine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            }
             velocityengine.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, CarbonUtils.getCarbonHome());
-            APIUtil.initializeVelocityContext(velocityengine);
             velocityengine.init();
             Template t = velocityengine.getTemplate(getTemplatePathForSubscription());
 
@@ -358,6 +388,20 @@ public class ThrottlePolicyTemplateBuilder {
 
     private  String getTemplatePathForSubscription() {
         return policyTemplateLocation + ThrottlePolicyTemplateBuilder.POLICY_VELOCITY_SUB + ".xml";
+    }
+
+    private static String getVelocityLogger() {
+        if (!"not-defined".equalsIgnoreCase(velocityLogPath)) {
+            return velocityLogPath;
+        } else {
+            APIManagerConfigurationService config = ServiceReferenceHolder.getInstance()
+                    .getAPIManagerConfigurationService();
+            String logPath = config.getAPIManagerConfiguration().getFirstProperty(APIConstants.VELOCITY_LOGGER);
+            if (logPath != null && !logPath.isEmpty()) {
+                velocityLogPath = logPath;
+            }
+            return velocityLogPath;
+        }
     }
 
     /**
