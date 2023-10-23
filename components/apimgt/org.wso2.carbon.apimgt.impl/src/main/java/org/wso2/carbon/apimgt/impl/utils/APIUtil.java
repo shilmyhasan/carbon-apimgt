@@ -315,8 +315,6 @@ import javax.cache.CacheConfiguration;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.net.ssl.SSLContext;
-import javax.security.cert.CertificateEncodingException;
-import javax.security.cert.X509Certificate;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -11158,7 +11156,7 @@ public final class APIUtil {
      * @return true if certificate exist in truststore
      * @throws APIManagementException
      */
-    public static boolean isCertificateExistsInTrustStore(X509Certificate certificate) throws APIManagementException {
+    public static boolean isCertificateExistsInTrustStore(Certificate certificate) throws APIManagementException {
 
         if (certificate != null) {
             try {
@@ -11175,7 +11173,7 @@ public final class APIUtil {
                         }
                     }
                 }
-            } catch (KeyStoreException | CertificateException | CertificateEncodingException | IOException e) {
+            } catch (KeyStoreException | CertificateException | IOException e) {
                 String msg = "Error in validating certificate existence";
                 log.error(msg, e);
                 throw new APIManagementException(msg, e);
@@ -11800,7 +11798,7 @@ public final class APIUtil {
         return Base64.encodeBase64URLSafeString(base64EncodedString.getBytes());
     }
 
-    public static X509Certificate retrieveCertificateFromContent(String base64EncodedCertificate)
+    public static Certificate retrieveCertificateFromContent(String base64EncodedCertificate)
             throws APIManagementException {
 
         if (base64EncodedCertificate != null) {
@@ -11810,8 +11808,8 @@ public final class APIUtil {
 
             byte[] bytes = Base64.decodeBase64(base64EncodedCertificate);
             try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
-                return X509Certificate.getInstance(inputStream);
-            } catch (IOException | javax.security.cert.CertificateException e) {
+                return CertificateFactory.getInstance("X.509").generateCertificate(inputStream);
+            } catch (IOException | CertificateException e) {
                 String msg = "Error while converting into X509Certificate";
                 log.error(msg, e);
                 throw new APIManagementException(msg, e);

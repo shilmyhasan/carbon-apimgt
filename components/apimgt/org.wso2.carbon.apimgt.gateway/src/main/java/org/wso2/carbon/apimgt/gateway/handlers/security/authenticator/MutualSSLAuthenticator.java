@@ -37,6 +37,8 @@ import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
 
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +46,6 @@ import java.util.List;
 import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
-import javax.security.cert.X509Certificate;
 
 /**
  * Authenticator responsible for handle API requests with mutual SSL.
@@ -96,7 +97,7 @@ public class MutualSSLAuthenticator implements Authenticator {
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext)
                 .getAxis2MessageContext();
         // try to retrieve the certificate
-        X509Certificate sslCertObject;
+        Certificate sslCertObject;
         try {
             sslCertObject = Utils.getClientCertificate(axis2MessageContext);
         } catch (APIManagementException e) {
@@ -130,11 +131,12 @@ public class MutualSSLAuthenticator implements Authenticator {
      * To set the authentication context in current message context.
      *
      * @param messageContext Relevant message context.
-     * @param x509Certificate  SSL certificate.
+     * @param certificate  SSL certificate.
      * @throws APISecurityException API Security Exception.
      */
-    private void setAuthContext(MessageContext messageContext, X509Certificate x509Certificate) throws APISecurityException {
+    private void setAuthContext(MessageContext messageContext, Certificate certificate) throws APISecurityException {
 
+        X509Certificate x509Certificate = Utils.convertCertificateToX509Certificate(certificate);
         String subjectDN = x509Certificate.getSubjectDN().getName();
         String uniqueIdentifier = (x509Certificate.getSerialNumber() + "_" + x509Certificate.getIssuerDN()).replaceAll(",",
                         "#").replaceAll("\"", "'").trim();

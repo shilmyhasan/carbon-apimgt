@@ -19,7 +19,7 @@ package org.wso2.carbon.apimgt.impl.dto;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.security.cert.Certificate;
+import java.security.cert.Certificate;
 
 public class TokenIssuerDto {
     private String issuer;

@@ -64,6 +64,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.security.cert.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -75,9 +76,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.cache.Caching;
-import javax.security.cert.CertificateEncodingException;
-import javax.security.cert.CertificateException;
-import javax.security.cert.X509Certificate;
 import javax.xml.namespace.QName;
 
 public class Utils {
@@ -437,15 +435,15 @@ public class Utils {
         return APIMgtGatewayConstants.BASE64_ENCODED_CLIENT_CERTIFICATE_HEADER;
     }
 
-    public static X509Certificate getClientCertificate(org.apache.axis2.context.MessageContext axis2MessageContext)
+    public static Certificate getClientCertificate(org.apache.axis2.context.MessageContext axis2MessageContext)
             throws APIManagementException {
 
         Map headers =
                 (Map) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         Object sslCertObject = axis2MessageContext.getProperty(NhttpConstants.SSL_CLIENT_AUTH_CERT_X509);
-        X509Certificate certificateFromMessageContext = null;
+        Certificate certificateFromMessageContext = null;
         if (sslCertObject != null) {
-            X509Certificate[] certs = (X509Certificate[]) sslCertObject;
+            Certificate[] certs = (Certificate[]) sslCertObject;
             certificateFromMessageContext = certs[0];
         }
         if (headers.containsKey(Utils.getClientCertificateHeader())) {
@@ -471,7 +469,9 @@ public class Utils {
                                 bytes = Base64.decodeBase64(certificate);
                             }
                         try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
-                            X509Certificate x509Certificate = X509Certificate.getInstance(inputStream);
+//                            X509Certificate x509Certificate = X509Certificate.getInstance(inputStream);
+                            Certificate x509Certificate =
+                                    CertificateFactory.getInstance("X.509").generateCertificate(inputStream);
                             if (APIUtil.isCertificateExistsInTrustStore(x509Certificate)) {
                                 return x509Certificate;
                             }else{
@@ -565,7 +565,7 @@ public class Utils {
         }
     }
 
-    public static String getEncodedClientCertificate(X509Certificate certificate) throws CertificateEncodingException {
+    public static String getEncodedClientCertificate(Certificate certificate) throws CertificateEncodingException {
         byte[] encoded = Base64.encodeBase64(certificate.getEncoded());
         if (isClientCertificateEncoded()) {
             String base64EncodedString = APIConstants.BEGIN_CERTIFICATE_STRING.concat(new String(encoded)).concat("\n"
@@ -603,5 +603,20 @@ public class Utils {
         public int compare(String o1, String o2) {
             return o2.length() - o1.length();
         }
+    }
+
+    /**
+     * @param certificate SSL Certificate
+     * @return X509Certificate
+     */
+    public static X509Certificate convertCertificateToX509Certificate(Certificate certificate) {
+        try {
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(certificate.getEncoded());
+            return (X509Certificate) certificateFactory.generateCertificate(inputStream);
+        } catch (CertificateException e) {
+            log.error("Error while converting client certificate", e);
+        }
+        return null;
     }
 }

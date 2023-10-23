@@ -41,12 +41,11 @@ import org.wso2.carbon.apimgt.impl.jwt.JWTValidatorImpl;
 import org.wso2.carbon.apimgt.impl.loader.KeyManagerConfigurationDataRetriever;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 
+import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.security.cert.X509Certificate;
 
 /**
  * This is a factory class.you have to use this when you need to initiate classes by reading config file.
@@ -200,10 +199,9 @@ public class KeyManagerHolder {
                         jwksConfigurationDTO.setUrl((String) certificateValue);
                         tokenIssuerDto.setJwksConfigurationDTO(jwksConfigurationDTO);
                     } else {
-                        X509Certificate x509Certificate =
-                                APIUtil.retrieveCertificateFromContent((String) certificateValue);
-                        if (x509Certificate != null) {
-                            tokenIssuerDto.setCertificate(x509Certificate);
+                        Certificate certificate = APIUtil.retrieveCertificateFromContent((String) certificateValue);
+                        if (certificate != null) {
+                            tokenIssuerDto.setCertificate(certificate);
                         }
                     }
                 }

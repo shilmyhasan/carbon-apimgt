@@ -30,10 +30,9 @@ import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.Utils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.util.Map;
-
-import javax.security.cert.CertificateEncodingException;
-import javax.security.cert.X509Certificate;
 
 public class MutualSSLCertificateHandler extends AbstractHandler {
 
@@ -47,7 +46,7 @@ public class MutualSSLCertificateHandler extends AbstractHandler {
         Map headers =
                 (Map) axis2MsgContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         try {
-            X509Certificate clientCertificate = Utils.getClientCertificate(axis2MsgContext);
+            Certificate clientCertificate = Utils.getClientCertificate(axis2MsgContext);
             headers.remove(Utils.getClientCertificateHeader());
             if (clientCertificate != null) {
                 headers.put(Utils.getClientCertificateHeader(), Utils.getEncodedClientCertificate(clientCertificate));
