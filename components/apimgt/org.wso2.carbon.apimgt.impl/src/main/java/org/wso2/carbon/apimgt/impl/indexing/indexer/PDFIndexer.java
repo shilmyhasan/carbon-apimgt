@@ -13,9 +13,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.pdfbox.cos.COSDocument;
+import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.wso2.carbon.registry.indexing.AsyncIndexer;
 import org.wso2.carbon.registry.indexing.IndexingConstants;
 import org.wso2.carbon.registry.indexing.AsyncIndexer.File2Index;
@@ -71,7 +72,7 @@ public class PDFIndexer implements Indexer {
 	}
 
 	protected PDFParser getPdfParser(File2Index fileData) throws IOException {
-		return new PDFParser(new ByteArrayInputStream(fileData.data));
+		return new PDFParser(new RandomAccessBufferedFileInputStream(new ByteArrayInputStream(fileData.data)));
 	}
 
 }
