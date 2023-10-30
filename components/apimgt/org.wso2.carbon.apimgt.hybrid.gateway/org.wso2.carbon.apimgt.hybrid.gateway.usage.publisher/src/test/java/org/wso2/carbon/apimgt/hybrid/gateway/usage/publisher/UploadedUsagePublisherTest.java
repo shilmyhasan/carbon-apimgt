@@ -37,7 +37,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * UploadedUsagePublisher Test Class

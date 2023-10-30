@@ -36,7 +36,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Configurator TestCase

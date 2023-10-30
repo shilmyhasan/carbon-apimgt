@@ -18,7 +18,7 @@ package org.wso2.carbon.apimgt.impl.observers;
 import org.apache.axis2.context.ConfigurationContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -64,7 +64,7 @@ public class SignupObserverTestCase {
         ConfigurationContext configurationContext = Mockito.mock(ConfigurationContext.class);
         PowerMockito.mockStatic(APIUtil.class);
         PowerMockito.doThrow(new APIManagementException("error"))
-                .when(APIUtil.class, "createSelfSignUpRoles", Matchers.eq(1234));
+                .when(APIUtil.class, "createSelfSignUpRoles", ArgumentMatchers.eq(1234));
         SignupObserver signupObserver = new SignupObserver();
         signupObserver.createdConfigurationContext(configurationContext);
 

@@ -3917,7 +3917,7 @@ public class ApiMgtDAO {
                 blockCondition = new BlockConditionsDTO();
                 blockCondition.setEnabled(resultSet.getBoolean("ENABLED"));
                 blockCondition.setConditionType(resultSet.getString("TYPE"));
-                blockCondition.setConditionValue(resultSet.getString("VALUE"));
+                blockCondition.setConditionValue(resultSet.getString("BLOCK_CONDITION"));
                 blockCondition.setConditionId(resultSet.getInt("CONDITION_ID"));
                 blockCondition.setTenantDomain(resultSet.getString("DOMAIN"));
                 blockCondition.setUUID(resultSet.getString("UUID"));
@@ -4738,11 +4738,11 @@ public class ApiMgtDAO {
                 sqlQuery = sqlQuery.replaceAll("NAME", "cast(NAME as varchar(100)) collate " +
                         "SQL_Latin1_General_CP1_CI_AS as NAME");
                 blockingFilerSql = " select distinct x.*,bl.ENABLED from ( " + sqlQuery + " )x left join " +
-                        "AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = (x.USER_ID + ':') + x" +
+                        "AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.BLOCK_CONDITION = (x.USER_ID + ':') + x" +
                         ".name)";
             } else {
                 blockingFilerSql = " select distinct x.*,bl.ENABLED from ( " + sqlQuery
-                        + " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = "
+                        + " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.BLOCK_CONDITION = "
                         + "concat(concat(x.USER_ID,':'),x.name))";
             }
 
@@ -12720,7 +12720,7 @@ public class ApiMgtDAO {
                 blockCondition = new BlockConditionsDTO();
                 blockCondition.setEnabled(resultSet.getBoolean("ENABLED"));
                 blockCondition.setConditionType(resultSet.getString("TYPE"));
-                blockCondition.setConditionValue(resultSet.getString("VALUE"));
+                blockCondition.setConditionValue(resultSet.getString("BLOCK_CONDITION"));
                 blockCondition.setConditionId(conditionId);
                 blockCondition.setTenantDomain(resultSet.getString("DOMAIN"));
                 blockCondition.setUUID(resultSet.getString("UUID"));
@@ -12763,7 +12763,7 @@ public class ApiMgtDAO {
                 blockCondition = new BlockConditionsDTO();
                 blockCondition.setEnabled(resultSet.getBoolean("ENABLED"));
                 blockCondition.setConditionType(resultSet.getString("TYPE"));
-                blockCondition.setConditionValue(resultSet.getString("VALUE"));
+                blockCondition.setConditionValue(resultSet.getString("BLOCK_CONDITION"));
                 blockCondition.setConditionId(resultSet.getInt("CONDITION_ID"));
                 blockCondition.setTenantDomain(resultSet.getString("DOMAIN"));
                 blockCondition.setUUID(resultSet.getString("UUID"));
@@ -12799,7 +12799,7 @@ public class ApiMgtDAO {
                 BlockConditionsDTO blockConditionsDTO = new BlockConditionsDTO();
                 blockConditionsDTO.setEnabled(resultSet.getBoolean("ENABLED"));
                 blockConditionsDTO.setConditionType(resultSet.getString("TYPE"));
-                blockConditionsDTO.setConditionValue(resultSet.getString("VALUE"));
+                blockConditionsDTO.setConditionValue(resultSet.getString("BLOCK_CONDITION"));
                 blockConditionsDTO.setConditionId(resultSet.getInt("CONDITION_ID"));
                 blockConditionsDTO.setUUID(resultSet.getString("UUID"));
                 blockConditionsDTO.setTenantDomain(resultSet.getString("DOMAIN"));
@@ -13769,7 +13769,7 @@ public class ApiMgtDAO {
             rs = ps.executeQuery();
             while (rs.next()) {
                 applicationAttributes.put(rs.getString("NAME"),
-                        rs.getString("VALUE"));
+                        rs.getString("APP_ATTRIBUTE"));
             }
 
         } catch (SQLException e) {

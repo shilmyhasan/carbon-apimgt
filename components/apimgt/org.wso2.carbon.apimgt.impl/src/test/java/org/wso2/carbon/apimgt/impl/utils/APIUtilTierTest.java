@@ -68,7 +68,7 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 
 
 @RunWith(PowerMockRunner.class)

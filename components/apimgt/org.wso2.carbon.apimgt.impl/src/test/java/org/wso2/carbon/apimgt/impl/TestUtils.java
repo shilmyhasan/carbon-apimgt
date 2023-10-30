@@ -22,7 +22,7 @@ package org.wso2.carbon.apimgt.impl;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
@@ -97,7 +97,7 @@ public class TestUtils {
         PowerMockito.when(realmService.getBootstrapRealm()).thenReturn(bootstrapRealm);
         ServiceReferenceHolder.setUserRealm(bootstrapRealm);
 
-        PowerMockito.when(tm.getTenantId(Matchers.anyString())).thenReturn(tenantId);
+        PowerMockito.when(tm.getTenantId(ArgumentMatchers.anyString())).thenReturn(tenantId);
 
         return sh;
     }

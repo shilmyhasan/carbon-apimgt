@@ -106,7 +106,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.wso2.carbon.apimgt.impl.utils.APIUtil.DISABLE_ROLE_VALIDATION_AT_SCOPE_CREATION;
 import static org.wso2.carbon.apimgt.impl.utils.APIUtil.getOAuthConfigurationFromAPIMConfig;
 import static org.wso2.carbon.apimgt.impl.utils.APIUtil.getOAuthConfigurationFromTenantRegistry;

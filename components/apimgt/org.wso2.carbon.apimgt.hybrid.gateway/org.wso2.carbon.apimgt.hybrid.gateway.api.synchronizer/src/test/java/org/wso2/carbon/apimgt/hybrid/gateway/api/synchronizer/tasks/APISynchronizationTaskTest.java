@@ -51,7 +51,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.Properties;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * APISynchronization Task Test Class

@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -153,7 +153,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.wso2.carbon.apimgt.impl.token.ClaimsRetriever.DEFAULT_DIALECT_URI;
 
 @RunWith(PowerMockRunner.class)
@@ -375,7 +375,7 @@ public class APIProviderImplTest {
 
         PowerMockito.when(sh.getRealmService()).thenReturn(realmService);
         PowerMockito.when(realmService.getTenantManager()).thenReturn(tm);
-        PowerMockito.when(tm.getTenantId(Matchers.anyString())).thenReturn(-1234);
+        PowerMockito.when(tm.getTenantId(ArgumentMatchers.anyString())).thenReturn(-1234);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         PowerMockito.when(registryService.getGovernanceSystemRegistry(-1234)).thenReturn(systemReg);
         Mockito.when(systemReg.resourceExists("testPath")).thenReturn(true);
@@ -467,7 +467,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION)).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
         String msg = "Error while processing the in in the registry";
@@ -478,7 +478,7 @@ public class APIProviderImplTest {
         }
 
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         String msg1 = "Error while retrieving registry for tenant -1";
         try {
@@ -521,7 +521,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION)).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
         String msg = "Error while processing the out in the registry";
@@ -532,7 +532,7 @@ public class APIProviderImplTest {
         }
 
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         String msg1 = "Error while retrieving registry for tenant -1";
         try {
@@ -562,7 +562,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION)).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
         String msg = "Error while processing the fault in the registry";
@@ -573,7 +573,7 @@ public class APIProviderImplTest {
         }
 
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         String msg1 = "Error while retrieving registry for tenant -1";
         try {
@@ -632,7 +632,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIUtil.getSequencePath(apiId,
                 APIConstants.API_CUSTOM_SEQUENCE_TYPE_IN))).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
@@ -645,7 +645,7 @@ public class APIProviderImplTest {
         }
 
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         String msg1 = "Error while retrieving registry for tenant -1";
         try {
@@ -675,7 +675,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIUtil.getSequencePath(apiId,
                 APIConstants.API_CUSTOM_SEQUENCE_TYPE_OUT))).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
@@ -688,7 +688,7 @@ public class APIProviderImplTest {
         }
 
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         String msg1 = "Error while retrieving registry for tenant -1";
         try {
@@ -718,7 +718,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIUtil.getSequencePath(apiId,
                 APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT))).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
@@ -731,7 +731,7 @@ public class APIProviderImplTest {
         }
 
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         String msg1 = "Error while retrieving registry for tenant -1";
         try {
@@ -917,7 +917,7 @@ public class APIProviderImplTest {
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
         Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
         Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        PowerMockito.when(tenantManager.getTenantId(Matchers.anyString())).thenReturn(-1234);
+        PowerMockito.when(tenantManager.getTenantId(ArgumentMatchers.anyString())).thenReturn(-1234);
 
         UserStoreManager userStoreManager = Mockito.mock(UserStoreManager.class);
         UserRealm userRealm = Mockito.mock(UserRealm.class);
@@ -1180,7 +1180,7 @@ public class APIProviderImplTest {
         RealmService realmService = Mockito.mock(RealmService.class);
         TenantManager tenantManager = Mockito.mock(TenantManager.class);
 
-        Mockito.when(artifactManager.newGovernanceArtifact(Matchers.any(QName.class))).thenReturn(artifact);
+        Mockito.when(artifactManager.newGovernanceArtifact(ArgumentMatchers.any(QName.class))).thenReturn(artifact);
         Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
         PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
         Mockito.when(serviceReferenceHolder.getRegistryService()).thenReturn(registryService);
@@ -1328,7 +1328,7 @@ public class APIProviderImplTest {
         api.setEnvironments(environments);
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
 
-        Mockito.when(artifactManager.newGovernanceArtifact(Matchers.any(QName.class))).thenReturn(artifact);
+        Mockito.when(artifactManager.newGovernanceArtifact(ArgumentMatchers.any(QName.class))).thenReturn(artifact);
         Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
         RegistryService registryService = Mockito.mock(RegistryService.class);
         UserRegistry userRegistry = Mockito.mock(UserRegistry.class);
@@ -1379,7 +1379,7 @@ public class APIProviderImplTest {
 
         PowerMockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
         PowerMockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        PowerMockito.when(tenantManager.getTenantId(Matchers.anyString())).thenReturn(-1234);
+        PowerMockito.when(tenantManager.getTenantId(ArgumentMatchers.anyString())).thenReturn(-1234);
         apiProvider.updateAPIStatus(api.getId(), newStatusValue, true, false, true);
     }
 
@@ -1586,7 +1586,7 @@ public class APIProviderImplTest {
 
         Map<String, Map<String, String>> failedGateways = new ConcurrentHashMap<String, Map<String, String>>();
 
-        PowerMockito.when(APIUtil.getArtifactManager(any(Registry.class), Matchers.anyString()))
+        PowerMockito.when(APIUtil.getArtifactManager(any(Registry.class), ArgumentMatchers.anyString()))
                 .thenReturn(artifactManager);
         Mockito.when(artifactManager.newGovernanceArtifact(any(QName.class))).thenReturn(artifact);
         Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
@@ -1645,7 +1645,7 @@ public class APIProviderImplTest {
         TenantManager tm = Mockito.mock(TenantManager.class);
         PowerMockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
         PowerMockito.when(realmService.getTenantManager()).thenReturn(tm);
-        PowerMockito.when(tm.getTenantId(Matchers.anyString())).thenReturn(-1234);
+        PowerMockito.when(tm.getTenantId(ArgumentMatchers.anyString())).thenReturn(-1234);
         failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.PUBLISHED);
 
         Assert.assertEquals(0, failedGatewaysReturned.size());
@@ -1658,7 +1658,7 @@ public class APIProviderImplTest {
         failedGateways.put("PUBLISHED", failedGWEnv);
 
         Mockito.when(gatewayManager.publishToGateway(any(API.class), any(APITemplateBuilder.class),
-                Matchers.anyString())).thenReturn(failedGWEnv);
+                ArgumentMatchers.anyString())).thenReturn(failedGWEnv);
         failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.PUBLISHED);
         Assert.assertEquals(1, failedGatewaysReturned.size());
         Assert.assertEquals(APIConstants.PUBLISHED, api.getStatus());
@@ -1675,7 +1675,7 @@ public class APIProviderImplTest {
         api.setStatus(APIConstants.CREATED);
         failedGateways.put("UNPUBLISHED", failedGWEnv);
         Mockito.when(gatewayManager.removeFromGateway(any(API.class),
-                Matchers.anyString())).thenReturn(failedGWEnv);
+                ArgumentMatchers.anyString())).thenReturn(failedGWEnv);
 
         failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.RETIRED);
         Assert.assertEquals(1, failedGatewaysReturned.size());
@@ -1699,11 +1699,11 @@ public class APIProviderImplTest {
         Mockito.when(apimgtDAO.addAPI(api, -1)).thenReturn(1);
         Mockito.doNothing().when(apimgtDAO).addURITemplates(1, api, -1);
         Mockito.doNothing().when(keyManager).attachResourceScopes(api, api.getUriTemplates());
-        Mockito.when(artifactManager.newGovernanceArtifact(Matchers.any(QName.class))).thenReturn(artifact);
+        Mockito.when(artifactManager.newGovernanceArtifact(ArgumentMatchers.any(QName.class))).thenReturn(artifact);
         Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
         Map<String, String> failedToPubGWEnv = new HashMap<String, String>();
-        Mockito.when(gatewayManager.publishToGateway(Matchers.any(API.class), Matchers.any(APITemplateBuilder.class),
-                Matchers.anyString())).thenReturn(failedToPubGWEnv);
+        Mockito.when(gatewayManager.publishToGateway(ArgumentMatchers.any(API.class), ArgumentMatchers.any(APITemplateBuilder.class),
+                ArgumentMatchers.anyString())).thenReturn(failedToPubGWEnv);
 
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
         UserRegistry userRegistry = Mockito.mock(UserRegistry.class);
@@ -1749,7 +1749,7 @@ public class APIProviderImplTest {
 
 
         PowerMockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        PowerMockito.when(tenantManager.getTenantId(Matchers.anyString())).thenReturn(-1234);
+        PowerMockito.when(tenantManager.getTenantId(ArgumentMatchers.anyString())).thenReturn(-1234);
 
         apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.PUBLISHED);
         Mockito.verify(notificationExecutor).sendAsyncNotifications(notificationDTO);
@@ -1947,7 +1947,7 @@ public class APIProviderImplTest {
         PowerMockito.when(apiProvider.registry.copy(resourcePath, newWsdlResourcePath)).thenReturn(newWsdlResourcePath);
 
         //Mock Config system registry
-        PowerMockito.when(tenantManager.getTenantId(Matchers.anyString())).thenReturn(-1234);
+        PowerMockito.when(tenantManager.getTenantId(ArgumentMatchers.anyString())).thenReturn(-1234);
 
         AuthorizationManager authManager = Mockito.mock(AuthorizationManager.class);
         UserRealm userRealm = Mockito.mock(UserRealm.class);
@@ -2223,8 +2223,8 @@ public class APIProviderImplTest {
         Assert.assertEquals(2, apiResponse.size());
         Assert.assertEquals("API1", apiResponse.get(0).getId().getApiName());
 
-        Mockito.when(apiProvider.registry.getAspectActions(Matchers.anyString(),
-                Matchers.anyString())).thenThrow(RegistryException.class);
+        Mockito.when(apiProvider.registry.getAspectActions(ArgumentMatchers.anyString(),
+                ArgumentMatchers.anyString())).thenThrow(RegistryException.class);
         try {
             apiProvider.getAPIsByProvider(providerId);
         } catch (APIManagementException e) {
@@ -2633,8 +2633,8 @@ public class APIProviderImplTest {
         }).when(artifactManager).updateGenericArtifact(artifact);
 
         //Mocking API already not published and published
-        Mockito.when(gatewayManager.isAPIPublished(any(API.class), Matchers.anyString())).thenReturn(true);
-        Mockito.when(gatewayManager.getAPIEndpointSecurityType(any(API.class), Matchers.anyString()))
+        Mockito.when(gatewayManager.isAPIPublished(any(API.class), ArgumentMatchers.anyString())).thenReturn(true);
+        Mockito.when(gatewayManager.getAPIEndpointSecurityType(any(API.class), ArgumentMatchers.anyString()))
                 .thenReturn(APIConstants.APIEndpointSecurityConstants.BASIC_AUTH,
                         APIConstants.APIEndpointSecurityConstants.DIGEST_AUTH);
         PowerMockito.mockStatic(OASParserUtil.class);
@@ -2891,9 +2891,9 @@ public class APIProviderImplTest {
         failedToUnPubGWEnv.put("Production", "Failed to unpublish");
 
         Mockito.when(gatewayManager.removeFromGateway(any(API.class),
-                Matchers.anyString())).thenReturn(failedToUnPubGWEnv);
+                ArgumentMatchers.anyString())).thenReturn(failedToUnPubGWEnv);
         Mockito.when(gatewayManager.publishToGateway(any(API.class), any(APITemplateBuilder.class),
-                Matchers.anyString())).thenReturn(failedToPubGWEnv);
+                ArgumentMatchers.anyString())).thenReturn(failedToPubGWEnv);
         Mockito.when(APIUtil.getTiers(APIConstants.TIER_RESOURCE_TYPE, "carbon.super")).thenReturn(tiers);
         PowerMockito.mockStatic(OASParserUtil.class);
         Mockito.when(OASParserUtil.getAPIDefinition(api.getId(), apiProvider.registry)).thenReturn(
@@ -3215,7 +3215,7 @@ public class APIProviderImplTest {
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
         Mockito.when(apimgtDAO.getAPIPolicy(policy.getPolicyName(), policy.getTenantId())).thenReturn(policy);
         Mockito.when(apimgtDAO.updateAPIPolicy(policy)).thenReturn(policy);
-        Mockito.doThrow(APIManagementException.class).when(manager).undeployPolicyFromGlobalCEP(Matchers.anyString());
+        Mockito.doThrow(APIManagementException.class).when(manager).undeployPolicyFromGlobalCEP(ArgumentMatchers.anyString());
         try {
             apiProvider.updatePolicy(policy);
         } catch (Exception e) {
@@ -3742,7 +3742,7 @@ public class APIProviderImplTest {
         List<API> apiList1 = (List<API>) result1.get("apis");
         Assert.assertEquals(0, apiList1.size());
         //Registry Exception while retrieving artifacts
-        Mockito.when(artifactManager.findGenericArtifacts(Matchers.anyMap())).thenThrow(RegistryException.class);
+        Mockito.when(artifactManager.findGenericArtifacts(ArgumentMatchers.anyMap())).thenThrow(RegistryException.class);
         try {
             apiProvider.getAllPaginatedAPIs("carbon.super", 0, 10);
         } catch (APIManagementException e) {
@@ -3788,7 +3788,7 @@ public class APIProviderImplTest {
         apiProvider.addDocumentationContent(api, docName, "content");
         doc.setVisibility(DocumentVisibility.PRIVATE);
         apiProvider.addDocumentationContent(api, docName, "content");
-        Mockito.doThrow(RegistryException.class).when(apiProvider.registry).put(Matchers.anyString(),
+        Mockito.doThrow(RegistryException.class).when(apiProvider.registry).put(ArgumentMatchers.anyString(),
                 any(Resource.class));
         try {
             apiProvider.addDocumentationContent(api, docName, "content");
@@ -4064,7 +4064,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION)).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
         String msg = "Error while processing the " + APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT
@@ -4076,7 +4076,7 @@ public class APIProviderImplTest {
         }
 
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         try {
             apiProvider.getCustomFaultSequences(apiId);
@@ -4107,7 +4107,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION)).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
         String msg = "Issue is in getting custom InSequences from the Registry";
@@ -4117,7 +4117,7 @@ public class APIProviderImplTest {
             Assert.assertEquals(msg, e.getMessage());
         }
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         try {
             apiProvider.getCustomInSequences(apiId);
@@ -4149,7 +4149,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION)).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
         String msg = "Issue is in getting custom OutSequences from the Registry";
@@ -4160,7 +4160,7 @@ public class APIProviderImplTest {
         }
 
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         try {
             apiProvider.getCustomOutSequences(apiId);
@@ -4184,7 +4184,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIUtil.getSequencePath(apiIdentifier,
                 APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT))).thenThrow(
                 org.wso2.carbon.registry.api.RegistryException.class);
@@ -4196,7 +4196,7 @@ public class APIProviderImplTest {
             Assert.assertTrue(e.getMessage().contains(msg));
         }
         //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenThrow(
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
                 RegistryException.class);
         String msg1 =  "Error while retrieving registry for tenant -1";
         try {
@@ -4212,7 +4212,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(seqLoc)).thenReturn(true);
         Collection seqCollection = Mockito.mock(Collection.class);
         Mockito.when(registry.get(seqLoc)).thenReturn(
@@ -4248,7 +4248,7 @@ public class APIProviderImplTest {
         RegistryService registryService = Mockito.mock(RegistryService.class);
         PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
         UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(Matchers.anyInt())).thenReturn(registry);
+        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(seqLoc)).thenReturn(true);
         Collection seqCollection = Mockito.mock(Collection.class);
         Mockito.when(registry.get(seqLoc)).thenReturn(
@@ -4757,7 +4757,7 @@ public class APIProviderImplTest {
         PowerMockito.doCallRealMethod().when(graphQLSchemaDefinition).saveGraphQLSchemaDefinition(api, schemaContent, userRegistry);
 
         //org.wso2.carbon.registry.api.RegistryException
-        Mockito.doThrow(RegistryException.class).when(registry).put(Matchers.anyString(), any(Resource.class));
+        Mockito.doThrow(RegistryException.class).when(registry).put(ArgumentMatchers.anyString(), any(Resource.class));
         try {
             graphQLSchemaDefinition.saveGraphQLSchemaDefinition(api, schemaContent, registry);
         } catch (APIManagementException e) {

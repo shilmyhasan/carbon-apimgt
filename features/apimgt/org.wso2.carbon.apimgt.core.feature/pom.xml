@@ -95,7 +95,7 @@
                                     <path refid="maven.compile.classpath" />
                                 </path>
                                 <echo message="########### Creating API Manager Database ##############" />
-                                <sql autocommit="true" driver="org.h2.Driver" onerror="continue" password="wso2carbon" url="jdbc:h2:${basedir}/src/main/resources/repository/database/WSO2AM_DB;create=true" userid="wso2carbon">
+                                <sql autocommit="true" driver="org.h2.Driver" onerror="continue" password="wso2carbon" url="jdbc:h2:${basedir}/src/main/resources/repository/database/WSO2AM_DB" userid="wso2carbon">
                                     <classpath>
                                         <path refid="h2.classpath" />
                                     </classpath>

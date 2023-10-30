@@ -853,14 +853,16 @@ public class APIKeyValidatorTestCase {
             Mockito.when(apiKeyDataStore.getAPIKeyData(context, apiVersion, apiKey, authenticationScheme,
                     clientDomain, matchingResource, httpVerb, tenantDomain, new ArrayList<>()))
                     .thenReturn(apiKeyValidationInfoDTO);
+            Mockito.when(APIUtil.getAccessTokenCacheKey(apiKey, context, apiVersion, matchingResource, httpVerb,
+                    authenticationScheme)).thenReturn(UUID.randomUUID().toString());
             apiKeyValidator.getKeyValidationInfo(context, apiKey, apiVersion, authenticationScheme, clientDomain,
                     matchingResource, httpVerb, defaultVersionInvoked, new ArrayList<>());
             Mockito.verify(tokenCache, Mockito.times(1)).get(Mockito.anyString());
             Mockito.verify(invalidTokenCache, Mockito.times(1)).get(Mockito.anyString());
             Mockito.verify(keyCache, Mockito.times(0)).get(Mockito.anyString());
             Mockito.verify(tokenCache, Mockito.times(1)).put(Mockito.anyString(), Mockito.anyString());
-            Mockito.verify(keyCache, Mockito.times(1)).put(Mockito.any(APIKeyValidationInfoDTO.class), Mockito
-                    .anyString());
+            Mockito.verify(keyCache, Mockito.times(1))
+                    .put(Mockito.anyString(), Mockito.any(APIKeyValidationInfoDTO.class));
             Mockito.verify(invalidTokenCache, Mockito.times(0)).put(Mockito.anyString(), Mockito.anyString());
             Mockito.verify(tokenCache, Mockito.times(0)).remove(Mockito.anyString());
             Mockito.verify(invalidTokenCache, Mockito.times(0)).remove(Mockito.anyString());
@@ -899,14 +901,16 @@ public class APIKeyValidatorTestCase {
             Mockito.when(apiKeyDataStore.getAPIKeyData(context, apiVersion, apiKey, authenticationScheme,
                     clientDomain, matchingResource, httpVerb, tenantDomain, new ArrayList<>()))
                     .thenReturn(apiKeyValidationInfoDTO);
+            Mockito.when(APIUtil.getAccessTokenCacheKey(apiKey, context, apiVersion, matchingResource, httpVerb,
+                    authenticationScheme)).thenReturn(UUID.randomUUID().toString());
             apiKeyValidator.getKeyValidationInfo(context, apiKey, apiVersion, authenticationScheme, clientDomain,
                     matchingResource, httpVerb, defaultVersionInvoked, new ArrayList<>());
             Mockito.verify(tokenCache, Mockito.times(1)).get(Mockito.anyString());
             Mockito.verify(invalidTokenCache, Mockito.times(1)).get(Mockito.anyString());
             Mockito.verify(keyCache, Mockito.times(0)).get(Mockito.anyString());
             Mockito.verify(tokenCache, Mockito.times(2)).put(Mockito.anyString(), Mockito.anyString());
-            Mockito.verify(keyCache, Mockito.times(1)).put(Mockito.any(APIKeyValidationInfoDTO.class), Mockito
-                    .anyString());
+            Mockito.verify(keyCache, Mockito.times(1))
+                    .put(Mockito.anyString(), Mockito.any(APIKeyValidationInfoDTO.class));
             Mockito.verify(invalidTokenCache, Mockito.times(0)).put(Mockito.anyString(), Mockito.anyString());
             Mockito.verify(tokenCache, Mockito.times(0)).remove(Mockito.anyString());
             Mockito.verify(invalidTokenCache, Mockito.times(0)).remove(Mockito.anyString());
@@ -1029,6 +1033,8 @@ public class APIKeyValidatorTestCase {
             APIKeyValidationInfoDTO apiKeyValidationInfoDTO = new APIKeyValidationInfoDTO();
             apiKeyValidationInfoDTO.setAuthorized(true);
             PowerMockito.when(APIUtil.isAccessTokenExpired(apiKeyValidationInfoDTO)).thenReturn(false);
+            Mockito.when(APIUtil.getAccessTokenCacheKey(apiKey, context, apiVersion, matchingResource, httpVerb,
+                    authenticationScheme)).thenReturn(UUID.randomUUID().toString());
             AxisConfiguration axisConfiguration = Mockito.mock(AxisConfiguration.class);
             Cache tokenCache = Mockito.mock(Cache.class);
             Cache keyCache = Mockito.mock(Cache.class);
@@ -1088,6 +1094,8 @@ public class APIKeyValidatorTestCase {
             Mockito.when(apiKeyDataStore.getAPIKeyData(context, apiVersion, apiKey, authenticationScheme,
                     clientDomain, matchingResource, httpVerb, tenantDomain, new ArrayList<>()))
                     .thenReturn(apiKeyValidationInfoDTO);
+            Mockito.when(APIUtil.getAccessTokenCacheKey(apiKey, context, apiVersion, matchingResource, httpVerb,
+                    authenticationScheme)).thenReturn(UUID.randomUUID().toString());
             apiKeyValidator.getKeyValidationInfo(context, apiKey, apiVersion, authenticationScheme, clientDomain,
                     matchingResource, httpVerb, defaultVersionInvoked, new ArrayList<>());
             Mockito.verify(tokenCache, Mockito.times(1)).get(Mockito.anyString());

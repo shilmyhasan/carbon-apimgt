@@ -47,7 +47,7 @@ import org.wso2.carbon.apimgt.hybrid.gateway.common.dto.AccessTokenDTO;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({APIManagerConfiguration.class, ServiceReferenceHolder.class, APIManagerConfigurationService.class,

@@ -33,7 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -125,7 +125,7 @@ public class WSO2APIPublisherTestCase {
         PowerMockito.mockStatic(MultipartEntityBuilder.class);
         Mockito.when(MultipartEntityBuilder.create()).thenReturn(multipartEntityBuilder);
         Mockito.when(multipartEntityBuilder.build()).thenReturn(Mockito.mock(HttpEntity.class));
-        Mockito.doNothing().when(httpPost).setEntity(Matchers.any());
+        Mockito.doNothing().when(httpPost).setEntity(ArgumentMatchers.any());
         apiImportExportManager = Mockito.mock(APIImportExportManager.class);
         PowerMockito.whenNew(APIImportExportManager.class).withAnyArguments().thenReturn(apiImportExportManager);
     }
@@ -150,13 +150,13 @@ public class WSO2APIPublisherTestCase {
     public void testPublishAndUpdateToStore() throws Exception {
 
         Mockito.when(tenantManager.getTenantId(tenantDomain)).thenReturn(tenantID);
-        Mockito.doReturn(apiArtifactDir).when(apiImportExportManager).exportAPIArtifacts(Matchers.any(API.class),
-                Matchers.anyBoolean(), Matchers.any(ExportFormat.class));
+        Mockito.doReturn(apiArtifactDir).when(apiImportExportManager).exportAPIArtifacts(ArgumentMatchers.any(API.class),
+                ArgumentMatchers.anyBoolean(), ArgumentMatchers.any(ExportFormat.class));
         //Test Unauthenticated scenario for publishing API
         Mockito.doReturn(HttpStatus.SC_UNAUTHORIZED).when(statusLine).getStatusCode();
         String unauthenticatedResponse = "{\"code\":401,\"message\":\"\",\"description\":\"Unauthenticated request\"," +
                 "\"moreInfo\":\"\",\"error\":[]}";
-        PowerMockito.when(EntityUtils.toString(Matchers.any())).thenReturn(unauthenticatedResponse);
+        PowerMockito.when(EntityUtils.toString(ArgumentMatchers.any())).thenReturn(unauthenticatedResponse);
         String errorMsg = "Import API service call received unsuccessful response: " + unauthenticatedResponse
                 + " status: " + HttpStatus.SC_UNAUTHORIZED;
         try {
@@ -175,7 +175,7 @@ public class WSO2APIPublisherTestCase {
         //Test Successful scenario for publishing and updating API
         Mockito.doReturn(HttpStatus.SC_OK).when(statusLine).getStatusCode();
         String successResponse = "API imported successfully.";
-        PowerMockito.when(EntityUtils.toString(Matchers.any())).thenReturn(successResponse);
+        PowerMockito.when(EntityUtils.toString(ArgumentMatchers.any())).thenReturn(successResponse);
         Assert.assertTrue("API Publish is unsuccessful", wso2APIPublisher.publishToStore(api, store));
         Assert.assertTrue("API Update is unsuccessful", wso2APIPublisher.updateToStore(api, store));
     }
@@ -185,7 +185,7 @@ public class WSO2APIPublisherTestCase {
 
         //Error path - When exporting API failed
         PowerMockito.doThrow(new APIImportExportException("Error while exporting API")).when(apiImportExportManager)
-                .exportAPIArtifacts(Matchers.any(API.class), Matchers.anyBoolean(), Matchers.any(ExportFormat.class));
+                .exportAPIArtifacts(ArgumentMatchers.any(API.class), ArgumentMatchers.anyBoolean(), ArgumentMatchers.any(ExportFormat.class));
         try {
             wso2APIPublisher.publishToStore(api, store);
             Assert.fail("APIManagement exception not thrown for error scenario");
@@ -235,7 +235,7 @@ public class WSO2APIPublisherTestCase {
                 "        \"previous\": \"\"\n" +
                 "    }\n" +
                 "}";
-        PowerMockito.when(EntityUtils.toString(Matchers.any())).thenReturn(apiGetResponse);
+        PowerMockito.when(EntityUtils.toString(ArgumentMatchers.any())).thenReturn(apiGetResponse);
         String errorMessage = "Duplicate APIs exists in external store for API name:"
                 + identifier.getApiName() + " version: " + identifier.getVersion();
         try {
@@ -257,7 +257,7 @@ public class WSO2APIPublisherTestCase {
                 "        \"previous\": \"\"\n" +
                 "    }\n" +
                 "}";
-        PowerMockito.when(EntityUtils.toString(Matchers.any())).thenReturn(apiGetResponse);
+        PowerMockito.when(EntityUtils.toString(ArgumentMatchers.any())).thenReturn(apiGetResponse);
         Assert.assertFalse("API Exists response received", wso2APIPublisher.isAPIAvailable(api, store));
 
         //Test successful API existence response
@@ -278,7 +278,7 @@ public class WSO2APIPublisherTestCase {
                 "        \"previous\": \"\"\n" +
                 "    }\n" +
                 "}";
-        PowerMockito.when(EntityUtils.toString(Matchers.any())).thenReturn(apiGetResponse);
+        PowerMockito.when(EntityUtils.toString(ArgumentMatchers.any())).thenReturn(apiGetResponse);
         Assert.assertTrue("API non exists response received", wso2APIPublisher.isAPIAvailable(api, store));
     }
 
@@ -298,7 +298,7 @@ public class WSO2APIPublisherTestCase {
                 "        \"previous\": \"\"\n" +
                 "    }\n" +
                 "}";
-        PowerMockito.when(EntityUtils.toString(Matchers.any())).thenReturn(apiGetResponse);
+        PowerMockito.when(EntityUtils.toString(ArgumentMatchers.any())).thenReturn(apiGetResponse);
         try {
             wso2APIPublisher.deleteFromStore(identifier, store);
             Assert.fail("APIManagement exception not thrown for error scenario");
@@ -326,7 +326,7 @@ public class WSO2APIPublisherTestCase {
                 "        \"previous\": \"\"\n" +
                 "    }\n" +
                 "}";
-        PowerMockito.when(EntityUtils.toString(Matchers.any())).thenReturn(apiGetResponse);
+        PowerMockito.when(EntityUtils.toString(ArgumentMatchers.any())).thenReturn(apiGetResponse);
         Assert.assertTrue("API deletion failed", wso2APIPublisher.deleteFromStore(identifier, store));
 
         //Test error path API deletion failed due to server error

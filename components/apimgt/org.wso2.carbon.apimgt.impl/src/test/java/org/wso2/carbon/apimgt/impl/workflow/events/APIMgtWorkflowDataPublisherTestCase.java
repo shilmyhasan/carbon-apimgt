@@ -19,7 +19,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -92,7 +92,7 @@ public class APIMgtWorkflowDataPublisherTestCase {
         workflowDTO.setStatus(WorkflowStatus.APPROVED);
         apiMgtWorkflowDataPublisher.publishEvent(workflowDTO);
         Mockito.verify(dataPublisher, Mockito.times(0))
-                .publish(Matchers.anyString(), Matchers.any(Object[].class), Matchers.any(Object[].class),
-                        Matchers.any(Object[].class));
+                .publish(ArgumentMatchers.anyString(), ArgumentMatchers.any(Object[].class), ArgumentMatchers.any(Object[].class),
+                        ArgumentMatchers.any(Object[].class));
     }
 }

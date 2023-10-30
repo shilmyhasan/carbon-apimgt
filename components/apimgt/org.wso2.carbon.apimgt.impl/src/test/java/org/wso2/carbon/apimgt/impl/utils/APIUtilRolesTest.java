@@ -49,7 +49,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({PrivilegedCarbonContext.class, ServiceReferenceHolder.class, APIManagerComponent.class})
