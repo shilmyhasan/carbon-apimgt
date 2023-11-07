@@ -82,6 +82,7 @@ const AppConfig = {
                 },
             },
         },
+        maxScopeCount: 2000,
     },
     swaggerValidationBehaviour: 'default',
 };
