@@ -1185,8 +1185,6 @@ public class ApisApiServiceImpl implements ApisApiService {
                             "Error while sending data to the API Security Audit Feature. Found http status " +
                                     response.getStatusLine());
                 }
-            } finally {
-                httpPut.releaseConnection();
             }
         }
     }
@@ -4602,8 +4600,6 @@ public class ApisApiServiceImpl implements ApisApiService {
         } catch (IOException e) {
             log.error("Error occurred while sending the HEAD request to the given endpoint url:", e);
             apiEndpointValidationResponseDTO.setError("Connection error");
-        } finally {
-            method.releaseConnection();
         }
         return apiEndpointValidationResponseDTO;
     }

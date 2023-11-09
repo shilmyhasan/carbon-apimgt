@@ -375,8 +375,6 @@ public final class SelfSignUpUtil {
                             "Error while retrieving data from " + url + ". Found http status " + response
                                     .getStatusLine());
                 }
-            } finally {
-                httpGet.releaseConnection();
             }
         }
     }

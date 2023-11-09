@@ -171,6 +171,7 @@
                             <bundles>
                                 <bundleDef>javax.validation:validation-api</bundleDef>
                                 <bundleDef>com.google.guava:guava:${google.guava.version}</bundleDef>
+                                <bundleDef>com.google.guava:failureaccess:${failureaccess.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.io.swagger.core:swagger-core</bundleDef>
                                 <bundleDef>io.swagger:swagger-models</bundleDef>
                                 <bundleDef>io.swagger:swagger-annotations</bundleDef>

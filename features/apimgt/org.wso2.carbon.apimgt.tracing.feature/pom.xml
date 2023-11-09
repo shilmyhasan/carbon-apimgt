@@ -49,7 +49,7 @@
             <artifactId>zipkin-reporter</artifactId>
         </dependency>
         <dependency>
-        <groupId>io.zipkin.reporter2</groupId>
+        <groupId>org.wso2.orbit.io.zipkin.reporter2</groupId>
         <artifactId>zipkin-sender-okhttp3</artifactId>
         </dependency>
         <dependency>
@@ -90,10 +90,10 @@
                                 <bundleDef>org.json.wso2:json:${orbit.version.json}</bundleDef>
                                 <bundleDef>org.wso2.orbit.io.jaeger:jaeger-client</bundleDef>
                                 <bundleDef>io.zipkin.zipkin2:zipkin</bundleDef>
-                                <bundleDef>io.zipkin.reporter2:zipkin-reporter</bundleDef>
-                                <bundleDef>io.zipkin.reporter2:zipkin-sender-okhttp3</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.squareup.okhttp:okhttp</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.squareup.okio:okio</bundleDef>
+                                <bundleDef>io.zipkin.reporter2:zipkin-reporter:${zipkin.reporter.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.io.zipkin.reporter2:zipkin-sender-okhttp3:${zipkin.sender.okhttp3.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.squareup.okhttp:okhttp:${okhttp.wso2.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.squareup.okio:okio:${okio.wso2.version}</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>

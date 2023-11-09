@@ -207,10 +207,7 @@ public class APIStateChangeWSWorkflowExecutor extends WorkflowExecutor {
                     String errorMsg = "Error while connecting to the BPMN process server from the WorkflowExecutor.";
                     log.error(errorMsg, e);
                     throw new WorkflowException(errorMsg, e);
-                } finally {
-                    httpPost.reset();
                 }
-
                 super.execute(workflowDTO);
             } else {
                 // For any other states, act as simpleworkflow executor.
@@ -372,14 +369,6 @@ public class APIStateChangeWSWorkflowExecutor extends WorkflowExecutor {
         } catch (APIManagementException e) {
             log.error("Error removing the workflow entry", e);
             throw new WorkflowException("Error removing the workflow entry", e);            
-        } finally {
-            if (httpGet != null) {
-                httpGet.reset();
-            }
-            if (httpDelete != null) {
-                httpDelete.reset();
-            }
-
         }
     }
 
@@ -543,8 +532,6 @@ public class APIStateChangeWSWorkflowExecutor extends WorkflowExecutor {
                 String errorMsg = "Error while parsing response from DCR endpoint";
                 log.error(errorMsg, e);
                 throw new WorkflowException(errorMsg, e);
-            } finally {
-                httpPost.reset();
             }
 
         }

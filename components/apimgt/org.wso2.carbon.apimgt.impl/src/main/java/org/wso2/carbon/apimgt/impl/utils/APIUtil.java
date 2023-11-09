@@ -9900,8 +9900,6 @@ public final class APIUtil {
                 handleException("Error while connecting to the server ", e);
             } catch (ParseException e) {
                 handleException("Error while parsing the response ", e);
-            } finally {
-                httpPost.reset();
             }
 
         } catch (MalformedURLException e) {

@@ -111,6 +111,8 @@
                                 <bundleDef>com.googlecode.json-simple.wso2:json-simple</bundleDef>
                                 <bundleDef>com.google.code.gson:gson:${google.code.gson.version}</bundleDef>
                                 <bundleDef>net.sf.ehcache.wso2:ehcache</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.httpcomponents:httpclient:${httpclient.version}</bundleDef>
+                                <bundleDef>org.apache.httpcomponents.wso2:httpcore:${httpcore.version}</bundleDef>
                                 <bundleDef>org.json.wso2:json:${orbit.version.json}</bundleDef>
                                 <bundleDef>org.wso2.uri.template:wso2-uri-templates:${wso2-uri-templates.version}
                                 </bundleDef>

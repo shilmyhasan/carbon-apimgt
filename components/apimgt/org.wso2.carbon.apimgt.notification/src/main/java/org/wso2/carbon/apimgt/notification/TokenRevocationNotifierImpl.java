@@ -112,9 +112,10 @@ public class TokenRevocationNotifierImpl implements TokenRevocationNotifier {
         etcdParams.add(new BasicNameValuePair("ttl", persistentNotifierTTL));
 
         //Send the revoked token to the persistent storage Server
-        httpETCDPut.setEntity(new UrlEncodedFormEntity(etcdParams, StandardCharsets.UTF_8));
-        HttpResponse etcdResponse;
+
         try {
+            httpETCDPut.setEntity(new UrlEncodedFormEntity(etcdParams, StandardCharsets.UTF_8.toString()));
+            HttpResponse etcdResponse;
             etcdResponse = etcdEPClient.execute(httpETCDPut);
             if (etcdResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK
                     || etcdResponse.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {

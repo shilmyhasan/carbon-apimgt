@@ -145,6 +145,7 @@
                             <bundles>
                                 <bundleDef>javax.validation:validation-api</bundleDef>
                                 <bundleDef>com.google.guava:guava:${google.guava.version}</bundleDef>
+                                <bundleDef>com.google.guava:failureaccess:${failureaccess.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.io.swagger.core:swagger-core</bundleDef>
                                 <bundleDef>io.swagger:swagger-models</bundleDef>
                                 <bundleDef>io.swagger:swagger-annotations</bundleDef>
@@ -158,6 +159,8 @@
                                 <bundleDef>
                                     org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.output.adapter.http:${carbon.apimgt.version}
                                 </bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.multi.attribute.login.mgt:${carbon.identity.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.poi:poi-ooxml:${apache.poi.version}</bundleDef>
                                 <bundleDef>com.googlecode.json-simple.wso2:json-simple</bundleDef>
                                 <bundleDef>com.google.code.gson:gson:${google.code.gson.version}</bundleDef>
                                 <bundleDef>net.sf.ehcache.wso2:ehcache</bundleDef>
