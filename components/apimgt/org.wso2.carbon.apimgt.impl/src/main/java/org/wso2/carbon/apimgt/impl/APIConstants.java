@@ -2129,4 +2129,5 @@ public final class APIConstants {
         public static final String ALL = "all";
         public static final String BODY = "body";
     }
+    public static final String BLOCK_GET_ACCESS_TOKEN_ON_APP_LOADING = "blockGetAccessTokenOnAppLoading";
 }
