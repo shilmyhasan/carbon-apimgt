@@ -119,6 +119,7 @@ public class OAuthClient {
 
             httpPost.setHeader(APIConstants.HEADER_CONTENT_TYPE, APIConstants.OAuthConstants.APPLICATION_X_WWW_FORM_URLENCODED);
             if (grantType.equals(APIConstants.OAuthConstants.CLIENT_CREDENTIALS)) {
+                // As per the RFC 6749, a refresh token should not be included in token response for client credentials grant type.
                 refreshToken = null;
                 payload.append(APIConstants.OAuthConstants.CLIENT_CRED_GRANT_TYPE);
             } else if (refreshToken != null) {
