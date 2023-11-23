@@ -182,7 +182,7 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
             revocationRequestPublisher.publishRevocationEvents(revokedToken, expiryTime, properties);
             if (isJwtToken) {
                 // Persist revoked JWT token to database.
-                log.debug("persisting jwt token revocation event.");
+                log.debug("Persisting JWT token revocation event during token renewal.");
                 persistRevokedJWTIdentifier(revokedToken, expiryTime, tenantId);
             }
         }
