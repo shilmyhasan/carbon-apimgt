@@ -27,13 +27,19 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.ExpiredJWTCleaner;
+import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
 import org.wso2.carbon.identity.oauth.event.AbstractOAuthEventInterceptor;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.ResponseHeader;
+import org.wso2.carbon.identity.oauth2.authz.AuthorizationHandlerManager;
+import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
+import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenRespDTO;
 import org.wso2.carbon.identity.oauth2.dto.OAuthRevocationRequestDTO;
 import org.wso2.carbon.identity.oauth2.dto.OAuthRevocationResponseDTO;
 import org.wso2.carbon.identity.oauth2.model.AccessTokenDO;
 import org.wso2.carbon.identity.oauth2.model.RefreshTokenValidationDataDO;
+import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
+import org.wso2.carbon.identity.oauth2.token.handlers.grant.RefreshGrantHandler;
 
 import java.util.Map;
 import java.util.Properties;
@@ -139,6 +145,47 @@ public class APIMOAuthEventInterceptor extends AbstractOAuthEventInterceptor {
 
         log.debug("onPostTokenRevocationBySystem event triggered.");
         publishAndPersistEvent(accessTokenDO);
+    }
+
+    @Override
+    public void onPostTokenRenewal(OAuth2AccessTokenReqDTO tokenReqDTO, OAuth2AccessTokenRespDTO tokenRespDTO,
+                                   OAuthTokenReqMessageContext tokReqMsgCtx, Map<String, Object> params)
+            throws IdentityOAuth2Exception {
+
+        if (tokReqMsgCtx.getProperty(RefreshGrantHandler.PREV_ACCESS_TOKEN) != null &&
+                tokReqMsgCtx.getProperty(AuthorizationHandlerManager.OAUTH_APP_PROPERTY) != null) {
+            RefreshTokenValidationDataDO previousAccessToken =
+                    (RefreshTokenValidationDataDO) tokReqMsgCtx.getProperty(RefreshGrantHandler.PREV_ACCESS_TOKEN);
+            OAuthAppDO oAuthAppDO =
+                    (OAuthAppDO) tokReqMsgCtx.getProperty(AuthorizationHandlerManager.OAUTH_APP_PROPERTY);
+            Properties properties = new  Properties();
+            long expiryTime =
+                    previousAccessToken.getIssuedTime().getTime() + previousAccessToken.getValidityPeriodInMillis();
+            boolean isJwtToken = false;
+            String revokedToken = previousAccessToken.getAccessToken();
+            int tenantId = tokReqMsgCtx.getTenantID();
+            String consumerKey = oAuthAppDO.getOauthConsumerKey();
+
+            try {
+                Application application = ApiMgtDAO.getInstance().getApplicationByClientId(consumerKey);
+                if (application != null) {
+                    if (APIConstants.TOKEN_TYPE_JWT.equals(application.getTokenType())) {
+                        properties.setProperty(APIConstants.REVOKED_TOKEN_TYPE, APIConstants.JWT);
+                        isJwtToken = true;
+                    }
+                } else {
+                    log.debug("Revoking tokens of application : null");
+                }
+            } catch (APIManagementException e) {
+                log.warn("Exception occurred while getting application for publishing revoke event.");
+            }
+            revocationRequestPublisher.publishRevocationEvents(revokedToken, expiryTime, properties);
+            if (isJwtToken) {
+                // Persist revoked JWT token to database.
+                log.debug("Persisting JWT token revocation event during token renewal.");
+                persistRevokedJWTIdentifier(revokedToken, expiryTime, tenantId);
+            }
+        }
     }
 
     private void publishAndPersistEvent(AccessTokenDO accessTokenDO) {
