@@ -1411,7 +1411,7 @@ public class SQLConstants {
             "   APPLICATION_ID = ?";
 
     public static final String ADD_APPLICATION_ATTRIBUTES_SQL =
-            " INSERT INTO AM_APPLICATION_ATTRIBUTES (APPLICATION_ID, NAME, APP_ATTRIBUTE, TENANT_ID) VALUES (?,?,?,?)";
+            " INSERT INTO AM_APPLICATION_ATTRIBUTES (APPLICATION_ID, NAME, `VALUE`, TENANT_ID) VALUES (?,?,?,?)";
 
     public static final String REMOVE_APPLICATION_ATTRIBUTES_SQL =
             " DELETE FROM " +
@@ -1971,7 +1971,7 @@ public class SQLConstants {
             " SELECT " +
                     "   APP.APPLICATION_ID," +
                     "   APP.NAME," +
-                    "   APP.APP_ATTRIBUTE" +
+                    "   `APP.VALUE`" +
                     " FROM " +
                     "   AM_APPLICATION_ATTRIBUTES APP WHERE APPLICATION_ID = ?";
 
@@ -3351,13 +3351,13 @@ public class SQLConstants {
                 "ORDER BY AUM.URL_MAPPING_ID";
 
         public static final String ADD_BLOCK_CONDITIONS_SQL =
-                "INSERT INTO AM_BLOCK_CONDITIONS (TYPE, BLOCK_CONDITION,ENABLED,DOMAIN,UUID) VALUES (?,?,?,?,?)";
+                "INSERT INTO AM_BLOCK_CONDITIONS (TYPE, `VALUE`,ENABLED,DOMAIN,UUID) VALUES (?,?,?,?,?)";
         public static final String GET_BLOCK_CONDITIONS_SQL =
-                "SELECT CONDITION_ID,TYPE,BLOCK_CONDITION,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE DOMAIN =?";
+                "SELECT CONDITION_ID,TYPE,`VALUE`,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE DOMAIN =?";
         public static final String GET_BLOCK_CONDITION_SQL =
-                "SELECT TYPE,BLOCK_CONDITION,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE CONDITION_ID =?";
+                "SELECT TYPE,`VALUE`,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE CONDITION_ID =?";
         public static final String GET_BLOCK_CONDITION_BY_UUID_SQL =
-                "SELECT CONDITION_ID,TYPE,BLOCK_CONDITION,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE UUID =?";
+                "SELECT CONDITION_ID,TYPE,`VALUE`,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE UUID =?";
         public static final String UPDATE_BLOCK_CONDITION_STATE_SQL =
                 "UPDATE AM_BLOCK_CONDITIONS SET ENABLED = ? WHERE CONDITION_ID = ?";
         public static final String UPDATE_BLOCK_CONDITION_STATE_BY_UUID_SQL =
@@ -3367,11 +3367,11 @@ public class SQLConstants {
         public static final String DELETE_BLOCK_CONDITION_BY_UUID_SQL =
                 "DELETE FROM AM_BLOCK_CONDITIONS WHERE UUID=?";
         public static final String BLOCK_CONDITION_EXIST_SQL =
-                "SELECT CONDITION_ID,TYPE,BLOCK_CONDITION,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE DOMAIN =? "
-                        + "AND TYPE =? AND BLOCK_CONDITION =?";
+                "SELECT CONDITION_ID,TYPE,`VALUE`,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE DOMAIN =? "
+                        + "AND TYPE =? AND `VALUE` =?";
         public static final String GET_SUBSCRIPTION_BLOCK_CONDITION_BY_VALUE_AND_DOMAIN_SQL =
-                "SELECT CONDITION_ID,TYPE,BLOCK_CONDITION,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE "
-                        + "BLOCK_CONDITION = ? AND DOMAIN = ? ";
+                "SELECT CONDITION_ID,TYPE,`VALUE`,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE "
+                        + "`VALUE` = ? AND DOMAIN = ? ";
 
         public static final String TIER_HAS_SUBSCRIPTION = " select count(sub.TIER_ID) as c from AM_SUBSCRIPTION sub, AM_API api "
                 + " where sub.TIER_ID = ? and sub.API_ID = api.API_ID ";
