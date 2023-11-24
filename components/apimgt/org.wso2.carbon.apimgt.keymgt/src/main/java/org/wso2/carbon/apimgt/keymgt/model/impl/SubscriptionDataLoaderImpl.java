@@ -435,12 +435,16 @@ public class SubscriptionDataLoaderImpl implements SubscriptionDataLoader {
             try {
                 httpResponse = httpClient.execute(method);
                 if (HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
-                    log.error("Could not retrieve subscriptions for tenantDomain: " + tenantDomain
+                    log.error("Could not retrieve " + path + " for tenantDomain: " + tenantDomain
                             + ". Received response with status code "
                             + httpResponse.getStatusLine().getStatusCode());
                     throw new DataLoadingException("Error while retrieving subscription");
+                } else if (retryCount > 0) {
+                    log.info("Successfully retrieved " + path + " for tenantDomain: " + tenantDomain);
                 }
+
                 retry = false;
+
             } catch (IOException | DataLoadingException ex) {
                 retryCount++;
                 if (retryCount < retrievalRetries) {
@@ -459,7 +463,8 @@ public class SubscriptionDataLoaderImpl implements SubscriptionDataLoader {
             }
         } while (retry);
         if (HttpStatus.SC_OK != httpResponse.getStatusLine().getStatusCode()) {
-            log.error("Could not retrieve subscriptions for tenantDomain : " + tenantDomain);
+            log.error("Failed to retrieve " + path + " from remote endpoint for tenantDomain : " + tenantDomain
+                    + "Maximum retry count exceeded");
             throw new DataLoadingException("Error while retrieving subscription from " + path);
         }
         String responseString = EntityUtils.toString(httpResponse.getEntity(), UTF8);
