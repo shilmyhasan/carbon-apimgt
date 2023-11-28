@@ -196,7 +196,7 @@
             <artifactId>org.wso2.carbon.registry.indexing</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.json-simple.wso2</groupId>
+            <groupId>org.wso2.orbit.com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
         </dependency>
         <dependency>
@@ -580,7 +580,7 @@
                             javax.sql,
                             javax.wsdl.*,
                             javax.xml.*;version="0.0.0",
-                            org.json.simple.*,
+                            org.json.simple.*;version="${json-simple.version.range}",
                             org.json.*;version="${org.json.version.range}",
                             org.slf4j,
                             org.slf4j.ext,

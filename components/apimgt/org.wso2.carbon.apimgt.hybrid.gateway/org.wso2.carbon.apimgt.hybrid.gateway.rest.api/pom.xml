@@ -73,7 +73,7 @@
             <version>${jsr311-api.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.json-simple.wso2</groupId>
+            <groupId>org.wso2.orbit.com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
         </dependency>
 

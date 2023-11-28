@@ -57,6 +57,7 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
+                                <bundleDef>org.wso2.orbit.com.googlecode.json-simple:json-simple</bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.jms.listener:${carbon.apimgt.version}
                                 </bundleDef>

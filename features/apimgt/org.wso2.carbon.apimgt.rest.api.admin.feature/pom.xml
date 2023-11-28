@@ -185,6 +185,7 @@
                                 <bundleDef>com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${fasterxml.jackson.version}</bundleDef>
                                 <bundleDef>com.fasterxml.jackson.datatype:jackson-datatype-guava:${fasterxml.jackson.version}</bundleDef>
                                 <bundleDef>com.github.ben-manes.caffeine:caffeine:${caffeine.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.googlecode.json-simple:json-simple</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>

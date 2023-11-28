@@ -480,12 +480,6 @@
             </dependency>
 
             <dependency>
-                <groupId>net.minidev</groupId>
-                <artifactId>json-smart</artifactId>
-                <version>${json-smart.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.wso2.carbon.apimgt</groupId>
                 <artifactId>org.wso2.carbon.apimgt.output.adapter.http</artifactId>
                 <version>${carbon.apimgt.version}</version>
@@ -1155,7 +1149,7 @@
             </dependency>
 
             <dependency>
-                <groupId>com.googlecode.json-simple.wso2</groupId>
+                <groupId>org.wso2.orbit.com.googlecode.json-simple</groupId>
                 <artifactId>json-simple</artifactId>
                 <version>${json-simple.wso2.version}</version>
             </dependency>
@@ -1769,8 +1763,8 @@
 
         <carbon.analytics.common.version>5.2.26</carbon.analytics.common.version>
         <!-- Carbon kernel version -->
-        <carbon.kernel.version>4.6.0.112</carbon.kernel.version>
-        <carbon.kernel.feature.version>4.6.0.112</carbon.kernel.feature.version>
+        <carbon.kernel.version>4.6.0.130-SNAPSHOT</carbon.kernel.version>
+        <carbon.kernel.feature.version>4.6.0.130-SNAPSHOT</carbon.kernel.feature.version>
         <carbon.kernel.package.import.version.range>[4.5.0, 5.0.0)</carbon.kernel.package.import.version.range>
 
         <carbon.commons.version>4.7.32.3</carbon.commons.version>
@@ -1858,7 +1852,7 @@
         <imp.package.version.osgi.framework>[1.6.0, 2.0.0)</imp.package.version.osgi.framework>
 
         <!-- Misc Versions -->
-	    <synapse.version>2.1.7-wso2v183.32</synapse.version>
+	    <synapse.version>2.1.7-wso2v183.52-SNAPSHOT</synapse.version>
 
         <orbit.version.json>3.0.0.wso2v1</orbit.version.json>
 
@@ -1878,13 +1872,14 @@
         <javax.xml.soap.imp.pkg.version>0.0.0</javax.xml.soap.imp.pkg.version>
         <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
 
-        <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
+        <json-simple.wso2.version>1.1.1.wso2v2</json-simple.wso2.version>
+        <json-simple.version.range>[0.0,3.0)</json-simple.version.range>
         <apache.woden.version>1.0.0.M9-wso2v1</apache.woden.version>
         <apache.poi.version>5.2.3.wso2v1</apache.poi.version>
         <rhino.js.version>1.7.0.R4.wso2v1</rhino.js.version>
         <owasp.encoder.version>1.2.2</owasp.encoder.version>
 
-        <httpclient.version>4.3.6.wso2v2</httpclient.version>
+        <httpclient.version>4.5.14.wso2v1</httpclient.version>
         <wss4j.version>1.5.11-wso2v18</wss4j.version>
         <commons-logging.version>1.1.1</commons-logging.version>
         <commons-io.version>2.4.0.wso2v1</commons-io.version>
@@ -1893,7 +1888,6 @@
         <httpcomponents.version>4.5.10</httpcomponents.version>
         <commons-codec.version>1.14</commons-codec.version>
         <com.nimbusds.wso2.version>7.3.0.wso2v1</com.nimbusds.wso2.version>
-        <json-smart.version>2.3</json-smart.version>
         <netty.version>4.1.100.Final</netty.version>
         <org.apache.velocity.version>2.3</org.apache.velocity.version>
         <org.slf4j.version>1.7.0</org.slf4j.version>
@@ -1969,7 +1963,7 @@
 
         <maven.checkstyleplugin.version>2.17</maven.checkstyleplugin.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
-        <httpcore.version>4.3.3.wso2v1</httpcore.version>
+        <httpcore.version>4.4.16.wso2v1</httpcore.version>
         <slf4j.wso2.version>1.5.10.wso2v1</slf4j.wso2.version>
         <re2j.version>1.2.wso2v1</re2j.version>
         <maven-site-plugin.version>3.3</maven-site-plugin.version>

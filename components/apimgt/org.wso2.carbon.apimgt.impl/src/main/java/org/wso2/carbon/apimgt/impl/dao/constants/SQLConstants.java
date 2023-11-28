@@ -1971,7 +1971,7 @@ public class SQLConstants {
             " SELECT " +
                     "   APP.APPLICATION_ID," +
                     "   APP.NAME," +
-                    "   `APP.VALUE`" +
+                    "   APP.`VALUE`" +
                     " FROM " +
                     "   AM_APPLICATION_ATTRIBUTES APP WHERE APPLICATION_ID = ?";
 

@@ -155,13 +155,18 @@
                                 <bundleDef>com.fasterxml.jackson.core:jackson-annotations</bundleDef>
                                 <bundleDef>com.fasterxml.jackson.core:jackson-databind</bundleDef>
                                 <bundleDef>org.yaml:snakeyaml</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.googlecode.json-simple:json-simple:${json-simple.wso2.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.impl</bundleDef>
                                 <bundleDef>
                                     org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.output.adapter.http:${carbon.apimgt.version}
                                 </bundleDef>
                                 <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.multi.attribute.login.mgt:${carbon.identity.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.governance:org.wso2.carbon.identity.multi.attribute.login.resolver.regex:${carbon.identity.governance.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.governance:org.wso2.carbon.identity.multi.attribute.login.service:${carbon.identity.governance.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.outbound.auth.oidc:org.wso2.carbon.identity.application.authenticator.oidc:${carbon.identity-outbound-auth-openid.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.user.functionality.mgt:${carbon.identity.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.org.apache.poi:poi-ooxml:${apache.poi.version}</bundleDef>
-                                <bundleDef>com.googlecode.json-simple.wso2:json-simple</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.googlecode.json-simple:json-simple</bundleDef>
                                 <bundleDef>com.google.code.gson:gson:${google.code.gson.version}</bundleDef>
                                 <bundleDef>net.sf.ehcache.wso2:ehcache</bundleDef>
                                 <bundleDef>org.json.wso2:json:${orbit.version.json}</bundleDef>

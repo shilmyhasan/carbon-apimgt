@@ -215,6 +215,7 @@
                                 <bundleDef>io.github.openfeign:feign-slf4j:${openfeign.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.squareup.okhttp:okhttp</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.squareup.okio:okio</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.googlecode.json-simple:json-simple</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
