@@ -1575,6 +1575,7 @@ public final class APIConstants {
     public static final String API_VERSION = "apiVersion";
 
     //swagger MG related constants
+    public static final String X_WSO2_ADVANCE_ENDPOINT_CONFIG = "advanceEndpointConfig";
     public static final String X_WSO2_AUTH_HEADER = "x-wso2-auth-header";
     public static final String X_THROTTLING_TIER = "x-throttling-tier";
     public static final String X_WSO2_CORS = "x-wso2-cors";

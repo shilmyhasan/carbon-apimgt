@@ -1229,6 +1229,51 @@ public class PublisherCommonUtils {
 
         existingAPI.setUriTemplates(uriTemplates);
         existingAPI.setScopes(scopes);
+        try {
+            JSONObject updatedApiJson = (JSONObject) new JSONParser().parse(apiDefinition);
+            JSONObject newProductionEndpointJson = (JSONObject) updatedApiJson.get(APIConstants.X_WSO2_PRODUCTION_ENDPOINTS);
+            JSONObject newSandboxEndpointJson = (JSONObject) updatedApiJson.get(APIConstants.X_WSO2_SANDBOX_ENDPOINTS);
+            String existingEndpointConfigString = existingAPI.getEndpointConfig();
+
+            if (StringUtils.isNotEmpty(existingEndpointConfigString)) { //check if endpoints are configured
+                JSONObject existingEndpointConfigJson = (JSONObject) new JSONParser().parse(existingEndpointConfigString);
+                if (newProductionEndpointJson != null) {
+                    if (existingEndpointConfigJson.get(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS) != null) {
+                        //put as a value under the ENDPOINT_PRODUCTION_ENDPOINTS key
+                        JSONObject productionConfigsJson = (JSONObject) existingEndpointConfigJson
+                                .get(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS);
+                        if (newProductionEndpointJson.containsKey(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                            JSONObject advanceConfig = (JSONObject) newProductionEndpointJson
+                                    .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                            productionConfigsJson.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
+                        } else {
+                            productionConfigsJson.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                        }
+                        existingEndpointConfigJson.put(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS, productionConfigsJson);
+                    }
+                }
+                if (newSandboxEndpointJson != null) {
+                    if (existingEndpointConfigJson.get(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS) != null) {
+                        //put as a value under the ENDPOINT_SANDBOX_ENDPOINTS key
+                        JSONObject sandboxConfigsJson = (JSONObject) existingEndpointConfigJson
+                                .get(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS);
+                        if (newSandboxEndpointJson.containsKey(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                            JSONObject advanceConfig = (JSONObject) newProductionEndpointJson
+                                    .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                            sandboxConfigsJson.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
+                        } else {
+                            sandboxConfigsJson.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                        }
+                        existingEndpointConfigJson.put(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS, sandboxConfigsJson);
+
+                    }
+                }
+                existingAPI.setEndpointConfig(existingEndpointConfigJson.toString());
+            }
+        } catch (ParseException e) {
+            throw new APIManagementException("Error when parsing endpoint configurations ", e);
+        }
+
         PublisherCommonUtils.validateScopes(existingAPI);
 
         //Update API is called to update URITemplates and scopes of the API
