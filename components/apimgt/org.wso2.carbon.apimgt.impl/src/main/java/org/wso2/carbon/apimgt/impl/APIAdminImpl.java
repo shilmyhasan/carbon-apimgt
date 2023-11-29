@@ -314,8 +314,9 @@ public class APIAdminImpl implements APIAdmin {
         return time;
     }
 
-    public List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(
-            String tenantDomain, boolean addGlobalKeyManager) throws APIManagementException {
+    @Override
+    public List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(String tenantDomain)
+            throws APIManagementException {
         KeyMgtRegistrationService.registerDefaultKeyManager(tenantDomain);
         List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
                 apiMgtDAO.getKeyManagerConfigurationsByTenant(tenantDomain);
@@ -338,12 +339,6 @@ public class APIAdminImpl implements APIAdmin {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
         }
         return keyManagerConfigurationsByTenant;
-    }
-
-    @Override
-    public List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(String tenantDomain)
-            throws APIManagementException {
-        return getKeyManagerConfigurationsByTenant(tenantDomain, false);
     }
 
     @Override

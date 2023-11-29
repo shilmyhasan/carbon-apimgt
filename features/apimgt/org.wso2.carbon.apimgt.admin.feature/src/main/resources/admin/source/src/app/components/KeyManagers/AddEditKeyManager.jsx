@@ -394,7 +394,7 @@ function AddEditKeyManager(props) {
 
 
         const keymanager = {
-            ...state, tokenValidation: newTokenValidation, global: isGlobal
+            ...state, tokenValidation: newTokenValidation, global: isGlobal,
         };
 
         if (id) {

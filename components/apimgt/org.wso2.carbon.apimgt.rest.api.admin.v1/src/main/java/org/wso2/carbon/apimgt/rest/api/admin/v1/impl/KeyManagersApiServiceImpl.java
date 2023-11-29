@@ -69,7 +69,7 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
         String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
         APIAdmin apiAdmin = new APIAdminImpl();
         List<KeyManagerConfigurationDTO> keyManagerConfigurations =
-                apiAdmin.getKeyManagerConfigurationsByTenant(tenantDomain, true);
+                apiAdmin.getKeyManagerConfigurationsByTenant(tenantDomain);
         KeyManagerListDTO keyManagerListDTO =
                 KeyManagerMappingUtil.toKeyManagerListDTO(keyManagerConfigurations);
         return Response.ok().entity(keyManagerListDTO).build();

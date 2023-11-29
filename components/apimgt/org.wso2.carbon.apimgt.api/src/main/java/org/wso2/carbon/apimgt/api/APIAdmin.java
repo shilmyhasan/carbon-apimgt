@@ -272,16 +272,6 @@ public interface APIAdmin  {
     long getTimestamp(String date);
 
     /**
-     * This method used to retrieve key manager configurations for tenant including global key manager
-     * @param tenantDomain tenant Domain
-     * @param addGlobalKeyManager whether to add global key manager
-     * @return KeyManagerConfigurationDTO list
-     * @throws APIManagementException if error occurred
-     */
-    List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(
-            String tenantDomain, boolean addGlobalKeyManager) throws APIManagementException;
-
-    /**
      * This method used to retrieve key manager configurations for tenant
      * @param tenantDomain tenant Domain
      * @return KeyManagerConfigurationDTO list
