@@ -1129,7 +1129,7 @@ public class OASParserUtil {
      * @param isProduction is production endpoints
      * @return JsonNode
      */
-    public static JsonNode generateOASConfigForEndpoints(API api, boolean isProduction) {
+    public static JsonNode generateOASConfigForEndpoints(API api, boolean isProduction) throws APIManagementException {
         if (api.getEndpointConfig() == null || api.getEndpointConfig().trim().isEmpty()) {
             return null;
         }
@@ -1264,7 +1264,8 @@ public class OASParserUtil {
      * @param isProd         endpoint type
      * @param type           endpoint type
      */
-    private static ObjectNode setPrimaryConfig(JSONObject endpointConfig, boolean isProd, String type) {
+    private static ObjectNode setPrimaryConfig(JSONObject endpointConfig, boolean isProd, String type)
+            throws APIManagementException {
         JSONObject primaryEndpoints = new JSONObject();
         if (isProd) {
             if (endpointConfig.has(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS)) {
@@ -1281,6 +1282,18 @@ public class OASParserUtil {
             ObjectNode endpointResult = objectMapper.createObjectNode();
             endpointResult.set(APIConstants.ENDPOINT_URLS, endpointsArray);
             endpointResult.put(APIConstants.X_WSO2_ENDPOINT_TYPE, type);
+            if (primaryEndpoints.has(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                try {
+                    endpointResult.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG,
+                            objectMapper.readTree(primaryEndpoints.get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG).toString()));
+                } catch (JsonProcessingException e) {
+                    throw new APIManagementException(
+                            "Error while setting the primary endpoint configs ", e);
+                }
+            } else {
+                //When user removes existing advancedConfigurations section.Returns null if key was not an existing
+                endpointResult.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+            }
             return endpointResult;
         }
         return null;
