@@ -33,6 +33,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -1243,33 +1244,83 @@ public class PublisherCommonUtils {
                 if (newProductionEndpointJson != null) {
                     if (existingEndpointConfigJson.get(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS) != null) {
                         //put as a value under the ENDPOINT_PRODUCTION_ENDPOINTS key
-                        JSONObject productionConfigsJson = (JSONObject) existingEndpointConfigJson
-                                .get(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS);
-                        if (newProductionEndpointJson.containsKey(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
-                            JSONObject advanceConfig = (JSONObject) newProductionEndpointJson
-                                    .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
-                            productionConfigsJson.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
+                        //if loadbalance endpoints, get relevant jsonobject from array
+                        if (existingEndpointConfigJson.get(APIConstants.API_ENDPOINT_CONFIG_PROTOCOL_TYPE)
+                                .equals(APIConstants.ENDPOINT_TYPE_LOADBALANCE)) {
+                            JSONArray productionConfigsJson = (JSONArray) existingEndpointConfigJson
+                                    .get(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS);
+                            for (int i = 0; i < productionConfigsJson.size(); i++) {
+                                if (!(((JSONObject) productionConfigsJson.get(i)).containsKey(APIConstants
+                                        .API_ENDPOINT_CONFIG_PROTOCOL_TYPE))) {
+                                    if (newProductionEndpointJson.containsKey(APIConstants
+                                            .X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                                        JSONObject advanceConfig = (JSONObject) newProductionEndpointJson
+                                                .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                                        ((JSONObject) productionConfigsJson.get(i))
+                                                .put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
+                                    } else {
+                                        ((JSONObject) productionConfigsJson.get(i))
+                                                .remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                                    }
+                                    break;
+                                }
+                            }
+                            existingEndpointConfigJson.put(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS,
+                                    productionConfigsJson);
                         } else {
-                            productionConfigsJson.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                            JSONObject productionConfigsJson = (JSONObject) existingEndpointConfigJson
+                                    .get(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS);
+                            if (newProductionEndpointJson.containsKey(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                                JSONObject advanceConfig = (JSONObject) newProductionEndpointJson
+                                        .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                                productionConfigsJson.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
+                            } else {
+                                productionConfigsJson.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                            }
+                            existingEndpointConfigJson.put(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS,
+                                    productionConfigsJson);
                         }
-                        existingEndpointConfigJson.put(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS,
-                                productionConfigsJson);
                     }
                 }
                 if (newSandboxEndpointJson != null) {
                     if (existingEndpointConfigJson.get(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS) != null) {
                         //put as a value under the ENDPOINT_SANDBOX_ENDPOINTS key
-                        JSONObject sandboxConfigsJson = (JSONObject) existingEndpointConfigJson
-                                .get(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS);
-                        if (newSandboxEndpointJson.containsKey(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
-                            JSONObject advanceConfig = (JSONObject) newProductionEndpointJson
-                                    .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
-                            sandboxConfigsJson.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
+                        //if loadbalance endpoints, get relevant jsonobject from array
+                        if (existingEndpointConfigJson.get(APIConstants.API_ENDPOINT_CONFIG_PROTOCOL_TYPE)
+                                .equals(APIConstants.ENDPOINT_TYPE_LOADBALANCE)) {
+                            JSONArray sandboxConfigsJson = (JSONArray) existingEndpointConfigJson
+                                    .get(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS);
+                            for (int i = 0; i < sandboxConfigsJson.size(); i++) {
+                                if (!(((JSONObject) sandboxConfigsJson.get(i)).containsKey(APIConstants
+                                        .API_ENDPOINT_CONFIG_PROTOCOL_TYPE))) {
+                                    if (newSandboxEndpointJson.containsKey(APIConstants
+                                            .X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                                        JSONObject advanceConfig = (JSONObject) newSandboxEndpointJson
+                                                .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                                        ((JSONObject) sandboxConfigsJson.get(i))
+                                                .put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
+                                    } else {
+                                        ((JSONObject) sandboxConfigsJson.get(i))
+                                                .remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                                    }
+                                    break;
+                                }
+                            }
+                            existingEndpointConfigJson.put(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS,
+                                    sandboxConfigsJson);
                         } else {
-                            sandboxConfigsJson.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                            JSONObject sandboxConfigsJson = (JSONObject) existingEndpointConfigJson
+                                    .get(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS);
+                            if (newSandboxEndpointJson.containsKey(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                                JSONObject advanceConfig = (JSONObject) newSandboxEndpointJson
+                                        .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                                sandboxConfigsJson.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
+                            } else {
+                                sandboxConfigsJson.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+                            }
+                            existingEndpointConfigJson.put(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS,
+                                    sandboxConfigsJson);
                         }
-                        existingEndpointConfigJson.put(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS, sandboxConfigsJson);
-
                     }
                 }
                 existingAPI.setEndpointConfig(existingEndpointConfigJson.toString());
