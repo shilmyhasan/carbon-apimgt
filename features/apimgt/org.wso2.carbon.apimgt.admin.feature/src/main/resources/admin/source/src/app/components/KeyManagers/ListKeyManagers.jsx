@@ -351,6 +351,7 @@ export default function ListKeyManagers() {
                         aria-expanded={open ? 'true' : undefined}
                         aria-label="select key store type"
                         aria-haspopup="menu"
+                        data-testid="add-km-dropdown"
                         onClick={() => {
                             setOpen((prevOpen) => !prevOpen);
                         }}
