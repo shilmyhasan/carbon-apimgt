@@ -275,8 +275,6 @@
   "KeyManagers.ListKeyManagers.addGlobalKeyManager": "Add Global Key Manager",
   "KeyManagers.ListKeyManagers.edit.success": "Key Manager updated successfully.",
   "KeyManagers.ListKeyManagers.empty.title": "Key Managers",
-  "KeyManagers.ListKeyManagers.global.heading": "Global Key Manager",
-  "KeyManagers.ListKeyManagers.local.heading": "Local Key Managers",
   "KeyManagers.ListKeyManagers.table.header.label.description": "Description",
   "KeyManagers.ListKeyManagers.table.header.label.name": "Name",
   "KeyManagers.ListKeyManagers.table.header.label.type": "Type",

@@ -21,7 +21,7 @@ import API from 'AppData/api';
 import { useIntl, FormattedMessage } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import Delete from 'AppComponents/KeyManagers/DeleteKeyManager';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Alert from 'AppComponents/Shared/Alert';
 import Switch from '@material-ui/core/Switch';
@@ -42,6 +42,10 @@ import InlineProgress from 'AppComponents/AdminPages/Addons/InlineProgress';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
+import Chip from '@material-ui/core/Chip';
+import {ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Popper, Paper} from "@material-ui/core";
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import Configurations from 'Config';
 
 const useStyles = makeStyles((theme) => ({
     searchBar: {
@@ -66,6 +70,8 @@ const useStyles = makeStyles((theme) => ({
         },
     },
 }));
+
+const addButtonLabels = ['local', 'global'];
 
 /**
  * API call to get microgateway labels
@@ -95,16 +101,17 @@ export default function ListKeyManagers() {
     const intl = useIntl();
     const classes = useStyles();
     const [data, setData] = useState(null);
-    const [localKMs, setLocalKMs] = useState(null);
     const [globalKMs, setGlobalKMs] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [error, setError] = useState(null);
     const editComponentProps = {};
+    const history = useHistory();
+    // for split buttons
+    const [open, setOpen] = useState(false);
+    const anchorRef = React.useRef(null);
+    const [selectedIndex, setSelectedIndex] = useState(0);
 
     const setKeyManagers = (keyManagers) => {
-        setLocalKMs(keyManagers.filter((item) => {
-            return !item.isGlobal;
-        }));
         setGlobalKMs(keyManagers.filter((item) => {
             return item.isGlobal;
         }));
@@ -197,7 +204,7 @@ export default function ListKeyManagers() {
                                     state: { isGlobal: tableMeta.rowData[5] },
                                 }}
                             >
-                                {value}
+                                {value} {tableMeta.rowData[5] && <Chip size='small' label='Global' color='primary' style={{marginTop: -4}}/>}
                             </RouterLink>
                         );
                     } else {
@@ -236,7 +243,7 @@ export default function ListKeyManagers() {
                 filter: false,
                 sort: false,
                 customBodyRender: (value, tableMeta) => {
-                    const dataRow = tableMeta.rowData[5] ? globalKMs[tableMeta.rowIndex] : localKMs[tableMeta.rowIndex];
+                    const dataRow = data[tableMeta.rowIndex];
                     const itemName = (typeof tableMeta.rowData === 'object') ? tableMeta.rowData[0] : '';
                     if (editComponentProps && editComponentProps.routeTo) {
                         if (typeof tableMeta.rowData === 'object') {
@@ -298,16 +305,90 @@ export default function ListKeyManagers() {
             defaultMessage: 'Key Managers',
         }),
     };
-    const addButtonOverride = (
-        <RouterLink to='/settings/key-managers/create'>
-            <Button variant='contained' color='primary' size='small'>
-                <FormattedMessage
-                    id='KeyManagers.ListKeyManagers.addButtonProps.triggerButtonText'
-                    defaultMessage='Add Key Manager'
-                />
-            </Button>
-        </RouterLink>
-    );
+
+    const onAddButtonClick = (index) => {
+        if (index === 1) {
+            history.push({
+                pathname: '/settings/key-managers/create',
+                state: { isGlobal: true },
+            });
+        } else {
+            history.push('/settings/key-managers/create');
+        }
+    }
+
+    const getAddKeyManagerButtonLabel = (label) => {
+        if (label === 'global') {
+            return intl.formatMessage({
+                id: 'KeyManagers.ListKeyManagers.addGlobalKeyManager',
+                defaultMessage: 'Add Global Key Manager',
+            });
+        }
+        return intl.formatMessage({
+            id: 'KeyManagers.ListKeyManagers.addButtonProps.triggerButtonText',
+            defaultMessage: 'Add Key Manager',
+        });
+    }
+
+    const addButtonOverride = () => {
+        if (!Configurations.app.enableGlobalKeyManagers || (globalKMs && globalKMs.length > 0)) {
+            return (
+                <Button variant='contained' color='primary' size='small' onClick={() => onAddButtonClick(0)}>
+                    {getAddKeyManagerButtonLabel('local')}
+                </Button>
+            );
+        }
+        return (
+            <>
+                <ButtonGroup variant="contained" color="primary" ref={anchorRef} aria-label="split button">
+                    <Button size='small' onClick={() => onAddButtonClick(selectedIndex)}>
+                        {getAddKeyManagerButtonLabel(selectedIndex === 1 ? 'global' : 'local')}
+                    </Button>
+                    <Button
+                        color="primary"
+                        size="small"
+                        aria-controls={open ? 'split-button-menu' : undefined}
+                        aria-expanded={open ? 'true' : undefined}
+                        aria-label="select key store type"
+                        aria-haspopup="menu"
+                        onClick={() => {
+                            setOpen((prevOpen) => !prevOpen);
+                        }}
+                    >
+                        <ArrowDropDownIcon />
+                    </Button>
+                </ButtonGroup>
+                <Popper open={open} anchorEl={anchorRef.current} style={{zIndex: 99999999}}>
+                    <Paper>
+                        <ClickAwayListener onClickAway={(event) => {
+                            if (anchorRef.current && anchorRef.current.contains(event.target)) {
+                                return;
+                            }
+                            setOpen(false);
+                        }}>
+                            <MenuList id="split-button-menu">
+                                {addButtonLabels.map((label, index) => (
+                                    <MenuItem
+                                        key={label}
+                                        style={{fontSize: '0.7rem'}}
+                                        disabled={index === 2}
+                                        selected={index === selectedIndex}
+                                        onClick={() => {
+                                            setSelectedIndex(index);
+                                            setOpen(false);
+                                        }}
+                                    >
+                                        {getAddKeyManagerButtonLabel(label)}
+                                    </MenuItem>
+                                ))}
+                            </MenuList>
+                        </ClickAwayListener>
+                    </Paper>
+                </Popper>
+            </>
+        );
+    }
+
     const emptyBoxProps = {
         content: (
             <Typography variant='body2' color='textSecondary' component='p'>
@@ -369,18 +450,6 @@ export default function ListKeyManagers() {
         onColumnSortChange,
     };
 
-    const globalDTOptions = {
-        selectableRows: 'none',
-        filter: false,
-        search: false,
-        print: false,
-        download: false,
-        viewColumns: false,
-        customToolbar: null,
-        responsive: 'stacked',
-        pagination: false,
-    };
-
     const filterData = (event) => {
         setSearchText(event.target.value);
     };
@@ -399,7 +468,7 @@ export default function ListKeyManagers() {
                         {emptyBoxProps.content}
                     </CardContent>
                     <CardActions>
-                        {addButtonOverride}
+                        {addButtonOverride()}
                     </CardActions>
                 </Card>
             </ContentBase>
@@ -425,48 +494,7 @@ export default function ListKeyManagers() {
     return (
         <>
             <ContentBase {... pageProps}>
-                <div style={{ marginBottom: '40px' }}>
-                    <Typography gutterBottom variant='h4' component='h2'>
-                        <FormattedMessage
-                            id='KeyManagers.ListKeyManagers.global.heading'
-                            defaultMessage='Global Key Manager'
-                        />
-                    </Typography>
-                    <div className={classes.tableCellWrapper}>
-                        {globalKMs && globalKMs.length > 0 && (
-                            <MUIDataTable
-                                title={null}
-                                data={globalKMs}
-                                columns={columns}
-                                options={globalDTOptions}
-                            />
-                        )}
-                    </div>
-                    {globalKMs && globalKMs.length === 0 && (
-                        <RouterLink
-                            to={{
-                                pathname: '/settings/key-managers/create',
-                                state: { isGlobal: true },
-                            }}
-                        >
-                            <Button variant='contained' color='primary' size='small' disabled={!isSuperAdmin}>
-                                <FormattedMessage
-                                    id='KeyManagers.ListKeyManagers.addGlobalKeyManager'
-                                    defaultMessage='Add Global Key Manager'
-                                />
-                            </Button>
-                        </RouterLink>
-                    )}
-                </div>
-
                 <div>
-                    <Typography gutterBottom variant='h4' component='h2'>
-                        <FormattedMessage
-                            id='KeyManagers.ListKeyManagers.local.heading'
-                            defaultMessage='Local Key Managers'
-                        />
-                    </Typography>
-
                     <AppBar className={classes.searchBar} position='static' color='default' elevation={0}>
                         <Toolbar>
                             <Grid container spacing={2} alignItems='center'>
@@ -486,7 +514,7 @@ export default function ListKeyManagers() {
                                     />
                                 </Grid>
                                 <Grid item>
-                                    {addButtonOverride}
+                                    {addButtonOverride()}
                                     <Tooltip title={(
                                         <FormattedMessage
                                             id='AdminPages.Addons.ListBase.reload'
@@ -503,10 +531,10 @@ export default function ListKeyManagers() {
                         </Toolbar>
                     </AppBar>
                     <div className={classes.tableCellWrapper}>
-                        {localKMs && localKMs.length > 0 && (
+                        {data && data.length > 0 && (
                             <MUIDataTable
                                 title={null}
-                                data={localKMs}
+                                data={data}
                                 columns={columns}
                                 options={options}
                             />
