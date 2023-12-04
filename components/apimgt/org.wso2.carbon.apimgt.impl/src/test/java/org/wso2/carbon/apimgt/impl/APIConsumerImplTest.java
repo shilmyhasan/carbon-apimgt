@@ -942,12 +942,12 @@ public class APIConsumerImplTest {
         Application[] applications = new Application[] { new Application(1), new Application(2) };
         Mockito.when(apiMgtDAO
                 .getApplicationsWithPagination((Subscriber) Mockito.any(), Mockito.anyString(), Mockito.anyInt(),
-                        Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                        Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean()))
                 .thenReturn(applications);
         APIConsumerImpl apiConsumer = new APIConsumerImplWrapper(apiMgtDAO);
         Assert.assertEquals(
                 apiConsumer.getApplicationsWithPagination(new Subscriber("sub1"), "1", 0, 5,
-                        "", "", "ASC").length, 2);
+                        "", "", "ASC", false).length, 2);
     }
 
     @Test
