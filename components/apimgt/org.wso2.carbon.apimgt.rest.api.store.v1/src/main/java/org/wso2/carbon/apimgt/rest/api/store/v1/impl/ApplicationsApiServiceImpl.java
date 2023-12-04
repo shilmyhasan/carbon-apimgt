@@ -117,7 +117,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      */
     @Override
     public Response applicationsGet(String groupId, String query, String sortBy, String sortOrder,
-                                    Integer limit, Integer offset, String ifNoneMatch, MessageContext messageContext) {
+                                    Boolean expand, Integer limit, Integer offset, String ifNoneMatch, MessageContext messageContext) {
 
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
@@ -126,6 +126,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                 ApplicationMappingUtil.getApplicationSortByField(sortBy) :
                 APIConstants.APPLICATION_NAME;
         query = query == null ? "" : query;
+        expand = expand != null && expand;
         ApplicationListDTO applicationListDTO = new ApplicationListDTO();
 
         String username = RestApiCommonUtil.getLoggedInUsername();
@@ -140,7 +141,32 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
             Application[] applications;
             applications = apiConsumer
                     .getApplicationsWithPagination(new Subscriber(username), groupId, offset, limit, query, sortBy,
-                            sortOrder);
+                            sortOrder, expand);
+            if (applications != null && expand) {
+                JSONArray applicationAttributesFromConfig = apiConsumer.getAppAttributesFromConfig(username);
+                for (Application application : applications) {
+                    // Remove hidden attributes and set the rest of the attributes from config
+                    Map<String, String> existingApplicationAttributes = application.getApplicationAttributes();
+                    Map<String, String> applicationAttributes = new HashMap<>();
+                    if (existingApplicationAttributes != null && applicationAttributesFromConfig != null) {
+                        for (Object object : applicationAttributesFromConfig) {
+                            JSONObject attribute = (JSONObject) object;
+                            Boolean hidden = (Boolean) attribute.get(APIConstants.ApplicationAttributes.HIDDEN);
+                            String attributeName = (String) attribute.get(APIConstants.ApplicationAttributes.ATTRIBUTE);
+
+                            if (!BooleanUtils.isTrue(hidden)) {
+                                String attributeVal = existingApplicationAttributes.get(attributeName);
+                                if (attributeVal != null) {
+                                    applicationAttributes.put(attributeName, attributeVal);
+                                } else {
+                                    applicationAttributes.put(attributeName, "");
+                                }
+                            }
+                        }
+                    }
+                    application.setApplicationAttributes(applicationAttributes);
+                }
+            }
             ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
             int applicationCount = apiMgtDAO.getAllApplicationCount(subscriber, groupId, query);
 
@@ -177,9 +203,10 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      * @param messageContext      Message Context
      * @return imported Application
      */
-    @Override public Response applicationsImportPost(InputStream fileInputStream, Attachment fileDetail,
-            Boolean preserveOwner, Boolean skipSubscriptions, String appOwner, Boolean skipApplicationKeys,
-            Boolean update, MessageContext messageContext) throws APIManagementException {
+    @Override
+    public Response applicationsImportPost(InputStream fileInputStream, Attachment fileDetail,
+                                           Boolean preserveOwner, Boolean skipSubscriptions, String appOwner, Boolean skipApplicationKeys,
+                                           Boolean update, MessageContext messageContext) throws APIManagementException {
         String ownerId;
         Application application;
 
@@ -274,11 +301,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     /**
      * Creates a new application
      *
-     * @param body        request body containing application details
+     * @param body request body containing application details
      * @return 201 response if successful
      */
     @Override
-    public Response applicationsPost(ApplicationDTO body, MessageContext messageContext){
+    public Response applicationsPost(ApplicationDTO body, MessageContext messageContext) {
         String username = RestApiCommonUtil.getLoggedInUsername();
         try {
             Application createdApplication = preProcessAndAddApplication(username, body);
@@ -351,8 +378,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     /**
      * Get an application by Id
      *
-     * @param applicationId   application identifier
-     * @param ifNoneMatch     If-None-Match header value
+     * @param applicationId application identifier
+     * @param ifNoneMatch   If-None-Match header value
      * @return response containing the required application object
      */
     @Override
@@ -406,9 +433,9 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     /**
      * Update an application by Id
      *
-     * @param applicationId     application identifier
-     * @param body              request body containing application details
-     * @param ifMatch           If-Match header value
+     * @param applicationId application identifier
+     * @param body          request body containing application details
+     * @param ifMatch       If-Match header value
      * @return response containing the updated application object
      */
     @Override
@@ -453,7 +480,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      * @return Updated application
      */
     private Application preProcessAndUpdateApplication(String username, ApplicationDTO applicationDto,
-            Application oldApplication, String applicationId) throws APIManagementException {
+                                                       Application oldApplication, String applicationId) throws APIManagementException {
         APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
         Object applicationAttributesFromUser = applicationDto.getAttributes();
         Map<String, String> applicationAttributes = new ObjectMapper()
@@ -487,7 +514,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      */
     @Override
     public Response applicationsExportGet(String appName, String appOwner, Boolean withKeys, String format,
-            MessageContext messageContext) throws APIManagementException {
+                                          MessageContext messageContext) throws APIManagementException {
         APIConsumer apiConsumer;
         Application application = null;
 
@@ -520,7 +547,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response applicationsApplicationIdApiKeysKeyTypeGeneratePost(String applicationId, String keyType,
-                                    String ifMatch, APIKeyGenerateRequestDTO body, MessageContext messageContext) {
+                                                                        String ifMatch, APIKeyGenerateRequestDTO body, MessageContext messageContext) {
 
         String userName = RestApiCommonUtil.getLoggedInUsername();
         Application application;
@@ -572,7 +599,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response applicationsApplicationIdApiKeysKeyTypeRevokePost(String applicationId, String keyType,
-                                  String ifMatch, APIKeyRevokeRequestDTO body, MessageContext messageContext) {
+                                                                      String ifMatch, APIKeyRevokeRequestDTO body, MessageContext messageContext) {
         String username = RestApiCommonUtil.getLoggedInUsername();
         String apiKey = body.getApikey();
         if (!StringUtils.isEmpty(apiKey) && APIUtil.isValidJWT(apiKey)) {
@@ -581,11 +608,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                 String signatureAlgorithm = APIUtil.getSignatureAlgorithm(splitToken);
                 String certAlias = APIUtil.getSigningAlias(splitToken);
                 Certificate certificate = APIUtil.getCertificateFromParentTrustStore(certAlias);
-                if(APIUtil.verifyTokenSignature(splitToken, certificate, signatureAlgorithm)) {
+                if (APIUtil.verifyTokenSignature(splitToken, certificate, signatureAlgorithm)) {
                     APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
                     Application application = apiConsumer.getApplicationByUUID(applicationId);
                     org.json.JSONObject decodedBody = new org.json.JSONObject(
-                                        new String(Base64.getUrlDecoder().decode(splitToken[1])));
+                            new String(Base64.getUrlDecoder().decode(splitToken[1])));
                     org.json.JSONObject appInfo = decodedBody.getJSONObject(APIConstants.JwtTokenConstants.APPLICATION);
                     if (appInfo != null && application != null) {
                         if (RestAPIStoreUtils.isUserOwnerOfApplication(application)) {
@@ -605,43 +632,43 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                                 if (log.isDebugEnabled()) {
                                     log.debug("Application uuid " + applicationId + " isn't matched with the " +
                                             "application in the token " + appUuid + " of API Key " +
-                                                                                    APIUtil.getMaskedToken(apiKey));
+                                            APIUtil.getMaskedToken(apiKey));
                                 }
                                 RestApiUtil.handleBadRequest("Validation failed for the given token ", log);
                             }
                         } else {
                             if (log.isDebugEnabled()) {
                                 log.debug("Logged in user " + username + " isn't the owner of the application "
-                                                                                                        + applicationId);
+                                        + applicationId);
                             }
                             RestApiUtil.handleAuthorizationFailure(RestApiConstants.RESOURCE_APPLICATION,
-                                                                                                      applicationId, log);
+                                    applicationId, log);
                         }
                     } else {
-                        if(log.isDebugEnabled()) {
+                        if (log.isDebugEnabled()) {
                             if (application == null) {
                                 log.debug("Application with given id " + applicationId + " doesn't not exist ");
                             }
 
                             if (appInfo == null) {
                                 log.debug("Application information doesn't exist in the token "
-                                                                                    + APIUtil.getMaskedToken(apiKey));
+                                        + APIUtil.getMaskedToken(apiKey));
                             }
                         }
                         RestApiUtil.handleBadRequest("Validation failed for the given token ", log);
                     }
                 } else {
-                    if(log.isDebugEnabled()) {
+                    if (log.isDebugEnabled()) {
                         log.debug("Signature verification of given token " + APIUtil.getMaskedToken(apiKey) +
-                                                                                                            " is failed");
+                                " is failed");
                     }
                     RestApiUtil.handleInternalServerError("Validation failed for the given token", log);
                 }
             } catch (APIManagementException e) {
                 String msg = "Error while revoking API Key of application " + applicationId;
-                if(log.isDebugEnabled()) {
+                if (log.isDebugEnabled()) {
                     log.debug("Error while revoking API Key of application " +
-                            applicationId+ " and token " + APIUtil.getMaskedToken(apiKey));
+                            applicationId + " and token " + APIUtil.getMaskedToken(apiKey));
                 }
                 log.error(msg, e);
                 RestApiUtil.handleInternalServerError(msg, e, log);
@@ -656,8 +683,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     /**
      * Deletes an application by id
      *
-     * @param applicationId     application identifier
-     * @param ifMatch           If-Match header value
+     * @param applicationId application identifier
+     * @param ifMatch       If-Match header value
      * @return 200 Response if successfully deleted the application
      */
     @Override
@@ -685,8 +712,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     /**
      * Generate keys for a application
      *
-     * @param applicationId     application identifier
-     * @param body              request body
+     * @param applicationId application identifier
+     * @param body          request body
      * @return A response object containing application keys
      */
     @Override
@@ -778,15 +805,16 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     /**
      * Clean up application keys
-     * @param applicationId Application Id
-     * @param keyType Key Type whether PRODUCTION or SANDBOX
+     *
+     * @param applicationId  Application Id
+     * @param keyType        Key Type whether PRODUCTION or SANDBOX
      * @param ifMatch
      * @param messageContext
      * @return
      */
     @Override
     public Response applicationsApplicationIdKeysKeyTypeCleanUpPost(String applicationId, String keyType, String ifMatch,
-                             MessageContext messageContext) {
+                                                                    MessageContext messageContext) {
 
         String username = RestApiCommonUtil.getLoggedInUsername();
         try {
@@ -840,7 +868,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response applicationsApplicationIdKeysKeyTypeGenerateTokenPost(String applicationId,
-            String keyType, ApplicationTokenGenerateRequestDTO body, String ifMatch, MessageContext messageContext) {
+                                                                          String keyType, ApplicationTokenGenerateRequestDTO body, String ifMatch, MessageContext messageContext) {
         try {
             String username = RestApiCommonUtil.getLoggedInUsername();
             APIConsumer apiConsumer = RestApiCommonUtil.getConsumer(username);
@@ -865,7 +893,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                                     "application " + applicationId + ". Invalid jsonInput '"
                                     + body.getAdditionalProperties() + "' provided.", log);
                         }
-                        if (StringUtils.isNotEmpty(body.getConsumerSecret())){
+                        if (StringUtils.isNotEmpty(body.getConsumerSecret())) {
                             appKey.setConsumerSecret(body.getConsumerSecret());
                         }
                         String[] scopes = body.getScopes().toArray(new String[0]);
@@ -906,7 +934,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      */
     @Override
     public Response applicationsApplicationIdKeysKeyTypeGet(String applicationId, String keyType,
-            String groupId, MessageContext messageContext) {
+                                                            String groupId, MessageContext messageContext) {
         return Response.ok().entity(getApplicationKeyByAppIDAndKeyType(applicationId, keyType)).build();
     }
 
@@ -934,7 +962,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      * Returns Keys of an application by key type
      *
      * @param applicationId Application Id
-     * @param keyMappingId       Key Mapping ID
+     * @param keyMappingId  Key Mapping ID
      * @return Application Key Information
      */
     private ApplicationKeyDTO getApplicationKeyByAppIDAndKeyMapping(String applicationId, String keyMappingId) {
@@ -966,7 +994,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      */
     @Override
     public Response applicationsApplicationIdKeysKeyTypePut(String applicationId, String keyType,
-            ApplicationKeyDTO body, MessageContext messageContext) {
+                                                            ApplicationKeyDTO body, MessageContext messageContext) {
         String username = RestApiCommonUtil.getLoggedInUsername();
         try {
             APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
@@ -990,7 +1018,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                     String keyManagerName = APIConstants.KeyManager.DEFAULT_KEY_MANAGER;
                     OAuthApplicationInfo updatedData = apiConsumer.updateAuthClient(username, application.getName(),
                             keyType, body.getCallbackUrl(), null, null, null, body.getGroupId(),
-                            new Gson().toJson(jsonParams),keyManagerName);
+                            new Gson().toJson(jsonParams), keyManagerName);
                     ApplicationKeyDTO applicationKeyDTO = new ApplicationKeyDTO();
                     applicationKeyDTO.setCallbackUrl(updatedData.getCallBackURL());
                     JsonObject json = new Gson().fromJson(updatedData.getJsonString(), JsonObject.class);
@@ -1027,11 +1055,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      */
     @Override
     public Response applicationsApplicationIdKeysKeyTypeRegenerateSecretPost(String applicationId,
-            String keyType, MessageContext messageContext) {
+                                                                             String keyType, MessageContext messageContext) {
         String username = RestApiCommonUtil.getLoggedInUsername();
         try {
             Set<APIKey> applicationKeys = getApplicationKeys(applicationId);
-            if (applicationKeys == null){
+            if (applicationKeys == null) {
                 return null;
             }
             for (APIKey apiKey : applicationKeys) {
@@ -1215,53 +1243,54 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
             throws APIManagementException {
 
         String username = RestApiCommonUtil.getLoggedInUsername();
-            APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
-            Application application = apiConsumer.getApplicationByUUID(applicationId);
-            if (application != null) {
-                ApplicationKeyDTO appKey = getApplicationKeyByAppIDAndKeyMapping(applicationId, keyMappingId);
-                if (RestAPIStoreUtils.isUserOwnerOfApplication(application) && appKey != null) {
-                    String grantTypes = StringUtils.join(body.getSupportedGrantTypes(), ',');
-                    JsonObject jsonParams = new JsonObject();
-                    jsonParams.addProperty(APIConstants.JSON_GRANT_TYPES, grantTypes);
-                    jsonParams.addProperty(APIConstants.JSON_USERNAME, username);
-                    if (body.getAdditionalProperties() != null) {
-                        if (body.getAdditionalProperties() instanceof String &&
-                                StringUtils.isNotEmpty((String) body.getAdditionalProperties())) {
-                            jsonParams.addProperty(APIConstants.JSON_ADDITIONAL_PROPERTIES,
-                                    (String) body.getAdditionalProperties());
-                        } else if (body.getAdditionalProperties() instanceof Map) {
-                            String jsonContent = new Gson().toJson(body.getAdditionalProperties());
-                            jsonParams.addProperty(APIConstants.JSON_ADDITIONAL_PROPERTIES, jsonContent);
-                        }
+        APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
+        Application application = apiConsumer.getApplicationByUUID(applicationId);
+        if (application != null) {
+            ApplicationKeyDTO appKey = getApplicationKeyByAppIDAndKeyMapping(applicationId, keyMappingId);
+            if (RestAPIStoreUtils.isUserOwnerOfApplication(application) && appKey != null) {
+                String grantTypes = StringUtils.join(body.getSupportedGrantTypes(), ',');
+                JsonObject jsonParams = new JsonObject();
+                jsonParams.addProperty(APIConstants.JSON_GRANT_TYPES, grantTypes);
+                jsonParams.addProperty(APIConstants.JSON_USERNAME, username);
+                if (body.getAdditionalProperties() != null) {
+                    if (body.getAdditionalProperties() instanceof String &&
+                            StringUtils.isNotEmpty((String) body.getAdditionalProperties())) {
+                        jsonParams.addProperty(APIConstants.JSON_ADDITIONAL_PROPERTIES,
+                                (String) body.getAdditionalProperties());
+                    } else if (body.getAdditionalProperties() instanceof Map) {
+                        String jsonContent = new Gson().toJson(body.getAdditionalProperties());
+                        jsonParams.addProperty(APIConstants.JSON_ADDITIONAL_PROPERTIES, jsonContent);
                     }
-                    OAuthApplicationInfo updatedData = apiConsumer.updateAuthClient(username, application.getName(),
-                            appKey.getKeyType().value(), body.getCallbackUrl(), null, null, null,
-                            body.getGroupId(),new Gson().toJson(jsonParams),appKey.getKeyManager());
-                    ApplicationKeyDTO applicationKeyDTO = new ApplicationKeyDTO();
-                    applicationKeyDTO.setCallbackUrl(updatedData.getCallBackURL());
-                    JsonObject json = new Gson().fromJson(updatedData.getJsonString(), JsonObject.class);
-                    if (json.get(APIConstants.JSON_GRANT_TYPES) != null) {
-                        String[] updatedGrantTypes = json.get(APIConstants.JSON_GRANT_TYPES).getAsString().split(" ");
-                        applicationKeyDTO.setSupportedGrantTypes(Arrays.asList(updatedGrantTypes));
-                    }
-                    applicationKeyDTO.setConsumerKey(updatedData.getClientId());
-                    applicationKeyDTO.setConsumerSecret(updatedData.getClientSecret());
-                    applicationKeyDTO.setKeyType(appKey.getKeyType());
-                    Object additionalProperties = updatedData.getParameter(APIConstants.JSON_ADDITIONAL_PROPERTIES);
-                    if (additionalProperties != null) {
-                        applicationKeyDTO.setAdditionalProperties(additionalProperties);
-                    }
-                    applicationKeyDTO.setKeyMappingId(body.getKeyMappingId());
-                    applicationKeyDTO.setKeyManager(body.getKeyManager());
-                    return Response.ok().entity(applicationKeyDTO).build();
-                } else {
-                    RestApiUtil.handleAuthorizationFailure(RestApiConstants.RESOURCE_APPLICATION, applicationId, log);
                 }
+                OAuthApplicationInfo updatedData = apiConsumer.updateAuthClient(username, application.getName(),
+                        appKey.getKeyType().value(), body.getCallbackUrl(), null, null, null,
+                        body.getGroupId(), new Gson().toJson(jsonParams), appKey.getKeyManager());
+                ApplicationKeyDTO applicationKeyDTO = new ApplicationKeyDTO();
+                applicationKeyDTO.setCallbackUrl(updatedData.getCallBackURL());
+                JsonObject json = new Gson().fromJson(updatedData.getJsonString(), JsonObject.class);
+                if (json.get(APIConstants.JSON_GRANT_TYPES) != null) {
+                    String[] updatedGrantTypes = json.get(APIConstants.JSON_GRANT_TYPES).getAsString().split(" ");
+                    applicationKeyDTO.setSupportedGrantTypes(Arrays.asList(updatedGrantTypes));
+                }
+                applicationKeyDTO.setConsumerKey(updatedData.getClientId());
+                applicationKeyDTO.setConsumerSecret(updatedData.getClientSecret());
+                applicationKeyDTO.setKeyType(appKey.getKeyType());
+                Object additionalProperties = updatedData.getParameter(APIConstants.JSON_ADDITIONAL_PROPERTIES);
+                if (additionalProperties != null) {
+                    applicationKeyDTO.setAdditionalProperties(additionalProperties);
+                }
+                applicationKeyDTO.setKeyMappingId(body.getKeyMappingId());
+                applicationKeyDTO.setKeyManager(body.getKeyManager());
+                return Response.ok().entity(applicationKeyDTO).build();
             } else {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_APPLICATION, applicationId, log);
+                RestApiUtil.handleAuthorizationFailure(RestApiConstants.RESOURCE_APPLICATION, applicationId, log);
             }
+        } else {
+            RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_APPLICATION, applicationId, log);
+        }
 
-        return null;    }
+        return null;
+    }
 
     @Override
     public Response applicationsApplicationIdOauthKeysKeyMappingIdRegenerateSecretPost(String applicationId,
@@ -1270,22 +1299,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
             throws APIManagementException {
 
         String username = RestApiCommonUtil.getLoggedInUsername();
-            Set<APIKey> applicationKeys = getApplicationKeys(applicationId);
-            if (applicationKeys == null) {
-                return null;
-            }
-            ApplicationKeyDTO applicationKeyDTO = getApplicationKeyByAppIDAndKeyMapping(applicationId, keyMappingId);
-            if (applicationKeyDTO != null) {
-                APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
-                String clientId = applicationKeyDTO.getConsumerKey();
-                String clientSecret = apiConsumer.renewConsumerSecret(clientId, applicationKeyDTO.getKeyManager());
+        Set<APIKey> applicationKeys = getApplicationKeys(applicationId);
+        if (applicationKeys == null) {
+            return null;
+        }
+        ApplicationKeyDTO applicationKeyDTO = getApplicationKeyByAppIDAndKeyMapping(applicationId, keyMappingId);
+        if (applicationKeyDTO != null) {
+            APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
+            String clientId = applicationKeyDTO.getConsumerKey();
+            String clientSecret = apiConsumer.renewConsumerSecret(clientId, applicationKeyDTO.getKeyManager());
 
-                ApplicationKeyDTO retrievedApplicationKey = new ApplicationKeyDTO();
-                retrievedApplicationKey.setConsumerKey(clientId);
-                retrievedApplicationKey.setConsumerSecret(clientSecret);
+            ApplicationKeyDTO retrievedApplicationKey = new ApplicationKeyDTO();
+            retrievedApplicationKey.setConsumerKey(clientId);
+            retrievedApplicationKey.setConsumerSecret(clientSecret);
 
-                return Response.ok().entity(retrievedApplicationKey).build();
-            }
+            return Response.ok().entity(retrievedApplicationKey).build();
+        }
         return null;
     }
 }

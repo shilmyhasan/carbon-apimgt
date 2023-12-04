@@ -562,7 +562,7 @@ public interface APIConsumer extends APIManager {
      */
 
     Application[] getApplicationsWithPagination(Subscriber subscriber, String groupingId,int start , int offset ,
-                                                String search, String sortColumn, String sortOrder)
+                                                String search, String sortColumn, String sortOrder, Boolean expand)
             throws APIManagementException;
 
 
