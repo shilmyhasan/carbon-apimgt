@@ -4256,7 +4256,7 @@ public class ApiMgtDAO {
      * @throws APIManagementException
      */
     public Application[] getApplicationsWithPagination(Subscriber subscriber, String groupingId, int start,
-                                                       int offset, String search, String sortColumn, String sortOrder)
+                                                       int offset, String search, String sortColumn, String sortOrder, Boolean expand)
             throws APIManagementException {
 
         Connection connection = null;
@@ -4366,6 +4366,12 @@ public class ApiMgtDAO {
                 //setting subscription count
                 int subscriptionCount = getSubscriptionCountByApplicationId(subscriber, applicationId, groupingId);
                 application.setSubscriptionCount(subscriptionCount);
+
+                // Get custom attributes of application
+                if (expand) {
+                    Map<String, String> applicationAttributes = getApplicationAttributes(connection, applicationId);
+                    application.setApplicationAttributes(applicationAttributes);
+                }
 
                 applicationsList.add(application);
             }
