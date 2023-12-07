@@ -116,7 +116,7 @@ public class KeyManagerHolder {
             keyManagerDto.setJwtValidator(jwtValidator);
             keyManagerDto.setKeyManager(keyManager);
             tenantKeyManagerDto.putKeyManagerDto(keyManagerDto);
-            if (APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
+            if (APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN.equals(tenantDomain)) {
                 globalKMMap.putKeyManagerDto(keyManagerDto);
                 globalJWTValidatorMap.put(issuer, keyManagerDto);
             } else {
@@ -141,8 +141,7 @@ public class KeyManagerHolder {
         if (tenantKeyManagerDto != null) {
             keyManagerMap.putAll(tenantKeyManagerDto.getKeyManagerMap());
         }
-        TenantKeyManagerDto globalKeyManagerDto = getTenantKeyManagerDto(
-                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
+        TenantKeyManagerDto globalKeyManagerDto = getTenantKeyManagerDto(APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
         if (globalKeyManagerDto != null) {
             keyManagerMap.putAll(globalKeyManagerDto.getKeyManagerMap());
         }
@@ -257,7 +256,8 @@ public class KeyManagerHolder {
 
     public static KeyManager getKeyManagerInstance(String tenantDomain, String keyManagerName) {
 
-        KeyManager keyManager = getTenantKeyManagerInstance(APIUtil.getGlobalKMTenantDomain(), keyManagerName);
+        KeyManager keyManager = getTenantKeyManagerInstance(
+                APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerName);
         if (keyManager == null) {
             keyManager = getTenantKeyManagerInstance(tenantDomain, keyManagerName);
         }
@@ -279,7 +279,7 @@ public class KeyManagerHolder {
     private static TenantKeyManagerDto getTenantKeyManagerDto(String tenantDomain) {
 
         TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDtoFromMap(tenantDomain);
-        if (tenantKeyManagerDto == null && !APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
+        if (tenantKeyManagerDto == null && !APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN.equals(tenantDomain)) {
             synchronized ("KeyManagerHolder".concat(tenantDomain)) {
                 if (tenantKeyManagerDto == null) {
                     new KeyManagerConfigurationDataRetriever(tenantDomain).run();
@@ -291,11 +291,10 @@ public class KeyManagerHolder {
     }
 
     private static TenantKeyManagerDto getTenantKeyManagerDtoFromMap(String tenantDomain) {
-        if (APIUtil.getGlobalKMTenantDomain().equals(tenantDomain)) {
+        if (APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN.equals(tenantDomain)) {
             return globalKMMap;
-        } else {
-            return tenantWiseMap.get(tenantDomain);
         }
+        return tenantWiseMap.get(tenantDomain);
     }
     public static void addGlobalJWTValidators(TokenIssuerDto tokenIssuerDto) {
 

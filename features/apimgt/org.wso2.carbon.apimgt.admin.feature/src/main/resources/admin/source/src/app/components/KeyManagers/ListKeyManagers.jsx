@@ -45,7 +45,6 @@ import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
 import {ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Popper, Paper} from "@material-ui/core";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import Configurations from 'Config';
 
 const useStyles = makeStyles((theme) => ({
     searchBar: {
@@ -73,14 +72,20 @@ const useStyles = makeStyles((theme) => ({
 
 const addButtonLabels = ['local', 'global'];
 
-/**
- * API call to get microgateway labels
- * @returns {Promise}.
- */
-function apiCall() {
-    const restApi = new API();
-    return restApi
+function localAPICall() {
+    return new API()
         .getKeyManagersList()
+        .then((result) => {
+            return result.body.list;
+        })
+        .catch((error) => {
+            throw error;
+        });
+}
+
+function globalAPICall() {
+    return new API()
+        .getGlobalKeyManagersList()
         .then((result) => {
             return result.body.list;
         })
@@ -111,21 +116,18 @@ export default function ListKeyManagers() {
     const anchorRef = React.useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
-    const setKeyManagers = (keyManagers) => {
-        setGlobalKMs(keyManagers.filter((item) => {
-            return item.isGlobal;
-        }));
-    };
-
     const fetchData = () => {
         // Fetch data from backend when an apiCall is provided
         setData(null);
-        if (apiCall) {
-            const promiseAPICall = apiCall();
-            promiseAPICall.then((LocalData) => {
-                if (LocalData) {
-                    setData(LocalData);
-                    setKeyManagers(LocalData);
+        let localKmList, globalKmList;
+        
+        if (localAPICall) {
+            localAPICall().then((result) => {
+                if (result) {
+                    localKmList = result;
+                    if (!!globalKmList) {
+                        setKeyManagerState(result, globalKmList);
+                    }
                     setError(null);
                 } else {
                     setError(intl.formatMessage({
@@ -134,12 +136,39 @@ export default function ListKeyManagers() {
                     }));
                 }
             })
-                .catch((e) => {
-                    setError(e.message);
-                });
+            .catch((e) => {
+                setError(e.message);
+            });
+        }
+
+        if (globalAPICall) {
+            globalAPICall().then((result) => {
+                if (result) {
+                    globalKmList = result;
+                    if (!!localKmList) {
+                        setKeyManagerState(localKmList, result);
+                    }
+                    setError(null);
+                } else {
+                    setError(intl.formatMessage({
+                        id: 'AdminPages.Addons.ListBase.noDataError',
+                        defaultMessage: 'Error while retrieving data.',
+                    }));
+                }
+            })
+            .catch((e) => {
+                setError(e.message);
+            });
         }
         setSearchText('');
     };
+
+    const setKeyManagerState = (localKmList, globalKmList) => {
+        localKmList = localKmList || [];
+        globalKmList = globalKmList || [];
+        setData([...localKmList, ...globalKmList]);
+        setGlobalKMs(globalKmList);
+    }
 
     const addedActions = [
         (props) => {
@@ -148,7 +177,8 @@ export default function ListKeyManagers() {
                 const restApi = new API();
                 const kmName = rowData[0];
                 const kmId = rowData[4];
-                (rowData[5] ? restApi.globalKeyManagerGet(kmId) : restApi.keyManagerGet(kmId)).then((result) => {
+                const isGlobal = rowData[5];
+                (isGlobal ? restApi.globalKeyManagerGet(kmId) : restApi.keyManagerGet(kmId)).then((result) => {
                     let editState;
                     if (result.body.name !== null) {
                         editState = {
@@ -156,21 +186,23 @@ export default function ListKeyManagers() {
                         };
                     }
                     editState.enabled = !editState.enabled;
-                    restApi.updateKeyManager(kmId, editState).then(() => {
-                        Alert.success(` ${kmName} ${intl.formatMessage({
-                            id: 'KeyManagers.ListKeyManagers.edit.success',
-                            defaultMessage: ' Key Manager updated successfully.',
-                        })}`);
-                        setSaving(false);
-                        updateList();
-                    }).catch((e) => {
-                        const { response } = e;
-                        if (response.body) {
-                            Alert.error(response.body.description);
-                        }
-                        setSaving(false);
-                        updateList();
-                    });
+                    (isGlobal ? 
+                        restApi.updateGlobalKeyManager(kmId, editState) : restApi.updateKeyManager(kmId, editState))
+                        .then(() => {
+                            Alert.success(` ${kmName} ${intl.formatMessage({
+                                id: 'KeyManagers.ListKeyManagers.edit.success',
+                                defaultMessage: ' Key Manager updated successfully.',
+                            })}`);
+                            setSaving(false);
+                            updateList();
+                        }).catch((e) => {
+                            const { response } = e;
+                            if (response.body) {
+                                Alert.error(response.body.description);
+                            }
+                            setSaving(false);
+                            updateList();
+                        });
                 });
             };
             const kmEnabled = rowData[3];
@@ -331,7 +363,7 @@ export default function ListKeyManagers() {
     }
 
     const addButtonOverride = () => {
-        if (!Configurations.app.enableGlobalKeyManagers || (globalKMs && globalKMs.length > 0)) {
+        if (globalKMs && globalKMs.length > 0) {
             return (
                 <Button variant='contained' color='primary' size='small' onClick={() => onAddButtonClick(0)}>
                     {getAddKeyManagerButtonLabel('local')}
@@ -457,7 +489,7 @@ export default function ListKeyManagers() {
 
     // If no apiCall is provided OR,
     // retrieved data is empty, display an information card.
-    if (!apiCall || (data && data.length === 0)) {
+    if ((!localAPICall && !globalAPICall) || (data && data.length === 0)) {
         return (
             <ContentBase
                 {...pageProps}
@@ -476,7 +508,7 @@ export default function ListKeyManagers() {
         );
     }
     // If apiCall is provided and data is not retrieved yet, display progress component
-    if (!error && apiCall && !data) {
+    if (!error && (localAPICall && globalAPICall) && !data) {
         return (
             <ContentBase pageStyle='paperLess'>
                 <InlineProgress />

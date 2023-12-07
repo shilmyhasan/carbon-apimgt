@@ -1347,8 +1347,8 @@ public class ApiMgtDAO {
         return subscribedAPIs;
     }
 
-    public Set<Pair<String, String>> getScopesForApplicationSubscription(Subscriber subscriber, int applicationId)
-            throws APIManagementException {
+    public Set<Pair<String, String>> getScopesForApplicationSubscription(
+            Subscriber subscriber, int applicationId, String xWSO2Tenant) throws APIManagementException {
 
         PreparedStatement getIncludedApisInProduct = null;
         PreparedStatement getSubscribedApisAndProducts = null;
@@ -8695,7 +8695,6 @@ public class ApiMgtDAO {
         try (Connection conn = APIMgtDBUtil.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
             preparedStatement.setString(1, tenantDomain);
-//            preparedStatement.setString(2, APIUtil.getGlobalKMTenantDomain());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     KeyManagerConfigurationDTO keyManagerConfigurationDTO = new KeyManagerConfigurationDTO();

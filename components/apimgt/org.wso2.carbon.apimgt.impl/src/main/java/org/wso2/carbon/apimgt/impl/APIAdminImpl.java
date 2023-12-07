@@ -344,7 +344,7 @@ public class APIAdminImpl implements APIAdmin {
     @Override
     public List<KeyManagerConfigurationDTO> getGlobalKeyManagerConfigurations() throws APIManagementException {
         List<KeyManagerConfigurationDTO> keyManagerConfigurations = apiMgtDAO.getKeyManagerConfigurationsByTenant(
-                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
+                APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurations) {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
         }
@@ -393,7 +393,7 @@ public class APIAdminImpl implements APIAdmin {
     @Override
     public KeyManagerConfigurationDTO getGlobalKeyManagerConfigurationById(String id) throws APIManagementException {
         KeyManagerConfigurationDTO keyManagerConfigurationDTO = apiMgtDAO.getKeyManagerConfigurationByID(
-                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
+                APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
         if (keyManagerConfigurationDTO != null) {
             maskValues(keyManagerConfigurationDTO);
         }
@@ -555,10 +555,9 @@ public class APIAdminImpl implements APIAdmin {
     public void deleteGlobalKeyManagerConfigurationById(String id) throws APIManagementException {
 
             KeyManagerConfigurationDTO keyManagerConfigurationDTO = apiMgtDAO.getKeyManagerConfigurationByID(
-                    APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
+                    APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
             if (keyManagerConfigurationDTO != null) {
-                apiMgtDAO.deleteKeyManagerConfigurationById(
-                        APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
+                apiMgtDAO.deleteKeyManagerConfigurationById(id, APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
                 new KeyMgtNotificationSender()
                         .notify(keyManagerConfigurationDTO, APIConstants.KeyManager.KeyManagerEvent.ACTION_DELETE);
             }

@@ -11733,10 +11733,6 @@ public final class APIUtil {
         return false;
     }
 
-    public static String getGlobalKMTenantDomain() {
-        return APIConstants.KeyManager.GLOBAL_KEY_MANAGER_TENANT_DOMAIN;
-    }
-
     public static String retrieveDefaultReservedUsername() {
 
         APIManagerConfiguration apiManagerConfiguration =

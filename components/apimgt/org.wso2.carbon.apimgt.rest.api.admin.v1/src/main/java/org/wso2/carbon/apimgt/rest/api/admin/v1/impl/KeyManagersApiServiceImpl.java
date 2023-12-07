@@ -108,7 +108,7 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
                     KeyManagerMappingUtil.toKeyManagerConfigurationDTO(tenantDomain, body);
             keyManagerConfigurationDTO.setUuid(keyManagerId);
             KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO =
-                    apiAdmin.getKeyManagerConfigurationById(tenantDomain, keyManagerId);;
+                    apiAdmin.getKeyManagerConfigurationById(tenantDomain, keyManagerId);
             if (oldKeyManagerConfigurationDTO == null) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_KEY_MANAGER, keyManagerId, log);
             } else {

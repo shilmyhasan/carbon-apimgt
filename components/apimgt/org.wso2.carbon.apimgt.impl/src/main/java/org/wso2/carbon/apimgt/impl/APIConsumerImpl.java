@@ -2808,11 +2808,12 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return subscribedAPIs;
     }
 
-    public Set<Scope> getScopesForApplicationSubscription(String username, int applicationId)
+    public Set<Scope> getScopesForApplicationSubscription(String username, int applicationId, String xWSO2Tenant)
             throws APIManagementException {
 
         Subscriber subscriber = new Subscriber(username);
-        Set<Pair<String, String>> scopeKeySet = apiMgtDAO.getScopesForApplicationSubscription(subscriber, applicationId);
+        Set<Pair<String, String>> scopeKeySet = apiMgtDAO.getScopesForApplicationSubscription(subscriber, applicationId,
+                xWSO2Tenant);
         Map<String, Scope> scopeToKeyMap = new HashMap<>();
         for (Pair<String, String> scopeEntry : scopeKeySet) {
             Scope scope = APIUtil.getScopeByName(scopeEntry.getRight(), scopeEntry.getLeft());
@@ -4858,8 +4859,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 String applicationName = application.getName();
                 if (!APIUtil.isApplicationOwnedBySubscriber(userId, applicationName)) {
                     for (APIKey apiKey : application.getKeys()) {
-                        KeyManager keyManager =
-                                KeyManagerHolder.getTenantKeyManagerInstance(APIUtil.getGlobalKMTenantDomain(), apiKey.getKeyManager());
+                        KeyManager keyManager = KeyManagerHolder.getTenantKeyManagerInstance(
+                                APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, apiKey.getKeyManager());
                         if (keyManager != null) {
                             // Prevent updating the OAuth app owner in the case of Global Key Manager.
                             continue;

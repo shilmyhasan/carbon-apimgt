@@ -47,8 +47,8 @@ public class KeyManagerMappingUtil {
         keyManagerInfoDTO.setDescription(keyManagerConfigurationDTO.getDescription());
         keyManagerInfoDTO.setType(keyManagerConfigurationDTO.getType());
         keyManagerInfoDTO.setEnabled(keyManagerConfigurationDTO.isEnabled());
-        keyManagerInfoDTO.setIsGlobal(keyManagerConfigurationDTO.getTenantDomain().equals(
-                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN));
+        keyManagerInfoDTO.setIsGlobal(
+                keyManagerConfigurationDTO.getTenantDomain().equals(APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN));
         return keyManagerInfoDTO;
     }
 
@@ -62,8 +62,8 @@ public class KeyManagerMappingUtil {
         keyManagerDTO.setDescription(keyManagerConfigurationDTO.getDescription());
         keyManagerDTO.setType(keyManagerConfigurationDTO.getType());
         keyManagerDTO.setEnabled(keyManagerConfigurationDTO.isEnabled());
-        keyManagerDTO.setGlobal(keyManagerConfigurationDTO.getTenantDomain().equals(
-                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN));
+        keyManagerDTO.setGlobal(
+                keyManagerConfigurationDTO.getTenantDomain().equals(APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN));
         JsonObject jsonObject = fromConfigurationMapToJson(keyManagerConfigurationDTO.getAdditionalProperties());
         JsonElement clientRegistrationElement = jsonObject.get(APIConstants.KeyManager.CLIENT_REGISTRATION_ENDPOINT);
         if (clientRegistrationElement != null) {

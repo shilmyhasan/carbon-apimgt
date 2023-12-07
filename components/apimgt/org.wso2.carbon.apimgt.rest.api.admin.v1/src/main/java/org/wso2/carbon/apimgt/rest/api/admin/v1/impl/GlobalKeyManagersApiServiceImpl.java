@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.apimgt.rest.api.admin.v1.impl;
 
 import org.apache.commons.logging.Log;
@@ -39,8 +57,6 @@ public class GlobalKeyManagersApiServiceImpl implements GlobalKeyManagersApiServ
 
     private static final Log log = LogFactory.getLog(GlobalKeyManagersApiServiceImpl.class);
 
-    // TODO: verify whether there are any checks for resident key manager text in the following flows.
-
     public Response globalKeyManagersGet(MessageContext messageContext) throws APIManagementException {
         APIAdmin apiAdmin = new APIAdminImpl();
         List<KeyManagerConfigurationDTO> globalKeyManagerConfigurations = apiAdmin.getGlobalKeyManagerConfigurations();
@@ -75,7 +91,7 @@ public class GlobalKeyManagersApiServiceImpl implements GlobalKeyManagersApiServ
         APIAdmin apiAdmin = new APIAdminImpl();
         try {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO = KeyManagerMappingUtil.toKeyManagerConfigurationDTO(
-                    APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerDTO);
+                    APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerDTO);
             keyManagerConfigurationDTO.setUuid(keyManagerId);
             KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO =
                     apiAdmin.getGlobalKeyManagerConfigurationById(keyManagerId);
@@ -103,7 +119,7 @@ public class GlobalKeyManagersApiServiceImpl implements GlobalKeyManagersApiServ
         try {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO =
                     KeyManagerMappingUtil.toKeyManagerConfigurationDTO(
-                            APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerDTO);
+                            APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerDTO);
             KeyManagerConfigurationDTO createdKeyManagerConfiguration =
                     apiAdmin.addKeyManagerConfiguration(keyManagerConfigurationDTO);
             URI location = new URI(RestApiConstants.KEY_MANAGERS + "/" + createdKeyManagerConfiguration.getUuid());
