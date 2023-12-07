@@ -387,6 +387,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                 if (RestAPIStoreUtils.isUserAccessAllowedForApplication(application)) {
                     ApplicationDTO applicationDTO = ApplicationMappingUtil.fromApplicationtoDTO(application);
                     applicationDTO.setHashEnabled(OAuthServerConfiguration.getInstance().isClientSecretHashEnabled());
+                    // TODO: pass tenant instead of username here
+
+                    // get all the apis for a particular application
+                    // filter the apis by xWSO2Tenant
+
                     Set<Scope> scopes = apiConsumer.getScopesForApplicationSubscription(username, application.getId());
                     List<ScopeInfoDTO> scopeInfoList = ApplicationMappingUtil.getScopeInfoDTO(scopes);
                     applicationDTO.setSubscriptionScopes(scopeInfoList);

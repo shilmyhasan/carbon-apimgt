@@ -679,12 +679,6 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                 .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
                 .errorDecoder(new KMClientErrorDecoder());
 
-        if (configuration.getParameter(APIConstants.KEY_MANAGER_TENANT_DOMAIN) != null) {
-            dcrFeignBuilder.requestInterceptor(new TenantHeaderInterceptor(tenantDomain));
-        }
-
-        dcrClient = dcrFeignBuilder.target(DCRClient.class, dcrEndpoint);
-
         Feign.Builder introspectionFeignBuilder = Feign.builder()
                 .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(introspectionEndpoint)))
                 .encoder(new GsonEncoder())
@@ -694,12 +688,6 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                 .errorDecoder(new KMClientErrorDecoder())
                 .encoder(new FormEncoder());
 
-        if (configuration.getParameter(APIConstants.KEY_MANAGER_TENANT_DOMAIN) != null) {
-            introspectionFeignBuilder.requestInterceptor(new TenantHeaderInterceptor(tenantDomain));
-        }
-
-        introspectionClient = introspectionFeignBuilder.target(IntrospectionClient.class, introspectionEndpoint);
-
         Feign.Builder scopeFeignBuilder = Feign.builder()
                 .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(scopeEndpoint)))
                 .encoder(new GsonEncoder())
@@ -707,12 +695,6 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                 .logger(new Slf4jLogger())
                 .requestInterceptor(new BasicAuthRequestInterceptor(username, password))
                 .errorDecoder(new KMClientErrorDecoder());
-
-        if (configuration.getParameter(APIConstants.KEY_MANAGER_TENANT_DOMAIN) != null) {
-            scopeFeignBuilder.requestInterceptor(new TenantHeaderInterceptor(tenantDomain));
-        }
-
-        scopeClient = scopeFeignBuilder.target(ScopeClient.class, scopeEndpoint);
 
         Feign.Builder userFeignBuilder = Feign.builder()
                 .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(userInfoEndpoint)))
@@ -723,11 +705,16 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                 .errorDecoder(new KMClientErrorDecoder());
 
         if (configuration.getParameter(APIConstants.KEY_MANAGER_TENANT_DOMAIN) != null) {
+            dcrFeignBuilder.requestInterceptor(new TenantHeaderInterceptor(tenantDomain));
+            introspectionFeignBuilder.requestInterceptor(new TenantHeaderInterceptor(tenantDomain));
+            scopeFeignBuilder.requestInterceptor(new TenantHeaderInterceptor(tenantDomain));
             userFeignBuilder.requestInterceptor(new TenantHeaderInterceptor(tenantDomain));
         }
 
+        dcrClient = dcrFeignBuilder.target(DCRClient.class, dcrEndpoint);
+        introspectionClient = introspectionFeignBuilder.target(IntrospectionClient.class, introspectionEndpoint);
+        scopeClient = scopeFeignBuilder.target(ScopeClient.class, scopeEndpoint);
         userClient = userFeignBuilder.target(UserClient.class, userInfoEndpoint);
-
         authClient = Feign.builder()
                 .client(new ApacheFeignHttpClient(APIUtil.getHttpClient(tokenEndpoint)))
                 .encoder(new GsonEncoder())

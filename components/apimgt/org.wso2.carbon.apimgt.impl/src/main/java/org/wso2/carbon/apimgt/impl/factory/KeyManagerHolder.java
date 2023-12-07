@@ -136,19 +136,16 @@ public class KeyManagerHolder {
     }
 
     public static Map<String, KeyManagerDto> getGlobalAndTenantKeyManagers(String tenantDomain) {
-
-        TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDto(tenantDomain);
-        TenantKeyManagerDto globalKeyManagerDto = getTenantKeyManagerDto(APIUtil.getGlobalKMTenantDomain());
-
         Map<String, KeyManagerDto> keyManagerMap = new HashMap<>();
-
+        TenantKeyManagerDto tenantKeyManagerDto = getTenantKeyManagerDto(tenantDomain);
         if (tenantKeyManagerDto != null) {
             keyManagerMap.putAll(tenantKeyManagerDto.getKeyManagerMap());
         }
+        TenantKeyManagerDto globalKeyManagerDto = getTenantKeyManagerDto(
+                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
         if (globalKeyManagerDto != null) {
             keyManagerMap.putAll(globalKeyManagerDto.getKeyManagerMap());
         }
-
         return keyManagerMap;
     }
 

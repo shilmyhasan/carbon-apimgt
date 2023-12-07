@@ -25,8 +25,6 @@ import javax.ws.rs.core.SecurityContext;
 public interface KeyManagersApiService {
       public Response keyManagersDiscoverPost(String url, String type, MessageContext messageContext) throws APIManagementException;
       public Response keyManagersGet(MessageContext messageContext) throws APIManagementException;
-      public Response keyManagersGlobalKeyManagerIdDelete(String keyManagerId, MessageContext messageContext) throws APIManagementException;
-      public Response keyManagersGlobalKeyManagerIdGet(String keyManagerId, MessageContext messageContext) throws APIManagementException;
       public Response keyManagersKeyManagerIdDelete(String keyManagerId, MessageContext messageContext) throws APIManagementException;
       public Response keyManagersKeyManagerIdGet(String keyManagerId, MessageContext messageContext) throws APIManagementException;
       public Response keyManagersKeyManagerIdPut(String keyManagerId, KeyManagerDTO keyManagerDTO, MessageContext messageContext) throws APIManagementException;

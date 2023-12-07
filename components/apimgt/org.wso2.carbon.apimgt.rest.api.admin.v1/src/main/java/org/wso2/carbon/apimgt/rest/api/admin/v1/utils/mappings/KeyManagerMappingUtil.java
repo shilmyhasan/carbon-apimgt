@@ -28,10 +28,11 @@ import java.util.Map;
 public class KeyManagerMappingUtil {
 
     public static KeyManagerListDTO toKeyManagerListDTO(List<KeyManagerConfigurationDTO> keyManagerDTOList) {
+
         KeyManagerListDTO keyManagerListDTO = new KeyManagerListDTO();
         List<KeyManagerInfoDTO> keyManagerDTOS = new ArrayList<>();
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerDTOList) {
-                keyManagerDTOS.add(toKeyManagerInfoDTO(keyManagerConfigurationDTO));
+            keyManagerDTOS.add(toKeyManagerInfoDTO(keyManagerConfigurationDTO));
         }
         keyManagerListDTO.setList(keyManagerDTOS);
         keyManagerListDTO.setCount(keyManagerDTOS.size());
@@ -203,11 +204,7 @@ public class KeyManagerMappingUtil {
         keyManagerConfigurationDTO.setDescription(keyManagerDTO.getDescription());
         keyManagerConfigurationDTO.setEnabled(keyManagerDTO.isEnabled());
         keyManagerConfigurationDTO.setType(keyManagerDTO.getType());
-        if (keyManagerDTO.isGlobal() != null && keyManagerDTO.isGlobal()) {
-            keyManagerConfigurationDTO.setTenantDomain(APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
-        } else {
-            keyManagerConfigurationDTO.setTenantDomain(tenantDomain);
-        }
+        keyManagerConfigurationDTO.setTenantDomain(tenantDomain);
         Map<String,Object> additionalProperties = new HashMap();
         if (keyManagerDTO.getAdditionalProperties() != null && keyManagerDTO.getAdditionalProperties() instanceof Map) {
             additionalProperties.putAll((Map) keyManagerDTO.getAdditionalProperties());

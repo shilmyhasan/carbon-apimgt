@@ -317,6 +317,7 @@ public class APIAdminImpl implements APIAdmin {
     @Override
     public List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(String tenantDomain)
             throws APIManagementException {
+
         KeyMgtRegistrationService.registerDefaultKeyManager(tenantDomain);
         List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
                 apiMgtDAO.getKeyManagerConfigurationsByTenant(tenantDomain);
@@ -334,11 +335,20 @@ public class APIAdminImpl implements APIAdmin {
             APIUtil.getAndSetDefaultKeyManagerConfiguration(defaultKeyManagerConfiguration);
             keyManagerConfigurationsByTenant.add(defaultKeyManagerConfiguration);
         }
-
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByTenant) {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
         }
         return keyManagerConfigurationsByTenant;
+    }
+
+    @Override
+    public List<KeyManagerConfigurationDTO> getGlobalKeyManagerConfigurations() throws APIManagementException {
+        List<KeyManagerConfigurationDTO> keyManagerConfigurations = apiMgtDAO.getKeyManagerConfigurationsByTenant(
+                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
+        for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurations) {
+            decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
+        }
+        return keyManagerConfigurations;
     }
 
     @Override
@@ -371,11 +381,22 @@ public class APIAdminImpl implements APIAdmin {
 
         KeyManagerConfigurationDTO keyManagerConfigurationDTO =
                 apiMgtDAO.getKeyManagerConfigurationByID(tenantDomain, id);
-        if (keyManagerConfigurationDTO != null &&
-                APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
-            APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfigurationDTO);
+        if (keyManagerConfigurationDTO != null) {
+            if (APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
+                APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfigurationDTO);
+            }
+            maskValues(keyManagerConfigurationDTO);
         }
-        maskValues(keyManagerConfigurationDTO);
+        return keyManagerConfigurationDTO;
+    }
+
+    @Override
+    public KeyManagerConfigurationDTO getGlobalKeyManagerConfigurationById(String id) throws APIManagementException {
+        KeyManagerConfigurationDTO keyManagerConfigurationDTO = apiMgtDAO.getKeyManagerConfigurationByID(
+                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
+        if (keyManagerConfigurationDTO != null) {
+            maskValues(keyManagerConfigurationDTO);
+        }
         return keyManagerConfigurationDTO;
     }
 
@@ -528,6 +549,19 @@ public class APIAdminImpl implements APIAdmin {
                         ExceptionCodes.INTERNAL_ERROR);
             }
         }
+    }
+
+    @Override
+    public void deleteGlobalKeyManagerConfigurationById(String id) throws APIManagementException {
+
+            KeyManagerConfigurationDTO keyManagerConfigurationDTO = apiMgtDAO.getKeyManagerConfigurationByID(
+                    APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
+            if (keyManagerConfigurationDTO != null) {
+                apiMgtDAO.deleteKeyManagerConfigurationById(
+                        APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
+                new KeyMgtNotificationSender()
+                        .notify(keyManagerConfigurationDTO, APIConstants.KeyManager.KeyManagerEvent.ACTION_DELETE);
+            }
     }
 
     @Override

@@ -68,10 +68,10 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
 
         String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
         APIAdmin apiAdmin = new APIAdminImpl();
-        List<KeyManagerConfigurationDTO> keyManagerConfigurations =
+        List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
                 apiAdmin.getKeyManagerConfigurationsByTenant(tenantDomain);
         KeyManagerListDTO keyManagerListDTO =
-                KeyManagerMappingUtil.toKeyManagerListDTO(keyManagerConfigurations);
+                KeyManagerMappingUtil.toKeyManagerListDTO(keyManagerConfigurationsByTenant);
         return Response.ok().entity(keyManagerListDTO).build();
     }
 
@@ -102,24 +102,13 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
     public Response keyManagersKeyManagerIdPut(String keyManagerId, KeyManagerDTO body, MessageContext messageContext) {
 
         String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
-        boolean isGlobal = body.isGlobal() != null && body.isGlobal();
-        if (isGlobal && !SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-            String error = "Error while creating Global Key Manager via tenant " + tenantDomain;
-            RestApiUtil.handleInternalServerError(error, log);
-            return null;
-        }
         APIAdmin apiAdmin = new APIAdminImpl();
         try {
             KeyManagerConfigurationDTO keyManagerConfigurationDTO =
                     KeyManagerMappingUtil.toKeyManagerConfigurationDTO(tenantDomain, body);
             keyManagerConfigurationDTO.setUuid(keyManagerId);
-            KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO;
-            if (isGlobal) {
-                oldKeyManagerConfigurationDTO = apiAdmin.getKeyManagerConfigurationById(
-                        APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerId);
-            } else {
-                oldKeyManagerConfigurationDTO = apiAdmin.getKeyManagerConfigurationById(tenantDomain, keyManagerId);
-            }
+            KeyManagerConfigurationDTO oldKeyManagerConfigurationDTO =
+                    apiAdmin.getKeyManagerConfigurationById(tenantDomain, keyManagerId);;
             if (oldKeyManagerConfigurationDTO == null) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_KEY_MANAGER, keyManagerId, log);
             } else {
@@ -136,36 +125,6 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
                             tenantDomain;
             RestApiUtil.handleInternalServerError(error, e, log);
         }
-        return null;
-    }
-
-    @Override
-    public Response keyManagersGlobalKeyManagerIdDelete(String keyManagerId, MessageContext messageContext)
-            throws APIManagementException {
-        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
-        if (!SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-            String error = "Error while Deleting Key Manager configuration for " + keyManagerId + " in tenant " +
-                    tenantDomain;
-            RestApiUtil.handleInternalServerError(error, log);
-            return null;
-        }
-        APIAdmin apiAdmin = new APIAdminImpl();
-        apiAdmin.deleteKeyManagerConfigurationById(
-                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerId);
-        return Response.ok().build();
-    }
-
-    @Override
-    public Response keyManagersGlobalKeyManagerIdGet(String keyManagerId, MessageContext messageContext)
-            throws APIManagementException {
-        APIAdmin apiAdmin = new APIAdminImpl();
-        KeyManagerConfigurationDTO keyManagerConfigurationDTO = apiAdmin.getKeyManagerConfigurationById(
-                APIConstants.GlobalKMConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, keyManagerId);
-        if (keyManagerConfigurationDTO != null) {
-            KeyManagerDTO keyManagerDTO = KeyManagerMappingUtil.toKeyManagerDTO(keyManagerConfigurationDTO);
-            return Response.ok(keyManagerDTO).build();
-        }
-        RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_KEY_MANAGER, keyManagerId, log);
         return null;
     }
 
