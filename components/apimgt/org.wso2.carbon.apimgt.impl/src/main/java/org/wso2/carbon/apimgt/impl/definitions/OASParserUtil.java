@@ -1183,7 +1183,8 @@ public class OASParserUtil {
      * @param endpointConfig endpoint configuration json string
      * @param isProd         endpoint type
      */
-    private static ObjectNode populateFailoverConfig(JSONObject endpointConfig, boolean isProd) {
+    private static ObjectNode populateFailoverConfig(JSONObject endpointConfig, boolean isProd)
+            throws APIManagementException {
         JSONArray endpointsURLs = null;
         JSONObject primaryEndpoints = null;
         if (isProd) {
@@ -1218,7 +1219,7 @@ public class OASParserUtil {
         ObjectNode endpointResult = objectMapper.createObjectNode();
         endpointResult.set(APIConstants.ENDPOINT_URLS, endpointsArray);
         endpointResult.put(APIConstants.X_WSO2_ENDPOINT_TYPE, APIConstants.ENDPOINT_TYPE_FAILOVER);
-        return endpointResult;
+        return updateEndpointResult(primaryEndpoints, endpointResult);
     }
 
     /**
@@ -1227,7 +1228,8 @@ public class OASParserUtil {
      * @param endpointConfig endpoint configuration json string
      * @param isProd         endpoint type
      */
-    private static ObjectNode populateLoadBalanceConfig(JSONObject endpointConfig, boolean isProd) {
+    private static ObjectNode populateLoadBalanceConfig(JSONObject endpointConfig, boolean isProd)
+            throws APIManagementException {
         JSONArray primaryProdEndpoints = new JSONArray();
         if (isProd) {
             if (endpointConfig.has(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS) && endpointConfig
@@ -1254,6 +1256,14 @@ public class OASParserUtil {
         ObjectNode endpointResult = objectMapper.createObjectNode();
         endpointResult.set(APIConstants.ENDPOINT_URLS, endpointsArray);
         endpointResult.put(APIConstants.X_WSO2_ENDPOINT_TYPE, APIConstants.ENDPOINT_TYPE_LOADBALANCE);
+
+        if (primaryProdEndpoints != null) {
+            for (int i = 0; i < primaryProdEndpoints.length(); i++) {
+                if (primaryProdEndpoints.getJSONObject(i).has(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                    return updateEndpointResult(primaryProdEndpoints.getJSONObject(i), endpointResult);
+                }
+            }
+        }
         return endpointResult;
     }
 
@@ -1282,21 +1292,32 @@ public class OASParserUtil {
             ObjectNode endpointResult = objectMapper.createObjectNode();
             endpointResult.set(APIConstants.ENDPOINT_URLS, endpointsArray);
             endpointResult.put(APIConstants.X_WSO2_ENDPOINT_TYPE, type);
-            if (primaryEndpoints.has(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
-                try {
-                    endpointResult.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG,
-                            objectMapper.readTree(primaryEndpoints.get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG).toString()));
-                } catch (JsonProcessingException e) {
-                    throw new APIManagementException(
-                            "Error while setting the primary endpoint configs ", e);
-                }
-            } else {
-                //When user removes existing advancedConfigurations section.Returns null if key was not an existing
-                endpointResult.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
-            }
-            return endpointResult;
+            return updateEndpointResult(primaryEndpoints, endpointResult);
         }
         return null;
+    }
+
+    /**
+     * Add advance configuration to the endpointResult object
+     *
+     * @param primaryEndpoints production and sandbox endpoint configuration Json object
+     * @param endpointResult         endpoint result ObjectNode
+     */
+    private static ObjectNode updateEndpointResult(JSONObject primaryEndpoints, ObjectNode endpointResult)
+            throws APIManagementException {
+        if (primaryEndpoints.has(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+            try {
+                endpointResult.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, objectMapper
+                        .readTree(primaryEndpoints.get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG).toString()));
+            } catch (JsonProcessingException e) {
+                throw new APIManagementException(
+                        "Error while setting the advance endpoint configs ", e);
+            }
+        } else {
+            //When user removes existing advancedConfigurations section.Returns null if key was not an existing
+            endpointResult.remove(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
+        }
+        return endpointResult;
     }
 
     /**
