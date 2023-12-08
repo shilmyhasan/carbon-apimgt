@@ -2443,7 +2443,7 @@ public class SQLConstants {
                 "FROM AM_SUBSCRIBER SUB " +
                 "INNER JOIN AM_APPLICATION APP ON SUB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
                 "INNER JOIN AM_SUBSCRIPTION SUBS ON APP.APPLICATION_ID = SUBS.APPLICATION_ID " +
-                "INNER JOIN AM_API API ON API.API_ID = SUBS.API_ID " +    // Correct until this
+                "INNER JOIN AM_API API ON API.API_ID = SUBS.API_ID " +    
                 "LEFT JOIN AM_API_PRODUCT_MAPPING APM ON APM.API_ID = API.API_ID " +
                 "INNER JOIN AM_API_URL_MAPPING AUM " +
                     "ON AUM.URL_MAPPING_ID = APM.URL_MAPPING_ID " +
