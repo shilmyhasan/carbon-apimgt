@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.apimgt.rest.api.publisher.v1.common.mappings;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.language.FieldDefinition;
 import graphql.language.ObjectTypeDefinition;
@@ -29,6 +31,7 @@ import graphql.schema.idl.UnExecutableSchemaGenerator;
 import graphql.schema.idl.errors.SchemaProblem;
 import graphql.schema.validation.SchemaValidationError;
 import graphql.schema.validation.SchemaValidator;
+import io.swagger.v3.parser.ObjectMapperFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -1231,10 +1234,10 @@ public class PublisherCommonUtils {
         existingAPI.setUriTemplates(uriTemplates);
         existingAPI.setScopes(scopes);
         try {
-            JSONObject updatedApiJson = (JSONObject) new JSONParser().parse(apiDefinition);
-            JSONObject newProductionEndpointJson = (JSONObject) updatedApiJson
+            ObjectMapper mapper = ObjectMapperFactory.createJson();
+            JsonNode newProductionEndpointJson = mapper.readTree(apiDefinition)
                     .get(APIConstants.X_WSO2_PRODUCTION_ENDPOINTS);
-            JSONObject newSandboxEndpointJson = (JSONObject) updatedApiJson
+            JsonNode newSandboxEndpointJson = mapper.readTree(apiDefinition)
                     .get(APIConstants.X_WSO2_SANDBOX_ENDPOINTS);
             String existingEndpointConfigString = existingAPI.getEndpointConfig();
 
@@ -1252,9 +1255,9 @@ public class PublisherCommonUtils {
                             for (int i = 0; i < productionConfigsJson.size(); i++) {
                                 if (!(((JSONObject) productionConfigsJson.get(i)).containsKey(APIConstants
                                         .API_ENDPOINT_CONFIG_PROTOCOL_TYPE))) {
-                                    if (newProductionEndpointJson.containsKey(APIConstants
+                                    if (newProductionEndpointJson.has(APIConstants
                                             .X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
-                                        JSONObject advanceConfig = (JSONObject) newProductionEndpointJson
+                                        JsonNode advanceConfig = newProductionEndpointJson
                                                 .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
                                         ((JSONObject) productionConfigsJson.get(i))
                                                 .put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
@@ -1270,8 +1273,8 @@ public class PublisherCommonUtils {
                         } else {
                             JSONObject productionConfigsJson = (JSONObject) existingEndpointConfigJson
                                     .get(APIConstants.ENDPOINT_PRODUCTION_ENDPOINTS);
-                            if (newProductionEndpointJson.containsKey(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
-                                JSONObject advanceConfig = (JSONObject) newProductionEndpointJson
+                            if (newProductionEndpointJson.has(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                                JsonNode advanceConfig = newProductionEndpointJson
                                         .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
                                 productionConfigsJson.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
                             } else {
@@ -1293,9 +1296,9 @@ public class PublisherCommonUtils {
                             for (int i = 0; i < sandboxConfigsJson.size(); i++) {
                                 if (!(((JSONObject) sandboxConfigsJson.get(i)).containsKey(APIConstants
                                         .API_ENDPOINT_CONFIG_PROTOCOL_TYPE))) {
-                                    if (newSandboxEndpointJson.containsKey(APIConstants
+                                    if (newSandboxEndpointJson.has(APIConstants
                                             .X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
-                                        JSONObject advanceConfig = (JSONObject) newSandboxEndpointJson
+                                        JsonNode advanceConfig = newSandboxEndpointJson
                                                 .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
                                         ((JSONObject) sandboxConfigsJson.get(i))
                                                 .put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
@@ -1311,8 +1314,8 @@ public class PublisherCommonUtils {
                         } else {
                             JSONObject sandboxConfigsJson = (JSONObject) existingEndpointConfigJson
                                     .get(APIConstants.ENDPOINT_SANDBOX_ENDPOINTS);
-                            if (newSandboxEndpointJson.containsKey(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
-                                JSONObject advanceConfig = (JSONObject) newSandboxEndpointJson
+                            if (newSandboxEndpointJson.has(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG)) {
+                                JsonNode advanceConfig = newSandboxEndpointJson
                                         .get(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG);
                                 sandboxConfigsJson.put(APIConstants.X_WSO2_ADVANCE_ENDPOINT_CONFIG, advanceConfig);
                             } else {
@@ -1325,7 +1328,7 @@ public class PublisherCommonUtils {
                 }
                 existingAPI.setEndpointConfig(existingEndpointConfigJson.toString());
             }
-        } catch (ParseException e) {
+        } catch (ParseException | JsonProcessingException e) {
             throw new APIManagementException("Error when parsing endpoint configurations ", e);
         }
 
