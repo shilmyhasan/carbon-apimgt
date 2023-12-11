@@ -125,7 +125,7 @@ public class RestApiPublisherUtils {
             mediaType = mediaType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : mediaType;
             apiProvider.addFileToDocumentation(apiIdentifier, documentation, filename, docInputStream, mediaType);
             apiProvider.updateDocumentation(apiIdentifier, documentation);
-            docFile.deleteOnExit();
+            docFile.delete();
         } catch (FileNotFoundException e) {
             RestApiUtil.handleInternalServerError("Unable to read the file from path ", e, log);
         } finally {
@@ -293,7 +293,7 @@ public class RestApiPublisherUtils {
 
         if (userPath.isAbsolute()){
             throw new APIManagementException("Invalid user path provided." +
-                    " User path must be absolute. User Path: " + userPath);
+                    " User path should not be absolute. User Path: " + userPath);
         }
 
         /*
