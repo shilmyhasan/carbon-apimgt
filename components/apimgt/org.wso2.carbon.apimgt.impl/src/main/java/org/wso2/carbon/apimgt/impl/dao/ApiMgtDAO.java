@@ -1546,7 +1546,7 @@ public class ApiMgtDAO {
                     scopeKeysSet.add(finalResultSet.getString(1));
                 }
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             handleException("Failed to retrieve scopes for application subscription ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(getScopesStatement, null, null);
