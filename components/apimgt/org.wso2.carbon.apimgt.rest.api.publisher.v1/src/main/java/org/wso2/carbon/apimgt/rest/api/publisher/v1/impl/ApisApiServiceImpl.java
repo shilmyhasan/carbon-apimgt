@@ -2789,6 +2789,8 @@ public class ApisApiServiceImpl implements ApisApiService {
         APIDTO apiDTOFromProperties;
         try {
             apiDTOFromProperties = objectMapper.readValue(additionalProperties, APIDTO.class);
+            APIUtil.validateCharacterLength(apiDTOFromProperties.getName(), apiDTOFromProperties.getVersion(),
+                    apiDTOFromProperties.getContext(), apiDTOFromProperties.getProvider());
             try {
                 APIUtil.validateAPIContext(apiDTOFromProperties.getContext(), apiDTOFromProperties.getName());
             } catch (APIManagementException e) {
@@ -2944,6 +2946,8 @@ public class ApisApiServiceImpl implements ApisApiService {
             // Minimum requirement name, version, context and endpointConfig.
             additionalPropertiesAPI = new ObjectMapper().readValue(additionalProperties, APIDTO.class);
             try {
+                APIUtil.validateCharacterLength(additionalPropertiesAPI.getName(), additionalPropertiesAPI.getVersion(),
+                        additionalPropertiesAPI.getContext(), RestApiCommonUtil.getLoggedInUsername());
                 APIUtil.validateAPIContext(additionalPropertiesAPI.getContext(), additionalPropertiesAPI.getName());
             } catch (APIManagementException e) {
                 throw new APIManagementException(e.getMessage(),
