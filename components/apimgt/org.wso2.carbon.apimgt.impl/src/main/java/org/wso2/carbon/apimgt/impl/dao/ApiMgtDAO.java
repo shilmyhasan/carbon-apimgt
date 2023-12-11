@@ -1531,14 +1531,13 @@ public class ApiMgtDAO {
 
     public Set<String> getScopesForApplicationSubscription(Subscriber subscriber, int applicationId)
             throws APIManagementException {
-        ResultSet resultSet = null;
+
         Set<String> scopeKeysSet = new HashSet<>();
-        PreparedStatement getScopesStatement = null;
         int tenantId = APIUtil.getTenantId(subscriber.getName());
 
-        try (Connection conn = APIMgtDBUtil.getConnection()) {
-            getScopesStatement = conn
-                    .prepareStatement(SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SQL);
+        try (Connection conn = APIMgtDBUtil.getConnection();
+             PreparedStatement getScopesStatement = conn
+                     .prepareStatement(SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SQL)) {
             getScopesStatement.setInt(1, tenantId);
             getScopesStatement.setInt(2, applicationId);
             try (ResultSet finalResultSet = getScopesStatement.executeQuery()) {
@@ -1548,8 +1547,6 @@ public class ApiMgtDAO {
             }
         } catch (SQLException e) {
             handleException("Failed to retrieve scopes for application subscription ", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(getScopesStatement, null, null);
         }
         return scopeKeysSet;
     }
