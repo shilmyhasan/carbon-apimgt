@@ -955,6 +955,12 @@ public class OAS3Parser extends APIDefinition {
         if (CollectionUtils.isNotEmpty(parseAttemptForV3.getMessages())) {
             log.debug("Errors found when parsing OAS definition");
         }
+        // This is to fix the scopes field removal issue where scopes are not defined from OAuthFlow in OAS 3 due to a
+        // bug in swagger parser 2.0.13.
+        if (parseAttemptForV3.getOpenAPI() != null && parseAttemptForV3.getOpenAPI().getComponents() != null &&
+                parseAttemptForV3.getOpenAPI().getComponents().getSecuritySchemes() != null) {
+            populateNullSecuritySchemeScopes(parseAttemptForV3.getOpenAPI().getComponents().getSecuritySchemes());
+        }
         return parseAttemptForV3.getOpenAPI();
     }
 
@@ -1001,5 +1007,23 @@ public class OAS3Parser extends APIDefinition {
         paths.put("/", pathItem);
 
         openAPI.setPaths(paths);
+    }
+
+    private void populateNullSecuritySchemeScopes(Map<String, SecurityScheme> securitySchemes) {
+        for (SecurityScheme securityScheme : securitySchemes.values()) {
+            OAuthFlows flows = securityScheme.getFlows();
+            if (flows != null) {
+                setScopesIfNull(flows.getAuthorizationCode());
+                setScopesIfNull(flows.getImplicit());
+                setScopesIfNull(flows.getPassword());
+                setScopesIfNull(flows.getClientCredentials());
+            }
+        }
+    }
+
+    private void setScopesIfNull(OAuthFlow flow) {
+        if (flow != null && flow.getScopes() == null) {
+            flow.setScopes(new Scopes());
+        }
     }
 }

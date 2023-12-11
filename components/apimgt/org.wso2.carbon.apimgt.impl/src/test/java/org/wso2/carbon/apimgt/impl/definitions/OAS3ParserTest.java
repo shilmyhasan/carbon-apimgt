@@ -11,9 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.wso2.carbon.apimgt.api.APIDefinition;
-import org.wso2.carbon.apimgt.api.model.API;
-import org.wso2.carbon.apimgt.api.model.APIIdentifier;
-import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
@@ -167,4 +164,55 @@ public class OAS3ParserTest extends OASTestBase {
         Assert.assertEquals(actualTemplates, expectedTemplates);
     }
 
+    @Test
+    public void testGetOpenAPIWithEmptyScopesInOAuthFlows() throws Exception {
+        String relativePath = "definitions" + File.separator + "oas3" + File.separator +
+                "oas3_security_schemes_with_empty_scopes.json";
+        String content = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+
+        String authorizationCodeOauthFlowType = String.format(content, "{\n" +
+                "          \"authorizationCode\": {\n" +
+                "            \"authorizationUrl\": \"https://test.com\",\n" +
+                "            \"tokenUrl\": \"https://test.com\",\n" +
+                "            \"scopes\": {}\n" +
+                "          }\n" +
+                "        }");
+        OpenAPI authorizationCodeOauthFlowTypeOpenAPI = oas3Parser.getOpenAPI(authorizationCodeOauthFlowType);
+        Assert.assertNotNull(authorizationCodeOauthFlowTypeOpenAPI);
+        Assert.assertNotNull(authorizationCodeOauthFlowTypeOpenAPI.getComponents().getSecuritySchemes().get("default").
+                getFlows().getAuthorizationCode().getScopes());
+
+        String implicitOauthFlowType = String.format(content, "{\n" +
+                "          \"implicit\": {\n" +
+                "            \"authorizationUrl\": \"https://test.com\",\n" +
+                "            \"scopes\": {}\n" +
+                "          }\n" +
+                "        }");
+        OpenAPI implicitOauthFlowTypeOpenAPI = oas3Parser.getOpenAPI(implicitOauthFlowType);
+        Assert.assertNotNull(implicitOauthFlowTypeOpenAPI);
+        Assert.assertNotNull(implicitOauthFlowTypeOpenAPI.getComponents().getSecuritySchemes().get("default").
+                getFlows().getImplicit().getScopes());
+
+        String passwordOauthFlowType = String.format(content, "{\n" +
+                "          \"password\": {\n" +
+                "            \"tokenUrl\": \"https://test.com\",\n" +
+                "            \"scopes\": {}\n" +
+                "          }\n" +
+                "        }");
+        OpenAPI passwordOauthFlowTypeOpenAPI = oas3Parser.getOpenAPI(passwordOauthFlowType);
+        Assert.assertNotNull(passwordOauthFlowTypeOpenAPI);
+        Assert.assertNotNull(passwordOauthFlowTypeOpenAPI.getComponents().getSecuritySchemes().get("default").
+                getFlows().getPassword().getScopes());
+
+        String clientCredentialsOauthFlowType = String.format(content, "{\n" +
+                "          \"clientCredentials\": {\n" +
+                "            \"tokenUrl\": \"https://test.com\",\n" +
+                "            \"scopes\": {}\n" +
+                "          }\n" +
+                "        }");
+        OpenAPI clientCredentialsOauthFlowTypeOpenAPI = oas3Parser.getOpenAPI(clientCredentialsOauthFlowType);
+        Assert.assertNotNull(clientCredentialsOauthFlowTypeOpenAPI);
+        Assert.assertNotNull(clientCredentialsOauthFlowTypeOpenAPI.getComponents().getSecuritySchemes().get("default").
+                getFlows().getClientCredentials().getScopes());
+    }
 }
