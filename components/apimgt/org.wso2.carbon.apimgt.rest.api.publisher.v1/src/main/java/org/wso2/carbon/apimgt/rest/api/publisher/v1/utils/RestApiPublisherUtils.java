@@ -94,7 +94,7 @@ public class RestApiPublisherUtils {
             PublisherCommonUtils
                     .addDocumentationContentForFile(docInputStream, mediaType, filename, apiProvider, apiId,
                             documentId, tenantDomain);
-            docFile.deleteOnExit();
+            docFile.delete();
         } catch (FileNotFoundException e) {
             RestApiUtil.handleInternalServerError("Unable to read the file from path ", e, log);
         } finally {
@@ -183,7 +183,7 @@ public class RestApiPublisherUtils {
             PublisherCommonUtils
                     .addDocumentationContentForFile(docInputStream, mediaType, filename, apiProvider, productId,
                             documentId, tenantDomain);
-            docFile.deleteOnExit();
+            docFile.delete();
         } catch (FileNotFoundException e) {
             RestApiUtil.handleInternalServerError("Unable to read the file from path ", e, log);
         } finally {
@@ -244,7 +244,7 @@ public class RestApiPublisherUtils {
 
         if (userPath.isAbsolute()){
             throw new APIManagementException("Invalid user path provided." +
-                    " User path must be absolute. User Path: " + userPath);
+                    " User path should not be absolute. User Path: " + userPath);
         }
 
         /*
