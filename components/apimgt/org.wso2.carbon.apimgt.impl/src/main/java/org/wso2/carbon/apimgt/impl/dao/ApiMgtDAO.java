@@ -1356,7 +1356,12 @@ public class ApiMgtDAO {
         Map<Integer, String> apiProviders = new HashMap<>();
         Set<Pair<String, String>> apiScopes = new HashSet<>();
         Set<Integer> apiIdSet = new HashSet<>();
-        int tenantId = APIUtil.getTenantId(subscriber.getName());
+        int tenantId;
+        if (StringUtils.isNotEmpty(xWSO2Tenant)) {
+            tenantId = APIUtil.getTenantIdFromTenantDomain(xWSO2Tenant);
+        } else {
+            tenantId = APIUtil.getTenantId(subscriber.getName());
+        }
 
         try (Connection conn = APIMgtDBUtil.getConnection()) {
             String sqlQueryForGetSubscribedApis = SQLConstants.GET_SUBSCRIBED_API_IDs_BY_APP_ID_SQL;
