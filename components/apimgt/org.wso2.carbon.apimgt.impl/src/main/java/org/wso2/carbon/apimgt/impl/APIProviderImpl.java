@@ -803,7 +803,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         int tenantId = APIUtil.getInternalOrganizationId(organization);
         String tenantDomain = APIUtil.getTenantDomainFromTenantId(tenantId);
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         //Get the local scopes set to register for the API from URI templates
         Set<Scope> scopesToRegister = getScopesToRegisterFromURITemplates(apiName, organization, uriTemplates);
         //Register scopes
@@ -894,7 +894,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String tenantDomain = APIUtil.getTenantDomainFromTenantId(tenantId);
         validateAndUpdateURITemplates(api, tenantId);
         apiMgtDAO.addURITemplates(apiId, api, tenantId);
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
             if (keyManager != null) {
@@ -917,7 +917,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     private void registerOrUpdateResourceInKeyManager(API api, String tenantDomain) throws APIManagementException {
         //get new key manager instance for  resource registration.
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
             if (keyManager != null) {
@@ -1667,7 +1667,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         // Need to remove the old local scopes and register new local scopes and, update the resource scope mappings
         // using the updated URI templates of the API.
         updateScopes(newLocalScopes, oldLocalScopeKeys, tenantId);
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
             if (keyManager != null) {
@@ -3852,7 +3852,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         // Deleting Resource Registration from key managers
         if (api != null && api.getId() != null && api.getId().toString() != null) {
-            Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+            Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
             for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
                 KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
                 if (keyManager != null) {
@@ -3974,7 +3974,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         // Get the URI Templates for the given API to detach the resources scopes from
         Set<URITemplate> uriTemplates = apiMgtDAO.getURITemplatesOfAPI(api.getUuid());
         // Detach all the resource scopes from the API resources in KM
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
             if (keyManager != null) {
@@ -8101,7 +8101,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         scopeSet.add(scope);
         int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
         addScopes(scopeSet, tenantId);
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
             if (keyManager != null) {
@@ -8202,7 +8202,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (log.isDebugEnabled()) {
             log.debug("Deleting shared scope " + scopeName);
         }
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerEntry.getValue().getKeyManager();
             if (keyManager != null) {
@@ -8229,7 +8229,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public void updateSharedScope(Scope sharedScope, String tenantDomain) throws APIManagementException {
 
         int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerEntry.getValue().getKeyManager();
             if (keyManager != null) {
@@ -8253,7 +8253,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public void validateSharedScopes(Set<Scope> scopes, String tenantDomain) throws APIManagementException {
 
-        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
             if (keyManager != null) {
