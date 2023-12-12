@@ -1347,15 +1347,21 @@ public class ApiMgtDAO {
         return subscribedAPIs;
     }
 
-    public Set<String> getScopesForApplicationSubscription(Subscriber subscriber, int applicationId)
-            throws APIManagementException {
+    public Set<Pair<String, String>> getScopesForApplicationSubscription(
+            Subscriber subscriber, int applicationId, String xWSO2Tenant) throws APIManagementException {
 
         PreparedStatement getIncludedApisInProduct = null;
         PreparedStatement getSubscribedApisAndProducts = null;
         ResultSet resultSet = null;
-        Set<String> scopeKeysSet = new HashSet<>();
+        Map<Integer, String> apiProviders = new HashMap<>();
+        Set<Pair<String, String>> apiScopes = new HashSet<>();
         Set<Integer> apiIdSet = new HashSet<>();
-        int tenantId = APIUtil.getTenantId(subscriber.getName());
+        int tenantId;
+        if (StringUtils.isNotEmpty(xWSO2Tenant)) {
+            tenantId = APIUtil.getTenantIdFromTenantDomain(xWSO2Tenant);
+        } else {
+            tenantId = APIUtil.getTenantId(subscriber.getName());
+        }
 
         try (Connection conn = APIMgtDBUtil.getConnection()) {
             String sqlQueryForGetSubscribedApis = SQLConstants.GET_SUBSCRIBED_API_IDs_BY_APP_ID_SQL;
@@ -1375,21 +1381,29 @@ public class ApiMgtDAO {
                     }
                 }
                 apiIdSet.add(apiId);
+                apiProviders.put(apiId, resultSet.getString("API_PROVIDER"));
             }
             if (!apiIdSet.isEmpty()) {
-                String apiIdList = StringUtils.join(apiIdSet, ", ");
-                String sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_API_PREFIX + apiIdList
-                        + SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
-
-                if (conn.getMetaData().getDriverName().contains("Oracle")) {
-                    sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_ORACLE_SQL + apiIdList
+                for (int apiId : apiIdSet) {
+                    String sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_API_PREFIX + apiId
                             + SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
-                }
-                try (PreparedStatement statement = conn.prepareStatement(sqlQuery)) {
-                    try (ResultSet finalResultSet = statement.executeQuery()) {
-                        while (finalResultSet.next()) {
-                            scopeKeysSet.add(finalResultSet.getString(1));
+
+                    if (conn.getMetaData().getDriverName().contains("Oracle")) {
+                        sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_ORACLE_SQL + apiId
+                                + SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
+                    }
+                    Set<String> scopeKeysSet = new HashSet<>();
+                    try (PreparedStatement statement = conn.prepareStatement(sqlQuery)) {
+                        try (ResultSet finalResultSet = statement.executeQuery()) {
+                            while (finalResultSet.next()) {
+                                scopeKeysSet.add(finalResultSet.getString(1));
+                            }
                         }
+                    }
+                    for (String scope : scopeKeysSet) {
+                        String apiProvider = apiProviders.get(apiId);
+                        String tenantDomain = MultitenantUtils.getTenantDomain(apiProvider);
+                        apiScopes.add(Pair.of(tenantDomain, scope));
                     }
                 }
             }
@@ -1399,7 +1413,7 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(getSubscribedApisAndProducts, null, resultSet);
             APIMgtDBUtil.closeAllConnections(getIncludedApisInProduct, null, null);
         }
-        return scopeKeysSet;
+        return apiScopes;
     }
 
     public Integer getSubscriptionCount(Subscriber subscriber, String applicationName, String groupingId)
@@ -8688,7 +8702,7 @@ public class ApiMgtDAO {
             throws APIManagementException {
 
         List<KeyManagerConfigurationDTO> keyManagerConfigurationDTOS = new ArrayList<>();
-        final String query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN = ? ";
+        final String query = "SELECT * FROM AM_KEY_MANAGER WHERE TENANT_DOMAIN IN (?)";
         try (Connection conn = APIMgtDBUtil.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
             preparedStatement.setString(1, tenantDomain);
@@ -8702,7 +8716,7 @@ public class ApiMgtDAO {
                     keyManagerConfigurationDTO.setDescription(resultSet.getString("DESCRIPTION"));
                     keyManagerConfigurationDTO.setType(resultSet.getString("TYPE"));
                     keyManagerConfigurationDTO.setEnabled(resultSet.getBoolean("ENABLED"));
-                    keyManagerConfigurationDTO.setTenantDomain(tenantDomain);
+                    keyManagerConfigurationDTO.setTenantDomain(resultSet.getString("TENANT_DOMAIN"));
                     try (InputStream configuration = resultSet.getBinaryStream("CONFIGURATION")) {
                         String configurationContent = IOUtils.toString(configuration);
                         Map map = new Gson().fromJson(configurationContent, Map.class);

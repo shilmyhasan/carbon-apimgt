@@ -223,7 +223,7 @@ public class DefaultKeyValidationHandler extends AbstractKeyValidationHandler {
         // Obtaining details about the token.
         if (StringUtils.isNotEmpty(validationContext.getTenantDomain())) {
             Map<String, KeyManagerDto>
-                    tenantKeyManagers = KeyManagerHolder.getTenantKeyManagers(validationContext.getTenantDomain());
+                    tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(validationContext.getTenantDomain());
             KeyManager keyManagerInstance = null;
             if (tenantKeyManagers.values().size() == 1) {
                 Map.Entry<String, KeyManagerDto> entry = tenantKeyManagers.entrySet().iterator().next();

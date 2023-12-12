@@ -29,7 +29,7 @@ public class KeymanagersApiServiceImpl implements KeymanagersApiService {
         KeyManagerDTO keyManagerDTO = new KeyManagerDTO();
         keyManagerDTO.setEnabled(keyManagerConfigurationDTO.isEnabled());
         keyManagerDTO.setName(keyManagerConfigurationDTO.getName());
-        keyManagerDTO.setTenantDomain(tenantDomain);
+        keyManagerDTO.setTenantDomain(keyManagerConfigurationDTO.getTenantDomain());
         keyManagerDTO.setType(keyManagerConfigurationDTO.getType());
         keyManagerDTO.setConfiguration(keyManagerConfigurationDTO.getAdditionalProperties());
         return keyManagerDTO;
@@ -44,6 +44,8 @@ public class KeymanagersApiServiceImpl implements KeymanagersApiService {
             APIAdmin apiAdmin = new APIAdminImpl();
             List<KeyManagerConfigurationDTO> keyManagerConfigurations =
                     apiAdmin.getKeyManagerConfigurationsByTenant(xWSO2Tenant);
+            List<KeyManagerConfigurationDTO> globalKeyManagerConfigurations = apiAdmin.getGlobalKeyManagerConfigurations();
+            keyManagerConfigurations.addAll(globalKeyManagerConfigurations);
             List<KeyManagerDTO> keyManagerDTOList = new ArrayList<>();
             for (KeyManagerConfigurationDTO keyManagerConfiguration : keyManagerConfigurations) {
                 keyManagerDTOList.add(toKeyManagerDTO(xWSO2Tenant, keyManagerConfiguration));

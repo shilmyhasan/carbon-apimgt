@@ -54,6 +54,7 @@ public class KeyManagerDTO   {
     private String scopesClaim = null;
     private List<TokenValidationDTO> tokenValidation = new ArrayList<TokenValidationDTO>();
     private Boolean enabled = null;
+    private Boolean global = null;
     private Object additionalProperties = null;
 
   /**
@@ -558,6 +559,23 @@ public class KeyManagerDTO   {
 
   /**
    **/
+  public KeyManagerDTO global(Boolean global) {
+    this.global = global;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "true", value = "")
+  @JsonProperty("global")
+  public Boolean isGlobal() {
+    return global;
+  }
+  public void setGlobal(Boolean global) {
+    this.global = global;
+  }
+
+  /**
+   **/
   public KeyManagerDTO additionalProperties(Object additionalProperties) {
     this.additionalProperties = additionalProperties;
     return this;
@@ -613,12 +631,13 @@ public class KeyManagerDTO   {
         Objects.equals(scopesClaim, keyManager.scopesClaim) &&
         Objects.equals(tokenValidation, keyManager.tokenValidation) &&
         Objects.equals(enabled, keyManager.enabled) &&
+        Objects.equals(global, keyManager.global) &&
         Objects.equals(additionalProperties, keyManager.additionalProperties);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, displayName, type, description, wellKnownEndpoint, introspectionEndpoint, clientRegistrationEndpoint, tokenEndpoint, displayTokenEndpoint, revokeEndpoint, displayRevokeEndpoint, userInfoEndpoint, authorizeEndpoint, certificates, issuer, scopeManagementEndpoint, availableGrantTypes, enableTokenGeneration, enableTokenEncryption, enableTokenHashing, enableMapOAuthConsumerApps, enableOAuthAppCreation, enableSelfValidationJWT, claimMapping, consumerKeyClaim, scopesClaim, tokenValidation, enabled, additionalProperties);
+    return Objects.hash(id, name, displayName, type, description, wellKnownEndpoint, introspectionEndpoint, clientRegistrationEndpoint, tokenEndpoint, displayTokenEndpoint, revokeEndpoint, displayRevokeEndpoint, userInfoEndpoint, authorizeEndpoint, certificates, issuer, scopeManagementEndpoint, availableGrantTypes, enableTokenGeneration, enableTokenEncryption, enableTokenHashing, enableMapOAuthConsumerApps, enableOAuthAppCreation, enableSelfValidationJWT, claimMapping, consumerKeyClaim, scopesClaim, tokenValidation, enabled, global, additionalProperties);
   }
 
   @Override
@@ -655,6 +674,7 @@ public class KeyManagerDTO   {
     sb.append("    scopesClaim: ").append(toIndentedString(scopesClaim)).append("\n");
     sb.append("    tokenValidation: ").append(toIndentedString(tokenValidation)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    global: ").append(toIndentedString(global)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -280,6 +280,13 @@ public interface APIAdmin  {
     List<KeyManagerConfigurationDTO> getKeyManagerConfigurationsByTenant(String tenantDomain) throws APIManagementException;
 
     /**
+     * This method used to retrieve global key manager configurations
+     * @return KeyManagerConfigurationDTO list
+     * @throws APIManagementException if error occurred
+     */
+    List<KeyManagerConfigurationDTO> getGlobalKeyManagerConfigurations() throws APIManagementException;
+
+    /**
      * This method returns all the key managers registered in all the tenants
      * @return
      * @throws APIManagementException
@@ -295,6 +302,15 @@ public interface APIAdmin  {
      */
     KeyManagerConfigurationDTO getKeyManagerConfigurationById(String tenantDomain, String id)
             throws APIManagementException;
+
+    /**
+     * This method used to retrieve global key manager with Id
+     * @param id uuid of key manager
+     * @return KeyManagerConfigurationDTO for retrieved data
+     * @throws APIManagementException
+     */
+    KeyManagerConfigurationDTO getGlobalKeyManagerConfigurationById(String id) throws APIManagementException;
+
     /**
      * This method used to check existence of key manager with Id in respective tenant
      * @param tenantDomain tenant domain requested
@@ -328,6 +344,13 @@ public interface APIAdmin  {
      * @throws APIManagementException
      */
     void deleteKeyManagerConfigurationById(String tenantDomain,String id) throws APIManagementException;
+
+    /**
+     * This method used to delete global key manager
+     * @param id uuid of key manager
+     * @throws APIManagementException
+     */
+    void deleteGlobalKeyManagerConfigurationById(String id) throws APIManagementException;
 
     /**
      * This method used to retrieve key manager from name

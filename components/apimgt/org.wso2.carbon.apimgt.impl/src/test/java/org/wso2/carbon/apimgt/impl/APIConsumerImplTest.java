@@ -1174,6 +1174,17 @@ public class APIConsumerImplTest {
                 ("carbon.super");
         BDDMockito.when(MultitenantUtils.getTenantDomain(newOwner)).thenReturn
                 ("carbon.super");
+        PowerMockito.when(KeyManagerHolder.getTenantKeyManagerInstance(Mockito.anyString(), Mockito.anyString()))
+                .thenAnswer(invocation -> {
+                    Object[] args = invocation.getArguments();
+                    String tenantDomain = (String) args[0];
+
+                    if (APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN.equals(tenantDomain)) {
+                        return null; // Mock behavior when tenantDomain is Global KM's tenant domain
+                    } else {
+                        return keyManager; // Mock behavior for other cases
+                    }
+                });
         apiConsumer.updateApplicationOwner(newOwner, application);
         Assert.assertEquals(oauthAppRequest.getOAuthApplicationInfo().getAppOwner(), newOwner);
     }

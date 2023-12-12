@@ -17,6 +17,7 @@ import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.KeyManagerInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.KeyManagerListDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.KeyManagerWellKnownResponseDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.TokenValidationDTO;
+import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +47,8 @@ public class KeyManagerMappingUtil {
         keyManagerInfoDTO.setDescription(keyManagerConfigurationDTO.getDescription());
         keyManagerInfoDTO.setType(keyManagerConfigurationDTO.getType());
         keyManagerInfoDTO.setEnabled(keyManagerConfigurationDTO.isEnabled());
+        keyManagerInfoDTO.setIsGlobal(
+                keyManagerConfigurationDTO.getTenantDomain().equals(APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN));
         return keyManagerInfoDTO;
     }
 
@@ -59,6 +62,8 @@ public class KeyManagerMappingUtil {
         keyManagerDTO.setDescription(keyManagerConfigurationDTO.getDescription());
         keyManagerDTO.setType(keyManagerConfigurationDTO.getType());
         keyManagerDTO.setEnabled(keyManagerConfigurationDTO.isEnabled());
+        keyManagerDTO.setGlobal(
+                keyManagerConfigurationDTO.getTenantDomain().equals(APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN));
         JsonObject jsonObject = fromConfigurationMapToJson(keyManagerConfigurationDTO.getAdditionalProperties());
         JsonElement clientRegistrationElement = jsonObject.get(APIConstants.KeyManager.CLIENT_REGISTRATION_ENDPOINT);
         if (clientRegistrationElement != null) {

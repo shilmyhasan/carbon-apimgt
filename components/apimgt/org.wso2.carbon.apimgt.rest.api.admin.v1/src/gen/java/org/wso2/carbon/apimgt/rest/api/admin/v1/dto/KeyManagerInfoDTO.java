@@ -25,6 +25,7 @@ public class KeyManagerInfoDTO   {
     private String type = null;
     private String description = null;
     private Boolean enabled = null;
+    private Boolean isGlobal = null;
 
   /**
    **/
@@ -113,6 +114,23 @@ public class KeyManagerInfoDTO   {
     this.enabled = enabled;
   }
 
+  /**
+   **/
+  public KeyManagerInfoDTO isGlobal(Boolean isGlobal) {
+    this.isGlobal = isGlobal;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "true", value = "")
+  @JsonProperty("isGlobal")
+  public Boolean isIsGlobal() {
+    return isGlobal;
+  }
+  public void setIsGlobal(Boolean isGlobal) {
+    this.isGlobal = isGlobal;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -127,12 +145,13 @@ public class KeyManagerInfoDTO   {
         Objects.equals(name, keyManagerInfo.name) &&
         Objects.equals(type, keyManagerInfo.type) &&
         Objects.equals(description, keyManagerInfo.description) &&
-        Objects.equals(enabled, keyManagerInfo.enabled);
+        Objects.equals(enabled, keyManagerInfo.enabled) &&
+        Objects.equals(isGlobal, keyManagerInfo.isGlobal);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, type, description, enabled);
+    return Objects.hash(id, name, type, description, enabled, isGlobal);
   }
 
   @Override
@@ -145,6 +164,7 @@ public class KeyManagerInfoDTO   {
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    isGlobal: ").append(toIndentedString(isGlobal)).append("\n");
     sb.append("}");
     return sb.toString();
   }

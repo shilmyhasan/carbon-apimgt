@@ -342,6 +342,16 @@ public class APIAdminImpl implements APIAdmin {
     }
 
     @Override
+    public List<KeyManagerConfigurationDTO> getGlobalKeyManagerConfigurations() throws APIManagementException {
+        List<KeyManagerConfigurationDTO> keyManagerConfigurations = apiMgtDAO.getKeyManagerConfigurationsByTenant(
+                APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
+        for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurations) {
+            decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
+        }
+        return keyManagerConfigurations;
+    }
+
+    @Override
     public Map<String, List<KeyManagerConfigurationDTO>> getAllKeyManagerConfigurations()
             throws APIManagementException {
 
@@ -371,11 +381,22 @@ public class APIAdminImpl implements APIAdmin {
 
         KeyManagerConfigurationDTO keyManagerConfigurationDTO =
                 apiMgtDAO.getKeyManagerConfigurationByID(tenantDomain, id);
-        if (keyManagerConfigurationDTO != null &&
-                APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
-            APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfigurationDTO);
+        if (keyManagerConfigurationDTO != null) {
+            if (APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfigurationDTO.getName())) {
+                APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfigurationDTO);
+            }
+            maskValues(keyManagerConfigurationDTO);
         }
-        maskValues(keyManagerConfigurationDTO);
+        return keyManagerConfigurationDTO;
+    }
+
+    @Override
+    public KeyManagerConfigurationDTO getGlobalKeyManagerConfigurationById(String id) throws APIManagementException {
+        KeyManagerConfigurationDTO keyManagerConfigurationDTO = apiMgtDAO.getKeyManagerConfigurationByID(
+                APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
+        if (keyManagerConfigurationDTO != null) {
+            maskValues(keyManagerConfigurationDTO);
+        }
         return keyManagerConfigurationDTO;
     }
 
@@ -531,16 +552,29 @@ public class APIAdminImpl implements APIAdmin {
     }
 
     @Override
+    public void deleteGlobalKeyManagerConfigurationById(String id) throws APIManagementException {
+
+            KeyManagerConfigurationDTO keyManagerConfigurationDTO = apiMgtDAO.getKeyManagerConfigurationByID(
+                    APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN, id);
+            if (keyManagerConfigurationDTO != null) {
+                apiMgtDAO.deleteKeyManagerConfigurationById(id, APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
+                new KeyMgtNotificationSender()
+                        .notify(keyManagerConfigurationDTO, APIConstants.KeyManager.KeyManagerEvent.ACTION_DELETE);
+            }
+    }
+
+    @Override
     public KeyManagerConfigurationDTO getKeyManagerConfigurationByName(String tenantDomain, String name)
             throws APIManagementException {
 
         KeyManagerConfigurationDTO keyManagerConfiguration =
                 apiMgtDAO.getKeyManagerConfigurationByName(tenantDomain, name);
-        if (keyManagerConfiguration != null &&
-                APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfiguration.getName())) {
-            APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfiguration);
+        if (keyManagerConfiguration != null) {
+            if (APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(keyManagerConfiguration.getName())) {
+                APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfiguration);
+            }
+            maskValues(keyManagerConfiguration);
         }
-        maskValues(keyManagerConfiguration);
         return keyManagerConfiguration;
     }
 
