@@ -619,7 +619,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         String password = (String) configuration.getParameter(APIConstants.KEY_MANAGER_PASSWORD);
         String keyManagerServiceUrl = (String) configuration.getParameter(APIConstants.AUTHSERVER_URL);
         Object kmAdminAsAppOwnerParameter = configuration.getParameter(APIConstants.KeyManager.KM_ADMIN_AS_APP_OWNER);
-        if (kmAdminAsAppOwnerParameter != null) {
+        if (kmAdminAsAppOwnerParameter != null && kmAdminAsAppOwnerParameter instanceof Boolean) {
             kmAdminAsAppOwner = (boolean) kmAdminAsAppOwnerParameter;
         }
 

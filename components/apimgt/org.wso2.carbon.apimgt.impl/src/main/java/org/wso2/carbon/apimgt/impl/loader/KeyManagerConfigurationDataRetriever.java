@@ -39,70 +39,75 @@ public class KeyManagerConfigurationDataRetriever extends TimerTask {
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService()
                         .getAPIManagerConfiguration();
         if (apiManagerConfiguration != null) {
-            EventHubConfigurationDto eventHubConfigurationDto =
-                    apiManagerConfiguration.getEventHubConfigurationDto();
-            if (eventHubConfigurationDto != null && eventHubConfigurationDto.isEnabled()) {
-                try {
-                    String url = eventHubConfigurationDto.getServiceUrl().concat(APIConstants.INTERNAL_WEB_APP_EP)
-                            .concat("/keymanagers");
-                    byte[] credentials = Base64.encodeBase64((eventHubConfigurationDto.getUsername() + ":" +
-                            eventHubConfigurationDto.getPassword()).getBytes());
-                    HttpGet method = new HttpGet(url);
-                    method.setHeader("Authorization", "Basic " + new String(credentials, StandardCharsets.UTF_8));
-                    method.setHeader(APIConstants.HEADER_TENANT, tenantDomain);
-                    URL configUrl = new URL(url);
-                    int port = configUrl.getPort();
-                    String protocol = configUrl.getProtocol();
-                    HttpClient httpClient = APIUtil.getHttpClient(port, protocol);
-                    HttpResponse httpResponse = null;
-                    int retryCount = 0;
-                    boolean retry;
-                    do {
-                        try {
-                            httpResponse = httpClient.execute(method);
-                            if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                                String responseString = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
-                                KeyManagerConfiguration[] keyManagerConfigurations =
-                                        new Gson().fromJson(responseString, KeyManagerConfiguration[].class);
-                                for (KeyManagerConfiguration keyManagerConfiguration : keyManagerConfigurations) {
-                                    if (keyManagerConfiguration.isEnabled()) {
-                                        try {
-                                            ServiceReferenceHolder.getInstance().getKeyManagerConfigurationService()
-                                                    .addKeyManagerConfiguration(
-                                                            keyManagerConfiguration.getTenantDomain(),
-                                                            keyManagerConfiguration.getName(),
-                                                            keyManagerConfiguration.getType(),
-                                                            keyManagerConfiguration);
-                                        } catch (APIManagementException e) {
-                                            log.error("Error while configuring Key Manager " +
-                                                    keyManagerConfiguration.getName() +
-                                                    " in tenant " + keyManagerConfiguration.getTenantDomain(), e);
-                                        }
+            loadKeyManagerConfigurations(apiManagerConfiguration, tenantDomain);
+//            loadKeyManagerConfigurations(apiManagerConfiguration, APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
+        }
+    }
+
+    private void loadKeyManagerConfigurations(APIManagerConfiguration apiManagerConfiguration, String tenantDomain) {
+        EventHubConfigurationDto eventHubConfigurationDto =
+                apiManagerConfiguration.getEventHubConfigurationDto();
+        if (eventHubConfigurationDto != null && eventHubConfigurationDto.isEnabled()) {
+            try {
+                String url = eventHubConfigurationDto.getServiceUrl().concat(APIConstants.INTERNAL_WEB_APP_EP)
+                        .concat("/keymanagers");
+                byte[] credentials = Base64.encodeBase64((eventHubConfigurationDto.getUsername() + ":" +
+                        eventHubConfigurationDto.getPassword()).getBytes());
+                HttpGet method = new HttpGet(url);
+                method.setHeader("Authorization", "Basic " + new String(credentials, StandardCharsets.UTF_8));
+                method.setHeader(APIConstants.HEADER_TENANT, tenantDomain);
+                URL configUrl = new URL(url);
+                int port = configUrl.getPort();
+                String protocol = configUrl.getProtocol();
+                HttpClient httpClient = APIUtil.getHttpClient(port, protocol);
+                HttpResponse httpResponse = null;
+                int retryCount = 0;
+                boolean retry;
+                do {
+                    try {
+                        httpResponse = httpClient.execute(method);
+                        if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                            String responseString = EntityUtils.toString(httpResponse.getEntity(), "UTF-8");
+                            KeyManagerConfiguration[] keyManagerConfigurations =
+                                    new Gson().fromJson(responseString, KeyManagerConfiguration[].class);
+                            for (KeyManagerConfiguration keyManagerConfiguration : keyManagerConfigurations) {
+                                if (keyManagerConfiguration.isEnabled()) {
+                                    try {
+                                        ServiceReferenceHolder.getInstance().getKeyManagerConfigurationService()
+                                                .addKeyManagerConfiguration(
+                                                        keyManagerConfiguration.getTenantDomain(),
+                                                        keyManagerConfiguration.getName(),
+                                                        keyManagerConfiguration.getType(),
+                                                        keyManagerConfiguration);
+                                    } catch (APIManagementException e) {
+                                        log.error("Error while configuring Key Manager " +
+                                                keyManagerConfiguration.getName() +
+                                                " in tenant " + keyManagerConfiguration.getTenantDomain(), e);
                                     }
                                 }
-                                retry = false;
-                            } else {
-                                retry = true;
-                                retryCount++;
                             }
-                        } catch (IOException ex) {
+                            retry = false;
+                        } else {
+                            retry = true;
                             retryCount++;
-                            int maxRetries = 15;
-                            if (retryCount < maxRetries) {
-                                retry = true;
-                                long retryTimeout = 15l;
-                                log.warn("Failed retrieving Key Manager Configurations from remote " +
-                                        "endpoint: " + ex.getMessage()
-                                        + ". Retrying after " + retryTimeout + " seconds...");
-                                Thread.sleep(retryTimeout * 1000);
-                            } else {
-                                throw ex;
-                            }
                         }
-                    } while (retry);
-                } catch (InterruptedException | IOException  e) {
-                    log.error("Error while retrieving key manager configurations", e);
-                }
+                    } catch (IOException ex) {
+                        retryCount++;
+                        int maxRetries = 15;
+                        if (retryCount < maxRetries) {
+                            retry = true;
+                            long retryTimeout = 15l;
+                            log.warn("Failed retrieving Key Manager Configurations from remote " +
+                                    "endpoint: " + ex.getMessage()
+                                    + ". Retrying after " + retryTimeout + " seconds...");
+                            Thread.sleep(retryTimeout * 1000);
+                        } else {
+                            throw ex;
+                        }
+                    }
+                } while (retry);
+            } catch (InterruptedException | IOException  e) {
+                log.error("Error while retrieving key manager configurations", e);
             }
         }
     }
