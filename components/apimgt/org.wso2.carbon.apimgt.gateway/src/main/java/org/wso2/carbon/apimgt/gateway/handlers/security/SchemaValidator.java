@@ -371,6 +371,14 @@ public class SchemaValidator extends AbstractHandler {
                     append(APIMgtGatewayConstants.JSONPATH_SEPARATE)
                     .append(requestMethod.toLowerCase()).append(APIMgtGatewayConstants.PARAM_SCHEMA);
             schema = JsonPath.read(Swagger, jsonPath.toString()).toString();
+            if (APIMgtGatewayConstants.EMPTY_ARRAY.equals(schema) && resourcePath.endsWith("/")) {
+                jsonPath = new StringBuilder();
+                String resourcePathWithoutSlash = resourcePath.substring(0, resourcePath.length() - 1);
+                jsonPath.append(APIMgtGatewayConstants.PATHS).append(resourcePathWithoutSlash).
+                        append(APIMgtGatewayConstants.JSONPATH_SEPARATE)
+                        .append(requestMethod.toLowerCase()).append(APIMgtGatewayConstants.PARAM_SCHEMA);
+                schema = JsonPath.read(Swagger, jsonPath.toString()).toString();
+            }
         }
         if (!schema.equals(APIMgtGatewayConstants.EMPTY_ARRAY)) {
             return extractReference(schema);
