@@ -43,7 +43,9 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Chip from '@material-ui/core/Chip';
-import {ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Popper, Paper} from "@material-ui/core";
+import {
+    ButtonGroup, ClickAwayListener, MenuItem, MenuList, Popper, Paper,
+} from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 const useStyles = makeStyles((theme) => ({
@@ -116,16 +118,24 @@ export default function ListKeyManagers() {
     const anchorRef = React.useRef(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
+    const setKeyManagerState = (localKmList, globalKmList) => {
+        const localKMArray = localKmList || [];
+        const globalKMArray = globalKmList || [];
+        setData([...localKMArray, ...globalKMArray]);
+        setGlobalKMs(globalKMArray);
+    };
+
     const fetchData = () => {
         // Fetch data from backend when an apiCall is provided
         setData(null);
-        let localKmList, globalKmList;
-        
+        let localKmList;
+        let globalKmList;
+
         if (localAPICall) {
             localAPICall().then((result) => {
                 if (result) {
                     localKmList = result;
-                    if (!!globalKmList) {
+                    if (globalKmList !== undefined) {
                         setKeyManagerState(result, globalKmList);
                     }
                     setError(null);
@@ -136,16 +146,16 @@ export default function ListKeyManagers() {
                     }));
                 }
             })
-            .catch((e) => {
-                setError(e.message);
-            });
+                .catch((e) => {
+                    setError(e.message);
+                });
         }
 
         if (globalAPICall) {
             globalAPICall().then((result) => {
                 if (result) {
                     globalKmList = result;
-                    if (!!localKmList) {
+                    if (localKmList !== undefined) {
                         setKeyManagerState(localKmList, result);
                     }
                     setError(null);
@@ -156,19 +166,12 @@ export default function ListKeyManagers() {
                     }));
                 }
             })
-            .catch((e) => {
-                setError(e.message);
-            });
+                .catch((e) => {
+                    setError(e.message);
+                });
         }
         setSearchText('');
     };
-
-    const setKeyManagerState = (localKmList, globalKmList) => {
-        localKmList = localKmList || [];
-        globalKmList = globalKmList || [];
-        setData([...localKmList, ...globalKmList]);
-        setGlobalKMs(globalKmList);
-    }
 
     const addedActions = [
         (props) => {
@@ -186,8 +189,8 @@ export default function ListKeyManagers() {
                         };
                     }
                     editState.enabled = !editState.enabled;
-                    (isGlobal ? 
-                        restApi.updateGlobalKeyManager(kmId, editState) : restApi.updateKeyManager(kmId, editState))
+                    (isGlobal
+                        ? restApi.updateGlobalKeyManager(kmId, editState) : restApi.updateKeyManager(kmId, editState))
                         .then(() => {
                             Alert.success(` ${kmName} ${intl.formatMessage({
                                 id: 'KeyManagers.ListKeyManagers.edit.success',
@@ -236,7 +239,17 @@ export default function ListKeyManagers() {
                                     state: { isGlobal: tableMeta.rowData[5] },
                                 }}
                             >
-                                {value} {tableMeta.rowData[5] && <Chip size='small' label='Global' color='primary' style={{marginTop: -4}}/>}
+                                {value}
+                                {
+                                    tableMeta.rowData[5] && (
+                                        <Chip
+                                            size='small'
+                                            label='Global'
+                                            color='primary'
+                                            style={{ marginTop: -4, marginLeft: 10 }}
+                                        />
+                                    )
+                                }
                             </RouterLink>
                         );
                     } else {
@@ -347,7 +360,7 @@ export default function ListKeyManagers() {
         } else {
             history.push('/settings/key-managers/create');
         }
-    }
+    };
 
     const getAddKeyManagerButtonLabel = (label) => {
         if (label === 'global') {
@@ -360,7 +373,7 @@ export default function ListKeyManagers() {
             id: 'KeyManagers.ListKeyManagers.addButtonProps.triggerButtonText',
             defaultMessage: 'Add Key Manager',
         });
-    }
+    };
 
     const addButtonOverride = () => {
         if (globalKMs && globalKMs.length > 0) {
@@ -372,18 +385,18 @@ export default function ListKeyManagers() {
         }
         return (
             <>
-                <ButtonGroup variant="contained" color="primary" ref={anchorRef} aria-label="split button">
+                <ButtonGroup variant='contained' color='primary' ref={anchorRef} aria-label='split button'>
                     <Button size='small' onClick={() => onAddButtonClick(selectedIndex)}>
                         {getAddKeyManagerButtonLabel(selectedIndex === 1 ? 'global' : 'local')}
                     </Button>
                     <Button
-                        color="primary"
-                        size="small"
+                        color='primary'
+                        size='small'
                         aria-controls={open ? 'split-button-menu' : undefined}
                         aria-expanded={open ? 'true' : undefined}
-                        aria-label="select key store type"
-                        aria-haspopup="menu"
-                        data-testid="add-km-dropdown"
+                        aria-label='select key store type'
+                        aria-haspopup='menu'
+                        data-testid='add-km-dropdown'
                         onClick={() => {
                             setOpen((prevOpen) => !prevOpen);
                         }}
@@ -391,19 +404,21 @@ export default function ListKeyManagers() {
                         <ArrowDropDownIcon />
                     </Button>
                 </ButtonGroup>
-                <Popper open={open} anchorEl={anchorRef.current} style={{zIndex: 99999999}}>
+                <Popper open={open} anchorEl={anchorRef.current} style={{ zIndex: 99999999 }}>
                     <Paper>
-                        <ClickAwayListener onClickAway={(event) => {
-                            if (anchorRef.current && anchorRef.current.contains(event.target)) {
-                                return;
-                            }
-                            setOpen(false);
-                        }}>
-                            <MenuList id="split-button-menu">
+                        <ClickAwayListener
+                            onClickAway={(event) => {
+                                if (anchorRef.current && anchorRef.current.contains(event.target)) {
+                                    return;
+                                }
+                                setOpen(false);
+                            }}
+                        >
+                            <MenuList id='split-button-menu'>
                                 {addButtonLabels.map((label, index) => (
                                     <MenuItem
                                         key={label}
-                                        style={{fontSize: '0.7rem'}}
+                                        style={{ fontSize: '0.7rem' }}
                                         disabled={index === 2}
                                         selected={index === selectedIndex}
                                         onClick={() => {
@@ -420,7 +435,7 @@ export default function ListKeyManagers() {
                 </Popper>
             </>
         );
-    }
+    };
 
     const emptyBoxProps = {
         content: (
