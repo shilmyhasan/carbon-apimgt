@@ -34,5 +34,4 @@ public class APIMConfigUtil {
     private static APIManagerConfiguration getApiManagerConfiguration() {
         return ServiceReferenceHolder.getInstance().getAPIMConfiguration();
     }
-
 }
