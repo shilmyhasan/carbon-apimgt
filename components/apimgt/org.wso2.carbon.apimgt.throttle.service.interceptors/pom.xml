@@ -51,11 +51,11 @@
             <artifactId>jackson-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.io.swagger</groupId>
-            <artifactId>swagger-codegen</artifactId>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.wso2.orbit.io.swagger</groupId>-->
+<!--            <artifactId>swagger-codegen</artifactId>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>

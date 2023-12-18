@@ -182,8 +182,6 @@
                                 </importFeatureDef>
                             </importFeatures>
                             <importBundles>
-                                <importBundleDef>org.wso2.orbit.io.swagger:swagger-codegen:${swagger.codegen.version}
-                                </importBundleDef>
                                 <importBundleDef>org.apache.pdfbox:pdfbox:${pdfbox.version}</importBundleDef>
                                 <importBundleDef>org.apache.pdfbox:fontbox:${pdfbox.version}</importBundleDef>
                                 <importBundleDef>org.apache.pdfbox:xmpbox:${pdfbox.version}</importBundleDef>

@@ -1315,11 +1315,11 @@
                 <artifactId>org.wso2.carbon.event.processor.stub</artifactId>
                 <version>${event.processor.stub.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.orbit.io.swagger</groupId>
-                <artifactId>swagger-codegen</artifactId>
-                <version>${swagger.codegen.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.wso2.orbit.io.swagger</groupId>-->
+<!--                <artifactId>swagger-codegen</artifactId>-->
+<!--                <version>${swagger.codegen.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-codegen</artifactId>
@@ -1772,7 +1772,7 @@
         <carbon.mediation.version>4.7.61.39-SNAPSHOT</carbon.mediation.version>
 
         <!-- Carbon Identity versions -->
-        <carbon.identity.version>5.17.5</carbon.identity.version>
+        <carbon.identity.version>5.17.5-jdk17-SNAPSHOT</carbon.identity.version>
         <carbon.identity.governance.version>1.4.1.62</carbon.identity.governance.version>
         <carbon.identity-inbound-auth-oauth.version>6.4.2</carbon.identity-inbound-auth-oauth.version>
         <carbon.identity-oauth2-grant-jwt.version>1.0.26</carbon.identity-oauth2-grant-jwt.version>
@@ -1781,7 +1781,7 @@
         <carbon.identity-inbound-auth-openid.version>5.5.0</carbon.identity-inbound-auth-openid.version>
         <carbon.identity-outbound-auth-openid.version>5.5.0</carbon.identity-outbound-auth-openid.version>
         <carbon.identity-local-auth-basicauth.version>6.3.0</carbon.identity-local-auth-basicauth.version>
-        <carbon.identity-outbound-auth-samlsso.version>5.3.6</carbon.identity-outbound-auth-samlsso.version>
+        <carbon.identity-outbound-auth-samlsso.version>5.3.6.14-SNAPSHOT</carbon.identity-outbound-auth-samlsso.version>
         <carbon.identity-data-publisher-application-authentication.version>5.3.10</carbon.identity-data-publisher-application-authentication.version>
 
         <!--SAML Common Utils Version-->
@@ -1880,11 +1880,11 @@
         <owasp.encoder.version>1.2.2</owasp.encoder.version>
 
         <httpclient.version>4.5.14.wso2v1</httpclient.version>
-        <wss4j.version>1.5.11-wso2v18</wss4j.version>
+        <wss4j.version>1.6.0-wso2v7</wss4j.version>
         <commons-logging.version>1.1.1</commons-logging.version>
-        <commons-io.version>2.4.0.wso2v1</commons-io.version>
+        <commons-io.version>2.10.0.wso2v1</commons-io.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
-        <google.code.gson.version>2.9.0</google.code.gson.version>
+        <google.code.gson.version>2.9.1</google.code.gson.version>
         <httpcomponents.version>4.5.10</httpcomponents.version>
         <commons-codec.version>1.14</commons-codec.version>
         <com.nimbusds.wso2.version>7.3.0.wso2v1</com.nimbusds.wso2.version>
@@ -1898,7 +1898,7 @@
         <swagger-jaxrs.version>1.6.1</swagger-jaxrs.version>
         <junit.version>4.12</junit.version>
         <opensaml3.version>3.3.1</opensaml3.version>
-        <openapi.generator.version>4.3.1.wso2v5</openapi.generator.version>
+        <openapi.generator.version>6.6.0.wso2v1</openapi.generator.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cal10n.version>0.8.1</cal10n.version>
 
@@ -1936,15 +1936,16 @@
         <failureaccess.version>1.0.2</failureaccess.version>
         <xercesImpl.version>2.12.2.wso2v1</xercesImpl.version>
         <commons.scxml.version>0.9.0.wso2v1</commons.scxml.version>
+        <commons.scxml.version>0.9.0.wso2v1</commons.scxml.version>
         <velocity.version>2.3</velocity.version>
-        <fasterxml.jackson.version>2.15.0</fasterxml.jackson.version>
+        <fasterxml.jackson.version>2.16.0</fasterxml.jackson.version>
         <fasterxml.jackson.version.range>(2.5.0,2.15.0]</fasterxml.jackson.version.range>
-        <fasterxml.jackson.databind.version>2.15.0</fasterxml.jackson.databind.version>
-        <fasterxml.jackson.core.version>2.15.0</fasterxml.jackson.core.version>
+        <fasterxml.jackson.databind.version>2.16.0</fasterxml.jackson.databind.version>
+        <fasterxml.jackson.core.version>2.16.0</fasterxml.jackson.core.version>
         <javax.validation-api>2.0.1.Final</javax.validation-api>
-        <carbon.broker.version>3.3.12</carbon.broker.version>
+        <carbon.broker.version>3.3.13.2-SNAPSHOT</carbon.broker.version>
         <waffle-jna.version>1.6.wso2v6</waffle-jna.version>
-        <version.snake.yaml>2.0</version.snake.yaml>
+        <version.snake.yaml>2.2</version.snake.yaml>
         <wsdl4j.version>1.6.3.wso2v3</wsdl4j.version>
         <slf4j.test.version>1.7.29</slf4j.test.version>
         <reflection.version>0.9.11</reflection.version>
@@ -1984,14 +1985,14 @@
         <json.orbit.version>3.0.0.wso2v1</json.orbit.version>
         <aspectj.version>1.9.4</aspectj.version>
         <wso2.securevault.version>1.1.3</wso2.securevault.version>
-        <org.wso2.orbit.com.jayway.jsonpath.version>2.4.0.wso2v2</org.wso2.orbit.com.jayway.jsonpath.version>
+        <org.wso2.orbit.com.jayway.jsonpath.version>2.6.0.wso2v2</org.wso2.orbit.com.jayway.jsonpath.version>
         <com.jayway.jsonpath.version>[2.4.0,3)</com.jayway.jsonpath.version>
         <org.wso2.orbit.commons-text.version>1.6.wso2v1</org.wso2.orbit.commons-text.version>
         <commons.lang.version>2.6.0.wso2v1</commons.lang.version>
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <maven.scr.plugin.version>1.26.0</maven.scr.plugin.version>
         <org.json.version.range>[3.0.0,4.0.0)</org.json.version.range>
-        <pax.logging.api.version>1.11.2</pax.logging.api.version>
+        <pax.logging.api.version>1.11.16</pax.logging.api.version>
         <import.package.version.commons.logging>[1.2.0,2.0.0)</import.package.version.commons.logging>
         <import.package.version.commons.io>[2.4.0,2.5.0)</import.package.version.commons.io>
 

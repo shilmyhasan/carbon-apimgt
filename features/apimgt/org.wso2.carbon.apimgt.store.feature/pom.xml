@@ -130,10 +130,10 @@
             <groupId>org.wso2.orbit.io.swagger.core</groupId>
             <artifactId>swagger-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.io.swagger</groupId>
-            <artifactId>swagger-codegen</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.wso2.orbit.io.swagger</groupId>-->
+<!--            <artifactId>swagger-codegen</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.wso2.orbit.io.swagger</groupId>
             <artifactId>swagger-inflector</artifactId>
@@ -232,8 +232,6 @@
                             </importFeatures>
                             <importBundles>
                                 <importBundleDef>commons-io.wso2:commons-io:${commons-io.version}</importBundleDef>
-                                <importBundleDef>org.wso2.orbit.io.swagger:swagger-codegen:${swagger.codegen.version}
-                                </importBundleDef>
                                 <importBundleDef>org.apache.commons:commons-lang3:${apache.commons.lang3.version}
                                 </importBundleDef>
                                 <importBundleDef>
