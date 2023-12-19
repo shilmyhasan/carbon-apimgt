@@ -3311,8 +3311,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      *                                                                the new version of the API
      */
     public void createNewAPIVersion(API api, String newVersion) throws DuplicateAPIException, APIManagementException {
-        String apiSourcePath = APIUtil.getAPIPath(api.getId());
 
+        Map oasInfoObject = null;
+        LinkedHashMap apiDefinitionMap = null;
+        String apiSourcePath = APIUtil.getAPIPath(api.getId());
         String targetPath = APIConstants.API_LOCATION + RegistryConstants.PATH_SEPARATOR +
                 api.getId().getProviderName() +
                 RegistryConstants.PATH_SEPARATOR + api.getId().getApiName() +
@@ -3333,6 +3335,19 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                 .getApiName();
                 log.error(errorMessage);
                 throw new APIManagementException(errorMessage);
+            }
+            // validate the Open API definition of the existing API for certain properties.
+            String openAPIDefinitionFilePath = APIUtil.getOpenAPIDefinitionFilePath(api.getId().getApiName(),
+                    api.getId().getVersion(), api.getId().getProviderName());
+            if (registry.resourceExists(openAPIDefinitionFilePath + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME)) {
+                String apiDefinition = OASParserUtil.getAPIDefinition(api.getId(), registry);
+                apiDefinitionMap = new ObjectMapper().readValue(apiDefinition, LinkedHashMap.class);
+                oasInfoObject = (Map) apiDefinitionMap.get(APIConstants.SWAGGER_INFO);
+                if (oasInfoObject == null) {
+                    // Ideally this validation should be done by the Parser library itself. Due to validation issue
+                    // in swagger2 parser, manually validating the OpenAPIDefinition to check if info object is present.
+                    throw new APIManagementException(ExceptionCodes.from(ExceptionCodes.NO_SWAGGER_INFO_PARAM_FOUND));
+                }
             }
             GenericArtifact artifact = artifactManager.getGenericArtifact(apiSourceArtifact.getUUID());
 
@@ -3519,15 +3534,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
 
-            //Copy Swagger 2.0 resources for New version.
-            String resourcePath = APIUtil.getOpenAPIDefinitionFilePath(api.getId().getApiName(),
-                    api.getId().getVersion(), api.getId().getProviderName());
-            if (registry.resourceExists(resourcePath + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME)) {
-                String apiDefinition = OASParserUtil.getAPIDefinition(api.getId(), registry);
-                LinkedHashMap apiDefinitionMap = new ObjectMapper().readValue(apiDefinition, LinkedHashMap.class);
-                Map infoObject = (Map) apiDefinitionMap.get("info");
-                infoObject.remove("version");
-                infoObject.put("version", newAPI.getId().getVersion());
+            // If swagger/openapi definition exists for existing API, copy Swagger resources for new version.
+            // Replacing info.version in oas with new version of API.
+            if (oasInfoObject != null) {
+                oasInfoObject.remove(APIConstants.SWAGGER_VERSION);
+                oasInfoObject.put(APIConstants.SWAGGER_VERSION, newAPI.getId().getVersion());
                 String apiDefinitionMapToJson = new ObjectMapper().writeValueAsString(apiDefinitionMap);
                 OASParserUtil.saveAPIDefinition(newAPI, apiDefinitionMapToJson, registry);
             }

@@ -192,6 +192,7 @@ ExceptionCodes implements ErrorHandler {
     INVALID_OAS3_FOUND(900762, "Invalid OpenAPI V3 definition found", 400, "Invalid OpenAPI V3 definition found"),
     NO_RESOURCES_FOUND(900763, "No resources found", 404, "API must have at least one resource defined"),
     ERROR_REMOVING_EXAMPLES(900764, "Internal Error While Processing Swagger Definition", 500, "Couldn't remove one or more examples from the swagger definition"),
+    NO_SWAGGER_INFO_PARAM_FOUND(900765, "Invalid Swagger/OpenAPI Definition", 400, "Info key is missing. Please add valid Swagger/OpenAPI definition."),
 
 
     // REST API related codes
