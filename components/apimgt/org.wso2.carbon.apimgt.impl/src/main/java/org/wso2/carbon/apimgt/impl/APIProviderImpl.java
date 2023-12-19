@@ -3346,7 +3346,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 if (oasInfoObject == null) {
                     // Ideally this validation should be done by the Parser library itself. Due to validation issue
                     // in swagger2 parser, manually validating the OpenAPIDefinition to check if info object is present.
-                    throw new APIManagementException(ExceptionCodes.from(ExceptionCodes.NO_SWAGGER_INFO_PARAM_FOUND));
+                    String msg = "Failed to create new version : " + newVersion + " of : " + api.getId().getApiName()
+                            + ". Invalid Swagger/OpenAPI Definition. " + APIConstants.SWAGGER_INFO
+                            + " key is missing.";
+                    handleException(msg);
                 }
             }
             GenericArtifact artifact = artifactManager.getGenericArtifact(apiSourceArtifact.getUUID());

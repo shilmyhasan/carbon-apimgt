@@ -40,6 +40,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.BlockConditionNotFoundException;
+import org.wso2.carbon.apimgt.api.ErrorHandler;
+import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.FaultGatewaysException;
 import org.wso2.carbon.apimgt.api.PolicyDeploymentFailureException;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
@@ -1963,6 +1965,17 @@ public class APIProviderImplTest {
         apiProvider.createNewAPIVersion(api, newVersion);
         Assert.assertEquals(newVersion, apiProvider.getAPI(newApi.getId()).getId().getVersion());
         Assert.assertEquals(newApi.getWsdlUrl(), apiProvider.getAPI(newApi.getId()).getWsdlUrl());
+
+        Mockito.when(OASParserUtil.getAPIDefinition(apiId, apiProvider.registry)).thenReturn(
+                "{\"swagger\":\"2.0\",\"schemes\":[\"https\"],\"consumes\":[\"application/json\"],\"produces\":"
+                        + "[\"application/json\"],\"security\":[{\"default\":[]}]}");
+        try {
+            apiProvider.createNewAPIVersion(api, newVersion);
+        } catch (APIManagementException e) {
+            String msg = "Failed to create new version : 1.0.1 of : API1. Invalid Swagger/OpenAPI Definition. "
+                    + APIConstants.SWAGGER_INFO + " key is missing.";
+            Assert.assertEquals(msg, e.getCause().getMessage());
+        }
     }
 
     @Test
