@@ -1299,18 +1299,28 @@ public class ApiMgtDAO {
         PreparedStatement getIncludedApisInProduct = null;
         PreparedStatement getSubscribedApisAndProducts = null;
         ResultSet resultSet = null;
-        Map<Integer, String> apiProviders = new HashMap<>();
         Set<Pair<String, String>> apiScopes = new HashSet<>();
         Set<Integer> apiIdSet = new HashSet<>();
         int tenantId;
+        String tenantDomain;
         if (StringUtils.isNotEmpty(xWSO2Tenant)) {
             tenantId = APIUtil.getTenantIdFromTenantDomain(xWSO2Tenant);
+            tenantDomain = xWSO2Tenant;
         } else {
             tenantId = APIUtil.getTenantId(subscriber.getName());
+            tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
         }
 
         try (Connection conn = APIMgtDBUtil.getConnection()) {
+
             String sqlQueryForGetSubscribedApis = SQLConstants.GET_SUBSCRIBED_API_IDs_BY_APP_ID_SQL;
+            if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+                sqlQueryForGetSubscribedApis =
+                        sqlQueryForGetSubscribedApis.concat(" AND API.CONTEXT NOT LIKE '/t/%'");
+            } else {
+                sqlQueryForGetSubscribedApis =
+                        sqlQueryForGetSubscribedApis.concat(" AND API.CONTEXT LIKE '/t/" + xWSO2Tenant + "%'");
+            }
             getSubscribedApisAndProducts = conn.prepareStatement(sqlQueryForGetSubscribedApis);
             getSubscribedApisAndProducts.setInt(1, tenantId);
             getSubscribedApisAndProducts.setInt(2, applicationId);
@@ -1327,7 +1337,6 @@ public class ApiMgtDAO {
                     }
                 }
                 apiIdSet.add(apiId);
-                apiProviders.put(apiId, resultSet.getString("API_PROVIDER"));
             }
             if (!apiIdSet.isEmpty()) {
                 for (int apiId : apiIdSet) {
@@ -1347,8 +1356,6 @@ public class ApiMgtDAO {
                         }
                     }
                     for (String scope : scopeKeysSet) {
-                        String apiProvider = apiProviders.get(apiId);
-                        String tenantDomain = MultitenantUtils.getTenantDomain(apiProvider);
                         apiScopes.add(Pair.of(tenantDomain, scope));
                     }
                 }
