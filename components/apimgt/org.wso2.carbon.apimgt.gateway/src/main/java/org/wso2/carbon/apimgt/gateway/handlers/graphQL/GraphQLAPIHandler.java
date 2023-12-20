@@ -267,7 +267,7 @@ public class GraphQLAPIHandler extends AbstractHandler {
                         if (!roleArrayList.isEmpty()) {
                             scopeRoleMappingList.put(base64DecodedTypeValue, roleArrayList);
                             if (log.isDebugEnabled()) {
-                                log.debug("Added scope " + base64DecodedTypeValue + "with role list " + String
+                                log.debug("Added scope " + base64DecodedTypeValue + " with role list " + String
                                         .join(",", roleArrayList));
                             }
                         }
@@ -294,17 +294,17 @@ public class GraphQLAPIHandler extends AbstractHandler {
         if (additionalTypeName.contains(APIConstants.SCOPE_ROLE_MAPPING)) {
             roleArrayList.add(base64DecodedURLTypeName);
             if (log.isDebugEnabled()) {
-                log.debug("Added scope " + base64DecodedTypeValue + "with role " + base64DecodedURLTypeName);
+                log.debug("Added scope " + base64DecodedTypeValue + " with role " + base64DecodedURLTypeName);
             }
         } else if (additionalTypeName.contains(APIConstants.SCOPE_OPERATION_MAPPING)) {
             operationScopeMappingList.put(base64DecodedTypeValue, base64DecodedURLTypeName);
             if (log.isDebugEnabled()) {
-                log.debug("Added operation " + base64DecodedTypeValue + "with scope " + base64DecodedURLTypeName);
+                log.debug("Added operation " + base64DecodedTypeValue + " with scope " + base64DecodedURLTypeName);
             }
         } else if (additionalTypeName.contains(APIConstants.OPERATION_THROTTLING_MAPPING)) {
             operationThrottlingMappingList.put(base64DecodedTypeValue, base64DecodedURLTypeName);
             if (log.isDebugEnabled()) {
-                log.debug("Added operation " + base64DecodedTypeValue + "with throttling " + base64DecodedURLTypeName);
+                log.debug("Added operation " + base64DecodedTypeValue + " with throttling " + base64DecodedURLTypeName);
             }
         } else if (additionalTypeName.contains(APIConstants.OPERATION_AUTH_SCHEME_MAPPING)) {
             boolean isSecurityEnabled = true;
@@ -313,7 +313,7 @@ public class GraphQLAPIHandler extends AbstractHandler {
             }
             operationAuthSchemeMappingList.put(base64DecodedTypeValue, isSecurityEnabled);
             if (log.isDebugEnabled()) {
-                log.debug("Added operation " + base64DecodedTypeValue + "with security " + isSecurityEnabled);
+                log.debug("Added operation " + base64DecodedTypeValue + " with security " + isSecurityEnabled);
             }
         }
     }
