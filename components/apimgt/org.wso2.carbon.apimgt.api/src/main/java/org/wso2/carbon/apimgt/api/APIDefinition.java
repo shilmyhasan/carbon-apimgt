@@ -227,4 +227,21 @@ public abstract class APIDefinition {
     public abstract String processDisableSecurityExtension(String swaggerContent)
             throws APIManagementException;
 
+    /**
+     * This method will first validate the mandatory info object of the API definition and
+     * update the required attributes, version and title from the current API. Secondly, based on a config,
+     * it will validate the whole API definition from the parser library. This method is intended to be used for
+     * creating new versions of an API/ updating an existing API.
+     * Default implementation of this method will not do any validation and will return the same swagger definition.
+     *
+     * @param apiDefinition swagger definition
+     * @param api           validating API
+     * @return validated and updated swagger definition
+     * @throws APIManagementException if validation of api definition fails
+     */
+    public String validateAPIDefinition(String apiDefinition, SwaggerData api)
+            throws APIManagementException {
+
+        return apiDefinition;
+    }
 }

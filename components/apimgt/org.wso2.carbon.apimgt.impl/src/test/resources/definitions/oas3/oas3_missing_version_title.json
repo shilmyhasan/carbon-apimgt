@@ -1,0 +1,14 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "description": "API description goes here"
+  },
+  "servers": [
+    {
+      "url": "https://192.168.60.1:8243/sampleContext/1.0.0"
+    },
+    {
+      "url": "http://192.168.60.1:8243/sampleContext/1.0.0"
+    }
+  ]
+}

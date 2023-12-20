@@ -1,5 +1,7 @@
 package org.wso2.carbon.apimgt.impl.definitions;
 
+import io.swagger.models.Swagger;
+import io.swagger.parser.SwaggerParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -10,21 +12,27 @@ import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.wso2.carbon.apimgt.api.APIDefinition;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ServiceReferenceHolder.class, OASParserUtil.class})
 public class OAS3ParserTest extends OASTestBase {
     private OAS3Parser oas3Parser = new OAS3Parser();
 
@@ -32,19 +40,19 @@ public class OAS3ParserTest extends OASTestBase {
     public void testGetURITemplates() throws Exception {
         String relativePath = "definitions" + File.separator + "oas3" + File.separator + "oas3_scopes.json";
         String oas3Scope = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
-        testGetURITemplates(oas3Parser, oas3Scope);
+        testGetURITemplatesByParser(oas3Parser, oas3Scope);
     }
 
     @Test
     public void testGetScopes() throws Exception {
         String relativePath = "definitions" + File.separator + "oas3" + File.separator + "oas3_scopes.json";
         String oas3Scope = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
-        testGetScopes(oas3Parser, oas3Scope);
+        testGetScopesByParser(oas3Parser, oas3Scope);
     }
 
     @Test
     public void testGenerateAPIDefinition() throws Exception {
-        testGenerateAPIDefinition(oas3Parser);
+        testGenerateAPIDefinitionByParser(oas3Parser);
     }
 
     @Test
@@ -130,4 +138,36 @@ public class OAS3ParserTest extends OASTestBase {
         Assert.assertEquals(actualTemplates, expectedTemplates);
     }
 
+    @Test
+    public void testValidateAPIDefinition() throws Exception {
+
+        String relativePath = "definitions" + File.separator + "oas3" + File.separator + "oas3_missing_info.json";
+        String swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        API api = new API(new APIIdentifier("admin", "API", "1.0.0"));
+        SwaggerData swaggerData = new SwaggerData(api);
+        Mockito.when(apiManagerConfiguration.isAdvancedSwaggerValidationEnabled()).thenReturn(false);
+        String validatedSwagger = oas3Parser.validateAPIDefinition(swagger, swaggerData);
+        OpenAPIV3Parser openAPIV3Parser = new OpenAPIV3Parser();
+        OpenAPI validatedSwaggerObj = openAPIV3Parser.readContents(validatedSwagger, null, null).getOpenAPI();
+        Assert.assertNotNull(validatedSwaggerObj.getInfo());
+        Assert.assertEquals("API", validatedSwaggerObj.getInfo().getTitle());
+        Assert.assertEquals("1.0.0", validatedSwaggerObj.getInfo().getVersion());
+        relativePath = "definitions" + File.separator + "oas3" + File.separator + "oas3_missing_version_title.json";
+        swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        api = new API(new APIIdentifier("admin", "API2", "2.0.0"));
+        validatedSwagger = oas3Parser.validateAPIDefinition(swagger, new SwaggerData(api));
+        validatedSwaggerObj = openAPIV3Parser.readContents(validatedSwagger, null, null).getOpenAPI();
+        Assert.assertNotNull(validatedSwaggerObj.getInfo());
+        Assert.assertEquals("API2", validatedSwaggerObj.getInfo().getTitle());
+        Assert.assertEquals("2.0.0", validatedSwaggerObj.getInfo().getVersion());
+        PowerMockito.mockStatic(OASParserUtil.class);
+        APIManagementException apiManagementException = new APIManagementException("Dummy exception");
+        PowerMockito.when(OASParserUtil.class, "verifyAPIDefinitionFromParser",swagger, oas3Parser, swaggerData)
+                .thenThrow(apiManagementException);
+        try {
+            validatedSwagger = oas3Parser.validateAPIDefinition(swagger, swaggerData);
+        } catch (APIManagementException e) {
+            Assert.assertEquals("Dummy exception", e.getMessage());
+        }
+    }
 }

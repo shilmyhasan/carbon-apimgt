@@ -59,6 +59,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.ErrorHandler;
 import org.wso2.carbon.apimgt.api.ErrorItem;
 import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.model.API;
@@ -69,6 +70,7 @@ import org.wso2.carbon.apimgt.api.model.Scope;
 import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 
 import java.io.IOException;
@@ -342,7 +344,9 @@ public class OAS2Parser extends APIDefinition {
         Set<URITemplate> urlTemplates = new LinkedHashSet<>();
         Set<Scope> scopes = getScopes(resourceConfigsJSON);
         String oauth2SchemeKey = getOAuth2SecuritySchemeKey(swagger);
-
+        if (swagger.getPaths() == null) {
+            return null;
+        }
         for (String pathString : swagger.getPaths().keySet()) {
             Path path = swagger.getPath(pathString);
             Map<HttpMethod, Operation> operationMap = path.getOperationMap();
@@ -675,9 +679,12 @@ public class OAS2Parser extends APIDefinition {
                     }
                 }
             }
-
             Swagger swagger = parseAttemptForV2.getSwagger();
             Info info = swagger.getInfo();
+            if (info == null && !parseAttemptForV2.getMessages().isEmpty()) {
+                validationResponse.setValid(false);
+                return validationResponse;
+            }
             OASParserUtil.updateValidationResponseAsSuccess(
                     validationResponse, apiDefinition, swagger.getSwagger(),
                     info.getTitle(), info.getVersion(), swagger.getBasePath(), info.getDescription(),
@@ -1671,4 +1678,22 @@ public class OAS2Parser extends APIDefinition {
         return getSwaggerJsonString(swagger);
     }
 
+    @Override
+    public String validateAPIDefinition(String apiDefinition, SwaggerData swaggerData) throws APIManagementException {
+
+        String validatedSwagger = apiDefinition;
+        Swagger swagger = getSwagger(apiDefinition);
+        if (swagger != null) {
+            Info info = swagger.getInfo();
+            if (info == null) {
+                info = new Info();
+            }
+            info.setTitle(swaggerData.getTitle());
+            info.setVersion(swaggerData.getVersion());
+            swagger.setInfo(info);
+            validatedSwagger = getSwaggerJsonString(swagger);
+        }
+        OASParserUtil.verifyAPIDefinitionFromParser(validatedSwagger, this, swaggerData);
+        return validatedSwagger;
+    }
 }

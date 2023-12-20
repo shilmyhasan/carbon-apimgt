@@ -46,6 +46,7 @@ import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceNotFoundException;
 import org.wso2.carbon.apimgt.api.APIProvider;
+import org.wso2.carbon.apimgt.api.ErrorHandler;
 import org.wso2.carbon.apimgt.api.ErrorItem;
 import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.FaultGatewaysException;
@@ -199,7 +200,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -3312,8 +3312,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     public void createNewAPIVersion(API api, String newVersion) throws DuplicateAPIException, APIManagementException {
 
-        Map oasInfoObject = null;
-        LinkedHashMap apiDefinitionMap = null;
+        String apiDefinitionString = null;
         String apiSourcePath = APIUtil.getAPIPath(api.getId());
         String targetPath = APIConstants.API_LOCATION + RegistryConstants.PATH_SEPARATOR +
                 api.getId().getProviderName() +
@@ -3340,17 +3339,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String openAPIDefinitionFilePath = APIUtil.getOpenAPIDefinitionFilePath(api.getId().getApiName(),
                     api.getId().getVersion(), api.getId().getProviderName());
             if (registry.resourceExists(openAPIDefinitionFilePath + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME)) {
-                String apiDefinition = OASParserUtil.getAPIDefinition(api.getId(), registry);
-                apiDefinitionMap = new ObjectMapper().readValue(apiDefinition, LinkedHashMap.class);
-                oasInfoObject = (Map) apiDefinitionMap.get(APIConstants.SWAGGER_INFO);
-                if (oasInfoObject == null) {
-                    // Ideally this validation should be done by the Parser library itself. Due to validation issue
-                    // in swagger2 parser, manually validating the OpenAPIDefinition to check if info object is present.
-                    String msg = "Failed to create new version : " + newVersion + " of : " + api.getId().getApiName()
-                            + ". Invalid Swagger/OpenAPI Definition. " + APIConstants.SWAGGER_INFO
-                            + " key is missing.";
-                    handleException(msg);
-                }
+                SwaggerData swaggerData = new SwaggerData(api);
+                swaggerData.setVersion(newVersion);
+                apiDefinitionString = OASParserUtil.getAPIDefinition(api.getId(), registry);
+                APIDefinition apiDefinition = OASParserUtil.getOASParser(apiDefinitionString);
+                apiDefinitionString = apiDefinition
+                        .validateAPIDefinition(apiDefinitionString, swaggerData);
             }
             GenericArtifact artifact = artifactManager.getGenericArtifact(apiSourceArtifact.getUUID());
 
@@ -3539,11 +3533,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             // If swagger/openapi definition exists for existing API, copy Swagger resources for new version.
             // Replacing info.version in oas with new version of API.
-            if (oasInfoObject != null) {
-                oasInfoObject.remove(APIConstants.SWAGGER_VERSION);
-                oasInfoObject.put(APIConstants.SWAGGER_VERSION, newAPI.getId().getVersion());
-                String apiDefinitionMapToJson = new ObjectMapper().writeValueAsString(apiDefinitionMap);
-                OASParserUtil.saveAPIDefinition(newAPI, apiDefinitionMapToJson, registry);
+            if (apiDefinitionString != null) {
+                OASParserUtil.saveAPIDefinition(newAPI, apiDefinitionString, registry);
             }
 
             if (APIConstants.GRAPHQL_API.equals(api.getType())) {
@@ -3599,7 +3590,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 handleException("Error while rolling back the transaction for API: " + api.getId(), re);
             }
             String msg = "Failed to create new version : " + newVersion + " of : " + api.getId().getApiName();
-            handleException(msg, e);
+            if (e instanceof APIManagementException) {
+                throw new APIManagementException(msg + ". " + e.getMessage(), e);
+            } else {
+                handleException(msg, e);
+            }
         } finally {
             try {
                 if (!transactionCommitted) {

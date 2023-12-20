@@ -2024,6 +2024,8 @@ public final class APIConstants {
     // Error message that will be shown when the user tries to access the API, that is not authorized for him.
     public static final String UN_AUTHORIZED_ERROR_MESSAGE = "User is not authorized to";
 
+    public static final String INVALID_SWAGGER_DEFINITION_ERROR_MESSAGE = "Invalid Swagger definition found";
+
     // Prefix used for saving the custom properties related with APIs
     public static final String API_RELATED_CUSTOM_PROPERTIES_PREFIX = "api_meta.";
     // Reserved keywords for search.
@@ -2294,6 +2296,8 @@ public final class APIConstants {
     public static final String RECOMMENDATIONS_CACHE_NAME = "APIRecommendationsCache";
     public static final String RECOMMENDATIONS_CACHE_KEY = "Recommendations";
     public static final String LAST_UPDATED_CACHE_KEY = "LastUpdated";
+    public static final String SWAGGER_VALIDATION = "SwaggerValidation";
+    public static final String ENABLE_ADVANCED_VALIDATION = "EnableAdvancedValidation";
 
     public static class CertificateReLoaderConfiguration {
 

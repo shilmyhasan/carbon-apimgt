@@ -1,0 +1,107 @@
+{
+  "openapi": "3.0.1",
+  "servers": [
+    {
+      "url": "https://192.168.60.1:8243/sampleContext/1.0.0"
+    },
+    {
+      "url": "http://192.168.60.1:8243/sampleContext/1.0.0"
+    }
+  ],
+  "components":{
+    "securitySchemes":{
+      "default":{
+        "type":"oauth2",
+        "flows":{
+          "implicit":{
+            "authorizationUrl":"https://172.19.0.1:8243/authorize",
+            "scopes":{
+
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths":{
+    "/*":{
+      "get":{
+        "responses":{
+          "200":{
+            "description":""
+          }
+        },
+        "x-auth-type":"Application",
+        "x-throttling-tier":"Unlimited"
+      },
+      "post":{
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "type":"object",
+                "properties":{
+                  "payload":{
+                    "type":"string"
+                  }
+                }
+              }
+            }
+          },
+          "required":true,
+          "description":"Request Body"
+        },
+        "responses":{
+          "200":{
+            "description":""
+          }
+        },
+        "x-auth-type":"Application User",
+        "x-throttling-tier":"Unlimited"
+      },
+      "put":{
+        "requestBody":{
+          "content":{
+            "application/json":{
+              "schema":{
+                "type":"object",
+                "properties":{
+                  "payload":{
+                    "type":"string"
+                  }
+                }
+              }
+            }
+          },
+          "required":true,
+          "description":"Request Body"
+        },
+        "responses":{
+          "200":{
+            "description":""
+          }
+        },
+        "x-auth-type":"None",
+        "x-throttling-tier":"Unlimited"
+      },
+      "delete":{
+        "responses":{
+          "200":{
+            "description":""
+          }
+        },
+        "x-throttling-tier":"Unlimited"
+      }
+    },
+    "/abc":{
+      "get":{
+        "responses":{
+          "200":{
+            "description":""
+          }
+        },
+        "x-throttling-tier":"Unlimited"
+      }
+    }
+  }
+}

@@ -84,8 +84,11 @@ import org.wso2.carbon.apimgt.api.model.APIProductResource;
 import org.wso2.carbon.apimgt.api.model.CORSConfiguration;
 import org.wso2.carbon.apimgt.api.model.Identifier;
 import org.wso2.carbon.apimgt.api.model.Scope;
+import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIFileUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.registry.api.Registry;
@@ -97,8 +100,6 @@ import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashSet;
@@ -1754,4 +1755,36 @@ public class OASParserUtil {
         return definitionUpdated;
     }
 
+    /**
+     * This method is used to validate the given swagger definition against the schema only if the advanced swagger
+     * validation configuration is enabled. This method will throw an APIManagementException if the validation fails.
+     *
+     * @param swagger     swagger definition
+     * @param oasParser   OAS2Parser or OAS3Parser
+     * @param swaggerData SwaggerData object related to the API
+     * @throws APIManagementException If the validation fails
+     */
+    public static void verifyAPIDefinitionFromParser(String swagger, APIDefinition oasParser, SwaggerData swaggerData)
+            throws APIManagementException {
+
+        if (ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                .isAdvancedSwaggerValidationEnabled()) {
+            APIDefinitionValidationResponse validationResponse = new APIDefinitionValidationResponse();
+            try {
+                validationResponse = oasParser.validateAPIDefinition(swagger, false);
+            } catch (Exception e) {
+                //catching a generic exception as there can be runtime exceptions when parsing happens.
+                OASParserUtil.addErrorToValidationResponse(validationResponse, e);
+            }
+            if (!validationResponse.isValid()) {
+                StringBuilder errorMessages = new StringBuilder("Error while validating API definition for API : "
+                        + swaggerData.getTitle() + "::" + swaggerData.getVersion()
+                        + ". " + APIConstants.INVALID_SWAGGER_DEFINITION_ERROR_MESSAGE+ " :: ");
+                for (ErrorHandler error : validationResponse.getErrorItems()) {
+                    errorMessages.append("\n").append(error.getErrorDescription());
+                }
+                throw new APIManagementException(errorMessages.toString());
+            }
+        }
+    }
 }
