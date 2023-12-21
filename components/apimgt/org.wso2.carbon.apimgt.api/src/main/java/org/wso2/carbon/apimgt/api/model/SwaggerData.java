@@ -230,4 +230,9 @@ public class SwaggerData {
     public String getApiLevelPolicy() {
         return apiLevelPolicy;
     }
+
+    public void setVersion(String version) {
+
+        this.version = version;
+    }
 }

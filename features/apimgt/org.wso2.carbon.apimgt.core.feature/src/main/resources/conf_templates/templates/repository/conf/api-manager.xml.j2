@@ -1019,6 +1019,12 @@
         {% endif %}
     </Monetization>
 
+    {% if apim.swagger is defined %}
+    <SwaggerValidation>
+        <EnableAdvancedValidation>{{apim.swagger.enable_advanced_validation}}</EnableAdvancedValidation>
+    </SwaggerValidation>
+    {% endif %}
+
     {% if apim.devportal.recommendations is defined %}
     <APIRecommendations>
         <recommendationAPI>{{apim.devportal.recommendations.recommendations_api}}</recommendationAPI>

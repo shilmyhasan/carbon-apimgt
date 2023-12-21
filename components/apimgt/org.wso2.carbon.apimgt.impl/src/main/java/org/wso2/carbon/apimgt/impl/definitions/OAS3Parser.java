@@ -86,7 +86,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.wso2.carbon.apimgt.impl.APIConstants.APPLICATION_JSON_MEDIA_TYPE;
-import static org.wso2.carbon.apimgt.impl.APIConstants.APPLICATION_XML_MEDIA_TYPE;
 
 /**
  * Models API definition using OAS (OpenAPI 3.0) parser
@@ -1901,4 +1900,22 @@ public class OAS3Parser extends APIDefinition {
         return Json.pretty(openAPI);
     }
 
+    @Override
+    public String validateAPIDefinition(String apiDefinition, SwaggerData swaggerData) throws APIManagementException {
+
+        String validatedOpenAPI = null;
+        OpenAPI openAPI = getOpenAPI(apiDefinition);
+        if (openAPI != null) {
+            Info info = openAPI.getInfo();
+            if (info == null) {
+                info = new Info();
+            }
+            info.setTitle(swaggerData.getTitle());
+            info.setVersion(swaggerData.getVersion());
+            openAPI.setInfo(info);
+            validatedOpenAPI = Json.pretty(openAPI);
+        }
+        OASParserUtil.verifyAPIDefinitionFromParser(validatedOpenAPI, this, swaggerData);
+        return validatedOpenAPI;
+    }
 }
