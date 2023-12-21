@@ -1779,7 +1779,7 @@ public class OASParserUtil {
             if (!validationResponse.isValid()) {
                 StringBuilder errorMessages = new StringBuilder("Error while validating API definition for API : "
                         + swaggerData.getTitle() + "::" + swaggerData.getVersion()
-                        + ". " + APIConstants.INVALID_SWAGGER_DEFINITION_ERROR_MESSAGE+ " :: ");
+                        + ". " + APIConstants.INVALID_SWAGGER_DEFINITION_ERROR_MESSAGE + " :: ");
                 for (ErrorHandler error : validationResponse.getErrorItems()) {
                     errorMessages.append("\n").append(error.getErrorDescription());
                 }
