@@ -121,14 +121,6 @@ public class ApplicationImportExportManager {
             throws APIManagementException, UserStoreException {
         List<APIIdentifier> skippedAPIList = new ArrayList<>();
         Set<SubscribedAPI> subscribedAPIs = appDetails.getSubscribedAPIs();
-        // removing existing subscribed apis
-        if (update) {
-            Subscriber subscriber = apiConsumer.getSubscriber(userId);
-            Set<SubscribedAPI> currentSubscribedAPIs = apiConsumer.getSubscribedAPIs(subscriber);
-            for (SubscribedAPI subscribedAPI : currentSubscribedAPIs) {
-                apiConsumer.removeSubscription(subscribedAPI);
-            }
-        }
         for (SubscribedAPI subscribedAPI : subscribedAPIs) {
             APIIdentifier apiIdentifier = subscribedAPI.getApiId();
             String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack
