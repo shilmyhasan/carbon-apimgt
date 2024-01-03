@@ -41,9 +41,11 @@ import org.wso2.carbon.identity.application.authentication.framework.model.Authe
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.model.AccessTokenDO;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
+import org.wso2.carbon.identity.core.ServiceURL;
+import org.wso2.carbon.identity.core.ServiceURLBuilder;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({OAuth2Util.class})
+@PrepareForTest({OAuth2Util.class, ServiceURLBuilder.class, ServiceURL.class})
 @SuppressStaticInitializationFor("org.wso2.carbon.identity.oauth2.util.OAuth2Util")
 public class AMDefaultKeyManagerImplTest {
     
