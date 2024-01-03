@@ -1332,14 +1332,13 @@ public class ApiMgtDAO {
             if (!apiIdSet.isEmpty()) {
                 for (int apiId : apiIdSet) {
                     String sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_API_PREFIX + apiId
-                    sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_ORACLE_SQL + apiIdList
                             + SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
 
                     if (conn.getMetaData().getDriverName().contains("Oracle")) {
                         sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_ORACLE_SQL + apiId
                                 + SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
                     }
-                    Set<String> scopeKeysSet = new HashSet<>();
+                     Set<String> scopeKeysSet = new HashSet<>();
                     try (PreparedStatement statement = conn.prepareStatement(sqlQuery)) {
                         try (ResultSet finalResultSet = statement.executeQuery()) {
                             while (finalResultSet.next()) {
@@ -8927,7 +8926,7 @@ public class ApiMgtDAO {
                     keyManagerConfigurationDTO.setDescription(resultSet.getString("DESCRIPTION"));
                     keyManagerConfigurationDTO.setType(resultSet.getString("TYPE"));
                     keyManagerConfigurationDTO.setEnabled(resultSet.getBoolean("ENABLED"));
-                    keyManagerConfigurationDTO.setTenantDomain(resultSet.getString("TENANT_DOMAIN"));
+                    keyManagerConfigurationDTO.setOrganization(resultSet.getString("ORGANIZATION"));
                     keyManagerConfigurationDTO.setTokenType(resultSet.getString("TOKEN_TYPE"));
                     keyManagerConfigurationDTO.setExternalReferenceId(resultSet.getString("EXTERNAL_REFERENCE_ID"));
                     try (InputStream configuration = resultSet.getBinaryStream("CONFIGURATION")) {

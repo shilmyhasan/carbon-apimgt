@@ -3003,6 +3003,8 @@ public final class APIConstants {
     // Constants related to basic health check APIs
     public static final String WEB_SOCKET_HEALTH_CHECK_PATH = "/health";
 
+    public static final String GLOBAL_KEY_MANAGER_TENANT_DOMAIN = "WSO2/System";
+
     public static final String MIGRATE = "migrate";
 
     public static class OpenTracerConstants {
