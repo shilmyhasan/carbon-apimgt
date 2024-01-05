@@ -2792,7 +2792,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             try {
                 APIUtil.validateCharacterLengthOfAPIParams(apiDTOFromProperties.getName(),
                         apiDTOFromProperties.getVersion(), apiDTOFromProperties.getContext(),
-                        apiDTOFromProperties.getProvider());
+                        RestApiCommonUtil.getLoggedInUsername());
                 APIUtil.validateAPIContext(apiDTOFromProperties.getContext(), apiDTOFromProperties.getName());
             } catch (APIManagementException e) {
                 throw new APIManagementException(e.getMessage(),
@@ -2946,10 +2946,10 @@ public class ApisApiServiceImpl implements ApisApiService {
 
             // Minimum requirement name, version, context and endpointConfig.
             additionalPropertiesAPI = new ObjectMapper().readValue(additionalProperties, APIDTO.class);
+            APIUtil.validateCharacterLengthOfAPIParams(additionalPropertiesAPI.getName(),
+                    additionalPropertiesAPI.getVersion(), additionalPropertiesAPI.getContext(),
+                    RestApiCommonUtil.getLoggedInUsername());
             try {
-                APIUtil.validateCharacterLengthOfAPIParams(additionalPropertiesAPI.getName(),
-                        additionalPropertiesAPI.getVersion(), additionalPropertiesAPI.getContext(),
-                        additionalPropertiesAPI.getProvider());
                 APIUtil.validateAPIContext(additionalPropertiesAPI.getContext(), additionalPropertiesAPI.getName());
             } catch (APIManagementException e) {
                 throw new APIManagementException(e.getMessage(),
@@ -3341,7 +3341,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             additionalPropertiesAPI = new ObjectMapper().readValue(additionalProperties, APIDTO.class);
             APIUtil.validateCharacterLengthOfAPIParams(additionalPropertiesAPI.getName(),
                     additionalPropertiesAPI.getVersion(), additionalPropertiesAPI.getContext(),
-                    additionalPropertiesAPI.getProvider());
+                    RestApiCommonUtil.getLoggedInUsername());
             APIUtil.validateAPIContext(additionalPropertiesAPI.getContext(), additionalPropertiesAPI.getName());
             additionalPropertiesAPI.setType(APIDTO.TypeEnum.GRAPHQL);
             String organization = RestApiUtil.getValidatedOrganization(messageContext);
@@ -3933,7 +3933,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             try {
                 APIUtil.validateCharacterLengthOfAPIParams(apiDTOFromProperties.getName(),
                         apiDTOFromProperties.getVersion(), apiDTOFromProperties.getContext(),
-                        apiDTOFromProperties.getProvider());
+                        RestApiCommonUtil.getLoggedInUsername());
                 APIUtil.validateAPIContext(apiDTOFromProperties.getContext(), apiDTOFromProperties.getName());
             } catch (APIManagementException e) {
                 throw new APIManagementException(e.getMessage(),
