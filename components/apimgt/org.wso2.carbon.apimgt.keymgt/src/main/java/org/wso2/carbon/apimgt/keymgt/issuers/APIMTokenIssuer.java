@@ -49,6 +49,9 @@ import java.text.ParseException;
 public class APIMTokenIssuer extends OauthTokenIssuerImpl {
 
     private static final Log log = LogFactory.getLog(APIMTokenIssuer.class);
+    public static final String RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_ENABLE_CONFIG =
+            "OAuth.JWT.RenewTokenWithoutRevokingExisting.Enable";
+    public static final String REQUEST_BINDING_TYPE = "request";
 
     @Override
     public String accessToken(OAuthTokenReqMessageContext tokReqMsgCtx) throws OAuthSystemException {
@@ -125,15 +128,16 @@ public class APIMTokenIssuer extends OauthTokenIssuerImpl {
                  *     allowed_grant_types = ["client_credentials","password", ...]
                  */
                 boolean renewWithoutRevokingExistingEnabled = Boolean.parseBoolean(
-                        IdentityUtil.getProperty(APIConstants.RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_ENABLE_CONFIG));
+                        IdentityUtil.getProperty(RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_ENABLE_CONFIG));
 
-                if (renewWithoutRevokingExistingEnabled && tokReqMsgCtx != null && tokReqMsgCtx.getTokenBinding() == null) {
+                if (renewWithoutRevokingExistingEnabled &&
+                        tokReqMsgCtx != null && tokReqMsgCtx.getTokenBinding() == null) {
                     if (OAuth2ServiceComponentHolder.getJwtRenewWithoutRevokeAllowedGrantTypes()
                             .contains(tokReqMsgCtx.getOauth2AccessTokenReqDTO().getGrantType())) {
                         String tokenBindingValue = UUIDGenerator.generateUUID();
                         tokReqMsgCtx.setTokenBinding(
-                                new TokenBinding(APIConstants.REQUEST_BINDING_TYPE, OAuth2Util.getTokenBindingReference(tokenBindingValue),
-                                        tokenBindingValue));
+                                new TokenBinding(REQUEST_BINDING_TYPE,
+                                        OAuth2Util.getTokenBindingReference(tokenBindingValue), tokenBindingValue));
                     }
                 }
 
