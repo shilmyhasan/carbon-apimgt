@@ -112,6 +112,7 @@ public class APIManagerConfiguration {
     private static Properties realtimeNotifierProperties;
     private static Properties persistentNotifierProperties;
     private static String tokenRevocationClassName;
+    private static boolean advancedSwaggerValidationEnabled = false;
 
     public static Properties getRealtimeTokenRevocationNotifierProperties() {
 
@@ -523,9 +524,25 @@ public class APIManagerConfiguration {
                 setRuntimeArtifactsSyncGatewayConfig(element);
             } else if (APIConstants.ContainerMgtAttributes.CONTAINER_MANAGEMENT.equals(localName)) {
                 setContainerMgtConfigurations(element);
+            } else if (APIConstants.SWAGGER_VALIDATION.equals(localName)) {
+                setSwaggerValidationProperties(element);
             }
             readChildElements(element, nameStack);
             nameStack.pop();
+        }
+    }
+
+    /**
+     * Set Swagger Validation properties.
+     *
+     * @param omElement OMElement for <SwaggerValidation>
+     */
+    private void setSwaggerValidationProperties(OMElement omElement) {
+
+        OMElement advancedValidationEnabledElement =
+                omElement.getFirstChildWithName(new QName(APIConstants.ENABLE_ADVANCED_VALIDATION));
+        if (advancedValidationEnabledElement != null) {
+            setAdvancedSwaggerValidationEnabled(Boolean.parseBoolean(advancedValidationEnabledElement.getText()));
         }
     }
 
@@ -1865,5 +1882,15 @@ public class APIManagerConfiguration {
             return Boolean.parseBoolean(config);
         }
         return false;
+    }
+
+    public boolean isAdvancedSwaggerValidationEnabled() {
+
+        return advancedSwaggerValidationEnabled;
+    }
+
+    public void setAdvancedSwaggerValidationEnabled(boolean advancedSwaggerValidationEnabled) {
+
+        APIManagerConfiguration.advancedSwaggerValidationEnabled = advancedSwaggerValidationEnabled;
     }
 }

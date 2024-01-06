@@ -21,6 +21,12 @@ package org.wso2.carbon.apimgt.impl.definitions;
 
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.model.API;
@@ -28,12 +34,17 @@ import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.Scope;
 import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ServiceReferenceHolder.class})
 public class OASTestBase {
 
     private Scope sampleScope;
@@ -42,6 +53,7 @@ public class OASTestBase {
     private URITemplate petPost;
     private URITemplate itemPost;
     private URITemplate itemGet;
+    protected APIManagerConfiguration apiManagerConfiguration;
 
     public OASTestBase() {
         sampleScope = new Scope();
@@ -101,7 +113,21 @@ public class OASTestBase {
         itemGet.setScopes(sampleScope);
     }
 
-    public void testGetURITemplates(APIDefinition parser, String content) throws Exception {
+    @Before
+    public void init() throws Exception {
+        ServiceReferenceHolder serviceReferenceHolder = PowerMockito.mock(ServiceReferenceHolder.class);
+        APIManagerConfigurationService apiManagerConfigurationService =
+                Mockito.mock(APIManagerConfigurationService.class);
+        apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+        Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
+                .thenReturn(apiManagerConfigurationService);
+        Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+    }
+
+
+    public void testGetURITemplatesByParser(APIDefinition parser, String content) throws Exception {
         JSONObject jsonObject = new JSONObject(content);
 
         URITemplate exUriTemplate = new URITemplate();
@@ -131,7 +157,7 @@ public class OASTestBase {
         Assert.assertTrue(uriTemplates.contains(petGet));
     }
 
-    public void testGetScopes(APIDefinition parser, String content) throws Exception {
+    public void testGetScopesByParser(APIDefinition parser, String content) throws Exception {
         JSONObject jsonObject = new JSONObject(content);
 
         String scopesOnlyInSecurity = jsonObject.getJSONObject("scopesOnlyInSecurity").toString();
@@ -154,7 +180,7 @@ public class OASTestBase {
         Assert.assertTrue(scopes.contains(extensionScope));
     }
 
-    public void testGenerateAPIDefinition(APIDefinition parser) throws Exception {
+    public void testGenerateAPIDefinitionByParser(APIDefinition parser) throws Exception {
         APIIdentifier identifier = new APIIdentifier("admin", "simple", "1.0.0");
         API api = new API(identifier);
         api.setScopes(new HashSet<>(Arrays.asList(sampleScope, extensionScope)));

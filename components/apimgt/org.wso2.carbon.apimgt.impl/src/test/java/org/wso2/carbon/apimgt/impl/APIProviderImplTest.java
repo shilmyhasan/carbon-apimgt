@@ -76,6 +76,7 @@ import org.wso2.carbon.apimgt.impl.certificatemgt.CertificateManagerImpl;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dao.ScopesDAO;
 import org.wso2.carbon.apimgt.impl.definitions.GraphQLSchemaDefinition;
+import org.wso2.carbon.apimgt.impl.definitions.OAS3Parser;
 import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
 import org.wso2.carbon.apimgt.impl.dto.KeyManagerDto;
@@ -128,6 +129,11 @@ import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tenant.TenantManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import javax.cache.Caching;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -141,12 +147,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.cache.Caching;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1937,8 +1937,11 @@ public class APIProviderImplTest {
         Mockito.when(apiProvider.registry.resourceExists(resourcePath + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME)).
                 thenReturn(true);
         PowerMockito.mockStatic(OASParserUtil.class);
+        PowerMockito.doNothing().when(OASParserUtil.class, "verifyAPIDefinitionFromParser", Mockito.any(),
+                Mockito.any(), Mockito.any());
         Mockito.when(OASParserUtil.getAPIDefinition(apiId, apiProvider.registry)).thenReturn(
                 "{\"info\": {\"swagger\":\"data\"}}");
+        Mockito.when(OASParserUtil.getOASParser(Mockito.anyString())).thenReturn(new OAS3Parser());
         Mockito.doNothing().when(artifactManager).updateGenericArtifact(artifact);
 
         // WSDL
@@ -1963,6 +1966,18 @@ public class APIProviderImplTest {
         apiProvider.createNewAPIVersion(api, newVersion);
         Assert.assertEquals(newVersion, apiProvider.getAPI(newApi.getId()).getId().getVersion());
         Assert.assertEquals(newApi.getWsdlUrl(), apiProvider.getAPI(newApi.getId()).getWsdlUrl());
+
+        // Test if any errors are not thrown when info object is not present in swagger definition.
+        PowerMockito.doNothing().when(OASParserUtil.class, "verifyAPIDefinitionFromParser", Mockito.any(),
+                Mockito.any(), Mockito.any());
+        Mockito.when(OASParserUtil.getAPIDefinition(apiId, apiProvider.registry)).thenReturn(
+                "{\"swagger\":\"2.0\",\"schemes\":[\"https\"],\"consumes\":[\"application/json\"],\"produces\":"
+                        + "[\"application/json\"],\"security\":[{\"default\":[]}]}");
+        apiProvider.createNewAPIVersion(api, newVersion);
+        Mockito.when(OASParserUtil.getAPIDefinition(apiId, apiProvider.registry)).thenReturn(
+                "{\"openapi\":\"3.0.0\",\"servers\":[{\"url\":\"https://example.com\"}],\"paths\":{},"
+                        + "\"components\":{\"securitySchemes\":{\"default\":{}}}}\n");
+        apiProvider.createNewAPIVersion(api, newVersion);
     }
 
     @Test

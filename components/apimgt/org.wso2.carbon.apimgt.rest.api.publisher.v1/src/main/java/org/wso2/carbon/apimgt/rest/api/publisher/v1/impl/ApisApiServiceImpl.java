@@ -70,6 +70,7 @@ import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
+import org.wso2.carbon.apimgt.api.ErrorHandler;
 import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.FaultGatewaysException;
 import org.wso2.carbon.apimgt.api.MonetizationException;
@@ -101,6 +102,7 @@ import org.wso2.carbon.apimgt.api.model.graphql.queryanalysis.GraphqlComplexityI
 import org.wso2.carbon.apimgt.api.model.graphql.queryanalysis.GraphqlSchemaType;
 import org.wso2.carbon.apimgt.api.model.policy.APIPolicy;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.GZIPUtils;
 import org.wso2.carbon.apimgt.impl.certificatemgt.ResponseCode;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
@@ -885,6 +887,8 @@ public class ApisApiServiceImpl implements ApisApiService {
             if (!isWSAPI) {
                 String oldDefinition = apiProvider.getOpenAPIDefinition(apiIdentifier);
                 APIDefinition apiDefinition = OASParserUtil.getOASParser(oldDefinition);
+                SwaggerData oldSwaggerData = new SwaggerData(originalAPI);
+                oldDefinition = apiDefinition.validateAPIDefinition(oldDefinition, oldSwaggerData);
                 SwaggerData swaggerData = new SwaggerData(apiToUpdate);
                 String newDefinition = apiDefinition.generateAPIDefinition(swaggerData, oldDefinition);
                 apiProvider.saveSwaggerDefinition(apiToUpdate, newDefinition);
@@ -4062,6 +4066,8 @@ public class ApisApiServiceImpl implements ApisApiService {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, apiId, e, log);
             } else if (isAuthorizationFailure(e)) {
                 RestApiUtil.handleAuthorizationFailure("Authorization failure while copying API : " + apiId, e, log);
+            } else if (isAPIDefinitionValidationFailure(e)) {
+                RestApiUtil.handleBadRequest(e.getMessage(), e, log);
             } else {
                 String errorMessage = "Error while copying API : " + apiId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -4443,6 +4449,17 @@ public class ApisApiServiceImpl implements ApisApiService {
     private boolean isAuthorizationFailure(Exception e) {
         String errorMessage = e.getMessage();
         return errorMessage != null && errorMessage.contains(APIConstants.UN_AUTHORIZED_ERROR_MESSAGE);
+    }
+
+    /**
+     * To check whether a particular exception is due to failure in api defintion validation.
+     *
+     * @param e Exception object.
+     * @return true if the exception is caused due to authorization failure.
+     */
+    private boolean isAPIDefinitionValidationFailure(Exception e) {
+        String errorMessage = e.getMessage();
+        return errorMessage != null && errorMessage.contains(APIConstants.INVALID_SWAGGER_DEFINITION_ERROR_MESSAGE);
     }
 
 

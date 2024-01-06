@@ -156,7 +156,7 @@ class CreateNewVersion extends React.Component {
                     Alert.error(intl.formatMessage({
                         id: 'Apis.Details.NewVersion.NewVersion.error',
                         defaultMessage: 'Something went wrong while creating a new version!. Error: ',
-                    }) + error.status);
+                    }) + error.status + '. ' + error.response.body.description);
                 }
             });
     }

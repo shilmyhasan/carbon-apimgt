@@ -20,18 +20,28 @@
 package org.wso2.carbon.apimgt.impl.definitions;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.parser.SwaggerParser;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIProductResource;
+import org.wso2.carbon.apimgt.api.model.SwaggerData;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +50,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ServiceReferenceHolder.class})
 public class OASParserUtilTest {
+
+    private APIManagerConfiguration apiManagerConfiguration;
+
+    @Before
+    public void init() throws Exception {
+        ServiceReferenceHolder serviceReferenceHolder = PowerMockito.mock(ServiceReferenceHolder.class);
+        APIManagerConfigurationService apiManagerConfigurationService =
+                Mockito.mock(APIManagerConfigurationService.class);
+        apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+        Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService())
+                .thenReturn(apiManagerConfigurationService);
+        Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+    }
 
     @Test
     public void testGetOASParser() throws Exception {
@@ -580,5 +607,53 @@ public class OASParserUtilTest {
         Assert.assertFalse(APIConstants.SWAGGER_X_THROTTLING_BANDWIDTH + " exists on resource level",
                 pathsObj.has(APIConstants.SWAGGER_X_THROTTLING_BANDWIDTH));
 
+    }
+
+    @Test
+    public void verifyOAS2FromParser() throws Exception {
+
+        String relativePath = "definitions" + File.separator + "oas2" + File.separator + "oas2_uri_template.json";
+        String swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        API api = new API(new APIIdentifier("admin", "PhoneVerification", "1.0.0"));
+        SwaggerData swaggerData = new SwaggerData(api);
+        Mockito.when(apiManagerConfiguration.isAdvancedSwaggerValidationEnabled()).thenReturn(false);
+        try {
+            OASParserUtil.verifyAPIDefinitionFromParser(swagger, new OAS2Parser(), swaggerData);
+            Mockito.when(apiManagerConfiguration.isAdvancedSwaggerValidationEnabled()).thenReturn(true);
+            OASParserUtil.verifyAPIDefinitionFromParser(swagger, new OAS2Parser(), swaggerData);
+        } catch (APIManagementException e) {
+            Assert.fail("Unexpected exception occurred while validating swagger definition");
+        }
+        relativePath = "definitions" + File.separator + "oas2" + File.separator + "oas2_missing_info.json";
+        swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        try {
+            OASParserUtil.verifyAPIDefinitionFromParser(swagger, new OAS2Parser(), swaggerData);
+        } catch (APIManagementException e) {
+            Assert.assertTrue(e.getMessage().contains("attribute paths is missing"));
+        }
+    }
+
+    @Test
+    public void verifyOAS3FromParser() throws Exception {
+
+        String relativePath = "definitions" + File.separator + "oas3" + File.separator + "oas3_uri_template.json";
+        String swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        API api = new API(new APIIdentifier("admin", "PhoneVerification", "1.0.0"));
+        SwaggerData swaggerData = new SwaggerData(api);
+        Mockito.when(apiManagerConfiguration.isAdvancedSwaggerValidationEnabled()).thenReturn(false);
+        try {
+            OASParserUtil.verifyAPIDefinitionFromParser(swagger, new OAS3Parser(), swaggerData);
+            Mockito.when(apiManagerConfiguration.isAdvancedSwaggerValidationEnabled()).thenReturn(true);
+            OASParserUtil.verifyAPIDefinitionFromParser(swagger, new OAS3Parser(), swaggerData);
+        } catch (APIManagementException e) {
+            Assert.fail("Unexpected exception occurred while validating swagger definition");
+        }
+        relativePath = "definitions" + File.separator + "oas3" + File.separator + "oas3_missing_version_title.json";
+        swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        try {
+            OASParserUtil.verifyAPIDefinitionFromParser(swagger, new OAS3Parser(), swaggerData);
+        } catch (APIManagementException e) {
+            Assert.assertTrue(e.getMessage().contains("attribute info.version is missing"));
+        }
     }
 }
