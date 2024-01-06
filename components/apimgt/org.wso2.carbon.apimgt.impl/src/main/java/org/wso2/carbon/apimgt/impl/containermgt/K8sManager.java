@@ -19,14 +19,15 @@
 package org.wso2.carbon.apimgt.impl.containermgt;
 
 import io.fabric8.kubernetes.api.model.*;
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionList;
+import io.fabric8.kubernetes.api.model.apiextensions.v1beta1.CustomResourceDefinition;
+import io.fabric8.kubernetes.api.model.apiextensions.v1beta1.CustomResourceDefinitionList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
 import io.fabric8.openshift.client.OpenShiftClient;
 import org.apache.commons.lang.StringUtils;
@@ -137,11 +138,10 @@ public class K8sManager implements ContainerManager {
         OpenShiftClient client = getClient(properties);
         if (client != null) {
             try {
-                CustomResourceDefinition apiCRD = client.customResourceDefinitions().withName(API_CRD_NAME).get();
-
+                CustomResourceDefinitionContext context = new CustomResourceDefinitionContext();
                 NonNamespaceOperation<APICustomResourceDefinition, APICustomResourceDefinitionList,
                         DoneableAPICustomResourceDefinition, Resource<APICustomResourceDefinition,
-                        DoneableAPICustomResourceDefinition>> crdClient = getCRDClient(client, apiCRD);
+                        DoneableAPICustomResourceDefinition>> crdClient = getCRDClient(client, context);
 
                 crdClient.withName(apiName.toLowerCase()).cascading(true).delete();
 
@@ -197,10 +197,11 @@ public class K8sManager implements ContainerManager {
             }
             try {
                 CustomResourceDefinition crd = client.customResourceDefinitions().withName(API_CRD_NAME).get();
+                CustomResourceDefinitionContext context = CustomResourceDefinitionContext.fromCrd(crd);
 
                 NonNamespaceOperation<APICustomResourceDefinition, APICustomResourceDefinitionList,
                         DoneableAPICustomResourceDefinition, Resource<APICustomResourceDefinition,
-                        DoneableAPICustomResourceDefinition>> crdClient = getCRDClient(client, crd);
+                        DoneableAPICustomResourceDefinition>> crdClient = getCRDClient(client, context);
 
                 APICustomResourceDefinition apiCustomResourceDefinition = crdClient.withName(apiName.toLowerCase()).get();
 
@@ -292,6 +293,7 @@ public class K8sManager implements ContainerManager {
             CustomResourceDefinitionList customResourceDefinitionList = client.customResourceDefinitions().list();
             List<CustomResourceDefinition> customResourceDefinitionItems = customResourceDefinitionList.getItems();
             CustomResourceDefinition apiCustomResourceDefinition = null;
+            CustomResourceDefinitionContext customResourceDefinitionContext = null;
 
             for (CustomResourceDefinition crd : customResourceDefinitionItems) {
                 ObjectMeta metadata = crd.getMetadata();
@@ -299,6 +301,8 @@ public class K8sManager implements ContainerManager {
                 if (metadata != null && metadata.getName().equals(API_CRD_NAME)) {
 
                     apiCustomResourceDefinition = crd;
+                    customResourceDefinitionContext =
+                             CustomResourceDefinitionContext.fromCrd(apiCustomResourceDefinition);
                 }
             }
 
@@ -312,7 +316,8 @@ public class K8sManager implements ContainerManager {
 
             NonNamespaceOperation<APICustomResourceDefinition, APICustomResourceDefinitionList,
                     DoneableAPICustomResourceDefinition, Resource<APICustomResourceDefinition,
-                    DoneableAPICustomResourceDefinition>> apiCrdClient = getCRDClient(client, apiCustomResourceDefinition);
+                    DoneableAPICustomResourceDefinition>> apiCrdClient = getCRDClient(client,
+                    customResourceDefinitionContext);
 
             // assigning values and creating API cr
             Definition definition = new Definition();
@@ -567,7 +572,8 @@ public class K8sManager implements ContainerManager {
      */
     private NonNamespaceOperation<APICustomResourceDefinition, APICustomResourceDefinitionList,
             DoneableAPICustomResourceDefinition, Resource<APICustomResourceDefinition,
-            DoneableAPICustomResourceDefinition>> getCRDClient(OpenShiftClient client, CustomResourceDefinition crd) {
+            DoneableAPICustomResourceDefinition>> getCRDClient(OpenShiftClient client,
+                                                               CustomResourceDefinitionContext crd) {
 
         NonNamespaceOperation<APICustomResourceDefinition, APICustomResourceDefinitionList,
                 DoneableAPICustomResourceDefinition, Resource<APICustomResourceDefinition,
