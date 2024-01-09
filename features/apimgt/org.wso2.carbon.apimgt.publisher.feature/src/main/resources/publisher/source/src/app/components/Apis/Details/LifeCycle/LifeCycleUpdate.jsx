@@ -134,10 +134,10 @@ class LifeCycleUpdate extends Component {
                 // get the latest state of the API
                 this.context.updateAPI();
                 const newState = response.body.lifecycleState.state;
-                const { workflowStatus ,jsonPayload} = response.body;
-                if (jsonPayload && jsonPayload !== ''){
-                   const message = JSON.parse(jsonPayload).message;
-                   this.setState({ message });
+                const { workflowStatus, jsonPayload } = response.body;
+                if (jsonPayload && jsonPayload !== '') {
+                    const { message } = JSON.parse(jsonPayload);
+                    this.setState({ message });
                 }
                 this.setState({ newState });
                 const { intl } = this.props;
@@ -151,17 +151,16 @@ class LifeCycleUpdate extends Component {
                 if (workflowStatus === this.WORKFLOW_STATUS.APPROVED) {
                     if (this.state.message && this.state.message !== '') {
                         Alert.info(this.state.message);
-                    } else{
+                    } else {
                         Alert.info(intl.formatMessage({
                             id: 'Apis.Details.LifeCycle.LifeCycleUpdate.approve.approveStatus',
                             defaultMessage: 'Lifecycle state change action approved successfully',
                         }));
                     }
-                }
-                else if (workflowStatus === this.WORKFLOW_STATUS.REJECTED) {
+                } else if (workflowStatus === this.WORKFLOW_STATUS.REJECTED) {
                     if (this.state.message && this.state.message !== '') {
                         Alert.error(this.state.message);
-                    } else{
+                    } else {
                         Alert.error(intl.formatMessage({
                             id: 'Apis.Details.LifeCycle.LifeCycleUpdate.reject.rejectStatus',
                             defaultMessage: 'Lifecycle state change action rejected due to validation failure',
