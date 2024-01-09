@@ -1084,6 +1084,19 @@
     </ApplicationConfiguration>
     {% endif %}
 
+    {% if oauth.jwt.renew_token_without_revoking_existing is defined %}
+    <RenewTokenWithoutRevokingExisting>
+        <Enable>{{oauth.jwt.renew_token_without_revoking_existing.enable}}</Enable>
+        {% if oauth.jwt.renew_token_without_revoking_existing.allowed_grant_types is defined %}
+        <AllowedGrantTypes>
+            {% for allowed_grant_type in oauth.jwt.renew_token_without_revoking_existing.allowed_grant_types %}
+            <AllowedGrantType>{{allowed_grant_type}}</AllowedGrantType>
+            {% endfor %}
+        </AllowedGrantTypes>
+        {% endif %}
+    </RenewTokenWithoutRevokingExisting>
+    {% endif %}
+
     {% if apim.ai_security is defined %}
     <AISecurityHandler>
         {% if apim.ai_security.operation_mode is defined %}
