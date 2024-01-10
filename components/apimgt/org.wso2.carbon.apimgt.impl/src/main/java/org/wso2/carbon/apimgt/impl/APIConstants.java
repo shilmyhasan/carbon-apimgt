@@ -659,6 +659,11 @@ public final class APIConstants {
     public static final String BINDING_TYPE = "binding_type";
     public static final String DEFAULT_COOKIE_BINDING_NAME = "atbv";
 
+    public static final String RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_ALLOWED_GRANT_TYPES_CONFIG = "AllowedGrantTypes";
+    public static final String RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_CONFIG = "RenewTokenWithoutRevokingExisting";
+    public static final String RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_ENABLE_CONFIG = "Enable";
+    public static final String CLIENT_CREDENTIALS_GRANT_TYPE = "client_credentials";
+    public static final String REQUEST_BINDING_TYPE = "request";
 
     public static final String TOKEN_URL = "TokenURL";
     public static final String REVOKE_URL = "RevokeURL";
