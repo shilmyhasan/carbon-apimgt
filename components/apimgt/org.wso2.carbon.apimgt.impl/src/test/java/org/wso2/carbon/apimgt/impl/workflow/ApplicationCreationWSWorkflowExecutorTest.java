@@ -20,8 +20,6 @@ package org.wso2.carbon.apimgt.impl.workflow;
 
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.description.AxisService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -263,9 +261,7 @@ public class ApplicationCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		try {
 			applicationCreationWSWorkflowExecutor.cleanUpPendingTask(workflowDTO.getExternalWorkflowReference());
@@ -320,9 +316,7 @@ public class ApplicationCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		try {
 			Assert.assertNotNull(applicationCreationWSWorkflowExecutor.execute(workflowDTO));
@@ -356,9 +350,8 @@ public class ApplicationCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
+
 		try {
 			applicationCreationWSWorkflowExecutor.execute(workflowDTO);
 			Assert.fail("Unexpected WorkflowException occurred while executing Application creation ws workflow");
@@ -388,9 +381,7 @@ public class ApplicationCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		try {
 			Assert.assertNotNull(applicationCreationWSWorkflowExecutor.execute(workflowDTO));
@@ -448,9 +439,7 @@ public class ApplicationCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		applicationCreationWSWorkflowExecutor.setUsername(null);
 		applicationCreationWSWorkflowExecutor.setPassword(null);
@@ -532,9 +521,7 @@ public class ApplicationCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		applicationCreationWSWorkflowExecutor.setContentType("application/xml");
 		try {

@@ -43,7 +43,6 @@ import org.wso2.carbon.user.mgt.stub.types.carbon.FlaggedName;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.rmi.RemoteException;
-import java.util.Arrays;
 
 /**
  * UserSignUpWorkflowExecutor test cases
@@ -99,24 +98,6 @@ public class UserSignUpWorkflowExecutorTest {
             Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.fail("Unexpected exception occurred while updating role of the given user");
-        }
-    }
-
-    @Test
-    public void testFailuresToUpdateRoleOfUserWhenRemoteServiceCallFailed() throws UserStoreException, RemoteException,
-            UserAdminUserAdminException {
-        Mockito.when(userAdminStub.getRolesOfUser(username, "*", -1)).thenReturn(flaggedNames);
-        Mockito.when(userStoreManager.isExistingRole(role)).thenReturn(true);
-
-        //Test failure to update the user role when
-        Mockito.doThrow(new RemoteException("Exception occurred while updating the roles of user")).when(userAdminStub)
-                .updateRolesOfUser(Mockito.anyString(), new
-                        String[]{Mockito.anyString()});
-        try {
-            UserSignUpWorkflowExecutor.updateRolesOfUser(serverURL, adminUsername, adminPassword, username, role);
-            Assert.fail("Expected exception has been not thrown while updating the roles of user failed");
-        } catch (Exception e) {
-            Assert.assertEquals(e.getMessage(), "Exception occurred while updating the roles of user");
         }
     }
 

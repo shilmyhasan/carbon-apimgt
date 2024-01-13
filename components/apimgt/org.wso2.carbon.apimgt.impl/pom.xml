@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.wso2.carbon.apimgt</groupId>
         <artifactId>apimgt</artifactId>
-        <version>6.7.206.482-SNAPSHOT</version>
+        <version>6.7.210-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -78,10 +78,14 @@
                     <groupId>org.apache.velocity</groupId>
                     <artifactId>velocity</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>wsdl4j</groupId>
+                    <artifactId>wsdl4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.poi</groupId>
+            <groupId>org.apache.poi.wso2</groupId>
             <artifactId>poi-ooxml</artifactId>
         </dependency>
         <dependency>
@@ -419,6 +423,14 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>xmltooling</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -431,37 +443,36 @@
                     </excludes>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-antrun-plugin</artifactId>-->
-<!--                <version>1.1</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>create-test-database</id>-->
-<!--                        <phase>generate-resources</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>run</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <tasks>-->
-<!--                                <path id="h2.classpath">-->
-<!--                                    <path refid="maven.compile.classpath" />-->
-<!--                                </path>-->
-<!--                                <echo message="########### Create Test Database ##############" />-->
-<!--                                <sql autocommit="true" driver="org.h2.Driver" onerror="continue" password="wso2carbon" url="jdbc:h2:${basedir}/target/repository/database/WSO2AM_DB" userid="wso2carbon">-->
-<!--                                    <classpath>-->
-<!--                                        <path refid="h2.classpath" />-->
-<!--                                    </classpath>-->
-<!--                                    <fileset file="${basedir}/src/test/resources/dbscripts/h2.sql" />-->
-<!--                                    <fileset file="${basedir}/src/test/resources/dbscripts/h2-sample-data.sql" />-->
-<!--                                </sql>-->
-<!--                                <echo message="##################### END ########################" />-->
-<!--                                <echo>${h2.database.version}</echo>-->
-<!--                            </tasks>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>create-test-database</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <path id="h2.classpath">
+                                    <path refid="maven.compile.classpath" />
+                                </path>
+                                <echo message="########### Create Test Database ##############" />
+                                <sql autocommit="true" driver="org.h2.Driver" onerror="continue" password="wso2carbon" url="jdbc:h2:${basedir}/target/repository/database/WSO2AM_DB" userid="wso2carbon">
+                                    <classpath>
+                                        <path refid="h2.classpath" />
+                                    </classpath>
+                                    <fileset file="${basedir}/src/test/resources/dbscripts/h2.sql" />
+                                    <fileset file="${basedir}/src/test/resources/dbscripts/h2-sample-data.sql" />
+                                </sql>
+                                <echo message="##################### END ########################" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
@@ -489,6 +500,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine>
+                        --add-opens=java.xml/jdk.xml.internal=ALL-UNNAMED
+                        --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
+                    </argLine>
                     <systemProperties>
                         <property>
                             <name>APIManagerDBConfigurationPath</name>

@@ -25,10 +25,7 @@ import org.apache.commons.collections.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.juddi.v3.error.RegistryException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -36,7 +33,6 @@ import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -56,7 +52,10 @@ import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
 import org.wso2.carbon.apimgt.api.model.policy.QuotaPolicy;
 import org.wso2.carbon.apimgt.api.model.policy.RequestCountLimit;
 import org.wso2.carbon.apimgt.api.model.policy.SubscriptionPolicy;
-import org.wso2.carbon.apimgt.impl.*;
+import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.ServiceReferenceHolderMockCreator;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dto.ConditionDto;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
@@ -76,6 +75,7 @@ import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.Tag;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserRealm;
@@ -90,7 +90,6 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.security.KeyStore;
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -1228,7 +1227,7 @@ public class APIUtilTest {
             Assert.fail();
         } catch (APIManagementException ex) {
             Assert.assertTrue(ex.getMessage().contains("Failed to initialize GenericArtifactManager"));
-        } catch (org.wso2.carbon.registry.core.exceptions.RegistryException e) {
+        } catch (RegistryException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
@@ -1932,22 +1931,6 @@ public class APIUtilTest {
         Assert.assertEquals("Test%26123%26test", APIUtil.sanitizeUserRole("Test&123&test"));
         Assert.assertEquals("Test123", APIUtil.sanitizeUserRole("Test123"));
         Assert.assertEquals("Role%20A", APIUtil.sanitizeUserRole("Role A"));
-    }
-    
-    @Test
-    public void testIsRoleExistForUser() throws Exception {
-        /*
-        String userName = "user1";
-        String[] userRoleList = {"role1", "role2"};
-        PowerMockito.mockStatic(APIUtil.class);
-        Mockito.when(APIUtil.getListOfRoles(userName)).thenReturn(userRoleList);
-        Assert.assertFalse(APIUtil.isRoleExistForUser(userName, "roleA,roleB"));
-        Assert.assertTrue(APIUtil.isRoleExistForUser(userName, "role1,roleB"));
-        //Assert.assertTrue(APIUtil.isRoleExistForUser(userName, "role1,role2"));
-        Assert.assertFalse(APIUtil.isRoleExistForUser(userName, ""));
-        Assert.assertFalse(APIUtil.isRoleExistForUser(userName, null));
-        Assert.assertFalse(APIUtil.isRoleExistForUser(userName, "test"));
-        */
     }
 
     @Test

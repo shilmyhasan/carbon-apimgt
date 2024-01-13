@@ -48,11 +48,9 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tenant.TenantManager;
 
-import javax.activation.DataHandler;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 import static org.wso2.carbon.h2.osgi.utils.CarbonConstants.CARBON_HOME;
 
@@ -345,8 +343,6 @@ public class ApplicationThrottleControllerTest {
         PowerMockito.mockStatic(OMAbstractFactory.class);
         OMFactory omFactory = Mockito.mock(OMFactory.class);
         PowerMockito.when(OMAbstractFactory.getOMFactory()).thenReturn(omFactory);
-        Mockito.doThrow(IOException.class).when(omFactory).createOMText((DataHandler) Mockito.anyObject(), Mockito
-                .anyBoolean());
         ApplicationThrottleController.getApplicationThrottleContext(messageContext, throttleDataHolder,
                 applicationId, THROTTLE_POLICY_KEY);
     }

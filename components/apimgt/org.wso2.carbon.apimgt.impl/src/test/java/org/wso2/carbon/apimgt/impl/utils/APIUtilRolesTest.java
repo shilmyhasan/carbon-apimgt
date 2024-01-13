@@ -37,7 +37,6 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.indexing.service.TenantIndexingLoader;
-import org.wso2.carbon.user.api.Permission;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.config.RealmConfiguration;
@@ -59,65 +58,69 @@ public class APIUtilRolesTest {
     @Test
     public void testCreateDefaultRoles() throws Exception {
         System.setProperty("carbon.home", "");
-        final int tenantId = MultitenantConstants.SUPER_TENANT_ID;
-        final String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        try {
+            final int tenantId = MultitenantConstants.SUPER_TENANT_ID;
+            final String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
 
-        File siteConfFile = new File(Thread.currentThread().getContextClassLoader().
-                getResource("tenant-conf.json").getFile());
+            File siteConfFile = new File(Thread.currentThread().getContextClassLoader().
+                    getResource("tenant-conf.json").getFile());
 
-        String tenantConfValue = FileUtils.readFileToString(siteConfFile);
+            String tenantConfValue = FileUtils.readFileToString(siteConfFile);
 
-        InputStream signUpConfStream = new FileInputStream(Thread.currentThread().getContextClassLoader().
-                getResource("default-sign-up-config.xml").getFile());
+            InputStream signUpConfStream = new FileInputStream(Thread.currentThread().getContextClassLoader().
+                    getResource("default-sign-up-config.xml").getFile());
 
-        PrivilegedCarbonContext carbonContext = Mockito.mock(PrivilegedCarbonContext.class);
-        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
-        RealmService realmService = Mockito.mock(RealmService.class);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        TenantManager tenantManager = Mockito.mock(TenantManager.class);
-        TenantIndexingLoader indexingLoader = Mockito.mock(TenantIndexingLoader.class);
-        TenantRegistryLoader tenantRegistryLoader = Mockito.mock(TenantRegistryLoader.class);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        Resource resource = Mockito.mock(Resource.class);
-        UserRealm userRealm = Mockito.mock(UserRealm.class);
-        UserStoreManager userStoreManager = Mockito.mock(UserStoreManager.class);
-        RealmConfiguration realmConfiguration = Mockito.mock(RealmConfiguration.class);
+            PrivilegedCarbonContext carbonContext = Mockito.mock(PrivilegedCarbonContext.class);
+            ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+            RealmService realmService = Mockito.mock(RealmService.class);
+            RegistryService registryService = Mockito.mock(RegistryService.class);
+            TenantManager tenantManager = Mockito.mock(TenantManager.class);
+            TenantIndexingLoader indexingLoader = Mockito.mock(TenantIndexingLoader.class);
+            TenantRegistryLoader tenantRegistryLoader = Mockito.mock(TenantRegistryLoader.class);
+            UserRegistry registry = Mockito.mock(UserRegistry.class);
+            Resource resource = Mockito.mock(Resource.class);
+            UserRealm userRealm = Mockito.mock(UserRealm.class);
+            UserStoreManager userStoreManager = Mockito.mock(UserStoreManager.class);
+            RealmConfiguration realmConfiguration = Mockito.mock(RealmConfiguration.class);
 
-        PowerMockito.mockStatic(PrivilegedCarbonContext.class);
-        PowerMockito.mockStatic(ServiceReferenceHolder.class);
-        PowerMockito.mockStatic(APIManagerComponent.class);
+            PowerMockito.mockStatic(PrivilegedCarbonContext.class);
+            PowerMockito.mockStatic(ServiceReferenceHolder.class);
+            PowerMockito.mockStatic(APIManagerComponent.class);
 
-        Mockito.when(PrivilegedCarbonContext.getThreadLocalCarbonContext()).thenReturn(carbonContext);
-        Mockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
-        Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
-        Mockito.when(serviceReferenceHolder.getRegistryService()).thenReturn(registryService);
-        Mockito.when(serviceReferenceHolder.getIndexLoaderService()).thenReturn(indexingLoader);
-        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        Mockito.when(realmService.getBootstrapRealm()).thenReturn(userRealm);
-        Mockito.when(realmService.getTenantUserRealm(tenantId)).thenReturn(userRealm);
-        Mockito.when(userRealm.getUserStoreManager()).thenReturn(userStoreManager);
-        Mockito.when(userRealm.getRealmConfiguration()).thenReturn(realmConfiguration);
-        Mockito.when(realmConfiguration.getAdminUserName()).thenReturn("admin");
-        Mockito.when(tenantManager.getTenantId(tenantDomain)).thenReturn(tenantId);
-        Mockito.when(APIManagerComponent.getTenantRegistryLoader()).thenReturn(tenantRegistryLoader);
-        Mockito.when(serviceReferenceHolder.getRegistryService()).thenReturn(registryService);
-        Mockito.when(registryService.getConfigSystemRegistry(eq(tenantId))).thenReturn(registry);
-        Mockito.when(registryService.getGovernanceSystemRegistry(eq(tenantId))).thenReturn(registry);
-        Mockito.when(registry.resourceExists(eq(APIConstants.API_TENANT_CONF_LOCATION))).thenReturn(true);
-        Mockito.when(registry.resourceExists(eq(APIConstants.SELF_SIGN_UP_CONFIG_LOCATION))).thenReturn(true);
-        Mockito.when(registry.get(eq(APIConstants.API_TENANT_CONF_LOCATION))).thenReturn(resource);
-        Mockito.when(registry.get(eq(APIConstants.SELF_SIGN_UP_CONFIG_LOCATION))).thenReturn(resource);
-        Mockito.when(resource.getContent()).thenReturn(tenantConfValue.getBytes());
-        Mockito.when(resource.getContentStream()).thenReturn(signUpConfStream);
+            Mockito.when(PrivilegedCarbonContext.getThreadLocalCarbonContext()).thenReturn(carbonContext);
+            Mockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+            Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
+            Mockito.when(serviceReferenceHolder.getRegistryService()).thenReturn(registryService);
+            Mockito.when(serviceReferenceHolder.getIndexLoaderService()).thenReturn(indexingLoader);
+            Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
+            Mockito.when(realmService.getBootstrapRealm()).thenReturn(userRealm);
+            Mockito.when(realmService.getTenantUserRealm(tenantId)).thenReturn(userRealm);
+            Mockito.when(userRealm.getUserStoreManager()).thenReturn(userStoreManager);
+            Mockito.when(userRealm.getRealmConfiguration()).thenReturn(realmConfiguration);
+            Mockito.when(realmConfiguration.getAdminUserName()).thenReturn("admin");
+            Mockito.when(tenantManager.getTenantId(tenantDomain)).thenReturn(tenantId);
+            Mockito.when(APIManagerComponent.getTenantRegistryLoader()).thenReturn(tenantRegistryLoader);
+            Mockito.when(serviceReferenceHolder.getRegistryService()).thenReturn(registryService);
+            Mockito.when(registryService.getConfigSystemRegistry(eq(tenantId))).thenReturn(registry);
+            Mockito.when(registryService.getGovernanceSystemRegistry(eq(tenantId))).thenReturn(registry);
+            Mockito.when(registry.resourceExists(eq(APIConstants.API_TENANT_CONF_LOCATION))).thenReturn(true);
+            Mockito.when(registry.resourceExists(eq(APIConstants.SELF_SIGN_UP_CONFIG_LOCATION))).thenReturn(true);
+            Mockito.when(registry.get(eq(APIConstants.API_TENANT_CONF_LOCATION))).thenReturn(resource);
+            Mockito.when(registry.get(eq(APIConstants.SELF_SIGN_UP_CONFIG_LOCATION))).thenReturn(resource);
+            Mockito.when(resource.getContent()).thenReturn(tenantConfValue.getBytes());
+            Mockito.when(resource.getContentStream()).thenReturn(signUpConfStream);
 
-        APIUtil.createDefaultRoles(tenantId);
+            APIUtil.createDefaultRoles(tenantId);
 
-        String[] adminName = {"admin"};
-        Mockito.verify(userStoreManager, Mockito.atLeastOnce()).addRole(eq("Internal/publisher"),
-                eq(adminName), new Permission[]{Mockito.any(Permission.class)});
-        Mockito.verify(userStoreManager, Mockito.atLeastOnce()).addRole(eq("Internal/subscriber"),
-                eq(adminName), new Permission[]{Mockito.any(Permission.class)});
-        Mockito.verify(userStoreManager, Mockito.atLeastOnce()).addRole(eq("Internal/creator"),
-                eq(adminName), new Permission[]{Mockito.any(Permission.class)});
+            String[] adminName = {"admin"};
+            Mockito.verify(userStoreManager, Mockito.atLeastOnce()).addRole(eq("Internal/publisher"),
+                    eq(adminName), Mockito.any());
+            Mockito.verify(userStoreManager, Mockito.atLeastOnce()).addRole(eq("Internal/subscriber"),
+                    eq(adminName), Mockito.any());
+            Mockito.verify(userStoreManager, Mockito.atLeastOnce()).addRole(eq("Internal/creator"),
+                    eq(adminName), Mockito.any());
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 }

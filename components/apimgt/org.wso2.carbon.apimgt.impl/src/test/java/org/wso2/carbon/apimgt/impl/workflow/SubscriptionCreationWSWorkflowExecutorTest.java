@@ -18,17 +18,8 @@
 
 package org.wso2.carbon.apimgt.impl.workflow;
 
-import java.util.UUID;
-
 import org.apache.axiom.om.util.AXIOMUtil;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.description.AxisService;
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +37,7 @@ import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 
 import javax.xml.stream.XMLStreamException;
+import java.util.UUID;
 
 /**
  * SubscriptionCreationSimpleWorkflowExecutor test cases
@@ -157,9 +149,7 @@ public class SubscriptionCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		try {
 			subscriptionCreationWSWorkflowExecutor.cleanUpPendingTask(workflowDTO.getExternalWorkflowReference());
@@ -217,9 +207,7 @@ public class SubscriptionCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		try {
 			Assert.assertNotNull(subscriptionCreationWSWorkflowExecutor.execute(workflowDTO));
@@ -294,9 +282,7 @@ public class SubscriptionCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		subscriptionCreationWSWorkflowExecutor.setUsername(null);
 		subscriptionCreationWSWorkflowExecutor.setPassword(null);
@@ -374,9 +360,7 @@ public class SubscriptionCreationWSWorkflowExecutorTest {
 		ServiceReferenceHolderMockCreator serviceRefMock = new ServiceReferenceHolderMockCreator(-1234);
 		ServiceReferenceHolderMockCreator.initContextService();
 
-		PowerMockito.whenNew(ServiceClient.class)
-				.withArguments(Mockito.any(ConfigurationContext.class), Mockito.any(AxisService.class))
-				.thenReturn(serviceClient);
+		PowerMockito.whenNew(ServiceClient.class).withAnyArguments().thenReturn(serviceClient);
 
 		subscriptionCreationWSWorkflowExecutor.setContentType("application/xml");
 		try {

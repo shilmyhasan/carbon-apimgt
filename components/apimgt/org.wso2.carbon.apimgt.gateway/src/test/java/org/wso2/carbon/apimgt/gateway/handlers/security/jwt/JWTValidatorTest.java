@@ -52,14 +52,13 @@ import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import javax.cache.Cache;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.cache.Cache;
 
 @RunWith(PowerMockRunner.class) @PrepareForTest({ JWTValidator.class, GatewayUtils.class, MultitenantUtils.class,
         PrivilegedCarbonContext.class, RevokedJWTDataHolder.class,
@@ -674,6 +673,7 @@ import javax.cache.Cache;
     @Test
     public void testAuthenticateForWSAndGraphQL()
             throws ParseException, APISecurityException, APIManagementException {
+        Mockito.when(privilegedCarbonContext.getTenantDomain()).thenReturn("carbon.super");
         String apiContext = "/graphql";
         String apiVersion = "1.0.0";
         SignedJWT signedJWT = SignedJWT.parse("eyJ4NXQiOiJNell4TW1Ga09HWXdNV0kwWldObU5EY3hOR1l3WW1NNFp"
@@ -740,6 +740,7 @@ import javax.cache.Cache;
 
     @Test
     public void testValidateScopesForGraphQLSubscriptions() throws ParseException {
+        Mockito.when(privilegedCarbonContext.getTenantDomain()).thenReturn("carbon.super");
         String apiContext = "/graphql";
         String apiVersion = "1.0.0";
         String matchingResource = "/subresource";

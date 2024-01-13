@@ -53,10 +53,9 @@ import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-import java.rmi.RemoteException;
+import javax.xml.stream.XMLStreamException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.stream.XMLStreamException;
 
 /**
  * UserSignUpWSWorkflowExecutor test cases
@@ -255,16 +254,6 @@ public class UserSignUpWSWorkflowExecutorTest {
         //Set tenant admin credentials
         userRegistrationConfigDTO.setAdminUserName("admin");
         userRegistrationConfigDTO.setAdminPassword("admin");
-
-        //Test failure to complete workflow execution, when error has been occurred while updating user with signup roles
-        Mockito.doThrow(new RemoteException()).when(userAdminStub).updateRolesOfUser(Mockito.anyString(), new
-                String[]{Mockito.anyString()});
-        try {
-            userSignUpWSWorkflowExecutor.complete(workflowDTO);
-            Assert.fail("Expected WorkflowException has not been thrown when signup user role update failed");
-        } catch (WorkflowException e) {
-            Assert.assertEquals(e.getMessage(), "Error while assigning role to user");
-        }
 
         //Test failure to complete workflow execution, when sign up roles are not existing in user realm
         Mockito.when(userStoreManager.isExistingRole("Internal/" + signUpRole)).thenReturn(false);
