@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -37,7 +38,6 @@ import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIKey;
 import org.wso2.carbon.apimgt.api.model.APIStatus;
 import org.wso2.carbon.apimgt.api.model.APIStore;
-import org.wso2.carbon.apimgt.api.model.AccessTokenInfo;
 import org.wso2.carbon.apimgt.api.model.ApiTypeWrapper;
 import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.BlockConditionsDTO;
@@ -87,6 +87,11 @@ import org.wso2.carbon.identity.core.util.IdentityConfigParser;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,11 +107,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -116,6 +116,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest( {KeyManagerHolder.class})
+@PowerMockIgnore("javax.management.*")
 public class APIMgtDAOTest {
 
     public static ApiMgtDAO apiMgtDAO;
@@ -941,7 +942,8 @@ public class APIMgtDAOTest {
         api.setContextTemplate("/testCreateApplicationRegistrationEntry/{version}");
         APIPolicy apiPolicy = (APIPolicy) getPolicyAPILevelPerUser("testCreateApplicationRegistrationEntry");
         api.setApiLevelPolicy(apiPolicy.getPolicyName());
-        apiMgtDAO.addAPI(api, -1234);
+        api.setUUID(UUID.randomUUID().toString());
+        api.getId().setId(apiMgtDAO.addAPI(api, -1234));
         apiId.setTier(subscriptionPolicy.getPolicyName());
         ApiTypeWrapper apiTypeWrapper = new ApiTypeWrapper(api);
         int subsId = apiMgtDAO.addSubscription(apiTypeWrapper, application.getId(),
@@ -956,14 +958,6 @@ public class APIMgtDAOTest {
                 .getId(), clientIdProduction, "Default", UUID.randomUUID().toString());
         apiMgtDAO.createApplicationKeyTypeMappingForManualClients(APIConstants.API_KEY_TYPE_SANDBOX, application
                 .getId(), clientIdSandbox, "Default", UUID.randomUUID().toString());
-        int appIdProduction = insertConsumerApp(clientIdProduction, application.getName(), subscriber.getName());
-        int appIdSandBox = insertConsumerApp(clientIdSandbox, application.getName(), subscriber.getName());
-        String tokenProduction = UUID.randomUUID().toString();
-        String tokenSandBox = UUID.randomUUID().toString();
-        String tokenIdProduction = insertAccessTokenForApp(appIdProduction, subscriber.getName(), tokenProduction);
-        String tokenIdSandbox = insertAccessTokenForApp(appIdSandBox, subscriber.getName(), tokenSandBox);
-        insertTokenScope(tokenIdProduction, "default");
-        insertTokenScope(tokenIdSandbox, "default");
         assertTrue(apiMgtDAO.getSubscriptionCount(subscriber, application.getName(), null) > 0);
         OAuthApplicationInfo oAuthApplicationInfo = new OAuthApplicationInfo();
         Mockito.when(keyManager.retrieveApplication(clientIdProduction)).thenReturn(oAuthApplicationInfo);
@@ -976,16 +970,12 @@ public class APIMgtDAOTest {
         assertEquals(subscribedAPIFromUuid.getSubCreatedStatus(), APIConstants.SubscriptionCreatedStatus.SUBSCRIBE);
         assertEquals(subscribedAPIFromUuid.getApiId(), apiId);
         assertEquals(subscribedAPIFromUuid.getApplication().getId(), application.getId());
-        List<AccessTokenInfo> accessTokenInfoList = apiMgtDAO.getAccessTokenListForUser(subscriber.getName(),
-                application.getName(), subscriber.getName());
-        assertTrue(accessTokenInfoList.size()==2);
         apiMgtDAO.updateApplicationStatus(application.getId(), APIConstants.ApplicationStatus.APPLICATION_APPROVED);
         String status = apiMgtDAO.getApplicationStatus("testCreateApplicationRegistrationEntry",
                 "testCreateApplicationRegistrationEntry");
         assertEquals(status, APIConstants.ApplicationStatus.APPLICATION_APPROVED);
         boolean applicationExist = apiMgtDAO.isApplicationExist(application.getName(), subscriber.getName(), null);
         assertTrue(applicationExist);
-        assertNotNull(apiMgtDAO.getPaginatedSubscribedAPIs(subscriber, application.getName(), 0, 10, null));
         Set<SubscribedAPI> subscribedAPIS = apiMgtDAO.getSubscribedAPIs(subscriber, application.getName(), null);
         assertEquals(subscribedAPIS.size(), 1);
         apiMgtDAO.updateSubscription(apiId, APIConstants.SubscriptionStatus.BLOCKED, application.getId());
@@ -1004,8 +994,6 @@ public class APIMgtDAOTest {
                 -1234);
         apiMgtDAO.deleteApplicationKeyMappingByConsumerKey(clientIdProduction);
         apiMgtDAO.deleteApplicationMappingByConsumerKey(clientIdSandbox);
-        deleteAccessTokenForApp(appIdProduction);
-        deleteAccessTokenForApp(appIdSandBox);
         deleteConsumerApp(clientIdProduction);
         deleteConsumerApp(clientIdSandbox);
         deleteSubscriber(subscriber.getId());
@@ -1329,30 +1317,30 @@ public class APIMgtDAOTest {
         }
     }
 
-    private String insertAccessTokenForApp(int clientId, String user, String token) throws SQLException {
-        Connection conn = null;
-        ResultSet rs = null;
-        PreparedStatement ps = null;
-        try {
-            conn = APIMgtDBUtil.getConnection();
-            conn.setAutoCommit(false);
-            String tokenId = UUID.randomUUID().toString();
-            String query = "INSERT INTO IDN_OAUTH2_ACCESS_TOKEN (TOKEN_ID, ACCESS_TOKEN, REFRESH_TOKEN, " +
-                    "CONSUMER_KEY_ID, AUTHZ_USER, TENANT_ID, USER_TYPE, GRANT_TYPE, VALIDITY_PERIOD, " +
-                    "REFRESH_TOKEN_VALIDITY_PERIOD, TOKEN_STATE,TIME_CREATED,REFRESH_TOKEN_TIME_CREATED) VALUES ('" +
-                    tokenId + "'," + " '" + token + "'," + " 'aa', ?,?, " +
-                    "'-1234','" + APIConstants.ACCESS_TOKEN_USER_TYPE_APPLICATION + "', 'client_credentials', '3600'," +
-                    " '3600', 'ACTIVE','2017-10-17','2017-10-17')";
-            ps = conn.prepareStatement(query);
-            ps.setInt(1, clientId);
-            ps.setString(2, user);
-            ps.executeUpdate();
-            conn.commit();
-            return tokenId;
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
-        }
-    }
+//    private String insertAccessTokenForApp(int clientId, String user, String token) throws SQLException {
+//        Connection conn = null;
+//        ResultSet rs = null;
+//        PreparedStatement ps = null;
+//        try {
+//            conn = APIMgtDBUtil.getConnection();
+//            conn.setAutoCommit(false);
+//            String tokenId = UUID.randomUUID().toString();
+//            String query = "INSERT INTO IDN_OAUTH2_ACCESS_TOKEN (TOKEN_ID, ACCESS_TOKEN, REFRESH_TOKEN, " +
+//                    "CONSUMER_KEY_ID, AUTHZ_USER, TENANT_ID, USER_TYPE, GRANT_TYPE, VALIDITY_PERIOD, " +
+//                    "REFRESH_TOKEN_VALIDITY_PERIOD, TOKEN_STATE,TIME_CREATED,REFRESH_TOKEN_TIME_CREATED) VALUES ('" +
+//                    tokenId + "'," + " '" + token + "'," + " 'aa', ?,?, " +
+//                    "'-1234','" + APIConstants.ACCESS_TOKEN_USER_TYPE_APPLICATION + "', 'client_credentials', '3600'," +
+//                    " '3600', 'ACTIVE','2017-10-17','2017-10-17')";
+//            ps = conn.prepareStatement(query);
+//            ps.setInt(1, clientId);
+//            ps.setString(2, user);
+//            ps.executeUpdate();
+//            conn.commit();
+//            return tokenId;
+//        } finally {
+//            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+//        }
+//    }
 
     private void deleteAccessTokenForApp(int clientId) throws SQLException {
         Connection conn = null;

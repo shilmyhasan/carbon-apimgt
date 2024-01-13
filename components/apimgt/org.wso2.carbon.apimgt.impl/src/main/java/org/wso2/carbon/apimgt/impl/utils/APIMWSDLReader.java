@@ -43,7 +43,6 @@ import org.wso2.carbon.apimgt.impl.wsdl.WSDL11ProcessorImpl;
 import org.wso2.carbon.apimgt.impl.wsdl.WSDL20ProcessorImpl;
 import org.wso2.carbon.apimgt.impl.wsdl.WSDLProcessor;
 import org.wso2.carbon.apimgt.impl.wsdl.exceptions.APIMgtWSDLException;
-import org.wso2.carbon.apimgt.impl.wsdl.model.WSDLInfo;
 import org.wso2.carbon.apimgt.impl.wsdl.model.WSDLValidationResponse;
 import org.xml.sax.SAXException;
 
@@ -60,14 +59,14 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.InputStream;
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -168,6 +167,7 @@ public class APIMWSDLReader {
         if (!wsdlFilePath.startsWith("/")) {
             wsdlFilePath = "/" + wsdlFilePath;
         }
+
         APIFileUtil.extractSingleWSDLFile(inputStream, path, wsdlFilePath);
         String finalPath = APIConstants.FILE_URI_PREFIX + wsdlFilePath;
 
@@ -201,7 +201,7 @@ public class APIMWSDLReader {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             writer.writeWSDL(wsdlDefinition, byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
+        } catch (WSDLException e) {
             throw new APIManagementException("Error occurs when change the address URL of the WSDL", e);
         }
     }
@@ -220,6 +220,18 @@ public class APIMWSDLReader {
         } catch (APIManagementException e) {
             return handleExceptionDuringValidation(e);
         }
+    }
+
+    /**
+     * Extract the WSDL file and validates it
+     *
+     * @param wsdlContent file content as a byte array
+     * @return Validation information
+     * @throws APIManagementException Error occurred during validation
+     */
+    public static WSDLValidationResponse validateWSDLFile(byte[] wsdlContent) throws  APIManagementException {
+        WSDLProcessor processor = getWSDLProcessor(wsdlContent);
+        return getWsdlValidationResponse(processor);
     }
 
     /**
@@ -300,14 +312,10 @@ public class APIMWSDLReader {
             DocumentBuilderFactory factory = getSecuredDocumentBuilder();
             DocumentBuilder builder = factory.newDocumentBuilder();
             return builder.parse(inputStream);
-        } catch (ParserConfigurationException e) {
-            throw new APIManagementException(errorMsg, e);
-        } catch (IOException e) {
-            throw new APIManagementException(errorMsg, e);
-        } catch (SAXException e) {
+        } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new APIManagementException(errorMsg, e);
         } finally {
-            if(inputStream != null) {
+            if (inputStream != null) {
                 IOUtils.closeQuietly(inputStream);
             }
         }
@@ -1080,7 +1088,7 @@ public class APIMWSDLReader {
      * @return WSDL validation response
      * @throws APIMgtWSDLException if error occurred while retrieving WSDL info
      */
-    private static WSDLValidationResponse getWsdlValidationResponse(WSDLProcessor  processor)
+    public static WSDLValidationResponse getWsdlValidationResponse(WSDLProcessor processor)
             throws APIMgtWSDLException {
         WSDLValidationResponse wsdlValidationResponse = new WSDLValidationResponse();
         if (processor.hasError()) {

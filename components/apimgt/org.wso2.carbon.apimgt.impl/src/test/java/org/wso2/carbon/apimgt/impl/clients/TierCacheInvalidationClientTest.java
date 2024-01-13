@@ -96,7 +96,7 @@ public class TierCacheInvalidationClientTest {
 
     @Test
     public void testShouldNotClearCachesWhenParametersIncorrect() throws APIManagementException, RemoteException {
-        Mockito.doThrow(Exception.class).when(cacheStub).invalidateCache(TENANT_DOMAIN);
+        Mockito.doThrow(RemoteException.class).when(cacheStub).invalidateCache(TENANT_DOMAIN);
         Mockito.when(amConfig.getFirstProperty(Mockito.anyString()))
                 .thenReturn(null)
                 .thenReturn(USERNAME)

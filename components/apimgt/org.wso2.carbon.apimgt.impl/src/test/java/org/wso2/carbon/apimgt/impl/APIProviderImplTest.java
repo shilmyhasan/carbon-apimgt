@@ -76,7 +76,6 @@ import org.wso2.carbon.apimgt.impl.certificatemgt.CertificateManagerImpl;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dao.ScopesDAO;
 import org.wso2.carbon.apimgt.impl.definitions.GraphQLSchemaDefinition;
-import org.wso2.carbon.apimgt.impl.definitions.OAS3Parser;
 import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
 import org.wso2.carbon.apimgt.impl.dto.KeyManagerDto;
@@ -101,7 +100,6 @@ import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
-import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifactImpl;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.governance.custom.lifecycles.checklist.beans.LifecycleBean;
 import org.wso2.carbon.governance.custom.lifecycles.checklist.util.CheckListItem;
@@ -121,7 +119,6 @@ import org.wso2.carbon.registry.core.pagination.PaginationContext;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
-import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
@@ -162,8 +159,7 @@ import static org.wso2.carbon.apimgt.impl.token.ClaimsRetriever.DEFAULT_DIALECT_
         GovernanceUtils.class, PrivilegedCarbonContext.class, WorkflowExecutorFactory.class, JavaUtils.class,
         APIProviderImpl.class, APIManagerFactory.class, RegistryUtils.class, ThrottlePolicyDeploymentManager.class,
         LifecycleBeanPopulator.class, Caching.class, PaginationContext.class, MultitenantUtils.class,
-        AbstractAPIManager.class, OASParserUtil.class, KeyManagerHolder.class, CertificateManagerImpl.class ,
-        ScopesDAO.class})
+        AbstractAPIManager.class, OASParserUtil.class, KeyManagerHolder.class, CertificateManagerImpl.class})
 public class APIProviderImplTest {
 
     private static String EP_CONFIG_WSDL = "{\"production_endpoints\":{\"url\":\"http://ws.cdyne.com/phoneverify/phoneverify.asmx?wsdl\""
@@ -183,7 +179,6 @@ public class APIProviderImplTest {
     public void init() throws Exception {
         System.setProperty("carbon.home", APIProviderImplTest.class.getResource("/").getFile());
         PowerMockito.mockStatic(ApiMgtDAO.class);
-        PowerMockito.mockStatic(ScopesDAO.class);
         PowerMockito.mockStatic(PrivilegedCarbonContext.class);
         PowerMockito.mockStatic(RegistryUtils.class);
         PowerMockito.mockStatic(GovernanceUtils.class);
@@ -448,47 +443,6 @@ public class APIProviderImplTest {
     }
 
     @Test
-    public void testGetCustomInSequences1() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        mockSequences(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_IN,
-                apiId);
-        List<String> sequenceList = apiProvider.getCustomInSequences();
-        Assert.assertNotNull(sequenceList);
-        Assert.assertEquals(1, sequenceList.size());
-
-        // OMException when building OMElement
-        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
-        apiProvider.getCustomOutSequences(apiId);
-
-        //org.wso2.carbon.registry.api.RegistryException
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION)).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Error while processing the in in the registry";
-        try {
-            apiProvider.getCustomInSequences();
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
-        }
-
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        String msg1 = "Error while retrieving registry for tenant -1";
-        try {
-            apiProvider.getCustomInSequences();
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg1, e.getMessage());
-        }
-    }
-
-    @Test
     public void testGetCustomInSequencesSorted() throws Exception {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
@@ -499,88 +453,6 @@ public class APIProviderImplTest {
         Assert.assertEquals(2, sequenceList.size());
         Assert.assertEquals(sequenceList.get(0), "abc");
         Assert.assertEquals(sequenceList.get(1), "pqr");
-    }
-
-    @Test
-    public void testGetCustomOutSequences1() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        mockSequences(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_OUT,
-                apiId);
-        List<String> sequenceList = apiProvider.getCustomOutSequences();
-        Assert.assertNotNull(sequenceList);
-        Assert.assertEquals(1, sequenceList.size());
-
-        // OMException when building OMElement
-        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
-        apiProvider.getCustomOutSequences();
-
-        //org.wso2.carbon.registry.api.RegistryException
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION)).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Error while processing the out in the registry";
-        try {
-            apiProvider.getCustomOutSequences();
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
-        }
-
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        String msg1 = "Error while retrieving registry for tenant -1";
-        try {
-            apiProvider.getCustomOutSequences();
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg1, e.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetCustomFaultSequences1() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        mockSequences(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT,
-                apiId);
-        List<String> sequenceList = apiProvider.getCustomFaultSequences();
-        Assert.assertNotNull(sequenceList);
-        Assert.assertEquals(1, sequenceList.size());
-
-        // OMException when building OMElement
-        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
-        apiProvider.getCustomFaultSequences();
-
-        //org.wso2.carbon.registry.api.RegistryException
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION)).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Error while processing the fault in the registry";
-        try {
-            apiProvider.getCustomFaultSequences();
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
-        }
-
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        String msg1 = "Error while retrieving registry for tenant -1";
-        try {
-            apiProvider.getCustomFaultSequences();
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg1, e.getMessage());
-        }
     }
 
     @Test
@@ -611,134 +483,6 @@ public class APIProviderImplTest {
         // status false
         assertTrue(apiProvider.changeAPILCCheckListItems(apiId, 10, true));
 
-    }
-
-    @Test
-    public void testGetCustomApiInSequences() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        mockSequences(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_IN,
-                apiId);
-        List<String> sequenceList = apiProvider.getCustomApiInSequences(apiId);
-        Assert.assertEquals(1, sequenceList.size());
-
-        // OMException when building OMElement
-        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
-        apiProvider.getCustomApiInSequences(apiId);
-
-        //org.wso2.carbon.registry.api.RegistryException
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIUtil.getSequencePath(apiId,
-                APIConstants.API_CUSTOM_SEQUENCE_TYPE_IN))).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Error while processing the " + APIConstants.API_CUSTOM_SEQUENCE_TYPE_IN +
-                " sequences of " + apiId + " in the registry";
-        try {
-            apiProvider.getCustomApiInSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
-        }
-
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        String msg1 = "Error while retrieving registry for tenant -1";
-        try {
-            apiProvider.getCustomApiInSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg1, e.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetCustomApiOutSequences() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        mockSequences(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_OUT,
-                apiId);
-        List<String> sequenceList = apiProvider.getCustomApiOutSequences(apiId);
-        Assert.assertNotNull(sequenceList);
-        Assert.assertEquals(1, sequenceList.size());
-
-        // OMException when building OMElement
-        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
-        apiProvider.getCustomApiOutSequences(apiId);
-
-        //org.wso2.carbon.registry.api.RegistryException
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIUtil.getSequencePath(apiId,
-                APIConstants.API_CUSTOM_SEQUENCE_TYPE_OUT))).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Error while processing the " + APIConstants.API_CUSTOM_SEQUENCE_TYPE_OUT +
-                " sequences of " + apiId + " in the registry";
-        try {
-            apiProvider.getCustomApiOutSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
-        }
-
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        String msg1 = "Error while retrieving registry for tenant -1";
-        try {
-            apiProvider.getCustomApiOutSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg1, e.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetCustomApiFaultSequences() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        mockSequences(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT,
-                apiId);
-        List<String> sequenceList = apiProvider.getCustomApiFaultSequences(apiId);
-        Assert.assertNotNull(sequenceList);
-        Assert.assertEquals(1, sequenceList.size());
-
-        // OMException when building OMElement
-        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
-        apiProvider.getCustomApiFaultSequences(apiId);
-
-        //org.wso2.carbon.registry.api.RegistryException
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIUtil.getSequencePath(apiId,
-                APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT))).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Error while processing the " + APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT +
-                " sequences of " + apiId + " in the registry";
-        try {
-            apiProvider.getCustomApiFaultSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
-        }
-
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        String msg1 = "Error while retrieving registry for tenant -1";
-        try {
-            apiProvider.getCustomApiFaultSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg1, e.getMessage());
-        }
     }
 
     @Test
@@ -942,21 +686,7 @@ public class APIProviderImplTest {
         assertEquals(configuredClaims.split(",").length, subscriberClaims.size());
     }
 
-    @Test
-    public void testAddTier() throws APIManagementException, RegistryException {
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        Tier tier = new Tier("testTier");
-        tier.setDescription("testDescription");
-        tier.setTierPlan("testPlan");
 
-        Map<String, Tier> tierMap = new HashMap<String, Tier>();
-        tierMap.put("tier", tier);
-        PowerMockito.when(APIUtil.getAllTiers()).thenReturn(tierMap);
-        Resource resource = new ResourceImpl();
-        Mockito.when(apiProvider.registry.newResource()).thenReturn(resource);
-        apiProvider.addTier(tier);
-        Mockito.verify(apiProvider.registry);
-    }
 
     @Test
     public void testGetExternalWorkflowReferenceId() throws APIManagementException {
@@ -1062,87 +792,6 @@ public class APIProviderImplTest {
         PowerMockito.when(APIUtil.searchAPIsByDoc(apiProvider.registry, apiProvider.tenantId,
                 apiProvider.username, "testTerm", APIConstants.PUBLISHER_CLIENT)).thenReturn(apiMap);
         assertEquals(apiMap, apiProvider.searchAPIsByDoc("testTerm", "testType"));
-    }
-
-
-    @Test
-    public void testRemoveTier() throws APIManagementException, RegistryException {
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        Tier tier = new Tier("testTier");
-        tier.setDescription("testDescription");
-        tier.setTierPlan("testPlan");
-
-        Map<String, Tier> tierMap = new HashMap<String, Tier>();
-        tierMap.put("tier", tier);
-        PowerMockito.when(APIUtil.getAllTiers()).thenReturn(tierMap);
-        Resource resource = new ResourceImpl();
-        Mockito.when(apiProvider.registry.newResource()).thenReturn(resource);
-
-        PowerMockito.when(APIUtil.getArtifactManager(apiProvider.registry, APIConstants.API_KEY)).
-                thenReturn(artifactManager);
-        GenericArtifact genericArtifact1 = new GenericArtifactImpl(new QName("local"), "artifact1");
-        GenericArtifact genericArtifact2 = new GenericArtifactImpl(new QName("local"), "artifact2");
-        GenericArtifact[] genericArtifacts = new GenericArtifact[]{genericArtifact1, genericArtifact2};
-        Mockito.when(artifactManager.findGovernanceArtifacts(Mockito.anyString()))
-                .thenReturn(null, genericArtifacts);
-        apiProvider.removeTier(tier);
-        try {
-            apiProvider.removeTier(tier);
-        } catch (APIManagementException e) {
-            assertEquals("Unable to remove this tier. Tier in use", e.getMessage());
-        }
-        Mockito.verify(apiProvider.registry);
-    }
-
-
-    @Test
-    public void testRemoveDocumentation() throws APIManagementException, RegistryException {
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        PowerMockito.when(APIUtil.getAPIDocPath(apiId) + "testDoc").thenReturn("testPath");
-        Resource resource = Mockito.mock(Resource.class);
-        Mockito.when(apiProvider.registry.get("testPathtestDoc")).thenReturn(resource);
-        Mockito.when(resource.getUUID()).thenReturn("1111");
-        PowerMockito.when(APIUtil.getArtifactManager(apiProvider.registry, APIConstants.DOCUMENTATION_KEY)).
-                thenReturn(artifactManager);
-        GenericArtifact genericArtifact = Mockito.mock(GenericArtifact.class);
-        Mockito.when(artifactManager.getGenericArtifact("1111")).thenReturn(genericArtifact);
-        Mockito.when(genericArtifact.getAttribute(APIConstants.DOC_FILE_PATH)).thenReturn("testDocPath");
-        Association association = Mockito.mock(Association.class);
-        Association[] associations = new Association[]{association};
-        Mockito.when(apiProvider.registry.getAssociations("testPathtestDoc", APIConstants.DOCUMENTATION_KEY)).
-                thenReturn(associations);
-        apiProvider.removeDocumentation(apiId, "testDoc", "testType");
-        Mockito.verify(apiProvider.registry);
-    }
-
-    @Test
-    public void testRemoveDocumentation1() throws APIManagementException, RegistryException {
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        PowerMockito.when(APIUtil.getArtifactManager(apiProvider.registry, APIConstants.DOCUMENTATION_KEY)).
-                thenReturn(artifactManager);
-        GenericArtifact artifact = Mockito.mock(GenericArtifact.class);
-        Mockito.when(artifactManager.getGenericArtifact("testId")).thenReturn(artifact);
-        Mockito.when(artifact.getPath()).thenReturn("docPath");
-        Mockito.when(artifact.getAttribute(APIConstants.DOC_FILE_PATH)).thenReturn("docFilePath");
-        Association association = Mockito.mock(Association.class);
-        Association[] associations = new Association[]{association};
-        Mockito.when(apiProvider.registry.getAssociations("docPath", APIConstants.DOCUMENTATION_KEY)).
-                thenReturn(associations);
-        apiProvider.removeDocumentation(apiId, "testId");
-        Mockito.verify(apiProvider.registry);
-    }
-
-    @Test
-    public void testCopyAllDocumentation() throws APIManagementException, RegistryException {
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        PowerMockito.when(APIUtil.getAPIDocPath(apiId)).thenReturn("oldVersion");
-        Resource resource = new ResourceImpl();
-        Mockito.when(apiProvider.registry.get("oldVersion")).thenReturn(resource);
-        apiProvider.copyAllDocumentation(apiId, "testVersion");
-        Mockito.verify(apiProvider.registry);
     }
 
     @Test
@@ -1562,127 +1211,6 @@ public class APIProviderImplTest {
     }
 
     @Test
-    public void testPropergateAPIStatusChangeToGateways() throws RegistryException, UserStoreException,
-            APIManagementException {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.0");
-        API api = new API(apiId);
-        api.setContext("/test");
-        api.setStatus(APIConstants.CREATED);
-        TestUtils.mockRegistryAndUserRealm(-1);
-
-        PowerMockito.mockStatic(ApiMgtDAO.class);
-        PowerMockito.mockStatic(JavaUtils.class);
-        ApiMgtDAO apimgtDAO = Mockito.mock(ApiMgtDAO.class);
-        UserRegistry configRegistry = Mockito.mock(UserRegistry.class);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(ApiMgtDAO.getInstance()).thenReturn(apimgtDAO);
-        Mockito.when(apimgtDAO.addAPI(api, -1)).thenReturn(1);
-        Mockito.doNothing().when(apimgtDAO).addURITemplates(1, api, -1);
-        Mockito.doNothing().when(keyManager).attachResourceScopes(api, api.getUriTemplates());
-
-        PowerMockito.mockStatic(APIUtil.class);
-        PowerMockito.when(APIUtil.replaceEmailDomain(apiId.getProviderName())).thenReturn("admin");
-        PowerMockito.when(APIUtil.replaceEmailDomainBack(api.getId().getProviderName())).thenReturn("admin");
-
-        Map<String, Map<String, String>> failedGateways = new ConcurrentHashMap<String, Map<String, String>>();
-
-        PowerMockito.when(APIUtil.getArtifactManager(any(Registry.class), ArgumentMatchers.anyString()))
-                .thenReturn(artifactManager);
-        Mockito.when(artifactManager.newGovernanceArtifact(any(QName.class))).thenReturn(artifact);
-        Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
-        Mockito.doNothing().when(artifact).attachLifecycle(APIConstants.API_LIFE_CYCLE);
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
-        String artifactPath = "artifact/path";
-        PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, artifact.getId())).
-                thenReturn(artifactPath);
-        RegistryService rs = Mockito.mock(RegistryService.class);
-        UserRegistry userRegistry = Mockito.mock(UserRegistry.class);
-        ServiceReferenceHolder srh = TestUtils.getServiceReferenceHolder();
-        RealmService realmService = Mockito.mock(RealmService.class);
-        TenantManager tenantManager = Mockito.mock(TenantManager.class);
-
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(srh);
-        Mockito.when(srh.getRegistryService()).thenReturn(rs);
-        Mockito.when(rs.getConfigSystemRegistry(Mockito.anyInt())).thenReturn(userRegistry);
-        Mockito.when(srh.getRealmService()).thenReturn(realmService);
-        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-        apiProvider.addAPI(api);
-
-        //No state changes
-        Map<String, String> failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId,
-                APIConstants.CREATED);
-        Assert.assertEquals(0, failedGatewaysReturned.size());
-        Assert.assertEquals(APIConstants.CREATED, api.getStatus());
-
-        ServiceReferenceHolder serviceReferenceHolder = TestUtils.mockAPIMConfiguration(APIConstants.API_GATEWAY_TYPE,
-                APIConstants.API_GATEWAY_TYPE_SYNAPSE, -1);
-        PowerMockito.when(apimgtDAO.getPublishedDefaultVersion(api.getId())).thenReturn("1.0.0");
-
-        //Change to PUBLISHED state
-        //Existing APIs of the provider
-        API api1 = new API(new APIIdentifier("admin", "API1", "0.0.5"));
-        api1.setStatus(APIConstants.PUBLISHED);
-        API api2 = new API(new APIIdentifier("admin", "API2", "1.0.0"));
-
-        prepareForGetAPIsByProvider(artifactManager, apiProvider, "admin", api1, api2);
-        //  artifactManager, apiProvider, "admin", api1, api2
-        PowerMockito.when(serviceReferenceHolder.getRegistryService()).thenReturn(registryService);
-        PowerMockito.when(registryService.getConfigSystemRegistry(-1)).thenReturn(configRegistry);
-        PowerMockito.when(configRegistry.resourceExists(APIConstants.API_TENANT_CONF_LOCATION)).thenReturn(false);
-        PowerMockito.when(JavaUtils.isTrueExplicitly("false")).thenReturn(false);
-
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, -1234))
-                .thenReturn(registry);
-
-        APIManagerConfiguration amConfig = Mockito.mock(APIManagerConfiguration.class);
-        APIManagerConfigurationService amConfigService = Mockito.mock(APIManagerConfigurationService.class);
-        PowerMockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).thenReturn(amConfigService);
-        PowerMockito.when(amConfigService.getAPIManagerConfiguration()).thenReturn(amConfig);
-        Mockito.when(amConfig.getFirstProperty(APIConstants.API_GATEWAY_TYPE)).
-                thenReturn(APIConstants.API_GATEWAY_TYPE_SYNAPSE);
-
-        TenantManager tm = Mockito.mock(TenantManager.class);
-        PowerMockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
-        PowerMockito.when(realmService.getTenantManager()).thenReturn(tm);
-        PowerMockito.when(tm.getTenantId(ArgumentMatchers.anyString())).thenReturn(-1234);
-        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.PUBLISHED);
-
-        Assert.assertEquals(0, failedGatewaysReturned.size());
-        Assert.assertEquals(APIConstants.PUBLISHED, api.getStatus());
-
-        //Change to PUBLISHED state and error thrown while publishing
-        api.setStatus(APIConstants.CREATED);
-        Map<String, String> failedGWEnv = new HashMap<String, String>();
-        failedGWEnv.put("Production", "Failed to publish");
-        failedGateways.put("PUBLISHED", failedGWEnv);
-
-        Mockito.when(gatewayManager.publishToGateway(any(API.class), any(APITemplateBuilder.class),
-                ArgumentMatchers.anyString())).thenReturn(failedGWEnv);
-        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.PUBLISHED);
-        Assert.assertEquals(1, failedGatewaysReturned.size());
-        Assert.assertEquals(APIConstants.PUBLISHED, api.getStatus());
-
-        //Change to RETIRED state
-        api.setStatus(APIConstants.CREATED);
-        failedGateways.remove("PUBLISHED");
-
-        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.RETIRED);
-        Assert.assertEquals(0, failedGatewaysReturned.size());
-        Assert.assertEquals(APIConstants.RETIRED, api.getStatus());
-
-        //Change to RETIRED state and error thrown while un-publishing
-        api.setStatus(APIConstants.CREATED);
-        failedGateways.put("UNPUBLISHED", failedGWEnv);
-        Mockito.when(gatewayManager.removeFromGateway(any(API.class),
-                ArgumentMatchers.anyString())).thenReturn(failedGWEnv);
-
-        failedGatewaysReturned = apiProvider.propergateAPIStatusChangeToGateways(apiId, APIConstants.RETIRED);
-        Assert.assertEquals(1, failedGatewaysReturned.size());
-        Assert.assertEquals(APIConstants.RETIRED, api.getStatus());
-    }
-
-    @Test
     public void testEmailSentWhenPropergateAPIStatusChangeToGateways() throws Exception {
         APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.0");
         API api = new API(apiId);
@@ -1777,209 +1305,6 @@ public class APIProviderImplTest {
                     + apiId.getVersion(), e.getMessage());
         }
     }
-
-    @Test
-    public void testCreateNewAPIVersion() throws Exception {
-        //Create Original API
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.0");
-        API api = new API(apiId);
-        api.setContext("/test");
-        api.setVisibility("Public");
-        api.setStatus(APIConstants.CREATED);
-        api.setWsdlUrl("https://localhost:9443/services/echo?wsdl");
-
-        String newVersion = "1.0.1";
-        //Create new API object
-        APIIdentifier newApiId = new APIIdentifier("admin", "API1", "1.0.1");
-        final API newApi = new API(newApiId);
-        newApi.setStatus(APIConstants.CREATED);
-        newApi.setContext("/test");
-        newApi.setWsdlUrl("/registry/resource/_system/governance/apimgt/applicationdata/wsdls/admin--API11.0.0.wsdl");
-
-
-        //Create Documentation List
-        List<Documentation> documentationList = getDocumentationList();
-
-        final APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, documentationList, null);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        UserRegistry userRegistry = Mockito.mock(UserRegistry.class);
-        ServiceReferenceHolder serviceReferenceHolder = TestUtils.getServiceReferenceHolder();
-        RealmService realmService = Mockito.mock(RealmService.class);
-        TenantManager tenantManager = Mockito.mock(TenantManager.class);
-
-        Mockito.when(artifactManager.newGovernanceArtifact(any(QName.class))).thenReturn(artifact);
-        Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
-        Mockito.when(serviceReferenceHolder.getRegistryService()).thenReturn(registryService);
-        Mockito.when(registryService.getConfigSystemRegistry(Mockito.anyInt())).thenReturn(userRegistry);
-        Mockito.when(serviceReferenceHolder.getRealmService()).thenReturn(realmService);
-        Mockito.when(realmService.getTenantManager()).thenReturn(tenantManager);
-
-        GenericArtifact artifactNew = Mockito.mock(GenericArtifact.class);
-        Mockito.when(APIUtil.createAPIArtifactContent(artifact, newApi)).thenReturn(artifactNew);
-        apiProvider.addAPI(api);
-
-        String targetPath = APIConstants.API_LOCATION + RegistryConstants.PATH_SEPARATOR +
-                api.getId().getProviderName() +
-                RegistryConstants.PATH_SEPARATOR + api.getId().getApiName() +
-                RegistryConstants.PATH_SEPARATOR + newVersion +
-                APIConstants.API_RESOURCE_NAME;
-
-        String apiSourcePath = APIConstants.API_LOCATION + RegistryConstants.PATH_SEPARATOR +
-                apiId.getProviderName() +
-                RegistryConstants.PATH_SEPARATOR + apiId.getApiName() +
-                RegistryConstants.PATH_SEPARATOR + apiId.getVersion() +
-                APIConstants.API_RESOURCE_NAME;
-        PowerMockito.when(APIUtil.getAPIPath(apiId)).thenReturn(apiSourcePath);
-        String apiSourceUUID = "87ty543-899hyt";
-
-        Mockito.when(apiProvider.registry.resourceExists(targetPath)).thenReturn(false);
-        Mockito.doNothing().when(apiProvider.registry).beginTransaction();
-        Mockito.doNothing().when(apiProvider.registry).commitTransaction();
-
-        Resource apiSourceArtifact = Mockito.mock(Resource.class);
-        Mockito.when(apiProvider.registry.get(apiSourcePath)).thenReturn(apiSourceArtifact);
-
-
-        //Mocking Old API retrieval
-        Mockito.when(apiSourceArtifact.getUUID()).thenReturn(apiSourceUUID);
-
-        Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS)).thenReturn("PUBLISHED");
-        Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_CONTEXT)).thenReturn("test");
-        Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_CONTEXT_TEMPLATE)).thenReturn("test/{version}");
-        Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_WEBSOCKET)).thenReturn("false");
-        Mockito.when(artifact.getAttribute(APIConstants.API_OVERVIEW_VISIBLE_ROLES)).thenReturn("admin, subscriber");
-        Mockito.when(artifactManager.getGenericArtifact(apiSourceUUID)).thenReturn(artifact);
-
-        //Mocking thumbnail
-        String thumbUrl = APIConstants.API_IMAGE_LOCATION + RegistryConstants.PATH_SEPARATOR +
-                api.getId().getProviderName() + RegistryConstants.PATH_SEPARATOR +
-                api.getId().getApiName() + RegistryConstants.PATH_SEPARATOR +
-                api.getId().getVersion() + RegistryConstants.PATH_SEPARATOR + APIConstants.API_ICON_IMAGE;
-        Resource image = Mockito.mock(Resource.class);
-        Mockito.when(apiProvider.registry.get(thumbUrl)).thenReturn(image);
-        Mockito.when(apiProvider.registry.resourceExists(thumbUrl)).thenReturn(true);
-
-        //Mocking In sequence retrieval
-        String inSeqFilePath = "API1/1.0.0/in";
-        PowerMockito.when(APIUtil.getSequencePath(api.getId(), "in")).thenReturn(inSeqFilePath);
-        Mockito.when(apiProvider.registry.resourceExists(inSeqFilePath)).thenReturn(true);
-        Collection inSeqCollection = Mockito.mock(Collection.class);
-        Mockito.when(apiProvider.registry.get(inSeqFilePath)).thenReturn(inSeqCollection);
-        String[] inSeqChildPaths = {"path1"};
-        Mockito.when(inSeqCollection.getChildren()).thenReturn(inSeqChildPaths);
-
-        Mockito.when(apiProvider.registry.get(inSeqChildPaths[0])).thenReturn(apiSourceArtifact);
-        InputStream responseStream = IOUtils.toInputStream("<sequence name=\"in-seq\"></sequence>", "UTF-8");
-        OMElement seqElment = buildSecuredOMElement(responseStream);
-        PowerMockito.when(APIUtil.buildSecuredOMElement(responseStream)).thenReturn(seqElment);
-        Mockito.when(apiSourceArtifact.getContentStream()).thenReturn(responseStream);
-
-        //Mocking Out sequence retrieval
-        Resource apiSourceArtifact1 = Mockito.mock(Resource.class);
-        String outSeqFilePath = "API1/1.0.0/out";
-        PowerMockito.when(APIUtil.getSequencePath(api.getId(), "out")).thenReturn(outSeqFilePath);
-        Mockito.when(apiProvider.registry.resourceExists(outSeqFilePath)).thenReturn(true);
-        Collection outSeqCollection = Mockito.mock(Collection.class);
-        Mockito.when(apiProvider.registry.get(outSeqFilePath)).thenReturn(outSeqCollection);
-        String[] outSeqChildPaths = {"path2"};
-        Mockito.when(outSeqCollection.getChildren()).thenReturn(outSeqChildPaths);
-
-        Mockito.when(apiProvider.registry.get(outSeqChildPaths[0])).thenReturn(apiSourceArtifact1);
-        InputStream responseStream2 = IOUtils.toInputStream("<sequence name=\"in-seq\"></sequence>", "UTF-8");
-        OMElement seqElment2 = buildSecuredOMElement(responseStream2);
-        PowerMockito.when(APIUtil.buildSecuredOMElement(responseStream2)).thenReturn(seqElment2);
-        Mockito.when(apiSourceArtifact1.getContentStream()).thenReturn(responseStream2);
-
-        //Mock Adding new API artifact with new version
-        Mockito.doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                apiProvider.createAPI(newApi);
-                return null;
-            }
-        }).when(artifactManager).addGenericArtifact(artifact);
-        Mockito.doNothing().when(artifact).attachLifecycle(APIConstants.API_LIFE_CYCLE);
-        PowerMockito.when(APIUtil.getAPIProviderPath(api.getId())).thenReturn("/dummy/provider/path");
-        Mockito.doNothing().when(apiProvider.registry).addAssociation("/dummy/provider/path",
-                targetPath, APIConstants.PROVIDER_ASSOCIATION);
-
-        String artifactPath = "artifact/path";
-        PowerMockito.when(GovernanceUtils.getArtifactPath(apiProvider.registry, artifact.getId())).
-                thenReturn(artifactPath);
-        PowerMockito.doNothing().when(APIUtil.class);
-        String[] roles = {"admin", "subscriber"};
-        APIUtil.setResourcePermissions("admin", "Public", roles, artifactPath);
-
-        //Mock no tags case
-        Mockito.when(apiProvider.registry.getTags(apiSourcePath)).thenReturn(null);
-
-        // Mock WSDL retrieval
-        String wsdlUrl = APIUtil.getWSDLDefinitionFilePath(api.getId().getApiName(), api.getId().getVersion(), api
-                .getId().getProviderName());
-        PowerMockito.when(apiProvider.registry.resourceExists(wsdlUrl)).thenReturn(true);
-
-        //Mock new API retrieval
-        String newApiPath = "API1/1.0.1/";
-        PowerMockito.when(APIUtil.getAPIPath(newApi.getId())).thenReturn(newApiPath);
-        String newApiUUID = "87ty543-899hy23";
-        GenericArtifact newArtifact = Mockito.mock(GenericArtifact.class);
-        Resource newApiResource = Mockito.mock(Resource.class);
-        Mockito.when(newApiResource.getUUID()).thenReturn(newApiUUID);
-        Mockito.when(apiProvider.registry.get(newApiPath)).thenReturn(newApiResource);
-        Mockito.when(artifactManager.getGenericArtifact(newApiUUID)).thenReturn(newArtifact);
-        PowerMockito.when(APIUtil.getAPI(newArtifact, apiProvider.registry, api.getId(), "test")).thenReturn(newApi);
-
-        //Swagger resource
-        String resourcePath = APIUtil.getOpenAPIDefinitionFilePath(api.getId().getApiName(),
-                api.getId().getVersion(),
-                api.getId().getProviderName());
-        Mockito.when(apiProvider.registry.resourceExists(resourcePath + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME)).
-                thenReturn(true);
-        PowerMockito.mockStatic(OASParserUtil.class);
-        PowerMockito.doNothing().when(OASParserUtil.class, "verifyAPIDefinitionFromParser", Mockito.any(),
-                Mockito.any(), Mockito.any());
-        Mockito.when(OASParserUtil.getAPIDefinition(apiId, apiProvider.registry)).thenReturn(
-                "{\"info\": {\"swagger\":\"data\"}}");
-        Mockito.when(OASParserUtil.getOASParser(Mockito.anyString())).thenReturn(new OAS3Parser());
-        Mockito.doNothing().when(artifactManager).updateGenericArtifact(artifact);
-
-        // WSDL
-        String newWsdlResourcePath = APIUtil.getWSDLDefinitionFilePath(newApi.getId().getApiName(), newApi
-                .getId().getVersion(), newApi.getId().getProviderName());
-        PowerMockito.when(apiProvider.registry.copy(resourcePath, newWsdlResourcePath)).thenReturn(newWsdlResourcePath);
-
-        //Mock Config system registry
-        PowerMockito.when(tenantManager.getTenantId(ArgumentMatchers.anyString())).thenReturn(-1234);
-
-        AuthorizationManager authManager = Mockito.mock(AuthorizationManager.class);
-        UserRealm userRealm = Mockito.mock(UserRealm.class);
-        PowerMockito.when(realmService.getTenantUserRealm(-1234)).thenReturn(userRealm);
-        PowerMockito.when(userRealm.getAuthorizationManager()).thenReturn(authManager);
-
-        PowerMockito.when(registryService.getConfigSystemRegistry(-1234)).thenReturn(userRegistry);
-        Mockito.when(userRegistry.resourceExists(APIConstants.API_TENANT_CONF_LOCATION)).thenReturn(true);
-        Resource tenantConfResource = Mockito.mock(Resource.class);
-        Mockito.when(userRegistry.get(APIConstants.API_TENANT_CONF_LOCATION)).thenReturn(tenantConfResource);
-        Mockito.when(tenantConfResource.getContent()).thenReturn(getTenantConfigContent());
-
-        apiProvider.createNewAPIVersion(api, newVersion);
-        Assert.assertEquals(newVersion, apiProvider.getAPI(newApi.getId()).getId().getVersion());
-        Assert.assertEquals(newApi.getWsdlUrl(), apiProvider.getAPI(newApi.getId()).getWsdlUrl());
-
-        // Test if any errors are not thrown when info object is not present in swagger definition.
-        PowerMockito.doNothing().when(OASParserUtil.class, "verifyAPIDefinitionFromParser", Mockito.any(),
-                Mockito.any(), Mockito.any());
-        Mockito.when(OASParserUtil.getAPIDefinition(apiId, apiProvider.registry)).thenReturn(
-                "{\"swagger\":\"2.0\",\"schemes\":[\"https\"],\"consumes\":[\"application/json\"],\"produces\":"
-                        + "[\"application/json\"],\"security\":[{\"default\":[]}]}");
-        apiProvider.createNewAPIVersion(api, newVersion);
-        Mockito.when(OASParserUtil.getAPIDefinition(apiId, apiProvider.registry)).thenReturn(
-                "{\"openapi\":\"3.0.0\",\"servers\":[{\"url\":\"https://example.com\"}],\"paths\":{},"
-                        + "\"components\":{\"securitySchemes\":{\"default\":{}}}}\n");
-        apiProvider.createNewAPIVersion(api, newVersion);
-    }
-
     @Test
     public void testCreateNewAPIVersion_ForDefaultVersion() throws Exception {
         //Create Original API
@@ -3701,120 +3026,6 @@ public class APIProviderImplTest {
     }
 
     @Test
-    public void testGetAllPaginatedAPIs() throws RegistryException, UserStoreException, APIManagementException {
-        APIIdentifier apiId1 = new APIIdentifier("admin", "API1", "1.0.0");
-        API api1 = new API(apiId1);
-        api1.setContext("/test");
-
-        APIIdentifier apiId2 = new APIIdentifier("admin", "API2", "1.0.0");
-        API api2 = new API(apiId2);
-        api2.setContext("/test1");
-
-        PaginationContext paginationCtx = Mockito.mock(PaginationContext.class);
-        PowerMockito.when(PaginationContext.getInstance()).thenReturn(paginationCtx);
-        Mockito.when(paginationCtx.getLength()).thenReturn(2);
-
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
-        ServiceReferenceHolder sh = TestUtils.getServiceReferenceHolder();
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry userReg = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME,
-                -1234)).thenReturn(userReg);
-        PowerMockito.when(APIUtil.getArtifactManager(userReg, APIConstants.API_KEY)).thenReturn(artifactManager);
-
-        APIManagerConfigurationService amConfigService = Mockito.mock(APIManagerConfigurationService.class);
-        APIManagerConfiguration amConfig = Mockito.mock(APIManagerConfiguration.class);
-        PowerMockito.when(sh.getAPIManagerConfigurationService()).thenReturn(amConfigService);
-        PowerMockito.when(amConfigService.getAPIManagerConfiguration()).thenReturn(amConfig);
-        PowerMockito.when(amConfig.getFirstProperty(APIConstants.API_PUBLISHER_APIS_PER_PAGE)).thenReturn("2");
-        RealmService realmService = Mockito.mock(RealmService.class);
-        TenantManager tm = Mockito.mock(TenantManager.class);
-        PowerMockito.when(sh.getRealmService()).thenReturn(realmService);
-        PowerMockito.when(realmService.getTenantManager()).thenReturn(tm);
-        PowerMockito.when(tm.getTenantId("carbon.super")).thenReturn(-1234);
-
-        GenericArtifact genericArtifact1 = Mockito.mock(GenericArtifact.class);
-        GenericArtifact genericArtifact2 = Mockito.mock(GenericArtifact.class);
-        Mockito.when(APIUtil.getAPI(genericArtifact1)).thenReturn(api1);
-        Mockito.when(APIUtil.getAPI(genericArtifact2)).thenReturn(api2);
-        List<GovernanceArtifact> governanceArtifacts = new ArrayList<GovernanceArtifact>();
-        governanceArtifacts.add(genericArtifact1);
-        governanceArtifacts.add(genericArtifact2);
-        List<GovernanceArtifact> governanceArtifacts1 = new ArrayList<GovernanceArtifact>();
-        PowerMockito.when(GovernanceUtils
-                .findGovernanceArtifacts(Mockito.anyMap(), any(Registry.class), Mockito.anyString()))
-                .thenReturn(governanceArtifacts, governanceArtifacts1);
-        Map<String, Object> result = apiProvider.getAllPaginatedAPIs("carbon.super", 0, 10);
-        List<API> apiList = (List<API>) result.get("apis");
-        Assert.assertEquals(2, apiList.size());
-        Assert.assertEquals("API1", apiList.get(0).getId().getApiName());
-        Assert.assertEquals("API2", apiList.get(1).getId().getApiName());
-        Assert.assertEquals(2, result.get("totalLength"));
-
-        //No APIs available
-        Map<String, Object> result1 = apiProvider.getAllPaginatedAPIs("carbon.super", 0, 10);
-        List<API> apiList1 = (List<API>) result1.get("apis");
-        Assert.assertEquals(0, apiList1.size());
-        //Registry Exception while retrieving artifacts
-        Mockito.when(artifactManager.findGenericArtifacts(ArgumentMatchers.anyMap())).thenThrow(RegistryException.class);
-        try {
-            apiProvider.getAllPaginatedAPIs("carbon.super", 0, 10);
-        } catch (APIManagementException e) {
-            Assert.assertEquals("Failed to get all APIs", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testAddDocumentationContent() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.0");
-        API api = new API(apiId);
-
-        String docName = "HowTo";
-        Documentation doc = new Documentation(DocumentationType.HOWTO, docName);
-        doc.setVisibility(DocumentVisibility.API_LEVEL);
-        String docPath = "/apimgt/applicationdata/provider/admin/API1/1.0.0/documentation/contents";
-        String documentationPath = docPath + docName;
-        String contentPath = docPath + APIConstants.INLINE_DOCUMENT_CONTENT_DIR +
-                RegistryConstants.PATH_SEPARATOR + docName;
-
-        Mockito.when(APIUtil.getAPIDocPath(apiId)).thenReturn(docPath);
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
-        Resource docResource = Mockito.mock(Resource.class);
-        Mockito.when(docResource.getUUID()).thenReturn("678ghk");
-        Mockito.when(apiProvider.registry.get(documentationPath)).thenReturn(docResource);
-
-        GenericArtifact docArtifact = Mockito.mock(GenericArtifact.class);
-        PowerMockito.whenNew(GenericArtifactManager.class).withAnyArguments().thenReturn(artifactManager);
-        Mockito.when(artifactManager.getGenericArtifact("678ghk")).thenReturn(docArtifact);
-        Mockito.when(APIUtil.getDocumentation(docArtifact)).thenReturn(doc);
-
-        Resource docContent = Mockito.mock(Resource.class);
-        Mockito.when(apiProvider.registry.resourceExists(contentPath)).thenReturn(true, false);
-        Mockito.when(apiProvider.registry.get(contentPath)).thenReturn(docContent);
-        Mockito.when(apiProvider.registry.newResource()).thenReturn(docContent);
-        apiProvider.addDocumentationContent(api, docName, "content");
-
-        RegistryAuthorizationManager registryAuthorizationManager = Mockito.mock(RegistryAuthorizationManager.class);
-        PowerMockito.whenNew(RegistryAuthorizationManager.class).withAnyArguments()
-                .thenReturn(registryAuthorizationManager);
-        apiProvider.tenantDomain = "carbon.super";
-        doc.setVisibility(DocumentVisibility.OWNER_ONLY);
-        apiProvider.addDocumentationContent(api, docName, "content");
-        doc.setVisibility(DocumentVisibility.PRIVATE);
-        apiProvider.addDocumentationContent(api, docName, "content");
-        Mockito.doThrow(RegistryException.class).when(apiProvider.registry).put(ArgumentMatchers.anyString(),
-                any(Resource.class));
-        try {
-            apiProvider.addDocumentationContent(api, docName, "content");
-        } catch (APIManagementException e) {
-            String msg = "Failed to add the documentation content of : "
-                    + docName + " of API :" + apiId.getApiName();
-            Assert.assertEquals(msg, e.getMessage());
-        }
-    }
-
-    @Test
     public void testSearchAPIs() throws APIManagementException, RegistryException {
         //APIs of the provider
         API api1 = new API(new APIIdentifier("admin", "API1", "1.0.1"));
@@ -4049,95 +3260,12 @@ public class APIProviderImplTest {
         String providerId = "admin";
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
         //Mock to throw exception when retrieving APIs
-        Mockito.when(artifactManager.getAllGenericArtifacts()).thenThrow(RegistryException.class);
+        Mockito.when(artifactManager.getAllGenericArtifacts()).
+                thenThrow(org.wso2.carbon.governance.api.exception.GovernanceException.class);
         try {
             apiProvider.searchAPIs("API", "Name", null);
         } catch (APIManagementException e) {
             Assert.assertEquals("Failed to search APIs with type", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetCustomFaultSequences() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
-        mockSequences(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT,
-                apiId);
-        List<String> sequenceList = apiProvider.getCustomFaultSequences(apiId);
-        Assert.assertNotNull(sequenceList);
-        Assert.assertEquals(2, sequenceList.size());
-        Assert.assertTrue(sequenceList.contains("fault-seq"));
-        Assert.assertTrue(sequenceList.contains("custom-fault-seq"));
-
-        // OMException when building OMElement
-        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
-        apiProvider.getCustomFaultSequences(apiId);
-
-        //org.wso2.carbon.registry.api.RegistryException
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION)).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Error while processing the " + APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT
-                + " sequences of " + apiId + " in the registry";
-        try {
-            apiProvider.getCustomFaultSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
-        }
-
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        try {
-            apiProvider.getCustomFaultSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals("Error while retrieving registry for tenant -1", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetCustomInSequences() throws Exception {
-        APIIdentifier apiId = new APIIdentifier("admin", "API1", "1.0.1");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null, null);
-        mockSequences(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_IN,
-                apiId);
-        List<String> sequenceList = apiProvider.getCustomInSequences(apiId);
-        Assert.assertNotNull(sequenceList);
-        Assert.assertEquals(2, sequenceList.size());
-        Assert.assertTrue(sequenceList.contains("fault-seq"));
-        Assert.assertTrue(sequenceList.contains("custom-fault-seq"));
-
-        // OMException when building OMElement
-        PowerMockito.when(APIUtil.buildSecuredOMElement(any(InputStream.class))).thenThrow(new OMException());
-        apiProvider.getCustomInSequences(apiId);
-
-        //org.wso2.carbon.registry.api.RegistryException
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_INSEQUENCE_LOCATION)).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Issue is in getting custom InSequences from the Registry";
-        try {
-            apiProvider.getCustomInSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
-        }
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        try {
-            apiProvider.getCustomInSequences(apiId);
-        } catch (APIManagementException e) {
-            Assert.assertEquals(msg, e.getMessage());
         }
     }
 
@@ -4166,7 +3294,7 @@ public class APIProviderImplTest {
         UserRegistry registry = Mockito.mock(UserRegistry.class);
         PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
         Mockito.when(registry.resourceExists(APIConstants.API_CUSTOM_OUTSEQUENCE_LOCATION)).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
+                org.wso2.carbon.registry.core.exceptions.RegistryException.class);
         String msg = "Issue is in getting custom OutSequences from the Registry";
         try {
             apiProvider.getCustomOutSequences(apiId);
@@ -4181,43 +3309,6 @@ public class APIProviderImplTest {
             apiProvider.getCustomOutSequences(apiId);
         } catch (APIManagementException e) {
             Assert.assertEquals(msg, e.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetSequenceFile() throws Exception {
-        APIIdentifier apiIdentifier = new APIIdentifier("admin", "API1", "1.0");
-        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO,scopesDAO, null,null);
-        mockSequences(APIConstants.API_CUSTOM_FAULTSEQUENCE_LOCATION, APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT,
-                apiIdentifier);
-
-        String sequenceContent = apiProvider.getSequenceFileContent(apiIdentifier, "fault", "custom-fault-seq");
-        Assert.assertNotNull(sequenceContent);
-
-        ServiceReferenceHolder sh = PowerMockito.mock(ServiceReferenceHolder.class);
-        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(sh);
-        RegistryService registryService = Mockito.mock(RegistryService.class);
-        PowerMockito.when(sh.getRegistryService()).thenReturn(registryService);
-        UserRegistry registry = Mockito.mock(UserRegistry.class);
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenReturn(registry);
-        Mockito.when(registry.resourceExists(APIUtil.getSequencePath(apiIdentifier,
-                APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT))).thenThrow(
-                org.wso2.carbon.registry.api.RegistryException.class);
-        String msg = "Error while processing the " + APIConstants.API_CUSTOM_SEQUENCE_TYPE_FAULT +" sequences of " +
-                apiIdentifier + " in the registry";
-        try {
-            apiProvider.getSequenceFileContent(apiIdentifier, "fault", "custom-fault-seq");
-        } catch(APIManagementException e) {
-            Assert.assertTrue(e.getMessage().contains(msg));
-        }
-        //Registry Exception
-        PowerMockito.when(registryService.getGovernanceSystemRegistry(ArgumentMatchers.anyInt())).thenThrow(
-                RegistryException.class);
-        String msg1 =  "Error while retrieving registry for tenant -1";
-        try {
-            apiProvider.getSequenceFileContent(apiIdentifier, "fault", "custom-fault-seq");
-        } catch(APIManagementException e) {
-            Assert.assertTrue(e.getMessage().contains(msg1));
         }
     }
 

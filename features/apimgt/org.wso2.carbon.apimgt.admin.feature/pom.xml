@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.apimgt</groupId>
         <artifactId>apimgt-feature</artifactId>
-        <version>6.7.206.482-SNAPSHOT</version>
+        <version>6.7.210-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -165,7 +165,7 @@
                                 <bundleDef>org.wso2.carbon.identity.governance:org.wso2.carbon.identity.multi.attribute.login.service:${carbon.identity.governance.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.identity.outbound.auth.oidc:org.wso2.carbon.identity.application.authenticator.oidc:${carbon.identity-outbound-auth-openid.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.identity.user.functionality.mgt:${carbon.identity.version}</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.poi:poi-ooxml:${apache.poi.version}</bundleDef>
+                                <bundleDef>org.apache.poi.wso2:poi-ooxml:${apache.poi.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.googlecode.json-simple:json-simple</bundleDef>
                                 <bundleDef>com.google.code.gson:gson:${google.code.gson.version}</bundleDef>
                                 <bundleDef>net.sf.ehcache.wso2:ehcache</bundleDef>

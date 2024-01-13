@@ -4,7 +4,7 @@
     <groupId>org.wso2.carbon.apimgt</groupId>
     <artifactId>carbon-apimgt</artifactId>
     <packaging>pom</packaging>
-    <version>6.7.206.482-SNAPSHOT</version>
+    <version>6.7.210-SNAPSHOT</version>
     <name>WSO2 Carbon - API Management Aggregator POM</name>
     <url>https://wso2.org</url>
 
@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.wso2</groupId>
         <artifactId>wso2</artifactId>
-        <version>1.2</version>
+        <version>1.3</version>
     </parent>
 
     <modules>
@@ -102,7 +102,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>${maven.war.plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -223,6 +223,10 @@
                             <jacoco-agent.destfile>${basedir}/target/coverage-reports/jacoco-ut.exec
                             </jacoco-agent.destfile>
                         </systemPropertyVariables>
+                        <argLine>
+                            --add-opens=java.xml/jdk.xml.internal=ALL-UNNAMED
+                            --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
+                        </argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -723,7 +727,7 @@
             </dependency>
 
             <dependency>
-                <groupId>org.wso2.orbit.org.apache.poi</groupId>
+                <groupId>org.apache.poi.wso2</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${apache.poi.version}</version>
             </dependency>
@@ -797,6 +801,12 @@
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.ui</artifactId>
                 <version>${carbon.kernel.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>wsdl4j.wso2</groupId>
+                        <artifactId>wsdl4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -815,6 +825,16 @@
                 <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.event.core</artifactId>
                 <version>${carbon.commons.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>wsdl4j</groupId>
+                        <artifactId>wsdl4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>wsdl4j.wso2</groupId>
+                        <artifactId>wsdl4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -833,6 +853,32 @@
                 <groupId>org.wso2.carbon.registry</groupId>
                 <artifactId>org.wso2.carbon.registry.ws.client</artifactId>
                 <version>${carbon.registry.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.opensaml</groupId>
+                        <artifactId>opensaml</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.opensaml</groupId>
+                        <artifactId>opensaml1</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>wsdl4j.wso2</groupId>
+                        <artifactId>wsdl4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-dbcp</groupId>
+                        <artifactId>commons-dbcp</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-fileupload</groupId>
+                        <artifactId>commons-fileupload</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -845,6 +891,12 @@
                 <groupId>org.wso2.carbon.governance</groupId>
                 <artifactId>org.wso2.carbon.governance.api</artifactId>
                 <version>${carbon.governance.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.wso2.carbon.registry</groupId>
+                        <artifactId>org.wso2.carbon.registry.extensions</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -858,6 +910,12 @@
                 <groupId>org.wso2.carbon.governance</groupId>
                 <artifactId>org.wso2.carbon.governance.custom.lifecycles.checklist</artifactId>
                 <version>${carbon.governance.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.ops4j.pax.logging</groupId>
+                        <artifactId>pax-logging-log4j2</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -888,6 +946,16 @@
                 <groupId>org.apache.axis2.wso2</groupId>
                 <artifactId>axis2-client</artifactId>
                 <version>${axis2.wso2.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.axis2.wso2</groupId>
+                        <artifactId>axis2-json</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>wsdl4j.wso2</groupId>
+                        <artifactId>wsdl4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -906,6 +974,12 @@
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core</artifactId>
                 <version>${carbon.kernel.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.wso2.org.ops4j.pax.logging</groupId>
+                        <artifactId>pax-logging-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -989,6 +1063,10 @@
                         <groupId>org.wso2.carbon</groupId>
                         <artifactId>org.wso2.carbon.logging</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.calcite.avatica</groupId>
+                        <artifactId>avatica-core</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -996,6 +1074,32 @@
                 <groupId>org.wso2.carbon.governance</groupId>
                 <artifactId>org.wso2.carbon.governance.registry.extensions</artifactId>
                 <version>${carbon.governance.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>wsdl4j</groupId>
+                        <artifactId>wsdl4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>wsdl4j.wso2</groupId>
+                        <artifactId>wsdl4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xalan</groupId>
+                        <artifactId>xalan</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-dbcp</groupId>
+                        <artifactId>commons-dbcp</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents.wso2</groupId>
+                        <artifactId>httpclient</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-fileupload</groupId>
+                        <artifactId>commons-fileupload</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -1008,6 +1112,10 @@
                         <artifactId>opensaml</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>org.opensaml</groupId>
+                        <artifactId>opensaml-saml-impl</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>ua.parser.wso2</groupId>
                         <artifactId>ua-parser</artifactId>
                     </exclusion>
@@ -1018,6 +1126,16 @@
                 <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
                 <artifactId>org.wso2.carbon.identity.oauth</artifactId>
                 <version>${carbon.identity-inbound-auth-oauth.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-core</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -1193,7 +1311,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>${mockito.all.version}</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -1201,6 +1319,12 @@
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-junit4</artifactId>
                 <version>${powermock.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                    </exclusion>
+                </exclusions>
                 <scope>test</scope>
             </dependency>
 
@@ -1233,6 +1357,20 @@
                 <artifactId>spring-context</artifactId>
                 <version>${spring-web.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.orbit.org.opensaml</groupId>
+                <artifactId>opensaml</artifactId>
+                <version>${opensaml3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.opensaml</groupId>
+                <artifactId>xmltooling</artifactId>
+                <version>${opensaml.xmltooling.version}</version>
+                <scope>test</scope>
+            </dependency>
+
 
             <dependency>
                 <groupId>junit</groupId>
@@ -1421,6 +1559,12 @@
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.stream.core</artifactId>
                 <version>${carbon.analytics.common.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
@@ -1622,6 +1766,16 @@
                 <groupId>org.wso2.securevault</groupId>
                 <artifactId>org.wso2.securevault</artifactId>
                 <version>${wso2.securevault.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-cli</groupId>
+                        <artifactId>commons-cli</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.openapitools</groupId>
@@ -1685,9 +1839,21 @@
                 <version>${jaeger.client.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.ibm.icu</groupId>
+                <artifactId>icu4j</artifactId>
+                <version>58.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.orbit.io.fabric8</groupId>
                 <artifactId>kubernetes-client</artifactId>
                 <version>${org.wso2.orbit.io.fabric8.kubernetes.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>junit-jupiter-api</groupId>
+                        <artifactId>org.junit.jupiter</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.apache.commons</groupId>
@@ -1755,6 +1921,16 @@
                 <artifactId>netty-codec-http</artifactId>
                 <version>${netty.version}</version>
             </dependency>
+            <dependency>
+                <groupId>javax.jms</groupId>
+                <artifactId>javax.jms-api</artifactId>
+                <version>${javax.jms.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax.annotation.verion}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1764,7 +1940,7 @@
 
         <!-- APIM Component Version -->
         <hamcrest.version>1.3</hamcrest.version>
-        <carbon.apimgt.version>6.7.206.482-SNAPSHOT</carbon.apimgt.version>
+        <carbon.apimgt.version>6.7.210-SNAPSHOT</carbon.apimgt.version>
         <carbon.apimgt.imp.pkg.version>[6.0.0, 7.0.0)</carbon.apimgt.imp.pkg.version>
 
         <carbon.analytics.common.version>5.2.26</carbon.analytics.common.version>
@@ -1773,8 +1949,8 @@
         <carbon.kernel.feature.version>4.6.4-SNAPSHOT</carbon.kernel.feature.version>
         <carbon.kernel.package.import.version.range>[4.5.0, 5.0.0)</carbon.kernel.package.import.version.range>
 
-        <carbon.commons.version>4.7.32.4-SNAPSHOT</carbon.commons.version>
-        <carbon.registry.version>4.7.35.7-SNAPSHOT</carbon.registry.version>
+        <carbon.commons.version>4.7.52-SNAPSHOT</carbon.commons.version>
+        <carbon.registry.version>4.7.51-SNAPSHOT</carbon.registry.version>
         <carbon.mediation.version>4.7.182-SNAPSHOT</carbon.mediation.version>
 
         <!-- Carbon Identity versions -->
@@ -1881,7 +2057,7 @@
         <json-simple.wso2.version>1.1.1.wso2v2</json-simple.wso2.version>
         <json-simple.version.range>[0.0,3.0)</json-simple.version.range>
         <apache.woden.version>1.0.0.M9-wso2v1</apache.woden.version>
-        <apache.poi.version>5.2.3.wso2v1</apache.poi.version>
+        <apache.poi.version>3.9.0.wso2v3</apache.poi.version>
         <rhino.js.version>1.7.0.R4.wso2v1</rhino.js.version>
         <owasp.encoder.version>1.2.2</owasp.encoder.version>
 
@@ -1891,7 +2067,7 @@
         <commons-io.version>2.10.0.wso2v1</commons-io.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <google.code.gson.version>2.9.1</google.code.gson.version>
-        <httpcomponents.version>4.5.10</httpcomponents.version>
+        <httpcomponents.version>4.5.14</httpcomponents.version>
         <commons-codec.version>1.14</commons-codec.version>
         <com.nimbusds.wso2.version>7.3.0.wso2v1</com.nimbusds.wso2.version>
         <netty.version>4.1.100.Final</netty.version>
@@ -1902,8 +2078,9 @@
         <spring-web.version>5.3.30</spring-web.version>
         <hibernate-validator.version>6.0.23.Final</hibernate-validator.version>
         <swagger-jaxrs.version>1.6.1</swagger-jaxrs.version>
-        <junit.version>4.12</junit.version>
-        <opensaml3.version>3.3.1</opensaml3.version>
+        <junit.version>4.13.1</junit.version>
+        <opensaml3.version>3.3.1.wso2v8</opensaml3.version>
+        <opensaml.xmltooling.version>1.4.6</opensaml.xmltooling.version>
         <openapi.generator.version>6.6.0.wso2v1</openapi.generator.version>
         <caffeine.version>2.8.1</caffeine.version>
         <cal10n.version>0.8.1</cal10n.version>
@@ -1953,15 +2130,15 @@
         <waffle-jna.version>1.6.wso2v6</waffle-jna.version>
         <version.snake.yaml>2.2</version.snake.yaml>
         <wsdl4j.version>1.6.3.wso2v3</wsdl4j.version>
-        <slf4j.test.version>1.7.29</slf4j.test.version>
+        <slf4j.test.version>1.7.32</slf4j.test.version>
         <reflection.version>0.9.11</reflection.version>
-        <jacoco.version>0.7.9</jacoco.version>
+        <jacoco.version>0.8.4</jacoco.version>
         <xml-apis.version>1.4.01</xml-apis.version>
-        <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>2.22.0</maven.surefire.plugin.version>
+        <maven.war.plugin.version>3.2.3</maven.war.plugin.version>
         <wiremock.version>2.5.0</wiremock.version>
-        <mockito.version>2.10.0</mockito.version>
-        <powermock.version>1.7.4</powermock.version>
-        <mockito.all.version>1.10.19</mockito.all.version>
+        <mockito.version>3.11.1</mockito.version>
+        <powermock.version>2.0.9</powermock.version>
         <reflection.version>0.9.11</reflection.version>
         <woodstox-core.version>6.2.1</woodstox-core.version>
         <apache.commons.version>2.8.0</apache.commons.version>
@@ -2019,6 +2196,9 @@
         <version.checkstyle>8.34</version.checkstyle>
         <project.scm.id>wso2-scm-server</project.scm.id>
         <com.nimbusds.version>[7.3,8)</com.nimbusds.version>
+        <javax.jms.version>2.0.1</javax.jms.version>
+        <javax.annotation.verion>1.3.2</javax.annotation.verion>
+
     </properties>
     <scm>
         <url>https://github.com/wso2-support/carbon-apimgt</url>

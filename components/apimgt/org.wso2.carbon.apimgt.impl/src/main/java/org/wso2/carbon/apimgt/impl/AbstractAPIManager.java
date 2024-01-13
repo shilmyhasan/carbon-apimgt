@@ -60,7 +60,6 @@ import org.wso2.carbon.apimgt.api.model.KeyManager;
 import org.wso2.carbon.apimgt.api.model.Mediation;
 import org.wso2.carbon.apimgt.api.model.OAuthApplicationInfo;
 import org.wso2.carbon.apimgt.api.model.ResourceFile;
-import org.wso2.carbon.apimgt.api.model.Scope;
 import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
 import org.wso2.carbon.apimgt.api.model.Subscriber;
 import org.wso2.carbon.apimgt.api.model.Tier;
@@ -119,6 +118,8 @@ import org.wso2.carbon.user.core.tenant.TenantManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -127,7 +128,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,9 +135,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 
 import static org.wso2.carbon.apimgt.impl.workflow.WorkflowConstants.WF_TYPE_AM_API_STATE;
 
@@ -2565,9 +2562,11 @@ public abstract class AbstractAPIManager implements APIManager {
             //Extracting mediation policy name from the json string
             JSONObject jsonObject = (JSONObject) parser.parse(configInJson);
             JSONObject rootObject = (JSONObject) jsonObject.get(APIConstants.MEDIATION_SEQUENCE_ELEM);
-            String name = rootObject.get(APIConstants.POLICY_NAME_ELEM).toString();
-            //explicitly add .xml extension to the name and return
-            return name + APIConstants.MEDIATION_CONFIG_EXT;
+            if (rootObject != null) {
+                String name = rootObject.get(APIConstants.POLICY_NAME_ELEM).toString();
+                //explicitly add .xml extension to the name and return
+                return name + APIConstants.MEDIATION_CONFIG_EXT;
+            }
         } catch (JSONException e) {
             log.error("Error occurred while converting the mediation config string to json", e);
         } catch (ParseException e) {

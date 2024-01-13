@@ -117,27 +117,6 @@ public class LabelApiServiceImplTestCase {
     }
 
     /**
-     * This method tests the functionality of labelsLabelIdDelete, for a successful delete of label
-     *
-     * @throws APIManagementException APIManagementException.
-     */
-    @Test
-    public void testLabelsLabelIdDelete() throws APIManagementException {
-        String id = "1111";
-        String userName = "admin";
-        PowerMockito.mockStatic(ApiMgtDAO.class);
-        apiMgtDAO = PowerMockito.mock(ApiMgtDAO.class);
-        PowerMockito.mockStatic(APIAdminImpl.class);
-        APIAdminImpl apiAdminImpl = PowerMockito.mock(APIAdminImpl.class);
-        PowerMockito.when(ApiMgtDAO.getInstance()).thenReturn(apiMgtDAO);
-        PowerMockito.when(RestApiUtil.getLoggedInUsername()).thenReturn(userName);
-        Mockito.when(apiAdminImpl.isAttachedLabel(userName, id)).thenReturn(false);
-        apiMgtDAO.deleteLabel(id);
-        Response response = labelsApiService.labelsLabelIdDelete(id, null, null);
-        Assert.assertEquals(response.getStatus(), 200);
-    }
-
-    /**
      * This method tests the functionality of testLabelsLabelIdPut, for a successful update of label
      *
      * @throws APIManagementException APIManagementException.

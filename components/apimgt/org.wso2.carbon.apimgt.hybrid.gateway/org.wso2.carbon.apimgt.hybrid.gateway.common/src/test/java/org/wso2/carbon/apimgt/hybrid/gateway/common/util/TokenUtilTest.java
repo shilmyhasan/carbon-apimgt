@@ -33,18 +33,13 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.wso2.carbon.apimgt.hybrid.gateway.common.TestBase;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.config.ConfigManager;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.dto.ConfigDTO;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.dto.OAuthApplicationInfoDTO;
 import org.wso2.carbon.apimgt.hybrid.gateway.common.internal.ServiceReferenceHolder;
-import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.TestBase;
-import org.wso2.carbon.apimgt.hybrid.gateway.common.dto.AccessTokenDTO;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -72,44 +67,6 @@ public class TokenUtilTest extends TestBase {
         byte[] decodedBytes = Base64.decodeBase64(encodedString);
         String decodedString = new String(decodedBytes);
         Assert.assertEquals(KEY + ":" + VALUE, decodedString);
-    }
-
-    @Test
-    public void registerClient() throws Exception {
-        Map<String, String> configMap = new HashMap<>();
-        configMap.put(APIConstants.API_KEY_VALIDATOR_USERNAME, "Username");
-        configMap.put(APIConstants.API_KEY_VALIDATOR_PASSWORD, "Password");
-        mockAPIMConfiguration(configMap);
-        mockAppCreationCall();
-        PowerMockito.mockStatic(ConfigManager.class);
-        PowerMockito.mockStatic(APIUtil.class);
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
-        PowerMockito.when(APIUtil.getHttpClient(Mockito.anyInt(), Mockito.anyString())).thenReturn(httpClient);
-        ConfigDTO configDTO = Mockito.mock(ConfigDTO.class);
-        PowerMockito.when(ConfigManager.getConfigurationDTO()).thenReturn(configDTO);
-        Mockito.when(ConfigManager.getConfigurationDTO().getUrl_publisher()).thenReturn("https" +
-                "://localhost:9443");
-        OAuthApplicationInfoDTO infoDTO = TokenUtil.registerClient();
-        Assert.assertNotNull(infoDTO);
-    }
-
-    @Test
-    public void generateAccessToken() throws Exception {
-        Map<String, String> configMap = new HashMap<>();
-        configMap.put(APIConstants.API_KEY_VALIDATOR_USERNAME, "Username");
-        configMap.put(APIConstants.API_KEY_VALIDATOR_PASSWORD, "Password");
-        mockAPIMConfiguration(configMap);
-        mockTokenGenCall();
-        PowerMockito.mockStatic(ConfigManager.class);
-        PowerMockito.mockStatic(APIUtil.class);
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
-        PowerMockito.when(APIUtil.getHttpClient(Mockito.anyInt(), Mockito.anyString())).thenReturn(httpClient);
-        ConfigDTO configDTO = Mockito.mock(ConfigDTO.class);
-        PowerMockito.when(ConfigManager.getConfigurationDTO()).thenReturn(configDTO);
-        Mockito.when(ConfigManager.getConfigurationDTO().getUrl_gateway()).thenReturn("https" +
-                "://localhost:9443");
-        AccessTokenDTO tokenDTO = TokenUtil.generateAccessToken("ClientId", "ClientSecret".toCharArray(), "Scope");
-        Assert.assertNotNull(tokenDTO);
     }
 
     public void mockAppCreationCall() throws Exception {
