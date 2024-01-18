@@ -2812,11 +2812,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (!isBasicAuth && !isOauth2 && !isApiKey && !isMutualSSLMandatory) {
             securityLevels.add(APIConstants.API_SECURITY_MUTUAL_SSL_MANDATORY);
         }
-        // If OAuth2/Basic-Auth and Mutual SSL protected and not specified the mandatory scheme,
-        // set OAuth2/Basic-Auth as mandatory
-        if ((isOauth2 || isBasicAuth || isApiKey) && isMutualSSL && !isOauthBasicAuthMandatory && !isMutualSSLMandatory) {
-            securityLevels.add(APIConstants.API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY);
-        }
         return securityLevels;
     }
 
