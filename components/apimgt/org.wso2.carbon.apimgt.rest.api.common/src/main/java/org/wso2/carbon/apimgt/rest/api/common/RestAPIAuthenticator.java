@@ -26,3 +26,4 @@ public interface RestAPIAuthenticator {
     String getAuthenticationType();
     int getPriority(HashMap<String, Object> message);
 }
+
