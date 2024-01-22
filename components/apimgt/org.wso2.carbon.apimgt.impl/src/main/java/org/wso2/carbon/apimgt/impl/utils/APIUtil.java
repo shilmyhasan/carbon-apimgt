@@ -11174,26 +11174,30 @@ public final class APIUtil {
             keyManagerUrl =
                     (String) keyManagerConfigurationDTO.getAdditionalProperties().get(APIConstants.AUTHSERVER_URL);
 
-            if (keyManagerConfigurationDTO.getProperty(APIConstants.KeyManager.ENABLE_TOKEN_ENCRYPTION) == null) {
-                keyManagerConfigurationDTO.addProperty(APIConstants.ENCRYPT_TOKENS_ON_PERSISTENCE,
-                        Boolean.parseBoolean(enableTokenEncryption));
+            if (StringUtils.isNotEmpty(keyManagerUrl)){
                 openIdConnectConfigurations = APIUtil.getOpenIdConnectConfigurations(
                         keyManagerUrl.split("/" + APIConstants.SERVICES_URL_RELATIVE_PATH)[0]
                                 .concat(getTenantAwareContext(keyManagerConfigurationDTO.getTenantDomain()))
                                 .concat(APIConstants.KeyManager.DEFAULT_KEY_MANAGER_OPENID_CONNECT_DISCOVERY_ENDPOINT));
-
-                if (!keyManagerConfigurationDTO.getAdditionalProperties().containsKey(APIConstants.REVOKE_URL)) {
-                    keyManagerConfigurationDTO.addProperty(APIConstants.REVOKE_URL,
-                            keyManagerUrl.split("/" + APIConstants.SERVICES_URL_RELATIVE_PATH)[0]
-                                    .concat(APIConstants.IDENTITY_REVOKE_ENDPOINT));
-                }
-                if (!keyManagerConfigurationDTO.getAdditionalProperties().containsKey(APIConstants.TOKEN_URL)) {
-                    keyManagerConfigurationDTO.addProperty(APIConstants.TOKEN_URL,
-                            keyManagerUrl.split("/" + APIConstants.SERVICES_URL_RELATIVE_PATH)[0]
-                                    .concat(APIConstants.IDENTITY_TOKEN_ENDPOINT_CONTEXT));
-                }
-
             }
+
+            if (keyManagerConfigurationDTO.getProperty(APIConstants.KeyManager.ENABLE_TOKEN_ENCRYPTION) == null) {
+                keyManagerConfigurationDTO.addProperty(APIConstants.ENCRYPT_TOKENS_ON_PERSISTENCE,
+                        Boolean.parseBoolean(enableTokenEncryption));
+            }
+
+            if (!keyManagerConfigurationDTO.getAdditionalProperties().containsKey(APIConstants.REVOKE_URL)) {
+                keyManagerConfigurationDTO.addProperty(APIConstants.REVOKE_URL,
+                        keyManagerUrl.split("/" + APIConstants.SERVICES_URL_RELATIVE_PATH)[0].concat(
+                                APIConstants.IDENTITY_REVOKE_ENDPOINT));
+            }
+
+            if (!keyManagerConfigurationDTO.getAdditionalProperties().containsKey(APIConstants.TOKEN_URL)) {
+                keyManagerConfigurationDTO.addProperty(APIConstants.TOKEN_URL,
+                        keyManagerUrl.split("/" + APIConstants.SERVICES_URL_RELATIVE_PATH)[0].concat(
+                                APIConstants.IDENTITY_TOKEN_ENDPOINT_CONTEXT));
+            }
+
             if (!keyManagerConfigurationDTO.getAdditionalProperties()
                     .containsKey(APIConstants.KeyManager.AVAILABLE_GRANT_TYPE)) {
                 keyManagerConfigurationDTO.addProperty(APIConstants.KeyManager.AVAILABLE_GRANT_TYPE,
