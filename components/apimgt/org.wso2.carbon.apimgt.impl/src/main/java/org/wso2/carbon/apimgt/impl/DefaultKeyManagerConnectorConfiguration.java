@@ -78,11 +78,6 @@ public class DefaultKeyManagerConnectorConfiguration implements KeyManagerConnec
                         "Id Token Expiry Time", "input", "Type ID Token Expiry Time " +
                         "in seconds ", APIConstants.KeyManager.NOT_APPLICABLE_VALUE, false, false,
                         Collections.EMPTY_LIST, false));
-        applicationConfigurationsList
-                .add(new ConfigurationDto(APIConstants.KeyManager.KM_ADMIN_AS_APP_OWNER,
-                        "Enable admin user as the owner of created OAuth applications", "checkbox",
-                        "Enable admin user as the owner of created OAuth applications", "", false, false,
-                        Collections.singletonList("Use as OAuth Application Owner"), false));
         return applicationConfigurationsList;
     }
 
