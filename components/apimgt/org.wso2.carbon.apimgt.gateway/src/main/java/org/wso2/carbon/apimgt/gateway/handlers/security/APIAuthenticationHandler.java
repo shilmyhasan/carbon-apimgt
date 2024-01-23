@@ -517,11 +517,10 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
 
         for (Authenticator authenticator : authenticators) {
             authenticationResponse = authenticator.authenticate(messageContext);
-            if (optionalAuthentication == null) {
-                if(authenticationResponse.getErrorCode() == APISecurityConstants.API_AUTH_INVALID_CREDENTIALS ||
-                        authenticationResponse.isAuthenticated()) {
-                    optionalAuthentication = authenticationResponse;
-                }
+            if (optionalAuthentication == null &&
+                    (authenticationResponse.getErrorCode() != APISecurityConstants.API_AUTH_MISSING_CREDENTIALS
+                            || authenticationResponse.isAuthenticated())) {
+                optionalAuthentication = authenticationResponse;
             }
             if (authenticationResponse.isMandatoryAuthentication()) {
                 // Update authentication status only if the authentication is a mandatory one
