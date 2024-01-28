@@ -463,4 +463,26 @@ public interface APIAdmin  {
      * @throws APIManagementException
      */
     Policy[] getPolicies(int tenantId, String level) throws APIManagementException;
+
+    /**
+     * This method used to retrieve global key manager configurations
+     * @return KeyManagerConfigurationDTO list
+     * @throws APIManagementException if error occurred
+     */
+    List<KeyManagerConfigurationDTO> getGlobalKeyManagerConfigurations() throws APIManagementException;
+
+    /**
+     * This method used to retrieve global key manager with Id
+     * @param id uuid of key manager
+     * @return KeyManagerConfigurationDTO for retrieved data
+     * @throws APIManagementException
+     */
+    KeyManagerConfigurationDTO getGlobalKeyManagerConfigurationById(String id) throws APIManagementException;
+
+    /**
+     * This method used to delete global key manager
+     * @param id uuid of key manager
+     * @throws APIManagementException
+     */
+    void deleteGlobalKeyManagerConfigurationById(String id) throws APIManagementException;
 }

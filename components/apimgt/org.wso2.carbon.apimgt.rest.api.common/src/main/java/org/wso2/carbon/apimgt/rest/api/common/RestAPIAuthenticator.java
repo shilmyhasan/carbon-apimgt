@@ -25,5 +25,5 @@ public interface RestAPIAuthenticator {
     boolean canHandle(HashMap<String, Object> message);
     String getAuthenticationType();
     int getPriority(HashMap<String, Object> message);
-
 }
+
