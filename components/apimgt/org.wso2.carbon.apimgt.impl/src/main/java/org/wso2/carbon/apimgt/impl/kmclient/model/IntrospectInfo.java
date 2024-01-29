@@ -22,6 +22,8 @@ public class IntrospectInfo {
 
     @SerializedName("active")
     private boolean active;
+    @SerializedName("aut")
+    private String aut;
     @SerializedName("client_id")
     private String clientId;
     @SerializedName("device_id")
@@ -42,6 +44,14 @@ public class IntrospectInfo {
     public boolean isActive() {
 
         return active;
+    }
+
+    public String getAut() {
+        return aut;
+    }
+
+    public void setAut(String aut) {
+        this.aut = aut;
     }
 
     public void setActive(boolean active) {

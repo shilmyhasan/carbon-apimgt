@@ -563,6 +563,14 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
                 tokenInfo.setEndUserName(username);
             }
 
+            String authUserType = introspectInfo.getAut();
+            // Setting this to a new property isEndUserAppToken to identify whether the user type is Application.
+            // The existing isApplicationToken property is not used since that value is used to validate the deprecated
+            // authScheme of the resources. Also, that will change the http://wso2.org/claims/usertype of the
+            // backend JWT. Hence, the new property is introduced.
+            tokenInfo.setEndUserAppToken(!StringUtils.isEmpty(authUserType)
+                    && APIConstants.ACCESS_TOKEN_USER_TYPE_APPLICATION.equalsIgnoreCase(authUserType));
+
             return tokenInfo;
         } catch (KeyManagerClientException e) {
             throw new APIManagementException("Error occurred in token introspection!", e);
