@@ -52,6 +52,15 @@ public class AccessTokenInfo {
 
     private String endUserName;
     private String keyManager;
+    private boolean isEndUserAppToken;
+
+    public boolean isEndUserAppToken() {
+        return isEndUserAppToken;
+    }
+
+    public void setEndUserAppToken(boolean endUserAppToken) {
+        isEndUserAppToken = endUserAppToken;
+    }
 
     public String getKeyManager() {
 

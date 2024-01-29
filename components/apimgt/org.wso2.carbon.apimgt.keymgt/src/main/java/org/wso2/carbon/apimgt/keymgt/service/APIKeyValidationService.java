@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.dto.ConditionDTO;
 import org.wso2.carbon.apimgt.api.dto.ConditionGroupDTO;
+import org.wso2.carbon.apimgt.api.model.AccessTokenInfo;
 import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.URITemplate;
 import org.wso2.carbon.apimgt.api.model.subscription.URLMapping;
@@ -233,6 +234,8 @@ public class APIKeyValidationService {
             if (Util.tracingEnabled()) {
                 generateJWTSpan = Util.startSpan(TracingConstants.GENERATE_JWT, validateMainSpan, tracer);
             }
+            String endUser = getEndUserFromValidationContext(validationContext);
+            validationContext.getValidationInfoDTO().setEndUserName(endUser);
             keyValidationHandler.generateConsumerToken(validationContext);
             timerContext5.stop();
             if (Util.tracingEnabled()) {
@@ -272,6 +275,27 @@ public class APIKeyValidationService {
             Util.finishSpan(validateMainSpan);
         }
         return validationContext.getValidationInfoDTO();
+    }
+
+    /**
+     * Get the end user name from the validation context DTO
+     *
+     * @param ctx TokenValidationContext
+     * @return end user name
+     */
+    public String getEndUserFromValidationContext(TokenValidationContext ctx) {
+        boolean isAppToken = ctx.getTokenInfo().isEndUserAppToken();
+        APIKeyValidationInfoDTO keyInfo = ctx.getValidationInfoDTO();
+        String endUsername = keyInfo.getEndUserName();
+        if (isAppToken) {
+            endUsername = keyInfo.getSubscriber();
+            if (!APIConstants.SUPER_TENANT_DOMAIN.equals(keyInfo.getSubscriberTenantDomain())) {
+                return endUsername;
+            } else {
+                return endUsername + "@" + keyInfo.getSubscriberTenantDomain();
+            }
+        }
+        return endUsername;
     }
 
     /**
