@@ -353,11 +353,19 @@ public class SchemaValidator extends AbstractHandler {
         String value = JsonPath.read(Swagger, APIMgtGatewayConstants.JSON_PATH +
                 APIMgtGatewayConstants.OPEN_API).toString();
         StringBuilder jsonPath = new StringBuilder();
+        String resourcePathWithoutSlash = resourcePath.substring(0, resourcePath.length() - 1);
         if (value != null && !value.equals(APIMgtGatewayConstants.EMPTY_ARRAY)) {
             //refer schema
             jsonPath.append(APIMgtGatewayConstants.PATHS)
                     .append(resourcePath).append(APIMgtGatewayConstants.BODY_CONTENT);
             schema = JsonPath.read(Swagger, jsonPath.toString()).toString();
+            if (APIMgtGatewayConstants.EMPTY_ARRAY.equals(schema) && resourcePath.endsWith("/")) {
+                jsonPath = new StringBuilder();
+                jsonPath.append(APIMgtGatewayConstants.PATHS)
+                        .append(resourcePathWithoutSlash)
+                        .append(APIMgtGatewayConstants.BODY_CONTENT);
+                schema = JsonPath.read(Swagger, jsonPath.toString()).toString();
+            }
             if (schema == null | APIMgtGatewayConstants.EMPTY_ARRAY.equals(schema)) {
                 // refer request bodies
                 StringBuilder requestBodyPath = new StringBuilder();
@@ -365,6 +373,14 @@ public class SchemaValidator extends AbstractHandler {
                         append(APIMgtGatewayConstants.JSONPATH_SEPARATE).
                         append(requestMethod.toLowerCase()).append(APIMgtGatewayConstants.REQUEST_BODY);
                 schema = JsonPath.read(Swagger, requestBodyPath.toString()).toString();
+                if (APIMgtGatewayConstants.EMPTY_ARRAY.equals(schema) && resourcePath.endsWith("/")) {
+                    requestBodyPath = new StringBuilder();
+                    requestBodyPath.append(APIMgtGatewayConstants.PATHS)
+                            .append(resourcePathWithoutSlash)
+                            .append(APIMgtGatewayConstants.JSONPATH_SEPARATE)
+                            .append(requestMethod.toLowerCase()).append(APIMgtGatewayConstants.REQUEST_BODY);
+                    schema = JsonPath.read(Swagger, requestBodyPath.toString()).toString();
+                }
             }
         } else {
             jsonPath.append(APIMgtGatewayConstants.PATHS).append(resourcePath).
@@ -373,7 +389,6 @@ public class SchemaValidator extends AbstractHandler {
             schema = JsonPath.read(Swagger, jsonPath.toString()).toString();
             if (APIMgtGatewayConstants.EMPTY_ARRAY.equals(schema) && resourcePath.endsWith("/")) {
                 jsonPath = new StringBuilder();
-                String resourcePathWithoutSlash = resourcePath.substring(0, resourcePath.length() - 1);
                 jsonPath.append(APIMgtGatewayConstants.PATHS).append(resourcePathWithoutSlash).
                         append(APIMgtGatewayConstants.JSONPATH_SEPARATE)
                         .append(requestMethod.toLowerCase()).append(APIMgtGatewayConstants.PARAM_SCHEMA);
