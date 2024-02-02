@@ -102,6 +102,18 @@ public class GraphQLSchemaDefinition {
     }
 
     /**
+     * Extract GraphQL Operations from given schema.
+     *
+     * @param schema graphQL Schema
+     * @return the arrayList of APIOperationsDTO
+     */
+    public List<URITemplate> extractGraphQLOperationList(String schema) {
+        SchemaParser schemaParser = new SchemaParser();
+        TypeDefinitionRegistry typeRegistry = schemaParser.parse(schema);
+        return extractGraphQLOperationList(typeRegistry, null);
+    }
+
+    /**
      * Check subscription operation availability from given graphql schema.
      *
      * @param schema graphQL Schema
