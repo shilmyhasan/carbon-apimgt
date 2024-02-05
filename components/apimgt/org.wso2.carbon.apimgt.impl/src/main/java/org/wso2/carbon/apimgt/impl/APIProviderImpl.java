@@ -2794,10 +2794,16 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (apiSecurityLevel.trim().equalsIgnoreCase(APIConstants.API_SECURITY_MUTUAL_SSL_MANDATORY)) {
                 isMutualSSLMandatory = true;
                 securityLevels.add(APIConstants.API_SECURITY_MUTUAL_SSL_MANDATORY);
+            } else if (apiSecurityLevel.trim().equalsIgnoreCase(APIConstants.API_SECURITY_MUTUAL_SSL_OPTIONAL)) {
+                securityLevels.add(APIConstants.API_SECURITY_MUTUAL_SSL_OPTIONAL);
             }
-            if (apiSecurityLevel.trim().equalsIgnoreCase(APIConstants.API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY)) {
+            if (apiSecurityLevel.trim()
+                    .equalsIgnoreCase(APIConstants.API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY)) {
                 isOauthBasicAuthMandatory = true;
                 securityLevels.add(APIConstants.API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY);
+            } else if (apiSecurityLevel.trim()
+                    .equalsIgnoreCase(APIConstants.API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_OPTIONAL)) {
+                securityLevels.add(APIConstants.API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_OPTIONAL);
             }
             if (apiSecurityLevel.trim().equalsIgnoreCase(APIConstants.API_SECURITY_MUTUAL_SSL_OPTIONAL)) {
                 isMutualSSLOptional = true;
