@@ -2757,7 +2757,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @return
      */
     private ArrayList<String> selectSecurityLevels(String apiSecurity) {
-        ArrayList<String> securityLevels = new ArrayList<>();
+        Set<String> securityLevels = new HashSet<>();
         String[] apiSecurityLevels = apiSecurity.split(",");
         boolean isOauth2 = false;
         boolean isMutualSSL = false;
@@ -2831,10 +2831,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         // If OAuth2/Basic-Auth and Mutual SSL protected and not specified the mandatory scheme,
         // set OAuth2/Basic-Auth as mandatory
         if ((isOauth2 || isBasicAuth || isApiKey) && isMutualSSL && !isOauthBasicAuthMandatory && !isMutualSSLMandatory
-        && !isMutualSSLOptional && !isOauthBasicAuthOptional) {
+            && !isMutualSSLOptional && !isOauthBasicAuthOptional) {
             securityLevels.add(APIConstants.API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY);
         }
-        return securityLevels;
+        return new ArrayList<>(securityLevels);
     }
 
     /**
