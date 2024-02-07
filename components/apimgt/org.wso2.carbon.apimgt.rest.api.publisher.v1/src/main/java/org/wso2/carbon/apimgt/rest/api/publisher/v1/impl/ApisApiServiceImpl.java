@@ -1043,15 +1043,14 @@ public class ApisApiServiceImpl implements ApisApiService {
                         log.debug("HTTP status " + response.getStatusLine().getStatusCode());
                     }
                     if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                        BufferedReader reader = new BufferedReader(
-                                new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
-                        String inputLine;
                         StringBuilder responseString = new StringBuilder();
-
-                        while ((inputLine = reader.readLine()) != null) {
-                            responseString.append(inputLine);
+                        try (BufferedReader reader = new BufferedReader(
+                                new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8))) {
+                            String inputLine;
+                            while ((inputLine = reader.readLine()) != null) {
+                                responseString.append(inputLine);
+                            }
                         }
-                        reader.close();
                         JSONObject responseJson = (JSONObject) new JSONParser().parse(responseString.toString());
                         String report = responseJson.get(APIConstants.DATA).toString();
                         String grade = (String) ((JSONObject) ((JSONObject) responseJson.get(APIConstants.ATTR))
