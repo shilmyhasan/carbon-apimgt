@@ -225,7 +225,8 @@
 							org.wso2.carbon.apimgt.keymgt.internal
 						</Private-Package>
 						<Import-Package>
-                            org.apache.commons.codec.*,
+							net.minidev.json.*; version="${imp.pkg.version.net.minidev.json}",
+							org.apache.commons.codec.*,
 							org.slf4j,
 							org.apache.commons.logging.*; version="${commons.logging.imp.pkg.version}",
 							org.wso2.carbon.identity.base.*; version="${carbon.identity.imp.pkg.version}",
