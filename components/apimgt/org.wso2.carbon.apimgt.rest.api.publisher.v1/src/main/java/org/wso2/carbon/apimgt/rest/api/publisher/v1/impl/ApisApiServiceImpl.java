@@ -4950,6 +4950,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             apiToAdd.setServiceInfo("md5", service.getMd5());
             apiToAdd.setEndpointConfig(PublisherCommonUtils.constructEndpointConfigForService(service
                     .getServiceUrl(), null));
+            apiToAdd.setApiSecurity(service.getSecurityType().toString());
         }
         boolean syncOperations = apiDTOFromProperties.getOperations().size() > 0;
         // Rearrange paths according to the API payload and save the OpenAPI definition
