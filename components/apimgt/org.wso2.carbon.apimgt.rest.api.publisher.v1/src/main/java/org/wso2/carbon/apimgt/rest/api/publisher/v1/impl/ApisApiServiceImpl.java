@@ -4950,7 +4950,8 @@ public class ApisApiServiceImpl implements ApisApiService {
             apiToAdd.setServiceInfo("md5", service.getMd5());
             apiToAdd.setEndpointConfig(PublisherCommonUtils.constructEndpointConfigForService(service
                     .getServiceUrl(), null));
-            if (APIConstants.SWAGGER_API_SECURITY_BASIC_AUTH_TYPE.equalsIgnoreCase(service.getSecurityType().toString())){
+            if (APIConstants.SWAGGER_API_SECURITY_BASIC_AUTH_TYPE.equalsIgnoreCase(
+                    service.getSecurityType().toString())) {
                 apiToAdd.setApiSecurity(APIConstants.API_SECURITY_BASIC_AUTH);
             } else {
                 apiToAdd.setApiSecurity(service.getSecurityType().toString());
