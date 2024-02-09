@@ -3000,11 +3000,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 isOauthBasicAuthMandatory = true;
                 securityLevels.add(APIConstants.API_SECURITY_OAUTH_BASIC_AUTH_API_KEY_MANDATORY);
             }
-            if (apiSecurityLevel.trim().equalsIgnoreCase(APIConstants.SWAGGER_API_SECURITY_BASIC_AUTH_TYPE)) {
-                isBasicAuth = true;
-                securityLevels.add(APIConstants.API_SECURITY_BASIC_AUTH);
-                securitySchemeFound = true;
-            }
         }
 
         // If no security schema found, set OAuth2 as default
