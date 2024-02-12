@@ -419,7 +419,9 @@ function Overview(props) {
                             </Typography>
                         </ExpansionPanelSummary>
                         <ExpansionPanelDetails className={classes.resourceWrapper}>
-                            {getResourcesForAPIs(api.type, api)}
+                            <div>
+                                {getResourcesForAPIs(api.type, api)}
+                            </div>
                         </ExpansionPanelDetails>
                         {!api.advertiseInfo.advertised && showTryout && (
                             <>
