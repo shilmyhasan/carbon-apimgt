@@ -177,12 +177,14 @@ function TransportLevel(props) {
     }
 
     useEffect(() => {
-        const name = API_SECURITY_MUTUAL_SSL_MANDATORY.slice(0);
-        const value = mandatoryValue.slice(0);
-        configDispatcher({
-            action: 'securityScheme',
-            event: { name, value },
-        });
+        if (mandatoryValue != null) {
+            const name = API_SECURITY_MUTUAL_SSL_MANDATORY.slice(0);
+            const value = mandatoryValue.slice(0);
+            configDispatcher({
+                action: 'securityScheme',
+                event: { name, value },
+            });
+        }
     }, []);
 
     return (
