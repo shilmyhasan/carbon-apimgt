@@ -177,7 +177,7 @@ function TransportLevel(props) {
     }
 
     useEffect(() => {
-        if (mandatoryValue != null) {
+        if (mandatoryValue !== null) {
             const name = API_SECURITY_MUTUAL_SSL_MANDATORY.slice(0);
             const value = mandatoryValue.slice(0);
             configDispatcher({
