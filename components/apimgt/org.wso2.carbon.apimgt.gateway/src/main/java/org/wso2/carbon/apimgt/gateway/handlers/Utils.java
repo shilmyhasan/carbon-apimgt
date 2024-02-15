@@ -425,37 +425,44 @@ public class Utils {
 
     public static X509Certificate getClientCertificate(org.apache.axis2.context.MessageContext axis2MessageContext)
             throws APIManagementException {
+
+        X509Certificate[] certs = getClientCertificatesChain(axis2MessageContext);
+        return (certs != null && certs.length > 0) ? certs[0] : null;
+    }
+
+    public static X509Certificate[] getClientCertificatesChain(
+            org.apache.axis2.context.MessageContext axis2MessageContext) throws APIManagementException {
+
         Object validatedCert = axis2MessageContext.getProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT);
-
         if (validatedCert != null) {
-            return (X509Certificate) validatedCert;
-        } else {
-            Map headers =
-                    (Map) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-            Object sslCertObject = axis2MessageContext.getProperty(NhttpConstants.SSL_CLIENT_AUTH_CERT_X509);
-            X509Certificate certificateFromMessageContext = null;
-            if (sslCertObject != null) {
-                X509Certificate[] certs = (X509Certificate[]) sslCertObject;
-                certificateFromMessageContext = certs[0];
-                axis2MessageContext.setProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT, certificateFromMessageContext);
-            }
-            if (headers.containsKey(Utils.getClientCertificateHeader())) {
-                try {
-                    if (!isClientCertificateValidationEnabled() || APIUtil
-                            .isCertificateExistsInListenerTrustStore(certificateFromMessageContext)) {
-                        X509Certificate x509Certificate = getClientCertificateFromHeader(axis2MessageContext);
-                        axis2MessageContext.setProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT, x509Certificate);
-                        return x509Certificate;
-                    }
-                } catch (APIManagementException e) {
-                    String msg = "Error while validating into Certificate Existence";
-                    log.error(msg, e);
-                    throw new APIManagementException(msg, e);
-                }
-            }
-
-            return certificateFromMessageContext;
+            return new X509Certificate[] { (X509Certificate) validatedCert };
         }
+
+        X509Certificate[] certs = null;
+        Map headers = (Map) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        Object sslCertObject = axis2MessageContext.getProperty(NhttpConstants.SSL_CLIENT_AUTH_CERT_X509);
+        X509Certificate certificateFromMessageContext = null;
+        if ((sslCertObject instanceof X509Certificate[])) {
+            certs = (X509Certificate[]) sslCertObject;
+            certificateFromMessageContext = certs[0];
+            axis2MessageContext.setProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT, certificateFromMessageContext);
+        }
+
+        if (headers.containsKey(Utils.getClientCertificateHeader())) {
+            try {
+                if (!isClientCertificateValidationEnabled() || APIUtil.isCertificateExistsInListenerTrustStore(
+                        certificateFromMessageContext)) {
+                    X509Certificate x509Certificate = getClientCertificateFromHeader(axis2MessageContext);
+                    axis2MessageContext.setProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT, x509Certificate);
+                    return new X509Certificate[] { x509Certificate };
+                }
+            } catch (APIManagementException e) {
+                String msg = "Error while validating certificate existence";
+                log.error(msg, e);
+                throw new APIManagementException(msg, e);
+            }
+        }
+        return certs;
     }
 
     private static X509Certificate getClientCertificateFromHeader(org.apache.axis2.context.MessageContext axis2MessageContext)
@@ -496,6 +503,20 @@ public class Utils {
             String firstProperty = apiManagerConfiguration
                     .getFirstProperty(APIConstants.MutualSSL.ENABLE_CLIENT_CERTIFICATE_VALIDATION);
             return Boolean.parseBoolean(firstProperty);
+        }
+        return false;
+    }
+
+    public static boolean isCertificateChainValidationEnabled() {
+
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+        if (apiManagerConfiguration != null) {
+            String validateCertificateChain =
+                    apiManagerConfiguration.getFirstProperty(APIConstants.MutualSSL.ENABLE_CERTIFICATE_CHAIN_VALIDATION);
+            if (StringUtils.isNotEmpty(validateCertificateChain)) {
+                return Boolean.parseBoolean(validateCertificateChain);
+            }
         }
         return false;
     }
