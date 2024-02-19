@@ -1305,7 +1305,6 @@ public class OAS3Parser extends APIDefinition {
             }
             // rewrite the authorization url if the authorization url is not empty.
             oAuthFlow.setAuthorizationUrl(authUrl);
-
             // Set the scopes defined in the API to the OAS definition.
             OASParserUtil.setScopesFromAPIToSecurityScheme(swaggerData, securityScheme);
         }
