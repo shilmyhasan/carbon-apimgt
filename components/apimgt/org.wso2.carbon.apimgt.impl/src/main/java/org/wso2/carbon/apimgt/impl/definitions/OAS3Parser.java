@@ -894,9 +894,7 @@ public class OAS3Parser extends APIDefinition {
         if (oAuthFlow.getScopes() == null) {
             oAuthFlow.setScopes(new Scopes());
         }
-        if (oAuthFlow.getAuthorizationUrl() == null) {
-            oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
-        }
+        oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
         if (api.getAuthorizationHeader() != null) {
             openAPI.addExtension(APIConstants.X_WSO2_AUTH_HEADER, api.getAuthorizationHeader());
         }
@@ -1056,9 +1054,7 @@ public class OAS3Parser extends APIDefinition {
                         oAuthFlow = new OAuthFlow();
             securityScheme.getFlows().setImplicit(oAuthFlow);
         }
-        if (oAuthFlow.getAuthorizationUrl() == null) {
-            oAuthFlow.setAuthorizationUrl(authUrl);
-        }
+        oAuthFlow.setAuthorizationUrl(authUrl);
         Scopes oas3Scopes = new Scopes();
         Set<Scope> scopes = swaggerData.getScopes();
         if (scopes != null && !scopes.isEmpty()) {
@@ -1304,9 +1300,7 @@ public class OAS3Parser extends APIDefinition {
                 securityScheme.getFlows().setImplicit(oAuthFlow);
             }
             // rewrite the authorization url if the authorization url is not empty.
-            if (oAuthFlow.getAuthorizationUrl() == null) {
-                oAuthFlow.setAuthorizationUrl(authUrl);
-            }
+            oAuthFlow.setAuthorizationUrl(authUrl);
             // Set the scopes defined in the API to the OAS definition.
             OASParserUtil.setScopesFromAPIToSecurityScheme(swaggerData, securityScheme);
         }
@@ -1771,9 +1765,7 @@ public class OAS3Parser extends APIDefinition {
                 oAuthFlow = new OAuthFlow();
                 securityScheme.getFlows().setImplicit(oAuthFlow);
             }
-            if (oAuthFlow.getAuthorizationUrl() == null) {
-                oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
-            }
+            oAuthFlow.setAuthorizationUrl(OPENAPI_DEFAULT_AUTHORIZATION_URL);
             Scopes oas3Scopes = oAuthFlow.getScopes() != null ? oAuthFlow.getScopes() : new Scopes();
 
             if (scopes != null && !scopes.isEmpty()) {
