@@ -618,7 +618,9 @@ public class OASParserUtil {
                 extractReferenceFromContent(content, context);
             } else {
                 String ref = requestBody.get$ref();
-                addToReferenceObjectMap(ref, context);
+                if (ref != null) {
+                    addToReferenceObjectMap(ref, context);
+                }
             }
         }
     }
@@ -638,13 +640,15 @@ public class OASParserUtil {
      * @param context The SwaggerUpdateContext object containing the context of the API definition.
      */
     private static void setRefOfApiResponse(ApiResponse response, SwaggerUpdateContext context) {
-        Content content = response.getContent();
-        if (content != null) {
-            extractReferenceFromContent(content, context);
-        } else {
-            String ref = response.get$ref();
-            if (ref != null) {
-                addToReferenceObjectMap(ref, context);
+        if (response != null) {
+            Content content = response.getContent();
+            if (content != null) {
+                extractReferenceFromContent(content, context);
+            } else {
+                String ref = response.get$ref();
+                if (ref != null) {
+                    addToReferenceObjectMap(ref, context);
+                }
             }
         }
     }
@@ -670,13 +674,15 @@ public class OASParserUtil {
      * @param context The SwaggerUpdateContext object containing the context of the API definition.
      */
     private static void setRefOfApiResponseHeader(Header header, SwaggerUpdateContext context) {
-        Content content = header.getContent();
-        if (content != null) {
-            extractReferenceFromContent(content, context);
-        } else {
-            String ref = header.get$ref();
-            if (ref != null) {
-                addToReferenceObjectMap(ref, context);
+        if (header != null) {
+            Content content = header.getContent();
+            if (content != null) {
+                extractReferenceFromContent(content, context);
+            } else {
+                String ref = header.get$ref();
+                if (ref != null) {
+                    addToReferenceObjectMap(ref, context);
+                }
             }
         }
     }
@@ -707,9 +713,11 @@ public class OASParserUtil {
      * @param context The SwaggerUpdateContext object containing the context of the API definition.
      */
     private static void setRefOfExample(Example example, SwaggerUpdateContext context) {
-        String ref = example.get$ref();
-        if (ref != null) {
-            addToReferenceObjectMap(ref, context);
+        if (example != null) {
+            String ref = example.get$ref();
+            if (ref != null) {
+                addToReferenceObjectMap(ref, context);
+            }
         }
     }
 
