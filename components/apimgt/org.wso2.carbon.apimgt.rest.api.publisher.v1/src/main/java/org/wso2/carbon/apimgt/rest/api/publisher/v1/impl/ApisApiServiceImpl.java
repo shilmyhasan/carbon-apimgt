@@ -4855,6 +4855,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             serviceInfo.put("key", service.getKey());
             serviceInfo.put("md5", service.getMd5());
             api.setServiceInfo(serviceInfo);
+            api.setUriTemplates(originalAPI.getUriTemplates());
             Map validationResponseMap = new HashMap();
             if (ServiceEntry.DefinitionType.OAS2.equals(service.getDefinitionType()) ||
                     ServiceEntry.DefinitionType.OAS3.equals(service.getDefinitionType())) {
