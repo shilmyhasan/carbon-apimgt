@@ -139,9 +139,14 @@ public class OAS2ParserTest extends OASTestBase {
         Assert.assertEquals(uriTemplateSet, uriTemplates);
     }
 
+    /**
+     * This test is used to test the behaviour of validateAPIDefinition method
+     * @throws Exception If test run fails
+     */
     @Test
     public void testValidateAPIDefinition() throws Exception {
 
+        // If the 'info' section is absent in the definition, it must be added to the definition during validation from SwaggerData
         String relativePath = "definitions" + File.separator + "oas2" + File.separator + "oas2_missing_info.json";
         String swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
         API api = new API(new APIIdentifier("admin", "API", "1.0.0"));
@@ -153,20 +158,66 @@ public class OAS2ParserTest extends OASTestBase {
         Assert.assertNotNull(validatedSwaggerObj.getInfo());
         Assert.assertEquals("API", validatedSwaggerObj.getInfo().getTitle());
         Assert.assertEquals("1.0.0", validatedSwaggerObj.getInfo().getVersion());
-        relativePath = "definitions" + File.separator + "oas2" + File.separator + "oas2_missing_version_title.json";
+
+        // If definition includes a title/version, those should not be modified during validation
+        relativePath = "definitions" + File.separator + "oas2" + File.separator + "oas2_with_info.json";
         swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
         api = new API(new APIIdentifier("admin", "API2", "2.0.0"));
         validatedSwagger = oas2Parser.validateAPIDefinition(swagger, new SwaggerData(api));
         validatedSwaggerObj = swaggerParser.parse(validatedSwagger);
         Assert.assertNotNull(validatedSwaggerObj.getInfo());
-        Assert.assertEquals("API2", validatedSwaggerObj.getInfo().getTitle());
-        Assert.assertEquals("2.0.0", validatedSwaggerObj.getInfo().getVersion());
+        Assert.assertEquals("SampleAPI", validatedSwaggerObj.getInfo().getTitle());
+        Assert.assertEquals("1.0.1", validatedSwaggerObj.getInfo().getVersion());
+
+        // When validation fails from parser, exception should be thrown from method
         PowerMockito.mockStatic(OASParserUtil.class);
         APIManagementException apiManagementException = new APIManagementException("Dummy exception");
         PowerMockito.when(OASParserUtil.class, "verifyAPIDefinitionFromParser",swagger, oas2Parser, swaggerData)
                 .thenThrow(apiManagementException);
         try {
             validatedSwagger = oas2Parser.validateAPIDefinition(swagger, swaggerData);
+        } catch (APIManagementException e) {
+            Assert.assertEquals("Dummy exception", e.getMessage());
+        }
+    }
+
+    /**
+     * This test is used to test the behaviour of validateAPIDefinitionForNewVersion method
+     * @throws Exception If test run fails
+     */
+    @Test
+    public void testValidateAPIDefinitionForNewVersion() throws Exception {
+
+        // If the 'info' section is absent in the definition, it must be added to the definition during validation from SwaggerData
+        String relativePath = "definitions" + File.separator + "oas2" + File.separator + "oas2_missing_info.json";
+        String swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        API api = new API(new APIIdentifier("admin", "API", "1.0.0"));
+        SwaggerData swaggerData = new SwaggerData(api);
+        SwaggerParser swaggerParser = new SwaggerParser();
+        Mockito.when(apiManagerConfiguration.isAdvancedSwaggerValidationEnabled()).thenReturn(false);
+        String validatedSwagger = oas2Parser.validateAPIDefinitionForNewVersion(swagger, swaggerData);
+        Swagger  validatedSwaggerObj = swaggerParser.parse(validatedSwagger);
+        Assert.assertNotNull(validatedSwaggerObj.getInfo());
+        Assert.assertEquals("API", validatedSwaggerObj.getInfo().getTitle());
+        Assert.assertEquals("1.0.0", validatedSwaggerObj.getInfo().getVersion());
+
+        // When "title" and "version" not specified, those values must be added to the definition during validation from SwaggerData
+        relativePath = "definitions" + File.separator + "oas2" + File.separator + "oas2_missing_version_title.json";
+        swagger = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        api = new API(new APIIdentifier("admin", "API2", "2.0.0"));
+        validatedSwagger = oas2Parser.validateAPIDefinitionForNewVersion(swagger, new SwaggerData(api));
+        validatedSwaggerObj = swaggerParser.parse(validatedSwagger);
+        Assert.assertNotNull(validatedSwaggerObj.getInfo());
+        Assert.assertEquals("API2", validatedSwaggerObj.getInfo().getTitle());
+        Assert.assertEquals("2.0.0", validatedSwaggerObj.getInfo().getVersion());
+
+        // When validation fails from parser, exception should be thrown from method
+        PowerMockito.mockStatic(OASParserUtil.class);
+        APIManagementException apiManagementException = new APIManagementException("Dummy exception");
+        PowerMockito.when(OASParserUtil.class, "verifyAPIDefinitionFromParser",swagger, oas2Parser, swaggerData)
+                .thenThrow(apiManagementException);
+        try {
+            validatedSwagger = oas2Parser.validateAPIDefinitionForNewVersion(swagger, swaggerData);
         } catch (APIManagementException e) {
             Assert.assertEquals("Dummy exception", e.getMessage());
         }

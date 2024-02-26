@@ -1909,6 +1909,31 @@ public class OAS3Parser extends APIDefinition {
             Info info = openAPI.getInfo();
             if (info == null) {
                 info = new Info();
+                info.setTitle(swaggerData.getTitle());
+                info.setVersion(swaggerData.getVersion());
+            }
+            openAPI.setInfo(info);
+            validatedOpenAPI = Json.pretty(openAPI);
+        }
+        OASParserUtil.verifyAPIDefinitionFromParser(validatedOpenAPI, this, swaggerData);
+        return validatedOpenAPI;
+    }
+
+    /**
+     * This method validates the API Definition when a new API version is created and sets the new version in the API definition
+     * @param apiDefinition swagger definition
+     * @param swaggerData           validating API
+     * @return validated and updated swagger definition
+     * @throws APIManagementException if validation of api definition fails
+     */
+    @Override
+    public String validateAPIDefinitionForNewVersion(String apiDefinition, SwaggerData swaggerData) throws APIManagementException {
+        String validatedOpenAPI = null;
+        OpenAPI openAPI = getOpenAPI(apiDefinition);
+        if (openAPI != null) {
+            Info info = openAPI.getInfo();
+            if (info == null) {
+                info = new Info();
             }
             info.setTitle(swaggerData.getTitle());
             info.setVersion(swaggerData.getVersion());
