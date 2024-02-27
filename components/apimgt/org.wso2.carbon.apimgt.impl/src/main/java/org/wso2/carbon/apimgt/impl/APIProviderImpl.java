@@ -3355,7 +3355,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 apiDefinitionString = OASParserUtil.getAPIDefinition(api.getId(), registry);
                 APIDefinition apiDefinition = OASParserUtil.getOASParser(apiDefinitionString);
                 apiDefinitionString = apiDefinition
-                        .validateAPIDefinition(apiDefinitionString, swaggerData);
+                        .validateAPIDefinitionForNewVersion(apiDefinitionString, swaggerData);
             }
             GenericArtifact artifact = artifactManager.getGenericArtifact(apiSourceArtifact.getUUID());
 

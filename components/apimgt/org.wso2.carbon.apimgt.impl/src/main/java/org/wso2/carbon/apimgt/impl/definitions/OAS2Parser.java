@@ -1687,6 +1687,31 @@ public class OAS2Parser extends APIDefinition {
             Info info = swagger.getInfo();
             if (info == null) {
                 info = new Info();
+                info.setTitle(swaggerData.getTitle());
+                info.setVersion(swaggerData.getVersion());
+            }
+            swagger.setInfo(info);
+            validatedSwagger = getSwaggerJsonString(swagger);
+        }
+        OASParserUtil.verifyAPIDefinitionFromParser(validatedSwagger, this, swaggerData);
+        return validatedSwagger;
+    }
+
+    /**
+     * This method validates the API Definition when a new API version is created and sets the new version in the API definition
+     * @param apiDefinition swagger definition
+     * @param swaggerData           validating API
+     * @return validated and updated swagger definition
+     * @throws APIManagementException if validation of api definition fails
+     */
+    @Override
+    public String validateAPIDefinitionForNewVersion(String apiDefinition, SwaggerData swaggerData) throws APIManagementException {
+        String validatedSwagger = apiDefinition;
+        Swagger swagger = getSwagger(apiDefinition);
+        if (swagger != null) {
+            Info info = swagger.getInfo();
+            if (info == null) {
+                info = new Info();
             }
             info.setTitle(swaggerData.getTitle());
             info.setVersion(swaggerData.getVersion());
