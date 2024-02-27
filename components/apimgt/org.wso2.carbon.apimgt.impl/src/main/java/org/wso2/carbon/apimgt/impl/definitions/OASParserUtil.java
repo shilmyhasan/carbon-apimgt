@@ -790,7 +790,12 @@ public class OASParserUtil {
                             if (OBJECT_DATA_TYPE.equalsIgnoreCase(sc.getType())) {
                                 references.addAll(addSchemaOfSchema(sc));
                             } else {
-                                references.add(sc.get$ref());
+                                String schemaRef = sc.get$ref();
+                                if (schemaRef != null) {
+                                    references.add(sc.get$ref());
+                                } else {
+                                    processSchemaProperties(sc, context);
+                                }
                             }
                         }
                     } else if (((ComposedSchema) schema).getAnyOf() != null) {
@@ -798,7 +803,12 @@ public class OASParserUtil {
                             if (OBJECT_DATA_TYPE.equalsIgnoreCase(sc.getType())) {
                                 references.addAll(addSchemaOfSchema(sc));
                             } else {
-                                references.add(sc.get$ref());
+                                String schemaRef = sc.get$ref();
+                                if (schemaRef != null) {
+                                    references.add(sc.get$ref());
+                                } else {
+                                    processSchemaProperties(sc, context);
+                                }
                             }
                         }
                     } else if (((ComposedSchema) schema).getOneOf() != null) {
@@ -806,7 +816,12 @@ public class OASParserUtil {
                             if (OBJECT_DATA_TYPE.equalsIgnoreCase(sc.getType())) {
                                 references.addAll(addSchemaOfSchema(sc));
                             } else {
-                                references.add(sc.get$ref());
+                                String schemaRef = sc.get$ref();
+                                if (schemaRef != null) {
+                                    references.add(sc.get$ref());
+                                } else {
+                                    processSchemaProperties(sc, context);
+                                }
                             }
                         }
                     } else {
@@ -825,13 +840,22 @@ public class OASParserUtil {
                 }
             }
 
-            // Process schema properties if present
-            Map properties = schema.getProperties();
+            processSchemaProperties(schema, context);
+        }
+    }
 
-            if (properties != null) {
-                for (Object propertySchema : properties.values()) {
-                    extractReferenceFromSchema((Schema) propertySchema, context);
-                }
+    /**
+     * Process properties of a schema object of the API definition.
+     *
+     * @param schema  The schema object which contains the properties which needs to be processed.
+     * @param context The SwaggerUpdateContext object containing the context of the API definition.
+     */
+    private static void processSchemaProperties(Schema schema, SwaggerUpdateContext context) {
+        // Process schema properties if present
+        Map properties = schema.getProperties();
+        if (properties != null) {
+            for (Object propertySchema : properties.values()) {
+                extractReferenceFromSchema((Schema) propertySchema, context);
             }
         }
     }
