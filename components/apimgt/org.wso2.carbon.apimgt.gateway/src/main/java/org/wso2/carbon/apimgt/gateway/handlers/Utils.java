@@ -73,6 +73,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
+import java.security.cert.Certificate;
 import java.util.*;
 import javax.cache.Caching;
 import javax.security.cert.CertificateException;
@@ -463,6 +464,29 @@ public class Utils {
             }
         }
         return certs;
+    }
+
+    /**
+     * Fetches certificate for the given distinguished name from listener trust store.
+     * @param certSubjectDN             Distinguished name of the certificate
+     * @return                          X509Certificate
+     * @throws APIManagementException
+     */
+    public static java.security.cert.X509Certificate getCertificateFromListenerTrustStore(String certSubjectDN)
+            throws APIManagementException {
+
+        Enumeration<String> aliases = APIUtil.getAliasesFromListenerTrustStore();
+        while (aliases.hasMoreElements()) {
+            String alias = aliases.nextElement();
+            Certificate certificate = APIUtil.getCertificateFromListenerTrustStore(alias);
+            if (certificate instanceof java.security.cert.X509Certificate) {
+                java.security.cert.X509Certificate x509Certificate = (java.security.cert.X509Certificate) certificate;
+                if (StringUtils.equals(x509Certificate.getSubjectDN().getName(), certSubjectDN)) {
+                    return x509Certificate;
+                }
+            }
+        }
+        return null;
     }
 
     private static X509Certificate getClientCertificateFromHeader(org.apache.axis2.context.MessageContext axis2MessageContext)
