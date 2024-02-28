@@ -68,6 +68,11 @@ public class OAuthResponseMediator extends AbstractMediator implements ManagedLi
         return true;
     }
 
+    @Override
+    public boolean isContentAware() {
+        return false;
+    }
+
     /**
      * Sends a fault response to the DevPortal console
      * @param errorCodeValue error code of the failure
