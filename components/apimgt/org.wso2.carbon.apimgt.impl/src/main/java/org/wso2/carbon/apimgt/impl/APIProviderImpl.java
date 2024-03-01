@@ -930,7 +930,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             api.setUuid(addedAPI.getId());
             api.setCreatedTime(addedAPI.getCreatedTime());
         } catch (APIPersistenceException e) {
-            throw new APIManagementException("Error while persisting API ", e);
+            throw new APIManagementException("Error while persisting API. " + e.getMessage(), e);
         }
 
         if (log.isDebugEnabled()) {

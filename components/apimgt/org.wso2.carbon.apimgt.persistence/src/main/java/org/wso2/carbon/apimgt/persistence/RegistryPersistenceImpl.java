@@ -193,12 +193,7 @@ public class RegistryPersistenceImpl implements APIPersistence {
             String providerPath = RegistryPersistenceUtil.getAPIProviderPath(api.getId());
             //provider ------provides----> API
             registry.addAssociation(providerPath, artifactPath, APIConstants.PROVIDER_ASSOCIATION);
-            Set<String> tagSet = api.getTags();
-            if (tagSet != null) {
-                for (String tag : tagSet) {
-                    registry.applyTag(artifactPath, tag);
-                }
-            }
+            applyTags(api.getTags(), registry, artifactPath);
 
             String apiStatus = api.getStatus();
             saveAPIStatus(registry, artifactPath, apiStatus);
@@ -281,7 +276,8 @@ public class RegistryPersistenceImpl implements APIPersistence {
                 registry.rollbackTransaction();
             } catch (RegistryException re) {
                 // Throwing an error here would mask the original exception
-                log.error("Error while rolling back the transaction for API: " + api.getId().getApiName(), re);
+                log.error("Error while rolling back the transaction for API: " + api.getId()
+                        .getApiName() + ". " + e.getMessage(), re);
             }
             throw new APIPersistenceException("Error while performing registry transaction operation", e);
         } catch (APIManagementException e) {
@@ -297,6 +293,32 @@ public class RegistryPersistenceImpl implements APIPersistence {
             } catch (RegistryException ex) {
                 throw new APIPersistenceException(
                         "Error while rolling back the transaction for API: " + api.getId().getApiName(), ex);
+            }
+        }
+    }
+
+    private void applyTags(Set<String> apiTags, Registry registry, String artifactPath)
+            throws APIPersistenceException {
+        Set<String> tagSet = apiTags;
+        if (tagSet != null) {
+            for (String tag : tagSet) {
+                try {
+                    registry.applyTag(artifactPath, tag);
+                } catch (RegistryException e) {
+                    try {
+                        registry.rollbackTransaction();
+                    } catch (RegistryException re) {
+                        log.error(
+                                "Error while rolling back the transaction of API Tag: " + tag + " to the artifact: "
+                                        + artifactPath + ". " + e.getMessage(), re);
+                    }
+
+                    String illegalCharacterString = "illegal characters";
+                    if (e.getMessage().contains(illegalCharacterString)) {
+                        throw new APIPersistenceException(e.getMessage());
+                    }
+                    throw new APIPersistenceException("Error while performing registry transaction operation", e);
+                }
             }
         }
     }
@@ -525,12 +547,7 @@ public class RegistryPersistenceImpl implements APIPersistence {
                     registry.removeTag(artifactPath, tag.getTagName());
                 }
             }
-            Set<String> tagSet = api.getTags();
-            if (tagSet != null) {
-                for (String tag : tagSet) {
-                    registry.applyTag(artifactPath, tag);
-                }
-            }
+            applyTags(api.getTags(), registry, artifactPath);
             artifactManager.updateGenericArtifact(updateApiArtifact);
 
             //write API Status to a separate property. This is done to support querying APIs using custom query (SQL)
@@ -641,7 +658,8 @@ public class RegistryPersistenceImpl implements APIPersistence {
                 registry.rollbackTransaction();
             } catch (RegistryException re) {
                 // Throwing an error from this level will mask the original exception
-                log.error("Error while rolling back the transaction for API: " + api.getId().getApiName(), re);
+                log.error("Error while rolling back the transaction for API: " + api.getId().getApiName() +
+                        ". " + e.getMessage(), re);
             }
             throw new APIPersistenceException("Error while performing registry transaction operation ", e);
         } finally {
@@ -3256,12 +3274,7 @@ public class RegistryPersistenceImpl implements APIPersistence {
             // Make the LC status of the API Product published by default
             saveAPIStatus(registry, artifactPath, APIConstants.PUBLISHED);
 
-            Set<String> tagSet = apiProduct.getTags();
-            if (tagSet != null) {
-                for (String tag : tagSet) {
-                    registry.applyTag(artifactPath, tag);
-                }
-            }
+            applyTags(apiProduct.getTags(), registry, artifactPath);
 
             String visibleRolesList = apiProduct.getVisibleRoles();
             String[] visibleRoles = new String[0];
@@ -3484,12 +3497,7 @@ public class RegistryPersistenceImpl implements APIPersistence {
                     registry.removeTag(artifactPath, tag.getTagName());
                 }
             }
-            Set<String> tagSet = apiProduct.getTags();
-            if (tagSet != null) {
-                for (String tag : tagSet) {
-                    registry.applyTag(artifactPath, tag);
-                }
-            }
+            applyTags(apiProduct.getTags(), registry, artifactPath);
             String publisherAccessControlRoles = apiProduct.getAccessControlRoles();
 
             updateRegistryResources(registry, artifactPath, publisherAccessControlRoles, apiProduct.getAccessControl(),
