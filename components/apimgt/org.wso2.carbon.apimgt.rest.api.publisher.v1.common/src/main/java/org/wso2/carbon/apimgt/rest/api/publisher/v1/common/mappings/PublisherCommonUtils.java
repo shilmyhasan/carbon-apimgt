@@ -1941,8 +1941,9 @@ public class PublisherCommonUtils {
         return apiProvider.getAPIbyUUID(apiToAdd.getUuid(), organization);
     }
 
-    public static boolean validateMandatoryProperties(org.json.simple.JSONArray customProperties, APIDTO apiDto) {
+    public static List<String> validateMandatoryProperties(org.json.simple.JSONArray customProperties, APIDTO apiDto) {
 
+        List<String> errorPropertyNames = new ArrayList<>();
         Map<String, APIInfoAdditionalPropertiesMapDTO> additionalPropertiesMap = apiDto.getAdditionalPropertiesMap();
 
         for (int i = 0; i < customProperties.size(); i++) {
@@ -1955,7 +1956,8 @@ public class PublisherCommonUtils {
                         additionalPropertiesMap.get(propertyName + "__display");
                 APIInfoAdditionalPropertiesMapDTO mapProperty = additionalPropertiesMap.get(propertyName);
                 if (mapProperty == null && mapPropertyDisplay == null) {
-                    return false;
+                    errorPropertyNames.add(propertyName);
+                    continue;
                 }
                 String propertyValue = "";
                 String propertyValueDisplay = "";
@@ -1967,10 +1969,10 @@ public class PublisherCommonUtils {
                 }
                 if ((propertyValue == null || propertyValue.isEmpty()) &&
                         (propertyValueDisplay == null || propertyValueDisplay.isEmpty())) {
-                    return false;
+                    errorPropertyNames.add(propertyName);
                 }
             }
         }
-        return true;
+        return errorPropertyNames;
     }
 }
