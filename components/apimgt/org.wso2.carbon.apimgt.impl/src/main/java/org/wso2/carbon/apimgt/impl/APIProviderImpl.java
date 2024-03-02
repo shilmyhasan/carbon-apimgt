@@ -1645,7 +1645,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             api.setCreatedTime(existingAPI.getCreatedTime());
             apiPersistenceInstance.updateAPI(new Organization(tenantDomain), APIMapper.INSTANCE.toPublisherApi(api));
         } catch (APIPersistenceException e) {
-            throw new APIManagementException("Error while updating API details", e);
+            throw new APIManagementException("Error while updating API details. " + e.getMessage(), e);
         }
         APIUtil.logAuditMessage(APIConstants.AuditLogConstants.API, apiLogObject.toString(),
                 APIConstants.AuditLogConstants.UPDATED, this.username);
@@ -2512,7 +2512,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     try {
                         apiPersistenceInstance.updateAPI(new Organization(tenantDomain), publisherAPI);
                     } catch (APIPersistenceException e) {
-                        handleException("Error while persisting the updated API ", e);
+                        handleException("Error while persisting the updated API. " + e.getMessage(), e);
                     }
 
                 }
@@ -7868,7 +7868,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             apiProductUUID = addedAPIProduct.getId();
         } catch (APIPersistenceException e) {
-            throw new APIManagementException("Error while creating API product ", e);
+            throw new APIManagementException("Error while creating API product. " + e.getMessage(), e);
         }
 
 
@@ -7927,7 +7927,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     new Organization(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()),
                     publisherAPIProduct);
         } catch (APIPersistenceException e) {
-            throw new APIManagementException("Error while creating API product ");
+            throw new APIManagementException("Error while creating API product. " + e.getMessage());
         }
     }
 
