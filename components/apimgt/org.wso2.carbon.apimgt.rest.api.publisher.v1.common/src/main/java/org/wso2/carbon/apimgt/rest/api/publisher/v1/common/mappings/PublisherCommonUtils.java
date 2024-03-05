@@ -1941,6 +1941,13 @@ public class PublisherCommonUtils {
         return apiProvider.getAPIbyUUID(apiToAdd.getUuid(), organization);
     }
 
+    /**
+     * This method is used to validate the mandatory custom properties of an API
+     *
+     * @param customProperties custom properties of the API
+     * @param apiDto API DTO to validate
+     * @return list of erroneous property names. returns an empty array if there are no errors.
+     */
     public static List<String> validateMandatoryProperties(org.json.simple.JSONArray customProperties, APIDTO apiDto) {
 
         List<String> errorPropertyNames = new ArrayList<>();
