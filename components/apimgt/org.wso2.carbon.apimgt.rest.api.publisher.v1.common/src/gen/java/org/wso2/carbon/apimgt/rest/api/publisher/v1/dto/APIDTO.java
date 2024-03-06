@@ -100,38 +100,7 @@ return null;
         }
     }
     private TypeEnum type = TypeEnum.HTTP;
-
-    @XmlType(name="AudienceEnum")
-    @XmlEnum(String.class)
-    public enum AudienceEnum {
-        PUBLIC("PUBLIC"),
-        SINGLE("SINGLE");
-        private String value;
-
-        AudienceEnum (String v) {
-            value = v;
-        }
-
-        public String value() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-        @JsonCreator
-        public static AudienceEnum fromValue(String v) {
-            for (AudienceEnum b : AudienceEnum.values()) {
-                if (String.valueOf(b.value).equals(v)) {
-                    return b;
-                }
-            }
-return null;
-        }
-    }
-    private AudienceEnum audience = null;
+    private List<String> audience = new ArrayList<String>();
     private List<String> transport = new ArrayList<String>();
     @Scope(name = "apim:api_publish", description="", value ="")
     @Scope(name = "apim:api_manage", description="", value ="")
@@ -634,20 +603,20 @@ return null;
   }
 
   /**
-   * The audience of the API. Accepted values are PUBLIC, SINGLE
+   * The audience of the API. Accepted values are any String values
    **/
-  public APIDTO audience(AudienceEnum audience) {
+  public APIDTO audience(List<String> audience) {
     this.audience = audience;
     return this;
   }
 
   
-  @ApiModelProperty(example = "PUBLIC", value = "The audience of the API. Accepted values are PUBLIC, SINGLE")
+  @ApiModelProperty(value = "The audience of the API. Accepted values are any String values")
   @JsonProperty("audience")
-  public AudienceEnum getAudience() {
+  public List<String> getAudience() {
     return audience;
   }
-  public void setAudience(AudienceEnum audience) {
+  public void setAudience(List<String> audience) {
     this.audience = audience;
   }
 

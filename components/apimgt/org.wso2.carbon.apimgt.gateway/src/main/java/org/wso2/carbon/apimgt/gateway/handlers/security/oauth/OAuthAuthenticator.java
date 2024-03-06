@@ -18,6 +18,8 @@ package org.wso2.carbon.apimgt.gateway.handlers.security.oauth;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -27,7 +29,9 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
+import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.model.ApiTypeWrapper;
 import org.wso2.carbon.apimgt.common.gateway.dto.JWTConfigurationDto;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
@@ -42,6 +46,7 @@ import org.wso2.carbon.apimgt.gateway.handlers.security.jwt.JWTValidator;
 import org.wso2.carbon.apimgt.gateway.internal.DataHolder;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
+import org.wso2.carbon.apimgt.gateway.utils.RESTAPIAdminServiceProxy;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
@@ -49,6 +54,8 @@ import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.jwt.SignedJWTInfo;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.model.entity.API;
+import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
+import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.apimgt.tracing.TracingSpan;
 import org.wso2.carbon.apimgt.tracing.TracingTracer;
 import org.wso2.carbon.apimgt.tracing.Util;
@@ -58,8 +65,11 @@ import org.wso2.carbon.metrics.manager.Timer;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import javax.cache.Cache;
 
@@ -88,8 +98,15 @@ public class OAuthAuthenticator implements Authenticator {
     private boolean removeDefaultAPIHeaderFromOutMessage = true;
     private String requestOrigin;
     private boolean isMandatory;
+    private Set<String> audience;
 
     public OAuthAuthenticator() {
+    }
+
+    public OAuthAuthenticator(String authorizationHeader, boolean isMandatory, boolean removeOAuthHeader,
+                              Set<String> audience) {
+        this(authorizationHeader, isMandatory, removeOAuthHeader);
+        this.setAudience(audience);
     }
 
     public OAuthAuthenticator(String authorizationHeader, boolean isMandatory, boolean removeOAuthHeader) {
@@ -297,6 +314,11 @@ public class OAuthAuthenticator implements Authenticator {
         } else {
             //Start JWT token validation
             if (isJwtToken) {
+                if (!validateAudience(signedJWTInfo)) {
+                    return new AuthenticationResponse(false, isMandatory, true,
+                            APISecurityConstants.API_OAUTH_INVALID_AUDIENCE,
+                            APISecurityConstants.API_OAUTH_INVALID_AUDIENCE_MESSAGE);
+                }
                 try {
                     AuthenticationContext authenticationContext = jwtValidator.authenticate(signedJWTInfo, synCtx);
                     APISecurityUtils.setAuthenticationContext(synCtx, authenticationContext, securityContextHeader);
@@ -397,6 +419,16 @@ public class OAuthAuthenticator implements Authenticator {
         return result.trim();
     }
 
+    private boolean validateAudience(SignedJWTInfo signedJWTInfo){
+        List<String> jwtAudienceClaim = signedJWTInfo.getJwtClaimsSet().getAudience();
+        for (String aud : getAudience()) {
+            if (jwtAudienceClaim.contains(aud)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected APIManagerConfiguration getApiManagerConfiguration() {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
     }
@@ -470,6 +502,14 @@ public class OAuthAuthenticator implements Authenticator {
 
     private void setSecurityContextHeader(String securityContextHeader) {
         this.securityContextHeader = securityContextHeader;
+    }
+
+    public void setAudience(Set<String> audience) {
+        this.audience = audience;
+    }
+
+    public Set<String> getAudience() {
+        return audience;
     }
 
     private boolean isRemoveOAuthHeadersFromOutMessage() {
