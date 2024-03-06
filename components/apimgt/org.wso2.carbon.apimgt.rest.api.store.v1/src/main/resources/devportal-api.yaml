@@ -4124,6 +4124,11 @@ components:
           type: string
           description: The unique identifier of the API.
           example: 2962f3bb-8330-438e-baee-0ee1d6434ba4
+        apiProviderTenantDomain:
+          type: string
+          description: |
+            Tenant domain of the API Owner.
+          example: carbon.super
         apiInfo:
           $ref: '#/components/schemas/APIInfo'
         applicationInfo:
