@@ -26,6 +26,7 @@ import org.wso2.carbon.apimgt.api.model.OAuthAppRequest;
 import org.wso2.carbon.apimgt.api.model.OAuthApplicationInfo;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
 import org.wso2.carbon.apimgt.rest.api.dcr.web.RegistrationService;
 import org.wso2.carbon.apimgt.rest.api.dcr.web.dto.FaultResponse;
@@ -47,6 +48,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.config.RealmConfigXMLProcessor;
@@ -76,6 +78,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private static final Log log = LogFactory.getLog(RegistrationServiceImpl.class);
     private static final String APP_DISPLAY_NAME = "DisplayName";
+    private final String AT_SUPER_TENANT_DOMAIN = "@carbon.super";
+    private final String SUPER_TENANT_DOMAIN = "carbon.super";
 
     @POST
     @Override
@@ -102,8 +106,26 @@ public class RegistrationServiceImpl implements RegistrationService {
             String owner = profile.getOwner();
             String authUserName = RestApiCommonUtil.getLoggedInUsername();
 
-            //If user is in a secondory userstore, update the owner of the application with
-            //correct domain
+            if (isUserSuperAdmin(authUserName)) {
+                String tenantDomain = MultitenantUtils.getTenantDomain(authUserName);
+                String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(owner);
+                try {
+                    int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                            .getTenantId(tenantDomain);
+                    UserStoreManager manager = ServiceReferenceHolder.getInstance().getRealmService()
+                            .getTenantUserRealm(tenantId).getUserStoreManager();
+                    if (!manager.isExistingUser(tenantAwareUserName)) {
+                        String errorMsg = "Application owner: " + owner + " does not exists";
+                        log.error(errorMsg);
+                        errorDTO = RestApiUtil.getErrorDTO(errorMsg, 403L, errorMsg);
+                        return Response.status(Response.Status.FORBIDDEN).entity(errorDTO).build();
+                    }
+                } catch (org.wso2.carbon.user.api.UserStoreException e) {
+                    throw new APIManagementException("Error while checking application owner existence.");
+                }
+            }
+
+            //If user is in a secondary user store, update the owner of the application with the correct domain
             if (owner != null && authUserName != null) {
                 int index = authUserName.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
                 int ownerIndex = owner.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
@@ -120,7 +142,19 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
             }
 
-            //Validates if the application owner and logged in username is same.
+            if (RestApiCommonUtil.getLoggedInUserTenantDomain().equals(SUPER_TENANT_DOMAIN)
+                    && !owner.equals(authUserName)) {
+                if (owner.contains(AT_SUPER_TENANT_DOMAIN) && !authUserName.contains(AT_SUPER_TENANT_DOMAIN)
+                        && !isUserSuperAdmin(authUserName)) {
+                    authUserName = authUserName + AT_SUPER_TENANT_DOMAIN;
+                }
+
+                if (!owner.contains(AT_SUPER_TENANT_DOMAIN) && authUserName.contains(AT_SUPER_TENANT_DOMAIN)) {
+                    owner = owner + AT_SUPER_TENANT_DOMAIN;
+                }
+            }
+
+            //Validates if the app owner in payload and auth-user username is same or is auth-user a super admin
             if (authUserName != null && ((authUserName.equals(owner))|| isUserSuperAdmin(authUserName))) {
                 if (!isUserAccessAllowed(authUserName)) {
                     String errorMsg = "You do not have enough privileges to create an OAuth app";
@@ -164,14 +198,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }else{
                     loggedInUserTenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
                 }
-                String userId = (String) oauthApplicationInfo.getParameter(OAUTH_CLIENT_USERNAME);
-                String userNameForSP = MultitenantUtils.getTenantAwareUsername(userId);
-                // Replace domain separator by "_" if user is coming from a secondary userstore.
-                String domain = UserCoreUtil.extractDomainFromName(userNameForSP);
-                if (domain != null && !domain.isEmpty() && !UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals
-                        (domain)) {
-                    userNameForSP = userNameForSP.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
-                }
+
                 applicationName = profile.getClientName();
 
                 ApplicationManagementService applicationManagementService =
@@ -191,8 +218,13 @@ public class RegistrationServiceImpl implements RegistrationService {
                 if (appServiceProvider != null) {
                     returnedAPP = this.getExistingApp(applicationName, appServiceProvider.isSaasApp());
                 } else {
-                    //create a new application if the application doesn't exists.
+                    //create a new application if the application doesn't exist.
                     returnedAPP = this.createApplication(applicationName, appRequest, grantTypes);
+                }
+
+                if (owner.contains(AT_SUPER_TENANT_DOMAIN)
+                        && !returnedAPP.getAppOwner().contains(AT_SUPER_TENANT_DOMAIN)) {
+                    returnedAPP.setAppOwner(returnedAPP.getAppOwner() + AT_SUPER_TENANT_DOMAIN);
                 }
                 //ReturnedAPP is null
                 if (returnedAPP == null) {
@@ -204,11 +236,22 @@ public class RegistrationServiceImpl implements RegistrationService {
                             (RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 500L, errorMsg);
                     response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                             entity(errorDTO).build();
-                } else {
+                } else if (authUserName.equals(returnedAPP.getAppOwner())
+                        || (isUserSuperAdmin(authUserName) && owner.equals(returnedAPP.getAppOwner()))) {
+                    // Permit only if (auth user is the app owner)
+                    // or (auth user is super admin and payload.owner is same as app owner)
                     if (log.isDebugEnabled()) {
                         log.debug("OAuth app " + profile.getClientName() + " creation successful.");
                     }
                     response = Response.status(Response.Status.OK).entity(returnedAPP).build();
+                } else {
+                    String errMsg = "Access is forbidden to the application";
+                    if (log.isDebugEnabled()) {
+                        log.debug("OAuth app owner: " + returnedAPP.getAppOwner() + " is different from payload " +
+                                "owner: " + owner + " and " + errMsg);
+                    }
+                    errorDTO = RestApiUtil.getErrorDTO(RestApiConstants.STATUS_FORBIDDEN_MESSAGE_DEFAULT, 403L, errMsg);
+                    response = Response.status(Response.Status.FORBIDDEN).entity(errorDTO).build();
                 }
             } else {
                 String errorMsg = "Logged in user '" + authUserName + "' and application owner '" +
@@ -309,9 +352,17 @@ public class RegistrationServiceImpl implements RegistrationService {
             Map<String, String> valueMap = new HashMap<String, String>();
             valueMap.put(OAUTH_CLIENT_GRANT, consumerAppDTO.getGrantTypes());
 
+            String username = consumerAppDTO.getUsername();
+            String tenantAwareUsername;
+            if (MultitenantUtils.getTenantDomain(username).equals("carbon.super")) {
+                tenantAwareUsername = MultitenantUtils.getTenantAwareUsername(username);
+            } else {
+                tenantAwareUsername = username;
+            }
+
             appToReturn = this.fromAppDTOToApplicationInfo(consumerAppDTO.getOauthConsumerKey(),
                     consumerAppDTO.getApplicationName(), consumerAppDTO.getCallbackUrl(),
-                    consumerAppDTO.getOauthConsumerSecret(), saasApp, null, valueMap);
+                    consumerAppDTO.getOauthConsumerSecret(), saasApp, tenantAwareUsername, valueMap);
 
         } catch (IdentityOAuthAdminException e) {
             log.error("error occurred while trying to get OAuth Application data", e);
@@ -322,9 +373,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     /**
      * Create a new client application
      *
+     * @param applicationName application name
      * @param appRequest OAuthAppRequest object with client's payload content
+     * @param grantType grant type
      * @return created Application
-     * @throws APIKeyMgtException if failed to create the a new application
+     * @throws APIManagementException if failed to create a new application
      */
     private OAuthApplicationInfo createApplication(String applicationName, OAuthAppRequest appRequest,
             String grantType) throws APIManagementException {
@@ -341,6 +394,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         String tenantDomain = MultitenantUtils.getTenantDomain(userId);
 
         try {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(userName);
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.
                     equals(tenantDomain)) {
                 isTenantFlowStarted = true;
@@ -388,6 +442,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             OAuthConsumerAppDTO createdOauthApp =
                     this.createOAuthApp(applicationName, applicationInfo, grantType, userName);
 
+            createdOauthApp.setUsername(MultitenantUtils.getTenantAwareUsername(createdOauthApp.getUsername()));
             // Set the OAuthApp in InboundAuthenticationConfig
             InboundAuthenticationConfig inboundAuthenticationConfig = new InboundAuthenticationConfig();
             InboundAuthenticationRequestConfig[] inboundAuthenticationRequestConfigs =
