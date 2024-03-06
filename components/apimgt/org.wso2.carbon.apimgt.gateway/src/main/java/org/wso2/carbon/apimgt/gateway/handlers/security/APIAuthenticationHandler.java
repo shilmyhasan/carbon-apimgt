@@ -60,11 +60,14 @@ import org.wso2.carbon.metrics.manager.MetricManager;
 import org.wso2.carbon.metrics.manager.Timer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -91,6 +94,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
     private SynapseEnvironment synapseEnvironment;
 
     private String authorizationHeader;
+    private Set<String> audience;
     private String apiSecurity;
     private String apiLevelPolicy;
     private String certificateInformation;
@@ -187,6 +191,24 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
      */
     public String getAuthorizationHeader() {
         return authorizationHeader;
+    }
+
+    /**
+     * To set the audience for api.
+     *
+     * @param audience the audience of the API request.
+     */
+    public void setAudience(String audience) {
+        this.audience = new HashSet<>(Arrays.asList(audience.split(",")));
+    }
+
+    /**
+     * To get the audience of an api.
+     *
+     * @return API level audience for JWT validation.
+     */
+    public Set<String> getAudience() {
+        return audience;
     }
 
     /**
@@ -321,7 +343,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         }
         if (isOAuthProtected) {
             Authenticator authenticator = new OAuthAuthenticator(authorizationHeader, isOAuthBasicAuthMandatory,
-                    removeOAuthHeadersFromOutMessage);
+                    removeOAuthHeadersFromOutMessage, this.getAudience());
             authenticator.init(synapseEnvironment);
             authenticators.add(authenticator);
         }

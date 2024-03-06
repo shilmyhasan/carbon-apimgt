@@ -20,6 +20,7 @@ package org.wso2.carbon.apimgt.persistence.dto;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A subset of org.wso2.carbon.apimgt.persistence.models.PublisherAPI. Minimal API information required only for
@@ -37,17 +38,17 @@ public class PublisherAPIInfo {
     private String thumbnail; // thumbnail is not required for normal ApiGet
     private String createdTime;
     private Date updatedTime;
-    private String audience;
+    private Set<String> audience;
     private Map<String, String> additionalProperties;
     private String description;
     private String gatewayVendor;
     private boolean advertiseOnly;
 
-    public String getAudience() {
+    public Set<String> getAudience() {
         return audience;
     }
 
-    public void setAudience(String audience) {
+    public void setAudience(Set<String> audience) {
         this.audience = audience;
     }
 

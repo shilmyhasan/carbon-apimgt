@@ -290,7 +290,7 @@ public class RegistryPersistenceUtil {
             //set async transport protocols for the API
             artifact.setAttribute(APIConstants.ASYNC_API_TRANSPORT_PROTOCOLS, api.getAsyncTransportProtocols());
 
-            artifact.setAttribute(APIConstants.API_OVERVIEW_AUDIENCE, api.getAudience());
+            artifact.setAttribute(APIConstants.API_OVERVIEW_AUDIENCE, new Gson().toJson(api.getAudience()));
 
         } catch (GovernanceException e) {
             String msg = "Failed to create API for : " + api.getId().getApiName();
@@ -676,7 +676,10 @@ public class RegistryPersistenceUtil {
             String monetizationInfo = artifact.getAttribute(APIConstants.Monetization.API_MONETIZATION_PROPERTIES);
 
             api.setWsUriMapping(getWsUriMappingFromArtifact(artifact));
-            api.setAudience(artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCE));
+            String audience = artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCE);
+            if (StringUtils.isNotEmpty(audience)) {
+                api.setAudience(new Gson().fromJson(audience, Set.class));
+            }
             api.setVersionTimestamp(artifact.getAttribute(APIConstants.API_OVERVIEW_VERSION_COMPARABLE));
 
             //set selected clusters which API needs to be deployed

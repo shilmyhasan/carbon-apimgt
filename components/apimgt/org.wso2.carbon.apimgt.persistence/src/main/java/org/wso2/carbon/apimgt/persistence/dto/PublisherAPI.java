@@ -92,18 +92,18 @@ public class PublisherAPI extends PublisherAPIInfo {
     private String asyncTransportProtocols;
 
     private String versionTimestamp;
-    private String audience;
+    private Set<String> audience;
     private String apiExternalProductionEndpoint;
     private String apiExternalSandboxEndpoint;
     private String redirectURL;
     private String apiOwner;
     private String vendor;
 
-    public String getAudience() {
+    public Set<String> getAudience() {
         return audience;
     }
 
-    public void setAudience(String audience) {
+    public void setAudience(Set<String> audience) {
         this.audience = audience;
     }
 

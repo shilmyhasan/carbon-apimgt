@@ -218,13 +218,13 @@ public class API implements Serializable {
      */
     private int revisionId;
     
-    private String audience;
+    private Set<String> audience;
 
-    public String getAudience() {
+    public Set<String> getAudience() {
         return audience;
     }
 
-    public void setAudience(String audience) {
+    public void setAudience(Set<String> audience) {
         this.audience = audience;
     }
 
