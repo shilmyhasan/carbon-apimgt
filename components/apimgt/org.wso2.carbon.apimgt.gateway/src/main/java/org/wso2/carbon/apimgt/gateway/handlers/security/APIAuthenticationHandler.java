@@ -656,6 +656,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
             status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
         } else if (e.getErrorCode() == APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE ||
                 e.getErrorCode() == APISecurityConstants.API_AUTH_FORBIDDEN ||
+                e.getErrorCode() == APISecurityConstants.API_OAUTH_INVALID_AUDIENCE ||
                 e.getErrorCode() == APISecurityConstants.INVALID_SCOPE) {
             status = HttpStatus.SC_FORBIDDEN;
         } else {

@@ -109,6 +109,9 @@ public class APISecurityConstants {
             case API_AUTH_INCORRECT_ACCESS_TOKEN_TYPE:
                 errorMessage = API_AUTH_INCORRECT_ACCESS_TOKEN_TYPE_MESSAGE;
                 break;
+            case API_OAUTH_INVALID_AUDIENCE:
+                errorMessage = API_OAUTH_INVALID_AUDIENCE_MESSAGE;
+                break;
             case API_BLOCKED:
                 errorMessage = API_BLOCKED_MESSAGE;
                 break;
