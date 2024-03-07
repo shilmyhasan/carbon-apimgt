@@ -415,8 +415,12 @@ public class OAuthAuthenticator implements Authenticator {
     }
 
     private boolean validateAudience(SignedJWTInfo signedJWTInfo){
+
+        if (this.getAudience() == null || this.getAudience().isEmpty()) {
+            return true;
+        }
         List<String> jwtAudienceClaim = signedJWTInfo.getJwtClaimsSet().getAudience();
-        for (String aud : getAudience()) {
+        for (String aud : this.getAudience()) {
             if (jwtAudienceClaim.contains(aud)) {
                 return true;
             }

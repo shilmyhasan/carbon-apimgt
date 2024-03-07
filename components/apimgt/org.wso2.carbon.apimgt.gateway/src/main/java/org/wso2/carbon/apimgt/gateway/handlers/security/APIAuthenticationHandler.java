@@ -199,7 +199,12 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
      * @param audience the audience of the API request.
      */
     public void setAudience(String audience) {
-        this.audience = new HashSet<>(Arrays.asList(audience.split(",")));
+
+        if (!audience.isEmpty()) {
+            this.audience = new HashSet<>(Arrays.asList(audience.split(",")));
+        } else {
+            this.audience = new HashSet<>();
+        }
     }
 
     /**
