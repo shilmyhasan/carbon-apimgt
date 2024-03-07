@@ -2965,9 +2965,12 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
             String applicationName = application.getName();
 
+            String requestedDomain = MultitenantUtils.getTenantDomain(
+                    APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
+
             try {
-                String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && requestedTenant != null ?
-                        requestedTenant : tenantDomain;
+                String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && requestedDomain != null ?
+                        requestedDomain : tenantDomain;
                 WorkflowExecutor addSubscriptionWFExecutor = getWorkflowExecutor(
                         WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION, workflowDomain);
 
@@ -3153,10 +3156,12 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 isTenantFlowStarted = startTenantFlowForTenantDomain(tenantDomain);
             }
 
+            String requestedDomain = MultitenantUtils.getTenantDomain(
+                    APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
 
             try {
-                String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && requestedTenant != null ?
-                        requestedTenant : tenantDomain;
+                String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && requestedDomain != null ?
+                        requestedDomain : tenantDomain;
                 WorkflowExecutor updateSubscriptionWFExecutor = getWorkflowExecutor(
                         WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_UPDATE, workflowDomain);
 
@@ -3339,8 +3344,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 isTenantFlowStarted = true;
             }
 
-            String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && requestedTenant != null ?
-                    requestedTenant : tenantDomain;
+            String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && providerTenantDomain != null ?
+                    providerTenantDomain : tenantDomain;
 
             SubscriptionWorkflowDTO workflowDTO;
             WorkflowExecutor createSubscriptionWFExecutor = getWorkflowExecutor(
