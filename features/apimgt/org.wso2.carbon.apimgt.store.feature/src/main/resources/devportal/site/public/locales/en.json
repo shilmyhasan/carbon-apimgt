@@ -311,6 +311,7 @@
   "Applications.Details.Subscriptions.api.webhooks": "Web Hooks",
   "Applications.Details.Subscriptions.api.webhooks.delivery.time.unavailable": "Delivery data unavailable",
   "Applications.Details.Subscriptions.api.webhooks.subscriptions.unavailable": "No Webhook subscriptions available at this time.",
+  "Applications.Details.Subscriptions.apiProviderTenantDomain": "Provider Organization",
   "Applications.Details.Subscriptions.business.plan.updated": "Business Plan updated successfully!",
   "Applications.Details.Subscriptions.delete.success": "Subscription deleted successfully!",
   "Applications.Details.Subscriptions.error.occurred.during.subscription": "Error occurred during subscription",

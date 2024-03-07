@@ -42,6 +42,7 @@ import Alert from 'AppComponents/Shared/Alert';
 import APIList from 'AppComponents/Apis/Listing/APICardView';
 import ResourceNotFound from 'AppComponents/Base/Errors/ResourceNotFound';
 import Subscription from 'AppData/Subscription';
+import Settings from 'AppComponents/Shared/SettingsContext';
 import Api from 'AppData/api';
 import { app } from 'Settings';
 import InlineMessage from 'AppComponents/Shared/InlineMessage';
@@ -168,6 +169,7 @@ class Subscriptions extends React.Component {
             apisNotFound: false,
             subscriptionsNotFound: false,
             isAuthorize: true,
+            isCrossTenantSubscriptionEnabled: false,
             openDialog: false,
             searchText: '',
         };
@@ -194,7 +196,17 @@ class Subscriptions extends React.Component {
                 params: { applicationId },
             },
         } = this.props;
+        this.isCrossTenantSubscriptionEnabled();
         this.updateSubscriptions(applicationId);
+    }
+
+    /**
+     * retrieve Settings from the context and check the crossTenantSubscription enabled
+     */
+    isCrossTenantSubscriptionEnabled = () => {
+        const settingsContext = this.context;
+        const enabled = settingsContext.settings.crossTenantSubscriptionEnabled;
+        this.setState({ isCrossTenantSubscriptionEnabled: enabled });
     }
 
     handleOpenDialog() {
@@ -408,7 +420,9 @@ class Subscriptions extends React.Component {
      * @memberof Subscriptions
      */
     render() {
-        const { isAuthorize, openDialog, searchText } = this.state;
+        const {
+            isAuthorize, openDialog, searchText, isCrossTenantSubscriptionEnabled,
+        } = this.state;
 
         if (!isAuthorize) {
             window.location = app.context + '/services/configs';
@@ -482,6 +496,14 @@ class Subscriptions extends React.Component {
                                                                 defaultMessage='API'
                                                             />
                                                         </TableCell>
+                                                        {isCrossTenantSubscriptionEnabled && (
+                                                            <TableCell>
+                                                                <FormattedMessage
+                                                                    id='Applications.Details.Subscriptions.apiProviderTenantDomain'
+                                                                    defaultMessage='Provider Organization'
+                                                                />
+                                                            </TableCell>
+                                                        )}
                                                         <TableCell>
                                                             <FormattedMessage
                                                                 id={`Applications.Details.Subscriptions
@@ -522,6 +544,9 @@ class Subscriptions extends React.Component {
                                                                             }
                                                                             handleSubscriptionUpdate={
                                                                                 this.handleSubscriptionUpdate
+                                                                            }
+                                                                            isCrossTenantSubscriptionEnabled={
+                                                                                this.isCrossTenantSubscriptionEnabled
                                                                             }
                                                                         />
                                                                     );
@@ -625,6 +650,9 @@ class Subscriptions extends React.Component {
         }
     }
 }
+
+Subscriptions.contextType = Settings;
+
 Subscriptions.propTypes = {
     classes: PropTypes.shape({}).isRequired,
     match: PropTypes.shape({
