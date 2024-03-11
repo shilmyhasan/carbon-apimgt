@@ -92,9 +92,8 @@ const styles = (theme) => {
             overflowY: 'auto',
             overflowX: 'hidden',
             position: 'relative',
-            minHeight: `calc(100vh - ${64 + footerHeight}px)`,
+            minHeight: theme.custom.banner.active ? `calc(100vh - ${64 + footerHeight}px)` : `calc(100vh - ${footerHeight}px)`,
             marginLeft: -4,
-            marginTop: 64,
         },
         push: {
             height: footerHeight || 50,
@@ -149,6 +148,11 @@ const styles = (theme) => {
             display: 'flex',
             distributeContent: theme.custom.banner.textAlign,
             justifyContent: theme.custom.banner.textAlign,
+            top: 0,
+            position: 'fixed',
+            width: '100%',
+            boxSizing: 'border-box',
+            zIndex: 1,
         },
         listRoot: {
             padding: 0,
@@ -236,6 +240,7 @@ class Layout extends React.Component {
         openNavBar: false,
         openUserMenu: false,
         selected: 'home',
+        bannerHeight: 0
     };
     ditectCurrentMenu = () => {
         // We can't use history location since with logout redirection, it behaves strangely.
@@ -257,7 +262,19 @@ class Layout extends React.Component {
 
     componentDidMount() {
         const { history: { location } } = this.props;
+        const { theme } = this.props;
         this.ditectCurrentMenu(location);
+        if (theme.custom.banner.active) {
+            if (theme.custom.banner.style === 'image') {
+                setTimeout(() => {
+                  const bannerElement = document.getElementById('bannerElement');
+                  this.setState({ bannerHeight: bannerElement.clientHeight });
+                }, 1000);
+            } else {
+                const bannerElement = document.getElementById('bannerElement');
+                this.setState({ bannerHeight: bannerElement.clientHeight });
+            }
+        }
     }
 
     handleRequestCloseUserMenu = () => {
@@ -373,7 +390,7 @@ class Layout extends React.Component {
         return (
             <>
                 {active && (
-                    <div className={classes.banner}>
+                    <div className={classes.banner} id='bannerElement'>
                         {style === 'text' ? text
                             : (
                                 <img
@@ -384,8 +401,13 @@ class Layout extends React.Component {
                     </div>
                 )}
                 <div className={classes.reactRoot} id='pageRoot'>
-                    <div className={classes.wrapper}>
-                        <AppBar position='fixed' className={classes.appBar} id='appBar'>
+                    <div className={classes.wrapper} style={{marginTop: active ? (this.state.bannerHeight + 64) + 'px' : 0}}>
+                        <AppBar 
+                            position='fixed' 
+                            className={classes.appBar} 
+                            id='appBar' 
+                            style={{  top: active ? this.state.bannerHeight + 'px' : 'unset' }}
+                        >
                             <Toolbar className={classes.toolbar} id='toolBar'>
                                 <Hidden mdUp>
                                     <IconButton onClick={this.toggleGlobalNavBar} color='inherit'>
@@ -569,7 +591,7 @@ class Layout extends React.Component {
                                     )}
                             </Toolbar>
                         </AppBar>
-                        <main><div className={classes.contentWrapper}>{children}</div></main>
+                        <main><div className={classes.contentWrapper} style={{ paddingTop: active ? 'unset' : '64px'}}>{children}</div></main>
                         {footerActive && <div className={classes.push} />}
                     </div>
                     {footerActive && (
