@@ -82,19 +82,19 @@ public class WorkflowExecutorFactory {
         String cacheName = tenantDomain + "_" + APIConstants.WORKFLOW_CACHE_NAME;
         //synchronized (cacheName.intern()){
         Cache workflowCache = Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).getCache(APIConstants.WORKFLOW_CACHE_NAME);
-        TenantWorkflowConfigHolder workflowConfig = (TenantWorkflowConfigHolder) workflowCache.get(cacheName);
-
-        if (workflowConfig != null) {
-            return workflowConfig;
-        } else {
-            TenantWorkflowConfigHolder configHolder = new TenantWorkflowConfigHolder(tenantDomain,tenantId);
-            try {
-                configHolder.load();
-                workflowCache.put(cacheName, configHolder);
-                return configHolder;
-            } catch (WorkflowException | RegistryException e) {
-                handleException("Error occurred while creating workflow configurations for tenant " + tenantDomain, e);
+        if (PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain().equals(tenantDomain)){
+            TenantWorkflowConfigHolder workflowConfig = (TenantWorkflowConfigHolder) workflowCache.get(cacheName);
+            if (workflowConfig != null) {
+                return workflowConfig;
             }
+        }
+        TenantWorkflowConfigHolder configHolder = new TenantWorkflowConfigHolder(tenantDomain,tenantId);
+        try {
+            configHolder.load();
+            workflowCache.put(cacheName, configHolder);
+            return configHolder;
+        } catch (WorkflowException | RegistryException e) {
+            handleException("Error occurred while creating workflow configurations for tenant " + tenantDomain, e);
         }
         // }
 
