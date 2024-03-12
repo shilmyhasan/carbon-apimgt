@@ -79,22 +79,30 @@ public class WorkflowExecutorFactory {
      */
     public TenantWorkflowConfigHolder getConfiguration(String tenantDomain, int tenantId) throws WorkflowException {
 
-        String cacheName = tenantDomain + "_" + APIConstants.WORKFLOW_CACHE_NAME;
-        //synchronized (cacheName.intern()){
-        Cache workflowCache = Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER).getCache(APIConstants.WORKFLOW_CACHE_NAME);
-        if (PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain().equals(tenantDomain)){
-            TenantWorkflowConfigHolder workflowConfig = (TenantWorkflowConfigHolder) workflowCache.get(cacheName);
-            if (workflowConfig != null) {
-                return workflowConfig;
-            }
+        boolean isDifferentDomain = !PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain()
+                .equals(tenantDomain);
+        if (isDifferentDomain) {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
         }
-        TenantWorkflowConfigHolder configHolder = new TenantWorkflowConfigHolder(tenantDomain,tenantId);
+        //synchronized (cacheName.intern()){
         try {
-            configHolder.load();
-            workflowCache.put(cacheName, configHolder);
-            return configHolder;
+            String cacheName = tenantDomain + "_" + APIConstants.WORKFLOW_CACHE_NAME;
+            Cache workflowCache = Caching.getCacheManager(APIConstants.API_MANAGER_CACHE_MANAGER)
+                    .getCache(APIConstants.WORKFLOW_CACHE_NAME);
+            TenantWorkflowConfigHolder workflowConfig = (TenantWorkflowConfigHolder) workflowCache.get(cacheName);
+            if (workflowConfig == null) {
+                workflowConfig = new TenantWorkflowConfigHolder(tenantDomain, tenantId);
+                workflowConfig.load();
+                workflowCache.put(cacheName, workflowConfig);
+            }
+            return workflowConfig;
         } catch (WorkflowException | RegistryException e) {
             handleException("Error occurred while creating workflow configurations for tenant " + tenantDomain, e);
+        } finally {
+            if (isDifferentDomain) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
         // }
 
