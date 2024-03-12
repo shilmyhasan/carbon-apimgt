@@ -455,7 +455,11 @@ public abstract class AbstractAPIManager implements APIManager {
             if (api.isAsync()) {
                 api.setAsyncApiDefinition(getAsyncAPIDefinition(identifier));
             } else {
-                api.setSwaggerDefinition(getOpenAPIDefinition(identifier, tenantDomain));
+                if (this.tenantDomain == null || !this.tenantDomain.equals(apiTenantDomain)) {
+                    api.setSwaggerDefinition(getOpenAPIDefinition(identifier, apiTenantDomain));
+                } else {
+                    api.setSwaggerDefinition(getOpenAPIDefinition(identifier, tenantDomain));
+                }
             }
             if (api.getType() != null && APIConstants.APITransportType.GRAPHQL.toString().equals(api.getType())) {
                 api.setGraphQLSchema(getGraphqlSchema(api.getId()));
