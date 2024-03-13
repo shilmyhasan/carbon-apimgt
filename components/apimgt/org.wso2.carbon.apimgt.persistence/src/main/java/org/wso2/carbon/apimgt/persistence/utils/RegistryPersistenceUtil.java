@@ -290,7 +290,8 @@ public class RegistryPersistenceUtil {
             //set async transport protocols for the API
             artifact.setAttribute(APIConstants.ASYNC_API_TRANSPORT_PROTOCOLS, api.getAsyncTransportProtocols());
 
-            artifact.setAttribute(APIConstants.API_OVERVIEW_AUDIENCE, new Gson().toJson(api.getAudience()));
+            artifact.setAttribute(APIConstants.API_OVERVIEW_AUDIENCE, api.getAudience());
+
             //set audiences for jwt audience validation
             artifact.setAttribute(APIConstants.API_OVERVIEW_AUDIENCES, new Gson().toJson(api.getAudiences()));
         } catch (GovernanceException e) {
