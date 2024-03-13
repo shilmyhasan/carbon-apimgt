@@ -124,7 +124,7 @@ return null;
   }
 
   /**
-   * Tenant domain of the API Owner. 
+   * Tenant domain of the API Owner or API Product Owner. 
    **/
   public SubscriptionDTO apiProviderTenantDomain(String apiProviderTenantDomain) {
     this.apiProviderTenantDomain = apiProviderTenantDomain;
@@ -132,7 +132,7 @@ return null;
   }
 
   
-  @ApiModelProperty(example = "carbon.super", value = "Tenant domain of the API Owner. ")
+  @ApiModelProperty(example = "carbon.super", value = "Tenant domain of the API Owner or API Product Owner. ")
   @JsonProperty("apiProviderTenantDomain")
   public String getApiProviderTenantDomain() {
     return apiProviderTenantDomain;
