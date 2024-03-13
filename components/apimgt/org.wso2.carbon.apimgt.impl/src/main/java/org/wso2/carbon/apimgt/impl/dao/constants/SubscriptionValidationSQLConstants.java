@@ -20,62 +20,6 @@ package org.wso2.carbon.apimgt.impl.dao.constants;
 
 public class SubscriptionValidationSQLConstants {
 
-    public static final String GET_ALL_APPLICATIONS_SQL =
-            " SELECT " +
-                    "   APP.UUID AS APP_UUID," +
-                    "   APP.APPLICATION_ID AS APP_ID," +
-                    "   APP.APPLICATION_TIER AS TIER," +
-                    "   APP.NAME AS APS_NAME," +
-                    "   APP.TOKEN_TYPE AS TOKEN_TYPE," +
-                    "   SUB.USER_ID AS SUB_NAME," +
-                    "   ATTRIBUTES.NAME AS ATTRIBUTE_NAME," +
-                    "   ATTRIBUTES.`VALUE` AS ATTRIBUTE_VALUE" +
-                    " FROM " +
-                    "   AM_SUBSCRIBER SUB," +
-                    "   AM_APPLICATION APP" +
-                    "   LEFT OUTER JOIN AM_APPLICATION_ATTRIBUTES ATTRIBUTES  " +
-                    "ON APP.APPLICATION_ID = ATTRIBUTES.APPLICATION_ID" +
-                    " WHERE " +
-                    "   APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID ";
-
-    public static final String GET_TENANT_APPLICATIONS_SQL =
-            " SELECT " +
-                    "   APP.UUID AS APP_UUID," +
-                    "   APP.APPLICATION_ID AS APP_ID," +
-                    "   APP.NAME AS APS_NAME," +
-                    "   APP.APPLICATION_TIER AS TIER," +
-                    "   APP.TOKEN_TYPE AS TOKEN_TYPE," +
-                    "   SUB.USER_ID AS SUB_NAME," +
-                    "   ATTRIBUTES.NAME AS ATTRIBUTE_NAME," +
-                    "   ATTRIBUTES.`VALUE` AS ATTRIBUTE_VALUE"+
-                    " FROM " +
-                    "   AM_SUBSCRIBER SUB," +
-                    "   AM_APPLICATION APP" +
-                    "   LEFT OUTER JOIN AM_APPLICATION_ATTRIBUTES ATTRIBUTES" +
-                    "  ON APP.APPLICATION_ID = ATTRIBUTES.APPLICATION_ID" +
-                    " WHERE " +
-                    "   APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID AND" +
-                    "   SUB.TENANT_ID = ? ";
-
-    public static final String GET_APPLICATION_BY_ID_SQL =
-            " SELECT " +
-                    "   APP.UUID AS APP_UUID," +
-                    "   APP.APPLICATION_ID AS APP_ID," +
-                    "   APP.NAME AS APS_NAME," +
-                    "   APP.APPLICATION_TIER AS TIER," +
-                    "   APP.TOKEN_TYPE AS TOKEN_TYPE," +
-                    "   SUB.USER_ID AS SUB_NAME," +
-                    "   ATTRIBUTES.NAME AS ATTRIBUTE_NAME," +
-                    "   ATTRIBUTES.`VALUE` AS ATTRIBUTE_VALUE"+
-                    " FROM " +
-                    "   AM_SUBSCRIBER SUB," +
-                    "   AM_APPLICATION APP" +
-                    "   LEFT OUTER JOIN AM_APPLICATION_ATTRIBUTES ATTRIBUTES  " +
-                    "ON APP.APPLICATION_ID = ATTRIBUTES.APPLICATION_ID" +
-                    " WHERE " +
-                    "   APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID AND" +
-                    "   APP.APPLICATION_ID = ? ";
-
     public static final String GET_ALL_SUBSCRIPTIONS_SQL =
             "SELECT " +
                     "   SUBSCRIPTION_ID AS SUB_ID," +
