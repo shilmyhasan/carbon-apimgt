@@ -134,7 +134,7 @@ public class OAuthAuthenticator implements Authenticator {
         }
 
         if (jwtValidator == null) {
-            this.jwtValidator = new JWTValidator(this.keyValidator, tenantDomain);
+            this.jwtValidator = new JWTValidator(this.keyValidator, tenantDomain, this.getAudiences());
         }
 
         config = getApiManagerConfiguration();

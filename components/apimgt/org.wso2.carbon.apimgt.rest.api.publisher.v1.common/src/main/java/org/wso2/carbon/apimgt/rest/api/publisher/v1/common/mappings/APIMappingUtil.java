@@ -641,9 +641,7 @@ public class APIMappingUtil {
         apiInfoDTO.setHasThumbnail(!StringUtils.isBlank(api.getThumbnailUrl()));
         if (api.getAudience() != null) {
             apiInfoDTO.setAudience(org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoDTO.AudienceEnum
-                    .valueOf();
-//            apiInfoDTO.setAudience(org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoDTO.AudienceEnum
-//                    .valueOf(api.getAudience()));
+                    .valueOf(api.getAudience()));
         }
         if (api.getAudiences() != null) {
             Set<String> audiences = api.getAudiences();

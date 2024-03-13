@@ -290,7 +290,8 @@ public class JWTValidator {
     }
 
     private boolean validateAudiences(SignedJWTInfo signedJWTInfo) throws APISecurityException {
-        if (this.getAudiences() == null || this.getAudiences().isEmpty()) {
+        if (this.getAudiences() == null || this.getAudiences().isEmpty() ||
+                this.getAudiences().contains(APIConstants.ALL_AUDIENCES)) {
             return true;
         }
         List<String> jwtAudienceClaim = signedJWTInfo.getJwtClaimsSet().getAudience();
