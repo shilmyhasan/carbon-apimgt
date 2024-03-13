@@ -4127,7 +4127,7 @@ components:
         apiProviderTenantDomain:
           type: string
           description: |
-            Tenant domain of the API Owner.
+            Tenant domain of the API Owner or API Product Owner.
           example: carbon.super
         apiInfo:
           $ref: '#/components/schemas/APIInfo'

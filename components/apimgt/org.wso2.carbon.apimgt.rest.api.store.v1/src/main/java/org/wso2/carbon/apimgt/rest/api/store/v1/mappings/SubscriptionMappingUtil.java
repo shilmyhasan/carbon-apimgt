@@ -28,6 +28,7 @@ import org.wso2.carbon.apimgt.api.model.APIProduct;
 import org.wso2.carbon.apimgt.api.model.APIProductIdentifier;
 import org.wso2.carbon.apimgt.api.model.ApiTypeWrapper;
 import org.wso2.carbon.apimgt.api.model.Application;
+import org.wso2.carbon.apimgt.api.model.Identifier;
 import org.wso2.carbon.apimgt.api.model.SubscribedAPI;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
@@ -37,7 +38,6 @@ import org.wso2.carbon.apimgt.rest.api.store.v1.dto.ApplicationInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.PaginationDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SubscriptionDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SubscriptionListDTO;
-import org.wso2.carbon.apimgt.rest.api.util.utils.RestAPIStoreUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
@@ -62,7 +62,8 @@ public class SubscriptionMappingUtil {
         APIConsumer apiConsumer = RestApiCommonUtil.getLoggedInUserConsumer();
         SubscriptionDTO subscriptionDTO = new SubscriptionDTO();
         subscriptionDTO.setSubscriptionId(subscription.getUUID());
-        subscriptionDTO.setApiProviderTenantDomain(MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(subscription.getApiId()
+        Identifier identifier = subscription.getApiId() != null ? subscription.getApiId() : subscription.getProductId();
+        subscriptionDTO.setApiProviderTenantDomain(MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(identifier
                 .getProviderName())));
         APIIdentifier apiId = subscription.getApiId();
         APIProductIdentifier apiProdId = subscription.getProductId();
