@@ -8250,8 +8250,15 @@ components:
           type: string
           example: HTTP
         audience:
+          type: string
+          description: The audience of the API. Accepted values are PUBLIC, SINGLE
+          example: PUBLIC
+          enum:
+            - PUBLIC
+            - SINGLE
+        audiences:
           type: array
-          description: The audience of the API. Accepted values are any String values
+          description: The audiences of the API for jwt validation. Accepted values are any String values
           items:
             type: string
             example: [ "aud1","aud2","aud3" ]
@@ -8419,8 +8426,15 @@ components:
             - WEBHOOK
             - ASYNC
         audience:
+          type: string
+          description: The audience of the API. Accepted values are PUBLIC, SINGLE
+          example: PUBLIC
+          enum:
+            - PUBLIC
+            - SINGLE
+        audiences:
           type: array
-          description: The audience of the API. Accepted values are any String values
+          description: The audiences of the API for jwt validation. Accepted values are any String values
           items:
             type: string
             example: [ "aud1","aud2","aud3" ]

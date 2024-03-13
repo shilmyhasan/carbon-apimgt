@@ -70,6 +70,7 @@ import org.wso2.carbon.apimgt.rest.api.common.dto.ErrorDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIBusinessInformationDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APICorsConfigurationDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIDTO;
+import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIDTO.AudienceEnum;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoAdditionalPropertiesDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoAdditionalPropertiesMapDTO;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoDTO;
@@ -421,7 +422,14 @@ public class APIMappingUtil {
             }
         }
         if (dto.getAudience() != null) {
-            model.setAudience(new HashSet<>(dto.getAudience()));
+            model.setAudience(dto.getAudience().toString());
+        }
+        if (dto.getAudiences() != null) {
+            List<String> audiences = dto.getAudiences();
+            if (audiences.isEmpty()) {
+                audiences.add(APIConstants.ALL_AUDIENCES);
+            }
+            model.setAudiences(new HashSet<>(audiences));
         }
         if (dto.getGatewayVendor() != null) {
             model.setGatewayVendor(dto.getGatewayVendor());
@@ -632,7 +640,17 @@ public class APIMappingUtil {
         apiInfoDTO.setLifeCycleStatus(api.getStatus());
         apiInfoDTO.setHasThumbnail(!StringUtils.isBlank(api.getThumbnailUrl()));
         if (api.getAudience() != null) {
-            apiInfoDTO.setAudience(new ArrayList<>(api.getAudience()));
+            apiInfoDTO.setAudience(org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoDTO.AudienceEnum
+                    .valueOf();
+//            apiInfoDTO.setAudience(org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoDTO.AudienceEnum
+//                    .valueOf(api.getAudience()));
+        }
+        if (api.getAudiences() != null) {
+            Set<String> audiences = api.getAudiences();
+            if (audiences.contains(APIConstants.ALL_AUDIENCES) && audiences.size() > 1) {
+                audiences.remove(APIConstants.ALL_AUDIENCES);
+            }
+            apiInfoDTO.setAudiences(new ArrayList<>(audiences));
         }
         if (api.getCreatedTime() != null) {
             Date createdTime = new Date(Long.parseLong(api.getCreatedTime()));
@@ -1277,9 +1295,17 @@ public class APIMappingUtil {
         }
         dto.setCategories(categoryNameList);
         dto.setKeyManagers(model.getKeyManagers());
-        
+
         if (model.getAudience() != null) {
-            dto.setAudience(new ArrayList<>(model.getAudience()));
+            dto.setAudience(AudienceEnum.valueOf(model.getAudience()));
+        }
+
+        if (model.getAudiences() != null) {
+            Set<String> audiences = model.getAudiences();
+            if (audiences.contains(APIConstants.ALL_AUDIENCES) && audiences.size() > 1) {
+                audiences.remove(APIConstants.ALL_AUDIENCES);
+            }
+            dto.setAudiences(new ArrayList<>(model.getAudiences()));
         }
 
         String gatewayVendor = StringUtils.toRootLowerCase(model.getGatewayVendor());

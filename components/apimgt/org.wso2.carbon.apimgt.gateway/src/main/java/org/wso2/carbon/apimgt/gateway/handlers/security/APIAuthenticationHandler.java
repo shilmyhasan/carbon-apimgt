@@ -94,7 +94,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
     private SynapseEnvironment synapseEnvironment;
 
     private String authorizationHeader;
-    private Set<String> audience;
+    private Set<String> audiences = new HashSet<>();;
     private String apiSecurity;
     private String apiLevelPolicy;
     private String certificateInformation;
@@ -194,26 +194,24 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
     }
 
     /**
-     * To set the audience for api.
+     * To set the audiences for api.
      *
-     * @param audience the audience of the API request.
+     * @param audiences the audiences of the API request.
      */
-    public void setAudience(String audience) {
-
-        if (!audience.isEmpty()) {
-            this.audience = new HashSet<>(Arrays.asList(audience.split(",")));
-        } else {
-            this.audience = new HashSet<>();
+    public void setAudiences(String audiences) {
+        if (!StringUtils.isEmpty(audiences)) {
+            this.audiences = new HashSet<>(Arrays.asList(audiences.split(",")));
         }
+
     }
 
     /**
-     * To get the audience of an api.
+     * To get the audiences of an api.
      *
-     * @return API level audience for JWT validation.
+     * @return API level audiences for JWT validation.
      */
-    public Set<String> getAudience() {
-        return audience;
+    public Set<String> getAudiences() {
+        return audiences;
     }
 
     /**
@@ -348,7 +346,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         }
         if (isOAuthProtected) {
             Authenticator authenticator = new OAuthAuthenticator(authorizationHeader, isOAuthBasicAuthMandatory,
-                    removeOAuthHeadersFromOutMessage, this.getAudience());
+                    removeOAuthHeadersFromOutMessage, this.getAudiences());
             authenticator.init(synapseEnvironment);
             authenticators.add(authenticator);
         }
@@ -661,7 +659,7 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
             status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
         } else if (e.getErrorCode() == APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE ||
                 e.getErrorCode() == APISecurityConstants.API_AUTH_FORBIDDEN ||
-                e.getErrorCode() == APISecurityConstants.API_OAUTH_INVALID_AUDIENCE ||
+                e.getErrorCode() == APISecurityConstants.API_OAUTH_INVALID_AUDIENCES ||
                 e.getErrorCode() == APISecurityConstants.INVALID_SCOPE) {
             status = HttpStatus.SC_FORBIDDEN;
         } else {

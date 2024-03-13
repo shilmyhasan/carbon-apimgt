@@ -93,15 +93,15 @@ public class OAuthAuthenticator implements Authenticator {
     private boolean removeDefaultAPIHeaderFromOutMessage = true;
     private String requestOrigin;
     private boolean isMandatory;
-    private Set<String> audience;
+    private Set<String> audiences;
 
     public OAuthAuthenticator() {
     }
 
     public OAuthAuthenticator(String authorizationHeader, boolean isMandatory, boolean removeOAuthHeader,
-                              Set<String> audience) {
+                              Set<String> audiences) {
         this(authorizationHeader, isMandatory, removeOAuthHeader);
-        this.setAudience(audience);
+        this.setAudiences(audiences);
     }
 
     public OAuthAuthenticator(String authorizationHeader, boolean isMandatory, boolean removeOAuthHeader) {
@@ -309,11 +309,6 @@ public class OAuthAuthenticator implements Authenticator {
         } else {
             //Start JWT token validation
             if (isJwtToken) {
-                if (!validateAudience(signedJWTInfo)) {
-                    return new AuthenticationResponse(false, isMandatory, true,
-                            APISecurityConstants.API_OAUTH_INVALID_AUDIENCE,
-                            APISecurityConstants.API_OAUTH_INVALID_AUDIENCE_MESSAGE);
-                }
                 try {
                     AuthenticationContext authenticationContext = jwtValidator.authenticate(signedJWTInfo, synCtx);
                     APISecurityUtils.setAuthenticationContext(synCtx, authenticationContext, securityContextHeader);
@@ -413,21 +408,6 @@ public class OAuthAuthenticator implements Authenticator {
         }
         return result.trim();
     }
-
-    private boolean validateAudience(SignedJWTInfo signedJWTInfo){
-
-        if (this.getAudience() == null || this.getAudience().isEmpty()) {
-            return true;
-        }
-        List<String> jwtAudienceClaim = signedJWTInfo.getJwtClaimsSet().getAudience();
-        for (String aud : this.getAudience()) {
-            if (jwtAudienceClaim.contains(aud)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected APIManagerConfiguration getApiManagerConfiguration() {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
     }
@@ -503,12 +483,12 @@ public class OAuthAuthenticator implements Authenticator {
         this.securityContextHeader = securityContextHeader;
     }
 
-    public void setAudience(Set<String> audience) {
-        this.audience = audience;
+    public void setAudiences(Set<String> audiences) {
+        this.audiences = audiences;
     }
 
-    public Set<String> getAudience() {
-        return audience;
+    public Set<String> getAudiences() {
+        return audiences;
     }
 
     private boolean isRemoveOAuthHeadersFromOutMessage() {

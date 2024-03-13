@@ -92,19 +92,28 @@ public class PublisherAPI extends PublisherAPIInfo {
     private String asyncTransportProtocols;
 
     private String versionTimestamp;
-    private Set<String> audience;
+    private String audience;
+    private Set<String> audiences;
     private String apiExternalProductionEndpoint;
     private String apiExternalSandboxEndpoint;
     private String redirectURL;
     private String apiOwner;
     private String vendor;
 
-    public Set<String> getAudience() {
+    public String getAudience() {
         return audience;
     }
 
-    public void setAudience(Set<String> audience) {
+    public void setAudience(String audience) {
         this.audience = audience;
+    }
+
+    public Set<String> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(Set<String> audiences) {
+        this.audiences = audiences;
     }
 
     public List<SOAPToRestSequence> getSoapToRestSequences() {

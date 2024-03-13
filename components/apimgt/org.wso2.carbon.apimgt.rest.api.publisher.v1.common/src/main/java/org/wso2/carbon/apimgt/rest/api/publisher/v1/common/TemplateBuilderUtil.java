@@ -188,14 +188,14 @@ public class TemplateBuilderUtil {
         authProperties.put(APIConstants.API_SECURITY, apiSecurity);
         authProperties.put(APIConstants.API_LEVEL_POLICY, apiLevelPolicy);
 
-        String audience;
-        Set<String> audienceList = api.getAudience();
+        String audiences;
+        Set<String> audienceList = api.getAudiences();
         if (audienceList != null) {
-            audience = String.join(",", audienceList);
+            audiences = String.join(",", audienceList);
         } else {
-            audience = "";
+            audiences = "";
         }
-        authProperties.put(APIConstants.AUDIENCE, audience);
+        authProperties.put(APIConstants.AUDIENCES, audiences);
 
         if (clientCertificateObject != null) {
             authProperties.put(APIConstants.CERTIFICATE_INFORMATION, clientCertificateObject.toString());

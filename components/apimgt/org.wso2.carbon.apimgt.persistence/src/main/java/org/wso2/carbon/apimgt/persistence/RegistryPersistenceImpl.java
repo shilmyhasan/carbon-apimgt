@@ -1022,9 +1022,10 @@ public class RegistryPersistenceImpl implements APIPersistence {
                 apiInfo.setStatus(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS));
                 apiInfo.setThumbnail(artifact.getAttribute(APIConstants.API_OVERVIEW_THUMBNAIL_URL));
                 apiInfo.setVersion(artifact.getAttribute(APIConstants.API_OVERVIEW_VERSION));
-                String audience = artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCE);
-                if (StringUtils.isNotEmpty(audience)) {
-                    apiInfo.setAudience(new Gson().fromJson(audience, Set.class));
+                apiInfo.setAudience(artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCE));
+                String audiences = artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCES);
+                if (StringUtils.isNotEmpty(audiences)) {
+                    apiInfo.setAudiences(new Gson().fromJson(audiences, Set.class));
                 }
                 apiInfo.setCreatedTime(String.valueOf(apiResource.getCreatedTime().getTime()));
                 apiInfo.setUpdatedTime(apiResource.getLastModified());

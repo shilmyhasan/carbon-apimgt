@@ -38,18 +38,27 @@ public class PublisherAPIInfo {
     private String thumbnail; // thumbnail is not required for normal ApiGet
     private String createdTime;
     private Date updatedTime;
-    private Set<String> audience;
+    private String audience;
+    private Set<String> audiences;
     private Map<String, String> additionalProperties;
     private String description;
     private String gatewayVendor;
     private boolean advertiseOnly;
 
-    public Set<String> getAudience() {
+    public String getAudience() {
         return audience;
     }
 
-    public void setAudience(Set<String> audience) {
+    public void setAudience(String audience) {
         this.audience = audience;
+    }
+
+    public Set<String> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(Set<String> audiences) {
+        this.audiences = audiences;
     }
 
     public String getApiName() {
