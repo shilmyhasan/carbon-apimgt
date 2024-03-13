@@ -3873,7 +3873,8 @@ public class ApiMgtDAO {
         ResultSet resultSet = null;
         BlockConditionsDTO blockCondition = null;
         try {
-            String query = SQLConstants.ThrottleSQLConstants.GET_SUBSCRIPTION_BLOCK_CONDITION_BY_VALUE_AND_DOMAIN_SQL;
+            String query = SQLConstantManagerFactory
+                    .getSQlString("GET_SUBSCRIPTION_BLOCK_CONDITION_BY_VALUE_AND_DOMAIN_SQL");
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(true);
             selectPreparedStatement = connection.prepareStatement(query);
@@ -4015,7 +4016,8 @@ public class ApiMgtDAO {
             String domain = MultitenantUtils.getTenantDomain(subscriber.getName());
             int tenantId = IdentityTenantUtil.getTenantId(domain);
 
-            preparedStatement = conn.prepareStatement(SQLConstants.REMOVE_APPLICATION_ATTRIBUTES_SQL);
+            String sqlRemoveQuery = SQLConstantManagerFactory.getSQlString("REMOVE_APPLICATION_ATTRIBUTES_SQL");
+            preparedStatement = conn.prepareStatement(sqlRemoveQuery);
             preparedStatement.setInt(1,application.getId());
             preparedStatement.execute();
 
@@ -4705,11 +4707,15 @@ public class ApiMgtDAO {
                 sqlQuery = sqlQuery.replaceAll("NAME", "cast(NAME as varchar(100)) collate " +
                         "SQL_Latin1_General_CP1_CI_AS as NAME");
                 blockingFilerSql = " select distinct x.*,bl.ENABLED from ( " + sqlQuery + " )x left join " +
-                        "AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.`VALUE` = (x.USER_ID + ':') + x" +
+                        "AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = (x.USER_ID + ':') + x" +
                         ".name)";
-            } else {
+            } else if (connection.getMetaData().getDriverName().contains("H2")) {
                 blockingFilerSql = " select distinct x.*,bl.ENABLED from ( " + sqlQuery
                         + " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.`VALUE` = "
+                        + "concat(concat(x.USER_ID,':'),x.name))";
+            } else {
+                blockingFilerSql = " select distinct x.*,bl.ENABLED from ( " + sqlQuery
+                        + " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = "
                         + "concat(concat(x.USER_ID,':'),x.name))";
             }
 
@@ -12534,7 +12540,7 @@ public class ApiMgtDAO {
         String tenantDomain = blockConditionsDTO.getTenantDomain();
         String conditionStatus = String.valueOf(blockConditionsDTO.isEnabled());
         try {
-            String query = SQLConstants.ThrottleSQLConstants.ADD_BLOCK_CONDITIONS_SQL;
+            String query = SQLConstantManagerFactory.getSQlString("ADD_BLOCK_CONDITIONS_SQL");
             if (APIConstants.BLOCKING_CONDITIONS_API.equals(conditionType)) {
                 String extractedTenantDomain = MultitenantUtils.getTenantDomainFromRequestURL(conditionValue);
                 if (extractedTenantDomain == null) {
@@ -12677,7 +12683,7 @@ public class ApiMgtDAO {
         ResultSet resultSet = null;
         BlockConditionsDTO blockCondition = null;
         try {
-            String query = SQLConstants.ThrottleSQLConstants.GET_BLOCK_CONDITION_SQL;
+            String query = SQLConstantManagerFactory.getSQlString("GET_BLOCK_CONDITION_SQL");
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(true);
             selectPreparedStatement = connection.prepareStatement(query);
@@ -12720,7 +12726,7 @@ public class ApiMgtDAO {
         ResultSet resultSet = null;
         BlockConditionsDTO blockCondition = null;
         try {
-            String query = SQLConstants.ThrottleSQLConstants.GET_BLOCK_CONDITION_BY_UUID_SQL;
+            String query = SQLConstantManagerFactory.getSQlString("GET_BLOCK_CONDITION_BY_UUID_SQL");
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(true);
             selectPreparedStatement = connection.prepareStatement(query);
@@ -12756,7 +12762,7 @@ public class ApiMgtDAO {
         ResultSet resultSet = null;
         List<BlockConditionsDTO> blockConditionsDTOList = new ArrayList<BlockConditionsDTO>();
         try {
-            String query = SQLConstants.ThrottleSQLConstants.GET_BLOCK_CONDITIONS_SQL;
+            String query = SQLConstantManagerFactory.getSQlString("GET_BLOCK_CONDITIONS_SQL");
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(true);
             selectPreparedStatement = connection.prepareStatement(query);
@@ -12800,7 +12806,7 @@ public class ApiMgtDAO {
         PreparedStatement updateBlockConditionPreparedStatement = null;
         boolean status = false;
         try {
-            String query = SQLConstants.ThrottleSQLConstants.UPDATE_BLOCK_CONDITION_STATE_SQL;
+            String query = SQLConstantManagerFactory.getSQlString("UPDATE_BLOCK_CONDITION_STATE_SQL");
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             updateBlockConditionPreparedStatement = connection.prepareStatement(query);
@@ -12837,7 +12843,7 @@ public class ApiMgtDAO {
         PreparedStatement updateBlockConditionPreparedStatement = null;
         boolean status = false;
         try {
-            String query = SQLConstants.ThrottleSQLConstants.UPDATE_BLOCK_CONDITION_STATE_BY_UUID_SQL;
+            String query = SQLConstantManagerFactory.getSQlString("UPDATE_BLOCK_CONDITION_STATE_BY_UUID_SQL");
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             updateBlockConditionPreparedStatement = connection.prepareStatement(query);
@@ -12873,7 +12879,7 @@ public class ApiMgtDAO {
         PreparedStatement deleteBlockConditionPreparedStatement = null;
         boolean status = false;
         try {
-            String query = SQLConstants.ThrottleSQLConstants.DELETE_BLOCK_CONDITION_SQL;
+            String query = SQLConstantManagerFactory.getSQlString("DELETE_BLOCK_CONDITION_SQL");
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             deleteBlockConditionPreparedStatement = connection.prepareStatement(query);
@@ -12908,7 +12914,7 @@ public class ApiMgtDAO {
         PreparedStatement deleteBlockConditionPreparedStatement = null;
         boolean status = false;
         try {
-            String query = SQLConstants.ThrottleSQLConstants.DELETE_BLOCK_CONDITION_BY_UUID_SQL;
+            String query = SQLConstantManagerFactory.getSQlString("DELETE_BLOCK_CONDITION_BY_UUID_SQL");
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             deleteBlockConditionPreparedStatement = connection.prepareStatement(query);
@@ -13034,7 +13040,7 @@ public class ApiMgtDAO {
         ResultSet checkIsResultSet = null;
         boolean status = false;
         try {
-            String isExistQuery = SQLConstants.ThrottleSQLConstants.BLOCK_CONDITION_EXIST_SQL;
+            String isExistQuery = SQLConstantManagerFactory.getSQlString("BLOCK_CONDITION_EXIST_SQL");
             checkIsExistPreparedStatement = connection.prepareStatement(isExistQuery);
             checkIsExistPreparedStatement.setString(1, tenantDomain);
             checkIsExistPreparedStatement.setString(2, conditionType);
@@ -13697,9 +13703,10 @@ public class ApiMgtDAO {
 
         PreparedStatement ps = null;
         ResultSet rs = null;
+        String sqlQuery = SQLConstantManagerFactory.getSQlString("ADD_APPLICATION_ATTRIBUTES_SQL");
         try {
             if (attributes != null) {
-                ps = conn.prepareStatement(SQLConstants.ADD_APPLICATION_ATTRIBUTES_SQL);
+                ps = conn.prepareStatement(sqlQuery);
                 for (Map.Entry<String, String> attribute : attributes.entrySet()) {
                     if (StringUtils.isNotEmpty(attribute.getKey()) && StringUtils.isNotEmpty(attribute.getValue())) {
                         ps.setInt(1, applicationId);
@@ -13730,8 +13737,9 @@ public class ApiMgtDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         Map<String, String> applicationAttributes = new HashMap<>();
+        String sqlQuery = SQLConstantManagerFactory.getSQlString("GET_APPLICATION_ATTRIBUTES_BY_APPLICATION_ID");
         try {
-            ps = conn.prepareStatement(SQLConstants.GET_APPLICATION_ATTRIBUTES_BY_APPLICATION_ID);
+            ps = conn.prepareStatement(sqlQuery);
             ps.setInt(1, applicationId);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -13762,7 +13770,9 @@ public class ApiMgtDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
-            ps = connection.prepareStatement(SQLConstants.REMOVE_APPLICATION_ATTRIBUTES_BY_ATTRIBUTE_NAME_SQL);
+            String sqlQuery = SQLConstantManagerFactory
+                    .getSQlString("REMOVE_APPLICATION_ATTRIBUTES_BY_ATTRIBUTE_NAME_SQL");
+            ps = connection.prepareStatement(sqlQuery);
             ps.setString(1, attributeKey);
             ps.setInt(2, applicationId);
             ps.execute();
