@@ -202,7 +202,6 @@ public class APIAuthenticationHandler extends AbstractHandler implements Managed
         if (!StringUtils.isEmpty(audiences)) {
             this.audiences = new HashSet<>(Arrays.asList(audiences.split(",")));
         }
-
     }
 
     /**
