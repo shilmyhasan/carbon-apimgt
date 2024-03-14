@@ -93,6 +93,7 @@ public class PublisherAPI extends PublisherAPIInfo {
 
     private String versionTimestamp;
     private String audience;
+    private Set<String> audiences;
     private String apiExternalProductionEndpoint;
     private String apiExternalSandboxEndpoint;
     private String redirectURL;
@@ -105,6 +106,14 @@ public class PublisherAPI extends PublisherAPIInfo {
 
     public void setAudience(String audience) {
         this.audience = audience;
+    }
+
+    public Set<String> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(Set<String> audiences) {
+        this.audiences = audiences;
     }
 
     public List<SOAPToRestSequence> getSoapToRestSequences() {

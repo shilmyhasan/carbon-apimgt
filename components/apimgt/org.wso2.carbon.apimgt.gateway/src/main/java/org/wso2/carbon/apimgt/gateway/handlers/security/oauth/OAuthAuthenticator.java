@@ -18,6 +18,8 @@ package org.wso2.carbon.apimgt.gateway.handlers.security.oauth;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import org.apache.axiom.om.OMElement;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -27,7 +29,9 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
+import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.model.ApiTypeWrapper;
 import org.wso2.carbon.apimgt.common.gateway.dto.JWTConfigurationDto;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.MethodStats;
@@ -60,6 +64,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import javax.cache.Cache;
 
@@ -88,8 +93,15 @@ public class OAuthAuthenticator implements Authenticator {
     private boolean removeDefaultAPIHeaderFromOutMessage = true;
     private String requestOrigin;
     private boolean isMandatory;
+    private Set<String> audiences;
 
     public OAuthAuthenticator() {
+    }
+
+    public OAuthAuthenticator(String authorizationHeader, boolean isMandatory, boolean removeOAuthHeader,
+                              Set<String> audiences) {
+        this(authorizationHeader, isMandatory, removeOAuthHeader);
+        this.setAudiences(audiences);
     }
 
     public OAuthAuthenticator(String authorizationHeader, boolean isMandatory, boolean removeOAuthHeader) {
@@ -122,7 +134,7 @@ public class OAuthAuthenticator implements Authenticator {
         }
 
         if (jwtValidator == null) {
-            this.jwtValidator = new JWTValidator(this.keyValidator, tenantDomain);
+            this.jwtValidator = new JWTValidator(this.keyValidator, tenantDomain, this.getAudiences());
         }
 
         config = getApiManagerConfiguration();
@@ -396,7 +408,6 @@ public class OAuthAuthenticator implements Authenticator {
         }
         return result.trim();
     }
-
     protected APIManagerConfiguration getApiManagerConfiguration() {
         return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
     }
@@ -470,6 +481,14 @@ public class OAuthAuthenticator implements Authenticator {
 
     private void setSecurityContextHeader(String securityContextHeader) {
         this.securityContextHeader = securityContextHeader;
+    }
+
+    public void setAudiences(Set<String> audiences) {
+        this.audiences = audiences;
+    }
+
+    public Set<String> getAudiences() {
+        return audiences;
     }
 
     private boolean isRemoveOAuthHeadersFromOutMessage() {

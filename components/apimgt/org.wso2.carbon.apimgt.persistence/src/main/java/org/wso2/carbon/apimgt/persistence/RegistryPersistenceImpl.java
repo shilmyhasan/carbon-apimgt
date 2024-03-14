@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.apimgt.persistence;
 
+import com.google.gson.Gson;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -1022,6 +1023,10 @@ public class RegistryPersistenceImpl implements APIPersistence {
                 apiInfo.setThumbnail(artifact.getAttribute(APIConstants.API_OVERVIEW_THUMBNAIL_URL));
                 apiInfo.setVersion(artifact.getAttribute(APIConstants.API_OVERVIEW_VERSION));
                 apiInfo.setAudience(artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCE));
+                String audiences = artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCES);
+                if (StringUtils.isNotEmpty(audiences)) {
+                    apiInfo.setAudiences(new Gson().fromJson(audiences, Set.class));
+                }
                 apiInfo.setCreatedTime(String.valueOf(apiResource.getCreatedTime().getTime()));
                 apiInfo.setUpdatedTime(apiResource.getLastModified());
                 apiInfo.setGatewayVendor(String.valueOf(artifact.getAttribute(APIConstants.API_OVERVIEW_GATEWAY_VENDOR)));

@@ -292,6 +292,8 @@ public class RegistryPersistenceUtil {
 
             artifact.setAttribute(APIConstants.API_OVERVIEW_AUDIENCE, api.getAudience());
 
+            //set audiences for jwt audience validation
+            artifact.setAttribute(APIConstants.API_OVERVIEW_AUDIENCES, new Gson().toJson(api.getAudiences()));
         } catch (GovernanceException e) {
             String msg = "Failed to create API for : " + api.getId().getApiName();
             log.error(msg, e);
@@ -676,6 +678,10 @@ public class RegistryPersistenceUtil {
             String monetizationInfo = artifact.getAttribute(APIConstants.Monetization.API_MONETIZATION_PROPERTIES);
 
             api.setWsUriMapping(getWsUriMappingFromArtifact(artifact));
+            String audiences = artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCES);
+            if (StringUtils.isNotEmpty(audiences)) {
+                api.setAudiences(new Gson().fromJson(audiences, Set.class));
+            }
             api.setAudience(artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCE));
             api.setVersionTimestamp(artifact.getAttribute(APIConstants.API_OVERVIEW_VERSION_COMPARABLE));
 

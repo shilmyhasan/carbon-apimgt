@@ -67,6 +67,7 @@ return null;
         }
     }
     private AudienceEnum audience = null;
+    private List<String> audiences = new ArrayList<String>();
     private String lifeCycleStatus = null;
     private String workflowStatus = null;
     private Boolean hasThumbnail = null;
@@ -252,6 +253,24 @@ return null;
   }
 
   /**
+   * The audiences of the API for jwt validation. Accepted values are any String values
+   **/
+  public APIInfoDTO audiences(List<String> audiences) {
+    this.audiences = audiences;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "The audiences of the API for jwt validation. Accepted values are any String values")
+  @JsonProperty("audiences")
+  public List<String> getAudiences() {
+    return audiences;
+  }
+  public void setAudiences(List<String> audiences) {
+    this.audiences = audiences;
+  }
+
+  /**
    **/
   public APIInfoDTO lifeCycleStatus(String lifeCycleStatus) {
     this.lifeCycleStatus = lifeCycleStatus;
@@ -407,6 +426,7 @@ return null;
         Objects.equals(provider, apIInfo.provider) &&
         Objects.equals(type, apIInfo.type) &&
         Objects.equals(audience, apIInfo.audience) &&
+        Objects.equals(audiences, apIInfo.audiences) &&
         Objects.equals(lifeCycleStatus, apIInfo.lifeCycleStatus) &&
         Objects.equals(workflowStatus, apIInfo.workflowStatus) &&
         Objects.equals(hasThumbnail, apIInfo.hasThumbnail) &&
@@ -419,7 +439,7 @@ return null;
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, description, context, additionalProperties, additionalPropertiesMap, version, provider, type, audience, lifeCycleStatus, workflowStatus, hasThumbnail, securityScheme, createdTime, updatedTime, gatewayVendor, advertiseOnly);
+    return Objects.hash(id, name, description, context, additionalProperties, additionalPropertiesMap, version, provider, type, audience, audiences, lifeCycleStatus, workflowStatus, hasThumbnail, securityScheme, createdTime, updatedTime, gatewayVendor, advertiseOnly);
   }
 
   @Override
@@ -437,6 +457,7 @@ return null;
     sb.append("    provider: ").append(toIndentedString(provider)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    audience: ").append(toIndentedString(audience)).append("\n");
+    sb.append("    audiences: ").append(toIndentedString(audiences)).append("\n");
     sb.append("    lifeCycleStatus: ").append(toIndentedString(lifeCycleStatus)).append("\n");
     sb.append("    workflowStatus: ").append(toIndentedString(workflowStatus)).append("\n");
     sb.append("    hasThumbnail: ").append(toIndentedString(hasThumbnail)).append("\n");

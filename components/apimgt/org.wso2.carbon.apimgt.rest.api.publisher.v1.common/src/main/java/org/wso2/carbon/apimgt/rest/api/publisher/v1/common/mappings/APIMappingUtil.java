@@ -424,6 +424,13 @@ public class APIMappingUtil {
         if (dto.getAudience() != null) {
             model.setAudience(dto.getAudience().toString());
         }
+        if (dto.getAudiences() != null) {
+            List<String> audiences = dto.getAudiences();
+            if (audiences.isEmpty()) {
+                audiences.add(APIConstants.ALL_AUDIENCES);
+            }
+            model.setAudiences(new HashSet<>(audiences));
+        }
         if (dto.getGatewayVendor() != null) {
             model.setGatewayVendor(dto.getGatewayVendor());
         }
@@ -635,6 +642,13 @@ public class APIMappingUtil {
         if (api.getAudience() != null) {
             apiInfoDTO.setAudience(org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIInfoDTO.AudienceEnum
                     .valueOf(api.getAudience()));
+        }
+        if (api.getAudiences() != null) {
+            Set<String> audiences = api.getAudiences();
+            if (audiences.contains(APIConstants.ALL_AUDIENCES) && audiences.size() > 1) {
+                audiences.remove(APIConstants.ALL_AUDIENCES);
+            }
+            apiInfoDTO.setAudiences(new ArrayList<>(audiences));
         }
         if (api.getCreatedTime() != null) {
             Date createdTime = new Date(Long.parseLong(api.getCreatedTime()));
@@ -1279,9 +1293,17 @@ public class APIMappingUtil {
         }
         dto.setCategories(categoryNameList);
         dto.setKeyManagers(model.getKeyManagers());
-        
+
         if (model.getAudience() != null) {
             dto.setAudience(AudienceEnum.valueOf(model.getAudience()));
+        }
+
+        if (model.getAudiences() != null) {
+            Set<String> audiences = model.getAudiences();
+            if (audiences.contains(APIConstants.ALL_AUDIENCES) && audiences.size() > 1) {
+                audiences.remove(APIConstants.ALL_AUDIENCES);
+            }
+            dto.setAudiences(new ArrayList<>(model.getAudiences()));
         }
 
         String gatewayVendor = StringUtils.toRootLowerCase(model.getGatewayVendor());

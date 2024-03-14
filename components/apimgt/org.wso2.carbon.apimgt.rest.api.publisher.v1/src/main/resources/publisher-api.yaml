@@ -8256,6 +8256,12 @@ components:
           enum:
             - PUBLIC
             - SINGLE
+        audiences:
+          type: array
+          description: The audiences of the API for jwt validation. Accepted values are any String values
+          items:
+            type: string
+            example: [ "aud1","aud2","aud3" ]
         lifeCycleStatus:
           type: string
           example: CREATED
@@ -8426,6 +8432,12 @@ components:
           enum:
             - PUBLIC
             - SINGLE
+        audiences:
+          type: array
+          description: The audiences of the API for jwt validation. Accepted values are any String values
+          items:
+            type: string
+            example: [ "aud1","aud2","aud3" ]
         transport:
           type: array
           description: |
