@@ -69,7 +69,6 @@ public class APISecurityConstants {
     public static final int API_OAUTH_INVALID_AUDIENCES = 900912;
     public static final String API_OAUTH_INVALID_AUDIENCES_MESSAGE = "The access token does not allow you to access the requested resource";
 
-
     public static final int OAUTH_TEMPORARY_SERVER_ERROR = 900424;
     public static final String OAUTH_TEMPORARY_SERVER_ERROR_MESSAGE = "Temporary Server Error";
 
