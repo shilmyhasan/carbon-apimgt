@@ -16250,6 +16250,10 @@ public class ApiMgtDAO {
                     if (!StringUtils.isEmpty(environmentName)) {
                         apiRevisionDeployment.setDeployment(environmentName);
                         String vhost = rs.getString("VHOST");
+                        // Ignore all revisions deployed on decommissioned gateways
+                        if (isGatewayDecommissioned(vhost, environmentName)) {
+                            continue;
+                        }
                         apiRevisionDeployment.setVhost(VHostUtils.resolveIfNullToDefaultVhost(environmentName, vhost));
                         //apiRevisionDeployment.setRevisionUUID(rs.getString(8));
                         apiRevisionDeployment.setDisplayOnDevportal(rs.getBoolean("DISPLAY_ON_DEVPORTAL"));
@@ -16351,6 +16355,10 @@ public class ApiMgtDAO {
                 while (rs.next()) {
                     String environmentName = rs.getString("NAME");
                     String vhost = rs.getString("VHOST");
+                    // Ignore all revisions deployed on decommissioned gateways
+                    if (isGatewayDecommissioned(vhost, environmentName)) {
+                        continue;
+                    }
                     apiRevisionDeployment.setDeployment(environmentName);
                     apiRevisionDeployment.setVhost(VHostUtils.resolveIfNullToDefaultVhost(environmentName, vhost));
                     apiRevisionDeployment.setRevisionUUID(rs.getString("REVISION_UUID"));
@@ -16383,6 +16391,10 @@ public class ApiMgtDAO {
                     APIRevisionDeployment apiRevisionDeployment = new APIRevisionDeployment();
                     String environmentName = rs.getString("NAME");
                     String vhost = rs.getString("VHOST");
+                    // Ignore all revisions deployed on decommissioned gateways
+                    if (isGatewayDecommissioned(vhost, environmentName)) {
+                        continue;
+                    }
                     apiRevisionDeployment.setDeployment(environmentName);
                     apiRevisionDeployment.setVhost(VHostUtils.resolveIfNullToDefaultVhost(environmentName, vhost));
                     apiRevisionDeployment.setRevisionUUID(rs.getString("REVISION_UUID"));
@@ -16417,6 +16429,10 @@ public class ApiMgtDAO {
                     APIRevisionDeployment apiRevisionDeployment = new APIRevisionDeployment();
                     String environmentName = rs.getString("NAME");
                     String vhost = rs.getString("VHOST");
+                    // Ignore all revisions deployed on decommissioned gateways (for devportal)
+                    if (isGatewayDecommissioned(vhost, environmentName)) {
+                        continue;
+                    }
                     apiRevisionDeployment.setDeployment(environmentName);
                     apiRevisionDeployment.setVhost(VHostUtils.resolveIfNullToDefaultVhost(environmentName, vhost));
                     apiRevisionDeployment.setRevisionUUID(rs.getString("REVISION_UUID"));
@@ -16474,6 +16490,10 @@ public class ApiMgtDAO {
                     APIRevisionDeployment apiRevisionDeployment = new APIRevisionDeployment();
                     String environmentName = rs.getString("NAME");
                     String vhost = rs.getString("VHOST");
+                    // Ignore all revisions deployed on decommissioned gateways
+                    if (isGatewayDecommissioned(vhost, environmentName)) {
+                        continue;
+                    }
                     apiRevisionDeployment.setDeployment(environmentName);
                     apiRevisionDeployment.setVhost(VHostUtils.resolveIfNullToDefaultVhost(environmentName, vhost));
                     apiRevisionDeployment.setRevisionUUID(rs.getString("REVISION_UUID"));
@@ -17463,6 +17483,22 @@ public class ApiMgtDAO {
             handleException("Error while checking existence of Policy " + policyName + "Attached to API/Resouce.", e);
         }
 
+        return false;
+    }
+
+    /**
+     * Checks if the gateway has been decommissioned (removed from deployment.toml)
+     * @param vhost string
+     * @param environmentName string
+     * @return true/false
+     */
+    private boolean isGatewayDecommissioned(String vhost, String environmentName) {
+        if (StringUtils.isEmpty(vhost)) {
+            Map<String, Environment> readOnlyEnvironments = APIUtil.getReadOnlyEnvironments();
+            if (readOnlyEnvironments.get(environmentName) == null) {
+                return true;
+            }
+        }
         return false;
     }
 
