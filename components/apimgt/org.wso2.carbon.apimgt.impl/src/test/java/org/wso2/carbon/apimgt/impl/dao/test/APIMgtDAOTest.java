@@ -78,6 +78,7 @@ import org.wso2.carbon.apimgt.impl.dto.APIKeyInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.ApplicationRegistrationWorkflowDTO;
 import org.wso2.carbon.apimgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
+import org.wso2.carbon.apimgt.impl.factory.SQLConstantManagerFactory;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.notifier.Notifier;
 import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
@@ -139,6 +140,7 @@ public class APIMgtDAOTest {
         keyManager = Mockito.mock(KeyManager.class);
         APIMgtDBUtil.initialize();
         apiMgtDAO = ApiMgtDAO.getInstance();
+        SQLConstantManagerFactory.initializeSQLConstantManager();
         IdentityTenantUtil.setRealmService(new TestRealmService());
         String identityConfigPath = System.getProperty("IdentityConfigurationPath");
         IdentityConfigParser.getInstance(identityConfigPath);
