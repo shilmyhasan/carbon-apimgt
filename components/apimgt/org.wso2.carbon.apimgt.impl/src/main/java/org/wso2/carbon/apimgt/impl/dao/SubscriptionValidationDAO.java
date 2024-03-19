@@ -43,6 +43,7 @@ import org.wso2.carbon.apimgt.api.model.subscription.URLMapping;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.ThrottlePolicyConstants;
 import org.wso2.carbon.apimgt.impl.dao.constants.SubscriptionValidationSQLConstants;
+import org.wso2.carbon.apimgt.impl.factory.SQLConstantManagerFactory;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
@@ -112,11 +113,12 @@ public class SubscriptionValidationDAO {
      *
      * @return {@link List<Application>}
      * */
-    public List<Application> getAllApplications() {
+    public List<Application> getAllApplications() throws APIManagementException{
 
         List<Application> applications = new ArrayList<>();
+        String sqlQuery = SQLConstantManagerFactory.getSQlString("GET_ALL_APPLICATIONS_SQL");
         try (Connection conn = APIMgtDBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SubscriptionValidationSQLConstants.GET_ALL_APPLICATIONS_SQL);
+             PreparedStatement ps = conn.prepareStatement(sqlQuery);
              ResultSet resultSet = ps.executeQuery();
         ) {
             addToApplicationList(applications, resultSet);
@@ -585,12 +587,12 @@ public class SubscriptionValidationDAO {
      * @param tenantId : tenant Id
      * @return {@link Subscription}
      * */
-    public List<Application> getAllApplications(String tenantDomain) {
+    public List<Application> getAllApplications(String tenantDomain) throws APIManagementException {
 
         ArrayList<Application> applications = new ArrayList<>();
+        String sqlQuery = SQLConstantManagerFactory.getSQlString("GET_TENANT_APPLICATIONS_SQL");
         try (Connection conn = APIMgtDBUtil.getConnection();
-             PreparedStatement ps =
-                     conn.prepareStatement(SubscriptionValidationSQLConstants.GET_TENANT_APPLICATIONS_SQL)) {
+             PreparedStatement ps = conn.prepareStatement(sqlQuery)) {
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
                         .getTenantId(tenantDomain);
@@ -843,13 +845,12 @@ public class SubscriptionValidationDAO {
      * @param applicationId : unique identifier of an application
      * @return {@link List<Application>} a list with one element
      * */
-    public List<Application> getApplicationById(int applicationId) {
+    public List<Application> getApplicationById(int applicationId) throws APIManagementException {
 
         List<Application> applicationList = new ArrayList<>();
-
+        String sqlQuery = SQLConstantManagerFactory.getSQlString("GET_APPLICATION_BY_ID_SQL");
         try (Connection conn = APIMgtDBUtil.getConnection();
-             PreparedStatement ps =
-                     conn.prepareStatement(SubscriptionValidationSQLConstants.GET_APPLICATION_BY_ID_SQL)) {
+             PreparedStatement ps = conn.prepareStatement(sqlQuery)) {
             ps.setInt(1, applicationId);
 
             try (ResultSet resultSet = ps.executeQuery()) {

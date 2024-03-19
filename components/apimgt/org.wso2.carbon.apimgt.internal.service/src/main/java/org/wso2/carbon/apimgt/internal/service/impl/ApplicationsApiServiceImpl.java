@@ -20,6 +20,7 @@ package org.wso2.carbon.apimgt.internal.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.subscription.Application;
 import org.wso2.carbon.apimgt.impl.dao.SubscriptionValidationDAO;
 import org.wso2.carbon.apimgt.internal.service.ApplicationsApiService;
@@ -31,7 +32,8 @@ import javax.ws.rs.core.Response;
 public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
-    public Response applicationsGet(String xWSO2Tenant, Integer appId, MessageContext messageContext) {
+    public Response applicationsGet(String xWSO2Tenant, Integer appId, MessageContext messageContext)
+            throws APIManagementException {
 
         SubscriptionValidationDAO subscriptionValidationDAO = new SubscriptionValidationDAO();
         if (appId != null) {

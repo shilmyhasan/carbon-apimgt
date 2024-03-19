@@ -25,6 +25,107 @@ package org.wso2.carbon.apimgt.impl.dao.constants;
 public class SQLConstantsDB2 extends SQLConstants{
 
 
+    public static final String GET_ALL_APPLICATIONS_SQL =
+            " SELECT " +
+                    "   APP.UUID AS APP_UUID," +
+                    "   APP.APPLICATION_ID AS APP_ID," +
+                    "   APP.APPLICATION_TIER AS TIER," +
+                    "   APP.NAME AS APS_NAME," +
+                    "   APP.TOKEN_TYPE AS TOKEN_TYPE," +
+                    "   SUB.USER_ID AS SUB_NAME," +
+                    "   ATTRIBUTES.NAME AS ATTRIBUTE_NAME," +
+                    "   ATTRIBUTES.VALUE AS ATTRIBUTE_VALUE" +
+                    " FROM " +
+                    "   AM_SUBSCRIBER SUB," +
+                    "   AM_APPLICATION APP" +
+                    "   LEFT OUTER JOIN AM_APPLICATION_ATTRIBUTES ATTRIBUTES  " +
+                    "ON APP.APPLICATION_ID = ATTRIBUTES.APPLICATION_ID" +
+                    " WHERE " +
+                    "   APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID ";
+
+    public static final String GET_TENANT_APPLICATIONS_SQL =
+            " SELECT " +
+                    "   APP.UUID AS APP_UUID," +
+                    "   APP.APPLICATION_ID AS APP_ID," +
+                    "   APP.NAME AS APS_NAME," +
+                    "   APP.APPLICATION_TIER AS TIER," +
+                    "   APP.TOKEN_TYPE AS TOKEN_TYPE," +
+                    "   SUB.USER_ID AS SUB_NAME," +
+                    "   ATTRIBUTES.NAME AS ATTRIBUTE_NAME," +
+                    "   ATTRIBUTES.VALUE AS ATTRIBUTE_VALUE"+
+                    " FROM " +
+                    "   AM_SUBSCRIBER SUB," +
+                    "   AM_APPLICATION APP" +
+                    "   LEFT OUTER JOIN AM_APPLICATION_ATTRIBUTES ATTRIBUTES" +
+                    "  ON APP.APPLICATION_ID = ATTRIBUTES.APPLICATION_ID" +
+                    " WHERE " +
+                    "   APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID AND" +
+                    "   SUB.TENANT_ID = ? ";
+
+    public static final String GET_APPLICATION_BY_ID_SQL =
+            " SELECT " +
+                    "   APP.UUID AS APP_UUID," +
+                    "   APP.APPLICATION_ID AS APP_ID," +
+                    "   APP.NAME AS APS_NAME," +
+                    "   APP.APPLICATION_TIER AS TIER," +
+                    "   APP.TOKEN_TYPE AS TOKEN_TYPE," +
+                    "   SUB.USER_ID AS SUB_NAME," +
+                    "   ATTRIBUTES.NAME AS ATTRIBUTE_NAME," +
+                    "   ATTRIBUTES.VALUE AS ATTRIBUTE_VALUE"+
+                    " FROM " +
+                    "   AM_SUBSCRIBER SUB," +
+                    "   AM_APPLICATION APP" +
+                    "   LEFT OUTER JOIN AM_APPLICATION_ATTRIBUTES ATTRIBUTES  " +
+                    "ON APP.APPLICATION_ID = ATTRIBUTES.APPLICATION_ID" +
+                    " WHERE " +
+                    "   APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID AND" +
+                    "   APP.APPLICATION_ID = ? ";
+
+    public static final String ADD_APPLICATION_ATTRIBUTES_SQL =
+            " INSERT INTO AM_APPLICATION_ATTRIBUTES (APPLICATION_ID, NAME, VALUE, TENANT_ID) VALUES (?,?,?,?)";
+
+    public static final String REMOVE_APPLICATION_ATTRIBUTES_SQL =
+            " DELETE FROM " +
+                    "   AM_APPLICATION_ATTRIBUTES" +
+                    " WHERE" +
+                    "   APPLICATION_ID = ?";
+
+    public static final String REMOVE_APPLICATION_ATTRIBUTES_BY_ATTRIBUTE_NAME_SQL =
+            " DELETE FROM " +
+                    "   AM_APPLICATION_ATTRIBUTES" +
+                    " WHERE" +
+                    "   NAME = ? AND APPLICATION_ID = ?";
+
+    public static final String GET_APPLICATION_ATTRIBUTES_BY_APPLICATION_ID =
+            " SELECT " +
+                    "   APP.APPLICATION_ID," +
+                    "   APP.NAME," +
+                    "   APP.VALUE" +
+                    " FROM " +
+                    "   AM_APPLICATION_ATTRIBUTES APP WHERE APPLICATION_ID = ?";
+
+    public static final String ADD_BLOCK_CONDITIONS_SQL =
+            "INSERT INTO AM_BLOCK_CONDITIONS (TYPE, VALUE,ENABLED,DOMAIN,UUID) VALUES (?,?,?,?,?)";
+    public static final String GET_BLOCK_CONDITIONS_SQL =
+            "SELECT CONDITION_ID,TYPE,VALUE,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE DOMAIN =?";
+    public static final String GET_BLOCK_CONDITION_SQL =
+            "SELECT TYPE,VALUE,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE CONDITION_ID =?";
+    public static final String GET_BLOCK_CONDITION_BY_UUID_SQL =
+            "SELECT CONDITION_ID,TYPE,VALUE,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE UUID =?";
+    public static final String UPDATE_BLOCK_CONDITION_STATE_SQL =
+            "UPDATE AM_BLOCK_CONDITIONS SET ENABLED = ? WHERE CONDITION_ID = ?";
+    public static final String UPDATE_BLOCK_CONDITION_STATE_BY_UUID_SQL =
+            "UPDATE AM_BLOCK_CONDITIONS SET ENABLED = ? WHERE UUID = ?";
+    public static final String DELETE_BLOCK_CONDITION_SQL =
+            "DELETE FROM AM_BLOCK_CONDITIONS WHERE CONDITION_ID=?";
+    public static final String DELETE_BLOCK_CONDITION_BY_UUID_SQL =
+            "DELETE FROM AM_BLOCK_CONDITIONS WHERE UUID=?";
+    public static final String BLOCK_CONDITION_EXIST_SQL =
+            "SELECT CONDITION_ID,TYPE,VALUE,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE DOMAIN =? "
+                    + "AND TYPE =? AND VALUE =?";
+    public static final String GET_SUBSCRIPTION_BLOCK_CONDITION_BY_VALUE_AND_DOMAIN_SQL =
+            "SELECT CONDITION_ID,TYPE,VALUE,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE "
+                    + "VALUE = ? AND DOMAIN = ? ";
 
     public static final String GET_APPLICATIONS_PREFIX_CASESENSITVE_WITHGROUPID =
             "select distinct x.*,bl.ENABLED from (" +
@@ -52,7 +153,7 @@ public class SQLConstantsDB2 extends SQLConstants{
                     "   (GROUP_ID= ?  OR  (GROUP_ID='' AND SUB.USER_ID = ?))" +
                     " And " +
                     "    NAME like ?" +
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.`VALUE` = concat(concat(x.USER_ID,':'),x.name)) " +
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
 
@@ -84,7 +185,7 @@ public class SQLConstantsDB2 extends SQLConstants{
                     "   (GROUP_ID= ?  OR (GROUP_ID='' AND LOWER (SUB.USER_ID) = LOWER (?)))"+
                     " And "+
                     "    NAME like ?" +
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.`VALUE` = concat(concat(x.USER_ID,':'),x.name)) " +
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
     public static final String GET_APPLICATIONS_PREFIX_CASESENSITVE =
@@ -113,7 +214,7 @@ public class SQLConstantsDB2 extends SQLConstants{
                     "    SUB.USER_ID = ?"+
                     " And "+
                     "    NAME like ?" +
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.`VALUE` = concat(concat(x.USER_ID,':'),x.name)) " +
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
 
@@ -143,7 +244,7 @@ public class SQLConstantsDB2 extends SQLConstants{
                     "   LOWER (SUB.USER_ID) = LOWER(?)" +
                     " And "+
                     "    NAME like ?" +
-                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.`VALUE` = concat(concat(x.USER_ID,':'),x.name)) " +
+                    " ) a )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) " +
                     " ORDER BY $1 $2 limit ? , ? ";
 
     public static final String GET_APPLICATIONS_PREFIX_NONE_CASESENSITVE_WITH_MULTIGROUPID =
@@ -177,7 +278,7 @@ public class SQLConstantsDB2 extends SQLConstants{
                     "    NAME like ?"+
                     " ORDER BY $1 $2 " +
                     " limit ? , ? "+
-                    " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.`VALUE` = concat(concat(x.USER_ID,':'),x.name)) ";
+                    " )x left join AM_BLOCK_CONDITIONS bl on  ( bl.TYPE = 'APPLICATION' AND bl.VALUE = concat(concat(x.USER_ID,':'),x.name)) ";
 
 
 
@@ -232,8 +333,3 @@ public class SQLConstantsDB2 extends SQLConstants{
                     " ORDER BY $1 $2 limit ? , ? ";
 
 }
-
-
-
-
-
