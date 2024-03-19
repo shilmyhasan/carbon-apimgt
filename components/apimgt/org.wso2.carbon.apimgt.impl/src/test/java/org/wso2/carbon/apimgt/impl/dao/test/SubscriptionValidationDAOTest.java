@@ -36,6 +36,7 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationServiceImpl;
 import org.wso2.carbon.apimgt.impl.dao.ApiMgtDAO;
 import org.wso2.carbon.apimgt.impl.dao.SubscriptionValidationDAO;
+import org.wso2.carbon.apimgt.impl.factory.SQLConstantManagerFactory;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.identity.core.util.IdentityConfigParser;
@@ -87,6 +88,7 @@ public class SubscriptionValidationDAOTest {
                 .setAPIManagerConfigurationService(new APIManagerConfigurationServiceImpl(config));
         APIMgtDBUtil.initialize();
         apiMgtDAO = ApiMgtDAO.getInstance();
+        SQLConstantManagerFactory.initializeSQLConstantManager();
         subscriptionValidationDAO = new SubscriptionValidationDAO();
         IdentityTenantUtil.setRealmService(new TestRealmService());
         String identityConfigPath = System.getProperty("IdentityConfigurationPath");
