@@ -134,6 +134,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -185,10 +186,14 @@ public class APIMappingUtil {
         model.setContext(context);
         model.setDescription(dto.getDescription());
 
-        if (dto.getEndpointConfig() != null) {
+        Object endpointConfig = dto.getEndpointConfig();
+        if (endpointConfig != null) {
             ObjectMapper mapper = new ObjectMapper();
             try {
-                model.setEndpointConfig(mapper.writeValueAsString(dto.getEndpointConfig()));
+                if (endpointConfig instanceof LinkedHashMap) {
+                    ((LinkedHashMap) endpointConfig).remove("implementation_status");
+                }
+                model.setEndpointConfig(mapper.writeValueAsString(endpointConfig));
             } catch (IOException e) {
                 handleException("Error while converting endpointConfig to json", e);
             }
