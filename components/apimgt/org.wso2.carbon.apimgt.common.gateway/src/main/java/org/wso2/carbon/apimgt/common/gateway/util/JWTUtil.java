@@ -27,6 +27,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.common.gateway.constants.JWTConstants;
 import org.wso2.carbon.apimgt.common.gateway.exception.JWTGeneratorException;
 import org.wso2.carbon.apimgt.common.gateway.jwtgenerator.JWTSignatureAlg;
 
@@ -80,16 +81,19 @@ public final class JWTUtil {
      * @param publicCert         The public certificate which needs to include in the header as thumbprint
      * @param signatureAlgorithm Signature algorithm which needs to include in the header
      * @param useKid             Specifies whether the header should include the kid property
+     * @param useSHA1Hash        Specifies whether to use SHA-1 algorithm to generate the certificate thumbprint
      * @throws JWTGeneratorException
      */
-    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid)
-            throws JWTGeneratorException {
+    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid,
+                                        boolean useSHA1Hash) throws JWTGeneratorException {
 
         try {
             X509Certificate x509Certificate = (X509Certificate) publicCert;
 
             //generate the SHA-1 thumbprint of the certificate
-            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
+            String hashingAlgorithm = useSHA1Hash ? JWTConstants.SHA_1 : JWTConstants.SHA_256;
+            //generate the thumbprint of the certificate
+            MessageDigest digestValue = MessageDigest.getInstance(hashingAlgorithm);
             byte[] der = publicCert.getEncoded();
             digestValue.update(der);
             byte[] digestInBytes = digestValue.digest();
@@ -100,16 +104,20 @@ public final class JWTUtil {
             StringBuilder jwtHeader = new StringBuilder();
             /*
              * Sample header
-             * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
+             * {"typ":"JWT", "alg":"SHA256withRSA", "x5t#S256":"a_jhNus21KVuoFx65LmkW2O_l10",
              * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256"}
-             * {"typ":"JWT", "alg":"[2]", "x5t":"[1]", "x5t":"[1]"}
+             * {"typ":"JWT", "alg":"[2]", "x5t#S256":"[1]"}
              * */
             jwtHeader.append("{\"typ\":\"JWT\",");
             jwtHeader.append("\"alg\":\"");
             jwtHeader.append(getJWSCompliantAlgorithmCode(signatureAlgorithm));
             jwtHeader.append("\",");
 
-            jwtHeader.append("\"x5t\":\"");
+            if (useSHA1Hash) {
+                jwtHeader.append("\"x5t\":\"");
+            } else {
+                jwtHeader.append("\"x5t#S256\":\"");
+            }
             jwtHeader.append(base64UrlEncodedThumbPrint);
             jwtHeader.append("\"");
 
