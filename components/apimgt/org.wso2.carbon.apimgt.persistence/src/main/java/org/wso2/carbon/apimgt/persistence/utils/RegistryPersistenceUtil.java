@@ -1446,7 +1446,7 @@ public class RegistryPersistenceUtil {
             artifact.setAttribute(APIConstants.API_OVERVIEW_THUMBNAIL_URL, apiProduct.getThumbnailUrl());
             artifact.setAttribute(
                     APIConstants.API_OVERVIEW_CACHE_TIMEOUT, Integer.toString(apiProduct.getCacheTimeout()));
-
+            artifact.setAttribute(APIConstants.API_OVERVIEW_AUDIENCES, new Gson().toJson(apiProduct.getAudiences()));
             StringBuilder policyBuilder = new StringBuilder();
             for (Tier tier : apiProduct.getAvailableTiers()) {
                 policyBuilder.append(tier.getName());
@@ -1574,6 +1574,10 @@ public class RegistryPersistenceUtil {
             apiProduct.setGatewayVendor(artifact.getAttribute(APIConstants.API_OVERVIEW_GATEWAY_VENDOR));
             String tenantDomainName = MultitenantUtils.getTenantDomain(replaceEmailDomainBack(providerName));
             apiProduct.setTenantDomain(tenantDomainName);
+            String audiences = artifact.getAttribute(APIConstants.API_OVERVIEW_AUDIENCES);
+            if (StringUtils.isNotEmpty(audiences)) {
+                apiProduct.setAudiences(new Gson().fromJson(audiences, Set.class));
+            }
             int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
                     .getTenantId(tenantDomainName);
 

@@ -131,6 +131,11 @@ public class APIProduct {
      */
     private String workflowStatus = null;
 
+    /**
+     * Used to set the audiences values in jwt audience validation
+     */
+    private Set<String> audiences;
+
     public APIProduct(){}
 
     public APIProduct(APIProductIdentifier id) {
@@ -205,6 +210,24 @@ public class APIProduct {
             this.type = type;
         }
     }
+
+    /**
+     * To get the audiences for jwt validation
+     *
+     * @return audiences of the API
+     */
+    public Set<String> getAudiences() {
+        return audiences;
+    }
+
+    /**
+     * To set the audiences for jwt validation
+     *
+     */
+    public void setAudiences(Set<String> audiences) {
+        this.audiences = audiences;
+    }
+
     public String getBusinessOwner() {
         return businessOwner;
     }
