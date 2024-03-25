@@ -2212,6 +2212,9 @@ public class APIMappingUtil {
             if (apiProduct.getApiSecurity() != null) {
                 productDto.setSecurityScheme(Arrays.asList(apiProduct.getApiSecurity().split(",")));
             }
+            if (apiProduct.getAudiences() != null) {
+                productDto.setAudiences(new ArrayList<>(apiProduct.getAudiences()));
+            }
 
             list.add(productDto);
         }
