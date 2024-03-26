@@ -307,6 +307,10 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response applicationsPost(ApplicationDTO body, MessageContext messageContext){
         String username = RestApiCommonUtil.getLoggedInUsername();
         try {
+            /* When new applications are created, we do not honor tokenType sent in the body
+            and all the applications created will be of 'JWT' token type */
+            body.setTokenType(ApplicationDTO.TokenTypeEnum.JWT);
+
             Application createdApplication = preProcessAndAddApplication(username, body);
             ApplicationDTO createdApplicationDTO = ApplicationMappingUtil.fromApplicationtoDTO(createdApplication);
 
@@ -360,10 +364,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         if (applicationAttributes != null) {
             applicationDto.setAttributes(applicationAttributes);
         }
-
-        //we do not honor tokenType sent in the body and
-        //all the applications created will of 'JWT' token type
-        applicationDto.setTokenType(ApplicationDTO.TokenTypeEnum.JWT);
 
         //subscriber field of the body is not honored. It is taken from the context
         Application application = ApplicationMappingUtil.fromDTOtoApplication(applicationDto, username);
