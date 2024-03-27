@@ -15545,9 +15545,8 @@ public class ApiMgtDAO {
                     workflow.setTenantDomain(rs.getString("TENANT_DOMAIN"));
                     workflow.setExternalWorkflowReference(rs.getString("WF_EXTERNAL_REFERENCE"));
                     workflow.setWorkflowDescription(rs.getString("WF_STATUS_DESC"));
-                    InputStream metadataBlob = rs.getBinaryStream("WF_METADATA");
-                    InputStream propertiesBlob = rs.getBinaryStream("WF_PROPERTIES");
 
+                    InputStream metadataBlob = rs.getBinaryStream("WF_METADATA");
                     if (metadataBlob != null) {
                         String metadata = APIMgtDBUtil.getStringFromInputStream(metadataBlob);
                         Gson metadataGson = new Gson();
@@ -15558,6 +15557,7 @@ public class ApiMgtDAO {
                         workflow.setMetadata(metadataJson);
                     }
 
+                    InputStream propertiesBlob = rs.getBinaryStream("WF_PROPERTIES");
                     if (propertiesBlob != null) {
                         String properties = APIMgtDBUtil.getStringFromInputStream(propertiesBlob);
                         Gson propertiesGson = new Gson();
@@ -15615,9 +15615,8 @@ public class ApiMgtDAO {
                     workflow.setTenantId(rs.getInt("TENANT_ID"));
                     workflow.setTenantDomain(rs.getString("TENANT_DOMAIN"));
                     workflow.setExternalWorkflowReference(rs.getString("WF_EXTERNAL_REFERENCE"));
-                    InputStream targetStream = rs.getBinaryStream("WF_METADATA");
-                    InputStream propertiesTargetStream = rs.getBinaryStream("WF_PROPERTIES");
 
+                    InputStream targetStream = rs.getBinaryStream("WF_METADATA");
                     if (targetStream != null) {
                         String metadata = APIMgtDBUtil.getStringFromInputStream(targetStream);
                         Gson metadataGson = new Gson();
@@ -15628,6 +15627,7 @@ public class ApiMgtDAO {
                         workflow.setMetadata(metadataJson);
                     }
 
+                    InputStream propertiesTargetStream = rs.getBinaryStream("WF_PROPERTIES");
                     if (propertiesTargetStream != null) {
                         String properties = APIMgtDBUtil.getStringFromInputStream(propertiesTargetStream);
                         Gson propertiesGson = new Gson();
