@@ -87,6 +87,7 @@ public class APIMappingUtilTest {
         Mockito.when(config.getFirstProperty(APIConstants.CORS_CONFIGURATION_ACCESS_CTL_ALLOW_ORIGIN))
                 .thenReturn(ALLOW_ORIGIN);
     }
+    
     @Test
     public void testPrototypeEndpointConfig() throws Exception {
 
