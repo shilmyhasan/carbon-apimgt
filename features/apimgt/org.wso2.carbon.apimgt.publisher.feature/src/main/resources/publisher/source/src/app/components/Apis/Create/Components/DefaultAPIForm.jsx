@@ -254,7 +254,8 @@ export default function DefaultAPIForm(props) {
                         if (result.body.list.length > 0 && (
                             (result.body.list[0].version !== undefined
                             && (result.body.list[0].version.toLowerCase()
-                                === value.toLowerCase())) || value === '1.0.0')) {
+                                === value.toLowerCase())) || value === '1.0.0')
+                            && result.body.list[0].context === api.context) {
                             updateValidity({
                                 ...validity,
                                 version: { message: apiVersion + ' context with version already exists' },
