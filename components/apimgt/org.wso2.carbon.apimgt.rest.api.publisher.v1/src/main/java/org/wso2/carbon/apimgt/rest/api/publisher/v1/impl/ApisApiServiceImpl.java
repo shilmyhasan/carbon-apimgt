@@ -201,6 +201,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
@@ -2100,6 +2102,12 @@ public class ApisApiServiceImpl implements ApisApiService {
             Documentation documentation = DocumentationMappingUtil.fromDTOtoDocumentation(body);
             String documentName = body.getName();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            Pattern pattern = Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA);
+            Matcher matcher = pattern.matcher(documentName);
+            if (matcher.find()) {
+                RestApiUtil.handleBadRequest("Document name contains one or more illegal characters  " +
+                        "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )", log);
+            }
             if (body.getType() == DocumentDTO.TypeEnum.OTHER && org.apache.commons.lang3.StringUtils.isBlank(body.getOtherTypeName())) {
                 //check otherTypeName for not null if doc type is OTHER
                 RestApiUtil.handleBadRequest("otherTypeName cannot be empty if type is OTHER.", log);
