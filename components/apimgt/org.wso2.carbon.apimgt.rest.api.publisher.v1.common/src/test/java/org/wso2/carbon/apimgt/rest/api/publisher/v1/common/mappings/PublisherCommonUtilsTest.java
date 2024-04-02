@@ -38,6 +38,8 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.APIDTO;
+import org.wso2.carbon.apimgt.rest.api.publisher.v1.dto.DocumentDTO;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.Mockito.when;
+import static org.wso2.carbon.apimgt.rest.api.publisher.v1.common.mappings.PublisherCommonUtils.addDocumentationToAPI;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RestApiCommonUtil.class, WorkflowExecutorFactory.class})
@@ -58,6 +61,12 @@ public class PublisherCommonUtilsTest {
     private static final String API_PRODUCT_VERSION = "1.0.0";
     private static final String ORGANIZATION = "carbon.super";
     private static final String UUID = "63e1e37e-a5b8-4be6-86a5-d6ae0749f131";
+    private static final String API_ID = "f4dbe403-4e19-44e9-bb14-c83eda633791";
+    private static final String DOC_NAME = "test/documentation";
+    private static final String DOC_TYPE = "HOWTO";
+    private static final String DOC_SUMMARY = "Summary of test documentation";
+    private static final String DOC_SOURCE_TYPE = "INLINE";
+    private static final String DOC_VISIBILITY = "API_LEVEL";
 
     @Test
     public void testGetInvalidTierNames() throws Exception {
@@ -127,6 +136,26 @@ public class PublisherCommonUtilsTest {
         flag = PublisherCommonUtils.validateEndpointConfigs(apiDTO);
         Assert.assertFalse(flag);
 
+    }
+
+    @Test
+    public void testDocumentCreationWithIllegalCharacters() throws Exception {
+
+        APIProvider apiProvider = Mockito.mock(APIProvider.class);
+        PowerMockito.mockStatic(RestApiCommonUtil.class);
+        when(RestApiCommonUtil.getLoggedInUserProvider()).thenReturn(apiProvider);
+        DocumentDTO documentDto = new DocumentDTO();
+        documentDto.setName(DOC_NAME);
+        documentDto.setType(DocumentDTO.TypeEnum.valueOf(DOC_TYPE));
+        documentDto.setSummary(DOC_SUMMARY);
+        documentDto.setSourceType(DocumentDTO.SourceTypeEnum.valueOf(DOC_SOURCE_TYPE));
+        documentDto.setVisibility(DocumentDTO.VisibilityEnum.valueOf(DOC_VISIBILITY));
+        try {
+            addDocumentationToAPI(documentDto, API_ID, ORGANIZATION);
+            fail("Expected APIManagementException was not thrown");
+        } catch (APIManagementException e) {
+            Assert.assertTrue(e.getMessage().contains("Document name cannot contain illegal characters  "));
+        }
     }
 
     private ApiTypeWrapper createMockAPIProduct() {
