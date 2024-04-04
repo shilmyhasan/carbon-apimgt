@@ -650,7 +650,7 @@ public class ExportUtils {
                 List<OperationPolicy> operationPolicies = uriTemplate.getOperationPolicies();
                 if (operationPolicies != null && !operationPolicies.isEmpty()) {
                     for (OperationPolicy policy : operationPolicies) {
-                        if (!exportedPolicies.contains(policy.getPolicyName())) {
+                        if (!exportedPolicies.contains(policy.getPolicyName() + "_" + policy.getPolicyVersion())) {
                             String policyFileName = APIUtil.getOperationPolicyFileName(policy.getPolicyName(),
                                     policy.getPolicyVersion());
                             if (policy.getPolicyId() != null) {
@@ -659,15 +659,15 @@ public class ExportUtils {
                                                 currentApiUuid, tenantDomain, true);
                                 if (policyData != null) {
                                     exportPolicyData(policyFileName, policyData, archivePath, exportFormat);
-                                    exportedPolicies.add(policy.getPolicyName());
+                                    exportedPolicies.add(policy.getPolicyName() + "_" + policy.getPolicyVersion());
                                 }
                             } else {
                                 // This path is to handle migrated APIs with mediation policies attached
                                 if (APIUtil.isSequenceDefined(api.getInSequence())
                                         || APIUtil.isSequenceDefined(api.getOutSequence())
                                         || APIUtil.isSequenceDefined(api.getFaultSequence())) {
-                                    log.info("Mediation policy " + policy.getPolicyName()
-                                            + " will be converted to an operation policy");
+                                    log.info("Mediation policy " + policy.getPolicyName() + "_" +
+                                            policy.getPolicyVersion() + " will be converted to an operation policy");
                                     if (!mediationPoliciesLoaded) {
                                         apiProvider.loadMediationPoliciesToAPI(api, tenantDomain);
                                         mediationPoliciesLoaded = true;
@@ -677,7 +677,7 @@ public class ExportUtils {
                                             policy.getDirection(), tenantDomain);
                                     if (policyData != null) {
                                         exportPolicyData(policyFileName, policyData, archivePath, exportFormat);
-                                        exportedPolicies.add(policy.getPolicyName());
+                                        exportedPolicies.add(policy.getPolicyName() + "_" + policy.getPolicyVersion());
                                     }
                                 }
                             }
