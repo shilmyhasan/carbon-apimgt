@@ -835,15 +835,20 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
             String applicationName = application.getName();
 
+            String requestedDomain = MultitenantUtils.getTenantDomain(
+                    APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
+
             try {
-                WorkflowExecutor addSubscriptionWFExecutor =
-                        getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
+                String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && requestedDomain != null ?
+                        requestedDomain : tenantDomain;
+                WorkflowExecutor addSubscriptionWFExecutor = getWorkflowExecutor(
+                        WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION, workflowDomain);
 
                 SubscriptionWorkflowDTO workflowDTO = new SubscriptionWorkflowDTO();
                 workflowDTO.setStatus(WorkflowStatus.CREATED);
                 workflowDTO.setCreatedTime(System.currentTimeMillis());
-                workflowDTO.setTenantDomain(tenantDomain);
-                workflowDTO.setTenantId(tenantId);
+                workflowDTO.setTenantDomain(workflowDomain);
+                workflowDTO.setTenantId(APIUtil.getTenantIdFromTenantDomain(workflowDomain));
                 workflowDTO.setExternalWorkflowReference(addSubscriptionWFExecutor.generateUUID());
                 workflowDTO.setWorkflowReference(String.valueOf(subscriptionId));
                 workflowDTO.setWorkflowType(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
@@ -1024,16 +1029,20 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 isTenantFlowStarted = startTenantFlowForTenantDomain(tenantDomain);
             }
 
+            String requestedDomain = MultitenantUtils.getTenantDomain(
+                    APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
 
             try {
-                WorkflowExecutor updateSubscriptionWFExecutor =
-                        getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_UPDATE);
+                String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && requestedDomain != null ?
+                        requestedDomain : tenantDomain;
+                WorkflowExecutor updateSubscriptionWFExecutor = getWorkflowExecutor(
+                        WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_UPDATE, workflowDomain);
 
                 SubscriptionWorkflowDTO workflowDTO = new SubscriptionWorkflowDTO();
                 workflowDTO.setStatus(WorkflowStatus.CREATED);
                 workflowDTO.setCreatedTime(System.currentTimeMillis());
-                workflowDTO.setTenantDomain(tenantDomain);
-                workflowDTO.setTenantId(tenantId);
+                workflowDTO.setTenantDomain(workflowDomain);
+                workflowDTO.setTenantId(APIUtil.getTenantIdFromTenantDomain(workflowDomain));
                 workflowDTO.setExternalWorkflowReference(updateSubscriptionWFExecutor.generateUUID());
                 workflowDTO.setWorkflowReference(String.valueOf(subscriptionId));
                 workflowDTO.setWorkflowType(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_UPDATE);
@@ -1196,12 +1205,18 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
         String applicationName = apiMgtDAO.getApplicationNameFromId(applicationId);
 
+        String providerTenantDomain = MultitenantUtils.getTenantDomain(
+                APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
+
         try {
+            String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && providerTenantDomain != null ?
+                    providerTenantDomain : tenantDomain;
+
             SubscriptionWorkflowDTO workflowDTO;
             WorkflowExecutor createSubscriptionWFExecutor = getWorkflowExecutor(
-                    WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
+                    WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION, workflowDomain);
             WorkflowExecutor removeSubscriptionWFExecutor = getWorkflowExecutor(
-                    WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION);
+                    WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_DELETION, workflowDomain);
             String workflowExtRef = apiMgtDAO
                     .getExternalWorkflowReferenceForSubscription(identifier, applicationId, organization);
 
@@ -1238,8 +1253,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             workflowDTO.setApiName(identifier.getName());
             workflowDTO.setApiVersion(identifier.getVersion());
             workflowDTO.setApplicationName(applicationName);
-            workflowDTO.setTenantDomain(tenantDomain);
-            workflowDTO.setTenantId(tenantId);
+            workflowDTO.setTenantDomain(workflowDomain);
+            workflowDTO.setTenantId(APIUtil.getTenantIdFromTenantDomain(workflowDomain));
             workflowDTO.setExternalWorkflowReference(workflowExtRef);
             workflowDTO.setSubscriber(userId);
             workflowDTO.setCallbackUrl(removeSubscriptionWFExecutor.getCallbackURL());
@@ -2952,6 +2967,18 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         PrivilegedCarbonContext.startTenantFlow();
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
         return isTenantFlowStarted;
+    }
+
+    /**
+     * Returns a workflow executor given the tenant domain and the workflow type
+     *
+     * @param workflowType Workflow executor type
+     * @param tenant tenant domain
+     * @return WorkflowExecutor of given type
+     * @throws WorkflowException if an error occurred while getting WorkflowExecutor
+     */
+    protected WorkflowExecutor getWorkflowExecutor(String workflowType, String tenant) throws WorkflowException {
+        return WorkflowExecutorFactory.getInstance().getWorkflowExecutor(workflowType, tenant);
     }
 
     /**
