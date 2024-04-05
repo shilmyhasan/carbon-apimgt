@@ -1032,7 +1032,6 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             String requestedDomain = MultitenantUtils.getTenantDomain(
                     APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
 
-
             try {
                 String workflowDomain = APIUtil.isCrossTenantSubscriptionsEnabled() && requestedDomain != null ?
                         requestedDomain : tenantDomain;
