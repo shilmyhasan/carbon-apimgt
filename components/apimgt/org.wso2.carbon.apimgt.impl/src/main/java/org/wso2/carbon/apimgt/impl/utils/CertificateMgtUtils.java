@@ -990,19 +990,15 @@ public class CertificateMgtUtils {
         } catch (CertificateException e) {
             String msg = "Error storing certificate.";
             log.error(msg, e);
-            throw new CertificateManagementException(msg);
         } catch (FileNotFoundException e) {
             String msg = "Error reading/ writing to the certificate file.";
             log.error(msg, e);
-            throw new CertificateManagementException(msg);
         } catch (NoSuchAlgorithmException e) {
             String msg = "Could not find the algorithm to load the certificate.";
             log.error(msg, e);
-            throw new CertificateManagementException(msg);
         } catch (UnsupportedEncodingException e) {
             String msg = "Error retrieving certificate from String.";
             log.error(msg, e);
-            throw new CertificateManagementException(msg);
         } catch (KeyStoreException e) {
             String msg = "Error loading certificate.";
             log.error(msg, e);
@@ -1010,7 +1006,6 @@ public class CertificateMgtUtils {
         } catch (IOException e) {
             String msg = "Error in loading the certificate.";
             log.error(msg, e);
-            throw new CertificateManagementException(msg);
         }
     }
 }
