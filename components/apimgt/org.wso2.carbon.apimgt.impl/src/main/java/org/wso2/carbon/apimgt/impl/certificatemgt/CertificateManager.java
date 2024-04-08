@@ -79,6 +79,13 @@ public interface CertificateManager {
     boolean addAllCertificateToGateway(String certificate, String alias, int tenantId);
 
     /**
+     * Method to add the all tenant's certificate to gateway nodes.
+     *
+     * @param certificateMetadataDTOList : The list of all certificates of a tenant
+     */
+    void addAllTenantCertificatesToGateway(List<CertificateMetadataDTO> certificateMetadataDTOList);
+
+    /**
      * This method is to remove the certificate from client-truststore.jks of gateway nodes.
      *
      * @param alias : The alias of the certificate to be removed.
