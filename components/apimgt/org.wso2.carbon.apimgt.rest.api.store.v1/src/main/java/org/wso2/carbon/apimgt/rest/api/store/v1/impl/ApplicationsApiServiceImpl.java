@@ -358,11 +358,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
             RestApiUtil.handleBadRequest("Specified tier " + tierName + " is invalid", log);
         }
 
-        Object applicationAttributesFromUser = applicationDto.getAttributes();
-        Map<String, String> applicationAttributes = new ObjectMapper()
-                .convertValue(applicationAttributesFromUser, Map.class);
-        if (applicationAttributes != null) {
-            applicationDto.setAttributes(applicationAttributes);
+        Map<String, String> applicationAttributesFromUser = applicationDto.getAttributes();
+        JSONArray attributeArray = apiConsumer.getAppAttributesFromConfig(username);
+        for (Object obj : attributeArray) {
+            JSONObject attributeObject = (JSONObject) obj;
+            String attributeName = (String) attributeObject.get(APIConstants.ApplicationAttributes.ATTRIBUTE);
+            applicationAttributesFromUser.putIfAbsent(attributeName, StringUtils.EMPTY);
         }
 
         //subscriber field of the body is not honored. It is taken from the context
@@ -482,12 +483,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     private Application preProcessAndUpdateApplication(String username, ApplicationDTO applicationDto,
             Application oldApplication, String applicationId) throws APIManagementException {
         APIConsumer apiConsumer = APIManagerFactory.getInstance().getAPIConsumer(username);
-        Object applicationAttributesFromUser = applicationDto.getAttributes();
-        Map<String, String> applicationAttributes = new ObjectMapper()
-                .convertValue(applicationAttributesFromUser, Map.class);
-
-        if (applicationAttributes != null) {
-            applicationDto.setAttributes(applicationAttributes);
+        Map<String, String> applicationAttributesFromUser = applicationDto.getAttributes();
+        JSONArray attributeArray = apiConsumer.getAppAttributesFromConfig(username);
+        for (Object obj : attributeArray) {
+            JSONObject attributeObject = (JSONObject) obj;
+            String attributeName = (String) attributeObject.get(APIConstants.ApplicationAttributes.ATTRIBUTE);
+            applicationAttributesFromUser.putIfAbsent(attributeName, StringUtils.EMPTY);
         }
 
         //we do not honor the subscriber coming from the request body as we can't change the subscriber of the application

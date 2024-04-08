@@ -170,8 +170,13 @@ class ApplicationFormHandler extends React.Component {
                 }
                 const allAppAttributes = [];
                 allAttributes.body.list.map((item) => allAppAttributes.push(item));
-                if (allAttributes.length > 0) {
-                    newRequest.attributes = allAppAttributes.filter((item) => !item.hidden);
+                if (allAppAttributes.length > 0) {
+                    newRequest.attributes = {};
+                    allAppAttributes.forEach((item) => {
+                        if (item.hidden !== 'true') {
+                            newRequest.attributes[item.attribute] = '';
+                        }
+                    });
                 }
                 this.setState({ applicationRequest: newRequest, throttlingPolicyList, allAppAttributes });
             })
