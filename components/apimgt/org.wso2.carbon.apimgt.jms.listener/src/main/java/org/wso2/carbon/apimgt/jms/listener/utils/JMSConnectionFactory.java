@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.apimgt.jms.listener.utils;
 
@@ -88,15 +88,21 @@ public class JMSConnectionFactory {
         try {
             context = new InitialContext(parameters);
             conFactory = JMSUtils.lookup(context, ConnectionFactory.class,
-                                         parameters.get(JMSConstants.PARAM_CONFAC_JNDI_NAME));
+                    parameters.get(JMSConstants.PARAM_CONFAC_JNDI_NAME));
             log.info("JMS ConnectionFactory : " + name + " initialized");
 
         } catch (NamingException e) {
+            log.error("Cannot acquire JNDI context, JMS Connection factory : "
+                    + parameters.get(JMSConstants.PARAM_CONFAC_JNDI_NAME)
+                    + " or default destination : "
+                    + parameters.get(JMSConstants.PARAM_DESTINATION) +
+                    " for JMS CF : " + name + " using : " + parameters, e);
+
             throw new ThrottlingRunTimeException("Cannot acquire JNDI context, JMS Connection factory : "
-                                                 + parameters.get(JMSConstants.PARAM_CONFAC_JNDI_NAME)
-                                                 + " or default destination : "
-                                                 + parameters.get(JMSConstants.PARAM_DESTINATION) +
-                                                 " for JMS CF : " + name + " using : " + parameters, e);
+                    + parameters.get(JMSConstants.PARAM_CONFAC_JNDI_NAME)
+                    + " or default destination : "
+                    + parameters.get(JMSConstants.PARAM_DESTINATION) +
+                    " for JMS CF : " + name + " using : " + parameters, e);
         }
     }
 
@@ -198,7 +204,7 @@ public class JMSConnectionFactory {
             return JMSUtils.lookupDestination(context, destinationName, parameters.get(JMSConstants.PARAM_DEST_TYPE));
         } catch (NamingException e) {
             handleException("Error looking up the JMS destination with name " + destinationName
-                            + " of type " + parameters.get(JMSConstants.PARAM_DEST_TYPE), e);
+                    + " of type " + parameters.get(JMSConstants.PARAM_DEST_TYPE), e);
         }
 
         // never executes but keeps the compiler happy
@@ -221,8 +227,8 @@ public class JMSConnectionFactory {
      */
     public String getReplyDestinationType() {
         return parameters.get(JMSConstants.PARAM_REPLY_DEST_TYPE) != null ?
-               parameters.get(JMSConstants.PARAM_REPLY_DEST_TYPE) :
-               JMSConstants.DESTINATION_TYPE_GENERIC;
+                parameters.get(JMSConstants.PARAM_REPLY_DEST_TYPE) :
+                JMSConstants.DESTINATION_TYPE_GENERIC;
     }
 
     private void handleException(String msg, Exception e) {
@@ -237,7 +243,7 @@ public class JMSConnectionFactory {
      */
     public boolean isJmsSpec11() {
         return parameters.get(JMSConstants.PARAM_JMS_SPEC_VER) == null ||
-               "1.1".equals(parameters.get(JMSConstants.PARAM_JMS_SPEC_VER));
+                "1.1".equals(parameters.get(JMSConstants.PARAM_JMS_SPEC_VER));
     }
 
     /**
@@ -247,7 +253,7 @@ public class JMSConnectionFactory {
      */
     public Boolean isQueue() {
         if (parameters.get(JMSConstants.PARAM_CONFAC_TYPE) == null &&
-            parameters.get(JMSConstants.PARAM_DEST_TYPE) == null) {
+                parameters.get(JMSConstants.PARAM_DEST_TYPE) == null) {
             return null;
         }
 
@@ -258,8 +264,8 @@ public class JMSConnectionFactory {
                 return false;
             } else {
                 throw new ThrottlingRunTimeException("Invalid " + JMSConstants.PARAM_CONFAC_TYPE + " : " +
-                                                     parameters.get(JMSConstants.PARAM_CONFAC_TYPE)
-                                                     + " for JMS CF : " + name);
+                        parameters.get(JMSConstants.PARAM_CONFAC_TYPE)
+                        + " for JMS CF : " + name);
             }
         } else {
             if ("queue".equalsIgnoreCase(parameters.get(JMSConstants.PARAM_DEST_TYPE))) {
@@ -268,8 +274,8 @@ public class JMSConnectionFactory {
                 return false;
             } else {
                 throw new ThrottlingRunTimeException("Invalid " + JMSConstants.PARAM_DEST_TYPE + " : " +
-                                                     parameters.get(JMSConstants.PARAM_DEST_TYPE)
-                                                     + " for JMS CF : " + name);
+                        parameters.get(JMSConstants.PARAM_DEST_TYPE)
+                        + " for JMS CF : " + name);
             }
         }
         //TODO fix this
@@ -283,7 +289,7 @@ public class JMSConnectionFactory {
      */
     private boolean isSessionTransacted() {
         return parameters.get(JMSConstants.PARAM_SESSION_TRANSACTED) != null &&
-               Boolean.valueOf(parameters.get(JMSConstants.PARAM_SESSION_TRANSACTED));
+                Boolean.valueOf(parameters.get(JMSConstants.PARAM_SESSION_TRANSACTED));
     }
 
     private boolean isDurable() {
@@ -318,7 +324,7 @@ public class JMSConnectionFactory {
 
         } catch (JMSException e) {
             handleException("Error acquiring a Connection from the JMS CF : " + name +
-                            " using properties : " + parameters, e);
+                    " using properties : " + parameters, e);
         }
         return connection;
     }
