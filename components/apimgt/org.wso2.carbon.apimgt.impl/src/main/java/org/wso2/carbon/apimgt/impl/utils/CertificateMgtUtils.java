@@ -920,7 +920,7 @@ public class CertificateMgtUtils {
         return Optional.ofNullable(null);
     }
 
-    public void deployTenantCertsToGatewayInABatch(List<CertificateMetadataDTO> certificateMetadataDTOList) {
+    public void deployTenantCertsToGatewaySenderInABatch(List<CertificateMetadataDTO> certificateMetadataDTOList) {
         //add cert to sender profile truststore
         try {
             TrustStoreDTO trustStoreDTO = getSenderProfileTrustStore();
