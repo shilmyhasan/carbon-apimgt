@@ -2023,7 +2023,7 @@ public class APIManagerConfiguration {
                         APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAG_NAME_CONFIG)).getText();
                 String value = property.getFirstChildWithName(new QName(
                         APIConstants.OpenTracerConstants.OPEN_TRACER_CUSTOM_TAG_VALUE_CONFIG)).getText();
-                if (name != null && value != null)  {
+                if (name != null && value != null) {
                     openTracerCustomTags.put(name, value);
                 }
             }
@@ -2032,5 +2032,19 @@ public class APIManagerConfiguration {
 
     public Map<String, String> getOpenTracerCustomTags() {
         return openTracerCustomTags;
+    }
+
+    /**
+     * Returns if the JWT Claim Cache Config is enabled
+     *
+     * @return true/false
+     */
+    public boolean isJWTClaimCacheEnabled() {
+
+        String jwtClaimCacheExpiryEnabledString = getFirstProperty(APIConstants.ENABLED_JWT_CLAIM_CACHE);
+        if (StringUtils.isNotEmpty(jwtClaimCacheExpiryEnabledString)) {
+            return Boolean.parseBoolean(jwtClaimCacheExpiryEnabledString);
+        }
+        return false;
     }
 }

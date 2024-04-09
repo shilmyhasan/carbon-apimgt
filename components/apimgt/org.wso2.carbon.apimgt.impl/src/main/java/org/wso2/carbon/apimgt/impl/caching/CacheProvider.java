@@ -170,6 +170,10 @@ public class CacheProvider {
         return getCache(APIConstants.RECOMMENDATIONS_CACHE_NAME);
     }
 
+    public static Cache getJWTClaimCache() {
+        return getCache(APIConstants.CLAIMS_APIM_CACHE);
+    }
+
     /**
      * @return APIManagerConfiguration
      */
@@ -530,6 +534,23 @@ public class CacheProvider {
         } else {
             long defaultCacheTimeout = getDefaultCacheTimeout();
             return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants.RECOMMENDATIONS_CACHE_NAME,
+                    defaultCacheTimeout, defaultCacheTimeout);
+        }
+    }
+
+    /**
+     * Create and return the JWT Claim Cache
+     */
+    public static Cache createJWTClaimCache() {
+
+        String jwtClaimCacheExpiry =
+                getApiManagerConfiguration().getFirstProperty(APIConstants.JWT_CLAIM_CACHE_EXPIRY);
+        if (jwtClaimCacheExpiry != null) {
+            return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants.CLAIMS_APIM_CACHE,
+                    Long.parseLong(jwtClaimCacheExpiry), Long.parseLong(jwtClaimCacheExpiry));
+        } else {
+            long defaultCacheTimeout = getDefaultCacheTimeout();
+            return getCache(APIConstants.API_MANAGER_CACHE_MANAGER, APIConstants.CLAIMS_APIM_CACHE,
                     defaultCacheTimeout, defaultCacheTimeout);
         }
     }

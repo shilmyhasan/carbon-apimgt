@@ -53,6 +53,7 @@ import org.wso2.carbon.apimgt.impl.factory.KeyManagerHolder;
 import org.wso2.carbon.apimgt.impl.jwt.JWTValidationService;
 import org.wso2.carbon.apimgt.impl.jwt.SignedJWTInfo;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.JWTUtil;
 import org.wso2.carbon.apimgt.impl.utils.SigningUtil;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -60,7 +61,6 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -283,11 +283,8 @@ public class JWTValidator {
             Object token = getGatewayJWTTokenCache().get(jwtTokenCacheKey);
             if (token != null) {
                 endUserToken = (String) token;
-                String[] splitToken = ((String) token).split("\\.");
-                JSONObject payload = new JSONObject(new String(Base64.getUrlDecoder().decode(splitToken[1])));
-                long exp = payload.getLong("exp") * 1000L;
                 long timestampSkew = getTimeStampSkewInSeconds() * 1000;
-                valid = (exp - System.currentTimeMillis() > timestampSkew);
+                valid = JWTUtil.isJWTValid(endUserToken, timestampSkew);
             }
             if (StringUtils.isEmpty(endUserToken) || !valid) {
                 try {
