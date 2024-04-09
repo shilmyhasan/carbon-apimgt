@@ -23,8 +23,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.AccessTokenInfo;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.JWTUtil;
 import org.wso2.carbon.apimgt.keymgt.APIKeyMgtException;
 import org.wso2.carbon.apimgt.keymgt.SubscriptionDataHolder;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataStore;
@@ -41,6 +43,7 @@ import org.wso2.carbon.apimgt.keymgt.model.impl.SubscriptionDataLoaderImpl;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.apimgt.keymgt.token.TokenGenerator;
 import org.wso2.carbon.apimgt.keymgt.util.APIKeyMgtDataHolder;
+import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -145,7 +148,7 @@ public abstract class AbstractKeyValidationHandler implements KeyValidationHandl
       TokenGenerator generator = APIKeyMgtDataHolder.getTokenGenerator();
 
         try {
-            String jwt = generator.generateToken(validationContext);
+            String jwt = getCachedJWTToken(validationContext);
             validationContext.getValidationInfoDTO().setEndUserToken(jwt);
             return true;
 
@@ -156,10 +159,54 @@ public abstract class AbstractKeyValidationHandler implements KeyValidationHandl
         return false;
     }
 
+    /**
+     * Get the cached JWT token
+     *
+     * @param validationContext TokenValidationContext
+     * @return token string
+     * @throws APIManagementException cache failure
+     */
+    private String getCachedJWTToken(TokenValidationContext validationContext) throws APIManagementException {
+
+        String jwtTokenCacheKey =
+                "OPAQUE:" + validationContext.getContext() + ":" + validationContext.getVersion() + ":"
+                        + validationContext.getAccessToken();
+
+        Object cachedJWT = CacheProvider.getGatewayJWTTokenCache().get(jwtTokenCacheKey);
+
+        if (cachedJWT instanceof String) {
+            long timestampSkew = getTimeStampSkewInSeconds() * 1000;
+            // If valid return the cached JWT, else remove from cache
+            if (JWTUtil.isJWTValid((String) cachedJWT, timestampSkew)) {
+                return (String) cachedJWT;
+            } else {
+                CacheProvider.getGatewayJWTTokenCache().remove(jwtTokenCacheKey);
+            }
+        }
+        synchronized (this.getClass().getName().concat(jwtTokenCacheKey).intern()) {
+            cachedJWT = CacheProvider.getGatewayJWTTokenCache().get(jwtTokenCacheKey);
+            if (cachedJWT instanceof String) {
+                long timestampSkew = getTimeStampSkewInSeconds() * 1000;
+                if (JWTUtil.isJWTValid((String) cachedJWT, timestampSkew)) {
+                    return (String) cachedJWT;
+                } else {
+                    CacheProvider.getGatewayJWTTokenCache().remove(jwtTokenCacheKey);
+                }
+            }
+            TokenGenerator generator = APIKeyMgtDataHolder.getTokenGenerator();
+            String jwt = generator.generateToken(validationContext);
+            if (jwt != null) {
+                CacheProvider.getGatewayJWTTokenCache().put(jwtTokenCacheKey, jwt);
+            }
+            return jwt;
+        }
+    }
+
+
     @Override
     public APIKeyValidationInfoDTO validateSubscription(String apiContext, String apiVersion, String consumerKey,
                                                         String keyManager) {
-        APIKeyValidationInfoDTO apiKeyValidationInfoDTO =  new APIKeyValidationInfoDTO();
+        APIKeyValidationInfoDTO apiKeyValidationInfoDTO = new APIKeyValidationInfoDTO();
 
         try {
             if (log.isDebugEnabled()) {
@@ -575,5 +622,15 @@ public abstract class AbstractKeyValidationHandler implements KeyValidationHandl
         infoDTO.setThrottlingDataList(list);
         infoDTO.setAuthorized(true);
         return infoDTO;
+    }
+
+    /**
+     * Return timeStampSkew in seconds
+     *
+     * @return seconds long
+     */
+    protected long getTimeStampSkewInSeconds() {
+
+        return OAuthServerConfiguration.getInstance().getTimeStampSkewInSeconds();
     }
 }

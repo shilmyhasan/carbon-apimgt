@@ -30,6 +30,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.json.JSONObject;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
 
 public class JWTUtil {
 
@@ -125,6 +127,21 @@ public class JWTUtil {
             throw new APIManagementException(
                     "Couldn't find a public certificate with alias " + alias + " to verify the signature");
         }
+    }
+
+    /**
+     * Validates the JWT token
+     *
+     * @param token         token string
+     * @param timestampSkew long timestamp
+     * @return true, if not expired, else false
+     */
+    public static boolean isJWTValid(String token, long timestampSkew) {
+
+        String[] splitToken = token.split("\\.");
+        JSONObject payload = new JSONObject(new String(Base64.getUrlDecoder().decode(splitToken[1])));
+        long exp = payload.getLong("exp") * 1000L;
+        return (exp - System.currentTimeMillis() > timestampSkew);
     }
 
 }
