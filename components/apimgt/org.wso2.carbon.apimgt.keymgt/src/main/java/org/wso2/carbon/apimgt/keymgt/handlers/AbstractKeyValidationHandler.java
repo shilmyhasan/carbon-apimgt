@@ -143,9 +143,7 @@ public abstract class AbstractKeyValidationHandler implements KeyValidationHandl
     }
 
     @Override
-    public boolean generateConsumerToken(TokenValidationContext validationContext) throws APIKeyMgtException {
-
-      TokenGenerator generator = APIKeyMgtDataHolder.getTokenGenerator();
+    public boolean generateConsumerToken(TokenValidationContext validationContext) {
 
         try {
             String jwt = getCachedJWTToken(validationContext);
