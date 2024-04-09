@@ -284,7 +284,7 @@ public class APIKeyValidationService {
      * @return end user name
      */
     public String getEndUserFromValidationContext(TokenValidationContext ctx) {
-        boolean isAppToken = ctx.getTokenInfo().isEndUserAppToken();
+        boolean isAppToken = ctx.getTokenInfo().isApplicationToken();
         APIKeyValidationInfoDTO keyInfo = ctx.getValidationInfoDTO();
         String endUsername = keyInfo.getEndUserName();
         if (isAppToken) {
