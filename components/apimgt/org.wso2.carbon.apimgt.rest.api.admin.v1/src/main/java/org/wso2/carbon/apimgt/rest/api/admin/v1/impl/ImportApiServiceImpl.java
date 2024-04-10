@@ -47,6 +47,7 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -57,8 +58,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.ws.rs.core.Response;
 
 public class ImportApiServiceImpl implements ImportApiService {
     private static final Log log = LogFactory.getLog(ImportApiServiceImpl.class);
@@ -231,11 +230,6 @@ public class ImportApiServiceImpl implements ImportApiService {
                     new FileBasedApplicationImportExportManager(consumer, tempDirPath);
             Application applicationDetails = importExportManager.importApplication(fileInputStream);
 
-            // set tokenType of the application to DEFAULT if it is null
-            if (StringUtils.isEmpty(applicationDetails.getTokenType())) {
-                applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
-            }
-
             // decode Oauth secrets
             Map<String, OAuthApplicationInfo>
                     keyManagerWiseProductionOauthApplicationInfo = applicationDetails.getOAuthApp(PRODUCTION);
@@ -281,12 +275,21 @@ public class ImportApiServiceImpl implements ImportApiService {
             if (APIUtil.isApplicationExist(ownerId, applicationDetails.getName(), applicationDetails.getGroupId()) && update != null && update) {
                 appId = APIUtil.getApplicationId(applicationDetails.getName(), ownerId);
                 Application application = consumer.getApplicationById(appId);
+                if (StringUtils.isEmpty(applicationDetails.getTokenType())
+                        && StringUtils.isNotEmpty(application.getTokenType())) {
+                    applicationDetails.setTokenType(application.getTokenType());
+                } else {
+                    applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
+                }
                 applicationDetails.setId(appId);
                 applicationDetails.setUUID(application.getUUID());
                 applicationDetails.setOwner(application.getOwner());
                 applicationDetails.updateSubscriber(application.getSubscriber());
                 consumer.updateApplication(applicationDetails);
             } else {
+                if (StringUtils.isEmpty(applicationDetails.getTokenType())) {
+                    applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
+                }
                 appId = consumer.addApplication(applicationDetails, ownerId);
                 update = Boolean.FALSE;
             }
