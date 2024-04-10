@@ -251,7 +251,7 @@ class SubscriptionTableData extends React.Component {
                 <TableCell>
                     { link }
                 </TableCell>
-                {isCrossTenantSubscriptionEnabled && <TableCell>{apiProviderTenantDomain}</TableCell>}
+                {isCrossTenantSubscriptionEnabled && (<TableCell>{apiProviderTenantDomain}</TableCell>)}
                 <TableCell>{apiInfo.lifeCycleStatus}</TableCell>
                 <TableCell>{throttlingPolicy}</TableCell>
                 <TableCell>{status}</TableCell>

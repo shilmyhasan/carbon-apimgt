@@ -196,14 +196,14 @@ class Subscriptions extends React.Component {
                 params: { applicationId },
             },
         } = this.props;
-        this.isCrossTenantSubscriptionEnabled();
+        this.handleCrossTenantSubscriptionEnabled();
         this.updateSubscriptions(applicationId);
     }
 
     /**
      * retrieve Settings from the context and check the crossTenantSubscription enabled
      */
-    isCrossTenantSubscriptionEnabled = () => {
+    handleCrossTenantSubscriptionEnabled = () => {
         const settingsContext = this.context;
         const enabled = settingsContext.settings.crossTenantSubscriptionEnabled;
         this.setState({ isCrossTenantSubscriptionEnabled: enabled });
@@ -546,7 +546,7 @@ class Subscriptions extends React.Component {
                                                                                 this.handleSubscriptionUpdate
                                                                             }
                                                                             isCrossTenantSubscriptionEnabled={
-                                                                                this.isCrossTenantSubscriptionEnabled
+                                                                                this.state.isCrossTenantSubscriptionEnabled
                                                                             }
                                                                         />
                                                                     );
