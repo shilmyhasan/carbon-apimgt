@@ -92,7 +92,6 @@ public class AWSLambdaMediator extends AbstractMediator {
         org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext)
                 .getAxis2MessageContext();
         boolean passRequestParamsToLambdaFunction = APIUtil.passRequestParamsToLambdaFunction();
-        JsonObject payload = new JsonObject();
 
         String body;
         if (JsonUtil.hasAJsonPayload(axis2MessageContext)) {
@@ -103,6 +102,7 @@ public class AWSLambdaMediator extends AbstractMediator {
 
         InvokeResult invokeResult;
         if (passRequestParamsToLambdaFunction) {
+            JsonObject payload = new JsonObject();
             // set headers
             JsonObject headers = new JsonObject();
             TreeMap transportHeaders = (TreeMap) axis2MessageContext.getProperty(
@@ -134,7 +134,7 @@ public class AWSLambdaMediator extends AbstractMediator {
             }
             payload.add(PATH_PARAMETERS, pathParameters);
             payload.add(QUERY_STRING_PARAMETERS, queryStringParameters);
-            payload.add(BODY_PARAMETER, new JsonParser().parse(body).getAsJsonObject());
+            payload.addProperty(BODY_PARAMETER, body);
             payload.addProperty(HTTP_METHOD, (String) messageContext.getProperty(APIConstants.REST_METHOD));
             payload.addProperty(PATH, (String) messageContext.getProperty(APIConstants.API_ELECTED_RESOURCE));
 
