@@ -2407,6 +2407,9 @@ public final class APIConstants {
     public static final String JWT_AUTHENTICATION_SUBSCRIPTION_VALIDATION =
             JWT_AUTHENTICATION_CONFIG + ".EnableSubscriptionValidationViaKeyManager";
     public static final String APPLICATION_TOKEN_TYPE_JWT = "JWT";
+    public static final String LAMBDA_MEDIATOR_CONFIG = "LambdaMediatorConfig.";
+    public static final String PASS_REQUEST_PARAMS_TO_LAMBDA_FUNCTION =
+            LAMBDA_MEDIATOR_CONFIG + "PassRequestParamsToLambdaFunction";
     /**
      * Constants for the recommendation system
      */
