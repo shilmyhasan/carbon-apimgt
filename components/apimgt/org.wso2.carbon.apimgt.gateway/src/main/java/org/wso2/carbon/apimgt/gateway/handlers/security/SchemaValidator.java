@@ -39,6 +39,7 @@ public class SchemaValidator extends AbstractHandler {
     private static final String INTERNAL_ERROR_CODE = "500";
     private static final Log logger = LogFactory.getLog(SchemaValidator.class);
     private static final String HTTP_SC_CODE = "400";
+    public static final String REG_TIME_MODULE = "register.timeModule";
 
     /**
      * Method to generate OpenApiInteractionValidator when the openAPI is provided.
@@ -62,7 +63,10 @@ public class SchemaValidator extends AbstractHandler {
     @Override
     public boolean handleRequest(MessageContext messageContext) {
 
-        Json.mapper().registerModule(new JavaTimeModule());
+        boolean timeModuleRegisterEnabled = Boolean.parseBoolean(System.getProperty(REG_TIME_MODULE, "false"));
+        if (timeModuleRegisterEnabled) {
+            Json.mapper().registerModule(new JavaTimeModule());
+        }
         logger.debug("Validating the API request Body content..");
         OpenAPI openAPI = (OpenAPI) messageContext.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT);
         if (openAPI == null) {
