@@ -200,12 +200,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
      * @param appOwner            Target owner of the application
      * @param skipApplicationKeys Skip application keys while importing
      * @param update              Update if existing application found or import
+     * @param ignoreTier          Ignore tier and proceed with subscribed APIs
      * @param messageContext      Message Context
      * @return imported Application
      */
     @Override public Response applicationsImportPost(InputStream fileInputStream, Attachment fileDetail,
             Boolean preserveOwner, Boolean skipSubscriptions, String appOwner, Boolean skipApplicationKeys,
-            Boolean update, MessageContext messageContext) throws APIManagementException {
+            Boolean update, Boolean ignoreTier, MessageContext messageContext) throws APIManagementException {
         String ownerId;
         Application application;
 
@@ -256,7 +257,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
             if (skipSubscriptions == null || !skipSubscriptions) {
                 skippedAPIs = ImportUtils
                         .importSubscriptions(exportedApplication.getSubscribedAPIs(), ownerId, application,
-                                update, apiConsumer);
+                                update, ignoreTier, apiConsumer);
             }
             Application importedApplication = apiConsumer.getApplicationById(application.getId());
             importedApplication.setOwner(ownerId);
