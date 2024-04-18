@@ -1893,6 +1893,11 @@ public class AsyncApiParser extends APIDefinition {
     }
 
     @Override
+    public String processDefaultSchemeScopesOfMultipleOauthFlows(String resourceConfigsJSON) throws APIManagementException {
+        return null;
+    }
+
+    @Override
     public API setExtensionsToAPI(String swaggerContent, API api) throws APIManagementException {
         return null;
     }
