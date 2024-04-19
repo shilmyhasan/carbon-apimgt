@@ -1947,6 +1947,7 @@ public final class APIConstants {
         public static final String NAME = "Name";
         public static final String TOOLTIP = "Tooltip";
         public static final String TYPE = "Type";
+        public static final String ENABLE_EMPTY_VALUES_IN_APPLICATION_ATTRIBUTES = "EnableEmptyValuesInApplicationAttributes";
     }
 
     public static final String REGISTRY_ARTIFACT_SEARCH_DESC_ORDER = "DES";
