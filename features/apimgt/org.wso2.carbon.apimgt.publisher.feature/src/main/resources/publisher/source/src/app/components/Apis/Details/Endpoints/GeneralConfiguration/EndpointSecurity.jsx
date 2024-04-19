@@ -165,6 +165,12 @@ function EndpointSecurity(props) {
             tmpSecurity.clientId = clientId === '' ? '********' : clientId;
             tmpSecurity.clientSecret = clientSecret === '' ? '********' : clientSecret;
             tmpSecurity.customParameters = customParameters;
+        } else {
+            /*
+              To prevent the default 'type' value in the Endpoint Security Configuration dropdown for sandbox endpoint
+              appearing as a blank when endpoint security is configured only for production endpoint
+            */
+            tmpSecurity.type = 'NONE';
         }
         setEndpointSecurityInfo(tmpSecurity);
     }, [props]);
