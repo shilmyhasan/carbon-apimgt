@@ -1367,7 +1367,7 @@ public class OAS2Parser extends APIDefinition {
     public String processDefaultSchemeScopesOfMultipleOauthFlows(String swaggerContent) throws APIManagementException {
         // This method is used to inject scopes of multiple oauth flows to the default scheme,
         // But OAS2 does not support multiple oauth flows.
-        return null;
+        return swaggerContent;
     }
 
     /**
