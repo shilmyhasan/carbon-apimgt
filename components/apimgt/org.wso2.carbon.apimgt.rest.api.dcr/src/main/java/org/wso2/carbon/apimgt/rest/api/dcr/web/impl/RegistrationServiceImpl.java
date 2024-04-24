@@ -133,8 +133,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
             }
 
-            //If user is in a secondory userstore, update the owner of the application with
-            //correct domain
+            //If user is in a secondary user store, update the owner of the application with the correct domain
             if (owner != null && authUserName != null) {
                 int index = authUserName.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
                 int ownerIndex = owner.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
@@ -163,7 +162,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }
             }
 
-            //Validates if the application owner and logged in username is same.
+            //Validates if the app owner in payload and auth-user username is same or is auth-user a super admin
             if (authUserName != null && ((authUserName.equals(owner))|| isUserSuperAdmin(authUserName))) {
                 //Getting client credentials from the profile
                 String grantTypes = profile.getGrantType();
@@ -196,14 +195,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 }else{
                     loggedInUserTenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
                 }
-                String userId = (String) oauthApplicationInfo.getParameter(OAUTH_CLIENT_USERNAME);
-                String userNameForSP = MultitenantUtils.getTenantAwareUsername(userId);
-                // Replace domain separator by "_" if user is coming from a secondary userstore.
-                String domain = UserCoreUtil.extractDomainFromName(userNameForSP);
-                if (domain != null && !domain.isEmpty() && !UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME.equals
-                        (domain)) {
-                    userNameForSP = userNameForSP.replace(UserCoreConstants.DOMAIN_SEPARATOR, "_");
-                }
+
                 applicationName = profile.getClientName();
 
                 ApplicationManagementService applicationManagementService =
@@ -225,11 +217,11 @@ public class RegistrationServiceImpl implements RegistrationService {
                 if (appServiceProvider != null) {
                     returnedAPP = this.getExistingApp(applicationName, appServiceProvider.isSaasApp());
                 } else {
-                    //create a new application if the application doesn't exists.
+                    //create a new application if the application doesn't exist.
                     returnedAPP = this.createApplication(applicationName, appRequest, grantTypes);
                 }
 
-                if (owner.contains(AT_SUPER_TENANT_DOMAIN) && userId.contains(AT_SUPER_TENANT_DOMAIN)
+                if (owner.contains(AT_SUPER_TENANT_DOMAIN)
                         && !returnedAPP.getAppOwner().contains(AT_SUPER_TENANT_DOMAIN)) {
                     returnedAPP.setAppOwner(returnedAPP.getAppOwner() + AT_SUPER_TENANT_DOMAIN);
                 }
@@ -243,10 +235,10 @@ public class RegistrationServiceImpl implements RegistrationService {
                             (RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 500L, errorMsg);
                     response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).
                             entity(errorDTO).build();
-                } else if ((authUserName.equals(returnedAPP.getAppOwner())) ||
-                        (isUserSuperAdmin(authUserName) && owner != null && owner.equals(returnedAPP.getAppOwner()))) {
-                    // Permitting only the owner of the application to create/get the OAuth app and admin user to
-                    // create/get the app info if the created app owner equals the payload app owner.
+                } else if (authUserName.equals(returnedAPP.getAppOwner())
+                        || (isUserSuperAdmin(authUserName) && owner.equals(returnedAPP.getAppOwner()))) {
+                    // Permit only if (auth user is the app owner)
+                    // or (auth user is super admin and payload.owner is same as app owner)
                     if (log.isDebugEnabled()) {
                         log.debug("OAuth app " + profile.getClientName() + " creation successful.");
                     }
@@ -334,9 +326,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     /**
      * Create a new client application
      *
+     * @param applicationName application name
      * @param appRequest OAuthAppRequest object with client's payload content
+     * @param grantType grant type
      * @return created Application
-     * @throws APIKeyMgtException if failed to create the a new application
+     * @throws APIManagementException if failed to create a new application
      */
     private OAuthApplicationInfo createApplication(String applicationName, OAuthAppRequest appRequest,
             String grantType) throws APIManagementException {
