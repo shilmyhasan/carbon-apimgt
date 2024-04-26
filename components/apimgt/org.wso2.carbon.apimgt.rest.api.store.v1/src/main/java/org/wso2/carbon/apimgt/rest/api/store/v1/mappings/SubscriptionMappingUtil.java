@@ -37,6 +37,7 @@ import org.wso2.carbon.apimgt.rest.api.store.v1.dto.ApplicationInfoDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.PaginationDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SubscriptionDTO;
 import org.wso2.carbon.apimgt.rest.api.store.v1.dto.SubscriptionListDTO;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,9 @@ public class SubscriptionMappingUtil {
         SubscriptionDTO subscriptionDTO = new SubscriptionDTO();
         subscriptionDTO.setSubscriptionId(subscription.getUUID());
         APIInfoDTO apiInfo;
-        Identifier apiId = subscription.getIdentifier();
+        Identifier identifier = subscription.getIdentifier();
+        subscriptionDTO.setApiProviderTenantDomain(MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack(
+                identifier.getProviderName())));
         ApiTypeWrapper apiTypeWrapper;
         try {
             apiTypeWrapper = apiConsumer.getAPIorAPIProductByUUID(subscription.getIdentifier().getUUID(), organization);
@@ -84,11 +87,11 @@ public class SubscriptionMappingUtil {
             subscriptionDTO.setApiInfo(apiInfo);
         } catch (APIManagementException e) {
             if (log.isDebugEnabled()) {
-                log.debug("User :" + username + " does not have access to the API " + apiId);
+                log.debug("User :" + username + " does not have access to the API " + identifier);
             }
             apiInfo = new APIInfoDTO();
-            apiInfo.setName(apiId.getName());
-            apiInfo.setVersion(apiId.getVersion());
+            apiInfo.setName(identifier.getName());
+            apiInfo.setVersion(identifier.getVersion());
             subscriptionDTO.setApiInfo(apiInfo);
         }
         Application application = subscription.getApplication();

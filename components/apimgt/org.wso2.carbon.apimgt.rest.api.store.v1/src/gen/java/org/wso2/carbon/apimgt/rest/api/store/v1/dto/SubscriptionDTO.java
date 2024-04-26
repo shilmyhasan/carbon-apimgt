@@ -25,6 +25,7 @@ public class SubscriptionDTO   {
     private String subscriptionId = null;
     private String applicationId = null;
     private String apiId = null;
+    private String apiProviderTenantDomain = null;
     private APIInfoDTO apiInfo = null;
     private ApplicationInfoDTO applicationInfo = null;
     private String throttlingPolicy = null;
@@ -121,6 +122,24 @@ return null;
   }
   public void setApiId(String apiId) {
     this.apiId = apiId;
+  }
+
+  /**
+   * Tenant domain of the API or API Product Owner.
+   **/
+  public SubscriptionDTO apiProviderTenantDomain(String apiProviderTenantDomain) {
+    this.apiProviderTenantDomain = apiProviderTenantDomain;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "carbon.super", value = "Tenant domain of the API or API Product Owner.")
+  @JsonProperty("apiProviderTenantDomain")
+  public String getApiProviderTenantDomain() {
+    return apiProviderTenantDomain;
+  }
+  public void setApiProviderTenantDomain(String apiProviderTenantDomain) {
+    this.apiProviderTenantDomain = apiProviderTenantDomain;
   }
 
   /**
@@ -242,6 +261,7 @@ return null;
     return Objects.equals(subscriptionId, subscription.subscriptionId) &&
         Objects.equals(applicationId, subscription.applicationId) &&
         Objects.equals(apiId, subscription.apiId) &&
+        Objects.equals(apiProviderTenantDomain, subscription.apiProviderTenantDomain) &&
         Objects.equals(apiInfo, subscription.apiInfo) &&
         Objects.equals(applicationInfo, subscription.applicationInfo) &&
         Objects.equals(throttlingPolicy, subscription.throttlingPolicy) &&
@@ -252,7 +272,7 @@ return null;
 
   @Override
   public int hashCode() {
-    return Objects.hash(subscriptionId, applicationId, apiId, apiInfo, applicationInfo, throttlingPolicy, requestedThrottlingPolicy, status, redirectionParams);
+    return Objects.hash(subscriptionId, applicationId, apiId, apiProviderTenantDomain, apiInfo, applicationInfo, throttlingPolicy, requestedThrottlingPolicy, status, redirectionParams);
   }
 
   @Override
@@ -263,6 +283,7 @@ return null;
     sb.append("    subscriptionId: ").append(toIndentedString(subscriptionId)).append("\n");
     sb.append("    applicationId: ").append(toIndentedString(applicationId)).append("\n");
     sb.append("    apiId: ").append(toIndentedString(apiId)).append("\n");
+    sb.append("    apiProviderTenantDomain: ").append(toIndentedString(apiProviderTenantDomain)).append("\n");
     sb.append("    apiInfo: ").append(toIndentedString(apiInfo)).append("\n");
     sb.append("    applicationInfo: ").append(toIndentedString(applicationInfo)).append("\n");
     sb.append("    throttlingPolicy: ").append(toIndentedString(throttlingPolicy)).append("\n");

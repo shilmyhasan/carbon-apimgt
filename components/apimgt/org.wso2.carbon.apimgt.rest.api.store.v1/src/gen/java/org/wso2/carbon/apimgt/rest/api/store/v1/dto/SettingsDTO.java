@@ -38,6 +38,7 @@ public class SettingsDTO   {
     private String passwordPolicyPattern = null;
     private Integer passwordPolicyMinLength = null;
     private Integer passwordPolicyMaxLength = null;
+    private Boolean crossTenantSubscriptionEnabled = false;
 
   /**
    **/
@@ -299,6 +300,24 @@ public class SettingsDTO   {
     this.passwordPolicyMaxLength = passwordPolicyMaxLength;
   }
 
+  /**
+   * Is Cross Tenant Subscriptions Enabled
+   **/
+  public SettingsDTO crossTenantSubscriptionEnabled(Boolean crossTenantSubscriptionEnabled) {
+    this.crossTenantSubscriptionEnabled = crossTenantSubscriptionEnabled;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "false", value = "Is Cross Tenant Subscriptions Enabled")
+  @JsonProperty("crossTenantSubscriptionEnabled")
+  public Boolean isCrossTenantSubscriptionEnabled() {
+    return crossTenantSubscriptionEnabled;
+  }
+  public void setCrossTenantSubscriptionEnabled(Boolean crossTenantSubscriptionEnabled) {
+    this.crossTenantSubscriptionEnabled = crossTenantSubscriptionEnabled;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -323,12 +342,13 @@ public class SettingsDTO   {
         Objects.equals(userStorePasswordPattern, settings.userStorePasswordPattern) &&
         Objects.equals(passwordPolicyPattern, settings.passwordPolicyPattern) &&
         Objects.equals(passwordPolicyMinLength, settings.passwordPolicyMinLength) &&
-        Objects.equals(passwordPolicyMaxLength, settings.passwordPolicyMaxLength);
+        Objects.equals(passwordPolicyMaxLength, settings.passwordPolicyMaxLength) &&
+        Objects.equals(crossTenantSubscriptionEnabled, settings.crossTenantSubscriptionEnabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, monetizationEnabled, recommendationEnabled, isUnlimitedTierPaid, identityProvider, isAnonymousModeEnabled, isPasswordChangeEnabled, userStorePasswordPattern, passwordPolicyPattern, passwordPolicyMinLength, passwordPolicyMaxLength);
+    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, monetizationEnabled, recommendationEnabled, isUnlimitedTierPaid, identityProvider, isAnonymousModeEnabled, isPasswordChangeEnabled, userStorePasswordPattern, passwordPolicyPattern, passwordPolicyMinLength, passwordPolicyMaxLength, crossTenantSubscriptionEnabled);
   }
 
   @Override
@@ -351,6 +371,7 @@ public class SettingsDTO   {
     sb.append("    passwordPolicyPattern: ").append(toIndentedString(passwordPolicyPattern)).append("\n");
     sb.append("    passwordPolicyMinLength: ").append(toIndentedString(passwordPolicyMinLength)).append("\n");
     sb.append("    passwordPolicyMaxLength: ").append(toIndentedString(passwordPolicyMaxLength)).append("\n");
+    sb.append("    crossTenantSubscriptionEnabled: ").append(toIndentedString(crossTenantSubscriptionEnabled)).append("\n");
     sb.append("}");
     return sb.toString();
   }
