@@ -4010,6 +4010,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                         api.setStatus(publiserAPI.getStatus());
                         api.setBusinessOwner(publiserAPI.getBusinessOwner());
                         api.setRating(APIUtil.getAverageRating(publiserAPI.getId()));
+                        api.setDescription(publiserAPI.getDescription());
+                        api.setType(publiserAPI.getTransportType());
                         apiSet.add(api);
                     }
                 }
