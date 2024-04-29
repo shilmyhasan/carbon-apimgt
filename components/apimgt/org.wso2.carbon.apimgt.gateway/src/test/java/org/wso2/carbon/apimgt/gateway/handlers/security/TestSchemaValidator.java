@@ -295,6 +295,18 @@ public class TestSchemaValidator {
         assertBadResponse();
     }
 
+    @Test
+    public void testBadRequestWithDuplicateKeys() throws IOException, XMLStreamException {
+        setMockedRequest("POST", "/pet", "/pet", "<jsonObject>" +
+                "<id>123</id><name>Doggie</name><name>Doggie</name>" +
+                "<photoUrls>https://mydog_1.jpg</photoUrls><photoUrls>https://mydog_2.jpg</photoUrls>" +
+                "<category><id>2</id><name>dog</name></category>" +
+                "<tags><id>12</id><name>Black</name></tags><tags><id>43</id><name>German Shepherd</name></tags>" +
+                "<status>available</status>" +
+                "</jsonObject>");
+        assertBadRequest();
+    }
+
     private void assertValidRequest() {
         Assert.assertTrue(schemaValidator.handleRequest(messageContext));
         Mockito.verify(messageContext, Mockito.times(0))

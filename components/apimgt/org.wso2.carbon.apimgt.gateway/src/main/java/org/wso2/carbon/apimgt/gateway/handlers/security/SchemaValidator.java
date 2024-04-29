@@ -18,7 +18,6 @@ package org.wso2.carbon.apimgt.gateway.handlers.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -42,6 +41,7 @@ import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.apimgt.api.APIManagementException;
@@ -115,17 +115,25 @@ public class SchemaValidator extends AbstractHandler {
                 return true;
             }
             Pipe pipe = (Pipe)axis2MC.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+
+            //extract particular payload content.
+            String payloadString = getMessageContentAsString(messageContext);
             if (pipe != null) {
-                if (getMessageContent(messageContext) == null) {
+                if (payloadString == null) {
                     String payloadContent = IOUtils.toString(pipe.getInputStream());
                     JsonUtil.getNewJsonPayload(axis2MC, payloadContent, true, true);
                     axis2MC.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
                 }
             }
-            JsonElement payloadObject = getMessageContent(messageContext);
+
+            payloadString = getMessageContentAsString(messageContext);
             if (!APIConstants.SupportedHTTPVerbs.GET.name().equals(requestMethod) &&
-                    payloadObject != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(payloadObject)) {
-                validateRequest(messageContext);
+                    payloadString != null && !APIMgtGatewayConstants.EMPTY.equals(payloadString)) {
+                //extract particular schema content.
+                String schema = getSchemaContent(messageContext);
+                if (schema != null && !APIMgtGatewayConstants.EMPTY.equals(schema)) {
+                    validateRequest(payloadString, schema, messageContext);
+                }
             }
         } catch (IOException e) {
             logger.error("Error occurred while building the API request", e);
@@ -179,7 +187,6 @@ public class SchemaValidator extends AbstractHandler {
     /**
      * Validate the Request/response content.
      *
-     * @param payloadObject  Request/response payload
      * @param schemaString   Schema which uses to validate request/response messages
      * @param messageContext Message context
      * @return Weather Schema validation success or not, if schema is null return true
@@ -220,15 +227,16 @@ public class SchemaValidator extends AbstractHandler {
     /**
      * Validate the API Request JSON Body.
      *
-     * @param messageContext Message context to be validate the request
+     * @param payloadString  payload string to be validated the request
+     * @param payloadString  schema content to be validated the request
+     * @param messageContext Message context to be validated the request
      */
-    private void validateRequest(MessageContext messageContext) throws APIManagementException {
-        //extract particular schema content.
-        String schema = getSchemaContent(messageContext);
-        //extract the request payload.
-        JsonElement payloadObject = getMessageContent(messageContext);
-        if (schema != null && !APIMgtGatewayConstants.EMPTY.equals(schema) &&
-                payloadObject != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(payloadObject)) {
+    private void validateRequest(String payloadString, String schema, MessageContext messageContext) {
+        validateDuplicateKeysInPayload(payloadString, messageContext);
+
+        JsonParser jsonParser = new JsonParser();
+        JsonElement payloadObject = jsonParser.parse(payloadString);
+        if (payloadObject != null) {
             if (payloadObject.isJsonArray()) {
                 for (JsonElement payloadItem : payloadObject.getAsJsonArray()) {
                     // if validation fails stop validation other items.
@@ -254,49 +262,93 @@ public class SchemaValidator extends AbstractHandler {
         } catch (JSONException ex) {
             return;
         }
-        JsonElement payloadObject = getMessageContent(messageContext);
-        if (responseSchema != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(responseSchema) &&
-                payloadObject != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(payloadObject)) {
-            if (payloadObject.isJsonArray()) {
-                for (JsonElement payloadItem : payloadObject.getAsJsonArray()) {
-                    // if validation fails stop validation other items.
-                    if (validateContent(payloadItem, responseSchema, messageContext)) {
-                        return;
+
+        String payloadString = getMessageContentAsString(messageContext);
+        if (responseSchema != null && !APIMgtGatewayConstants.EMPTY_ARRAY.equals(
+                responseSchema) && payloadString != null && !APIMgtGatewayConstants.EMPTY.equals(payloadString)) {
+            validateDuplicateKeysInPayload(payloadString, messageContext);
+
+            JsonParser jsonParser = new JsonParser();
+            JsonElement payloadObject = jsonParser.parse(payloadString);
+            if (payloadObject != null) {
+                if (payloadObject.isJsonArray()) {
+                    for (JsonElement payloadItem : payloadObject.getAsJsonArray()) {
+                        // if validation fails stop validation other items.
+                        if (validateContent(payloadItem, responseSchema, messageContext)) {
+                            return;
+                        }
                     }
+                } else {
+                    validateContent(payloadObject, responseSchema, messageContext);
                 }
-            } else {
-                validateContent(payloadObject, responseSchema, messageContext);
             }
         }
     }
 
     /**
-     * Get the Request/Response messageContent as a JsonObject.
+     * Get the Request/Response messageContent.
      *
      * @param messageContext Message context
-     * @return JsonElement which contains the request/response message content
+     * @return String which contains the request/response message content
      */
-    private JsonElement getMessageContent(MessageContext messageContext) {
-        JsonElement payloadObject = null;
+    private String getMessageContentAsString(MessageContext messageContext) {
+        String jsonString = null;
         org.apache.axis2.context.MessageContext axis2Context = ((Axis2MessageContext) messageContext)
                 .getAxis2MessageContext();
         if (JsonUtil.hasAJsonPayload(axis2Context)) {
-            String jsonString = JsonUtil.jsonPayloadToString(axis2Context);
-            JsonParser jsonParser = new JsonParser();
-            payloadObject = jsonParser.parse(jsonString);
+            jsonString = JsonUtil.jsonPayloadToString(axis2Context);
         } else if (messageContext.getEnvelope().getBody() != null) {
             Object objFirstElement = messageContext.getEnvelope().getBody().getFirstElement();
             if (objFirstElement != null) {
                 OMElement xmlResponse = messageContext.getEnvelope().getBody().getFirstElement();
                 try {
-                    JsonParser jsonParser = new JsonParser();
-                    payloadObject = jsonParser.parse(JsonUtil.toJsonString(xmlResponse).toString());
+                    jsonString = JsonUtil.toJsonString(xmlResponse).toString();
                 } catch (AxisFault axisFault) {
                     logger.error(" Error occurred while converting the String payload to Json");
                 }
             }
         }
-        return payloadObject;
+        return jsonString;
+    }
+
+    /**
+     * This method is to independently validate any duplicate keys in the payload.
+     * Since parsing the string with Gson will remove duplicate keys without errors before validation,
+     * this method ensures that duplicate keys are checked separately.
+     *
+     * @param payloadString  The payload string to be validated.
+     * @param messageContext The message context associated with the payload.
+     */
+    private void validateDuplicateKeysInPayload(String payloadString, MessageContext messageContext) {
+        try {
+            JSONObject jsonObject = new JSONObject(payloadString);
+        } catch (JSONException e) {
+            // If parsing as a JSONObject fails, try parsing as a JSONArray
+            if (e.getMessage().contains("A JSONObject text must begin with '{'")) {
+                try {
+                    JSONArray jsonArray = new JSONArray(payloadString);
+                } catch (JSONException ex) {
+                    // Handle only duplicate key error, others are later validated
+                    if (ex.getMessage().contains("Duplicate key")) {
+                        handleDuplicateKeyErrorMessage(messageContext, ex);
+                    }
+                }
+            } else if (e.getMessage().contains("Duplicate key")) {
+                handleDuplicateKeyErrorMessage(messageContext, e);
+            }
+        }
+    }
+
+    private void handleDuplicateKeyErrorMessage(MessageContext messageContext, Exception e) {
+        if (messageContext.isResponse()) {
+            String errMessage = "Schema validation failed in the Response: " + e.getMessage();
+            logger.error(errMessage, e);
+            GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.INTERNAL_ERROR_CODE, errMessage);
+        } else {
+            String errMessage = "Schema validation failed in the Request: " + e.getMessage();
+            logger.error(errMessage, e);
+            GatewayUtils.handleThreat(messageContext, APIMgtGatewayConstants.HTTP_SC_CODE, errMessage);
+        }
     }
 
     /**
