@@ -373,6 +373,7 @@ public class APIConsumerImplTest {
         tierMap.put("tier1",new Tier("tier1"));
         PowerMockito.when(APIUtil.getTiers(APIConstants.TIER_APPLICATION_TYPE, "testorg")).thenReturn(tierMap);
         PowerMockito.when(APIUtil.findTier(tierMap.values(), "tier1")).thenReturn(new Tier("tier1"));
+        Mockito.when(apiMgtDAO.getApplicationById(Mockito.anyInt())).thenReturn(application);
         Mockito.when(apiMgtDAO.addApplication(application, "userID", "testorg")).thenReturn(1);
         assertEquals(1, apiConsumer.addApplication(application, "userID", "testorg"));
     }
@@ -413,6 +414,7 @@ public class APIConsumerImplTest {
         PowerMockito.when(application.getSubscriber()).thenReturn(new Subscriber("User1"));
         PowerMockito.when(MultitenantUtils.getTenantDomain("userID")).thenReturn("carbon.super");
         PowerMockito.when(APIUtil.isApplicationExist("userID", "app", "1", "testorg")).thenReturn(false);
+        Mockito.when(apiMgtDAO.getApplicationById(Mockito.anyInt())).thenReturn(application);
         Mockito.when(apiMgtDAO.addApplication(application, "userID", "testorg")).thenReturn(1);
         assertEquals(1, apiConsumer.addApplication(application, "userID", "testorg"));
     }
