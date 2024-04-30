@@ -39,19 +39,7 @@ import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIMgtResourceNotFoundException;
 import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.dto.KeyManagerConfigurationDTO;
-import org.wso2.carbon.apimgt.api.model.APICategory;
-import org.wso2.carbon.apimgt.api.model.Application;
-import org.wso2.carbon.apimgt.api.model.ApplicationInfo;
-import org.wso2.carbon.apimgt.api.model.ApplicationInfoKeyManager;
-import org.wso2.carbon.apimgt.api.model.ConfigurationDto;
-import org.wso2.carbon.apimgt.api.model.Environment;
-import org.wso2.carbon.apimgt.api.model.KeyManagerConfiguration;
-import org.wso2.carbon.apimgt.api.model.KeyManagerConnectorConfiguration;
-import org.wso2.carbon.apimgt.api.model.Monetization;
-import org.wso2.carbon.apimgt.api.model.MonetizationUsagePublishInfo;
-import org.wso2.carbon.apimgt.api.model.VHost;
-import org.wso2.carbon.apimgt.api.model.Workflow;
-import org.wso2.carbon.apimgt.api.model.WorkflowTaskService;
+import org.wso2.carbon.apimgt.api.model.*;
 import org.wso2.carbon.apimgt.api.model.botDataAPI.BotDetectionData;
 import org.wso2.carbon.apimgt.api.model.policy.Policy;
 import org.wso2.carbon.apimgt.api.model.policy.PolicyConstants;
@@ -110,6 +98,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import static org.wso2.carbon.apimgt.impl.utils.APIUtil.getPaginatedApplicationList;
 
 /**
  * This class provides the core API admin functionality.
@@ -418,6 +407,29 @@ public class APIAdminImpl implements APIAdmin {
 
     }
 
+    private void setKeyManagerUsageRelatedInformation(
+            List<KeyManagerConfigurationDTO> keyManagerConfigurationsByOrganization, String organization)
+            throws APIManagementException {
+
+        for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByOrganization) {
+
+            KeyManagerApplicationUsages appUsages = getApplicationsOfKeyManager(keyManagerConfigurationDTO.getUuid(), 0,
+                    Integer.MAX_VALUE);
+            if (appUsages.getApplicationCount() > 0) {
+                keyManagerConfigurationDTO.setUsed(true);
+                continue;
+            }
+
+            AdminContentSearchResult apiUsages = getAPIUsagesByKeyManagerNameAndOrganization(organization,
+                    keyManagerConfigurationDTO.getName(), 0, Integer.MAX_VALUE);
+            if (apiUsages.getApiCount() > 0) {
+                keyManagerConfigurationDTO.setUsed(true);
+                continue;
+            }
+            keyManagerConfigurationDTO.setUsed(false);
+        }
+    }
+
     private void setAliasForTokenExchangeKeyManagers(List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant,
                                                      String tenantDomain) throws APIManagementException {
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByTenant) {
@@ -590,22 +602,28 @@ public class APIAdminImpl implements APIAdmin {
     }
 
     public AdminContentSearchResult getAPIUsagesByKeyManagerNameAndOrganization(String org, String keyManagerName,
-                                                                                int start, int offset, int limit)
-            throws APIManagementException {
+        int offset, int limit) throws APIManagementException {
+
         APIPersistence apiPersistenceInstance = PersistenceFactory.getAPIPersistenceInstance();
         String searchQuery = APIConstants.API_USAGE_BY_KEY_MANAGER_QUERY.replace("$1", keyManagerName);
         try {
-            return apiPersistenceInstance.searchContentForAdmin(org, searchQuery, start, offset, limit);
+            return apiPersistenceInstance.searchContentForAdmin(org, searchQuery, offset, limit, limit);
         } catch (APIPersistenceException e) {
             throw new APIManagementException("Error while finding the key manager ", e);
         }
     }
 
-    public List<ApplicationInfoKeyManager> getAllApplicationsOfKeyManager(String keyManagerId)
+    public KeyManagerApplicationUsages getApplicationsOfKeyManager(String keyManagerId, int offset, int limit)
             throws APIManagementException {
+
+        KeyManagerApplicationUsages keyManagerApplicationUsages = new KeyManagerApplicationUsages();
         ApiMgtDAO apiMgtDAO = ApiMgtDAO.getInstance();
-        return apiMgtDAO.getAllApplicationsOfKeyManager(keyManagerId);
+        List<ApplicationInfoKeyManager> applications = apiMgtDAO.getAllApplicationsOfKeyManager(keyManagerId);
+        keyManagerApplicationUsages.setApplicationCount(applications.size());
+        keyManagerApplicationUsages.setApplications(getPaginatedApplicationList(applications, offset, limit));
+        return keyManagerApplicationUsages;
     }
+
 
     private void validateKeyManagerEndpointConfiguration(KeyManagerConfigurationDTO keyManagerConfigurationDTO)
             throws APIManagementException {
@@ -879,9 +897,12 @@ public class APIAdminImpl implements APIAdmin {
     public void deleteKeyManagerConfigurationById(String organization, KeyManagerConfigurationDTO kmConfig)
             throws APIManagementException {
         if (kmConfig != null) {
-            AdminContentSearchResult usage = getAPIUsagesByKeyManagerNameAndOrganization(organization, kmConfig.getName()
-                    , 0, 0, Integer.MAX_VALUE);
-            if (usage != null && usage.getApiCount() == 0 && usage.getApplicationCount() == 0) {
+            AdminContentSearchResult apiUsage = getAPIUsagesByKeyManagerNameAndOrganization(organization,
+                    kmConfig.getName(), 0, Integer.MAX_VALUE);
+            KeyManagerApplicationUsages appUsages = getApplicationsOfKeyManager(kmConfig.getUuid(), 0,
+                    Integer.MAX_VALUE);
+            if (apiUsage != null && apiUsage.getApiCount() == 0 && appUsages != null
+                    && appUsages.getApplicationCount() == 0) {
                 if (!APIConstants.KeyManager.DEFAULT_KEY_MANAGER.equals(kmConfig.getName())) {
                     deleteIdentityProvider(organization, kmConfig);
                     apiMgtDAO.deleteKeyManagerConfigurationById(kmConfig.getUuid(), organization);
@@ -892,7 +913,7 @@ public class APIAdminImpl implements APIAdmin {
                             ExceptionCodes.KEY_MANAGER_DELETE_FAILED);
                 }
             } else {
-                throw new APIManagementException("Key Manager is already used by an API or and Application.",
+                throw new APIManagementException("Key Manager is already used by an API or an Application.",
                         ExceptionCodes.KEY_MANAGER_DELETE_FAILED);
             }
         }
@@ -900,7 +921,7 @@ public class APIAdminImpl implements APIAdmin {
 
     @Override
     public KeyManagerConfigurationDTO getKeyManagerConfigurationByName(String organization, String name)
-            throws APIManagementException {
+        throws APIManagementException {
 
         KeyManagerConfigurationDTO keyManagerConfiguration =
                 apiMgtDAO.getKeyManagerConfigurationByName(organization, name);
@@ -909,15 +930,17 @@ public class APIAdminImpl implements APIAdmin {
                 APIUtil.getAndSetDefaultKeyManagerConfiguration(keyManagerConfiguration);
             }
             maskValues(keyManagerConfiguration);
+            if (!StringUtils.equals(KeyManagerConfiguration.TokenType.EXCHANGED.toString(),
+                    keyManagerConfiguration.getTokenType())) {
+                getKeyManagerEndpoints(keyManagerConfiguration);
+            }
+            return keyManagerConfiguration;
         }
-        if (!StringUtils.equals(KeyManagerConfiguration.TokenType.EXCHANGED.toString(),
-                keyManagerConfiguration.getTokenType())) {
-            getKeyManagerEndpoints(keyManagerConfiguration);
-        }
-        return keyManagerConfiguration;
+        return null;
     }
 
-    @Override
+
+        @Override
     public void addBotDetectionAlertSubscription(String email) throws APIManagementException {
 
         apiMgtDAO.addBotDetectionAlertSubscription(email);
@@ -1591,6 +1614,17 @@ public class APIAdminImpl implements APIAdmin {
         for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurations) {
             decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
         }
+        return keyManagerConfigurations;
+    }
+
+    public List<KeyManagerConfigurationDTO> getGlobalKeyManagerConfigurations(String organization)
+        throws APIManagementException {
+        List<KeyManagerConfigurationDTO> keyManagerConfigurations = apiMgtDAO.getKeyManagerConfigurationsByOrganization(
+                APIConstants.GLOBAL_KEY_MANAGER_TENANT_DOMAIN);
+        for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurations) {
+            decryptKeyManagerConfigurationValues(keyManagerConfigurationDTO);
+        }
+        setKeyManagerUsageRelatedInformation(keyManagerConfigurations, organization);
         return keyManagerConfigurations;
     }
 

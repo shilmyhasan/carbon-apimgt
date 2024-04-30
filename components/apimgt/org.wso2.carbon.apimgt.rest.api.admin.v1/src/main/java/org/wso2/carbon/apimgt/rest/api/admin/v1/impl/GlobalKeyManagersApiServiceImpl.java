@@ -28,6 +28,7 @@ import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
+import org.wso2.carbon.apimgt.rest.api.admin.v1.GlobalKeyManagersApiService;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.KeyManagerDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.KeyManagerListDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.utils.mappings.KeyManagerMappingUtil;
@@ -49,7 +50,8 @@ public class GlobalKeyManagersApiServiceImpl implements GlobalKeyManagersApiServ
 
     public Response globalKeyManagersGet(MessageContext messageContext) throws APIManagementException {
         APIAdmin apiAdmin = new APIAdminImpl();
-        List<KeyManagerConfigurationDTO> globalKeyManagerConfigurations = apiAdmin.getGlobalKeyManagerConfigurations();
+        String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
+        List<KeyManagerConfigurationDTO> globalKeyManagerConfigurations = apiAdmin.getGlobalKeyManagerConfigurations(tenantDomain);
         KeyManagerListDTO keyManagerListDTO =
                 KeyManagerMappingUtil.toKeyManagerListDTO(globalKeyManagerConfigurations);
         return Response.ok().entity(keyManagerListDTO).build();

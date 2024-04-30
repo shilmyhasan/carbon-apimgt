@@ -472,6 +472,15 @@ public interface APIAdmin  {
     List<KeyManagerConfigurationDTO> getGlobalKeyManagerConfigurations() throws APIManagementException;
 
     /**
+     * This method used to retrieve global key manager configurations with usage check
+     * @param organization organization
+     * @return KeyManagerConfigurationDTO list
+     * @throws APIManagementException if error occurred
+     */
+    List<KeyManagerConfigurationDTO> getGlobalKeyManagerConfigurations(String organization)
+            throws APIManagementException;
+
+    /**
      * This method used to retrieve global key manager with Id
      * @param id uuid of key manager
      * @return KeyManagerConfigurationDTO for retrieved data
