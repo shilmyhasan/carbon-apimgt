@@ -2281,7 +2281,7 @@ public abstract class AbstractAPIManager implements APIManager {
                     APIUtil.loadTenantConfigBlockingMode(requestedTenantDomain);
                 }
             } else {
-                userRegistry = this.registry;
+                userRegistry = getRegistryService().getGovernanceUserRegistry(userNameLocal, tenantId);
                 tenantIDLocal = tenantId;
             }
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(userNameLocal);
@@ -3427,7 +3427,7 @@ public abstract class AbstractAPIManager implements APIManager {
                 userRegistry = getRegistryService().getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantIDLocal);
                 userNameLocal = CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME;
             } else {
-                userRegistry = this.registry;
+                userRegistry = getRegistryService().getGovernanceUserRegistry(userNameLocal, tenantId);
                 tenantIDLocal = tenantId;
             }
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(userNameLocal);
