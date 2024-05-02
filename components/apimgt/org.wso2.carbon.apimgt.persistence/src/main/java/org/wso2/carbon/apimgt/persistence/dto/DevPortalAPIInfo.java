@@ -31,6 +31,9 @@ public class DevPortalAPIInfo {
     private String type;
     private String thumbnail;
     private String businessOwner;
+    private String businessOwnerEmail;
+    private String technicalOwner;
+    private String technicalOwnerEmail;
     private String status;
     private Set<String> availableTierNames;
     private String subscriptionAvailability; 
@@ -118,14 +121,36 @@ public class DevPortalAPIInfo {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    public String getBusinessOwnerEmail() {
+        return businessOwnerEmail;
+        
+    }
+    public void setBusinessOwnerEmail(String businessOwnerEmail) {
+        this.businessOwnerEmail = businessOwnerEmail;
+    }
+    public String getTechnicalOwner() {
+        return technicalOwner;
+    }
+    public void setTechnicalOwner(String technicalOwner) {
+        this.technicalOwner = technicalOwner;
+    }
+    public String getTechnicalOwnerEmail() {
+        return technicalOwnerEmail;
+    }
+    public void setTechnicalOwnerEmail(String technicalOwnerEmail) {
+        this.technicalOwnerEmail = technicalOwnerEmail;
+    }
 
     @Override
     public String toString() {
-        return "DevPortalAPIInfo [id=" + id + ", apiName=" + apiName + ", description=" + description + ", version="
-                + version + ", providerName=" + providerName + ", context=" + context + ", type=" + type + ", " +
-                "thumbnail=" + thumbnail + ", businessOwner=" + businessOwner + ", status=" + status + ", " +
-                "availableTierNames=" + availableTierNames + ", subscriptionAvailability=" + subscriptionAvailability
-                + ", subscriptionAvailableOrgs=" + subscriptionAvailableOrgs + "]";
+        return "DevPortalAPIInfo [id=" + id + ", apiName=" + apiName + ", version=" + version + ", providerName="
+                + providerName + ", context=" + context + ", type=" + type + ", thumbnail=" + thumbnail
+                + ", businessOwner=" + businessOwner + ", businessOwnerEmail=" + businessOwnerEmail
+                + ", technicalOwner=" + technicalOwner + ", technicalOwnerEmail=" + technicalOwnerEmail + ", status="
+                + status + ", availableTierNames=" + availableTierNames + ", subscriptionAvailability="
+                + subscriptionAvailability + ", subscriptionAvailableOrgs=" + subscriptionAvailableOrgs
+                + ", description=" + description + "]";
     }
 
 }
