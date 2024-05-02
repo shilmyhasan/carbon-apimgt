@@ -3899,6 +3899,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
 
         apiMgtDAO.updateApplication(application);
+        Application updatedApplication = apiMgtDAO.getApplicationById(application.getId());
         if (log.isDebugEnabled()) {
             log.debug("Successfully updated the Application: " + application.getId() +" in the database.");
         }
@@ -3926,9 +3927,9 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         String tenantDomain = APIUtil.getTenantDomainFromTenantId(tenantId);
         ApplicationEvent applicationEvent = new ApplicationEvent(UUID.randomUUID().toString(),
                 System.currentTimeMillis(), APIConstants.EventType.APPLICATION_UPDATE.name(), tenantId, tenantDomain,
-                application.getId(), application.getUUID(), application.getName(), application.getTokenType(),
-                application.getTier(), application.getGroupId(), application.getApplicationAttributes(),
-                existingApp.getSubscriber().getName());
+                updatedApplication.getId(), updatedApplication.getUUID(), updatedApplication.getName(),
+                updatedApplication.getTokenType(), updatedApplication.getTier(), updatedApplication.getGroupId(),
+                updatedApplication.getApplicationAttributes(), existingApp.getSubscriber().getName());
         APIUtil.sendNotification(applicationEvent, APIConstants.NotifierType.APPLICATION.name());
     }
 
