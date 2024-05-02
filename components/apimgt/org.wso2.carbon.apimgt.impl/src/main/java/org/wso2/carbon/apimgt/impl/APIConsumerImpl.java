@@ -6310,7 +6310,7 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                         api.setContextTemplate(publiserAPI.getContext());
                         api.setStatus(publiserAPI.getStatus());
                         api.setBusinessOwner(publiserAPI.getBusinessOwner());
-                        api.setBusinessOwnerEmail(publiserAPI.getBusinessOwner());
+                        api.setBusinessOwnerEmail(publiserAPI.getBusinessOwnerEmail());
                         api.setTechnicalOwner(publiserAPI.getTechnicalOwner());
                         api.setTechnicalOwnerEmail(publiserAPI.getTechnicalOwnerEmail());
                         api.setRating(0);// need to retrieve from db
