@@ -124,6 +124,7 @@ public class SettingsMappingUtil {
         settingsDTO.setPasswordPolicyPattern(passwordPolicyPattern);
         settingsDTO.setPasswordPolicyMinLength(passwordPolicyMinLength);
         settingsDTO.setPasswordPolicyMaxLength(passwordPolicyMaxLength);
+        settingsDTO.setCrossTenantSubscriptionEnabled(APIUtil.isCrossTenantSubscriptionsEnabled());
 
         if (isUserAvailable) {
             settingsDTO.setGrantTypes(APIUtil.getGrantTypes());
