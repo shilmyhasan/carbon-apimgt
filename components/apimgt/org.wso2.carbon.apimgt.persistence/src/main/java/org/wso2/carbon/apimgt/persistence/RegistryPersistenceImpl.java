@@ -1124,6 +1124,9 @@ public class RegistryPersistenceImpl implements APIPersistence {
                 apiInfo.setStatus(artifact.getAttribute(APIConstants.API_OVERVIEW_STATUS));
                 apiInfo.setThumbnail(artifact.getAttribute(APIConstants.API_OVERVIEW_THUMBNAIL_URL));
                 apiInfo.setBusinessOwner(artifact.getAttribute(APIConstants.API_OVERVIEW_BUSS_OWNER));
+                apiInfo.setBusinessOwnerEmail(artifact.getAttribute(APIConstants.API_OVERVIEW_BUSS_OWNER_EMAIL));
+                apiInfo.setTechnicalOwner(artifact.getAttribute(APIConstants.API_OVERVIEW_TEC_OWNER));
+                apiInfo.setTechnicalOwnerEmail(artifact.getAttribute(APIConstants.API_OVERVIEW_TEC_OWNER_EMAIL));
                 apiInfo.setVersion(artifact.getAttribute(APIConstants.API_OVERVIEW_VERSION));
                 String tiers = artifact.getAttribute(APIConstants.API_OVERVIEW_TIER);
                 Set<String> availableTiers = new HashSet<String>();
@@ -1678,7 +1681,8 @@ public class RegistryPersistenceImpl implements APIPersistence {
                                 content.setStatus(devAPI.getStatus());
                                 content.setBusinessOwner(devAPI.getBusinessOwner());
                                 content.setBusinessOwnerEmail(devAPI.getBusinessOwnerEmail());
-
+                                content.setTechnicalOwner(devAPI.getTechnicalOwner());
+                                content.setTechnicalOwnerEmail(devAPI.getTechnicalOwnerEmail());
                                 contentData.add(content);
                             } else {
                                 throw new GovernanceException("artifact id is null for " + resourcePath);

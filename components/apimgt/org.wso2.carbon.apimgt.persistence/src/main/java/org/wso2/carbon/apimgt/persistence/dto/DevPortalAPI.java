@@ -31,10 +31,6 @@ public class DevPortalAPI extends DevPortalAPIInfo {
     private Boolean isDefaultVersion;
     private String description;
     private String wsdlUrl;
-    private String technicalOwner;
-    private String technicalOwnerEmail;
-    private String businessOwner;
-    private String businessOwnerEmail;
     private String transports;
     private String redirectURL;  // (originalStoreUrl)
     private String apiExternalProductionEndpoint;
@@ -103,38 +99,6 @@ public class DevPortalAPI extends DevPortalAPIInfo {
 
     public void setWsdlUrl(String wsdlUrl) {
         this.wsdlUrl = wsdlUrl;
-    }
-
-    public String getTechnicalOwner() {
-        return technicalOwner;
-    }
-
-    public void setTechnicalOwner(String technicalOwner) {
-        this.technicalOwner = technicalOwner;
-    }
-
-    public String getTechnicalOwnerEmail() {
-        return technicalOwnerEmail;
-    }
-
-    public void setTechnicalOwnerEmail(String technicalOwnerEmail) {
-        this.technicalOwnerEmail = technicalOwnerEmail;
-    }
-
-    public String getBusinessOwner() {
-        return businessOwner;
-    }
-
-    public void setBusinessOwner(String businessOwner) {
-        this.businessOwner = businessOwner;
-    }
-
-    public String getBusinessOwnerEmail() {
-        return businessOwnerEmail;
-    }
-
-    public void setBusinessOwnerEmail(String businessOwnerEmail) {
-        this.businessOwnerEmail = businessOwnerEmail;
     }
 
     public Boolean getIsDefaultVersion() {
@@ -341,9 +305,9 @@ public class DevPortalAPI extends DevPortalAPIInfo {
     @Override
     public String toString() {
         return "DevPortalAPI [status=" + status + ", isDefaultVersion=" + isDefaultVersion + ", description="
-                + description + ", wsdlUrl=" + wsdlUrl + ", technicalOwner=" + technicalOwner + ", technicalOwnerEmail="
-                + technicalOwnerEmail + ", businessOwner=" + businessOwner + ", businessOwnerEmail="
-                + businessOwnerEmail + ", transports=" + transports + ", redirectURL=" + redirectURL
+                + description + ", wsdlUrl=" + wsdlUrl + ", technicalOwner=" + getTechnicalOwner() + ", technicalOwnerEmail="
+                + getTechnicalOwnerEmail() + ", businessOwner=" + getBusinessOwner() + ", businessOwnerEmail="
+                + getBusinessOwnerEmail() + ", transports=" + transports + ", redirectURL=" + redirectURL
                 + ", apiExternalProductionEndpoint=" + apiExternalProductionEndpoint + ", apiExternalSandboxEndpoint="
                 + apiExternalSandboxEndpoint + ", apiOwner=" + apiOwner + ", advertiseOnly=" + advertiseOnly
                 + ", subscriptionAvailability=" + subscriptionAvailability + ", subscriptionAvailableOrgs="
