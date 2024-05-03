@@ -25,10 +25,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
 import org.apache.axis2.util.JavaUtils;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,7 +95,6 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Event;
 import org.wso2.carbon.governance.custom.lifecycles.checklist.util.CheckListItem;
-import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
@@ -107,7 +104,6 @@ import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -914,15 +910,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     private void validateKeyManagers(API api) throws APIManagementException {
 
-        List<KeyManagerConfigurationDTO> keyManagerConfigurationsByTenant =
-                apiMgtDAO.getKeyManagerConfigurationsByOrganization(tenantDomain);
+        Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         List<String> configuredMissingKeyManagers = new ArrayList<>();
         for (String keyManager : api.getKeyManagers()) {
             if (!APIConstants.KeyManager.API_LEVEL_ALL_KEY_MANAGERS.equals(keyManager)) {
-                KeyManagerConfigurationDTO selectedKeyManager = null;
-                for (KeyManagerConfigurationDTO keyManagerConfigurationDTO : keyManagerConfigurationsByTenant) {
-                    if (keyManager.equals(keyManagerConfigurationDTO.getName())) {
-                        selectedKeyManager = keyManagerConfigurationDTO;
+                KeyManagerDto selectedKeyManager = null;
+
+                for (String kmName: tenantKeyManagers.keySet()) {
+                    if (keyManager.equals(tenantKeyManagers.get(kmName).getName())) {
+                        selectedKeyManager = tenantKeyManagers.get(kmName);
                         break;
                     }
                 }
