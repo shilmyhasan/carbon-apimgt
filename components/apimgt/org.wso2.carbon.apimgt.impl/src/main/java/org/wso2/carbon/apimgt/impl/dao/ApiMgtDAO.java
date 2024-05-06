@@ -1299,18 +1299,33 @@ public class ApiMgtDAO {
         return subscribedAPIs;
     }
 
-    public Set<String> getScopesForApplicationSubscription(Subscriber subscriber, int applicationId)
-            throws APIManagementException {
+    public Set<Pair<String, String>> getScopesForApplicationSubscription(
+            Subscriber subscriber, int applicationId, String xWSO2Tenant) throws APIManagementException {
 
         PreparedStatement getIncludedApisInProduct = null;
         PreparedStatement getSubscribedApisAndProducts = null;
         ResultSet resultSet = null;
-        Set<String> scopeKeysSet = new HashSet<>();
+        Set<Pair<String, String>> apiScopes = new HashSet<>();
         Set<Integer> apiIdSet = new HashSet<>();
-        int tenantId = APIUtil.getTenantId(subscriber.getName());
+        int tenantId;
+        String tenantDomain;
+        if (StringUtils.isNotEmpty(xWSO2Tenant)) {
+            tenantId = APIUtil.getTenantIdFromTenantDomain(xWSO2Tenant);
+            tenantDomain = xWSO2Tenant;
+        } else {
+            tenantId = APIUtil.getTenantId(subscriber.getName());
+            tenantDomain = MultitenantUtils.getTenantDomain(subscriber.getName());
+        }
 
         try (Connection conn = APIMgtDBUtil.getConnection()) {
             String sqlQueryForGetSubscribedApis = SQLConstants.GET_SUBSCRIBED_API_IDs_BY_APP_ID_SQL;
+            if (tenantId == MultitenantConstants.SUPER_TENANT_ID) {
+                sqlQueryForGetSubscribedApis =
+                        sqlQueryForGetSubscribedApis.concat(" AND API.CONTEXT NOT LIKE '/t/%'");
+            } else {
+                sqlQueryForGetSubscribedApis =
+                        sqlQueryForGetSubscribedApis.concat(" AND API.CONTEXT LIKE '/t/" + xWSO2Tenant + "%'");
+            }
             getSubscribedApisAndProducts = conn.prepareStatement(sqlQueryForGetSubscribedApis);
             getSubscribedApisAndProducts.setInt(1, tenantId);
             getSubscribedApisAndProducts.setInt(2, applicationId);
@@ -1329,19 +1344,23 @@ public class ApiMgtDAO {
                 apiIdSet.add(apiId);
             }
             if (!apiIdSet.isEmpty()) {
-                String apiIdList = StringUtils.join(apiIdSet, ", ");
-                String sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_API_PREFIX + apiIdList
-                        + SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
-
-                if (conn.getMetaData().getDriverName().contains("Oracle")) {
-                    sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_ORACLE_SQL + apiIdList
+                for (int apiId : apiIdSet) {
+                    String sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_API_PREFIX + apiId
                             + SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
-                }
-                try (PreparedStatement statement = conn.prepareStatement(sqlQuery)) {
-                    try (ResultSet finalResultSet = statement.executeQuery()) {
-                        while (finalResultSet.next()) {
-                            scopeKeysSet.add(finalResultSet.getString(1));
+                    if (conn.getMetaData().getDriverName().contains("Oracle")) {
+                        sqlQuery = SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_ORACLE_SQL + apiId
+                                + SQLConstants.GET_SCOPE_BY_SUBSCRIBED_ID_SUFFIX;
+                    }
+                    Set<String> scopeKeysSet = new HashSet<>();
+                    try (PreparedStatement statement = conn.prepareStatement(sqlQuery)) {
+                        try (ResultSet finalResultSet = statement.executeQuery()) {
+                            while (finalResultSet.next()) {
+                                scopeKeysSet.add(finalResultSet.getString(1));
+                            }
                         }
+                    }
+                    for (String scope : scopeKeysSet) {
+                        apiScopes.add(Pair.of(tenantDomain, scope));
                     }
                 }
             }
@@ -1351,7 +1370,7 @@ public class ApiMgtDAO {
             APIMgtDBUtil.closeAllConnections(getSubscribedApisAndProducts, null, resultSet);
             APIMgtDBUtil.closeAllConnections(getIncludedApisInProduct, null, null);
         }
-        return scopeKeysSet;
+        return apiScopes;
     }
 
     public Integer getSubscriptionCount(Subscriber subscriber, String applicationName, String groupingId)
@@ -9252,7 +9271,7 @@ public class ApiMgtDAO {
             throws APIManagementException {
 
         List<KeyManagerConfigurationDTO> keyManagerConfigurationDTOS = new ArrayList<>();
-        final String query = "SELECT * FROM AM_KEY_MANAGER WHERE ORGANIZATION = ? ";
+        final String query = "SELECT * FROM AM_KEY_MANAGER WHERE ORGANIZATION IN (?)";
         try (Connection conn = APIMgtDBUtil.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
             preparedStatement.setString(1, organization);
@@ -9266,7 +9285,7 @@ public class ApiMgtDAO {
                     keyManagerConfigurationDTO.setDescription(resultSet.getString("DESCRIPTION"));
                     keyManagerConfigurationDTO.setType(resultSet.getString("TYPE"));
                     keyManagerConfigurationDTO.setEnabled(resultSet.getBoolean("ENABLED"));
-                    keyManagerConfigurationDTO.setOrganization(organization);
+                    keyManagerConfigurationDTO.setOrganization(resultSet.getString("ORGANIZATION"));
                     keyManagerConfigurationDTO.setTokenType(resultSet.getString("TOKEN_TYPE"));
                     keyManagerConfigurationDTO.setExternalReferenceId(resultSet.getString("EXTERNAL_REFERENCE_ID"));
                     try (InputStream configuration = resultSet.getBinaryStream("CONFIGURATION")) {
@@ -9671,12 +9690,10 @@ public class ApiMgtDAO {
     }
 
     public KeyManagerApplicationInfo getKeyManagerNameAndConsumerKeyByAppIdAndKeyMappingId(int applicationId,
-                                                                                           String keyMappingId)
-            throws APIManagementException {
-        final String query = "SELECT NAME AS KEY_MANAGER_NAME, CONSUMER_KEY, CREATE_MODE FROM AM_KEY_MANAGER AKM, " +
-                "AM_APPLICATION_KEY_MAPPING AAKM WHERE APPLICATION_ID=? AND AAKM.UUID = ? " +
-                "AND AKM.UUID=AAKM.KEY_MANAGER";
-        Set<APIKey> apiKeyList = new HashSet<>();
+        String keyMappingId) throws APIManagementException {
+
+        String query = SQLConstants.KeyManagerSqlConstants
+                .GET_KEY_MANAGER_NAME_AND_CONSUMER_KEY_BY_APPLICATION_ID_AND_KEY_MAPPING_ID;
         try (Connection connection = APIMgtDBUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, applicationId);
@@ -9695,7 +9712,6 @@ public class ApiMgtDAO {
         }
         return null;
     }
-
     public String getKeyManagerNameFromKeyMappingId(String keyMappingId)
             throws APIManagementException {
 

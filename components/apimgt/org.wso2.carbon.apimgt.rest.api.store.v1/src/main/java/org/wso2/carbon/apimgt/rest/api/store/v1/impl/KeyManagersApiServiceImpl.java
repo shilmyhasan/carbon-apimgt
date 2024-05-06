@@ -4,10 +4,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.wso2.carbon.apimgt.api.APIAdmin;
+import org.wso2.carbon.apimgt.api.APIConsumer;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.dto.KeyManagerConfigurationDTO;
 import org.wso2.carbon.apimgt.impl.APIAdminImpl;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIConsumerImpl;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
 import org.wso2.carbon.apimgt.rest.api.store.v1.KeyManagersApiService;
@@ -29,6 +31,9 @@ public class KeyManagersApiServiceImpl implements KeyManagersApiService {
         try {
             List<KeyManagerConfigurationDTO> keyManagerConfigurations =
                     apiAdmin.getKeyManagerConfigurationsByOrganization(organization);
+            List<KeyManagerConfigurationDTO> globalKeyManagerConfigurations
+                    = apiAdmin.getGlobalKeyManagerConfigurations();
+            keyManagerConfigurations.addAll(globalKeyManagerConfigurations);
             return Response.ok(KeyManagerMappingUtil.toKeyManagerListDto(keyManagerConfigurations)).build();
         } catch (APIManagementException e) {
             RestApiUtil.handleInternalServerError(

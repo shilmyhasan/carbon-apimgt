@@ -91,7 +91,8 @@ public class SQLConstants {
 
     public static final String GET_SUBSCRIBED_API_IDs_BY_APP_ID_SQL =
             " SELECT " +
-                    "   API.API_ID " +
+                    "   API.API_ID, " +
+                    "   API.API_PROVIDER " +
                     " FROM " +
                     "   AM_SUBSCRIBER SUB," +
                     "   AM_APPLICATION APP, " +
@@ -3626,6 +3627,11 @@ public class SQLConstants {
 
         public static final String DELETE_KEY_MANAGER =
                 "DELETE FROM AM_KEY_MANAGER WHERE UUID = ? AND ORGANIZATION = ?";
+        public static final String GET_KEY_MANAGER_NAME_AND_CONSUMER_KEY_BY_APPLICATION_ID_AND_KEY_MAPPING_ID =
+                "SELECT NAME AS KEY_MANAGER_NAME, CONSUMER_KEY, CREATE_MODE FROM AM_KEY_MANAGER AKM, " +
+                        "AM_APPLICATION_KEY_MAPPING AAKM WHERE APPLICATION_ID=? AND AAKM.UUID = ? " +
+                        "AND AKM.UUID=AAKM.KEY_MANAGER";
+
     }
 
     /**

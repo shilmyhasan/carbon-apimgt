@@ -42,6 +42,7 @@ public class KeyManagerConfigurationDTO implements Serializable {
     private String tokenType;
     private String externalReferenceId = null;
     private String alias = null;
+    private Boolean isUsed = null;
 
     public KeyManagerConfigurationDTO() {
 
@@ -183,5 +184,15 @@ public class KeyManagerConfigurationDTO implements Serializable {
     public void setEndpoints(Map<String, String> endpoints) {
 
         this.endpoints = endpoints;
+    }
+
+    public Boolean getIsUsed() {
+
+        return this.isUsed;
+    }
+
+    public void setUsed(Boolean isUsed) {
+
+        this.isUsed = isUsed;
     }
 }

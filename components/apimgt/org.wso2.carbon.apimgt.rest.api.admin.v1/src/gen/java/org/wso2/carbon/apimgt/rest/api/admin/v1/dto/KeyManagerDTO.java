@@ -57,6 +57,7 @@ public class KeyManagerDTO   {
     private String scopesClaim = null;
     private List<TokenValidationDTO> tokenValidation = new ArrayList<TokenValidationDTO>();
     private Boolean enabled = null;
+    private Boolean global = null;
     private Object additionalProperties = null;
 
     @XmlType(name="TokenTypeEnum")
@@ -630,6 +631,23 @@ return null;
 
   /**
    **/
+  public KeyManagerDTO global(Boolean global) {
+    this.global = global;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "true", value = "")
+  @JsonProperty("global")
+  public Boolean isGlobal() {
+    return global;
+  }
+  public void setGlobal(Boolean global) {
+    this.global = global;
+  }
+
+  /**
+   **/
   public KeyManagerDTO additionalProperties(Object additionalProperties) {
     this.additionalProperties = additionalProperties;
     return this;
@@ -705,13 +723,14 @@ return null;
         Objects.equals(scopesClaim, keyManager.scopesClaim) &&
         Objects.equals(tokenValidation, keyManager.tokenValidation) &&
         Objects.equals(enabled, keyManager.enabled) &&
+        Objects.equals(global, keyManager.global) &&
         Objects.equals(additionalProperties, keyManager.additionalProperties) &&
         Objects.equals(tokenType, keyManager.tokenType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, displayName, type, description, wellKnownEndpoint, introspectionEndpoint, clientRegistrationEndpoint, tokenEndpoint, displayTokenEndpoint, revokeEndpoint, displayRevokeEndpoint, userInfoEndpoint, authorizeEndpoint, endpoints, certificates, issuer, alias, scopeManagementEndpoint, availableGrantTypes, enableTokenGeneration, enableTokenEncryption, enableTokenHashing, enableMapOAuthConsumerApps, enableOAuthAppCreation, enableSelfValidationJWT, claimMapping, consumerKeyClaim, scopesClaim, tokenValidation, enabled, additionalProperties, tokenType);
+    return Objects.hash(id, name, displayName, type, description, wellKnownEndpoint, introspectionEndpoint, clientRegistrationEndpoint, tokenEndpoint, displayTokenEndpoint, revokeEndpoint, displayRevokeEndpoint, userInfoEndpoint, authorizeEndpoint, endpoints, certificates, issuer, alias, scopeManagementEndpoint, availableGrantTypes, enableTokenGeneration, enableTokenEncryption, enableTokenHashing, enableMapOAuthConsumerApps, enableOAuthAppCreation, enableSelfValidationJWT, claimMapping, consumerKeyClaim, scopesClaim, tokenValidation, enabled, global, additionalProperties, tokenType);
   }
 
   @Override
@@ -750,6 +769,7 @@ return null;
     sb.append("    scopesClaim: ").append(toIndentedString(scopesClaim)).append("\n");
     sb.append("    tokenValidation: ").append(toIndentedString(tokenValidation)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    global: ").append(toIndentedString(global)).append("\n");
     sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
     sb.append("    tokenType: ").append(toIndentedString(tokenType)).append("\n");
     sb.append("}");
