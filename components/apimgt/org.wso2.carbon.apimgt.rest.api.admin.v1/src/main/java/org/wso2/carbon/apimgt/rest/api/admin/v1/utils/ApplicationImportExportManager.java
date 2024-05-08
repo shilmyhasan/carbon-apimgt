@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ApplicationImportExportManager {
     private static final Log log = LogFactory.getLog(ApplicationImportExportManager.class);
@@ -120,44 +121,84 @@ public class ApplicationImportExportManager {
     public List<APIIdentifier> importSubscriptions(Application appDetails, String userId, int appId, Boolean update)
             throws APIManagementException, UserStoreException {
         List<APIIdentifier> skippedAPIList = new ArrayList<>();
-        Set<SubscribedAPI> subscribedAPIs = appDetails.getSubscribedAPIs();
-        // removing existing subscribed apis
+        // Create a map of the imported subscriptions. The key is a combination of apiName and version
+        Map<String, SubscribedAPI> importedSubscriptionMap = appDetails.getSubscribedAPIs().stream()
+                .collect(Collectors.toMap(
+                        api -> api.getApiId().getApiName() + "_" + api.getApiId().getVersion(),
+                        api -> api));
+
+        // If update flag is set, remove the existing subscriptions that are not in the imported list
         if (update) {
             Subscriber subscriber = apiConsumer.getSubscriber(userId);
-            Set<SubscribedAPI> currentSubscribedAPIs = apiConsumer.getSubscribedAPIs(subscriber);
-            for (SubscribedAPI subscribedAPI : currentSubscribedAPIs) {
-                apiConsumer.removeSubscription(subscribedAPI);
+            Set<SubscribedAPI> currentSubscribedAPIs = apiConsumer.getSubscribedAPIsByApplicationId(subscriber,
+                    appDetails.getId(), appDetails.getGroupId());
+
+            // Remove the existing subscriptions that are not in the imported list
+            for (SubscribedAPI existingSubscribedAPI : currentSubscribedAPIs) {
+                String existingSubscriptionKey = existingSubscribedAPI.getApiId().getApiName() + "_" +
+                        existingSubscribedAPI.getApiId().getVersion();
+                if (importedSubscriptionMap.containsKey(existingSubscriptionKey)) {
+
+                    // Update the tier if the existing tier is different from the imported tier
+                    if (!existingSubscribedAPI.getTier().equals(
+                            importedSubscriptionMap.get(existingSubscriptionKey).getTier())) {
+                        APIIdentifier existingApi = existingSubscribedAPI.getApiId();
+
+                        String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack
+                                (existingApi.getProviderName()));
+                        if (!StringUtils.isEmpty(tenantDomain) && APIUtil.isTenantAvailable(tenantDomain)) {
+                            Set<Object> apiSet = getMatchingApis(existingApi.getApiName(),
+                                    existingApi.getVersion(), tenantDomain);
+                            ApiTypeWrapper apiTypeWrapper = null;
+                            if (apiSet != null && !apiSet.isEmpty()) {
+                                Object type = apiSet.iterator().next();
+                                // Check whether the object is ApiProduct
+                                if (isApiProduct(type)) {
+                                    APIProduct apiProduct = (APIProduct) apiSet.iterator().next();
+                                    apiTypeWrapper = new ApiTypeWrapper(apiProduct);
+                                } else {
+                                    API api = (API) apiSet.iterator().next();
+                                    apiTypeWrapper = new ApiTypeWrapper(api);
+                                }
+                            }
+                            if (apiTypeWrapper != null && isTierAvailable(importedSubscriptionMap.
+                                            get(existingSubscriptionKey).getTier(),
+                                    apiTypeWrapper)) {
+                                apiConsumer.updateSubscription(apiTypeWrapper, userId, appId,
+                                        existingSubscribedAPI.getUUID(),
+                                        existingSubscribedAPI.getTier().getName(),
+                                        importedSubscriptionMap.get(existingSubscriptionKey).getTier().getName());
+                            } else {
+                                log.error("Failed to update the subscription tier for" + existingApi.getApiName() +
+                                        "-" + existingApi.getVersion() + " as one or more tiers may be unavailable");
+                            }
+                        }
+                    }
+
+                    // Remove the existing subscription from the imported list
+                    importedSubscriptionMap.remove(existingSubscriptionKey);
+                } else {
+                    apiConsumer.removeSubscription(existingSubscribedAPI);
+                }
             }
         }
-        for (SubscribedAPI subscribedAPI : subscribedAPIs) {
+
+        // Add the new subscriptions
+        for (String importedSubscriptionKey : importedSubscriptionMap.keySet()) {
+            SubscribedAPI subscribedAPI = importedSubscriptionMap.get(importedSubscriptionKey);
             APIIdentifier apiIdentifier = subscribedAPI.getApiId();
+
             String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.replaceEmailDomainBack
                     (apiIdentifier.getProviderName()));
             if (!StringUtils.isEmpty(tenantDomain) && APIUtil.isTenantAvailable(tenantDomain)) {
                 String name = apiIdentifier.getApiName();
                 String version = apiIdentifier.getVersion();
-                //creating a solr compatible search query, here we will execute a search query without wildcard *s
-                StringBuilder searchQuery = new StringBuilder();
-                String[] searchCriteria = {name, "version:" + version};
-                for (int i = 0; i < searchCriteria.length; i++) {
-                    if (i == 0) {
-                        searchQuery = new StringBuilder(
-                                APIUtil.getSingleSearchCriteria(searchCriteria[i]).replace("*", ""));
-                    } else {
-                        searchQuery.append(APIConstants.SEARCH_AND_TAG)
-                                .append(APIUtil.getSingleSearchCriteria(searchCriteria[i]).replace("*", ""));
-                    }
-                }
-                Map matchedAPIs;
-                matchedAPIs = apiConsumer.searchPaginatedAPIs(searchQuery.toString(), tenantDomain, 0,
-                        Integer.MAX_VALUE,
-                        false);
-                Set<Object> apiSet = (Set<Object>) matchedAPIs.get("apis");
+                Set<Object> apiSet = getMatchingApis(name, version, tenantDomain);
                 if (apiSet != null && !apiSet.isEmpty()) {
                     Object type = apiSet.iterator().next();
                     ApiTypeWrapper apiTypeWrapper = null;
                     Identifier id = null;
-                    //Check whether the object is ApiProduct
+                    // Check whether the object is ApiProduct
                     if (isApiProduct(type)) {
                         APIProduct apiProduct = (APIProduct) apiSet.iterator().next();
                         apiTypeWrapper = new ApiTypeWrapper(apiProduct);
@@ -167,35 +208,61 @@ public class ApplicationImportExportManager {
                         apiTypeWrapper = new ApiTypeWrapper(api);
                         id = api.getId();
                     }
-                    //tier of the imported subscription
                     Tier tier = subscribedAPI.getTier();
-                    //checking whether the target tier is available
+                    // Check whether the target tier is available
                     if (isTierAvailable(tier, apiTypeWrapper) && apiTypeWrapper.getStatus() != null &&
                             APIConstants.PUBLISHED.equals(apiTypeWrapper.getStatus())) {
                         apiTypeWrapper.setTier(tier.getName());
-                        // add subscription if update flag is not specified
-                        // it will throw an error if subscriber already exists
-                        if (update == null || !update) {
-                            apiConsumer.addSubscription(apiTypeWrapper, userId, appId);
-                        } else if (!apiConsumer.isSubscribedToApp(id, userId, appId)) {
-                            // on update skip subscriptions that already exists
-                            apiConsumer.addSubscription(apiTypeWrapper, userId, appId);
-                        }
+                        // Add the subscription
+                        apiConsumer.addSubscription(apiTypeWrapper, userId, appId);
                     } else {
                         log.error("Failed to import Subscription as API/API Product " + name + "-" + version +
-                                " as one or more tiers may be unavailable or the API/API Product may not have been published ");
+                                " as one or more tiers may be unavailable or the API/API Product may not have " +
+                                "been published");
                         skippedAPIList.add(subscribedAPI.getApiId());
                     }
                 } else {
-                    log.error("Failed to import Subscription as API " + name + "-" + version + " is not available");
+                    log.error("Failed to import Subscription as API " + name + "-" + version + " " +
+                            "is not available");
                     skippedAPIList.add(subscribedAPI.getApiId());
                 }
             } else {
-                log.error("Failed to import Subscription as Tenant domain: " + tenantDomain + " is not available");
+                log.error("Failed to import Subscription as Tenant domain: " + tenantDomain + " " +
+                        "is not available");
                 skippedAPIList.add(subscribedAPI.getApiId());
             }
         }
         return skippedAPIList;
+    }
+
+    /**
+     * Retrieve the APIs and API Products that match the given name and version
+     *
+     * @param apiName      name of the API
+     * @param apiVersion   version of the API
+     * @param tenantDomain tenant domain of the API
+     * @return a set of APIs and API Products that match the given name and version
+     * @throws APIManagementException if an error occurs while retrieving the APIs and API Products
+     */
+    private Set<Object> getMatchingApis(String apiName, String apiVersion, String tenantDomain) throws
+            APIManagementException {
+        // Creating a solr compatible search query, here we will execute a search query without wildcard *s
+        StringBuilder searchQuery = new StringBuilder();
+        String[] searchCriteria = {apiName, "version:" + apiVersion};
+        for (int i = 0; i < searchCriteria.length; i++) {
+            if (i == 0) {
+                searchQuery = new StringBuilder(
+                        APIUtil.getSingleSearchCriteria(searchCriteria[i]).replace("*", ""));
+            } else {
+                searchQuery.append(APIConstants.SEARCH_AND_TAG)
+                        .append(APIUtil.getSingleSearchCriteria(searchCriteria[i]).replace("*", ""));
+            }
+        }
+        Map matchedAPIs;
+        matchedAPIs = apiConsumer.searchPaginatedAPIs(searchQuery.toString(), tenantDomain, 0,
+                Integer.MAX_VALUE, false);
+        Set<Object> apiSet = (Set<Object>) matchedAPIs.get("apis");
+        return apiSet;
     }
 
     /**
