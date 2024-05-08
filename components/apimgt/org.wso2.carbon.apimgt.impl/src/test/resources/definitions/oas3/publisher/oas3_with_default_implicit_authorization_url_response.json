@@ -110,7 +110,6 @@
     }
   },
   "x-wso2-auth-header" : "Authorization",
-  "x-wso2-cors" : null,
   "x-wso2-production-endpoints" : {
     "urls" : [ "http://api.ipify.org" ],
     "type" : "http"
@@ -119,10 +118,9 @@
     "urls" : [ "http://api.ipify.org" ],
     "type" : "http"
   },
-  "x-wso2-basePath" : null,
   "x-wso2-transports" : [ "http", "https" ],
   "x-wso2-application-security" : {
-    "security-types" : [ "oauth2" ],
+    "security-types" : [ "api_key", "basic_auth", "oauth2" ],
     "optional" : false
   },
   "x-wso2-response-cache" : {
