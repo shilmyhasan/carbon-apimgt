@@ -42,6 +42,7 @@ public class DataHolder {
     private Map<String, List<String>> apiToKeyManagersMap = new HashMap<>();
     private Map<String,Map<String, API>> tenantAPIMap  = new HashMap<>();
     private boolean isAllApisDeployed = false;
+    private Set<String> tenantsInReadyState = new HashSet<>();
 
     private DataHolder() {
 
@@ -110,6 +111,18 @@ public class DataHolder {
     public void setAllApisDeployed(boolean allApisDeployed) {
 
         isAllApisDeployed = allApisDeployed;
+    }
+
+    public Set<String> getTenantsInReadyState() {
+        return tenantsInReadyState;
+    }
+
+    public void addTenantsInReadyState(String tenant) {
+        tenantsInReadyState.add(tenant);
+    }
+
+    public void removeTenantsInReadyState(String tenant) {
+        tenantsInReadyState.remove(tenant);
     }
 
     public void addKeyManagerToAPIMapping(String uuid, List<String> keyManagers) {

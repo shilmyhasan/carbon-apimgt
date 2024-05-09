@@ -1651,8 +1651,19 @@ public class GatewayUtils {
         return ServiceReferenceHolder.getInstance().getTelemetryTracer();
     }
 
-    public static boolean isAllApisDeployed () {
-        return DataHolder.getInstance().isAllApisDeployed();
+    public static boolean isAllApisDeployed () throws APIManagementException {
+        String eagerLoadingConfig = APIUtil.getEagerLoadingEnabledTenantsConfig();
+        Set<String> tenantsInReadyState = DataHolder.getInstance().getTenantsInReadyState();
+
+        if (StringUtils.isNotEmpty(eagerLoadingConfig)) {
+            //Return true only if all the eager loading enabled tenants and super tenant are in ready state
+            Set<String> eagerLoadingEnabledTenants = APIUtil.getEagerLoadingEnabledTenants();
+            return tenantsInReadyState.containsAll(eagerLoadingEnabledTenants) &&
+                    tenantsInReadyState.contains(APIConstants.SUPER_TENANT_DOMAIN);
+        } else {
+            //default behaviour - lazy loading, check whether super tenant APIs are loaded
+            return tenantsInReadyState.contains(APIConstants.SUPER_TENANT_DOMAIN);
+        }
     }
 
     public static List<String> getKeyManagers(org.apache.synapse.MessageContext messageContext) {
