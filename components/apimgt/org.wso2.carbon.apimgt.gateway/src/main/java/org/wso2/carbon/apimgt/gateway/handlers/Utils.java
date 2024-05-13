@@ -427,17 +427,25 @@ public class Utils {
 
     public static Certificate getClientCertificate(org.apache.axis2.context.MessageContext axis2MessageContext)
             throws APIManagementException {
-        Object validatedCert = axis2MessageContext.getProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT);
 
+        Certificate[] certs = getClientCertificatesChain(axis2MessageContext);
+        return (certs != null && certs.length > 0) ? certs[0] : null;
+    }
+
+    public static Certificate[] getClientCertificatesChain(
+            org.apache.axis2.context.MessageContext axis2MessageContext) throws APIManagementException {
+
+        Object validatedCert = axis2MessageContext.getProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT);
         if (validatedCert != null) {
-            return (Certificate) validatedCert;
+            return new Certificate[] { (Certificate) validatedCert };
         } else {
+            Certificate[] certs = null;
             Map headers =
                     (Map) axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
             Object sslCertObject = axis2MessageContext.getProperty(NhttpConstants.SSL_CLIENT_AUTH_CERT);
             Certificate certificateFromMessageContext = null;
             if (sslCertObject != null) {
-                Certificate[] certs = (Certificate[]) sslCertObject;
+                certs = (Certificate[]) sslCertObject;
                 certificateFromMessageContext = certs[0];
                 axis2MessageContext.setProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT, certificateFromMessageContext);
             }
@@ -447,7 +455,7 @@ public class Utils {
                             .isCertificateExistsInListenerTrustStore(certificateFromMessageContext)) {
                         Certificate certificate = getClientCertificateFromHeader(axis2MessageContext);
                         axis2MessageContext.setProperty(APIMgtGatewayConstants.VALIDATED_X509_CERT, certificate);
-                        return certificate;
+                        return new Certificate[] { certificate };
                     }
                 } catch (APIManagementException e) {
                     String msg = "Error while validating into Certificate Existence";
@@ -455,8 +463,7 @@ public class Utils {
                     throw new APIManagementException(msg, e);
                 }
             }
-
-            return certificateFromMessageContext;
+            return certs;
         }
     }
 
@@ -517,6 +524,20 @@ public class Utils {
             String firstProperty = apiManagerConfiguration
                     .getFirstProperty(APIConstants.MutualSSL.ENABLE_CLIENT_CERTIFICATE_VALIDATION);
             return Boolean.parseBoolean(firstProperty);
+        }
+        return false;
+    }
+
+    public static boolean isCertificateChainValidationEnabled() {
+
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfiguration();
+        if (apiManagerConfiguration != null) {
+            String validateCertificateChain =
+                    apiManagerConfiguration.getFirstProperty(APIConstants.MutualSSL.ENABLE_CERTIFICATE_CHAIN_VALIDATION);
+            if (StringUtils.isNotEmpty(validateCertificateChain)) {
+                return Boolean.parseBoolean(validateCertificateChain);
+            }
         }
         return false;
     }
@@ -716,4 +737,79 @@ public class Utils {
         }
         return null;
     }
+
+    public static List<X509Certificate> convertCertificatesToX509Certificates(Certificate[] certificates) {
+
+        List<X509Certificate> x509Certificates = new ArrayList<>();
+
+        for (Certificate certificate : certificates) {
+            if (certificate instanceof X509Certificate) {
+                x509Certificates.add((X509Certificate) certificate);
+            } else {
+                log.warn("Certificate can not be converted in to X509Certificate.");
+            }
+        }
+        return x509Certificates;
+    }
+
+    /**
+     * Using the api context to match API path to get the invoked API from an API Collection.
+     *
+     * @param messageContext MessageContext
+     * @return selected API based on the API path
+     */
+    public static API getAPIByContext(MessageContext messageContext) {
+        API selectedApi = null;
+        //getting the API collection from the synapse configuration to find the invoked API
+        Collection<API> apiSet = messageContext.getEnvironment().getSynapseConfiguration().getAPIs();
+        List<API> duplicateApiSet = new ArrayList<>(apiSet);
+        //obtaining required parameters to execute findResource method
+        String requestPath = ApiUtils.getFullRequestPath(messageContext);
+        for (API api : duplicateApiSet) {
+            if (ApiUtils.matchApiPath(requestPath, api.getContext())) {
+                selectedApi = api;
+                break;
+            }
+        }
+        return selectedApi;
+    }
+
+    /**
+     * Select acceptable resources from the set of all resources based on requesting methods.
+     *
+     * @return set of acceptable resources
+     */
+    public static Set<Resource> getAcceptableResources(Resource[] allAPIResources,
+                                                       String httpMethod, String corsRequestMethod) {
+        Set<Resource> acceptableResources = new LinkedHashSet<>();
+        for (Resource resource : allAPIResources) {
+            //If the requesting method is OPTIONS or if the Resource contains the requesting method
+            String [] resourceMethods = resource.getMethods();
+            if ((RESTConstants.METHOD_OPTIONS.equals(httpMethod) && resourceMethods != null
+                    && Arrays.asList(resourceMethods).contains(corsRequestMethod))
+                    || (resourceMethods != null && Arrays.asList(resourceMethods).contains(httpMethod))) {
+                acceptableResources.add(resource);
+            }
+        }
+        return acceptableResources;
+    }
+
+    /**
+     * Obtain the selected resource from the message context for CORSRequestHandler.
+     *
+     * @return selected resource
+     */
+    public static Resource getSelectedResource(MessageContext messageContext,
+                                               String httpMethod, String corsRequestMethod) {
+        Resource selectedResource = null;
+        Resource resource = (Resource) messageContext.getProperty(RESTConstants.SELECTED_RESOURCE);
+        String [] resourceMethods = resource.getMethods();
+        if ((RESTConstants.METHOD_OPTIONS.equals(httpMethod) && resourceMethods != null
+                && Arrays.asList(resourceMethods).contains(corsRequestMethod))
+                || (resourceMethods != null && Arrays.asList(resourceMethods).contains(httpMethod))) {
+            selectedResource = resource;
+        }
+        return selectedResource;
+    }
+
 }
