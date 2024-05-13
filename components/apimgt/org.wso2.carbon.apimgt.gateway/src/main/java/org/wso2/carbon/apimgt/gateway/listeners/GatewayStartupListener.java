@@ -267,7 +267,7 @@ public class GatewayStartupListener extends AbstractAxis2ConfigurationContextObs
                 log.error("Maximum retry limit exceeded. Server is starting without deploying all synapse artifacts");
             }
         } else {
-            DataHolder.getInstance().addTenantsInReadyState(tenantDomain);
+            DataHolder.getInstance().setTenantDeployStatus(tenantDomain);
             log.info("Deployment attempt : " + syncModeDeploymentCount + " was successful");
         }
     }
@@ -308,7 +308,7 @@ public class GatewayStartupListener extends AbstractAxis2ConfigurationContextObs
             try {
                 boolean isArtifactsDeployed = deployArtifactsAtStartup(tenantDomain);
                 if (isArtifactsDeployed) {
-                    DataHolder.getInstance().addTenantsInReadyState(tenantDomain);
+                    DataHolder.getInstance().setTenantDeployStatus(tenantDomain);
                     log.info("Synapse Artifacts deployed Successfully in the Gateway");
                     retry = false;
                 } else {

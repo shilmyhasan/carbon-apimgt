@@ -18,13 +18,10 @@
 
 package org.wso2.carbon.apimgt.rest.api.gateway.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
-import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.gateway.ServerStartupHealthcheckApiService;
 
 import javax.ws.rs.core.Response;
@@ -34,15 +31,10 @@ public class ServerStartupHealthcheckApiServiceImpl implements ServerStartupHeal
     private static final Log log = LogFactory.getLog(ServerStartupHealthcheckApiServiceImpl.class);
 
     public Response serverStartupHealthcheckGet(MessageContext messageContext) {
-        try {
-            boolean isAllApisDeployed = GatewayUtils.isAllApisDeployed();
-            if (isAllApisDeployed) {
-                return Response.status(Response.Status.OK).build();
-            }
-        } catch (APIManagementException e) {
-            log.error("Error while checking gateway health status");
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        boolean isAllApisDeployed = GatewayUtils.isAllApisDeployed();
+        if (isAllApisDeployed) {
+            return Response.status(Response.Status.OK).build();
         }
-        return null;
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 }
