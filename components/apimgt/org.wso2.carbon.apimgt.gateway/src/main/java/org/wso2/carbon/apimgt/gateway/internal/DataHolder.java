@@ -117,10 +117,6 @@ public class DataHolder {
         tenantDeployStatus.put(tenant, true);
     }
 
-    public void resetTenantDeployStatus(String tenant) {
-        tenantDeployStatus.put(tenant, false);
-    }
-
     public void addKeyManagerToAPIMapping(String uuid, List<String> keyManagers) {
 
         apiToKeyManagersMap.put(uuid, keyManagers);
