@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.apimgt.rest.api.gateway.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.rest.api.gateway.ServerStartupHealthcheckApiService;
@@ -28,7 +26,6 @@ import javax.ws.rs.core.Response;
 
 
 public class ServerStartupHealthcheckApiServiceImpl implements ServerStartupHealthcheckApiService {
-    private static final Log log = LogFactory.getLog(ServerStartupHealthcheckApiServiceImpl.class);
 
     public Response serverStartupHealthcheckGet(MessageContext messageContext) {
         boolean isAllApisDeployed = GatewayUtils.isAllApisDeployed();
