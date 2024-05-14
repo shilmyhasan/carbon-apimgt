@@ -59,6 +59,7 @@ import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.GatewayCertificateMgtUtil;
 import org.wso2.carbon.apimgt.keymgt.SubscriptionDataHolder;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataStore;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -577,10 +578,10 @@ public class Utils {
     public static X509Certificate getCertificateFromListenerTrustStore(String certSubjectDN)
             throws APIManagementException {
 
-        Enumeration<String> aliases = APIUtil.getAliasesFromListenerTrustStore();
+        Enumeration<String> aliases = GatewayCertificateMgtUtil.getAliasesFromListenerTrustStore();
         while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
-            Certificate certificate = APIUtil.getCertificateFromListenerTrustStore(alias);
+            Certificate certificate = GatewayCertificateMgtUtil.getCertificateFromListenerTrustStore(alias);
             if (certificate instanceof X509Certificate) {
                 X509Certificate x509Certificate = (X509Certificate) certificate;
                 if (StringUtils.equals(x509Certificate.getSubjectDN().getName(), certSubjectDN)) {
@@ -790,65 +791,4 @@ public class Utils {
         }
         return x509Certificates;
     }
-
-    /**
-     * Using the api context to match API path to get the invoked API from an API Collection.
-     *
-     * @param messageContext MessageContext
-     * @return selected API based on the API path
-     */
-    public static API getAPIByContext(MessageContext messageContext) {
-        API selectedApi = null;
-        //getting the API collection from the synapse configuration to find the invoked API
-        Collection<API> apiSet = messageContext.getEnvironment().getSynapseConfiguration().getAPIs();
-        List<API> duplicateApiSet = new ArrayList<>(apiSet);
-        //obtaining required parameters to execute findResource method
-        String requestPath = ApiUtils.getFullRequestPath(messageContext);
-        for (API api : duplicateApiSet) {
-            if (ApiUtils.matchApiPath(requestPath, api.getContext())) {
-                selectedApi = api;
-                break;
-            }
-        }
-        return selectedApi;
-    }
-
-    /**
-     * Select acceptable resources from the set of all resources based on requesting methods.
-     *
-     * @return set of acceptable resources
-     */
-    public static Set<Resource> getAcceptableResources(Resource[] allAPIResources,
-                                                       String httpMethod, String corsRequestMethod) {
-        Set<Resource> acceptableResources = new LinkedHashSet<>();
-        for (Resource resource : allAPIResources) {
-            //If the requesting method is OPTIONS or if the Resource contains the requesting method
-            String [] resourceMethods = resource.getMethods();
-            if ((RESTConstants.METHOD_OPTIONS.equals(httpMethod) && resourceMethods != null
-                    && Arrays.asList(resourceMethods).contains(corsRequestMethod))
-                    || (resourceMethods != null && Arrays.asList(resourceMethods).contains(httpMethod))) {
-                acceptableResources.add(resource);
-            }
-        }
-        return acceptableResources;
-    }
-
-    /**
-     * Obtain the selected resource from the message context for CORSRequestHandler.
-     *
-     * @return selected resource
-     */
-    public static Resource getSelectedResource(MessageContext messageContext,
-                                               String httpMethod, String corsRequestMethod) {
-        Resource selectedResource = null;
-        Resource resource = (Resource) messageContext.getProperty(RESTConstants.SELECTED_RESOURCE);
-        String [] resourceMethods = resource.getMethods();
-        if ((RESTConstants.METHOD_OPTIONS.equals(httpMethod) && resourceMethods != null
-                && Arrays.asList(resourceMethods).contains(corsRequestMethod))
-                || (resourceMethods != null && Arrays.asList(resourceMethods).contains(httpMethod))) {
-            selectedResource = resource;
-        }
-        return selectedResource;
-    }
-
 }
