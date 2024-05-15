@@ -157,6 +157,7 @@ public final class APIConstants {
     // registry location of the governance component
     public static final String GOVERNANCE_COMPONENT_REGISTRY_LOCATION = "/repository/components/org.wso2.carbon" +
             ".governance";
+    public static final String BLOCK_GET_ACCESS_TOKEN_ON_APP_LOADING = "blockGetAccessTokenOnAppLoading";
 
     // registry location for wsdl files
     public static final String API_WSDL_RESOURCE_LOCATION = API_APPLICATION_DATA_LOCATION + "/wsdls/";
