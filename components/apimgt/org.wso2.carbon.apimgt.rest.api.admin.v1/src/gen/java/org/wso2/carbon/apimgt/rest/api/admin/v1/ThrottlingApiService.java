@@ -34,7 +34,7 @@ public interface ThrottlingApiService {
       public Response throttlingBlacklistConditionIdDelete(String conditionId, String ifMatch, String ifUnmodifiedSince, MessageContext messageContext) throws APIManagementException;
       public Response throttlingBlacklistConditionIdGet(String conditionId, String ifNoneMatch, String ifModifiedSince, MessageContext messageContext) throws APIManagementException;
       public Response throttlingBlacklistConditionIdPatch(String conditionId, BlockingConditionStatusDTO body, String contentType, String ifMatch, String ifUnmodifiedSince, MessageContext messageContext) throws APIManagementException;
-      public Response throttlingBlacklistGet(String accept, String ifNoneMatch, String ifModifiedSince, MessageContext messageContext) throws APIManagementException;
+      public Response throttlingBlacklistGet(String accept, String ifNoneMatch, String ifModifiedSince, String query, MessageContext messageContext) throws APIManagementException;
       public Response throttlingBlacklistPost(BlockingConditionDTO body, String contentType, MessageContext messageContext) throws APIManagementException;
       public Response throttlingPoliciesAdvancedGet(String accept, String ifNoneMatch, String ifModifiedSince, MessageContext messageContext) throws APIManagementException;
       public Response throttlingPoliciesAdvancedPolicyIdDelete(String policyId, String ifMatch, String ifUnmodifiedSince, MessageContext messageContext) throws APIManagementException;

@@ -109,6 +109,14 @@ public class SQLConstantsH2MySQL extends SQLConstants{
             "INSERT INTO AM_BLOCK_CONDITIONS (TYPE, `VALUE`,ENABLED,DOMAIN,UUID) VALUES (?,?,?,?,?)";
     public static final String GET_BLOCK_CONDITIONS_SQL =
             "SELECT CONDITION_ID,TYPE,`VALUE`,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE DOMAIN =?";
+    public static final String GET_BLOCK_CONDITIONS_BY_TYPE_AND_VALUE_SQL =
+            "SELECT CONDITION_ID, TYPE, `VALUE`, ENABLED, DOMAIN, UUID FROM AM_BLOCK_CONDITIONS WHERE "
+                    + "(TYPE = ? OR ? IS NULL) AND "
+                    + "(`VALUE` LIKE CONCAT('%', ?, '%') OR ? IS NULL) AND "
+                    + "DOMAIN = ? AND "
+                    + "((TYPE = ? AND `VALUE` LIKE CONCAT('%', ?, '%')) OR "
+                    + "(TYPE = ? IS NULL AND `VALUE` LIKE CONCAT('%', ?, '%')) OR "
+                    + "(TYPE = ? AND `VALUE` LIKE CONCAT('%', ?, '%') IS NULL))";
     public static final String GET_BLOCK_CONDITION_SQL =
             "SELECT TYPE,`VALUE`,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE CONDITION_ID =?";
     public static final String GET_BLOCK_CONDITION_BY_UUID_SQL =

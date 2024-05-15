@@ -985,11 +985,23 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
      * @return All matched block conditions to the given request
      */
     @Override
-    public Response throttlingBlacklistGet(String accept, String ifNoneMatch, String ifModifiedSince,
+    public Response throttlingBlacklistGet(String accept, String ifNoneMatch, String ifModifiedSince, String query,
                                            MessageContext messageContext) {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            List<BlockConditionsDTO> blockConditions = apiProvider.getBlockConditions();
+            List<BlockConditionsDTO> blockConditions = new ArrayList<>();
+            // If conditionType and conditionValue are provided, retrieve the block conditions list for the given values.
+            if (query != null && !query.isEmpty()) {
+                Map<String, String> parametersMap = BlockingConditionMappingUtil.getQueryParams(query);
+                if (parametersMap != null && !parametersMap.isEmpty()) {
+                    blockConditions = apiProvider.getLightweightBlockConditions(
+                            parametersMap.get("conditionType"), parametersMap.get("conditionValue"));
+                } else {
+                    RestApiUtil.handleBadRequest("Query parameter is not supported for this request", log);
+                }
+            } else {
+                blockConditions = apiProvider.getBlockConditions();
+            }
             BlockingConditionListDTO listDTO =
                     BlockingConditionMappingUtil.fromBlockConditionListToListDTO(blockConditions);
             return Response.ok().entity(listDTO).build();

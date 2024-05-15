@@ -25,7 +25,9 @@ import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.BlockingConditionDTO;
 import org.wso2.carbon.apimgt.rest.api.admin.v1.dto.BlockingConditionListDTO;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is responsible for mapping Block Condition model and its sub components into REST API DTOs and vice-versa
@@ -76,5 +78,27 @@ public class BlockingConditionMappingUtil {
         }
         dto.setConditionStatus(blockCondition.isEnabled());
         return dto;
+    }
+
+    /**
+     * Get query parameter values for conditionType and conditionValue from the query string.
+     *
+     * @param query Request query
+     * @return map of conditionType and conditionValue values
+     */
+    public static Map<String, String> getQueryParams(String query) {
+        Map<String, String> parameters = new HashMap<>();
+        String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            String[] keyValue = pair.split(":");
+            if (keyValue.length == 2) {
+                String key = keyValue[0];
+                String value = keyValue[1];
+                if (key.equals("conditionType") || key.equals("conditionValue")) {
+                    parameters.put(key, value);
+                }
+            }
+        }
+        return parameters;
     }
 }
