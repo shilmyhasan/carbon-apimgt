@@ -4199,22 +4199,10 @@
       "value": "Lifecycle task deleted successfully"
     }
   ],
-  "Apis.Details.LifeCycle.LifeCycleUpdate.approve.approveStatus": [
-    {
-      "type": 0,
-      "value": "Lifecycle state change action approved successfully"
-    }
-  ],
   "Apis.Details.LifeCycle.LifeCycleUpdate.error.certs": [
     {
       "type": 0,
       "value": "Error while retrieving certificates"
-    }
-  ],
-  "Apis.Details.LifeCycle.LifeCycleUpdate.reject.rejectStatus": [
-    {
-      "type": 0,
-      "value": "Lifecycle state change action rejected due to validation failure"
     }
   ],
   "Apis.Details.LifeCycle.LifeCycleUpdate.success.createStatus": [
