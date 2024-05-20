@@ -993,7 +993,7 @@ public interface APIProvider extends APIManager {
     List<BlockConditionsDTO> getBlockConditions() throws APIManagementException;
 
     /**
-     * Get a lightweight version of list of block Conditions
+     * Get a lightweight version of list of block Conditions.
      *
      * @param conditionType  type of the condition
      * @param conditionValue condition value

@@ -983,22 +983,23 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
      * @param ifNoneMatch     If-None-Match header value
      * @param ifModifiedSince If-Modified-Since header value
      * @return All matched block conditions to the given request
+     * @throws APIManagementException when there are retrieval errors
      */
     @Override
     public Response throttlingBlacklistGet(String accept, String ifNoneMatch, String ifModifiedSince, String query,
-                                           MessageContext messageContext) {
+                                           MessageContext messageContext) throws APIManagementException {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             List<BlockConditionsDTO> blockConditions = new ArrayList<>();
             // If conditionType and conditionValue are provided, retrieve the block conditions list for the given values.
-            if (query != null && !query.isEmpty()) {
+            if (StringUtils.isNotEmpty(query)) {
                 Map<String, String> parametersMap = BlockingConditionMappingUtil.getQueryParams(query);
                 if (parametersMap != null && !parametersMap.isEmpty()) {
                     blockConditions = apiProvider.getLightweightBlockConditions(
                             parametersMap.get(APIConstants.BLOCK_CONDITION_TYPE),
                             parametersMap.get(APIConstants.BLOCK_CONDITION_VALUE));
                 } else {
-                    RestApiUtil.handleBadRequest("Query parameter is not supported for this request", log);
+                    throw new APIManagementException(ExceptionCodes.BLOCK_CONDITION_RETRIEVE_EXCEPTION);
                 }
             } else {
                 blockConditions = apiProvider.getBlockConditions();
@@ -1006,7 +1007,7 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
             BlockingConditionListDTO listDTO =
                     BlockingConditionMappingUtil.fromBlockConditionListToListDTO(blockConditions);
             return Response.ok().entity(listDTO).build();
-        } catch (APIManagementException | ParseException e) {
+        } catch (ParseException e) {
             String errorMessage = "Error while retrieving Block Conditions";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
