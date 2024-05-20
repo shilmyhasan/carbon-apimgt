@@ -7781,6 +7781,12 @@
       "value": "Verb"
     }
   ],
+  "Scopes.Usage.UsageView.resource.revision": [
+    {
+      "type": 0,
+      "value": "Revision"
+    }
+  ],
   "Scopes.Usage.UsageViewAPI.api.usage": [
     {
       "type": 0,
