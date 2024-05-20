@@ -995,7 +995,7 @@ public interface APIProvider extends APIManager {
     /**
      * Get a lightweight version of list of block Conditions
      *
-     * @param conditionType type of the condition
+     * @param conditionType  type of the condition
      * @param conditionValue condition value
      * @return list of block conditions
      * @throws APIManagementException

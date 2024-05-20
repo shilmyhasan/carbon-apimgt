@@ -12790,9 +12790,9 @@ public class ApiMgtDAO {
     /**
      * Retrieves block conditions based on the specified condition type and condition value
      *
-     * @param conditionType type of the condition
-     * @param conditionValue condition value
-     * @param tenantDomain tenant domain
+     * @param conditionType     type of the condition
+     * @param conditionValue    condition value
+     * @param tenantDomain      tenant domain
      * @return list of block conditions
      * @throws APIManagementException
      */
@@ -12801,7 +12801,7 @@ public class ApiMgtDAO {
         Connection connection = null;
         PreparedStatement selectPreparedStatement = null;
         ResultSet resultSet = null;
-        List<BlockConditionsDTO> blockConditionsDTOList = new ArrayList<BlockConditionsDTO>();
+        List<BlockConditionsDTO> blockConditionsDTOList = new ArrayList<>();
         try {
             String query = SQLConstantManagerFactory.getSQlString("GET_BLOCK_CONDITIONS_BY_TYPE_AND_VALUE_SQL");
             connection = APIMgtDBUtil.getConnection();

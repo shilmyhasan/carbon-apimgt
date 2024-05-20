@@ -995,7 +995,8 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
                 Map<String, String> parametersMap = BlockingConditionMappingUtil.getQueryParams(query);
                 if (parametersMap != null && !parametersMap.isEmpty()) {
                     blockConditions = apiProvider.getLightweightBlockConditions(
-                            parametersMap.get("conditionType"), parametersMap.get("conditionValue"));
+                            parametersMap.get(APIConstants.BLOCK_CONDITION_TYPE),
+                            parametersMap.get(APIConstants.BLOCK_CONDITION_VALUE));
                 } else {
                     RestApiUtil.handleBadRequest("Query parameter is not supported for this request", log);
                 }

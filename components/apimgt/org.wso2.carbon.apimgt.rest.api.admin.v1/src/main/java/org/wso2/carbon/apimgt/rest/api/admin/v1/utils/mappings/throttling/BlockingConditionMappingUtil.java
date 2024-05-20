@@ -94,7 +94,7 @@ public class BlockingConditionMappingUtil {
             if (keyValue.length == 2) {
                 String key = keyValue[0];
                 String value = keyValue[1];
-                if (key.equals("conditionType") || key.equals("conditionValue")) {
+                if (key.equals(APIConstants.BLOCK_CONDITION_TYPE) || key.equals(APIConstants.BLOCK_CONDITION_VALUE)) {
                     parameters.put(key, value);
                 }
             }
