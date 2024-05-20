@@ -12810,7 +12810,8 @@ public class ApiMgtDAO {
             selectPreparedStatement.setString(1, conditionTypeUpper);
             selectPreparedStatement.setString(2, conditionTypeUpper);
             selectPreparedStatement.setString(3, conditionValue);
-            selectPreparedStatement.setString(4, tenantDomain);
+            selectPreparedStatement.setString(4, conditionValue);
+            selectPreparedStatement.setString(5, tenantDomain);
             resultSet = selectPreparedStatement.executeQuery();
             while (resultSet.next()) {
                 BlockConditionsDTO blockConditionsDTO = populateBlockConditionsDataWithRS(resultSet);
