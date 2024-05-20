@@ -999,7 +999,7 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
                             parametersMap.get(APIConstants.BLOCK_CONDITION_TYPE),
                             parametersMap.get(APIConstants.BLOCK_CONDITION_VALUE));
                 } else {
-                    throw new APIManagementException(ExceptionCodes.BLOCK_CONDITION_RETRIEVE_EXCEPTION);
+                    throw new APIManagementException(ExceptionCodes.BLOCK_CONDITION_RETRIEVE_PARAMS_EXCEPTION);
                 }
             } else {
                 blockConditions = apiProvider.getBlockConditions();
