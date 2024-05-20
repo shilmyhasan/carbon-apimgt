@@ -12805,33 +12805,18 @@ public class ApiMgtDAO {
         try {
             String query = SQLConstantManagerFactory.getSQlString("GET_BLOCK_CONDITIONS_BY_TYPE_AND_VALUE_SQL");
             connection = APIMgtDBUtil.getConnection();
-            connection.setAutoCommit(true);
             selectPreparedStatement = connection.prepareStatement(query);
             String conditionTypeUpper = conditionType != null ? conditionType.toUpperCase() : null;
             selectPreparedStatement.setString(1, conditionTypeUpper);
             selectPreparedStatement.setString(2, conditionTypeUpper);
             selectPreparedStatement.setString(3, conditionValue);
-            selectPreparedStatement.setString(4, conditionValue);
-            selectPreparedStatement.setString(5, tenantDomain);
-            selectPreparedStatement.setString(6, conditionTypeUpper);
-            selectPreparedStatement.setString(7, conditionValue);
-            selectPreparedStatement.setString(8, conditionTypeUpper);
-            selectPreparedStatement.setString(9, conditionValue);
-            selectPreparedStatement.setString(10, conditionTypeUpper);
-            selectPreparedStatement.setString(11, conditionValue);
+            selectPreparedStatement.setString(4, tenantDomain);
             resultSet = selectPreparedStatement.executeQuery();
             while (resultSet.next()) {
                 BlockConditionsDTO blockConditionsDTO = populateBlockConditionsDataWithRS(resultSet);
                 blockConditionsDTOList.add(blockConditionsDTO);
             }
         } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    handleException("Failed to rollback getting Block conditions ", ex);
-                }
-            }
             handleException(
                     "Failed to get Block conditions by condition type: " + conditionType + " and condition value: "
                             + conditionValue, e);
