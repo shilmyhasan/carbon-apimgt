@@ -83,48 +83,47 @@ function Usage(props) {
     const { scopeName, scopeId, usageCount } = props;
 
     useEffect(() => {
-        API.getSharedScopeUsages(scopeId).then((response) =>
-            {
-                // process revision resources, in case a shared scope applied resource is used in current API and a revision
-                // the response from API will have 2 records. Here we flatten it to a single API record that has 2
-                // revision resources.
-                const apiList = response.body.usedApiList;
+        API.getSharedScopeUsages(scopeId).then((response) => {
+            // process revision resources, in case a shared scope applied resource is used in current API and a revision
+            // the response from API will have 2 records. Here we flatten it to a single API record that has 2
+            // revision resources.
+            const apiList = response.body.usedApiList;
 
-                var apisMap = new Map();
-                var processedAPIList = new Array();
-                for (let i = 0; i < apiList.length; i++) {
-                    let api = apiList[i];
-                    let key =  api.provider + ":" + api.name + ":" + api.version;
+            const apisMap = new Map();
+            const processedAPIList = [];
+            for (let i = 0; i < apiList.length; i++) {
+                const api = apiList[i];
+                const key = api.provider + ':' + api.name + ':' + api.version;
 
-                    var apiData = null;
-                    if (apisMap.has(key)) {
-                        apiData = apisMap.get(key);
-                        for (let j = 0; j < api.usedResourceList.length; j++) {
-                            let resource = api.usedResourceList[j];
-                            resource.revisionID = api.revisionID;
-                            apiData.usedResourceList.push(resource);
-                        }
-                    } else {
-                        let resourceList = new Array();
-                        for (let k = 0; k < api.usedResourceList.length; k++) {
-                            let resource = api.usedResourceList[k];
-                            resource.revisionID = api.revisionID;
-                            resourceList.push(resource);
-                        }
-                        apiData = {
-                            name: api.name,
-                            context: api.context,
-                            version: api.version,
-                            provider: api.provider,
-                            usedResourceList: resourceList
-                        };
-                        apisMap.set(key, apiData);
-                        processedAPIList.push(apiData);
+                let apiData = null;
+                if (apisMap.has(key)) {
+                    apiData = apisMap.get(key);
+                    for (let j = 0; j < api.usedResourceList.length; j++) {
+                        const resource = api.usedResourceList[j];
+                        resource.revisionID = api.revisionID;
+                        apiData.usedResourceList.push(resource);
                     }
+                } else {
+                    const resourceList = [];
+                    for (let k = 0; k < api.usedResourceList.length; k++) {
+                        const resource = api.usedResourceList[k];
+                        resource.revisionID = api.revisionID;
+                        resourceList.push(resource);
+                    }
+                    apiData = {
+                        name: api.name,
+                        context: api.context,
+                        version: api.version,
+                        provider: api.provider,
+                        usedResourceList: resourceList,
+                    };
+                    apisMap.set(key, apiData);
+                    processedAPIList.push(apiData);
                 }
-                response.body.usedApiList = processedAPIList;
-                setUsage(response.body);
-            });
+            }
+            response.body.usedApiList = processedAPIList;
+            setUsage(response.body);
+        });
     }, [scopeName, scopeId, usageCount]);
 
     const handleUsageOpen = () => {
