@@ -430,7 +430,8 @@ public final class APIImportUtil {
                         retrieveLifeCycleAction(tenantDomain, currentStatus, APIStatus.PUBLISHED.toString(), apiProvider));
                 currentStatus = APIStatus.PUBLISHED.toString();
             }
-            if (StringUtils.equals(targetStatus, APIStatus.RETIRED.toString())) {
+            if (StringUtils.equals(targetStatus, APIStatus.RETIRED.toString()) && !StringUtils.equals(currentStatus,
+                    APIStatus.DEPRECATED.toString())) {
                 // The API should be Deprecated prior Retiring the API
                 lifeCycleActions.put(APIStatus.DEPRECATED.toString(),
                         retrieveLifeCycleAction(tenantDomain, currentStatus, APIStatus.DEPRECATED.toString(),
