@@ -283,6 +283,7 @@ ExceptionCodes implements ErrorHandler {
             "Shared Scope display name not specified"),
     BLOCK_CONDITION_RETRIEVE_PARAMS_EXCEPTION(900988, "Block conditions retrieval error", 400, "Provided query parameters are not valid"),
     BLOCK_CONDITION_RETRIEVE_FAILED(900989, "Failed to get Block conditions", 500, "Failed to retrieve Block conditions from the database"),
+    INVALID_BLOCK_CONDITION_VALUES(900254, "Error while retrieving Block Conditions", 500, "Invalid format for condition values"),
 
     //Dedicated container based gateway related Codes
     NO_RESOURCE_LOADED_FROM_DEFINITION(900990, "Container based resource Not Found", 404, "No resource loaded from " +

@@ -12790,7 +12790,7 @@ public class ApiMgtDAO {
     }
 
     /**
-     * Retrieves block conditions based on the specified condition type and condition value
+     * Retrieves block conditions based on the specified condition type and condition value.
      *
      * @param conditionType     type of the condition
      * @param conditionValue    condition value
@@ -15512,7 +15512,6 @@ public class ApiMgtDAO {
         blockConditionsDTO.setConditionId(resultSet.getInt("CONDITION_ID"));
         blockConditionsDTO.setUUID(resultSet.getString("UUID"));
         blockConditionsDTO.setTenantDomain(resultSet.getString("DOMAIN"));
-
         return blockConditionsDTO;
     }
 }
