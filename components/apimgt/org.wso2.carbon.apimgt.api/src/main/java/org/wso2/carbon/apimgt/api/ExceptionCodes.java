@@ -208,7 +208,12 @@ ExceptionCodes implements ErrorHandler {
             "%s property value of payload cannot be blank"),
     CONTAIN_SPECIAL_CHARACTERS(900706, "contain invalid characters", 400,
             "%s property value of payload cannot contain invalid characters"),
-
+    /*
+     * Cannot use 900706 because it is for property values. 900707 is a generic one for any invalid character
+     * hence it accepts an error description
+     */
+    CONTAIN_INVALID_CHARACTERS(900707, "contain invalid characters", 400,
+            "%s"),
     //GraphQL API related codes
     API_NOT_GRAPHQL(900800, "This API is not a GraphQL API", 400, "This API is not a GraphQL API"),
 
