@@ -278,7 +278,7 @@ public class ImportApiServiceImpl implements ImportApiService {
                 if (StringUtils.isEmpty(applicationDetails.getTokenType())
                         && StringUtils.isNotEmpty(application.getTokenType())) {
                     applicationDetails.setTokenType(application.getTokenType());
-                } else {
+                } else if (StringUtils.isEmpty(applicationDetails.getTokenType())) {
                     applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
                 }
                 applicationDetails.setId(appId);
