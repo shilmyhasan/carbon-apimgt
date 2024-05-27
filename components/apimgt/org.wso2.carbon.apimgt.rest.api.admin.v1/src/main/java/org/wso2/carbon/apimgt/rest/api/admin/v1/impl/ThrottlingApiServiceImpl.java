@@ -983,21 +983,29 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
      * @param ifNoneMatch     If-None-Match header value
      * @param ifModifiedSince If-Modified-Since header value
      * @return All matched block conditions to the given request
+     * @throws APIManagementException when there are retrieval errors
      */
     @Override
     public Response throttlingBlacklistGet(String accept, String ifNoneMatch, String ifModifiedSince,
-                                           MessageContext messageContext) {
-        try {
-            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            List<BlockConditionsDTO> blockConditions = apiProvider.getBlockConditions();
-            BlockingConditionListDTO listDTO =
-                    BlockingConditionMappingUtil.fromBlockConditionListToListDTO(blockConditions);
-            return Response.ok().entity(listDTO).build();
-        } catch (APIManagementException | ParseException e) {
-            String errorMessage = "Error while retrieving Block Conditions";
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            String query, MessageContext messageContext) throws APIManagementException {
+        APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+        List<BlockConditionsDTO> blockConditions = new ArrayList<>();
+        // If conditionType and conditionValue are provided, retrieve the block conditions list for the given values.
+        if (StringUtils.isNotEmpty(query)) {
+            Map<String, String> parametersMap = BlockingConditionMappingUtil.getQueryParams(query);
+            if (parametersMap != null && !parametersMap.isEmpty()) {
+                blockConditions = apiProvider.getLightweightBlockConditions(
+                        parametersMap.get(APIConstants.BLOCK_CONDITION_TYPE),
+                        parametersMap.get(APIConstants.BLOCK_CONDITION_VALUE));
+            } else {
+                throw new APIManagementException(ExceptionCodes.BLOCK_CONDITION_RETRIEVE_PARAMS_EXCEPTION);
+            }
+        } else {
+            blockConditions = apiProvider.getBlockConditions();
         }
-        return null;
+        BlockingConditionListDTO listDTO = BlockingConditionMappingUtil.fromBlockConditionListToListDTO(
+                blockConditions);
+        return Response.ok().entity(listDTO).build();
     }
 
     /**
@@ -1052,7 +1060,7 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
                         + body.getConditionType() + ", " + "value: " + body.getConditionValue() + ". " + e.getMessage();
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
-        } catch (URISyntaxException | ParseException e) {
+        } catch (URISyntaxException e) {
             String errorMessage = "Error while retrieving Blocking Condition resource location: Condition type: "
                     + body.getConditionType() + ", " + "value: " + body.getConditionValue() + ". " + e.getMessage();
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1089,9 +1097,6 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
                 String errorMessage = "Error while retrieving Block Condition. Id : " + conditionId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
-        } catch (ParseException e) {
-            String errorMessage = "Error while retrieving Blocking Conditions";
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }
@@ -1160,7 +1165,7 @@ public class ThrottlingApiServiceImpl implements ThrottlingApiService {
             BlockConditionsDTO newBlockingCondition = apiProvider.getBlockConditionByUUID(conditionId);
             BlockingConditionDTO dto = BlockingConditionMappingUtil.fromBlockingConditionToDTO(newBlockingCondition);
             return Response.ok().entity(dto).build();
-        } catch (APIManagementException | ParseException e) {
+        } catch (APIManagementException e) {
             if (RestApiUtil.isDueToResourceNotFound(e)) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_BLOCK_CONDITION, conditionId, e, log);
             } else {
