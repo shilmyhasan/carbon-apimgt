@@ -147,11 +147,6 @@ public class ImportApiServiceImpl extends ImportApiService {
                     new FileBasedApplicationImportExportManager(consumer, tempDirPath);
             Application applicationDetails = importExportManager.importApplication(fileInputStream);
 
-            // set tokenType of the application to DEFAULT if it is null
-            if (StringUtils.isEmpty(applicationDetails.getTokenType())) {
-                applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
-            }
-
             // decode Oauth secrets
             Map<String, OAuthApplicationInfo>
                     keyManagerWiseProductionOAuthApps = applicationDetails.getOAuthApp(PRODUCTION);
@@ -194,12 +189,21 @@ public class ImportApiServiceImpl extends ImportApiService {
             if (APIUtil.isApplicationExist(ownerId, applicationDetails.getName(), applicationDetails.getGroupId()) && update != null && update) {
                 appId = APIUtil.getApplicationId(applicationDetails.getName(), ownerId);
                 Application application = consumer.getApplicationById(appId);
+                if (StringUtils.isEmpty(applicationDetails.getTokenType())
+                        && StringUtils.isNotEmpty(application.getTokenType())) {
+                    applicationDetails.setTokenType(application.getTokenType());
+                } else if (StringUtils.isEmpty(applicationDetails.getTokenType())) {
+                    applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
+                }
                 applicationDetails.setId(appId);
                 applicationDetails.setUUID(application.getUUID());
                 applicationDetails.setOwner(application.getOwner());
                 applicationDetails.updateSubscriber(application.getSubscriber());
                 consumer.updateApplication(applicationDetails);
             } else {
+                if (StringUtils.isEmpty(applicationDetails.getTokenType())) {
+                    applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
+                }
                 appId = consumer.addApplication(applicationDetails, ownerId);
             }
 

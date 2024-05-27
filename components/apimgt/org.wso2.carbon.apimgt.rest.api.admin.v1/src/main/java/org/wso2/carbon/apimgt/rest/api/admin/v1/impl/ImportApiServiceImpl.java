@@ -47,7 +47,6 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -58,6 +57,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.ws.rs.core.Response;
 
 public class ImportApiServiceImpl implements ImportApiService {
     private static final Log log = LogFactory.getLog(ImportApiServiceImpl.class);
@@ -278,7 +279,7 @@ public class ImportApiServiceImpl implements ImportApiService {
                 if (StringUtils.isEmpty(applicationDetails.getTokenType())
                         && StringUtils.isNotEmpty(application.getTokenType())) {
                     applicationDetails.setTokenType(application.getTokenType());
-                } else {
+                } else if (StringUtils.isEmpty(applicationDetails.getTokenType())) {
                     applicationDetails.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
                 }
                 applicationDetails.setId(appId);
