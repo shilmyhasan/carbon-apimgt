@@ -575,6 +575,14 @@ public class APIProviderImplTest {
         }
     }
 
+    @Test public void testGetBlockConditionsByConditionTypeAndValue() throws APIManagementException {
+        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
+        List<BlockConditionsDTO> list = new ArrayList<BlockConditionsDTO>();
+        Mockito.when(apimgtDAO.getBlockConditionsByConditionTypeAndValue(Mockito.anyString(), Mockito.anyString(),
+                Mockito.anyString())).thenReturn(list);
+        assertNotNull(apiProvider.getLightweightBlockConditions("conditionType", "conditionValue"));
+    }
+
     @Test
     public void testUpdateBlockCondition() throws APIManagementException {
         APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
