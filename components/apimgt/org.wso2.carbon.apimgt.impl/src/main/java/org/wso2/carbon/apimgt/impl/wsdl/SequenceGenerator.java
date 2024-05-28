@@ -94,6 +94,8 @@ public class SequenceGenerator {
     private static String soapV = SOAPToRESTConstants.EMPTY_STRING;
     private static String soapMessageType = SOAPToRESTConstants.EMPTY_STRING;
     private static String soapStyle = SOAPToRESTConstants.EMPTY_STRING;
+    private static boolean preserveElementOrder = Boolean.parseBoolean(
+            System.getProperty(APIConstants.SOAP_TO_REST_PRESERVE_ELEMENT_ORDER));
 
     /**
      * Generates in/out sequences from the swagger given
@@ -121,7 +123,7 @@ public class SequenceGenerator {
             Map<HttpMethod, Operation> operationMap = path.getOperationMap();
             for (HttpMethod httpMethod : operationMap.keySet()) {
                 boolean isResourceFromWSDL = false;
-                Map<String, String> parameterJsonPathMapping = new HashMap<>();
+                Map<String, String> parameterJsonPathMapping = new LinkedHashMap<>();
                 Map<String, String> queryParameters = new HashMap<>();
                 Operation operation = operationMap.get(httpMethod);
                 String operationId = operation.getOperationId();
@@ -164,8 +166,15 @@ public class SequenceGenerator {
                                 replaceNullWithStringExample(example);
                                 String jsonExample = Json.pretty(example);
                                 try {
-                                    org.json.JSONObject json = new org.json.JSONObject(jsonExample);
-                                    SequenceUtils.listJson(json, parameterJsonPathMapping);
+                                    if (!preserveElementOrder) {
+                                        org.json.JSONObject json = new org.json.JSONObject(jsonExample);
+                                        SequenceUtils.listJson(json, parameterJsonPathMapping);
+                                    } else {
+                                        // Using the jsonObjects to process the schema will change the order of the
+                                        // parameters. This will break the SOAP mapping if wsdl has sequence elements
+                                        // which requires the sequential order of the parameters.
+                                        SequenceUtils.listExamples(example, parameterJsonPathMapping);
+                                    }
                                 } catch (JSONException e) {
                                     log.error("Error occurred while generating json mapping for the definition", e);
                                 }
@@ -267,8 +276,15 @@ public class SequenceGenerator {
 
                         String jsonExample = Json.pretty(example);
                         try {
-                            org.json.JSONObject json = new org.json.JSONObject(jsonExample);
-                            SequenceUtils.listJson(json, parameterJsonPathMapping);
+                            if (!preserveElementOrder) {
+                                org.json.JSONObject json = new org.json.JSONObject(jsonExample);
+                                SequenceUtils.listJson(json, parameterJsonPathMapping);
+                            } else {
+                                // Using the jsonObjects to process the schema will change the order of the parameters.
+                                // This will break the SOAP mapping if wsdl has sequence elements which requires the
+                                // sequential order of the parameters.
+                                SequenceUtils.listExamples(example, parameterJsonPathMapping);
+                            }
                         } catch (JSONException e) {
                             log.error("Error occurred while generating json mapping for the definition: " + defName, e);
                         }
