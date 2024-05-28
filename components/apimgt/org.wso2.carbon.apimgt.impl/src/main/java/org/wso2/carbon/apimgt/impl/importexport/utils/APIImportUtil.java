@@ -159,7 +159,7 @@ public final class APIImportUtil {
             if (APIUtil.containsIllegals(apiVersion, false)) {
                 log.error("Version '" + apiVersion + "' cannot contain special characters in API " + apiName);
                 throw new APIManagementException(
-                        "Version '" + apiVersion + "' cannot contain special characters in API " + apiName,
+                        "Version '" + apiVersion + "' cannot contain spaces or special characters in API " + apiName,
                         ExceptionCodes.CONTAIN_INVALID_CHARACTERS);
             }
 

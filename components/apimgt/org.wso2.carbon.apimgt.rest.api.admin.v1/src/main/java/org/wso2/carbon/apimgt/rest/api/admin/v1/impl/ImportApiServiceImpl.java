@@ -121,6 +121,8 @@ public class ImportApiServiceImpl implements ImportApiService {
             } else if (RestApiUtil.isDueToInvalidAPIContext(e)) {
                 String errorMessage = "Error while importing API. Invalid API context: " + e.getMessage();
                 RestApiUtil.handleBadRequest(errorMessage, e, log);
+            } else if (RestApiUtil.isContentValidationFailure(e)) {
+                RestApiUtil.handleBadRequest(e.getMessage(), e, log);
             }
             RestApiUtil.handleInternalServerError("Error while importing API", e, log);
         }
