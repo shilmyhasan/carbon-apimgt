@@ -678,6 +678,66 @@ public class OAS2Parser extends APIDefinition {
                 swaggerErrorFound = true;
             }
         }
+
+        // Check for multiple resource paths with and without trailing slashes.
+        // If there are two resource paths with the same name, one with and one without trailing slashes,
+        // it will be considered an error since those are considered as one resource in the API deployment.
+        if (parseAttemptForV2.getSwagger() != null) {
+            Swagger swagger = parseAttemptForV2.getSwagger();
+            Map<String, Path> pathItems = swagger.getPaths();
+            for (String path : pathItems.keySet()) {
+                // trim the trailing slash of the path if exists
+                if (path.endsWith("/")) {
+                    String newPath = path.substring(0, path.length() - 1);
+                    if (pathItems.containsKey(newPath)) {
+                        // check for multiple operations with the path names with and without trailing slashes
+                        if (pathItems.get(newPath).getGet() != null && pathItems.get(path).getGet() != null) {
+                            swaggerErrorFound = true;
+                            OASParserUtil.addErrorToValidationResponse(validationResponse,
+                                    "Multiple GET operations with the same resource path " + newPath +
+                                            " found in the swagger definition");
+                        }
+                        if (pathItems.get(newPath).getPost() != null && pathItems.get(path).getPost() != null) {
+                            swaggerErrorFound = true;
+                            OASParserUtil.addErrorToValidationResponse(validationResponse,
+                                    "Multiple POST operations with the same resource path " + newPath +
+                                            " found in the swagger definition");
+                        }
+                        if (pathItems.get(newPath).getPut() != null && pathItems.get(path).getPut() != null) {
+                            swaggerErrorFound = true;
+                            OASParserUtil.addErrorToValidationResponse(validationResponse,
+                                    "Multiple PUT operations with the same resource path " + newPath +
+                                            " found in the swagger definition");
+                        }
+                        if (pathItems.get(newPath).getPatch() != null && pathItems.get(path).getPatch() != null) {
+                            swaggerErrorFound = true;
+                            OASParserUtil.addErrorToValidationResponse(validationResponse,
+                                    "Multiple PATCH operations with the same resource path " + newPath +
+                                            " found in the swagger definition");
+                        }
+                        if (pathItems.get(newPath).getDelete() != null && pathItems.get(path).getDelete() != null) {
+                            swaggerErrorFound = true;
+                            OASParserUtil.addErrorToValidationResponse(validationResponse,
+                                    "Multiple DELETE operations with the same resource path " + newPath +
+                                            " found in the swagger definition");
+                        }
+                        if (pathItems.get(newPath).getHead() != null && pathItems.get(path).getHead() != null) {
+                            swaggerErrorFound = true;
+                            OASParserUtil.addErrorToValidationResponse(validationResponse,
+                                    "Multiple HEAD operations with the same resource path " + newPath +
+                                            " found in the swagger definition");
+                        }
+                        if (pathItems.get(newPath).getOptions() != null &&
+                                pathItems.get(path).getOptions() != null) {
+                            swaggerErrorFound = true;
+                            OASParserUtil.addErrorToValidationResponse(validationResponse,
+                                    "Multiple OPTIONS operations with the same resource path " + newPath +
+                                            " found in the swagger definition");
+                        }
+                    }
+                }
+            }
+        }
         if (parseAttemptForV2.getSwagger() == null || swaggerErrorFound) {
             validationResponse.setValid(false);
         } else {
