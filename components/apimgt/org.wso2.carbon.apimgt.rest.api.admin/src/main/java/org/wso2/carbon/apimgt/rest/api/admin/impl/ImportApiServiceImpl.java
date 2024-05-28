@@ -112,6 +112,8 @@ public class ImportApiServiceImpl extends ImportApiService {
             } else if (RestApiUtil.isDueToResourceNotFound(e)) {
                 RestApiUtil.handleResourceNotFoundError("Requested " + RestApiConstants.RESOURCE_API
                         + " not found", e, log);
+            } else if (RestApiUtil.isContentValidationFailure(e)) {
+                RestApiUtil.handleBadRequest(e.getMessage(), e, log);
             }
             RestApiUtil.handleInternalServerError("Error while importing API", e, log);
         }

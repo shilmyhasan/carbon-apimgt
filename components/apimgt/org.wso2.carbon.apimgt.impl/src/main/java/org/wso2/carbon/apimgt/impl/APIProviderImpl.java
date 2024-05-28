@@ -1069,13 +1069,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String apiVersion = api.getId().getVersion();
         if (apiName == null) {
             handleException("API Name is required.");
-        } else if (containsIllegals(apiName)) {
+        } else if (APIUtil.containsIllegals(apiName, true)) {
             handleException("API Name contains one or more illegal characters  " +
                     "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )");
         }
         if (apiVersion == null) {
             handleException("API Version is required.");
-        } else if (containsIllegals(apiVersion, false)) {
+        } else if (APIUtil.containsIllegals(apiVersion, false)) {
             String errorMessage = "API Version contains one or more illegal characters  " +
                     "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
             throw new APIManagementException(errorMessage,
@@ -1117,21 +1117,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @return true if found illegal characters, else false
      */
     public boolean containsIllegals(String toExamine) {
-        return containsIllegals(toExamine, true);
+        return APIUtil.containsIllegals(toExamine, true);
     }
 
-    /**
-     * Check whether a string contains illegal charactersA
-     *
-     * @param toExamine string to examine for illegal characters
-     * @return true if found illegal characters, else false
-     */
-    public boolean containsIllegals(String toExamine, boolean spaceAllowed) {
-        Pattern pattern = spaceAllowed ? Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA) :
-                Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA_WO_SPACE);
-        Matcher matcher = pattern.matcher(toExamine);
-        return matcher.find();
-    }
 
     /**
      * Check whether the provided information exceeds the maximum length
@@ -3335,6 +3323,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     public void createNewAPIVersion(API api, String newVersion) throws DuplicateAPIException, APIManagementException {
 
+        if (APIUtil.containsIllegals(newVersion, false)) {
+            String errorMessage = "API Version contains one or more illegal characters  " +
+                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
+            throw new APIManagementException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.CONTAIN_INVALID_CHARACTERS, errorMessage));
+        }
         String apiDefinitionString = null;
         String apiSourcePath = APIUtil.getAPIPath(api.getId());
         String targetPath = APIConstants.API_LOCATION + RegistryConstants.PATH_SEPARATOR +

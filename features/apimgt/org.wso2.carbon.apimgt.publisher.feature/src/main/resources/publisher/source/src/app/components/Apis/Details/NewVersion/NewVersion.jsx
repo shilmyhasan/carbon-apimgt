@@ -117,7 +117,7 @@ class CreateNewVersion extends React.Component {
     };
 
     hasSpecialChars(value) {
-        if (/^[^~!@#;:%^*()+={}|\\<>"',&/$]+$/.test(value)) {
+        if (/^[^~!@#;:%^*()+={}|\\<>"',&/$ ]+$/.test(value)) {
             return false;
         } else {
             return true;
@@ -181,7 +181,7 @@ class CreateNewVersion extends React.Component {
         } else if (valid.version.alreadyExists) {
             helperText = 'An API with version "' + newVersion + '" already exists.';
         } else if (valid.version.hasSpecialChars) {
-            helperText = 'API Version should not contain special characters';
+            helperText = 'API Version should not contain spaces or special characters';
         }
 
         return (

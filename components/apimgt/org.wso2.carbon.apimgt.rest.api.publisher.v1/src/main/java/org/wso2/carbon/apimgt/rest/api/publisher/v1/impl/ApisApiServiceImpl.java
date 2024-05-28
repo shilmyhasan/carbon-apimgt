@@ -4076,7 +4076,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, apiId, e, log);
             } else if (isAuthorizationFailure(e)) {
                 RestApiUtil.handleAuthorizationFailure("Authorization failure while copying API : " + apiId, e, log);
-            } else if (isAPIDefinitionValidationFailure(e)) {
+            } else if (isAPIDefinitionValidationFailure(e) || RestApiUtil.isContentValidationFailure(e)) {
                 RestApiUtil.handleBadRequest(e.getMessage(), e, log);
             } else {
                 String errorMessage = "Error while copying API : " + apiId;
