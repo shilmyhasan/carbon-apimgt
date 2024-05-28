@@ -619,7 +619,7 @@ public class RestApiUtil {
     public static boolean isContentValidationFailure(Throwable e) {
         Throwable rootCause = getPossibleErrorCause(e);
         if (rootCause instanceof APIManagementException) {
-            return ((APIManagementException)e).getErrorHandler().getHttpStatusCode() == 400;
+            return ((APIManagementException)rootCause).getErrorHandler().getHttpStatusCode() == 400;
         }
         return false;
     }
