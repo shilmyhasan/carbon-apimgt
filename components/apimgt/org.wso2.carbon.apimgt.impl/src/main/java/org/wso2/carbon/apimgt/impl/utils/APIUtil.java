@@ -622,6 +622,20 @@ public final class APIUtil {
     }
 
     /**
+     * Check whether a string contains illegal characters
+     *
+     * @param toExamine string to examine for illegal characters
+     * @param spaceAllowed boolean to define if space is not considered as an illegal character
+     * @return true if found illegal characters, else false
+     */
+    public static boolean containsIllegals(String toExamine, boolean spaceAllowed) {
+        Pattern pattern = spaceAllowed ? Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA) :
+                Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA_WO_SPACE);
+        Matcher matcher = pattern.matcher(toExamine);
+        return matcher.find();
+    }
+
+    /**
      * Check whether the parentheses are balanced
      *
      * @param input API Context
