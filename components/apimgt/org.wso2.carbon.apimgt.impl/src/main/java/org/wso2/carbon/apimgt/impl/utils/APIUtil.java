@@ -392,6 +392,14 @@ public final class APIUtil {
     private static final double retryProgressionFactor = 2.0;
     private static int retrievalRetryCount;
 
+    /*
+     *  Initializing the below variables here to avoid compiling the pattern for every request.
+     */
+    private static final Pattern illegalCharacterPattern =
+            Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA);
+    private static final Pattern illegalCharacterPatternWOSpace =
+            Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA_WO_SPACE);
+
     /**
      * To initialize the publisherRoleCache configurations, based on configurations.
      */
@@ -624,15 +632,14 @@ public final class APIUtil {
     }
 
     /**
-     * Check whether a string contains illegal characters
+     * Check whether a string contains illegal characters.
      *
      * @param toExamine string to examine for illegal characters
      * @param spaceAllowed boolean to define if space is not considered as an illegal character
      * @return true if found illegal characters, else false
      */
     public static boolean containsIllegals(String toExamine, boolean spaceAllowed) {
-        Pattern pattern = spaceAllowed ? Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA) :
-                Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA_WO_SPACE);
+        Pattern pattern = spaceAllowed ? illegalCharacterPattern : illegalCharacterPatternWOSpace;
         Matcher matcher = pattern.matcher(toExamine);
         return matcher.find();
     }
