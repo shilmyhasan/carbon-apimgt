@@ -1069,15 +1069,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String apiVersion = api.getId().getVersion();
         if (apiName == null) {
             handleException("API Name is required.");
-        } else if (containsIllegals(apiName)) {
+        } else if (APIUtil.containsIllegals(apiName, true)) {
             handleException("API Name contains one or more illegal characters  " +
                     "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )");
         }
         if (apiVersion == null) {
             handleException("API Version is required.");
-        } else if (containsIllegals(apiVersion)) {
-            handleException("API Version contains one or more illegal characters  " +
-                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )");
+        } else if (APIUtil.containsIllegals(apiVersion, false)) {
+            String errorMessage = "API Version contains one or more illegal characters  " +
+                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
+            throw new APIManagementException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.CONTAIN_INVALID_CHARACTERS, errorMessage));
         }
         if (!hasValidLength(apiName, APIConstants.MAX_LENGTH_API_NAME)
                 || !hasValidLength(apiVersion, APIConstants.MAX_LENGTH_VERSION)
@@ -1115,9 +1117,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @return true if found illegal characters, else false
      */
     public boolean containsIllegals(String toExamine) {
-        Pattern pattern = Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA);
-        Matcher matcher = pattern.matcher(toExamine);
-        return matcher.find();
+        return APIUtil.containsIllegals(toExamine, true);
     }
 
 
@@ -3323,6 +3323,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     public void createNewAPIVersion(API api, String newVersion) throws DuplicateAPIException, APIManagementException {
 
+        if (APIUtil.containsIllegals(newVersion, false)) {
+            String errorMessage = "API Version contains one or more illegal characters  " +
+                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
+            throw new APIManagementException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.CONTAIN_INVALID_CHARACTERS, errorMessage));
+        }
         String apiDefinitionString = null;
         String apiSourcePath = APIUtil.getAPIPath(api.getId());
         String targetPath = APIConstants.API_LOCATION + RegistryConstants.PATH_SEPARATOR +
