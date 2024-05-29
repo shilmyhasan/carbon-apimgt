@@ -370,7 +370,14 @@ public class RegistryPersistenceImplTestCase {
         Registry registry = Mockito.mock(Registry.class);
         GenericArtifact artifact = PersistenceHelper.getSampleAPIArtifact();
         String apiUUID = artifact.getId();
-        
+
+        PowerMockito.mockStatic(RegistryPersistenceUtil.class);
+        GenericArtifactManager manager = Mockito.mock(GenericArtifactManager.class);
+        PowerMockito.when(RegistryPersistenceUtil.getArtifactManager(registry, APIConstants.API_KEY))
+                .thenReturn(manager);
+        Mockito.when(manager.getGenericArtifact(apiUUID)).thenReturn(artifact);
+        Mockito.doNothing().when(manager).updateGenericArtifact(artifact);
+
         Organization org = new Organization(SUPER_TENANT_DOMAIN);
         APIPersistence apiPersistenceInstance = new RegistryPersistenceImplWrapper(registry, artifact);
         
