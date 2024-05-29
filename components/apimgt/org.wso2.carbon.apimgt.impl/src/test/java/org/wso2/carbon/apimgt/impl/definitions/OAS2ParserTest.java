@@ -164,7 +164,7 @@ public class OAS2ParserTest extends OASTestBase {
     }
 
     @Test
-    public void estOpenAPIValidatorWithMultiplePathsHavingSameNameWithAndWithoutTrailingSlash() throws Exception {
+    public void testOpenAPIValidatorWithMultiplePathsHavingSameNameWithAndWithoutTrailingSlash() throws Exception {
         String faultySwagger = IOUtils.toString(
                 getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
                         + File.separator + "oas2_paths_with_trailing_slash.json"),

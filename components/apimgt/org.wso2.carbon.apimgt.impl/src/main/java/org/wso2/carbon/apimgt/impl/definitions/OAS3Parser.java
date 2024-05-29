@@ -87,6 +87,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.wso2.carbon.apimgt.impl.APIConstants.APPLICATION_JSON_MEDIA_TYPE;
+import static org.wso2.carbon.apimgt.impl.definitions.OASParserUtil.isValidWithPathsWithTrailingSlashes;
 
 /**
  * Models API definition using OAS (OpenAPI 3.0) parser
@@ -743,60 +744,9 @@ public class OAS3Parser extends APIDefinition {
             // If there are two resource paths with the same name, one with and one without trailing slashes,
             // it will be considered an error since those are considered as one resource in the API deployment.
             if (parseAttemptForV3.getOpenAPI() != null) {
-                OpenAPI openAPI = parseAttemptForV3.getOpenAPI();
-                Map<String, PathItem> pathItems = openAPI.getPaths();
-                for (String path : pathItems.keySet()) {
-                    // trim the trailing slash of the path if exists
-                    if (path.endsWith("/")) {
-                        String newPath = path.substring(0, path.length() - 1);
-                        if (pathItems.containsKey(newPath)) {
-                            // check for multiple operations with the path names with and without trailing slashes
-                            if (pathItems.get(newPath).getGet() != null && pathItems.get(path).getGet() != null) {
-                                validationResponse.setValid(false);
-                                OASParserUtil.addErrorToValidationResponse(validationResponse,
-                                        "Multiple GET operations with the same resource path " + newPath +
-                                                " found in the openAPI definition");
-                            }
-                            if (pathItems.get(newPath).getPost() != null && pathItems.get(path).getPost() != null) {
-                                validationResponse.setValid(false);
-                                OASParserUtil.addErrorToValidationResponse(validationResponse,
-                                        "Multiple POST operations with the same resource path " + newPath +
-                                                " found in the openAPI definition");
-                            }
-                            if (pathItems.get(newPath).getPut() != null && pathItems.get(path).getPut() != null) {
-                                validationResponse.setValid(false);
-                                OASParserUtil.addErrorToValidationResponse(validationResponse,
-                                        "Multiple PUT operations with the same resource path " + newPath +
-                                                " found in the openAPI definition");
-                            }
-                            if (pathItems.get(newPath).getPatch() != null && pathItems.get(path).getPatch() != null) {
-                                validationResponse.setValid(false);
-                                OASParserUtil.addErrorToValidationResponse(validationResponse,
-                                        "Multiple PATCH operations with the same resource path " + newPath +
-                                                " found in the openAPI definition");
-                            }
-                            if (pathItems.get(newPath).getDelete() != null && pathItems.get(path).getDelete() != null) {
-                                validationResponse.setValid(false);
-                                OASParserUtil.addErrorToValidationResponse(validationResponse,
-                                        "Multiple DELETE operations with the same resource path " + newPath +
-                                                " found in the openAPI definition");
-                            }
-                            if (pathItems.get(newPath).getHead() != null && pathItems.get(path).getHead() != null) {
-                                validationResponse.setValid(false);
-                                OASParserUtil.addErrorToValidationResponse(validationResponse,
-                                        "Multiple HEAD operations with the same resource path " + newPath +
-                                                " found in the openAPI definition");
-                            }
-                            if (pathItems.get(newPath).getOptions() != null &&
-                                    pathItems.get(path).getOptions() != null) {
-                                validationResponse.setValid(false);
-                                OASParserUtil.addErrorToValidationResponse(validationResponse,
-                                        "Multiple OPTIONS operations with the same resource path " +
-                                                newPath + " found in the openAPI definition");
-                            }
-                        }
-                    }
-                }
+                if (!isValidWithPathsWithTrailingSlashes(parseAttemptForV3.getOpenAPI(), null, validationResponse)) {
+                    validationResponse.setValid(false);
+                };
             }
         }
         if (validationResponse.isValid()) {
