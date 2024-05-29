@@ -3385,6 +3385,9 @@ public class SQLConstants {
                         "AND VALUE =?";
         public static final String GET_SUBSCRIPTION_BLOCK_CONDITION_BY_VALUE_AND_DOMAIN_SQL =
                 "SELECT CONDITION_ID,TYPE,VALUE,ENABLED,DOMAIN,UUID FROM AM_BLOCK_CONDITIONS WHERE VALUE = ? AND DOMAIN = ? ";
+        public static final String GET_BLOCK_CONDITIONS_BY_TYPE_AND_VALUE_SQL =
+                "SELECT CONDITION_ID, TYPE, VALUE, ENABLED, DOMAIN, UUID FROM AM_BLOCK_CONDITIONS WHERE " +
+                        "(TYPE = ? OR ? IS NULL) AND (VALUE LIKE CONCAT('%', ?, '%') OR ? IS NULL) AND DOMAIN = ?";
 
         public static final String TIER_HAS_SUBSCRIPTION = " select count(sub.TIER_ID) as c from AM_SUBSCRIPTION sub, AM_API api "
                 + " where sub.TIER_ID = ? and sub.API_ID = api.API_ID ";
