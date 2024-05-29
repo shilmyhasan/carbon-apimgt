@@ -395,9 +395,9 @@ public final class APIUtil {
     /*
      *  Initializing the below variables here to avoid compiling the pattern for every request.
      */
-    private static final Pattern illegalCharacterPattern =
+    private static final Pattern ILLEGAL_CHARACTER_PATTERN =
             Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA);
-    private static final Pattern illegalCharacterPatternWOSpace =
+    private static final Pattern ILLEGAL_CHARACTER_PATTERN_WO_SPACE =
             Pattern.compile(APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA_WO_SPACE);
 
     /**
@@ -639,7 +639,7 @@ public final class APIUtil {
      * @return true if found illegal characters, else false
      */
     public static boolean containsIllegals(String toExamine, boolean spaceAllowed) {
-        Pattern pattern = spaceAllowed ? illegalCharacterPattern : illegalCharacterPatternWOSpace;
+        Pattern pattern = spaceAllowed ? ILLEGAL_CHARACTER_PATTERN : ILLEGAL_CHARACTER_PATTERN_WO_SPACE;
         Matcher matcher = pattern.matcher(toExamine);
         return matcher.find();
     }
