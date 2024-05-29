@@ -865,6 +865,7 @@ public class APIProviderImplTest {
 
         Mockito.when(artifactManager.newGovernanceArtifact(any(QName.class))).thenReturn(artifact);
         Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
+        Mockito.when(APIUtil.containsIllegals("API2&", true)).thenReturn(true);
 
         try {
             apiProvider.addAPI(api);
@@ -885,6 +886,28 @@ public class APIProviderImplTest {
 
         Mockito.when(artifactManager.newGovernanceArtifact(any(QName.class))).thenReturn(artifact);
         Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
+        Mockito.when(APIUtil.containsIllegals("1.0.2&", false)).thenReturn(true);
+
+        try {
+            apiProvider.addAPI(api);
+            Assert.fail("Exception was expected, but wasn't thrown");
+        } catch (APIManagementException e) {
+            Assert.assertTrue(e.getMessage().contains("API Version contains one or more illegal characters"));
+        }
+    }
+
+    @Test
+    public void testAddAPIVersionWithSpace() throws APIManagementException, GovernanceException {
+        APIIdentifier apiId = new APIIdentifier("admin", "API4", "1 0.2");
+        API api = new API(apiId);
+        api.setContext("/test");
+        api.setStatus(APIConstants.CREATED);
+
+        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
+
+        Mockito.when(artifactManager.newGovernanceArtifact(any(QName.class))).thenReturn(artifact);
+        Mockito.when(APIUtil.createAPIArtifactContent(artifact, api)).thenReturn(artifact);
+        Mockito.when(APIUtil.containsIllegals("1 0.2", false)).thenReturn(true);
 
         try {
             apiProvider.addAPI(api);
