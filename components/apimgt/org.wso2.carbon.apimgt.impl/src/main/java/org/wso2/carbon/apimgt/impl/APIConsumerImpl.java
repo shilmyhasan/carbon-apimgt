@@ -6321,6 +6321,8 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                         api.setTechnicalOwner(publiserAPI.getTechnicalOwner());
                         api.setTechnicalOwnerEmail(publiserAPI.getTechnicalOwnerEmail());
                         api.setRating(0);// need to retrieve from db
+                        api.setDescription(publiserAPI.getDescription());
+                        api.setType(publiserAPI.getTransportType());
                         apiSet.add(api);
                     }
                 }
