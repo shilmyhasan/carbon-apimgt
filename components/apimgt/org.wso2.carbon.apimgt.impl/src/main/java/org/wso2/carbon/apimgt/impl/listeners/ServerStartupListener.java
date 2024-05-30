@@ -47,8 +47,9 @@ public class ServerStartupListener implements ServerStartupObserver {
 
         copyToExtensions();
         String migrationEnabled = System.getProperty(APIConstants.MIGRATE);
+        APIManagerConfiguration apiManagerConfiguration = null;
         if (migrationEnabled == null) {
-            APIManagerConfiguration apiManagerConfiguration =
+            apiManagerConfiguration =
                     ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
             if (apiManagerConfiguration != null) {
                 String enableKeyManagerRetrieval =
@@ -63,7 +64,10 @@ public class ServerStartupListener implements ServerStartupObserver {
         } else {
             log.info("Running on migration enabled mode: Stopped at ServerStartupListener completed");
         }
-        CorrelationConfigManager.getInstance().initializeCorrelationComponentList();
+        if (apiManagerConfiguration != null && apiManagerConfiguration.getEventHubConfigurationDto() != null &&
+                apiManagerConfiguration.getEventHubConfigurationDto().isEnabled()) {
+            CorrelationConfigManager.getInstance().initializeCorrelationComponentList();
+        }
     }
 
     /**
