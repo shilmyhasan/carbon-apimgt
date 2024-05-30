@@ -39,7 +39,6 @@ public class ServiceReferenceHolderTestCase {
 
         serviceReferenceHolder.getThrottleDataHolder();
         ThrottleDataHolder throttleDataHolder = Mockito.mock(ThrottleDataHolder.class);
-        serviceReferenceHolder.setThrottleDataHolder(throttleDataHolder);
 
         ConfigurationContextService cfgCtxService = Mockito.mock(ConfigurationContextService.class);
         serviceReferenceHolder.setConfigurationContextService(cfgCtxService);
