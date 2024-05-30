@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.apimgt.persistence;
 
+import org.wso2.carbon.apimgt.api.model.SOAPToRestSequence;
 import org.wso2.carbon.apimgt.api.model.Tag;
 import org.wso2.carbon.apimgt.persistence.dto.AdminContentSearchResult;
 import org.wso2.carbon.apimgt.persistence.dto.DevPortalAPI;
@@ -533,5 +534,15 @@ public interface APIPersistence {
      * @return list of all the tags of an organization
      */
     Set<Tag> getAllTags(Organization org, UserContext ctx) throws APIPersistenceException;
+    
+    /**
+     * Update SoapToRest Sequences for the given API.
+     * @param org  Organization the API product is owned by
+     * @param apiId  API ID
+     * @param sequences list of SOAPToRestSequence.
+     * @throws APIPersistenceException
+     */
+    void updateSoapToRestSequences(Organization org, String apiId, List<SOAPToRestSequence> sequences)
+            throws APIPersistenceException;
 
 }

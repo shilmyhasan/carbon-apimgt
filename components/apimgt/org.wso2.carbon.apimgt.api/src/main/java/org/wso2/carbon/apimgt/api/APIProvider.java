@@ -1717,4 +1717,14 @@ public interface APIProvider extends APIManager {
      */
     boolean validateAppliedPolicyWithSpecification(OperationPolicySpecification policySpecification, OperationPolicy
             appliedPolicy, String apiType) throws APIManagementException;
+    
+    /**
+     * Update SoapToRest Sequences for the given API.
+     * @param organization    Organization
+     * @param apiId  API ID
+     * @param sequences list of SOAPToRestSequence.
+     * @throws APIPersistenceException
+     */
+    void updateSoapToRestSequences(String organization, String apiId, List<SOAPToRestSequence> sequences)
+            throws APIManagementException;
 }
