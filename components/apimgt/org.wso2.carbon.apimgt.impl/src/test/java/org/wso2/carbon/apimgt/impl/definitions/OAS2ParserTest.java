@@ -169,6 +169,21 @@ public class OAS2ParserTest extends OASTestBase {
                 response.getErrorItems().get(1).getErrorCode());
     }
 
+    @Test
+    public void testOpenAPIValidatorWithMultiplePathsHavingSameNameWithAndWithoutTrailingSlash() throws Exception {
+        String faultySwagger = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
+                        + File.separator + "oas2_paths_with_trailing_slash.json"),
+                "UTF-8");
+
+        APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(faultySwagger, true);
+        Assert.assertFalse(response.isValid());
+        Assert.assertEquals(ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorCode(),
+                response.getErrorItems().get(0).getErrorCode());
+        Assert.assertEquals("Multiple GET operations with the same resource path /test found in " +
+                "the swagger definition", response.getErrorItems().get(0).getErrorDescription());
+    }
+
 
     @Test
     public void testRootLevelApplicationSecurity() throws Exception {
