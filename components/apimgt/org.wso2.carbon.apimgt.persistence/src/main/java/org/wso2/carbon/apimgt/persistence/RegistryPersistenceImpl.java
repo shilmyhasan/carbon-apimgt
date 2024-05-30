@@ -694,6 +694,8 @@ public class RegistryPersistenceImpl implements APIPersistence {
                 String apiSourcePath = apiPath.substring(0, prependIndex );
                 String definitionPath = apiSourcePath + RegistryConstants.PATH_SEPARATOR
                         + APIConstants.API_OAS_DEFINITION_RESOURCE_NAME;
+                String asyncApiDefinitionPath = apiSourcePath + RegistryConstants.PATH_SEPARATOR
+                        + APIConstants.API_ASYNC_API_DEFINITION_RESOURCE_NAME;
 
                 if (registry.resourceExists(definitionPath)) {
                     Resource apiDocResource = registry.get(definitionPath);
@@ -705,6 +707,17 @@ public class RegistryPersistenceImpl implements APIPersistence {
                     List<SOAPToRestSequence> list = getSoapToRestSequences(registry, api, Direction.IN);
                     list.addAll(getSoapToRestSequences(registry, api, Direction.OUT));
                     api.setSoapToRestSequences(list);
+                } else if (APIConstants.API_TYPE_WEBSUB.equals(api.getType()) ||
+                        APIConstants.API_TYPE_WS.equals(api.getType()) ||
+                        APIConstants.API_TYPE_SSE.equals(api.getType()) ||
+                        APIConstants.API_TYPE_WEBHOOK.equals(api.getType())) {
+                    if (asyncApiDefinitionPath != null) {
+                        if (registry.resourceExists(asyncApiDefinitionPath)) {
+                            Resource apiDocResource = registry.get(asyncApiDefinitionPath);
+                            String apiDocContent = new String((byte[]) apiDocResource.getContent(), Charset.defaultCharset());
+                            api.setAsyncApiDefinition(apiDocContent);
+                        }
+                    }
                 }
 
                 PublisherAPI pubApi = APIMapper.INSTANCE.toPublisherApi(api) ; 

@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
+import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.api.model.SwaggerData;
@@ -140,5 +141,20 @@ public class OAS2ParserTest extends OASTestBase {
         uriTemplates.add(getUriTemplate("GET", "Application & Application User", "/abc"));
         Set<URITemplate> uriTemplateSet = oas2Parser.getURITemplates(swagger);
         Assert.assertEquals(uriTemplateSet, uriTemplates);
+    }
+
+    @Test
+    public void testOpenAPIValidatorWithMultiplePathsHavingSameNameWithAndWithoutTrailingSlash() throws Exception {
+        String faultySwagger = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("definitions" + File.separator + "oas2"
+                        + File.separator + "oas2_paths_with_trailing_slash.json"),
+                "UTF-8");
+
+        APIDefinitionValidationResponse response = OASParserUtil.validateAPIDefinition(faultySwagger, true);
+        Assert.assertFalse(response.isValid());
+        Assert.assertEquals(ExceptionCodes.OPENAPI_PARSE_EXCEPTION.getErrorCode(),
+                response.getErrorItems().get(0).getErrorCode());
+        Assert.assertEquals("Multiple GET operations with the same resource path /test found in " +
+                "the swagger definition", response.getErrorItems().get(0).getErrorDescription());
     }
 }

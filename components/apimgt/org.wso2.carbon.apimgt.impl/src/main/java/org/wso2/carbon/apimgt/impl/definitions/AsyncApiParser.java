@@ -1991,8 +1991,14 @@ public class AsyncApiParser extends APIDefinition {
         return Library.writeDocumentToJSONString(aai20Document);
     }
 
-    public String updateAsyncAPIDefinition(String oldDefinition, API apiToUpdate) {
-        Aai20Document document = (Aai20Document) Library.readDocumentFromJSONString(oldDefinition);
+    public String updateAsyncAPIDefinition(String oldDefinition, API apiToUpdate) throws APIManagementException {
+        Aai20Document document = null;
+        try {
+            document = (Aai20Document) Library.readDocumentFromJSONString(oldDefinition);
+        } catch (IllegalArgumentException e) {
+            String msg = "Error in parsing the provided Async API definition: " + e.getMessage();
+            throw new APIManagementException(msg, e);
+        }
 
         if (document.components == null) {
             document.components = document.createComponents();
