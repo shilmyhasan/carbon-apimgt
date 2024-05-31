@@ -1152,6 +1152,8 @@ public class APIMgtDAOTest {
         BlockConditionsDTO userUUID = apiMgtDAO.addBlockConditions(userBlockcondition);
         assertNotNull(apiMgtDAO.getBlockConditionByUUID(apiUUID.getUUID()));
         assertNotNull(userUUID);
+        assertNotNull(apiMgtDAO.getBlockConditionsByConditionTypeAndValue(APIConstants.BLOCKING_CONDITIONS_API,
+                "/testAddUpdateDeleteBlockCondition", "carbon.super"));
         assertNotNull(apiMgtDAO
                 .updateBlockConditionState(apiMgtDAO.getBlockConditionByUUID(userUUID.getUUID()).getConditionId(),
                         "FALSE"));
