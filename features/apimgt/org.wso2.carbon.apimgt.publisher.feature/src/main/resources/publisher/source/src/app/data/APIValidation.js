@@ -126,7 +126,7 @@ const definition = {
         .error((errors) => {
             return errors.map((error) => ({ ...error, message: 'Name ' + getMessage(error.type, 50) }));
         }),
-    apiVersion: Joi.string().regex(/^[^~!@#;:%^*()+={}|\\<>"',&/$]+$/).required().error((errors) => {
+    apiVersion: Joi.string().regex(/^[^~!@#;:%^*()+={}|\\<>"',&/$ ]+$/).required().error((errors) => {
         const tmpErrors = [...errors];
         errors.forEach((err, index) => {
             const tmpError = { ...err };

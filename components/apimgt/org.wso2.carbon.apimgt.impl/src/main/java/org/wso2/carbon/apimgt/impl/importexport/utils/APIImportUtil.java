@@ -156,12 +156,17 @@ public final class APIImportUtil {
             apiName = apiId.get(APIImportExportConstants.API_NAME_ELEMENT).getAsString();
             apiVersion = apiId.get(APIImportExportConstants.VERSION_ELEMENT).getAsString();
 
+            if (APIUtil.containsIllegals(apiVersion, false)) {
+                log.error("Version '" + apiVersion + "' cannot contain special characters in API " + apiName);
+                throw new APIManagementException(
+                        "Version '" + apiVersion + "' cannot contain spaces or special characters in API " + apiName,
+                        ExceptionCodes.CONTAIN_INVALID_CHARACTERS);
+            }
+
             // Remove spaces of API Name/version if present
             if (apiName != null && apiVersion != null) {
                 apiId.addProperty(APIImportExportConstants.API_NAME_ELEMENT,
                         apiName = apiName.replace(" ", ""));
-                apiId.addProperty(APIImportExportConstants.VERSION_ELEMENT,
-                        apiVersion = apiVersion.replace(" ", ""));
             } else {
                 throw new IOException("API Name (id.apiName) and Version (id.version) must be provided in api.yaml");
             }
@@ -405,6 +410,9 @@ public final class APIImportUtil {
             if (importedApi != null) {
                 errorMessage += importedApi.getId().getApiName() + StringUtils.SPACE + APIConstants.API_DATA_VERSION
                         + ": " + importedApi.getId().getVersion();
+            }
+            if (StringUtils.isNotEmpty(e.getMessage())) {
+                errorMessage += e.getMessage();
             }
             throw new APIImportExportException(errorMessage, e);
         }

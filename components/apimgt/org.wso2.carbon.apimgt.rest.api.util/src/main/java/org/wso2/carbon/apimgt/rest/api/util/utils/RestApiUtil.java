@@ -609,6 +609,21 @@ public class RestApiUtil {
         return rootCause instanceof APIMgtResourceNotFoundException || rootCause instanceof ResourceNotFoundException;
     }
 
+
+    /**
+     * Check if the specified throwable e is happened because of a content validation failure
+     * @param e throwable to check
+     * @return true if the specified throwable e is happened due to a content validation failure, false otherwise
+     */
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public static boolean isContentValidationFailure(Throwable e) {
+        Throwable rootCause = getPossibleErrorCause(e);
+        if (rootCause instanceof APIManagementException) {
+            return ((APIManagementException)rootCause).getErrorHandler().getHttpStatusCode() == 400;
+        }
+        return false;
+    }
+
     /**
      * Check if the specified throwable e is happened as the provided meta information related to api is corrupted
      *

@@ -347,7 +347,7 @@ public class ApisApiServiceImpl implements ApisApiService {
         } catch (APIManagementException e) {
             String errorMessage = "Error while adding new API : " + body.getProvider() + "-" + body.getName() + "-"
                     + body.getVersion() + " - " + e.getMessage();
-            if (e.getMessage().contains("API context is malformed")) {
+            if (e.getErrorHandler().getHttpStatusCode() == 400) {
                 RestApiUtil.handleBadRequest(errorMessage, e, log);
             }
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -4066,7 +4066,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, apiId, e, log);
             } else if (isAuthorizationFailure(e)) {
                 RestApiUtil.handleAuthorizationFailure("Authorization failure while copying API : " + apiId, e, log);
-            } else if (isAPIDefinitionValidationFailure(e)) {
+            } else if (isAPIDefinitionValidationFailure(e) || RestApiUtil.isContentValidationFailure(e)) {
                 RestApiUtil.handleBadRequest(e.getMessage(), e, log);
             } else {
                 String errorMessage = "Error while copying API : " + apiId;
