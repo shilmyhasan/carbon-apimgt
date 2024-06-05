@@ -1644,7 +1644,15 @@ public class RegistryPersistenceImpl implements APIPersistence {
                                 DevPortalAPI devAPI = RegistryPersistenceUtil.getDevPortalAPIForSearch(apiArtifact);
                                 DevPortalSearchContent content = new DevPortalSearchContent();
                                 content.setContext(devAPI.getContext());
+                                String associatedType;
+                                if (apiArtifact.getAttribute(APIConstants.API_OVERVIEW_TYPE)
+                                        .equals(APIConstants.AuditLogConstants.API_PRODUCT)) {
+                                    associatedType = APIConstants.API_PRODUCT;
+                                } else {
+                                    associatedType = APIConstants.API;
+                                }
                                 content.setDescription(devAPI.getDescription());
+                                content.setType(associatedType);
                                 content.setId(devAPI.getId());
                                 content.setName(devAPI.getApiName());
                                 content.setProvider(
