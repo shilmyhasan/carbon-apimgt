@@ -2939,9 +2939,9 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     APIConstants.SubscriptionStatus.ON_HOLD, tenantAwareUsername);
 
             boolean isTenantFlowStarted = false;
-            tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.
-                    replaceEmailDomainBack(identifier.getProviderName()));
-            tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+            String tenantDomain = MultitenantUtils.getTenantDomain(
+                    APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
+            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = startTenantFlowForTenantDomain(tenantDomain);
             }
@@ -3060,9 +3060,6 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             // only send the notification if approved
             // wfDTO is null when simple wf executor is used because wf state is not stored in the db and is always approved.
             int id = apiMgtDAO.getAPIID(identifier, null);
-            int tenantId = APIUtil.getTenantId(APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
-            String tenantDomain = MultitenantUtils
-                    .getTenantDomain(APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
             if (wfDTO != null) {
                 if (WorkflowStatus.APPROVED.equals(wfDTO.getStatus())) {
                     SubscriptionEvent subscriptionEvent = new SubscriptionEvent(UUID.randomUUID().toString(),
@@ -3125,9 +3122,9 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
             boolean isTenantFlowStarted = false;
 
-            tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.
+            String tenantDomain = MultitenantUtils.getTenantDomain(APIUtil.
                     replaceEmailDomainBack(identifier.getProviderName()));
-            tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
+            int tenantId = APIUtil.getTenantIdFromTenantDomain(tenantDomain);
 
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = startTenantFlowForTenantDomain(tenantDomain);
