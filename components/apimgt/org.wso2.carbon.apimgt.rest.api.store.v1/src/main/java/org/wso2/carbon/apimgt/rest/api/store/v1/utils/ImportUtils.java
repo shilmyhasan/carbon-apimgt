@@ -189,7 +189,7 @@ public class ImportUtils {
                                     tenantDomain);
                             if (StringUtils.isNotEmpty(uuidFromIdentifier)) {
                                 ApiTypeWrapper apiTypeWrapper = apiConsumer.getAPIorAPIProductByUUID(
-                                        uuidFromIdentifier, organization);
+                                        uuidFromIdentifier, tenantDomain);
                                 // Tier of the imported subscription
                                 String targetTier = importedSubscriptionMap.get(existingSubscriptionKey).
                                         getThrottlingPolicy();
@@ -237,7 +237,7 @@ public class ImportUtils {
                         tenantDomain);
                 if (StringUtils.isNotEmpty(uuidFromIdentifier)) {
                     ApiTypeWrapper apiTypeWrapper = apiConsumer.getAPIorAPIProductByUUID(uuidFromIdentifier,
-                            organization);
+                            tenantDomain);
                     // Tier of the imported subscription
                     String targetTier = subscribedAPI.getThrottlingPolicy();
                     // Checking whether the target tier is available
