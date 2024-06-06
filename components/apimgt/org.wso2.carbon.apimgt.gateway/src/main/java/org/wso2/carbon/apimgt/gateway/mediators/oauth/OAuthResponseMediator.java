@@ -63,8 +63,8 @@ public class OAuthResponseMediator extends AbstractMediator implements ManagedLi
                     try {
                         OAuthEndpoint oAuthEndpoint = (OAuthEndpoint) oauthEndpointObject;
                         if (ServiceReferenceHolder.getInstance().isRedisEnabled()) {
-                            new RedisCacheUtils(ServiceReferenceHolder.getInstance().getRedisPool())
-                                    .deleteKey(oAuthEndpoint.getId());
+                            new RedisCacheUtils(ServiceReferenceHolder.getInstance().getRedisPool()).deleteKey(
+                                    oAuthEndpoint.getId());
                         } else {
                             TokenCache.getInstance().getTokenMap().put(oAuthEndpoint.getId(), null);
                         }
