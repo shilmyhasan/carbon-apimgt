@@ -3862,11 +3862,12 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
      */
     protected APIKey getApplicationKey(int applicationId, String keyType) throws APIManagementException {
         String consumerKey = apiMgtDAO.getConsumerkeyByApplicationIdAndKeyType(String.valueOf(applicationId), keyType);
+        Boolean blockGetAccessTokenByConsumerKey = false;
         if (StringUtils.isNotEmpty(consumerKey)) {
             String consumerKeyStatus = apiMgtDAO.getKeyStatusOfApplication(keyType, applicationId).getState();
             KeyManager keyManager = KeyManagerHolder.getKeyManagerInstance();
             OAuthApplicationInfo oAuthApplicationInfo = keyManager.retrieveApplication(consumerKey);
-            AccessTokenInfo tokenInfo = keyManager.getAccessTokenByConsumerKey(consumerKey);
+
             APIKey apiKey = new APIKey();
             apiKey.setConsumerKey(consumerKey);
             apiKey.setType(keyType);
@@ -3878,13 +3879,27 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     apiKey.setGrantTypes(oAuthApplicationInfo.getParameter(APIConstants.JSON_GRANT_TYPES).toString());
                 }
             }
-            if (tokenInfo != null) {
-                apiKey.setAccessToken(tokenInfo.getAccessToken());
-                apiKey.setValidityPeriod(tokenInfo.getValidityPeriod());
-                apiKey.setTokenScope(getScopeString(tokenInfo.getScopes()));
+
+            AccessTokenInfo tokenInfo = null;
+            if (System.getenv(APIConstants.BLOCK_GET_ACCESS_TOKEN_ON_APP_LOADING) != null) {
+                blockGetAccessTokenByConsumerKey = Boolean.parseBoolean(
+                        System.getenv(APIConstants.BLOCK_GET_ACCESS_TOKEN_ON_APP_LOADING));
+            }
+            if (!blockGetAccessTokenByConsumerKey) {
+                tokenInfo = keyManager.getAccessTokenByConsumerKey(consumerKey);
+                if (tokenInfo != null) {
+                    apiKey.setAccessToken(tokenInfo.getAccessToken());
+                    apiKey.setValidityPeriod(tokenInfo.getValidityPeriod());
+                    apiKey.setTokenScope(getScopeString(tokenInfo.getScopes()));
+                } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Access token does not exist for Consumer Key: " + consumerKey);
+                    }
+                }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug("Access token does not exist for Consumer Key: " + consumerKey);
+                    log.debug("System property:blockGetAccessTokenOnAppLoading is set to true."
+                            + " Hence not calling the key manager to get the access token");
                 }
             }
             return apiKey;
