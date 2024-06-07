@@ -44,20 +44,29 @@ public class CertificateReLoader implements Runnable {
     public void run() {
 
         if (StringUtils.isNotEmpty(TRUST_STORE_PASSWORD)) {
-            File trustStoreFile = new File(TRUST_STORE);
-            FileInputStream localTrustStoreStream;
+            String tempTrustStore = TRUST_STORE + ".temp.lock";
             try {
-                long lastUpdatedTimeStamp = CertificateReLoaderUtil.getLastUpdatedTimeStamp();
-                long lastModified = trustStoreFile.lastModified();
-                if (lastUpdatedTimeStamp != lastModified) {
-                    CertificateReLoaderUtil.setLastUpdatedTimeStamp(lastModified);
-                    localTrustStoreStream = new FileInputStream(trustStoreFile);
-                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD.toCharArray());
-                    ServiceReferenceHolder.getInstance().setTrustStore(trustStore);
+                if (TrustStoreUtils.acquireLockWithRetries(tempTrustStore)) {
+                    File trustStoreFile = new File(TRUST_STORE);
+                    FileInputStream localTrustStoreStream;
+                    try {
+                        long lastUpdatedTimeStamp = CertificateReLoaderUtil.getLastUpdatedTimeStamp();
+                        long lastModified = trustStoreFile.lastModified();
+                        if (lastUpdatedTimeStamp != lastModified) {
+                            CertificateReLoaderUtil.setLastUpdatedTimeStamp(lastModified);
+                            localTrustStoreStream = new FileInputStream(trustStoreFile);
+                            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                            TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD.toCharArray());
+                            ServiceReferenceHolder.getInstance().setTrustStore(trustStore);
+                        }
+                    } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+                        log.error("Unable to find the certificate", e);
+                    }
+                } else {
+                    log.error("Unable to acquire lock to reload the certificate");
                 }
-            } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
-                log.error("Unable to find the certificate", e);
+            } catch (InterruptedException e) {
+                log.error("Error while acquiring lock to reload the certificate", e);
             }
         }
     }
