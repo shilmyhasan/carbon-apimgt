@@ -19,9 +19,9 @@ import java.util.Random;
 
 public final class TrustStoreUtils {
     private static final Log log = LogFactory.getLog(TrustStoreUtils.class);
-    private static final int MAX_RETRY_COUNT = 100;
-    private static final int MAX_BACKOFF = 1000;
-    private static final int WAIT_TIME_BEFORE_LOCK_RELEASE = 10000;
+//    private static final int MAX_RETRY_COUNT = 100;
+//    private static final int MAX_BACKOFF = 1000;
+//    private static final int WAIT_TIME_BEFORE_LOCK_RELEASE = 10000;
 
     public static synchronized void loadCerts(KeyStore trustStore, String keyStorePath, char[] password )
             throws CertificateException, NoSuchAlgorithmException, IOException {
@@ -33,6 +33,10 @@ public final class TrustStoreUtils {
     }
 
     public static synchronized boolean acquireLockWithRetries(String lockFilePath) throws InterruptedException {
+        int MAX_RETRY_COUNT = System.getProperty("maxRetryCount") != null ?
+                Integer.parseInt(System.getProperty("maxRetryCount")) : 100;
+        int WAIT_TIME_BEFORE_LOCK_RELEASE = System.getProperty("waitTimeBeforeLockRelease") != null ?
+                Integer.parseInt(System.getProperty("waitTimeBeforeLockRelease")) : 10000;
         for (int attempt = 1; attempt <= MAX_RETRY_COUNT; attempt++) {
             try {
                 // check if file exists
@@ -66,6 +70,8 @@ public final class TrustStoreUtils {
     }
 
     private static int generateRandomBackOff() {
+        int MAX_BACKOFF = System.getProperty("maxBackoff") != null ?
+                Integer.parseInt(System.getProperty("maxBackoff")) : 1000;
         return new Random().nextInt(MAX_BACKOFF);
     }
 
