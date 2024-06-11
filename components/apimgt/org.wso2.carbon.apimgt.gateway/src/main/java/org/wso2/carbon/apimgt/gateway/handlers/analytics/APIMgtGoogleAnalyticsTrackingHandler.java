@@ -335,18 +335,18 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
             message = ANONYMOUS_USER_ID;
         }
 
-        MessageDigest m = MessageDigest.getInstance("MD5");
+        MessageDigest m = MessageDigest.getInstance("SHA-256");
         m.update(message.getBytes("UTF-8"), 0, message.length());
         byte[] sum = m.digest();
         BigInteger messageAsNumber = new BigInteger(1, sum);
-        String md5String = messageAsNumber.toString(16);
+        String sha256String = messageAsNumber.toString(16);
 
         /* Pad to make sure id is 32 characters long. */
-        while (md5String.length() < 32) {
-            md5String = "0" + md5String;
+        while (sha256String.length() < 32) {
+            sha256String = "0" + sha256String;
         }
 
-        return "0x" + md5String.substring(0, 16);
+        return "0x" + sha256String.substring(0, 16);
     }
 
     @MethodStats
