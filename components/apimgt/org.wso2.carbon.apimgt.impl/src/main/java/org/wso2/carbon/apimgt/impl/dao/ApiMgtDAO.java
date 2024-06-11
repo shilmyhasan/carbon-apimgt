@@ -5560,6 +5560,12 @@ public class ApiMgtDAO {
         String query = SQLConstants.GET_ALL_WORKFLOW_ENTRY_FROM_INTERNAL_REF_SQL;
         try {
             connection = APIMgtDBUtil.getConnection();
+            // avoid unnecessary sorting in other jdbc types
+            if (connection.getMetaData().getDriverName() != null && connection.getMetaData().getDriverName()
+                    .toLowerCase().contains("oracle")) {
+                // Ordering to eliminate non-contiguous memory issue in oracle
+                query = query + " ORDER BY WF_ID ASC";
+            }
             prepStmt = connection.prepareStatement(query);
             prepStmt.setString(1, workflowReference);
             prepStmt.setString(2, workflowType);
