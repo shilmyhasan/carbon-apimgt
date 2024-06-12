@@ -2788,4 +2788,6 @@ public final class APIConstants {
         public static final String OPEN_TRACER_CUSTOM_TAG_NAME_CONFIG = "Name";
         public static final String OPEN_TRACER_CUSTOM_TAG_VALUE_CONFIG = "Value";
     }
+
+    public static final String EAGER_LOADING_ENABLED_TENANTS = "Tenant.LoadingPolicy.EagerLoading.Include";
 }
