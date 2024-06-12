@@ -21,30 +21,34 @@ package org.wso2.carbon.apimgt.gateway.internal;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.gateway.GatewayAPIDTO;
-import org.wso2.carbon.apimgt.gateway.webhooks.SubscriptionDataStore;
+import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.notifier.events.APIEvent;
 import org.wso2.carbon.apimgt.impl.notifier.events.DeployAPIInGatewayEvent;
-import org.wso2.carbon.apimgt.keymgt.SubscriptionDataHolder;
 import org.wso2.carbon.apimgt.keymgt.model.SubscriptionDataLoader;
 import org.wso2.carbon.apimgt.keymgt.model.entity.API;
 import org.wso2.carbon.apimgt.keymgt.model.exception.DataLoadingException;
 import org.wso2.carbon.apimgt.keymgt.model.impl.SubscriptionDataLoaderImpl;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DataHolder {
 
     private static final DataHolder Instance = new DataHolder();
     private Map<String, List<String>> apiToCertificatesMap = new HashMap();
-    private boolean isAllApisDeployed = false;
+    private Map<String, Boolean> tenantDeployStatus = new HashMap<>();
     private Map<String,Map<String, API>> tenantAPIMap  = new HashMap<>();
+
     private static final Log log  = LogFactory.getLog(DataHolder.class);
 
     private DataHolder() {
-
+        initializeTenantDeploymentStatusMap();
     }
 
     public Map<String, List<String>> getApiToCertificatesMap() {
@@ -73,11 +77,15 @@ public class DataHolder {
     }
 
     public boolean isAllApisDeployed() {
-        return isAllApisDeployed;
+        return tenantDeployStatus.values().stream().allMatch(Boolean::booleanValue);
     }
 
-    public void setAllApisDeployed(boolean allApisDeployed) {
-        isAllApisDeployed = allApisDeployed;
+    public Map<String, Boolean> getTenantDeployStatus() {
+        return tenantDeployStatus;
+    }
+
+    public void setTenantDeployStatus(String tenant) {
+        tenantDeployStatus.put(tenant, true);
     }
 
     public void addAPIMetaData(API api) {
@@ -178,5 +186,14 @@ public class DataHolder {
                     "/");
         }
         return tenantDomain;
+    }
+
+    private void initializeTenantDeploymentStatusMap() {
+        try {
+            Set<String> tenants = GatewayUtils.getTenantsToBeDeployed();
+            tenantDeployStatus = tenants.stream().collect(Collectors.toMap(str -> str, str -> false));
+        } catch (APIManagementException e) {
+            log.error("Error while initializing tenant deployment status map", e);
+        }
     }
 }
