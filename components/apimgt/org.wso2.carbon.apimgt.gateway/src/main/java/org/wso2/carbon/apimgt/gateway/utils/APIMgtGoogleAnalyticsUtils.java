@@ -47,6 +47,8 @@ public class APIMgtGoogleAnalyticsUtils {
     private static final Log log = LogFactory.getLog(APIMgtGoogleAnalyticsUtils.class);
     private static final String ANONYMOUS_USER_ID = "anonymous";
     private static final String GOOGLE_ANALYTICS_TRACKER_VERSION = "1";
+    private static final String googleAnalyticsSecureHashingEnabled = System.getProperty(APIMgtGatewayConstants
+            .GOOGLE_ANALYTICS_SECURE_HASHING);
     private String configKey = null;
     private GoogleAnalyticsConfig gaConfig = null;
 
@@ -140,8 +142,6 @@ public class APIMgtGoogleAnalyticsUtils {
         if (message == null) {
             message = ANONYMOUS_USER_ID;
         }
-        String googleAnalyticsSecureHashingEnabled = System.getProperty(APIMgtGatewayConstants
-                .GOOGLE_ANALYTICS_SECURE_HASHING);
         String hashingAlgorithm = "MD5";
         if (JavaUtils.isTrueExplicitly(googleAnalyticsSecureHashingEnabled)) {
             hashingAlgorithm = "SHA-256";
