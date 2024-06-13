@@ -223,5 +223,7 @@ public class APIMgtGatewayConstants {
     public static final String API_OBJECT = "API";
     public static final String OAUTH_ENDPOINT_INSTANCE = "oauth.instance";
     public static final String VALIDATED_X509_CERT = "ValidatedX509Cert";
+
+    public static final String GOOGLE_ANALYTICS_SECURE_HASHING = "googleAnalyticsSecureHashingEnabled";
 }
 
