@@ -78,6 +78,9 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
 
     protected GoogleAnalyticsConfig config = null;
 
+    private static final String googleAnalyticsSecureHashingEnabled = System.getProperty(APIMgtGatewayConstants
+            .GOOGLE_ANALYTICS_SECURE_HASHING);
+
     @MethodStats
     @Override
     public boolean handleRequest(MessageContext msgCtx) {
@@ -334,19 +337,22 @@ public class APIMgtGoogleAnalyticsTrackingHandler extends AbstractHandler {
         } else {
             message = ANONYMOUS_USER_ID;
         }
-
-        MessageDigest m = MessageDigest.getInstance("SHA-256");
+        String hashingAlgorithm = "MD5";
+        if (JavaUtils.isTrueExplicitly(googleAnalyticsSecureHashingEnabled)) {
+            hashingAlgorithm = "SHA-256";
+        }
+        MessageDigest m = MessageDigest.getInstance(hashingAlgorithm);
         m.update(message.getBytes("UTF-8"), 0, message.length());
         byte[] sum = m.digest();
         BigInteger messageAsNumber = new BigInteger(1, sum);
-        String sha256String = messageAsNumber.toString(16);
+        String hashString = messageAsNumber.toString(16);
 
         /* Pad to make sure id is 32 characters long. */
-        while (sha256String.length() < 32) {
-            sha256String = "0" + sha256String;
+        while (hashString.length() < 32) {
+            hashString = "0" + hashString;
         }
 
-        return "0x" + sha256String.substring(0, 16);
+        return "0x" + hashString.substring(0, 16);
     }
 
     @MethodStats
