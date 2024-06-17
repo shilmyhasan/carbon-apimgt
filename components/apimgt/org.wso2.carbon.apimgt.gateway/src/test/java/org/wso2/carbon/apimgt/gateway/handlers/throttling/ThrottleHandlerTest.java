@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.gateway.handlers.throttling;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.commons.throttle.core.AccessInformation;
+import org.apache.synapse.commons.throttle.core.ThrottleContext;
 import org.apache.synapse.commons.throttle.core.ThrottleException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -93,7 +94,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testDoNotThrottleWhenMsgIsAResponseAndAuthCtxNotAvailable() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
 
@@ -104,7 +105,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testSubscriptionLevelThrottlingInitWhenThrottleCtxIsNull() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
 
@@ -116,7 +117,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testSubscriptionLevelThrottlingInitialization() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
 
@@ -131,7 +132,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgThrottleOutWhenBlockingConditionsAreSatisfied() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
 
@@ -152,7 +153,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgThrottleContinueWhenAPITierIsNotAvailable() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
 
@@ -167,7 +168,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgDoContinueWhenAllThrottlingLevelsAreNotThrolled() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
         ServiceReferenceHolder.getInstance().setThrottleDataPublisher(new ThrottleDataPublisher());
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
@@ -185,7 +186,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgDoThrottleWhenUserLevelThrottlingIsTriggerred() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
@@ -204,7 +205,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgThrottleOutWhenAPILevelIsThrottled() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
@@ -232,7 +233,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgThrottleOutWhenResourceLevelIsThrottled() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
@@ -260,7 +261,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgThrottleOutWhenSubscriptionLevelIsThrottledAndStopOnQuotaReachIsEnabled() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
@@ -282,12 +283,13 @@ public class ThrottleHandlerTest {
         //Should throttle out and discontinue message flow, when subscription level is throttled out
         //and stop on quota reach is enabled
         Assert.assertFalse(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData(subscriptionLevelThrottleKey);
 
     }
 
     @Test
     public void testMsgContinueWhenSubscriptionLevelIsThrottledAndStopOnQuotaReachIsDisabled() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
@@ -311,11 +313,12 @@ public class ThrottleHandlerTest {
         //Though subscription level is throttled out, should continue the message flow, if stop on quota reach is
         //disabled
         Assert.assertTrue(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData(subscriptionLevelThrottleKey);
     }
 
     @Test
     public void testMsgThrottleOutWhenApplicationLevelIsThrottled() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
@@ -336,11 +339,12 @@ public class ThrottleHandlerTest {
 
         //Should discontinue message flow, when application level is throttled
         Assert.assertFalse(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData(applicationLevelThrottleKey);
     }
 
     @Test
     public void testMsgThrottleOutWhenProductionHardThrottlingLimitsThrottled() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator,
                 accessInformation);
@@ -370,7 +374,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgThrottleOutWhenSandBoxHardThrottlingLimitsThrottled() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator,
                 accessInformation);
@@ -409,7 +413,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testMsgThrottleOutWhenCustomThrottlingLimitExceeded() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator,
                 accessInformation);
@@ -436,11 +440,13 @@ public class ThrottleHandlerTest {
         Assert.assertFalse(throttleHandler.handleRequest(messageContext));
         throttleDataHolder.removeKeyTemplate("testKeyTemplate");
         Assert.assertTrue(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData("testKeyTemplate");
+        throttleDataHolder.removeKeyTemplate("$user");
     }
 
     @Test
     public void testMsgThrottleOutWhenHittingSubscriptionLevelSpike() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator,
                 accessInformation);
@@ -471,7 +477,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testHandleResponse() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
@@ -480,7 +486,7 @@ public class ThrottleHandlerTest {
 
     @Test
     public void testCheckForStaledThrottleData() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
         ServiceReferenceHolder.getInstance().setThrottleDataPublisher(new ThrottleDataPublisher());
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator,
                 accessInformation);
@@ -504,11 +510,12 @@ public class ThrottleHandlerTest {
         throttleDataHolder.addKeyTemplate("testKeyTemplate", "testKeyTemplateValue");
         throttleDataHolder.addThrottleData("testKeyTemplate", System.currentTimeMillis() - 10000);
         Assert.assertTrue(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData("testKeyTemplate");
     }
 
     @Test
     public void testMsgThrottleOutWithUserBlockingConditions() {
-        ThrottleDataHolder throttleDataHolder = new ThrottleDataHolder();
+        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
 
         ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator);
         MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
