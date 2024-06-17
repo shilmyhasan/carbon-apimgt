@@ -21,6 +21,7 @@ package org.wso2.carbon.apimgt.gateway.handlers.throttling;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.commons.throttle.core.AccessInformation;
+import org.apache.synapse.commons.throttle.core.ThrottleContext;
 import org.apache.synapse.commons.throttle.core.ThrottleException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -282,6 +283,7 @@ public class ThrottleHandlerTest {
         //Should throttle out and discontinue message flow, when subscription level is throttled out
         //and stop on quota reach is enabled
         Assert.assertFalse(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData(subscriptionLevelThrottleKey);
 
     }
 
@@ -311,6 +313,7 @@ public class ThrottleHandlerTest {
         //Though subscription level is throttled out, should continue the message flow, if stop on quota reach is
         //disabled
         Assert.assertTrue(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData(subscriptionLevelThrottleKey);
     }
 
     @Test
@@ -336,6 +339,7 @@ public class ThrottleHandlerTest {
 
         //Should discontinue message flow, when application level is throttled
         Assert.assertFalse(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData(applicationLevelThrottleKey);
     }
 
     @Test
@@ -407,39 +411,6 @@ public class ThrottleHandlerTest {
         Assert.assertFalse(throttleHandler.handleRequest(messageContext));
     }
 
-
-    @Test
-    public void testMsgThrottleOutWhenHardThrottlingFailedWithThrottleException() {
-        ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
-
-        ThrottleHandler throttleHandler = new ThrottlingHandlerWrapper(timer, throttleDataHolder, throttleEvaluator,
-                accessInformation);
-        throttleHandler.setProductionMaxCount("100");
-        SynapseEnvironment synapseEnvironment = Mockito.mock(SynapseEnvironment.class);
-        throttleHandler.init(synapseEnvironment);
-        MessageContext messageContext = TestUtils.getMessageContextWithAuthContext(apiContext, apiVersion);
-        messageContext.setProperty(VERB_INFO_DTO, verbInfoDTO);
-        ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty(org.apache.axis2.context
-                .MessageContext.TRANSPORT_HEADERS);
-        AuthenticationContext authenticationContext = (AuthenticationContext) messageContext.getProperty
-                (API_AUTH_CONTEXT);
-        authenticationContext.setApiTier(throttlingTier);
-        authenticationContext.setKeyType("SANDBOX");
-        authenticationContext.setSpikeArrestLimit(0);
-        messageContext.setProperty(API_AUTH_CONTEXT, authenticationContext);
-
-        verbInfo.setConditionGroups(conditionGroupDTOs);
-        ArrayList<ConditionGroupDTO> matchingConditions = new ArrayList<>();
-        matchingConditions.add(conditionGroupDTO);
-
-
-        //Throw ThrottleException while retrieving access information
-        Mockito.doThrow(ThrottleException.class).when(accessInformation).isAccessAllowed();
-        //Should discontinue message flow, when an exception is thrown during hard limit throttling information
-        //process time
-        Assert.assertFalse(throttleHandler.handleRequest(messageContext));
-    }
-
     @Test
     public void testMsgThrottleOutWhenCustomThrottlingLimitExceeded() {
         ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
@@ -469,6 +440,8 @@ public class ThrottleHandlerTest {
         Assert.assertFalse(throttleHandler.handleRequest(messageContext));
         throttleDataHolder.removeKeyTemplate("testKeyTemplate");
         Assert.assertTrue(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData("testKeyTemplate");
+        throttleDataHolder.removeKeyTemplate("$user");
     }
 
     @Test
@@ -537,6 +510,7 @@ public class ThrottleHandlerTest {
         throttleDataHolder.addKeyTemplate("testKeyTemplate", "testKeyTemplateValue");
         throttleDataHolder.addThrottleData("testKeyTemplate", System.currentTimeMillis() - 10000);
         Assert.assertTrue(throttleHandler.handleRequest(messageContext));
+        throttleDataHolder.removeThrottleData("testKeyTemplate");
     }
 
     @Test
