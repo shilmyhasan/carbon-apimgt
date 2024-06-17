@@ -1170,6 +1170,9 @@ public class APIGatewayManager {
         String timeout = endpointConfig[0];
         String suspendOnFailure = endpointConfig[1];
         String markForSuspension = endpointConfig[2];
+        String endpointName =
+                api.getId().getProviderName() + "_" + api.getId().getApiName() + "_" + api.getId().getVersion()
+                        + urltype + APIConstants.IMPLEMENTATION_TYPE_ENDPOINT;
         String endpointConf = "<default>\n" +
                 "\t<timeout>\n" +
                 timeout +
@@ -1218,7 +1221,7 @@ public class APIGatewayManager {
                 "           name=\"To\"\n" +
                 "           expression=\"$ctx:fullUrl\"/>\n" +
                 "   <send>\n" +
-                "      <endpoint>\n" +
+                "      <endpoint name=\"" + endpointName + "\">\n" +
                 endpointConf + "\n" +
                 "      </endpoint>\n" +
                 "   </send>\n" +
