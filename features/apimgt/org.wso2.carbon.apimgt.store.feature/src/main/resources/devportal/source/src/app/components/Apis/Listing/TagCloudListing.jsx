@@ -62,9 +62,10 @@ export default function TagCloudListing() {
     const classes = useStyles();
     const theme = useTheme();
     const [allTags, setAllTags] = useState(null);
+    const tagsLimit = -1;
     useEffect(() => {
         const restApiClient = new API();
-        const promisedTags = restApiClient.getAllTags();
+        const promisedTags = restApiClient.getAllTags(tagsLimit);
         promisedTags
             .then((response) => {
                 setAllTags(response.body.list);
