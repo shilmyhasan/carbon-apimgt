@@ -47,12 +47,14 @@ import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.ResourceInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.JWTUtil;
 import org.wso2.carbon.apimgt.keymgt.model.entity.Scope;
 import org.wso2.carbon.apimgt.keymgt.service.TokenValidationContext;
 import org.wso2.carbon.apimgt.tracing.TracingSpan;
 import org.wso2.carbon.apimgt.tracing.TracingTracer;
 import org.wso2.carbon.apimgt.tracing.Util;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.ArrayList;
@@ -138,6 +140,7 @@ public class APIKeyValidator {
             throws APISecurityException {
 
         String prefixedVersion = apiVersion;
+        boolean valid;
         //Check if client has invoked the default version API.
         if (defaultVersionInvoked) {
             //Prefix the version so that it looks like _default_1.0 (_default_<version>)).
@@ -157,6 +160,8 @@ public class APIKeyValidator {
                 APIKeyValidationInfoDTO info = (APIKeyValidationInfoDTO) getGatewayKeyCache().get(cacheKey);
 
                 if (info != null) {
+                    long timestampSkew = getTimeStampSkewInSeconds() * 1000;
+                    valid = JWTUtil.isJWTValid(info.getEndUserToken(), timestampSkew);
                     if (APIUtil.isAccessTokenExpired(info)) {
                         log.info("Invalid OAuth Token : Access Token " + GatewayUtils.getMaskedToken(apiKey) + " " +
                                 "expired.");
@@ -169,7 +174,9 @@ public class APIKeyValidator {
                         // Put into invalid token cache
                         getInvalidTokenCache().put(apiKey, cachedToken);
                     }
-                    return info;
+                    if (valid) {
+                        return info;
+                    }
                 }
             } else {
                 // Check token available in invalidToken Cache
@@ -234,6 +241,10 @@ public class APIKeyValidator {
 
     protected void endTenantFlow() {
         PrivilegedCarbonContext.endTenantFlow();
+    }
+
+    protected long getTimeStampSkewInSeconds() {
+        return OAuthServerConfiguration.getInstance().getTimeStampSkewInSeconds();
     }
 
     protected void startTenantFlow() {
