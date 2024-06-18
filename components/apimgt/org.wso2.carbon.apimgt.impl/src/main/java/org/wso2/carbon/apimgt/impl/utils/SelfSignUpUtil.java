@@ -361,14 +361,15 @@ public final class SelfSignUpUtil {
                     log.debug("HTTP status " + response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(response.getEntity().getContent()));
-                    String inputLine;
-                    StringBuilder responseString = new StringBuilder();
+					StringBuilder responseString = new StringBuilder();
+					try (BufferedReader reader = new BufferedReader(
+							new InputStreamReader(response.getEntity().getContent()))) {
+						String inputLine;
+						while ((inputLine = reader.readLine()) != null) {
+							responseString.append(inputLine);
+						}
 
-                    while ((inputLine = reader.readLine()) != null) {
-                        responseString.append(inputLine);
-                    }
+					}
                     return responseString.toString();
                 } else {
                     throw new APIManagementException(
