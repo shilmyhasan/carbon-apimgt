@@ -70,7 +70,7 @@ public class ServiceReferenceHolder {
 
     private ConfigurationContextService cfgCtxService;
     private APIManagerConfigurationService amConfigService;
-    public ThrottleDataHolder throttleDataHolder;
+    private final ThrottleDataHolder throttleDataHolder = ThrottleDataHolder.getInstance();
     private ThrottleProperties throttleProperties;
     private ConfigurationContext axis2ConfigurationContext;
     private TracingService tracingService;
@@ -98,9 +98,7 @@ public class ServiceReferenceHolder {
 
     private Set<String> activeTenants = new ConcurrentSkipListSet<>();
     private JedisPool redisPool;
-    public void setThrottleDataHolder(ThrottleDataHolder throttleDataHolder) {
-        this.throttleDataHolder = throttleDataHolder;
-    }
+
     public ThrottleDataHolder getThrottleDataHolder() {
         return throttleDataHolder;
     }
