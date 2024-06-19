@@ -71,13 +71,16 @@ public final class TrustStoreUtils {
 
     private static int generateRandomBackOff() {
         int MAX_BACKOFF = System.getProperty("maxBackoff") != null ?
-                Integer.parseInt(System.getProperty("maxBackoff")) : 1000;
+                Integer.parseInt(System.getProperty("maxBackoff")) : 2000;
         return new Random().nextInt(MAX_BACKOFF);
     }
 
     public static synchronized void releaseLock(String lockFilePath) {
         try {
-            Files.delete(Paths.get(lockFilePath));
+            final Path path = Paths.get(lockFilePath);
+            if (Files.exists(path)) {
+                Files.delete(path);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

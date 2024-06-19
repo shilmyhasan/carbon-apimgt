@@ -151,6 +151,7 @@ public class CertificateMgtUtils {
                 log.error("Could not acquire lock to update the trust store.");
                 return ResponseCode.INTERNAL_SERVER_ERROR;
             }
+            TrustStoreUtils.releaseLock(tempTrustStore);
             responseCode = expired ? ResponseCode.CERTIFICATE_EXPIRED :
                     isCertExists ? ResponseCode.ALIAS_EXISTS_IN_TRUST_STORE : ResponseCode.SUCCESS;
         } catch (CertificateException e) {
@@ -276,6 +277,7 @@ public class CertificateMgtUtils {
                 log.error("Could not acquire lock to update the trust store.");
                 return ResponseCode.INTERNAL_SERVER_ERROR;
             }
+            TrustStoreUtils.releaseLock(tempTrustStore);
             responseCode = isExists ? ResponseCode.SUCCESS : ResponseCode.CERTIFICATE_NOT_FOUND;
         } catch (IOException e) {
             log.error("Error in loading the certificate.", e);
