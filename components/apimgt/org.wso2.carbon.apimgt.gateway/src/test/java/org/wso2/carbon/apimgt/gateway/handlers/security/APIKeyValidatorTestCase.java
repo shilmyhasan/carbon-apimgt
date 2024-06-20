@@ -49,6 +49,7 @@ import org.wso2.carbon.apimgt.impl.caching.CacheProvider;
 import org.wso2.carbon.apimgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.apimgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.JWTUtil;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.caching.impl.Util;
 import org.wso2.carbon.context.CarbonContext;
@@ -73,7 +74,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({PrivilegedCarbonContext.class, APISecurityUtils.class, ServiceReferenceHolder.class,
-        ServerConfiguration.class, APIUtil.class, Util.class, CarbonContext.class, Caching.class,
+        ServerConfiguration.class, APIUtil.class, Util.class, CarbonContext.class, Caching.class, JWTUtil.class,
         APIKeyValidator.class, RESTUtils.class, org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder.class,
         Cache.class, APIManagerConfigurationService.class, CacheProvider.class, Cache.class, CarbonConstants.class})
 public class APIKeyValidatorTestCase {
@@ -100,6 +101,7 @@ public class APIKeyValidatorTestCase {
         PowerMockito.mockStatic(CarbonConstants.class);
         PowerMockito.mockStatic(ServerConfiguration.class);
         PowerMockito.mockStatic(APIUtil.class);
+        PowerMockito.mockStatic(JWTUtil.class);
         PowerMockito.mockStatic(CarbonContext.class);
         PowerMockito.mockStatic(Util.class);
         PowerMockito.mockStatic(Caching.class);
@@ -1000,6 +1002,7 @@ public class APIKeyValidatorTestCase {
             APIKeyValidationInfoDTO apiKeyValidationInfoDTO = new APIKeyValidationInfoDTO();
             apiKeyValidationInfoDTO.setAuthorized(true);
             PowerMockito.when(APIUtil.isAccessTokenExpired(apiKeyValidationInfoDTO)).thenReturn(false);
+            PowerMockito.when(JWTUtil.isJWTValid(Mockito.anyString(), Mockito.anyLong())).thenReturn(true);
             AxisConfiguration axisConfiguration = Mockito.mock(AxisConfiguration.class);
             Cache tokenCache = Mockito.mock(Cache.class);
             Cache keyCache = Mockito.mock(Cache.class);
@@ -1046,6 +1049,7 @@ public class APIKeyValidatorTestCase {
             APIKeyValidationInfoDTO apiKeyValidationInfoDTO = new APIKeyValidationInfoDTO();
             apiKeyValidationInfoDTO.setAuthorized(true);
             PowerMockito.when(APIUtil.isAccessTokenExpired(apiKeyValidationInfoDTO)).thenReturn(true);
+            PowerMockito.when(JWTUtil.isJWTValid(Mockito.anyString(), Mockito.anyLong())).thenReturn(true);
             AxisConfiguration axisConfiguration = Mockito.mock(AxisConfiguration.class);
             Cache tokenCache = Mockito.mock(Cache.class);
             Cache keyCache = Mockito.mock(Cache.class);
@@ -1175,6 +1179,11 @@ public class APIKeyValidatorTestCase {
             protected String getTenantDomain() {
 
                 return tenantDomain;
+            }
+
+            @Override
+            protected long getTimeStampSkewInSeconds() {
+                return 0l;
             }
 
             @Override
