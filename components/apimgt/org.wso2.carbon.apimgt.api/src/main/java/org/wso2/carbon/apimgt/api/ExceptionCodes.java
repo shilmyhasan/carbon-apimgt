@@ -40,7 +40,8 @@ ExceptionCodes implements ErrorHandler {
     APPLICATION_NOT_FOUND(900307, "Application not found", 404, "Application not found"),
     API_NOT_FOUND(900308, "API Not Found", 404, "Requested API with id %s not found"),
     APPLICATION_INACTIVE(900309, "Application is not active", 400, "Application is not active"),
-    SUBSCRIPTION_NOT_FOUND(900310, "Subscription not found", 404, "Couldn't retrieve Subscriptions for API"),
+    SUBSCRIPTION_NOT_FOUND(900310, "Subscription not found", 404,
+            "The requested subscription with ID '%s' was not found."),
     UPDATE_STATE_CHANGE(900311, "API fields have state changes", 400, "Couldn't Update as API have changes can't be " +
             "done"),
     DOCUMENT_ALREADY_EXISTS(900312, "Document already exists", 409, "Document already exists"),
@@ -398,7 +399,22 @@ ExceptionCodes implements ErrorHandler {
     CORRELATION_CONFIG_BAD_REQUEST(901403, "Bad Request", 400, "Request body can not have empty elements"),
     CORRELATION_CONFIG_BAD_REQUEST_INVALID_NAME(902021, "Bad Request", 400, "Request body contains invalid correlation component name"),
     // Artifact synchronise related
-    ARTIFACT_SYNC_HTTP_REQUEST_FAILED(901410, "Error while retrieving artifacts", 500, "Error while executing HTTP request to retrieve artifacts");
+    ARTIFACT_SYNC_HTTP_REQUEST_FAILED(901410, "Error while retrieving artifacts", 500, "Error while executing HTTP request to retrieve artifacts"),
+
+    // Subscriptions related
+    SUBSCRIPTION_ID_NOT_SPECIFIED(901411, "Subscription ID not specified.", 400,
+            "Subscription ID not specified."),
+    BUSINESS_PLAN_NOT_SPECIFIED(901412, "Business plan not specified.", 400,
+            "Business plan not specified."),
+    BUSINESS_PLAN_NOT_ALLOWED(901413, "The Business plan is not allowed.", 400,
+            "Business plan '%s' is not allowed for the API.", false),
+    INVALID_STATE_FOR_BUSINESS_PLAN_CHANGE(901414, "Cannot change the business plan of the subscription.",
+            409, "Cannot change the business plan of the subscription with ID '%s' as the " +
+            "subscription is in '%s' state.", false),
+    NOT_ALLOWED_TIER_FOR_SUBSCRIBER(901415, "Cannot change the business plan of the subscription.",
+            403, "Cannot change the business plan of the subscription with ID '%s' as the " +
+            "subscriber does not have permission to access the specified business plan.", false);
+
 
 
     private final long errorCode;

@@ -1122,6 +1122,11 @@ public class SQLConstants {
                     " , SUB_STATUS = ? " +
                     " WHERE SUBSCRIPTION_ID = ?";
 
+    public static final String UPDATE_SUBSCRIPTION_TIER_SQL =
+            " UPDATE AM_SUBSCRIPTION " +
+                    " SET TIER_ID = ? " +
+                    " WHERE SUBSCRIPTION_ID = ?";
+
     public static final String UPDATE_REFRESHED_APPLICATION_ACCESS_TOKEN_PREFIX = "UPDATE ";
 
     public static final String UPDATE_REFRESHED_APPLICATION_ACCESS_TOKEN_SUFFIX =

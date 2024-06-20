@@ -56,6 +56,25 @@ SubscriptionsApiService delegate = new SubscriptionsApiServiceImpl();
         return delegate.subscriptionsBlockSubscriptionPost(subscriptionId, blockState, ifMatch, securityContext);
     }
 
+    @POST
+    @Path("/change-business-plan")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Change subscription business plan", notes = "This operation can be used to change the business plan of a subscription specifying the subscription Id and the business plan. ", response = Void.class, authorizations = {
+        @Authorization(value = "OAuth2Security", scopes = {
+            @AuthorizationScope(scope = "apim:subscription_update", description = "Subscription update related operations")
+        })
+    }, tags={ "Subscriptions",  })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK. Subscription business plan was changed successfully. ", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request. Invalid request or validation error. ", response = ErrorDTO.class),
+        @ApiResponse(code = 403, message = "Forbidden. Operation is not allowed as the subscriber does not have permission to access the business plan. ", response = ErrorDTO.class),
+        @ApiResponse(code = 404, message = "Not Found. Requested subscription does not exist. ", response = ErrorDTO.class),
+        @ApiResponse(code = 409, message = "Conflict. Business plan change is not allowed due to a pending workflow task. ", response = ErrorDTO.class) })
+    public Response subscriptionsChangeBusinessPlanPost( @NotNull @ApiParam(value = "Subscription Id ",required=true)  @QueryParam("subscriptionId") String subscriptionId,  @NotNull @ApiParam(value = "The business plan to be assigned to the subscription. ",required=true)  @QueryParam("businessPlan") String businessPlan, @ApiParam(value = "Validator for conditional requests; based on ETag. " )@HeaderParam("If-Match") String ifMatch) throws APIManagementException{
+        return delegate.subscriptionsChangeBusinessPlanPost(subscriptionId, businessPlan, ifMatch, securityContext);
+    }
+
     @GET
     
     @Consumes({ "application/json" })

@@ -24,6 +24,7 @@ import javax.ws.rs.core.SecurityContext;
 
 public interface SubscriptionsApiService {
       public Response subscriptionsBlockSubscriptionPost(String subscriptionId, String blockState, String ifMatch, MessageContext messageContext) throws APIManagementException;
+      public Response subscriptionsChangeBusinessPlanPost(String subscriptionId, String businessPlan, String ifMatch, MessageContext messageContext) throws APIManagementException;
       public Response subscriptionsGet(String apiId, Integer limit, Integer offset, String ifNoneMatch, String query, MessageContext messageContext) throws APIManagementException;
       public Response subscriptionsSubscriptionIdSubscriberInfoGet(String subscriptionId, MessageContext messageContext) throws APIManagementException;
       public Response subscriptionsSubscriptionIdUsageGet(String subscriptionId, MessageContext messageContext) throws APIManagementException;

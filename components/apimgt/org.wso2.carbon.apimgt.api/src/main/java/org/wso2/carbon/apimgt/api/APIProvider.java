@@ -1572,4 +1572,15 @@ public interface APIProvider extends APIManager {
      */
     boolean isValidContext(String providerName, String apiName, String contextTemplate, String userName)
             throws APIManagementException;
+
+    /**
+     * Updates the subscription tier of a given subscription.
+     *
+     * @param subscriptionUUID The UUID of the subscription to be updated
+     * @param subscriptionTier The new subscription tier to be assigned
+     * @return The updated subscription
+     * @throws APIManagementException If the subscription is not found, status is TIER_UPDATE_PENDING, the specified
+     *                                tier is not allowed for the API or an error occurs while updating the subscription
+     */
+    SubscribedAPI updateSubscriptionTier(String subscriptionUUID, String subscriptionTier) throws APIManagementException;
 }
