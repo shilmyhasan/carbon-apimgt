@@ -36,6 +36,7 @@ import org.apache.synapse.rest.AbstractHandler;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.common.gateway.util.JWTUtil;
 import org.wso2.carbon.apimgt.gateway.dto.CertificateInfo;
+import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -43,8 +44,6 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.KeyStoreManager;
-import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
-import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -83,7 +82,7 @@ public class JwksHandler extends AbstractHandler {
             axis2MsgContext.setProperty(Constants.Configuration.MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
             axis2MsgContext.setProperty(Constants.Configuration.CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
             axis2MsgContext.removeProperty(APIConstants.NO_ENTITY_BODY);
-        } catch (ParseException | AxisFault | APIManagementException | IdentityOAuth2Exception |
+        } catch (ParseException | AxisFault | APIManagementException |
                  CertificateEncodingException e) {
             log.error("Error while generating payload " + axis2MsgContext.getLogIDString(), e);
         }
@@ -99,7 +98,7 @@ public class JwksHandler extends AbstractHandler {
      *
      * @return JWKS response
      */
-    public String getJwksEndpointResponse() throws ParseException, APIManagementException, IdentityOAuth2Exception,
+    public String getJwksEndpointResponse() throws ParseException, APIManagementException,
             CertificateEncodingException {
         this.jwtConfigurationDto = org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder.getInstance()
                 .getAPIManagerConfiguration().getJwtConfigurationDto();
@@ -135,7 +134,7 @@ public class JwksHandler extends AbstractHandler {
      * @return JWKS response as a JSON string
      */
     private String buildResponse(Set<CertificateInfo> certificates) throws ParseException, APIManagementException,
-            CertificateEncodingException, IdentityOAuth2Exception {
+            CertificateEncodingException {
 
         JSONArray jwksArray = new JSONArray();
         JSONObject jwksJson = new JSONObject();
@@ -158,7 +157,7 @@ public class JwksHandler extends AbstractHandler {
                 jwk.keyUse(KeyUse.parse(KEY_USE));
 
                 jwk.x509CertChain(encodedCertList);
-                jwk.x509CertSHA256Thumbprint(new Base64URL(OAuth2Util.getThumbPrint(x509Certificate, alias)));
+                jwk.x509CertSHA256Thumbprint(new Base64URL(GatewayUtils.getThumbPrint(x509Certificate, alias)));
                 jwksArray.add(jwk.build().toJSONObject());
             }
         }
