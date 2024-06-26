@@ -76,7 +76,7 @@ public final class JWTUtil {
 
     public static String generateHeader(Certificate publicCert, String signatureAlgorithm)
             throws JWTGeneratorException {
-        return generateHeader(publicCert, signatureAlgorithm, false);
+        return generateHeader(publicCert, signatureAlgorithm, false, false);
     }
 
     /**
@@ -87,8 +87,8 @@ public final class JWTUtil {
      * @param useKid             Specifies whether the header should include the kid property
      * @throws JWTGeneratorException
      */
-    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid)
-            throws JWTGeneratorException {
+    public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid,
+                                        boolean encodeX5tWithoutPadding) throws JWTGeneratorException {
 
         /*
          * Sample header
@@ -106,8 +106,13 @@ public final class JWTUtil {
             byte[] digestInBytes = digestValue.digest();
             String publicCertThumbprint = hexify(digestInBytes);
             String base64UrlEncodedThumbPrint;
-            base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
-                    .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+            if (encodeX5tWithoutPadding) {
+                base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder().withoutPadding()
+                        .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+            } else {
+                base64UrlEncodedThumbPrint = java.util.Base64.getUrlEncoder()
+                        .encodeToString(publicCertThumbprint.getBytes("UTF-8"));
+            }
             StringBuilder jwtHeader = new StringBuilder();
             /*
              * Sample header
