@@ -43,6 +43,7 @@ public class JWTConfigurationDto {
     private PrivateKey privateKey;
     private long ttl;
     private boolean useKid = false;
+    private boolean isEncodeX5tWithoutPadding;
 
     public JWTConfigurationDto(JWTConfigurationDto jwtConfigurationDto) {
 
@@ -187,6 +188,14 @@ public class JWTConfigurationDto {
 
     public void setUseKid(boolean useKid) {
         this.useKid = useKid;
+    }
+
+    public boolean isEncodeX5tWithoutPadding() {
+        return isEncodeX5tWithoutPadding;
+    }
+
+    public void setEncodeX5tWithoutPadding(boolean encodeX5tWithoutPadding) {
+        isEncodeX5tWithoutPadding = encodeX5tWithoutPadding;
     }
 
 }

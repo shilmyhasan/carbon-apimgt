@@ -60,11 +60,11 @@ public class JWTUtilTestCase {
                 Files.newInputStream(Paths.get("src/test/resources/cnf/certificate.pem"))
         );
 
-        String jwt = JWTUtil.generateHeader(cert, "SHA256withRSA", true);
+        String jwt = JWTUtil.generateHeader(cert, "SHA256withRSA", true, false);
         Assert.assertNotNull(jwt);
         Assert.assertTrue(jwt.contains("kid"));
 
-        jwt = JWTUtil.generateHeader(cert, "SHA256withRSA", false);
+        jwt = JWTUtil.generateHeader(cert, "SHA256withRSA", false, false);
         Assert.assertNotNull(jwt);
         Assert.assertFalse(jwt.contains("kid"));
     }
