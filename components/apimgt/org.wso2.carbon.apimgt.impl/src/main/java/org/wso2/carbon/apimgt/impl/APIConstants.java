@@ -626,6 +626,7 @@ public final class APIConstants {
     public static final String JWKS_URI = "jwksUri";
 
     public static final String ORG_ALL_QUERY_PARAM = "ALL";
+    public static final String JWT_HEADER_ACCESS_TOKEN_TYPE = "at+jwt";
 
     public static class TokenStatus {
 
@@ -3021,4 +3022,9 @@ public final class APIConstants {
     public static final String ENABLE_API_POLICIES = "EnableAPIPolicies";
 
     public static final String EAGER_LOADING_ENABLED_TENANTS = "Tenant.LoadingPolicy.EagerLoading.Include";
+
+    public static class TokenValidationConstants {
+        public static final String TOKEN_VALIDATION_CONFIG = "TokenValidation";
+        public static final String ENFORCE_JWT_TYPE_HEADER_VALIDATION = "EnforceTypeHeaderValidation";
+    }
 }
