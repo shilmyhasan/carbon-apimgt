@@ -626,6 +626,7 @@ public final class APIConstants {
     public static final String API_QUOTA_LIMIT_ENABLE = API_QUOTA_LIMIT + "EnableAPIQuotaLimit";
     public static final String JWKS_URI = "jwksUri";
     public static final String ORG_ALL_QUERY_PARAM = "ALL";
+    public static final String JWT_HEADER_ACCESS_TOKEN_TYPE = "at+jwt";
 
     public static class TokenStatus {
 
@@ -3018,5 +3019,10 @@ public final class APIConstants {
         public static final String OPEN_TRACER_CUSTOM_TAG_CONFIG = "CustomTag";
         public static final String OPEN_TRACER_CUSTOM_TAG_NAME_CONFIG = "Name";
         public static final String OPEN_TRACER_CUSTOM_TAG_VALUE_CONFIG = "Value";
+    }
+
+    public static class TokenValidationConstants {
+        public static final String TOKEN_VALIDATION_CONFIG = "TokenValidation";
+        public static final String ENFORCE_JWT_TYPE_HEADER_VALIDATION = "EnforceTypeHeaderValidation";
     }
 }
