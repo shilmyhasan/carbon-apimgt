@@ -1946,7 +1946,7 @@ public class SQLConstants {
                 "AM_API_COMMENTS.COMMENT_ID = ?";
 
     public static final String GET_API_CONTEXT_SQL =
-            "SELECT CONTEXT FROM AM_API WHERE CONTEXT= ? AND ORGANIZATION = ?";
+            "SELECT CONTEXT_TEMPLATE FROM AM_API WHERE  LOWER(CONTEXT_TEMPLATE) = LOWER(?) AND ORGANIZATION = ?";
 
     public static final String GET_API_CONTEXT_SQL_FOR_API_PRODUCTS =
             "SELECT CONTEXT FROM AM_API WHERE (CONTEXT= ? OR CONTEXT= ? OR CONTEXT_TEMPLATE= ?) AND ORGANIZATION = ?";
@@ -3662,6 +3662,12 @@ public class SQLConstants {
         public static final String GET_REVISIONED_URL_MAPPINGS_ID = "SELECT URL_MAPPING_ID FROM AM_API_URL_MAPPING " +
                 "WHERE API_ID = ? AND REVISION_UUID = ? AND HTTP_METHOD = ? AND AUTH_SCHEME = ? AND URL_PATTERN = ? " +
                 "AND THROTTLING_TIER = ? ";
+
+        public static final String GET_REVISIONED_URL_MAPPINGS_ID_CASE_SENSITIVE_MYSQL = "SELECT URL_MAPPING_ID " +
+                "FROM AM_API_URL_MAPPING " + "WHERE API_ID = ? AND REVISION_UUID = ? AND HTTP_METHOD = ? AND " +
+                "AUTH_SCHEME = ? AND URL_PATTERN = CONVERT(? USING utf8mb4) COLLATE utf8mb4_bin " +
+                "AND THROTTLING_TIER = ? ";
+
         public static final String GET_URL_MAPPINGS_ID = "SELECT URL_MAPPING_ID FROM AM_API_URL_MAPPING " +
                 "WHERE API_ID = ? AND HTTP_METHOD = ? AND AUTH_SCHEME = ? AND URL_PATTERN = ? " +
                 "AND THROTTLING_TIER = ? AND REVISION_UUID = ?";

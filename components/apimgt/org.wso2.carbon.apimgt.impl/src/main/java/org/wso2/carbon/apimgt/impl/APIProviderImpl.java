@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
 import org.apache.axis2.util.JavaUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -103,6 +104,7 @@ import javax.cache.Cache;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -5544,16 +5546,28 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public void setThumbnailToAPI(String apiId, ResourceFile resource, String organization) throws APIManagementException {
 
+        InputStream thumbnailImageContent = null;
         try {
             org.wso2.carbon.apimgt.persistence.dto.ResourceFile iconResourceFile = new org.wso2.carbon.apimgt.persistence.dto.ResourceFile(
                     resource.getContent(), resource.getContentType());
-            apiPersistenceInstance.saveThumbnail(new Organization(organization), apiId, iconResourceFile);
+            thumbnailImageContent = iconResourceFile.getContent();
+            if (thumbnailImageContent.available() > 0) {
+                apiPersistenceInstance.saveThumbnail(new Organization(organization), apiId, iconResourceFile);
+            } else {
+                // Thumbnail deletion from publisher originally handled through the same PUT call
+                // It was decided after discussion to fix the deletion (U2 update) through the same originally used PUT
+                apiPersistenceInstance.deleteThumbnail(new Organization(organization), apiId);
+            }
         } catch (ThumbnailPersistenceException e) {
             if (e.getErrorHandler() == ExceptionCodes.API_NOT_FOUND) {
                 throw new APIMgtResourceNotFoundException(e);
             } else {
                 throw new APIManagementException("Error while saving thumbnail ", e);
             }
+        } catch (IOException e) {
+            throw new APIManagementException("Error while reading input stream ", e);
+        } finally {
+            IOUtils.closeQuietly(thumbnailImageContent);
         }
     }
 
@@ -6719,7 +6733,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 } else {
                     uriTemplate.setThrottlingTier(api.getApiLevelPolicy());
                 }
+                if (StringUtils.isEmpty(uriTemplate.getAuthType())) {
+                    uriTemplate.setAuthType("Any");
+                }
             }
         }
+    }
+    
+    @Override
+    public void updateSoapToRestSequences(String organization, String apiId, List<SOAPToRestSequence> sequences)
+            throws APIManagementException {
+        Organization org = new Organization(organization);
+        try {
+            apiPersistenceInstance.updateSoapToRestSequences(org, apiId, sequences);
+        } catch (APIPersistenceException e) {
+            throw new APIManagementException("Error while sequences to the api  " + apiId, e);
+        }        
     }
 }

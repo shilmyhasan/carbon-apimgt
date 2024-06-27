@@ -453,6 +453,7 @@ public final class APIConstants {
     public static final String JWT_SIGNATURE_ALGORITHM = "SignatureAlgorithm";
     public static final String GATEWAY_JWT_GENERATOR = "GatewayJWTGeneration";
     public static final String GATEWAY_JWT_GENERATOR_IMPL = "ImplClass";
+    public static final String ENCODE_X5T_WITHOUT_PADDING = "EncodeX5tWithoutPadding";
     public static final String TOKEN_ISSUERS = "TokenIssuers";
     public static final String GATEWAY_JWT_CONFIGURATION = "Configuration";
     public static final String GATEWAY_JWT_GENERATOR_CLAIMS = "ExcludedClaims";
@@ -920,7 +921,9 @@ public final class APIConstants {
     public static final String DEFAULT_APPLICATION_NAME = "DefaultApplication";
     public static final String DEFAULT_APPLICATION_DESCRIPTION = "This is the default application";
     public static final String BASIC_AUTH_APPLICATION_NAME = "BasicAuthApplication";
-    public static final String BASIC_AUTH_APPLICATION_OWNER = "BasicAuthApplicationOwner";
+    public static final String BASIC_AUTH_APPLICATION_OWNER = " BasicAuthApplicationOwner";
+    public static final String MUTUAL_SSL_AUTH_APPLICATION_NAME = "MutualSSLAuthApplication";
+    public static final String MUTUAL_SSL_AUTH_APPLICATION_OWNER = "MutualSSLAuthApplicationOwner";
 
     public static final QName POLICY_ELEMENT = new QName("http://schemas.xmlsoap.org/ws/2004/09/policy",
             "Policy");

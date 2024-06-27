@@ -147,7 +147,8 @@ public abstract class AbstractAPIMgtGatewayJWTGenerator {
 
         try {
             Certificate publicCert = jwtConfigurationDto.getPublicCert();
-            return JWTUtil.generateHeader(publicCert, signatureAlgorithm, jwtConfigurationDto.useKid());
+            return JWTUtil.generateHeader(publicCert, signatureAlgorithm, jwtConfigurationDto.useKid(),
+                    jwtConfigurationDto.isEncodeX5tWithoutPadding());
         } catch (Exception e) {
             String error = "Error in obtaining keystore";
             throw new JWTGeneratorException(error, e);
