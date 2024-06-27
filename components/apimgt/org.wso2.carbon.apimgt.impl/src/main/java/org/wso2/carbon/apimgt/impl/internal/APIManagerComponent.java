@@ -348,6 +348,9 @@ public class APIManagerComponent {
             boolean isPolicyTableExists = ApiMgtDAO.getInstance().isTableExists("AM_API_POLICY_MAPPING");
             boolean isAPIPoliciesEnabled = Boolean.parseBoolean(isAPIPoliciesEnabledConfig) && isPolicyTableExists;
             ServiceReferenceHolder.getInstance().setAPIPoliciesEnabled(isAPIPoliciesEnabled);
+            boolean isDetailedErrorResponsesEnabled = Boolean.parseBoolean(System.getProperty("detailedErrorResponses"));
+
+            ServiceReferenceHolder.getInstance().setIsDetailedErrorResponses(isDetailedErrorResponsesEnabled);
 
         } catch (APIManagementException e) {
             log.error("Error while initializing the API manager component", e);

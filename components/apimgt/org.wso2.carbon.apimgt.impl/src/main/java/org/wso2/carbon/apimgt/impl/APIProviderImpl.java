@@ -113,6 +113,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.apimgt.impl.utils.APIUtil.handleException;
+
 /**
  * This class provides the core API provider functionality. It is implemented in a very
  * self-contained and 'pure' manner, without taking requirements like security into account,
@@ -591,8 +593,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 if (!isScopeKeyAssignedLocally(apiName, scope.getKey(), organization)) {
                     scopesToRegister.add(scope);
                 } else {
-                    throw new APIManagementException("Error while adding local scopes for API " + apiName
-                            + ". Scope: " + scopeKey + " already assigned locally for a different API.");
+                    String errMsg = "Error while adding local scopes for API " + apiName
+                            + ". Scope: " + scopeKey + " already assigned locally for a different API.";
+                    APIUtil.handleException(errMsg, ExceptionCodes
+                            .from(ExceptionCodes.SCOPE_ALREADY_ASSIGNED_FOR_DIFFERENT_API, apiName, scopeKey));
                 }
             } else if (log.isDebugEnabled()) {
                 log.debug("Scope " + scopeKey + " exists as a shared scope. Skip adding as a local scope.");
@@ -1044,9 +1048,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                 (JSONObject) oldEndpointConfigJson.get(APIConstants.ENDPOINT_SECURITY);
                         if (endpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION) != null) {
                             if (oldEndpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION) != null) {
-                                EndpointSecurity endpointSecurity = new ObjectMapper().convertValue(
-                                        endpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION),
-                                        EndpointSecurity.class);
+                                EndpointSecurity endpointSecurity;
+                                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                                    try {
+                                        endpointSecurity = new ObjectMapper().convertValue(
+                                                endpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION),
+                                                EndpointSecurity.class);
+                                    } catch (IllegalArgumentException e) {
+                                        ErrorHandler errorHandler = ExceptionCodes.from(
+                                                ExceptionCodes.INVALID_ENDPOINT_SECURITY_CONFIG,
+                                                APIConstants.ENDPOINT_SECURITY_PRODUCTION);
+                                        throw new APIManagementException(
+                                                "Error while processing " + APIConstants.ENDPOINT_SECURITY_PRODUCTION + " endpoint security configuration related values provided for API " + api.getId()
+                                                        .toString(), errorHandler);
+                                    }
+                                } else {
+                                    endpointSecurity = new ObjectMapper().convertValue(
+                                            endpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION),
+                                            EndpointSecurity.class);
+                                }
+
                                 EndpointSecurity oldEndpointSecurity = new ObjectMapper().convertValue(
                                         oldEndpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION),
                                         EndpointSecurity.class);
@@ -1054,6 +1075,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                         StringUtils.isBlank(endpointSecurity.getPassword())) {
                                     endpointSecurity.setUsername(oldEndpointSecurity.getUsername());
                                     endpointSecurity.setPassword(oldEndpointSecurity.getPassword());
+                                    if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                                        if (StringUtils.isBlank(endpointSecurity.getType())) {
+                                            ErrorHandler errorHandler = ExceptionCodes.from(
+                                                    ExceptionCodes.ENDPOINT_SECURITY_TYPE_NOT_DEFINED,
+                                                    APIConstants.ENDPOINT_SECURITY_PRODUCTION);
+                                            throw new APIManagementException("Endpoint security type is not defined " +
+                                                    "for the endpoint type " + APIConstants.ENDPOINT_SECURITY_PRODUCTION,
+                                                    errorHandler);
+                                        }
+                                    }
+
                                     if (endpointSecurity.getType().equals(APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH)) {
                                         endpointSecurity.setUniqueIdentifier(oldEndpointSecurity.getUniqueIdentifier());
                                         endpointSecurity.setGrantType(oldEndpointSecurity.getGrantType());
@@ -1069,9 +1101,27 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         }
                         if (endpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_SANDBOX) != null) {
                             if (oldEndpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_SANDBOX) != null) {
-                                EndpointSecurity endpointSecurity = new ObjectMapper()
-                                        .convertValue(endpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_SANDBOX),
+                                EndpointSecurity endpointSecurity;
+                                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                                    try {
+                                        endpointSecurity = new ObjectMapper().convertValue(
+                                                endpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_SANDBOX),
                                                 EndpointSecurity.class);
+                                    } catch (IllegalArgumentException e) {
+                                        ErrorHandler errorHandler = ExceptionCodes.from(
+                                                ExceptionCodes.INVALID_ENDPOINT_SECURITY_CONFIG,
+                                                APIConstants.ENDPOINT_SECURITY_SANDBOX);
+                                        throw new APIManagementException(
+                                                "Error while processing " + APIConstants.ENDPOINT_SECURITY_SANDBOX +
+                                                        " endpoint security configuration related values provided for API " + api.getId()
+                                                        .toString(), errorHandler);
+                                    }
+                                } else {
+                                    endpointSecurity = new ObjectMapper().convertValue(
+                                            endpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_SANDBOX),
+                                            EndpointSecurity.class);
+                                }
+
                                 EndpointSecurity oldEndpointSecurity = new ObjectMapper()
                                         .convertValue(oldEndpointSecurityJson.get(APIConstants.ENDPOINT_SECURITY_SANDBOX),
                                                 EndpointSecurity.class);
@@ -1079,6 +1129,16 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                         StringUtils.isBlank(endpointSecurity.getPassword())) {
                                     endpointSecurity.setUsername(oldEndpointSecurity.getUsername());
                                     endpointSecurity.setPassword(oldEndpointSecurity.getPassword());
+                                    if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                                        if (StringUtils.isBlank(endpointSecurity.getType())) {
+                                            ErrorHandler errorHandler = ExceptionCodes.from(
+                                                    ExceptionCodes.ENDPOINT_SECURITY_TYPE_NOT_DEFINED,
+                                                    APIConstants.ENDPOINT_SECURITY_SANDBOX);
+                                            throw new APIManagementException("Endpoint security type is not defined " +
+                                                    "for the endpoint type " + APIConstants.ENDPOINT_SECURITY_SANDBOX,
+                                                    errorHandler);
+                                        }
+                                    }
                                     if (endpointSecurity.getType().equals(APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH)) {
                                         endpointSecurity.setUniqueIdentifier(oldEndpointSecurity.getUniqueIdentifier());
                                         endpointSecurity.setGrantType(oldEndpointSecurity.getGrantType());
@@ -1636,6 +1696,16 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         if (!commonPolicyData.getSpecification().getName()
                                 .equals(policy.getPolicyName()) || !commonPolicyData.getSpecification().getVersion()
                                 .equals(policy.getPolicyVersion())) {
+                            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                                String errMsg =
+                                        "policyName and/or policyVersion provided for the applied policy " + policy.getPolicyName()
+                                        + "_" + policy.getPolicyVersion() + " does not match the policy " +
+                                        "specification identified by the given policyId " + policyId;
+                                ErrorHandler errorHandler = ExceptionCodes.from(
+                                        ExceptionCodes.OPERATION_POLICY_NAME_VERSION_INVALID, policy.getPolicyName(),
+                                        policy.getPolicyVersion(), policyId);
+                                throw new APIManagementException(errMsg, errorHandler);
+                            }
                             throw new APIManagementException("Applied policy for uriTemplate " + policy.getPolicyName()
                                     + "_" + policy.getPolicyVersion() + " does not match the specification");
                         }
@@ -1718,11 +1788,34 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     if (appliedPolicyAttribute != null) {
                         if (attribute.getValidationRegex() != null) {
                             Pattern pattern = Pattern.compile(attribute.getValidationRegex(), Pattern.CASE_INSENSITIVE);
-                            Matcher matcher = pattern.matcher((String) appliedPolicyAttribute);
+                            Matcher matcher;
+                            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                                try {
+                                    matcher = pattern.matcher((String) appliedPolicyAttribute);
+                                } catch (ClassCastException e) {
+                                    ErrorHandler errorHandler = ExceptionCodes.from(
+                                            ExceptionCodes.INVALID_OPERATION_POLICY_PARAMS, attribute.getName());
+                                    throw new APIManagementException(
+                                            "Value with invalid data type provided for the operation policy " +
+                                                    "parameter " + attribute.getName(),
+                                            errorHandler);
+                                }
+                            } else {
+                                matcher = pattern.matcher((String) appliedPolicyAttribute);
+                            }
+
                             if (!matcher.matches()) {
-                                throw new APIManagementException("Policy attribute " + attribute.getName()
-                                        + " regex validation error.",
-                                        ExceptionCodes.INVALID_OPERATION_POLICY_PARAMETERS);
+                                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                                    ErrorHandler errorHandler = ExceptionCodes.from(
+                                            ExceptionCodes.INVALID_OPERATION_POLICY_PARAMS, attribute.getName());
+                                    throw new APIManagementException(
+                                            "Invalid value provided for the operation policy parameter " + attribute.getName(),
+                                            errorHandler);
+                                } else {
+                                    throw new APIManagementException(
+                                            "Policy attribute " + attribute.getName() + " regex validation error.",
+                                            ExceptionCodes.MISSING_OPERATION_POLICY_PARAMETERS);
+                                }
                             }
                         }
                     } else {
@@ -1848,7 +1941,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     private void checkIfValidTransport(String transport) throws APIManagementException {
         if (!Constants.TRANSPORT_HTTP.equalsIgnoreCase(transport) && !Constants.TRANSPORT_HTTPS.equalsIgnoreCase(transport)
                 && !APIConstants.WS_PROTOCOL.equalsIgnoreCase(transport) && !APIConstants.WSS_PROTOCOL.equalsIgnoreCase(transport)) {
-            handleException("Unsupported Transport [" + transport + ']');
+            String errMsg = "Unsupported Transport [" + transport + ']';
+            APIUtil.handleException(errMsg, ExceptionCodes
+                    .from(ExceptionCodes.UNSUPPORTED_TRANSPORT, transport));
         }
     }
 
