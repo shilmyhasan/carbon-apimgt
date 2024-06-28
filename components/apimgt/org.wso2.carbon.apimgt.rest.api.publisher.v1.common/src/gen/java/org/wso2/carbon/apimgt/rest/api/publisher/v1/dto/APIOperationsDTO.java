@@ -61,8 +61,9 @@ public class APIOperationsDTO   {
   }
 
   
-  @ApiModelProperty(example = "/order/{orderId}", value = "")
+  @ApiModelProperty(example = "/order/{orderId}", required = true, value = "")
   @JsonProperty("target")
+  @NotNull
   public String getTarget() {
     return target;
   }
@@ -78,8 +79,9 @@ public class APIOperationsDTO   {
   }
 
   
-  @ApiModelProperty(example = "POST", value = "")
+  @ApiModelProperty(example = "POST", required = true, value = "")
   @JsonProperty("verb")
+  @NotNull
   public String getVerb() {
     return verb;
   }

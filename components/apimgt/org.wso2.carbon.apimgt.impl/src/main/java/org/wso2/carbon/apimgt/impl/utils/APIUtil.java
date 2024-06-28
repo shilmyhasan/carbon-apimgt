@@ -87,6 +87,7 @@ import org.wso2.carbon.apimgt.api.LoginPostExecutor;
 import org.wso2.carbon.apimgt.api.NewPostLoginExecutor;
 import org.wso2.carbon.apimgt.api.OrganizationResolver;
 import org.wso2.carbon.apimgt.api.PasswordResolver;
+import org.wso2.carbon.apimgt.api.ErrorHandler;
 import org.wso2.carbon.apimgt.api.doc.model.APIDefinition;
 import org.wso2.carbon.apimgt.api.doc.model.APIResource;
 import org.wso2.carbon.apimgt.api.doc.model.Operation;
@@ -1669,6 +1670,15 @@ public final class APIUtil {
         throw new APIManagementException(msg);
     }
 
+    public static void handleException(String msg, ErrorHandler errorHandler) throws APIManagementException {
+        if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+            throw new APIManagementException(msg, errorHandler);
+        } else {
+            log.error(msg);
+            throw new APIManagementException(msg);
+        }
+    }
+
     public static void handleException(String msg, Throwable t) throws APIManagementException {
 
         log.error(msg, t);
@@ -2331,8 +2341,13 @@ public final class APIUtil {
 
         boolean authorized = false;
         if (userNameWithoutChange == null) {
-            throw new APIManagementException("Attempt to execute privileged operation as" +
-                    " the anonymous user");
+            String errMsg = "Attempt to execute privileged operation as the anonymous user";
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                ExceptionCodes errorHandler = ExceptionCodes.ANONYMOUS_USER_NOT_PERMITTED;
+                throw new APIManagementException(errMsg, errorHandler);
+            } else {
+                throw new APIManagementException("Attempt to execute privileged operation as the anonymous user");
+            }
         }
 
         if (isPermissionCheckDisabled()) {
@@ -2425,8 +2440,13 @@ public final class APIUtil {
     public static String[] getListOfRoles(String username) throws APIManagementException {
 
         if (username == null) {
-            throw new APIManagementException("Attempt to execute privileged operation as" +
-                    " the anonymous user");
+            String errMsg = "Attempt to execute privileged operation as the anonymous user";
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                ExceptionCodes errorHandler = ExceptionCodes.ANONYMOUS_USER_NOT_PERMITTED;
+                throw new APIManagementException(errMsg, errorHandler);
+            } else {
+                throw new APIManagementException(errMsg);
+            }
         }
 
         String[] roles = getValueFromCache(APIConstants.API_USER_ROLE_CACHE, username);

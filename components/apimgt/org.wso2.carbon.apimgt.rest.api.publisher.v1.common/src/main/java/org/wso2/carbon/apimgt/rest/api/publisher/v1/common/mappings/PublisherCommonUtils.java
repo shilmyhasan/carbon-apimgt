@@ -38,6 +38,7 @@ import org.wso2.carbon.apimgt.api.APIDefinition;
 import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
+import org.wso2.carbon.apimgt.api.ErrorHandler;
 import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.FaultGatewaysException;
 import org.wso2.carbon.apimgt.api.doc.model.APIResource;
@@ -67,6 +68,7 @@ import org.wso2.carbon.apimgt.impl.definitions.GraphQLSchemaDefinition;
 import org.wso2.carbon.apimgt.impl.definitions.OAS2Parser;
 import org.wso2.carbon.apimgt.impl.definitions.OAS3Parser;
 import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.apimgt.impl.wsdl.SequenceGenerator;
@@ -770,6 +772,9 @@ public class PublisherCommonUtils {
 
         if (additionalProperties != null) {
             for (APIInfoAdditionalPropertiesDTO property : additionalProperties) {
+                if (property.getName() == null || property.getValue() == null || property.isDisplay() == null) {
+                    return "Property name, value or display status should not be null";
+                }
                 String propertyKey = property.getName();
                 String propertyValue = property.getValue();
                 if (propertyKey.contains(" ")) {
@@ -794,7 +799,7 @@ public class PublisherCommonUtils {
         }
         return "";
     }
-
+    // done
     /**
      * validate user inout scopes.
      *
@@ -1007,7 +1012,7 @@ public class PublisherCommonUtils {
      * @param apiDto API DTO of the API
      * @return validity of URLs found within the endpoint configurations of the DTO
      */
-    public static boolean validateEndpoints(APIDTO apiDto) {
+    public static boolean validateEndpoints(APIDTO apiDto) throws APIManagementException {
 
         ArrayList<String> endpoints = new ArrayList<>();
         org.json.JSONObject endpointConfiguration = new org.json.JSONObject((Map) apiDto.getEndpointConfig());
@@ -1031,6 +1036,7 @@ public class PublisherCommonUtils {
         return APIUtil.validateEndpointURLs(endpoints);
     }
 
+
     /**
      * Extract sandbox or production endpoint URLs from endpoint config object.
      *
@@ -1039,11 +1045,25 @@ public class PublisherCommonUtils {
      * @param endpoints         List of URLs. Extracted URL(s), if any, are added to this list.
      */
     private static void extractURLsFromEndpointConfig(org.json.JSONObject endpointConfigObj, String endpointType,
-            ArrayList<String> endpoints) {
+            ArrayList<String> endpoints) throws APIManagementException {
         if (!endpointConfigObj.isNull(endpointType)) {
             org.json.JSONObject endpointObj = endpointConfigObj.optJSONObject(endpointType);
             if (endpointObj != null) {
-                endpoints.add(endpointConfigObj.getJSONObject(endpointType).getString(APIConstants.API_DATA_URL));
+                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                    if (endpointObj.has(APIConstants.API_DATA_URL)) {
+                        endpoints.add(
+                                endpointConfigObj.getJSONObject(endpointType).getString(APIConstants.API_DATA_URL));
+                    } else {
+                        ErrorHandler errorHandler = ExceptionCodes.from(ExceptionCodes.ENDPOINT_URL_NOT_PROVIDED,
+                                endpointType);
+                        throw new APIManagementException(
+                                "Url is not provided for the endpoint type: " + endpointType + " in the endpoint " +
+                                        "config",
+                                errorHandler);
+                    }
+                } else {
+                    endpoints.add(endpointConfigObj.getJSONObject(endpointType).getString(APIConstants.API_DATA_URL));
+                }
             } else {
                 JSONArray endpointArray = endpointConfigObj.getJSONArray(endpointType);
                 for (int i = 0; i < endpointArray.length(); i++) {
@@ -1135,6 +1155,7 @@ public class PublisherCommonUtils {
      * @return API object to be created
      * @throws APIManagementException Error while creating the API
      */
+    // 4
     public static API prepareToCreateAPIByDTO(APIDTO body, APIProvider apiProvider, String username,
                                               String organization)
             throws APIManagementException {
@@ -1287,7 +1308,13 @@ public class PublisherCommonUtils {
         } else if (body.getKeyManagers() == null) {
             apiToAdd.setKeyManagers(Collections.singletonList(APIConstants.KeyManager.API_LEVEL_ALL_KEY_MANAGERS));
         } else {
-            throw new APIManagementException("KeyManagers value need to be an array");
+            String errMsg = "KeyManagers value needs to be an array";
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                ExceptionCodes errorHandler = ExceptionCodes.KEYMANAGERS_VALUE_NOT_ARRAY;
+                throw new APIManagementException(errMsg, errorHandler);
+            } else {
+                throw new APIManagementException("KeyManagers value needs to be an array");
+            }
         }
 
         // Set default gatewayVendor

@@ -404,7 +404,13 @@ public class APIMappingUtil {
         } else if (dto.getKeyManagers() == null) {
             model.setKeyManagers(Collections.singletonList(APIConstants.KeyManager.API_LEVEL_ALL_KEY_MANAGERS));
         } else {
-            throw new APIManagementException("KeyManagers value need to be an array");
+            String errMsg = "KeyManagers value needs to be an array";
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                ExceptionCodes errorHandler = ExceptionCodes.KEYMANAGERS_VALUE_NOT_ARRAY;
+                throw new APIManagementException(errMsg, errorHandler);
+            } else {
+                throw new APIManagementException("KeyManagers value needs to be an array");
+            }
         }
 
         APIServiceInfoDTO serviceInfoDTO = dto.getServiceInfo();
@@ -1662,6 +1668,13 @@ public class APIMappingUtil {
 
             String uriTempVal = operation.getTarget();
 
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                if (StringUtils.isEmpty(uriTempVal)) {
+                    String errMsg = "Resource URI template value (target) is not specified for the operation/resource";
+                    handleException(errMsg, ExceptionCodes.RESOURCE_URI_TEMPLATE_NOT_DEFINED);
+                }
+            }
+
             String httpVerb = operation.getVerb();
             List<String> scopeList = operation.getScopes();
             if (scopeList != null) {
@@ -1681,6 +1694,14 @@ public class APIMappingUtil {
             if (amznResourceName != null) {
                 template.setAmznResourceName(amznResourceName);
             }
+
+            if (StringUtils.isEmpty(httpVerb)) {
+                String errMsg = "Operation type/http method is not specified for the operation/resource " + uriTempVal;
+                handleException(errMsg,
+                        ExceptionCodes.from(ExceptionCodes.OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED,
+                                uriTempVal));
+            }
+
             //Only continue for supported operations
             if (APIConstants.SUPPORTED_METHODS.contains(httpVerb.toLowerCase())
                     || (APIConstants.GRAPHQL_SUPPORTED_METHOD_LIST.contains(httpVerb.toUpperCase()))
@@ -1713,23 +1734,33 @@ public class APIMappingUtil {
                 }
                 uriTemplates.add(template);
             } else {
+                final String errorMessageEndClause = " operation Type  '" + httpVerb + "' provided" + " for operation" +
+                        " '" + uriTempVal + "' is invalid";
                 if (APIConstants.GRAPHQL_API.equals(model.getType())) {
-                    handleException(
-                            "The GRAPHQL operation Type '" + httpVerb + "' provided for operation '" + uriTempVal
-                                    + "' is invalid");
+                    String errMsg = "The " + APIConstants.GRAPHQL_API + errorMessageEndClause;
+                    ErrorHandler errorHandler = ExceptionCodes.from(ExceptionCodes.OPERATION_TYPE_INVALID,
+                            APIConstants.GRAPHQL_API, httpVerb, uriTempVal);
+                    APIUtil.handleException(errMsg, errorHandler);
                 } else if (APIConstants.API_TYPE_WEBSUB.equals(model.getType())) {
-                    handleException("The WEBSUB operation Type '" + httpVerb + "' provided for operation '" + uriTempVal
-                            + "' is invalid");
+                    String errMsg = "The " + APIConstants.API_TYPE_WEBSUB + errorMessageEndClause;
+                    ErrorHandler errorHandler = ExceptionCodes.from(ExceptionCodes.OPERATION_TYPE_INVALID,
+                            APIConstants.API_TYPE_WEBSUB, httpVerb, uriTempVal);
+                    APIUtil.handleException(errMsg, errorHandler);
                 } else if (APIConstants.API_TYPE_SSE.equals(model.getType())) {
-                    handleException("The SSE operation Type '" + httpVerb + "' provided for operation '" + uriTempVal
-                            + "' is invalid");
+                    String errMsg = "The " + APIConstants.API_TYPE_SSE + errorMessageEndClause;
+                    ErrorHandler errorHandler = ExceptionCodes.from(ExceptionCodes.OPERATION_TYPE_INVALID,
+                            APIConstants.API_TYPE_SSE, httpVerb, uriTempVal);
+                    APIUtil.handleException(errMsg, errorHandler);
                 } else if (APIConstants.API_TYPE_WS.equals(model.getType())) {
-                    handleException(
-                            "The WEBSOCKET operation Type '" + httpVerb + "' provided for operation '" + uriTempVal
-                                    + "' is invalid");
+                    String errMsg = "The " + APIConstants.API_TYPE_WS + errorMessageEndClause;
+                    ErrorHandler errorHandler = ExceptionCodes.from(ExceptionCodes.OPERATION_TYPE_INVALID,
+                            APIConstants.API_TYPE_WS, httpVerb, uriTempVal);
+                    APIUtil.handleException(errMsg, errorHandler);
                 } else {
-                    handleException("The HTTP method '" + httpVerb + "' provided for resource '" + uriTempVal
-                            + "' is invalid");
+                    String errMsg = "The HTTP method '" + httpVerb + "' provided for resource '" + uriTempVal + "' is" +
+                     " invalid";
+                    APIUtil.handleException(errMsg,
+                            ExceptionCodes.from(ExceptionCodes.HTTP_METHOD_INVALID, httpVerb, uriTempVal));
                 }
             }
 
@@ -3081,8 +3112,8 @@ public class APIMappingUtil {
                     (JSONObject) endpointSecurityElement.get(APIConstants.ENDPOINT_SECURITY_SANDBOX);
             if (sandboxEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_PASSWORD) != null) {
                 sandboxEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_PASSWORD, EMPTY_STRING);
-                if (sandboxEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_TYPE)
-                        .equals(APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH)) {
+                if (APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.equals(
+                        sandboxEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_TYPE))) {
                     sandboxEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_ID, EMPTY_STRING);
                     sandboxEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_SECRET, EMPTY_STRING);
                 }
@@ -3093,8 +3124,8 @@ public class APIMappingUtil {
                     (JSONObject) endpointSecurityElement.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION);
             if (productionEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_PASSWORD) != null) {
                 productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_PASSWORD, EMPTY_STRING);
-                if (productionEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_TYPE)
-                        .equals(APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH)) {
+                if (APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.equals(
+                        productionEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_TYPE))) {
                     productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_ID, EMPTY_STRING);
                     productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_SECRET, EMPTY_STRING);
                 }

@@ -79,7 +79,7 @@ public class ServiceReferenceHolder {
     private Map<String, APIDefinition> apiDefinitionMap = new HashMap<>();
     private WorkflowTaskService workflowTaskService;
     private boolean isAPIPoliciesEnabled = false;
-
+    private boolean isDetailedErrorResponsesEnabled = false;
     private ServiceReferenceHolder() {
 
     }
@@ -386,4 +386,13 @@ public class ServiceReferenceHolder {
     public void setAPIPoliciesEnabled(boolean APIPoliciesEnabled) {
         isAPIPoliciesEnabled = APIPoliciesEnabled;
     }
+
+    public void setIsDetailedErrorResponses(boolean isDetailedErrorResponsesEnabled) {
+        this.isDetailedErrorResponsesEnabled = isDetailedErrorResponsesEnabled;
+    }
+
+    public boolean isDetailedErrorResponsesEnabled() {
+        return isDetailedErrorResponsesEnabled;
+    }
+
 }
