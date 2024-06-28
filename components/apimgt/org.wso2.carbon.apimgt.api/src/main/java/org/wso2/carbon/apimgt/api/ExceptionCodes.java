@@ -598,7 +598,7 @@ public enum ExceptionCodes implements ErrorHandler {
 
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
-            "Operation type/http method is not specified for the operation/resource: %s"),
+            "Operation type/http method is not specified for the operation/resource: %s", false),
 
     RESOURCE_URI_TEMPLATE_NOT_DEFINED(902032, "Resource URI template value not defined", 400,
             "Resource URI template value (target) not defined", false);
