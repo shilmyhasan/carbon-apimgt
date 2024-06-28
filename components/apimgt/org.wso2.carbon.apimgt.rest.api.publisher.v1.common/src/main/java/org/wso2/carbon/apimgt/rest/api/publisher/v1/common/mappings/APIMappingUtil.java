@@ -1668,6 +1668,13 @@ public class APIMappingUtil {
 
             String uriTempVal = operation.getTarget();
 
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                if (StringUtils.isEmpty(uriTempVal)) {
+                    String errMsg = "Resource URI template value (target) is not specified for the operation/resource";
+                    handleException(errMsg, ExceptionCodes.RESOURCE_URI_TEMPLATE_NOT_DEFINED);
+                }
+            }
+
             String httpVerb = operation.getVerb();
             List<String> scopeList = operation.getScopes();
             if (scopeList != null) {
@@ -1687,6 +1694,14 @@ public class APIMappingUtil {
             if (amznResourceName != null) {
                 template.setAmznResourceName(amznResourceName);
             }
+
+            if (StringUtils.isEmpty(httpVerb)) {
+                String errMsg = "Operation type/http method is not specified for the operation/resource " + uriTempVal;
+                handleException(errMsg,
+                        ExceptionCodes.from(ExceptionCodes.OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED,
+                                uriTempVal));
+            }
+
             //Only continue for supported operations
             if (APIConstants.SUPPORTED_METHODS.contains(httpVerb.toLowerCase())
                     || (APIConstants.GRAPHQL_SUPPORTED_METHOD_LIST.contains(httpVerb.toUpperCase()))
