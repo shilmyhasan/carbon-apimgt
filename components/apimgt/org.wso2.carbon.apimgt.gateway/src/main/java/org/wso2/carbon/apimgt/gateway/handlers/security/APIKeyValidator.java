@@ -160,8 +160,6 @@ public class APIKeyValidator {
                 APIKeyValidationInfoDTO info = (APIKeyValidationInfoDTO) getGatewayKeyCache().get(cacheKey);
 
                 if (info != null) {
-                    long timestampSkew = getTimeStampSkewInSeconds() * 1000;
-                    valid = JWTUtil.isJWTValid(info.getEndUserToken(), timestampSkew);
                     if (APIUtil.isAccessTokenExpired(info)) {
                         log.info("Invalid OAuth Token : Access Token " + GatewayUtils.getMaskedToken(apiKey) + " " +
                                 "expired.");
@@ -174,6 +172,11 @@ public class APIKeyValidator {
                         // Put into invalid token cache
                         getInvalidTokenCache().put(apiKey, cachedToken);
                     }
+                    if (info.getEndUserToken() == null) {
+                        return info;
+                    }
+                    long timestampSkew = getTimeStampSkewInSeconds() * 1000;
+                    valid = JWTUtil.isJWTValid(info.getEndUserToken(), timestampSkew);
                     if (valid) {
                         return info;
                     }
