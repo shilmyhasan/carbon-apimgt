@@ -1370,13 +1370,13 @@ public abstract class AbstractAPIManager implements APIManager {
                                 convertedList.add(DocumentMapper.INSTANCE.toDocumentation(docList.get(i)));
                             }
                             if (APIConstants.DOC_OWNER_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
-                                if (APIConstants.WSO2_ANONYMOUS_USER != username
+                                if (!APIConstants.WSO2_ANONYMOUS_USER.equals(username)
                                         && !isTenantDomainNotMatching(tenantDomain)) {
                                     convertedList.add(DocumentMapper.INSTANCE.toDocumentation(docList.get(i)));
                                 }
                             }
                             if (APIConstants.DOC_SHARED_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
-                                if (APIConstants.WSO2_ANONYMOUS_USER != username) {
+                                if (!APIConstants.WSO2_ANONYMOUS_USER.equals(username)) {
                                     privateDocs.add(DocumentMapper.INSTANCE.toDocumentation(docList.get(i)));
                                 }
                             }
@@ -1690,11 +1690,11 @@ public abstract class AbstractAPIManager implements APIManager {
         if (APIConstants.DOC_API_BASED_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
             validDoc = true;
         } else if (APIConstants.DOC_OWNER_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
-            if (APIConstants.WSO2_ANONYMOUS_USER != username && !isTenantDomainNotMatching(requestedTenantDomain)) {
+            if (!APIConstants.WSO2_ANONYMOUS_USER.equals(username) && !isTenantDomainNotMatching(requestedTenantDomain)) {
                 validDoc = true;
             }
         } else if (APIConstants.DOC_SHARED_VISIBILITY.equals(String.valueOf(doc.getVisibility()))) {
-            if (APIConstants.WSO2_ANONYMOUS_USER != username) {
+            if (!APIConstants.WSO2_ANONYMOUS_USER.equals(username)) {
                 try {
                     if (validatePrivateScopes(username, loggedInTenantDomain)) {
                         validDoc = true;
@@ -3041,7 +3041,7 @@ public abstract class AbstractAPIManager implements APIManager {
                         } else if (api instanceof APIProduct) {
                             apiId = ((APIProduct) api).getId().getApplicationId();
                         }
-                        if (apiId != null && apiId != "") {
+                        if (StringUtils.isNotEmpty(apiId)) {
                             Set<Scope> scopes = apiScopeSet.get(apiId);
                             if (api instanceof API) {
                                 ((API) api).setScopes(scopes);
