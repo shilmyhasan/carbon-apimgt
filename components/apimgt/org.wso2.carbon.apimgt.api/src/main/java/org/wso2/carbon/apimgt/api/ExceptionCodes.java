@@ -546,8 +546,8 @@ public enum ExceptionCodes implements ErrorHandler {
     KEY_MANAGER_DELETE_FAILED(902013, "Key Manager Delete error", 412,"Key Manager Delete error. %s", false),
     KEYS_DELETE_FAILED(902014, "Key Delete error", 412,"Keys delete error. %s", false),
 
-    DOCUMENT_NAME_ILLEGAL_CHARACTERS(903200, "Document name cannot contain illegal characters", 400,
-            "Document name contains one or more illegal characters", false),
+    DOCUMENT_NAME_ILLEGAL_CHARACTERS(902015, "Document name cannot contain illegal characters", 400,
+            "Document name contains one or more illegal characters"),
 
     HTTP_METHOD_INVALID(903201,
             "Invalid HTTP method provided for API resource", 400,
