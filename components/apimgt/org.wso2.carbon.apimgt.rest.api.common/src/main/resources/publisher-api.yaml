@@ -10745,9 +10745,6 @@ components:
     APIOperations:
       title: Operation
       type: object
-      required:
-        - target
-        - verb
       properties:
         id:
           type: string
