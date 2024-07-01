@@ -65,6 +65,7 @@ public class TagsApiServiceImpl implements TagsApiService {
             if (tagSet != null) {
                 tagList.addAll(tagSet);
             }
+            
             TagListDTO tagListDTO = limit == -1 ?
                     TagMappingUtil.fromTagListToDTO(tagList, tagList.size(), offset) :
                     TagMappingUtil.fromTagListToDTO(tagList, limit, offset);

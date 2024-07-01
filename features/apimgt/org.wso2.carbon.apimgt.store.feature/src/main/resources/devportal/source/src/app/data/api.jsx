@@ -663,7 +663,7 @@ export default class API extends Resource {
      */
     getAllTags(limit = 25) {
         const promiseGet = this.client.then((client) => {
-            return client.apis.Tags.get_tags({ limit },this._requestMetaData());
+            return client.apis.Tags.get_tags({ limit } ,this._requestMetaData());
         }).catch((error) => {
             console.error(error);
         });
