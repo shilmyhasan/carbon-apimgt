@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -42,7 +43,9 @@ import javax.xml.stream.XMLStreamException;
  */
 public class DataProcessAndPublishingAgent implements Runnable {
     private static final Log log = LogFactory.getLog(DataProcessAndPublishingAgent.class);
-
+    private static final Pattern IPV4_PATTERN = Pattern.compile(
+            "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-5]{2})\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-5]{2})$");
+    private static final Pattern IPV6_PATTERN = Pattern.compile("^[0-9a-fA-F:]+$");
     private static String streamID = "org.wso2.throttle.request.stream:1.0.0";
     private MessageContext messageContext;
     private DataPublisher dataPublisher;
@@ -202,12 +205,18 @@ public class DataProcessAndPublishingAgent implements Runnable {
                 ipAddress = ipAddress.split(":")[0];
             }
             try {
-                InetAddress address = APIUtil.getAddress(ipAddress);
-                if (address instanceof Inet4Address) {
-                    jsonObMap.put(APIThrottleConstants.IP, APIUtil.ipToLong(ipAddress));
+                if (IPV4_PATTERN.matcher(ipAddress).matches() || IPV6_PATTERN.matcher(ipAddress).matches()) {
+                    InetAddress address = APIUtil.getAddress(ipAddress);
+                    if (address instanceof Inet4Address) {
+                        jsonObMap.put(APIThrottleConstants.IP, APIUtil.ipToLong(ipAddress));
+                        jsonObMap.put(APIThrottleConstants.IPv6, 0);
+                    } else if (address instanceof Inet6Address) {
+                        jsonObMap.put(APIThrottleConstants.IPv6, APIUtil.ipToBigInteger(ipAddress));
+                        jsonObMap.put(APIThrottleConstants.IP, 0);
+                    }
+                } else {
+                    log.error("Error while parsing host IP " + ipAddress);
                     jsonObMap.put(APIThrottleConstants.IPv6, 0);
-                } else if (address instanceof Inet6Address) {
-                    jsonObMap.put(APIThrottleConstants.IPv6, APIUtil.ipToBigInteger(ipAddress));
                     jsonObMap.put(APIThrottleConstants.IP, 0);
                 }
             } catch (UnknownHostException e) {
