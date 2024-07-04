@@ -44,9 +44,10 @@ import javax.xml.stream.XMLStreamException;
 public class DataProcessAndPublishingAgent implements Runnable {
     private static final Log log = LogFactory.getLog(DataProcessAndPublishingAgent.class);
     private static final Pattern IPV4_PATTERN = Pattern.compile(
-            "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-5]{2})\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-5]{2})$");
-    private static final Pattern IPV6_PATTERN = Pattern.compile("^[0-9a-fA-F:]+$");
-    private static String streamID = "org.wso2.throttle.request.stream:1.0.0";
+            "^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
+    private static final Pattern IPV6_PATTERN = Pattern.compile(
+            "([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})");
+    private static final String streamID = "org.wso2.throttle.request.stream:1.0.0";
     private MessageContext messageContext;
     private DataPublisher dataPublisher;
 
