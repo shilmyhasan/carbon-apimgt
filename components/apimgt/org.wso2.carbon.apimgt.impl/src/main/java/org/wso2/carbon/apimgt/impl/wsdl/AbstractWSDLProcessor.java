@@ -64,6 +64,12 @@ abstract class AbstractWSDLProcessor implements WSDLProcessor {
         InputStream inputStream = null;
         try {
             DocumentBuilderFactory factory = getSecuredDocumentBuilder();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setNamespaceAware(true);
+            factory.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+                    false);
+            factory.setFeature(Constants.SAX_FEATURE_PREFIX +
+                    Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
             DocumentBuilder builder = factory.newDocumentBuilder();
             inputStream = url.openStream();
             return builder.parse(inputStream);
@@ -86,6 +92,12 @@ abstract class AbstractWSDLProcessor implements WSDLProcessor {
         InputStream inputStream = null;
         try {
             DocumentBuilderFactory factory = getSecuredDocumentBuilder();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setNamespaceAware(true);
+            factory.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+                    false);
+            factory.setFeature(Constants.SAX_FEATURE_PREFIX +
+                    Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
             DocumentBuilder builder = factory.newDocumentBuilder();
             inputStream = new FileInputStream(new File(path));
             return builder.parse(inputStream);
@@ -107,6 +119,12 @@ abstract class AbstractWSDLProcessor implements WSDLProcessor {
         InputStream inputStream = null;
         try {
             DocumentBuilderFactory factory = getSecuredDocumentBuilder();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setNamespaceAware(true);
+            factory.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+                    false);
+            factory.setFeature(Constants.SAX_FEATURE_PREFIX +
+                    Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
             DocumentBuilder builder = factory.newDocumentBuilder();
             inputStream = new ByteArrayInputStream(content);
             return builder.parse(inputStream);
