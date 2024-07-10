@@ -19,9 +19,6 @@ import java.util.Random;
 
 public final class TrustStoreUtils {
     private static final Log log = LogFactory.getLog(TrustStoreUtils.class);
-//    private static final int MAX_RETRY_COUNT = 100;
-//    private static final int MAX_BACKOFF = 1000;
-//    private static final int WAIT_TIME_BEFORE_LOCK_RELEASE = 10000;
 
     public static synchronized void loadCerts(KeyStore trustStore, String keyStorePath, char[] password )
             throws CertificateException, NoSuchAlgorithmException, IOException {

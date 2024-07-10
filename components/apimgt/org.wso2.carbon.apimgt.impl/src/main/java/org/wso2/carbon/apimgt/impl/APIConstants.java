@@ -2241,6 +2241,7 @@ public final class APIConstants {
     public static final String API_KEY_REVOKE_PATH = "/key/revoke";
 
     public static final String SKIP_ROLES_BY_REGEX = "skipRolesByRegex";
+    public static final String ENABLE_PHYSICAL_FILE_LOCK_FOR_TRUST_STORE = "Security.TrustStore.EnableTruststoreFileLock";
 
     /**
      * API categories related constants

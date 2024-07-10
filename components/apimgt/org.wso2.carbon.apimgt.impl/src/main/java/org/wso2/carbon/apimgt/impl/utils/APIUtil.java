@@ -12387,5 +12387,18 @@ public final class APIUtil {
         velocityEngine.setProperty(DeprecatedRuntimeConstants.OLD_SPACE_GOBBLING,"bc");
         velocityEngine.setProperty("runtime.conversion.handler", "none");
     }
+
+    /**
+     * Get if it is enabled or disabled physical file lock for truststore in carbon.xml
+     *
+     * @return true if EnableTruststoreFileLock is set to true in carbon.xml
+     */
+    public static boolean enableTruststoreFileLock() {
+
+        String isEnabled =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                        .getFirstProperty(APIConstants.ENABLE_PHYSICAL_FILE_LOCK_FOR_TRUST_STORE);
+        return Boolean.parseBoolean(isEnabled);
+    }
 }
 
