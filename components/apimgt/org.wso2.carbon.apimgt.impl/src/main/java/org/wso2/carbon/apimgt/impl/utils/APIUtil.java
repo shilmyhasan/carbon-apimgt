@@ -12400,5 +12400,44 @@ public final class APIUtil {
                         .getFirstProperty(APIConstants.ENABLE_PHYSICAL_FILE_LOCK_FOR_TRUST_STORE);
         return Boolean.parseBoolean(isEnabled);
     }
+
+    /**
+     * Get maximum retry counts to access the truststore file in carbon.xml
+     *
+     * @return number of retry counts if MaxRetryCount is set to any value in carbon.xml
+     */
+    public static int getMaximumRetryCounts() {
+
+        String max_retry_count =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                        .getFirstProperty(APIConstants.MAXIMUM_RETRY_COUNT);
+        return Integer.parseInt(max_retry_count);
+    }
+
+    /**
+     * Get the waiting time to keep the truststore file locked in carbon.xml
+     *
+     * @return waiting time if WaitTimeBeforeLockRelease is set to any value in carbon.xml
+     */
+    public static int getWaitTimeBeforeLockRelease() {
+
+        String wait_time_before_lock_release =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                        .getFirstProperty(APIConstants.WAIT_TIME_BEFORE_LOCK_RELEASE);
+        return Integer.parseInt(wait_time_before_lock_release);
+    }
+
+    /**
+     * Get the wait time before retrying truststore file access in carbon.xml
+     *
+     * @return back off time if MaxBackOffTime is set to any value in carbon.xml
+     */
+    public static int getMaximumBackOffTime() {
+
+        String max_back_off_time =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
+                        .getFirstProperty(APIConstants.MAXIMUM_BACK_OFF_TIME);
+        return Integer.parseInt(max_back_off_time);
+    }
 }
 

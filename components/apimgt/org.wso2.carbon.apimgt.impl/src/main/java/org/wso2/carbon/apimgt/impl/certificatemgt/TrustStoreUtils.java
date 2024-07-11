@@ -1,8 +1,26 @@
+/*
+ * Copyright (c) 2024, WSO2 LLC. (https://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.apimgt.impl.certificatemgt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +37,9 @@ import java.util.Random;
 
 public final class TrustStoreUtils {
     private static final Log log = LogFactory.getLog(TrustStoreUtils.class);
+    private static int maximumBackOffTime = APIUtil.getMaximumBackOffTime();
+    private static int maximumRetryCounts = APIUtil.getMaximumRetryCounts();
+    private static int waitTimeBeforeLockRelease = APIUtil.getWaitTimeBeforeLockRelease();
 
     public static synchronized void loadCerts(KeyStore trustStore, String keyStorePath, char[] password )
             throws CertificateException, NoSuchAlgorithmException, IOException {
@@ -30,11 +51,7 @@ public final class TrustStoreUtils {
     }
 
     public static synchronized boolean acquireLockWithRetries(String lockFilePath) throws InterruptedException {
-        int MAX_RETRY_COUNT = System.getProperty("maxRetryCount") != null ?
-                Integer.parseInt(System.getProperty("maxRetryCount")) : 100;
-        int WAIT_TIME_BEFORE_LOCK_RELEASE = System.getProperty("waitTimeBeforeLockRelease") != null ?
-                Integer.parseInt(System.getProperty("waitTimeBeforeLockRelease")) : 10000;
-        for (int attempt = 1; attempt <= MAX_RETRY_COUNT; attempt++) {
+        for (int attempt = 1; attempt <= maximumRetryCounts; attempt++) {
             try {
                 // check if file exists
                 Path path = Paths.get(lockFilePath);
@@ -43,7 +60,7 @@ public final class TrustStoreUtils {
                     File file = new File(lockFilePath);
                     long currentTime = System.currentTimeMillis();
                     long fileCreatedTime = file.lastModified();
-                    if (currentTime - fileCreatedTime > WAIT_TIME_BEFORE_LOCK_RELEASE) {
+                    if (currentTime - fileCreatedTime > waitTimeBeforeLockRelease) {
                         Files.delete(path);
                     } else {
                         int backOff = generateRandomBackOff();
@@ -67,9 +84,7 @@ public final class TrustStoreUtils {
     }
 
     private static int generateRandomBackOff() {
-        int MAX_BACKOFF = System.getProperty("maxBackoff") != null ?
-                Integer.parseInt(System.getProperty("maxBackoff")) : 2000;
-        return new Random().nextInt(MAX_BACKOFF);
+        return new Random().nextInt(maximumBackOffTime);
     }
 
     public static synchronized void releaseLock(String lockFilePath) {

@@ -2242,6 +2242,9 @@ public final class APIConstants {
 
     public static final String SKIP_ROLES_BY_REGEX = "skipRolesByRegex";
     public static final String ENABLE_PHYSICAL_FILE_LOCK_FOR_TRUST_STORE = "Security.TrustStore.EnableTruststoreFileLock";
+    public static final String MAXIMUM_RETRY_COUNT = "Security.TrustStore.MaxRetryCount";
+    public static final String WAIT_TIME_BEFORE_LOCK_RELEASE = "Security.TrustStore.WaitTimeBeforeLockRelease";
+    public static final String MAXIMUM_BACK_OFF_TIME = "Security.TrustStore.MaxBackOffTime";
 
     /**
      * API categories related constants
