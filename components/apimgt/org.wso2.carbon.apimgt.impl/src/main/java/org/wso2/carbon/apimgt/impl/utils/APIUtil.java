@@ -12394,7 +12394,6 @@ public final class APIUtil {
      * @return true if EnableTruststoreFileLock is set to true in carbon.xml
      */
     public static boolean enableTruststoreFileLock() {
-
         String isEnabled =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
                         .getFirstProperty(APIConstants.ENABLE_PHYSICAL_FILE_LOCK_FOR_TRUST_STORE);
@@ -12407,7 +12406,6 @@ public final class APIUtil {
      * @return number of retry counts if MaxRetryCount is set to any value in carbon.xml
      */
     public static int getMaximumRetryCounts() {
-
         String max_retry_count =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
                         .getFirstProperty(APIConstants.MAXIMUM_RETRY_COUNT);
@@ -12420,7 +12418,6 @@ public final class APIUtil {
      * @return waiting time if WaitTimeBeforeLockRelease is set to any value in carbon.xml
      */
     public static int getWaitTimeBeforeLockRelease() {
-
         String wait_time_before_lock_release =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
                         .getFirstProperty(APIConstants.WAIT_TIME_BEFORE_LOCK_RELEASE);
@@ -12433,7 +12430,6 @@ public final class APIUtil {
      * @return back off time if MaxBackOffTime is set to any value in carbon.xml
      */
     public static int getMaximumBackOffTime() {
-
         String max_back_off_time =
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
                         .getFirstProperty(APIConstants.MAXIMUM_BACK_OFF_TIME);
