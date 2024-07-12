@@ -104,8 +104,6 @@ public class CertificateMgtUtils {
      */
     public ResponseCode addCertificateToTrustStore(String base64Cert, String alias) {
 
-        boolean isCertExists = false;
-        boolean expired = false;
         InputStream serverCert = null;
         try {
             //Decode base64 encoded certificate.
@@ -116,39 +114,10 @@ public class CertificateMgtUtils {
                 return ResponseCode.INTERNAL_SERVER_ERROR;
             }
             if (enableTruststoreFileLock) {
+                // If the file locking is enabled for truststore
                 String tempTrustStore = TRUST_STORE + ".temp.lock";
                 if (TrustStoreUtils.acquireLockWithRetries(tempTrustStore)) {
-                    //Read the client-truststore.jks into a KeyStore.
-                    File trustStoreFile = new File(TRUST_STORE);
-                    localTrustStoreStream = new FileInputStream(trustStoreFile);
-                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD);
-
-                    CertificateFactory cf = CertificateFactory.getInstance(CERTIFICATE_TYPE);
-                    while (serverCert.available() > 0) {
-                        Certificate certificate = cf.generateCertificate(serverCert);
-                        //Check whether the Alias exists in the trust store.
-                        if (trustStore.containsAlias(alias)) {
-                            isCertExists = true;
-                        } else {
-                            /*
-                             * If alias is not exists, check whether the certificate is expired or not. If expired set the
-                             * expired flag.
-                             * */
-                            X509Certificate x509Certificate = (X509Certificate) certificate;
-                            if (x509Certificate.getNotAfter().getTime() <= System.currentTimeMillis()) {
-                                expired = true;
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Provided certificate is expired.");
-                                }
-                            } else {
-                                //If not expired add the certificate to trust store.
-                                trustStore.setCertificateEntry(alias, certificate);
-                            }
-                        }
-                    }
-                    fileOutputStream = new FileOutputStream(trustStoreFile);
-                    trustStore.store(fileOutputStream, TRUST_STORE_PASSWORD);
+                    responseCode = addCertificate(alias, serverCert);
                 } else {
                     log.error("Could not acquire lock to update the trust store.");
                     return ResponseCode.INTERNAL_SERVER_ERROR;
@@ -156,40 +125,8 @@ public class CertificateMgtUtils {
                 TrustStoreUtils.releaseLock(tempTrustStore);
             }
             else {
-                //Read the client-truststore.jks into a KeyStore.
-                File trustStoreFile = new File(TRUST_STORE);
-                localTrustStoreStream = new FileInputStream(trustStoreFile);
-                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                TrustStoreUtils.loadCerts(trustStore, TRUST_STORE,TRUST_STORE_PASSWORD);
-
-                CertificateFactory cf = CertificateFactory.getInstance(CERTIFICATE_TYPE);
-                while (serverCert.available() > 0) {
-                    Certificate certificate = cf.generateCertificate(serverCert);
-                    //Check whether the Alias exists in the trust store.
-                    if (trustStore.containsAlias(alias)) {
-                        isCertExists = true;
-                    } else {
-                        /*
-                         * If alias is not exists, check whether the certificate is expired or not. If expired set the
-                         * expired flag.
-                         * */
-                        X509Certificate x509Certificate = (X509Certificate) certificate;
-                        if (x509Certificate.getNotAfter().getTime() <= System.currentTimeMillis()) {
-                            expired = true;
-                            if (log.isDebugEnabled()) {
-                                log.debug("Provided certificate is expired.");
-                            }
-                        } else {
-                            //If not expired add the certificate to trust store.
-                            trustStore.setCertificateEntry(alias, certificate);
-                        }
-                    }
-                }
-                fileOutputStream = new FileOutputStream(trustStoreFile);
-                trustStore.store(fileOutputStream, TRUST_STORE_PASSWORD);
+                responseCode = addCertificate(alias, serverCert);
             }
-            responseCode = expired ? ResponseCode.CERTIFICATE_EXPIRED :
-                    isCertExists ? ResponseCode.ALIAS_EXISTS_IN_TRUST_STORE : ResponseCode.SUCCESS;
         } catch (CertificateException e) {
             log.error("Error loading certificate.", e);
             responseCode = ResponseCode.INTERNAL_SERVER_ERROR;
@@ -288,49 +225,20 @@ public class CertificateMgtUtils {
      */
     public ResponseCode removeCertificateFromTrustStore(String alias) {
 
-        boolean isExists; //Check for the existence of the certificate in trust store.
         try {
             if (enableTruststoreFileLock) {
+                // If the file locking is enabled for truststore
                 String tempTrustStore = TRUST_STORE + ".temp.lock";
                 if (TrustStoreUtils.acquireLockWithRetries(tempTrustStore)) {
-                    File trustStoreFile = new File(TRUST_STORE);
-                    localTrustStoreStream = new FileInputStream(trustStoreFile);
-                    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD);
-                    if (trustStore.containsAlias(alias)) {
-                        trustStore.deleteEntry(alias);
-                        isExists = true;
-                    } else {
-                        isExists = false;
-                        if (log.isDebugEnabled()) {
-                            log.debug("Certificate for alias '" + alias + "' not found in the trust store.");
-                        }
-                    }
-                    fileOutputStream = new FileOutputStream(trustStoreFile);
-                    trustStore.store(fileOutputStream, TRUST_STORE_PASSWORD);
+                    responseCode = removeCertificate(alias);
                 } else {
                     log.error("Could not acquire lock to update the trust store.");
                     return ResponseCode.INTERNAL_SERVER_ERROR;
                 }
                 TrustStoreUtils.releaseLock(tempTrustStore);
             } else {
-                File trustStoreFile = new File(TRUST_STORE);
-                localTrustStoreStream = new FileInputStream(trustStoreFile);
-                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                TrustStoreUtils.loadCerts(trustStore, TRUST_STORE,TRUST_STORE_PASSWORD);
-                if (trustStore.containsAlias(alias)) {
-                    trustStore.deleteEntry(alias);
-                    isExists = true;
-                } else {
-                    isExists = false;
-                    if (log.isDebugEnabled()) {
-                        log.debug("Certificate for alias '" + alias + "' not found in the trust store.");
-                    }
-                }
-                fileOutputStream = new FileOutputStream(trustStoreFile);
-                trustStore.store(fileOutputStream, TRUST_STORE_PASSWORD);
+                responseCode = removeCertificate(alias);
             }
-            responseCode = isExists ? ResponseCode.SUCCESS : ResponseCode.CERTIFICATE_NOT_FOUND;
         } catch (IOException e) {
             log.error("Error in loading the certificate.", e);
             responseCode = ResponseCode.INTERNAL_SERVER_ERROR;
@@ -639,5 +547,66 @@ public class CertificateMgtUtils {
             String error = "Error in obtaining tenant's keystore";
             throw new APIManagementException(error, e);
         }
+    }
+
+    private ResponseCode addCertificate(String alias, InputStream serverCert)
+            throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
+        boolean isCertExists = false;
+        boolean expired = false;
+        //Read the client-truststore.jks into a KeyStore.
+        File trustStoreFile = new File(TRUST_STORE);
+        localTrustStoreStream = new FileInputStream(trustStoreFile);
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD);
+
+        CertificateFactory cf = CertificateFactory.getInstance(CERTIFICATE_TYPE);
+        while (serverCert.available() > 0) {
+            Certificate certificate = cf.generateCertificate(serverCert);
+            //Check whether the Alias exists in the trust store.
+            if (trustStore.containsAlias(alias)) {
+                isCertExists = true;
+            } else {
+                /*
+                 * If alias is not exists, check whether the certificate is expired or not. If expired set the
+                 * expired flag.
+                 * */
+                X509Certificate x509Certificate = (X509Certificate) certificate;
+                if (x509Certificate.getNotAfter().getTime() <= System.currentTimeMillis()) {
+                    expired = true;
+                    if (log.isDebugEnabled()) {
+                        log.debug("Provided certificate is expired.");
+                    }
+                } else {
+                    //If not expired add the certificate to trust store.
+                    trustStore.setCertificateEntry(alias, certificate);
+                }
+            }
+        }
+        fileOutputStream = new FileOutputStream(trustStoreFile);
+        trustStore.store(fileOutputStream, TRUST_STORE_PASSWORD);
+        return expired ?
+                ResponseCode.CERTIFICATE_EXPIRED :
+                isCertExists ? ResponseCode.ALIAS_EXISTS_IN_TRUST_STORE : ResponseCode.SUCCESS;
+    }
+
+    private ResponseCode removeCertificate(String alias)
+            throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException {
+        boolean isExists; //Check for the existence of the certificate in trust store.
+        File trustStoreFile = new File(TRUST_STORE);
+        localTrustStoreStream = new FileInputStream(trustStoreFile);
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD);
+        if (trustStore.containsAlias(alias)) {
+            trustStore.deleteEntry(alias);
+            isExists = true;
+        } else {
+            isExists = false;
+            if (log.isDebugEnabled()) {
+                log.debug("Certificate for alias '" + alias + "' not found in the trust store.");
+            }
+        }
+        fileOutputStream = new FileOutputStream(trustStoreFile);
+        trustStore.store(fileOutputStream, TRUST_STORE_PASSWORD);
+        return isExists ? ResponseCode.SUCCESS : ResponseCode.CERTIFICATE_NOT_FOUND;
     }
 }

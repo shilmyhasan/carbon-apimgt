@@ -47,24 +47,11 @@ public class CertificateReLoader implements Runnable {
 
         if (StringUtils.isNotEmpty(TRUST_STORE_PASSWORD)) {
             if (enableTruststoreFileLock) {
+                // If the file locking is enabled for truststore
                 String tempTrustStore = TRUST_STORE + ".temp.lock";
                 try {
                     if (TrustStoreUtils.acquireLockWithRetries(tempTrustStore)) {
-                        File trustStoreFile = new File(TRUST_STORE);
-                        FileInputStream localTrustStoreStream;
-                        try {
-                            long lastUpdatedTimeStamp = CertificateReLoaderUtil.getLastUpdatedTimeStamp();
-                            long lastModified = trustStoreFile.lastModified();
-                            if (lastUpdatedTimeStamp != lastModified) {
-                                CertificateReLoaderUtil.setLastUpdatedTimeStamp(lastModified);
-                                localTrustStoreStream = new FileInputStream(trustStoreFile);
-                                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                                TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD.toCharArray());
-                                ServiceReferenceHolder.getInstance().setTrustStore(trustStore);
-                            }
-                        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
-                            log.error("Unable to find the certificate", e);
-                        }
+                        loadCertificates();
                     } else {
                         log.error("Unable to acquire lock to reload the certificate");
                     }
@@ -72,22 +59,26 @@ public class CertificateReLoader implements Runnable {
                     log.error("Error while acquiring lock to reload the certificate", e);
                 }
             } else {
-                File trustStoreFile = new File(TRUST_STORE);
-                FileInputStream localTrustStoreStream;
-                try {
-                    long lastUpdatedTimeStamp = CertificateReLoaderUtil.getLastUpdatedTimeStamp();
-                    long lastModified = trustStoreFile.lastModified();
-                    if (lastUpdatedTimeStamp != lastModified) {
-                        CertificateReLoaderUtil.setLastUpdatedTimeStamp(lastModified);
-                        localTrustStoreStream = new FileInputStream(trustStoreFile);
-                        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                        TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD.toCharArray());
-                        ServiceReferenceHolder.getInstance().setTrustStore(trustStore);
-                    }
-                } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
-                    log.error("Unable to find the certificate", e);
-                }
+                loadCertificates();
             }
+        }
+    }
+
+    private void loadCertificates() {
+        File trustStoreFile = new File(TRUST_STORE);
+        FileInputStream localTrustStoreStream;
+        try {
+            long lastUpdatedTimeStamp = CertificateReLoaderUtil.getLastUpdatedTimeStamp();
+            long lastModified = trustStoreFile.lastModified();
+            if (lastUpdatedTimeStamp != lastModified) {
+                CertificateReLoaderUtil.setLastUpdatedTimeStamp(lastModified);
+                localTrustStoreStream = new FileInputStream(trustStoreFile);
+                KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                TrustStoreUtils.loadCerts(trustStore, TRUST_STORE, TRUST_STORE_PASSWORD.toCharArray());
+                ServiceReferenceHolder.getInstance().setTrustStore(trustStore);
+            }
+        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+            log.error("Unable to find the certificate", e);
         }
     }
 }
