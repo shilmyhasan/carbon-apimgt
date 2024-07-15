@@ -720,7 +720,9 @@ public class OASParserUtil {
                 addToReferenceObjectMap(ref, context);
             } else if (!references.isEmpty() && references.size() != 0) {
                 for (String reference : references) {
-                    addToReferenceObjectMap(reference, context);
+                    if (reference != null) {
+                        addToReferenceObjectMap(reference, context);
+                    }
                 }
             }
 
@@ -740,8 +742,9 @@ public class OASParserUtil {
         ObjectSchema os = (ObjectSchema) schema;
         if (os.getProperties() != null) {
             for (String propertyName : os.getProperties().keySet()) {
-                if (os.getProperties().get(propertyName) instanceof ComposedSchema) {
-                    ComposedSchema cs = (ComposedSchema) os.getProperties().get(propertyName);
+                Schema propertySchema = os.getProperties().get(propertyName);
+                if (propertySchema instanceof ComposedSchema) {
+                    ComposedSchema cs = (ComposedSchema) propertySchema;
                     if (cs.getAllOf() != null) {
                         for (Schema sc : cs.getAllOf()) {
                             references.add(sc.get$ref());
@@ -757,6 +760,9 @@ public class OASParserUtil {
                     } else {
                         log.error("Unidentified schema. The schema is not available in the API definition.");
                     }
+                } else if (propertySchema instanceof ArraySchema) {
+                    ArraySchema arraySchema = (ArraySchema) propertySchema;
+                    references.add(arraySchema.getItems().get$ref());
                 }
             }
         }
