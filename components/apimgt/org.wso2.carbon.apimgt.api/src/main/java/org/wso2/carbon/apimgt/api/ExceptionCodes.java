@@ -596,6 +596,16 @@ public enum ExceptionCodes implements ErrorHandler {
     ENDPOINT_SECURITY_TYPE_NOT_DEFINED(903214, "Endpoint security type not defined", 400,
             "Endpoint security type not defined for the %s endpoint", false),
 
+    ADDITIONAL_PROPERTIES_CANNOT_BE_NULL(903215, "'additionalProperties' is required and should " +
+            "not be null", 400,
+            "The field 'additionalProperties' is required and should not be null"),
+
+    ADDITIONAL_PROPERTIES_PARSE_ERROR(903216, "Error while parsing 'additionalProperties'", 400,
+            "Error while parsing 'additionalProperties'", true),
+
+    ENDPOINT_SECURITY_CRYPTO_EXCEPTION(903217, "Error while encrypting the secret key of API", 500,
+            "%s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),

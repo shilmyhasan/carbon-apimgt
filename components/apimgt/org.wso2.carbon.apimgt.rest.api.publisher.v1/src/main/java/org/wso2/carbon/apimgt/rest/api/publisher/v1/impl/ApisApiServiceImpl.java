@@ -2791,7 +2791,12 @@ public class ApisApiServiceImpl implements ApisApiService {
 
         // validate 'additionalProperties' json
         if (StringUtils.isBlank(additionalProperties)) {
-            RestApiUtil.handleBadRequest("'additionalProperties' is required and should not be null", log);
+            String errorMessage = "'additionalProperties' is required and should not be null";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage, ExceptionCodes.ADDITIONAL_PROPERTIES_CANNOT_BE_NULL);
+            } else {
+                RestApiUtil.handleBadRequest(errorMessage, log);
+            }
         }
 
         // Convert the 'additionalProperties' json into an APIDTO object
@@ -2809,7 +2814,12 @@ public class ApisApiServiceImpl implements ApisApiService {
                         ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, e.getMessage()));
             }
         } catch (IOException e) {
-            throw RestApiUtil.buildBadRequestException("Error while parsing 'additionalProperties'", e);
+            String errorMessage = "Error while parsing 'additionalProperties'";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage, e, ExceptionCodes.ADDITIONAL_PROPERTIES_PARSE_ERROR);
+            } else {
+                throw RestApiUtil.buildBadRequestException(errorMessage, e);
+            }
         }
 
         // validate sandbox and production endpoints
@@ -2840,10 +2850,15 @@ public class ApisApiServiceImpl implements ApisApiService {
                     apiDTOFromProperties.getName() + "-" + apiDTOFromProperties.getVersion();
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (CryptoException e) {
-            String errorMessage =
-                    "Error while encrypting the secret key of API : " + apiDTOFromProperties.getProvider() + "-"
-                            + apiDTOFromProperties.getName() + "-" + apiDTOFromProperties.getVersion();
-            throw new APIManagementException(errorMessage, e);
+            String errorMessage = "Error while encrypting the secret key of API : " + apiDTOFromProperties.getProvider()
+                    + "-" + apiDTOFromProperties.getName() + "-" + apiDTOFromProperties.getVersion();
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage, e,
+                        ExceptionCodes.from(ExceptionCodes.ENDPOINT_SECURITY_CRYPTO_EXCEPTION, errorMessage));
+            } else {
+                throw new APIManagementException(errorMessage, e);
+            }
+
         }
         return null;
     }
