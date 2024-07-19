@@ -1739,7 +1739,7 @@ public class ApisApiServiceImpl implements ApisApiService {
             }
             if (apiIdentifier == null) {
                 throw new APIManagementException("Error while getting the api identifier for the API:" +
-                        apiId, ExceptionCodes.INVALID_API_ID);
+                        apiId, ExceptionCodes.from(ExceptionCodes.INVALID_API_ID, apiId));
             }
             return PublisherCommonUtils.getLifecycleStateInformation(apiIdentifier, organization);
         } catch (APIManagementException e) {

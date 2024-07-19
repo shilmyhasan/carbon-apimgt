@@ -1679,6 +1679,16 @@ public final class APIUtil {
         }
     }
 
+    public static void handleException(String msg, ErrorHandler errorHandler, Throwable t)
+            throws APIManagementException {
+        if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+            throw new APIManagementException(msg, t, errorHandler);
+        } else {
+            log.error(msg);
+            throw new APIManagementException(msg, t);
+        }
+    }
+
     public static void handleException(String msg, Throwable t) throws APIManagementException {
 
         log.error(msg, t);

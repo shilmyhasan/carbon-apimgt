@@ -3031,6 +3031,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public APIStateChangeResponse changeLifeCycleStatus(String orgId, ApiTypeWrapper apiTypeWrapper, String action,
                                                         Map<String, Boolean> checklist) throws APIManagementException{
         APIStateChangeResponse response = new APIStateChangeResponse();
+        String uuid = null;
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
@@ -3043,7 +3044,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String apiType;
             String apiVersion;
             String currentStatus;
-            String uuid;
             int apiOrApiProductId;
             boolean isApiProduct = apiTypeWrapper.isAPIProduct();
             String workflowType;
@@ -3108,7 +3108,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         APIConstants.AuditLogConstants.LIFECYCLE_CHANGED, this.username);
             }
         } catch (APIPersistenceException e) {
-            handleException("Error while accessing persistence layer", e);
+            APIUtil.handleException("Error while accessing persistence layer",
+                    ExceptionCodes.from(ExceptionCodes.ERROR_CHANGING_REGISTRY_LIFECYCLE_STATE, uuid), e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
@@ -5126,14 +5127,19 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 throw new APIMgtResourceNotFoundException(msg);
             }
         } catch (APIPersistenceException e) {
-            throw new APIManagementException("Failed to get API", e);
+            APIUtil.handleException("Failed to get API", ExceptionCodes.from(ExceptionCodes.ERROR_RETRIEVING_API, uuid),
+                    e);
         } catch (OASPersistenceException e) {
-            throw new APIManagementException("Error while retrieving the OAS definition", e);
+            APIUtil.handleException("Error while retrieving the OAS definition",
+                    ExceptionCodes.from(ExceptionCodes.OPENAPI_RETRIEVAL_ERROR, uuid), e);
         } catch (ParseException e) {
-            throw new APIManagementException("Error while parsing the OAS definition", e);
+            APIUtil.handleException("Error while parsing the OAS definition",
+                    ExceptionCodes.from(ExceptionCodes.OPENAPI_PARSE_EXCEPTION, uuid), e);
         } catch (AsyncSpecPersistenceException e) {
-            throw new APIManagementException("Error while retrieving the Async API definition", e);
+            APIUtil.handleException("Error while retrieving the Async API definition",
+                    ExceptionCodes.from(ExceptionCodes.ASYNCAPI_RETRIEVAL_ERROR, uuid), e);
         }
+        return null;
     }
 
     /**
@@ -5390,8 +5396,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         } catch (APIPersistenceException e) {
             String msg = "Failed to get API with uuid " + uuid;
-            throw new APIManagementException(msg, e);
+            APIUtil.handleException(msg, ExceptionCodes.from(ExceptionCodes.ERROR_RETRIEVING_API, uuid),
+                    e);
         }
+        return null;
     }
 
     @Override
@@ -5603,8 +5611,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     return;
                 }
             }
-
-            throw new APIManagementException(APIConstants.UN_AUTHORIZED_ERROR_MESSAGE + " view or modify the api");
+            String errorMessage = APIConstants.UN_AUTHORIZED_ERROR_MESSAGE + " view or modify the api";
+            APIUtil.handleException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.UN_AUTHORIZED_TO_VIEW_MODIFY_API, username));
         }
 
     }

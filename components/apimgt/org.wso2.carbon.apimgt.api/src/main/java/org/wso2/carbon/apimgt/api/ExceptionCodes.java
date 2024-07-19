@@ -606,6 +606,27 @@ public enum ExceptionCodes implements ErrorHandler {
     ENDPOINT_SECURITY_CRYPTO_EXCEPTION(903217, "Error while encrypting the secret key of API", 500,
             "%s"),
 
+    OPENAPI_RETRIEVAL_ERROR(903218, "Error while retrieving the OAS definition", 500,
+            "Error while retrieving the OAS definition for API with UUID %s"),
+
+    ASYNCAPI_RETRIEVAL_ERROR(903219, "Error while retrieving the Async API definition", 500,
+            "Error while retrieving the Async API definition for API with UUID %s"),
+
+    ERROR_RETRIEVING_API(903220, "Failed to get API", 500,
+            "Failed to get API with UUID %s"),
+
+    ERROR_CHANGING_REGISTRY_LIFECYCLE_STATE(903221, "Error changing registry lifecycle state", 500,
+            "Error changing registry lifecycle state for API/API Product with UUID %s"),
+
+    UN_AUTHORIZED_TO_VIEW_MODIFY_API(903222, "User is not authorized to view or modify the api",
+            403, "User %s is not authorized to view or modify the api"),
+
+    FAILED_PUBLISHING_API_NO_ENDPOINT_SELECTED(903223, "Failed to publish service to API store. No endpoint selected",
+            400, "Failed to publish service to API store. No endpoint selected for API with UUID %s"),
+
+    FAILED_PUBLISHING_API_NO_TIERS_SELECTED(903224, "Failed to publish service to API store. No Tiers selected",
+            400, "Failed to publish service to API store. No Tiers selected for API with UUID %s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),
