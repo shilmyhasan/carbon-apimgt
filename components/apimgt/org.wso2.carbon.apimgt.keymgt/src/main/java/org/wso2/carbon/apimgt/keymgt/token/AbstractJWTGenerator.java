@@ -87,7 +87,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     private String userAttributeSeparator = APIConstants.MULTI_ATTRIBUTE_SEPARATOR_DEFAULT;
     private boolean tenantBasedSigningEnabled;
     private boolean useKid;
-    private boolean useSHA1Hash;
+    private boolean useSHA256Hash = false;
 
     public AbstractJWTGenerator() {
 
@@ -123,7 +123,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         }
         tenantBasedSigningEnabled = jwtConfigurationDto.isTenantBasedSigningEnabled();
         useKid = jwtConfigurationDto.useKid();
-        useSHA1Hash = jwtConfigurationDto.useSHA1Hash();
+        useSHA256Hash = jwtConfigurationDto.useSHA256Hash();
     }
 
     public String getDialectURI() {
@@ -346,7 +346,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 KeyStoreManager keyStoreManager = KeyStoreManager.getInstance(MultitenantConstants.SUPER_TENANT_ID);
                 publicCert = keyStoreManager.getDefaultPrimaryCertificate();
             }
-            return generateHeader(publicCert, signatureAlgorithm, useKid, useSHA1Hash);
+            return generateHeader(publicCert, signatureAlgorithm, useKid, useSHA256Hash);
         } catch (Exception e) {
             String error = "Error in obtaining keystore";
             throw new APIManagementException(error, e);
@@ -390,12 +390,12 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @param publicCert         The public certificate which needs to include in the header as thumbprint
      * @param signatureAlgorithm Signature algorithm which needs to include in the header
      * @param useKid             Boolean to indicate whether to include kid property in the header
-     * @param useSHA1Hash        Specifies whether to use SHA-1 algorithm to generate the certificate thumbprint
+     * @param useSHA256Hash        Specifies whether to use SHA-256 algorithm to generate the certificate thumbprint
      */
     public static String generateHeader(Certificate publicCert, String signatureAlgorithm, boolean useKid,
-                                        boolean useSHA1Hash) throws APIManagementException {
+                                        boolean useSHA256Hash) throws APIManagementException {
         try {
-            String hashingAlgorithm = useSHA1Hash ? APIConstants.SHA_1 : APIConstants.SHA_256;
+            String hashingAlgorithm = useSHA256Hash ? APIConstants.SHA_256 : APIConstants.SHA_1;
             //generate the thumbprint of the certificate
             MessageDigest digestValue = MessageDigest.getInstance(hashingAlgorithm);
             byte[] der = publicCert.getEncoded();
@@ -410,20 +410,18 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             /*
              * Sample header
              * {"typ":"JWT", "alg":"SHA256withRSA", "x5t":"a_jhNus21KVuoFx65LmkW2O_l10",
-             * {"typ":"JWT", "alg":"SHA256withRSA", "x5t#S256":"a_jhNus21KVuoFx65LmkW2O_l10",
              * "kid":"a_jhNus21KVuoFx65LmkW2O_l10_RS256"}
-             * {"typ":"JWT", "alg":"[2]", "x5t":"[1]", "x5t":"[1]"}
-             * {"typ":"JWT", "alg":"[2]", "x5t#S256":"[1]"}
+             * {"typ":"JWT", "alg":"[2]", "x5t":"[1]"}
              * */
             jwtHeader.append("{\"typ\":\"JWT\",");
             jwtHeader.append("\"alg\":\"");
             jwtHeader.append(APIUtil.getJWSCompliantAlgorithmCode(signatureAlgorithm));
             jwtHeader.append("\",");
             
-            if (useSHA1Hash) {
-                jwtHeader.append("\"x5t\":\"");
-            } else {
+            if (useSHA256Hash) {
                 jwtHeader.append("\"x5t#S256\":\"");
+            } else {
+                jwtHeader.append("\"x5t\":\"");
             }
             jwtHeader.append(base64UrlEncodedThumbPrint);
             jwtHeader.append("\"");
