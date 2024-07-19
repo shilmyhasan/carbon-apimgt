@@ -54,6 +54,8 @@ public class APIClientGenerationManager {
 
     private static final Log log = LogFactory.getLog(APIClientGenerationManager.class);
     private static final Map<String, String> langCodeGen = new HashMap<String, String>();
+    private static final String PYTHON = "python";
+    private static final String PYTHON_PRIOR = "python-prior";
 
     public APIClientGenerationManager() {
         langCodeGen.put("java", "org.openapitools.codegen.languages.JavaClientCodegen");
@@ -193,6 +195,11 @@ public class APIClientGenerationManager {
                 .setModelPackage(config.getFirstProperty(APIConstants.CLIENT_CODEGEN_MODAL_PACKAGE) + apiName);
         codegenConfigurator.setApiPackage(config.getFirstProperty(APIConstants.CLIENT_CODEGEN_API_PACKAGE) + apiName);
         codegenConfigurator.setInputSpec(specLocation);
+        // Due to a breaking change after upgrading the openapi-generator dependency to v6.6.0, falling back to
+        // use the python-prior generator which contains the previous python generator for python SDK generation.
+        if (PYTHON.equals(sdkLanguage)) {
+            sdkLanguage = PYTHON_PRIOR;
+        }
         codegenConfigurator.setGeneratorName(sdkLanguage);
         codegenConfigurator.setOutputDir(temporaryOutputPath);
         codegenConfigurator.setValidateSpec(false);
