@@ -12394,9 +12394,8 @@ public final class APIUtil {
      * @return true if EnableTruststoreFileLock is set to true in carbon.xml
      */
     public static boolean enableTruststoreFileLock() {
-        String isEnabled =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
-                        .getFirstProperty(APIConstants.ENABLE_PHYSICAL_FILE_LOCK_FOR_TRUST_STORE);
+        String isEnabled = CarbonUtils.getServerConfiguration()
+                .getFirstProperty(APIConstants.ENABLE_PHYSICAL_FILE_LOCK_FOR_TRUST_STORE);
         return Boolean.parseBoolean(isEnabled);
     }
 
@@ -12406,10 +12405,16 @@ public final class APIUtil {
      * @return number of retry counts if MaxRetryCount is set to any value in carbon.xml
      */
     public static int getMaximumRetryCounts() {
-        String max_retry_count =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
-                        .getFirstProperty(APIConstants.MAXIMUM_RETRY_COUNT);
-        return Integer.parseInt(max_retry_count);
+        String max_retry_count = CarbonUtils.getServerConfiguration()
+                .getFirstProperty(APIConstants.MAXIMUM_RETRY_COUNT);
+        try {
+            return Integer.parseInt(max_retry_count.trim());
+        } catch (NumberFormatException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error in converting max retry counts due to " + e.getMessage());
+            }
+        }
+        return 0;
     }
 
     /**
@@ -12418,10 +12423,16 @@ public final class APIUtil {
      * @return waiting time if WaitTimeBeforeLockRelease is set to any value in carbon.xml
      */
     public static int getWaitTimeBeforeLockRelease() {
-        String wait_time_before_lock_release =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
-                        .getFirstProperty(APIConstants.WAIT_TIME_BEFORE_LOCK_RELEASE);
-        return Integer.parseInt(wait_time_before_lock_release);
+        String wait_time_before_lock_release = CarbonUtils.getServerConfiguration()
+                .getFirstProperty(APIConstants.WAIT_TIME_BEFORE_LOCK_RELEASE);
+        try {
+            return Integer.parseInt(wait_time_before_lock_release.trim());
+        } catch (NumberFormatException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error in converting wait time before lock release due to " + e.getMessage());
+            }
+        }
+        return 0;
     }
 
     /**
@@ -12430,10 +12441,16 @@ public final class APIUtil {
      * @return back off time if MaxBackOffTime is set to any value in carbon.xml
      */
     public static int getMaximumBackOffTime() {
-        String max_back_off_time =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration()
-                        .getFirstProperty(APIConstants.MAXIMUM_BACK_OFF_TIME);
-        return Integer.parseInt(max_back_off_time);
+        String max_back_off_time = CarbonUtils.getServerConfiguration()
+                .getFirstProperty(APIConstants.MAXIMUM_BACK_OFF_TIME);
+        try {
+            return Integer.parseInt(max_back_off_time.trim());
+        } catch (NumberFormatException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error in converting max backoff time due to " + e.getMessage());
+            }
+        }
+        return 0;
     }
 }
 

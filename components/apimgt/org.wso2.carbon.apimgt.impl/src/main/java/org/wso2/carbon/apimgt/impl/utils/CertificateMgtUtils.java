@@ -68,7 +68,6 @@ public class CertificateMgtUtils {
     private static ConcurrentHashMap<Integer, Certificate> publicCerts = new ConcurrentHashMap<>();
 
     private static CertificateMgtUtils instance;
-    private boolean enableTruststoreFileLock = APIUtil.enableTruststoreFileLock();
 
     private CertificateMgtUtils(){}
 
@@ -113,7 +112,7 @@ public class CertificateMgtUtils {
                 log.error("Certificate is empty for the provided alias " + alias);
                 return ResponseCode.INTERNAL_SERVER_ERROR;
             }
-            if (enableTruststoreFileLock) {
+            if (APIUtil.enableTruststoreFileLock()) {
                 // If the file locking is enabled for truststore
                 String tempTrustStore = TRUST_STORE + ".temp.lock";
                 if (TrustStoreUtils.acquireLockWithRetries(tempTrustStore)) {
@@ -226,7 +225,7 @@ public class CertificateMgtUtils {
     public ResponseCode removeCertificateFromTrustStore(String alias) {
 
         try {
-            if (enableTruststoreFileLock) {
+            if (APIUtil.enableTruststoreFileLock()) {
                 // If the file locking is enabled for truststore
                 String tempTrustStore = TRUST_STORE + ".temp.lock";
                 if (TrustStoreUtils.acquireLockWithRetries(tempTrustStore)) {

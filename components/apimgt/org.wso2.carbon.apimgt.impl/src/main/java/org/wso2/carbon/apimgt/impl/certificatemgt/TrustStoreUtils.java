@@ -37,9 +37,6 @@ import java.util.Random;
 
 public final class TrustStoreUtils {
     private static final Log log = LogFactory.getLog(TrustStoreUtils.class);
-    private static int maximumBackOffTime = APIUtil.getMaximumBackOffTime();
-    private static int maximumRetryCounts = APIUtil.getMaximumRetryCounts();
-    private static int waitTimeBeforeLockRelease = APIUtil.getWaitTimeBeforeLockRelease();
 
     public static synchronized void loadCerts(KeyStore trustStore, String keyStorePath, char[] password )
             throws CertificateException, NoSuchAlgorithmException, IOException {
@@ -51,7 +48,7 @@ public final class TrustStoreUtils {
     }
 
     public static synchronized boolean acquireLockWithRetries(String lockFilePath) throws InterruptedException {
-        for (int attempt = 1; attempt <= maximumRetryCounts; attempt++) {
+        for (int attempt = 1; attempt <= APIUtil.getMaximumRetryCounts(); attempt++) {
             try {
                 // check if file exists
                 Path path = Paths.get(lockFilePath);
@@ -60,7 +57,7 @@ public final class TrustStoreUtils {
                     File file = new File(lockFilePath);
                     long currentTime = System.currentTimeMillis();
                     long fileCreatedTime = file.lastModified();
-                    if (currentTime - fileCreatedTime > waitTimeBeforeLockRelease) {
+                    if (currentTime - fileCreatedTime > APIUtil.getWaitTimeBeforeLockRelease()) {
                         Files.delete(path);
                     } else {
                         int backOff = generateRandomBackOff();
@@ -84,7 +81,7 @@ public final class TrustStoreUtils {
     }
 
     private static int generateRandomBackOff() {
-        return new Random().nextInt(maximumBackOffTime);
+        return new Random().nextInt(APIUtil.getMaximumBackOffTime());
     }
 
     public static synchronized void releaseLock(String lockFilePath) {
