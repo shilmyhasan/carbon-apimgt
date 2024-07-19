@@ -3639,7 +3639,8 @@ public class ApisApiServiceImpl implements ApisApiService {
      * @return response containing newly created APIRevision object
      */
     @Override
-    public Response createAPIRevision(String apiId, APIRevisionDTO apIRevisionDTO, MessageContext messageContext) {
+    public Response createAPIRevision(String apiId, APIRevisionDTO apIRevisionDTO, MessageContext messageContext)
+            throws APIManagementException {
         try {
             APIProvider apiProvider = RestApiCommonUtil.getLoggedInUserProvider();
             String organization = RestApiUtil.getValidatedOrganization(messageContext);
@@ -3650,8 +3651,14 @@ public class ApisApiServiceImpl implements ApisApiService {
             //validate whether the API is advertise only
             APIDTO apiDto = getAPIByID(apiId, apiProvider, organization);
             if (apiDto != null && apiDto.getAdvertiseInfo() != null && apiDto.getAdvertiseInfo().isAdvertised()) {
-                throw new APIManagementException("Creating API Revisions is not supported for third party APIs: "
-                        + apiId);
+                String errorMessage = "Creating API Revisions is not supported for third party APIs: " + apiId;
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes.
+                            THIRD_PARTY_API_REVISION_CREATION_UNSUPPORTED, apiId));
+                } else {
+                    throw new APIManagementException("Creating API Revisions is not supported for third party APIs: "
+                            + apiId);
+                }
             }
 
             //validate API update operation permitted based on the LC state
@@ -3673,7 +3680,13 @@ public class ApisApiServiceImpl implements ApisApiService {
             return Response.created(createdApiUri).entity(createdApiRevisionDTO).build();
         } catch (APIManagementException e) {
             String errorMessage = "Error while adding new API Revision for API : " + apiId;
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())
+                    && e.getErrorHandler().getErrorCode()
+                    == ExceptionCodes.THIRD_PARTY_API_REVISION_CREATION_UNSUPPORTED.getErrorCode()) {
+                throw e;
+            } else {
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
         } catch (URISyntaxException e) {
             String errorMessage = "Error while retrieving created revision API location for API : "
                     + apiId;

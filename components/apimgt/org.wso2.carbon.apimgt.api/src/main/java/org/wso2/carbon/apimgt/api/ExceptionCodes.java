@@ -627,6 +627,9 @@ public enum ExceptionCodes implements ErrorHandler {
     FAILED_PUBLISHING_API_NO_TIERS_SELECTED(903224, "Failed to publish service to API store. No Tiers selected",
             400, "Failed to publish service to API store. No Tiers selected for API with UUID %s"),
 
+    THIRD_PARTY_API_REVISION_CREATION_UNSUPPORTED(903225, "Creating API Revisions is not supported " +
+            "for third party APIs", 400,"Creating API Revisions is not supported for third party APIs: %s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),
