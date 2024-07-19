@@ -68,6 +68,10 @@
         </dependency>
         <dependency>
             <groupId>org.apache.poi.wso2</groupId>
+            <artifactId>poi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi.wso2</groupId>
             <artifactId>poi-ooxml</artifactId>
         </dependency>
         <dependency>
