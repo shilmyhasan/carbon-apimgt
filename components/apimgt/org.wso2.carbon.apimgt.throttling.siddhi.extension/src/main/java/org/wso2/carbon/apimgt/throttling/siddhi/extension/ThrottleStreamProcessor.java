@@ -49,10 +49,13 @@ public class ThrottleStreamProcessor extends StreamProcessor implements Scheduli
 
     private long timeInMilliSeconds;
     private ComplexEventChunk<StreamEvent> expiredEventChunk = new ComplexEventChunk<StreamEvent>(true);
+    private ComplexEventChunk<StreamEvent> currentEventChunk = new ComplexEventChunk<StreamEvent>(true);
     private Scheduler scheduler;
     private ExecutionPlanContext executionPlanContext;
     private long expireEventTime = -1;
     private long startTime = -1;
+    private StreamEvent resetEvent = null;
+
 
     @Override
     public void setScheduler(Scheduler scheduler) {
@@ -155,7 +158,6 @@ public class ThrottleStreamProcessor extends StreamProcessor implements Scheduli
                 if (streamEvent.getType() != ComplexEvent.Type.CURRENT) {
                     continue;
                 }
-
                 complexEventPopulater.populateComplexEvent(streamEvent, new Object[]{expireEventTime});
                 StreamEvent clonedStreamEvent = streamEventCloner.copyStreamEvent(streamEvent);
                 clonedStreamEvent.setType(StreamEvent.Type.EXPIRED);
@@ -168,6 +170,18 @@ public class ThrottleStreamProcessor extends StreamProcessor implements Scheduli
                     streamEventChunk.add(expiredEventChunk.getFirst());
                 }
                 expiredEventChunk.clear();
+                if (streamEventChunk.getFirst() != null) {
+
+                    // add reset event in front of current events
+                    streamEventChunk.add(resetEvent);
+                    resetEvent = null;
+                    resetEvent = streamEventCloner.copyStreamEvent(streamEventChunk.getFirst());
+                    resetEvent.setType(ComplexEvent.Type.RESET);
+                }
+                if (expiredEventChunk != null) {
+                    expiredEventChunk.clear();
+                }
+                currentEventChunk.clear();
             }
         }
         if (streamEventChunk.getFirst() != null) {
