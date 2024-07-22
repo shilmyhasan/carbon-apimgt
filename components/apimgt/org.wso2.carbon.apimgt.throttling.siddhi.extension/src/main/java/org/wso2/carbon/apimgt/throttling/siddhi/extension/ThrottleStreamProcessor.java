@@ -168,11 +168,6 @@ public class ThrottleStreamProcessor extends StreamProcessor implements Scheduli
                 expiredEventChunk.reset();
                 if (expiredEventChunk.getFirst() != null) {
                     streamEventChunk.add(expiredEventChunk.getFirst());
-                }
-                expiredEventChunk.clear();
-                if (streamEventChunk.getFirst() != null) {
-
-                    // add reset event in front of current events
                     streamEventChunk.add(resetEvent);
                     resetEvent = null;
                     resetEvent = streamEventCloner.copyStreamEvent(streamEventChunk.getFirst());
