@@ -56,7 +56,6 @@ public class ThrottleStreamProcessor extends StreamProcessor implements Scheduli
     private long startTime = -1;
     private StreamEvent resetEvent = null;
 
-
     @Override
     public void setScheduler(Scheduler scheduler) {
         this.scheduler = scheduler;
