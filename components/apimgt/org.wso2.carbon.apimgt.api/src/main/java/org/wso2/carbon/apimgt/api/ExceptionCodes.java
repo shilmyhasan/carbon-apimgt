@@ -636,6 +636,9 @@ public enum ExceptionCodes implements ErrorHandler {
     RETIRED_API_REVISION_DEPLOYMENT_UNSUPPORTED(903227, "Deploying API Revisions is not supported for retired APIs",
             400, "Deploying API Revisions is not supported for retired APIs. ApiId: %s"),
 
+    REVISION_NOT_FOUND_FOR_REVISION_NUMBER(903228, "No revision found", 404,
+            "No revision found for revision number %s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),

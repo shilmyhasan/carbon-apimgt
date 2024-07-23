@@ -3839,7 +3839,13 @@ public class ApisApiServiceImpl implements ApisApiService {
         if (revisionId == null && revisionNum != null) {
             revisionId = apiProvider.getAPIRevisionUUID(revisionNum, apiId);
             if (revisionId == null) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(null).build();
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(
+                            "No revision found for revision number " + revisionNum + " of API with UUID " + apiId,
+                            ExceptionCodes.from(ExceptionCodes.REVISION_NOT_FOUND_FOR_REVISION_NUMBER, revisionNum));
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).entity(null).build();
+                }
             }
         }
 
