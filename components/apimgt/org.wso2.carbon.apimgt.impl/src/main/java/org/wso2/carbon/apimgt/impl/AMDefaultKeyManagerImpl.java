@@ -204,12 +204,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
 
         clientInfo.setClientName(oauthClientName);
 
-        //todo: run tests by commenting the type
-        if (APIConstants.JWT.equals(info.getTokenType())) {
-            clientInfo.setTokenType(info.getTokenType());
-        } else {
-            clientInfo.setTokenType(APIConstants.DEFAULT_TOKEN_TYPE);
-        }
+        clientInfo.setTokenType(getTokenTypeToSendInRequest(info, isUpdate));
 
         // Use a generated user as the app owner for cross tenant subscription scenarios, to avoid the tenant admin
         // being exposed in the JWT token.
@@ -352,6 +347,40 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
         clientInfo.setApplicationDisplayName(info.getClientName());
 
         return clientInfo;
+    }
+
+    private String getTokenTypeToSendInRequest(OAuthApplicationInfo infoInRequest, boolean isUpdate) {
+        if (isUpdate) {
+            ClientInfo existingClient;
+            String existingTokenType = null;
+            try {
+                existingClient = dcrClient.getApplication(Base64.getUrlEncoder().encodeToString(
+                        infoInRequest.getClientId().getBytes(StandardCharsets.UTF_8)));
+                existingTokenType = existingClient.getTokenType();
+            } catch (KeyManagerClientException e) {
+                log.error("Error while retrieving existing client info for clientId" + infoInRequest.getClientId() + ": ", e);
+            }
+
+            if (existingTokenType == null) {
+                // If the existing token type is not available, preserve the existing value by sending null
+                return null;
+            } else if (APIConstants.TOKEN_TYPE_JWT.equals(infoInRequest.getTokenType()) &&
+                    (APIConstants.DEFAULT_TOKEN_TYPE.equals(existingTokenType)
+                            || APIConstants.TOKEN_TYPE_OAUTH.equals(existingTokenType))) {
+                // requested token type is JWT and existing token type is either default or oauth then allow to change
+                // the token type to JWT
+                return APIConstants.TOKEN_TYPE_JWT;
+            } else {
+                return existingTokenType;
+            }
+        } else {
+            // create app path
+            if (APIConstants.TOKEN_TYPE_JWT.equals(infoInRequest.getTokenType())) {
+                return infoInRequest.getTokenType();
+            } else {
+                return APIConstants.DEFAULT_TOKEN_TYPE;
+            }
+        }
     }
 
     @Override
@@ -584,7 +613,7 @@ public class AMDefaultKeyManagerImpl extends AbstractKeyManager {
      *
      * @param appInfoRequest oAuth application properties will contain in this object
      * @return OAuthApplicationInfo with created oAuth application details.
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     * @throws APIManagementException
      */
     @Override
     public OAuthApplicationInfo mapOAuthApplication(OAuthAppRequest appInfoRequest)
