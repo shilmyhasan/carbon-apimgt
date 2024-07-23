@@ -12387,5 +12387,70 @@ public final class APIUtil {
         velocityEngine.setProperty(DeprecatedRuntimeConstants.OLD_SPACE_GOBBLING,"bc");
         velocityEngine.setProperty("runtime.conversion.handler", "none");
     }
+
+    /**
+     * Get if it is enabled or disabled physical file lock for truststore in carbon.xml
+     *
+     * @return true if EnableTruststoreFileLock is set to true in carbon.xml
+     */
+    public static boolean enableTruststoreFileLock() {
+        String isEnabled = CarbonUtils.getServerConfiguration()
+                .getFirstProperty(APIConstants.ENABLE_PHYSICAL_FILE_LOCK_FOR_TRUST_STORE);
+        return Boolean.parseBoolean(isEnabled);
+    }
+
+    /**
+     * Get maximum retry counts to access the truststore file in carbon.xml
+     *
+     * @return number of retry counts if MaxRetryCount is set to any value in carbon.xml
+     */
+    public static int getMaximumRetryCounts() {
+        String max_retry_count = CarbonUtils.getServerConfiguration()
+                .getFirstProperty(APIConstants.MAXIMUM_RETRY_COUNT);
+        try {
+            return Integer.parseInt(max_retry_count.trim());
+        } catch (NumberFormatException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error in converting max retry counts due to " + e.getMessage());
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Get the waiting time to keep the truststore file locked in carbon.xml
+     *
+     * @return waiting time if WaitTimeBeforeLockRelease is set to any value in carbon.xml
+     */
+    public static int getWaitTimeBeforeLockRelease() {
+        String wait_time_before_lock_release = CarbonUtils.getServerConfiguration()
+                .getFirstProperty(APIConstants.WAIT_TIME_BEFORE_LOCK_RELEASE);
+        try {
+            return Integer.parseInt(wait_time_before_lock_release.trim());
+        } catch (NumberFormatException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error in converting wait time before lock release due to " + e.getMessage());
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Get the wait time before retrying truststore file access in carbon.xml
+     *
+     * @return back off time if MaxBackOffTime is set to any value in carbon.xml
+     */
+    public static int getMaximumBackOffTime() {
+        String max_back_off_time = CarbonUtils.getServerConfiguration()
+                .getFirstProperty(APIConstants.MAXIMUM_BACK_OFF_TIME);
+        try {
+            return Integer.parseInt(max_back_off_time.trim());
+        } catch (NumberFormatException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error in converting max backoff time due to " + e.getMessage());
+            }
+        }
+        return 0;
+    }
 }
 
