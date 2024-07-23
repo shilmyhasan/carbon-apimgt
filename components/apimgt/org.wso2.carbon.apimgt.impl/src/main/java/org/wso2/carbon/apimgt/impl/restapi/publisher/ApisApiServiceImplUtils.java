@@ -895,6 +895,10 @@ public class ApisApiServiceImplUtils {
         apiRevisionDeployment.setRevisionUUID(revisionId);
         apiRevisionDeployment.setDeployment(deployment);
         apiRevisionDeployment.setVhost(vhost);
+        if (displayOnDevportal == null) {
+            // Set default value as true. If null, there will be a NullPointer exception when setting the value here.
+            displayOnDevportal = true;
+        }
         apiRevisionDeployment.setDisplayOnDevportal(displayOnDevportal);
         return apiRevisionDeployment;
     }

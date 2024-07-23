@@ -630,6 +630,12 @@ public enum ExceptionCodes implements ErrorHandler {
     THIRD_PARTY_API_REVISION_CREATION_UNSUPPORTED(903225, "Creating API Revisions is not supported " +
             "for third party APIs", 400,"Creating API Revisions is not supported for third party APIs: %s"),
 
+    THIRD_PARTY_API_REVISION_DEPLOYMENT_UNSUPPORTED(903226, "Deploying API Revisions is not supported " +
+            "for third party APIs", 400,"Deploying API Revisions is not supported for third party APIs: %s"),
+
+    RETIRED_API_REVISION_DEPLOYMENT_UNSUPPORTED(903227, "Deploying API Revisions is not supported for retired APIs",
+            400, "Deploying API Revisions is not supported for retired APIs. ApiId: %s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),
