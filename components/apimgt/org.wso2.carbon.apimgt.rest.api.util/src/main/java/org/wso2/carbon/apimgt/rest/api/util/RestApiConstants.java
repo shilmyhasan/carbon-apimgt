@@ -180,4 +180,5 @@ public final class RestApiConstants {
     public static final String SEQUENCE_ARTIFACT_ID = "id";
     public static final String HTTP_METHOD = "method";
     public static final String EMPTY_STRING = " ";
+    public static final String ALLOW_SPACES_IN_API_NAME = "allowSpacesInApiName";
 }
