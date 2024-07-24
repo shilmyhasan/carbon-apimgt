@@ -205,27 +205,17 @@ public class DataProcessAndPublishingAgent implements Runnable {
                 log.warn("Client port will be ignored and only the IP address (IPV4) will concern from " + ipAddress);
                 ipAddress = ipAddress.split(":")[0];
             }
-            try {
-                if (IPV4_PATTERN.matcher(ipAddress).matches() || IPV6_PATTERN.matcher(ipAddress).matches()) {
-                    InetAddress address = APIUtil.getAddress(ipAddress);
-                    if (address instanceof Inet4Address) {
+                if (IPV4_PATTERN.matcher(ipAddress).matches()) {
                         jsonObMap.put(APIThrottleConstants.IP, APIUtil.ipToLong(ipAddress));
                         jsonObMap.put(APIThrottleConstants.IPv6, 0);
-                    } else if (address instanceof Inet6Address) {
+                } else if (IPV6_PATTERN.matcher(ipAddress).matches()) {
                         jsonObMap.put(APIThrottleConstants.IPv6, APIUtil.ipToBigInteger(ipAddress));
                         jsonObMap.put(APIThrottleConstants.IP, 0);
-                    }
                 } else {
                     log.error("Error while parsing host IP " + ipAddress);
                     jsonObMap.put(APIThrottleConstants.IPv6, 0);
                     jsonObMap.put(APIThrottleConstants.IP, 0);
                 }
-            } catch (UnknownHostException e) {
-                //send empty value as ip
-                log.error("Error while parsing host IP " + ipAddress, e);
-                jsonObMap.put(APIThrottleConstants.IPv6, 0);
-                jsonObMap.put(APIThrottleConstants.IP, 0);
-            }
         }
 
         //HeaderMap will only be set if the Header Publishing has been enabled.
