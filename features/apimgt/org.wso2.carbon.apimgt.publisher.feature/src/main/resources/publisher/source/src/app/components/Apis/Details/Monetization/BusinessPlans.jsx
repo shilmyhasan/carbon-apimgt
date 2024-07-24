@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { Grid, Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import CheckIcon from '@material-ui/icons/Check';
@@ -105,7 +105,7 @@ class BusinessPlans extends Component {
      */
     render() {
         const { policies, monetizedPolices } = this.state;
-        const { classes } = this.props;
+        const { classes, intl } = this.props;
         if (monetizedPolices === null) {
             return <Progress />;
         }
@@ -189,7 +189,10 @@ class BusinessPlans extends Component {
                                 dense
                                 paperProps={{ elevation: 1 }}
                                 type='info'
-                                message='Click Save to monetize all unmonetized policies'
+                                message={intl.formatMessage({
+                                    id: 'Apis.Details.Monetization.BusinessPlans.commercial.policies.banner.save',
+                                    defaultMessage: 'Click Save to monetize all unmonetized policies',
+                                })}
                             />
                         ) : (
                             <Banner
@@ -197,7 +200,10 @@ class BusinessPlans extends Component {
                                 dense
                                 paperProps={{ elevation: 1 }}
                                 type='info'
-                                message='No commercial policies to monetize'
+                                message={intl.formatMessage({
+                                    id: 'Apis.Details.Monetization.BusinessPlans.commercial.no.policies.banner',
+                                    defaultMessage: 'No commercial policies to monetize',
+                                })}
                             />
                         )
                     }
@@ -212,4 +218,4 @@ BusinessPlans.propTypes = {
     classes: PropTypes.shape({}).isRequired,
 };
 
-export default withStyles(styles)(BusinessPlans);
+export default injectIntl(withStyles(styles)(BusinessPlans));

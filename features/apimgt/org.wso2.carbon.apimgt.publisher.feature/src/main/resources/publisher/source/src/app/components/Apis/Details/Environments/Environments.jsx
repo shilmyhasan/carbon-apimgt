@@ -480,13 +480,19 @@ export default function Environments() {
         if (api.apiType === API.CONSTS.APIProduct) {
             restProductApi.createProductRevision(api.id, body)
                 .then(() => {
-                    Alert.info('Revision Created Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.create.success',
+                        defaultMessage: 'Revision Created Successfully',
+                    }));
                 })
                 .catch((error) => {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while creating the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.create.error',
+                            defaultMessage: 'Something went wrong while creating the revision',
+                        }));
                     }
                     console.error(error);
                 }).finally(() => {
@@ -495,13 +501,19 @@ export default function Environments() {
         } else {
             api.createRevision(api.id, body)
                 .then(() => {
-                    Alert.info('Revision Created Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.create.success',
+                        defaultMessage: 'Revision Created Successfully',
+                    }));
                 })
                 .catch((error) => {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while creating the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.create.error',
+                            defaultMessage: 'Something went wrong while creating the revision',
+                        }));
                     }
                     console.error(error);
                 }).finally(() => {
@@ -547,13 +559,19 @@ export default function Environments() {
         if (api.apiType !== API.CONSTS.APIProduct) {
             restApi.restoreRevision(api.id, revisionId)
                 .then(() => {
-                    Alert.info('Revision Restored Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.restore.success',
+                        defaultMessage: 'Revision Restored Successfully',
+                    }));
                 })
                 .catch((error) => {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while restoring the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.restore.error',
+                            defaultMessage: 'Something went wrong while restoring the revision',
+                        }));
                     }
                     console.error(error);
                 }).finally(() => {
@@ -563,13 +581,19 @@ export default function Environments() {
         } else {
             restProductApi.restoreProductRevision(api.id, revisionId)
                 .then(() => {
-                    Alert.info('Revision Restored Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.restore.success',
+                        defaultMessage: 'Revision Restored Successfully',
+                    }));
                 })
                 .catch((error) => {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while restoring the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.restore.error',
+                            defaultMessage: 'Something went wrong while restoring the revision',
+                        }));
                     }
                     console.error(error);
                 }).finally(() => {
@@ -599,13 +623,19 @@ export default function Environments() {
         if (api.apiType !== API.CONSTS.APIProduct) {
             restApi.undeployRevision(api.id, revisionId, body)
                 .then(() => {
-                    Alert.info('Revision Undeployed Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.undeploy.success',
+                        defaultMessage: 'Revision Undeployed Successfully',
+                    }));
                 })
                 .catch((error) => {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while undeploying the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.undeploy.error',
+                            defaultMessage: 'Something went wrong while undeploying the revision',
+                        }));
                     }
                     console.error(error);
                 }).finally(() => {
@@ -615,13 +645,19 @@ export default function Environments() {
         } else {
             restProductApi.undeployProductRevision(api.id, revisionId, body)
                 .then(() => {
-                    Alert.info('Revision Undeployed Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.undeploy.success',
+                        defaultMessage: 'Revision Undeployed Successfully',
+                    }));
                 })
                 .catch((error) => {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while undeploying the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.undeploy.error',
+                            defaultMessage: 'Something went wrong while undeploying the revision',
+                        }));
                     }
                     console.error(error);
                 }).finally(() => {
@@ -644,13 +680,19 @@ export default function Environments() {
         if (api.apiType !== API.CONSTS.APIProduct) {
             restApi.deployRevision(api.id, revisionId, body)
                 .then(() => {
-                    Alert.info('Deploy revision Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.deploy.success',
+                        defaultMessage: 'Deploy revision Successfully',
+                    }));
                 })
                 .catch((error) => {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while deploy the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.deploy.error',
+                            defaultMessage: 'Something went wrong while deploying the revision',
+                        }));
                     }
                     console.error(error);
                 }).finally(() => {
@@ -660,13 +702,19 @@ export default function Environments() {
         } else {
             restProductApi.deployProductRevision(api.id, revisionId, body)
                 .then(() => {
-                    Alert.info('Deploy revision Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.deploy.success',
+                        defaultMessage: 'Deploy revision Successfully',
+                    }));
                 })
                 .catch((error) => {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while deploy the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.deploy.error',
+                            defaultMessage: 'Something went wrong while deploying the revision',
+                        }));
                     }
                     console.error(error);
                 }).finally(() => {
@@ -687,7 +735,10 @@ export default function Environments() {
         if (api.apiType !== API.CONSTS.APIProduct) {
             restApi.createRevision(api.id, body)
                 .then((response) => {
-                    Alert.info('Revision Created Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.create.success',
+                        defaultMessage: 'Revision Created Successfully',
+                    }));
                     const body1 = [];
                     for (let i = 0; i < envList.length; i++) {
                         body1.push({
@@ -698,13 +749,19 @@ export default function Environments() {
                     }
                     restApi.deployRevision(api.id, response.body.id, body1)
                         .then(() => {
-                            Alert.info('Revision Deployed Successfully');
+                            Alert.info(intl.formatMessage({
+                                id: 'Apis.Details.Environments.Environments.api.revision.deploy.success',
+                                defaultMessage: 'Revision Deployed Successfully',
+                            }));
                         })
                         .catch((error) => {
                             if (error.response) {
                                 Alert.error(error.response.body.description);
                             } else {
-                                Alert.error('Something went wrong while deploying the revision');
+                                Alert.error(intl.formatMessage({
+                                    id: 'Apis.Details.Environments.Environments.revision.deploy.error',
+                                    defaultMessage: 'Something went wrong while deploying the revision',
+                                }));
                             }
                             console.error(error);
                         }).finally(() => {
@@ -717,7 +774,10 @@ export default function Environments() {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while creating the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.deploy.error',
+                            defaultMessage: 'Something went wrong while deploying the revision',
+                        }));
                     }
                     console.error(error);
                 });
@@ -725,7 +785,10 @@ export default function Environments() {
         } else {
             restProductApi.createProductRevision(api.id, body)
                 .then((response) => {
-                    Alert.info('Revision Created Successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Details.Environments.Environments.revision.create.success',
+                        defaultMessage: 'Revision Created Successfully',
+                    }));
                     const body1 = [];
                     for (let i = 0; i < envList.length; i++) {
                         body1.push({
@@ -736,13 +799,19 @@ export default function Environments() {
                     }
                     restProductApi.deployProductRevision(api.id, response.body.id, body1)
                         .then(() => {
-                            Alert.info('Revision Deployed Successfully');
+                            Alert.info(intl.formatMessage({
+                                id: 'Apis.Details.Environments.Environments.api.revision.deploy.success',
+                                defaultMessage: 'Revision Deployed Successfully',
+                            }));
                         })
                         .catch((error) => {
                             if (error.response) {
                                 Alert.error(error.response.body.description);
                             } else {
-                                Alert.error('Something went wrong while deploying the revision');
+                                Alert.error(intl.formatMessage({
+                                    id: 'Apis.Details.Environments.Environments.revision.deploy.error',
+                                    defaultMessage: 'Something went wrong while deploying the revision',
+                                }));
                             }
                             console.error(error);
                         }).finally(() => {
@@ -755,7 +824,10 @@ export default function Environments() {
                     if (error.response) {
                         Alert.error(error.response.body.description);
                     } else {
-                        Alert.error('Something went wrong while creating the revision');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Environments.Environments.revision.create.error',
+                            defaultMessage: 'Something went wrong while creating the revision',
+                        }));
                     }
                     console.error(error);
                 });
@@ -1396,7 +1468,12 @@ export default function Environments() {
                                 name='description'
                                 margin='dense'
                                 variant='outlined'
-                                label='Description'
+                                label={(
+                                    <FormattedMessage
+                                        id='Apis.Details.Environments.Environments.revision.description.label'
+                                        defaultMessage='Description'
+                                    />
+                                )}
                                 inputProps={{ maxLength: maxCommentLength }}
                                 helperText={(
                                     <FormattedMessage
@@ -1719,7 +1796,12 @@ export default function Environments() {
                                 name='description'
                                 margin='dense'
                                 variant='outlined'
-                                label='Description'
+                                label={(
+                                    <FormattedMessage
+                                        id='Apis.Details.Environments.Environments.revision.description.label'
+                                        defaultMessage='Description'
+                                    />
+                                )}
                                 inputProps={{ maxLength: maxCommentLength }}
                                 helperText={(
                                     <FormattedMessage
@@ -1790,8 +1872,8 @@ export default function Environments() {
                                         ? (
                                             <TableCell align='left'>
                                                 <FormattedMessage
-                                                    id='Apis.Details.Environments.Environments.gateway
-                                                    .deployed.revision'
+                                                    id={'Apis.Details.Environments.Environments.gateway.'
+                                                        + 'deployed.revision'}
                                                     defaultMessage='Deployed Revision'
                                                 />
                                             </TableCell>
@@ -1865,8 +1947,8 @@ export default function Environments() {
                                                             select
                                                             label={(
                                                                 <FormattedMessage
-                                                                    id='Apis.Details.Environments.Environments
-                                                                    .select.vhost'
+                                                                    id={'Apis.Details.Environments.Environments.'
+                                                                    + 'select.vhost'}
                                                                     defaultMessage='Select Access URL'
                                                                 />
                                                             )}
@@ -1936,8 +2018,8 @@ export default function Environments() {
                                                             select
                                                             label={(
                                                                 <FormattedMessage
-                                                                    id='Apis.Details.Environments.Environments
-                                                                    .select.table'
+                                                                    id={'Apis.Details.Environments.Environments.'
+                                                                            + 'select.table'}
                                                                     defaultMessage='Select Revision'
                                                                 />
                                                             )}
@@ -1985,8 +2067,8 @@ export default function Environments() {
 
                                                         >
                                                             <FormattedMessage
-                                                                id='Apis.Details.Environments.Environments
-                                                                .deploy.button'
+                                                                id={'Apis.Details.Environments.Environments.'
+                                                                    + 'deploy.button'}
                                                                 defaultMessage='Deploy'
                                                             />
                                                         </Button>

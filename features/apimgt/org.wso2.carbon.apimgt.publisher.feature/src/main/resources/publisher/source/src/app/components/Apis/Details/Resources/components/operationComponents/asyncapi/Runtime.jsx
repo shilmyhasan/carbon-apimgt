@@ -30,6 +30,7 @@ import { useAppContext } from 'AppComponents/Shared/AppContext';
 import { useRevisionContext } from 'AppComponents/Shared/RevisionContext';
 import Utils from 'AppData/Utils';
 import { FileCopy } from '@material-ui/icons';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 /**
  * Renders the callback URL for WebSub and URI mapping for WebSocket.
@@ -43,6 +44,7 @@ export default function Runtime(props) {
     const { settings } = useAppContext();
     const { allEnvRevision } = useRevisionContext();
     const allEnvDeployments = Utils.getAllEnvironmentDeployments(settings.environment, allEnvRevision);
+    const intl = useIntl();
 
     const buildCallbackURL = (protocol, host, port) => {
         const context = api.context.substr(0, 1) !== '/' ? '/' + api.context : api.context;
@@ -75,7 +77,10 @@ export default function Runtime(props) {
         <>
             <Grid item xs={12} md={12}>
                 <Typography variant='subtitle1'>
-                    Runtime
+                    <FormattedMessage
+                        id='Apis.Details.Resources.components.async.api.runtime.title'
+                        defaultMessage='Runtime'
+                    />
                     <Divider variant='middle' />
                 </Typography>
             </Grid>
@@ -86,7 +91,10 @@ export default function Runtime(props) {
                         <TextField
                             margin='dense'
                             fullWidth
-                            label='URL Mapping'
+                            label={intl.formatMessage({
+                                id: 'Apis.Details.Resources.components.async.api.url.mapping.label',
+                                defaultMessage: 'URL Mapping',
+                            })}
                             value={operation[verb]['x-uri-mapping']}
                             variant='outlined'
                             helperText={uriMappingHelperText}

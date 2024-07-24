@@ -113,7 +113,7 @@ class CreateNewVersion extends React.Component {
     }
 
     componentDidMount() {
-        const { api } = this.props;
+        const { api, intl } = this.props;
         if (api.serviceInfo !== null) {
             const promisedServices = ServiceCatalog.getServiceByName(api.serviceInfo);
             promisedServices.then((data) => {
@@ -121,7 +121,10 @@ class CreateNewVersion extends React.Component {
                 this.setState({ versionList: array });
             }).catch((error) => {
                 console.error(error);
-                Alert.error('Error while loading services version');
+                Alert.error(intl.formatMessage({
+                    id: 'Apis.Details.NewVersion.loading.services.error',
+                    defaultMessage: 'Error while loading services version',
+                }));
             });
         }
     }

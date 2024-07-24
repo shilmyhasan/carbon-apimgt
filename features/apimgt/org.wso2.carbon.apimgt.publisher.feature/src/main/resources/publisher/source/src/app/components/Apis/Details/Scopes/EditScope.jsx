@@ -176,6 +176,7 @@ class EditScope extends React.Component {
      */
     handleRoleAddition(role) {
         const { validRoles, invalidRoles } = this.state;
+        const { intl } = this.props;
         const promise = APIValidation.role.validate(base64url.encode(role));
         promise
             .then(() => {
@@ -191,7 +192,15 @@ class EditScope extends React.Component {
                         invalidRoles: [...invalidRoles, role],
                     });
                 } else {
-                    Alert.error('Error when validating role: ' + role);
+                    Alert.error(intl.formatMessage(
+                        {
+                            id: 'Apis.Details.Scopes.Edit.Scope.validate.role.error',
+                            defaultMessage: 'Error when validating role: {role}',
+                        },
+                        {
+                            role,
+                        },
+                    ));
                     console.error('Error when validating role ' + error);
                 }
             });
@@ -283,7 +292,9 @@ class EditScope extends React.Component {
      * @returns {JSX} rendered component.
      */
     render() {
-        const { classes, api, isAPIProduct } = this.props;
+        const {
+            classes, api, isAPIProduct, intl,
+        } = this.props;
         const {
             apiScope, roleValidity, validRoles, invalidRoles,
         } = this.state;
@@ -323,7 +334,10 @@ class EditScope extends React.Component {
                                 <FormControl margin='normal'>
                                     <TextField
                                         id='name'
-                                        label='Name'
+                                        label={intl.formatMessage({
+                                            id: 'Apis.Details.Scopes.EditScope.name.label',
+                                            defaultMessage: 'Name',
+                                        })}
                                         fullWidth
                                         margin='normal'
                                         variant='outlined'
@@ -338,8 +352,14 @@ class EditScope extends React.Component {
                                 <FormControl margin='normal'>
                                     <TextField
                                         id='displayName'
-                                        label='Display Name'
-                                        placeholder='Scope Display Name'
+                                        label={intl.formatMessage({
+                                            id: 'Apis.Details.Scopes.EditScope.display.name.label',
+                                            defaultMessage: 'Display Name',
+                                        })}
+                                        placeholder={intl.formatMessage({
+                                            id: 'Apis.Details.Scopes.EditScope.display.name.placeholder',
+                                            defaultMessage: 'Scope Display Name',
+                                        })}
                                         helperText={(
                                             <FormattedMessage
                                                 id='Apis.Details.Scopes.CreateScope.short.description.name'
@@ -359,9 +379,16 @@ class EditScope extends React.Component {
                                 <FormControl margin='normal'>
                                     <TextField
                                         id='description'
-                                        label='Description'
+                                        label={intl.formatMessage({
+                                            id: 'Apis.Details.Scopes.EditScope.description.about.the.scope.label',
+                                            defaultMessage: 'Description',
+                                        })}
                                         variant='outlined'
-                                        placeholder='Short description about the scope'
+                                        placeholder={intl.formatMessage({
+                                            id: 'Apis.Details.Scopes.EditScope.short.description.'
+                                            + 'about.the.scope.placeholder',
+                                            defaultMessage: 'Short description about the scope',
+                                        })}
                                         helperText={(
                                             <FormattedMessage
                                                 id='Apis.Details.Scopes.EditScope.short.description.about.the.scope'
@@ -379,14 +406,20 @@ class EditScope extends React.Component {
                                 </FormControl>
                                 <FormControl margin='normal'>
                                     <ChipInput
-                                        label='Roles'
+                                        label={intl.formatMessage({
+                                            id: 'Apis.Details.Scopes.EditScope.roles.label',
+                                            defaultMessage: 'Roles',
+                                        })}
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
                                         variant='outlined'
                                         value={validRoles.concat(invalidRoles)}
                                         alwaysShowPlaceholder={false}
-                                        placeholder='Enter roles and press Enter'
+                                        placeholder={intl.formatMessage({
+                                            id: 'Apis.Details.Scopes.EditScope.roles.placeholder',
+                                            defaultMessage: 'Enter roles and press Enter',
+                                        })}
                                         blurBehavior='clear'
                                         InputProps={{
                                             endAdornment: !roleValidity && (

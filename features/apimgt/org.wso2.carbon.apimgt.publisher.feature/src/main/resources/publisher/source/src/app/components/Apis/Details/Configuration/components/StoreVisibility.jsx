@@ -21,7 +21,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutline from '@material-ui/icons/HelpOutline';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -63,6 +63,7 @@ export default function StoreVisibility(props) {
     const classes = useStyles();
     const restApi = new API();
     const [tenants, setTenants] = useState([]);
+    const intl = useIntl();
     useEffect(() => {
         restApi.getTenantsByState(CONSTS.TENANT_STATE_ACTIVE)
             .then((result) => {
@@ -92,7 +93,15 @@ export default function StoreVisibility(props) {
                 setRoleValidity(false);
                 setInvalidRoles([...invalidRoles, role]);
             } else {
-                Alert.error('Error when validating role: ' + role);
+                Alert.error(intl.formatMessage(
+                    {
+                        id: 'Apis.Details.Configuration.Components.validate.role.error',
+                        defaultMessage: 'Error when validating role: {role}',
+                    },
+                    {
+                        role,
+                    },
+                ));
                 console.error('Error when validating roles ' + error);
             }
         });

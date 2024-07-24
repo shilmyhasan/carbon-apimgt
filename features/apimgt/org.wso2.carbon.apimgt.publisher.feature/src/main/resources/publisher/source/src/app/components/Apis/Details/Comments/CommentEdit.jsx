@@ -25,6 +25,7 @@ import Select from '@material-ui/core/Select';
 import Grid from '@material-ui/core/Grid';
 import Alert from 'AppComponents/Shared/Alert';
 import API from 'AppData/api';
+import { injectIntl } from 'react-intl';
 
 const styles = (theme) => ({
     textField: {
@@ -106,7 +107,7 @@ class CommentEdit extends React.Component {
      */
     handleClickUpdateComment() {
         const {
-            api, comment, allComments, toggleShowEdit, commentsUpdate,
+            api, comment, allComments, toggleShowEdit, commentsUpdate, intl,
         } = this.props;
         const { category, commentText } = this.state;
         const Api = new API();
@@ -137,11 +138,17 @@ class CommentEdit extends React.Component {
                     if (error.response) {
                         Alert.error(error.response.body.message);
                     } else {
-                        Alert.error('Something went wrong while adding the comment');
+                        Alert.error(intl.formatMessage({
+                            id: 'Apis.Details.Comments.Comment.Add.error',
+                            defaultMessage: 'Something went wrong while adding the comment',
+                        }));
                     }
                 });
         } else {
-            Alert.error('You cannot enter a blank comment');
+            Alert.error(intl.formatMessage({
+                id: 'Apis.Details.Comments.Comment.Add.blank.error',
+                defaultMessage: 'You cannot enter a blank comment',
+            }));
         }
     }
 
@@ -235,4 +242,4 @@ CommentEdit.propTypes = {
     theme: PropTypes.shape({}).isRequired,
 };
 
-export default withStyles(styles, { withTheme: true })(CommentEdit);
+export default injectIntl(withStyles(styles, { withTheme: true })(CommentEdit));

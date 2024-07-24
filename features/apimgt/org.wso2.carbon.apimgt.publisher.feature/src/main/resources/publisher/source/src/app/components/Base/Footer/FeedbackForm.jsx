@@ -30,7 +30,7 @@ import FeedbackIcon from '@material-ui/icons/Feedback';
 import Tooltip from '@material-ui/core/Tooltip';
 import Grid from '@material-ui/core/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
+import { useIntl } from 'react-intl';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import IconButton from '@material-ui/core/IconButton';
 import MoodIcon from '@material-ui/icons/Mood';
@@ -48,7 +48,7 @@ import Configurations from 'Config';
 export default function FeedbackForm() {
     const [open, setOpen] = useState(false);
     const [isSending, setIsSending] = useState(false);
-
+    const intl = useIntl();
     /**
      *
      *
@@ -98,7 +98,10 @@ export default function FeedbackForm() {
             body: JSON.stringify(data),
         });
         response.finally(() => {
-            Alert.info('Thank you for the feedback.');
+            Alert.info(intl.formatMessage({
+                id: 'App.Components.Footer.Feedback.response.msg',
+                defaultMessage: 'Thank you for the feedback.',
+            }));
             setIsSending(false);
             onClose();
         });

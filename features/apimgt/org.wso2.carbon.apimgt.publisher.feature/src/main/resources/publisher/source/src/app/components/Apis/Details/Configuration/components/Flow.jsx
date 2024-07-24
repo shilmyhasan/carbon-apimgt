@@ -100,7 +100,12 @@ function InFlow(props) {
                             {selectedMediationPolicy && selectedMediationPolicy.name ? (
                                 <span>{selectedMediationPolicy.name}</span>
                             ) : (
-                                <span>none</span>
+                                <span>
+                                    <FormattedMessage
+                                        id='Apis.Details.MediationPolicies.Mediation.None'
+                                        defaultMessage='None'
+                                    />
+                                </span>
                             )}
                         </Typography>
                         <Button

@@ -27,7 +27,7 @@ import ClearAllIcon from '@material-ui/icons/ClearAll';
 import Tooltip from '@material-ui/core/Tooltip';
 import { isRestricted } from 'AppData/AuthManager';
 import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
-
+import { useIntl } from 'react-intl';
 /**
  *
  *
@@ -37,7 +37,7 @@ import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
 export default function OperationsSelector(props) {
     const { selectedOperations, setSelectedOperation, operations } = props;
     const [apiFromContext] = useAPI();
-
+    const intl = useIntl();
     // TODO: Following logic introduce a limitation in showing `indeterminate` icon state if user
     // select all -> unchecked one operation -> recheck same operation again ~tmkb
     const isIndeterminate = !isEmpty(selectedOperations);
@@ -54,7 +54,16 @@ export default function OperationsSelector(props) {
             <Grid item />
             <Grid item>
                 <Box mr={17.25}>
-                    <Tooltip title={isIndeterminate ? 'Clear selections' : 'Mark all for delete'}>
+                    <Tooltip title={isIndeterminate
+                        ? intl.formatMessage({
+                            id: 'Apis.Details.Resources.Components.Operations.tooltip.clear.selections',
+                            defaultMessage: 'Clear selections',
+                        })
+                        : intl.formatMessage({
+                            id: 'Apis.Details.Resources.Components.Operations.tooltip.delete.selections',
+                            defaultMessage: 'Mark all for delete',
+                        })}
+                    >
                         <div>
                             <IconButton
                                 disabled={isRestricted(['apim:api_create'], apiFromContext)}

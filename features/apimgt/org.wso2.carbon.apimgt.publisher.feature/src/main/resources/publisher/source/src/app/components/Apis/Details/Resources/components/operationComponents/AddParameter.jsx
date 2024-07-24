@@ -197,7 +197,10 @@ function AddParameter(props) {
             <Grid item xs={2} md={2}>
                 <FormControl margin='dense' variant='outlined' className={classes.formControl}>
                     <InputLabel ref={inputLabel} htmlFor='param-in' error={isParameterExist}>
-                        Parameter Type
+                        <FormattedMessage
+                            id='Apis.Details.Resources.components.operationComponents.AddParameter.type'
+                            defaultMessage='Parameter Type'
+                        />
                     </InputLabel>
 
                     <Select
@@ -317,7 +320,12 @@ function AddParameter(props) {
                             );
                         })}
                     </Select>
-                    <FormHelperText>Select the data type</FormHelperText>
+                    <FormHelperText>
+                        <FormattedMessage
+                            id='Apis.Details.Resources.components.operationComponents.data.type.helper'
+                            defaultMessage='Select the data type'
+                        />
+                    </FormHelperText>
                 </FormControl>
             </Grid>
             <Grid item xs={2} md={2}>

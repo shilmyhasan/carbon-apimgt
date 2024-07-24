@@ -23,7 +23,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Select from '@material-ui/core/Select';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import Alert from 'AppComponents/Shared/Alert';
@@ -70,7 +70,7 @@ class Policies extends Component {
         this.setState({
             loading: true,
         });
-        const { api: { id: apiUUID } } = this.props;
+        const { api: { id: apiUUID }, intl } = this.props;
         const promisedApi = this.api.get(apiUUID);
         promisedApi.then((response) => {
             const apiData = JSON.parse(response.data);
@@ -80,7 +80,10 @@ class Policies extends Component {
                 this.setState({
                     loading: false,
                 });
-                Alert.info('Lifecycle state updated successfully');
+                Alert.info(intl.formatMessage({
+                    id: 'Apis.Details.LifeCycle.Policies.update.success',
+                    defaultMessage: 'Lifecycle state updated successfully',
+                }));
             });
         });
     }
@@ -164,4 +167,4 @@ Policies.propTypes = {
     policies: PropTypes.shape({}).isRequired,
 };
 
-export default withStyles(styles)(Policies);
+export default injectIntl(withStyles(styles)(Policies));

@@ -36,7 +36,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { Collapse } from '@material-ui/core';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { isRestricted } from 'AppData/AuthManager';
 
 const useStyles = makeStyles((theme) => ({
@@ -65,8 +65,8 @@ const useStyles = makeStyles((theme) => ({
  * @param {*} props
  * @returns
  */
-export default function MaxBackendTps(props) {
-    const { api, configDispatcher } = props;
+function MaxBackendTps(props) {
+    const { api, configDispatcher, intl } = props;
     const classes = useStyles();
 
     return (
@@ -84,7 +84,7 @@ export default function MaxBackendTps(props) {
                                     <FormattedMessage
                                         id='Apis.Details.Configuration.components.MaxBackendTps.tooltip'
                                         defaultMessage={'Limits the total number of calls the API Manager is allowed'
-                                        + ' to make to the backend'}
+                                            + ' to make to the backend'}
                                     />
                                 )}
                                 aria-label='APISecurity'
@@ -97,7 +97,12 @@ export default function MaxBackendTps(props) {
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails className={classes.expansionPanelDetails}>
                         <FormControl component='fieldset'>
-                            <FormLabel component='legend'>Maximum Throughput</FormLabel>
+                            <FormLabel component='legend'>
+                                <FormattedMessage
+                                    id='Apis.Details.Configuration.components.MaxBackendTps.max.throughput'
+                                    defaultMessage='Maximum Throughput'
+                                />
+                            </FormLabel>
                             <RadioGroup
                                 aria-label='change-max-TPS'
                                 value={api.maxTps === null ? 'unlimited' : 'specify'}
@@ -119,7 +124,11 @@ export default function MaxBackendTps(props) {
                                             disabled={isRestricted(['apim:api_create'], api)}
                                         />
                                     )}
-                                    label='Unlimited'
+                                    label={intl.formatMessage({
+                                        id: 'Apis.Details.Configuration.components.MaxBackendTps.max.'
+                                            + 'throughput.unlimited',
+                                        defaultMessage: 'Unlimited',
+                                    })}
                                     labelPlacement='end'
 
                                 />
@@ -131,7 +140,11 @@ export default function MaxBackendTps(props) {
                                             disabled={isRestricted(['apim:api_create'], api)}
                                         />
                                     )}
-                                    label='Specify'
+                                    label={intl.formatMessage({
+                                        id: 'Apis.Details.Configuration.components.MaxBackendTps.max.'
+                                            + 'throughput.specify',
+                                        defaultMessage: 'Specify',
+                                    })}
                                     labelPlacement='end'
                                     disabled={isRestricted(['apim:api_create'], api)}
                                 />
@@ -140,7 +153,11 @@ export default function MaxBackendTps(props) {
                         <Collapse in={api.maxTps !== null}>
                             <Grid item xs={12} style={{ marginBottom: 10, position: 'relative' }}>
                                 <TextField
-                                    label='Max Production TPS'
+                                    label={intl.formatMessage({
+                                        id: 'Apis.Details.Configuration.components.MaxBackendTps.max.'
+                                            + 'throughput.specify.max.prod.tps',
+                                        defaultMessage: 'Max Production TPS',
+                                    })}
                                     margin='normal'
                                     variant='outlined'
                                     onChange={(event) => {
@@ -158,7 +175,11 @@ export default function MaxBackendTps(props) {
                             </Grid>
                             <Grid item xs={12} style={{ marginBottom: 10, position: 'relative' }}>
                                 <TextField
-                                    label='Max Sandbox TPS'
+                                    label={intl.formatMessage({
+                                        id: 'Apis.Details.Configuration.components.MaxBackendTps.max.'
+                                            + 'throughput.specify.max.sandbox.tps',
+                                        defaultMessage: 'Max Sandbox TPS',
+                                    })}
                                     margin='normal'
                                     variant='outlined'
                                     onChange={(event) => {
@@ -192,3 +213,4 @@ MaxBackendTps.propTypes = {
     api: PropTypes.shape({}).isRequired,
     configDispatcher: PropTypes.func.isRequired,
 };
+export default injectIntl((MaxBackendTps));

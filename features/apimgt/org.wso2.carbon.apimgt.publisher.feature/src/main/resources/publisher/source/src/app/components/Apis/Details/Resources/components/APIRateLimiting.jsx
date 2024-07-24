@@ -36,6 +36,7 @@ import HelpOutline from '@material-ui/icons/HelpOutline';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { isRestricted } from 'AppData/AuthManager';
 import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 const RateLimitingLevels = {
     API: 'api',
@@ -62,6 +63,7 @@ function APIRateLimiting(props) {
         setFocusOperationLevel, focusOperationLevel,
     } = props;
     const classes = useStyles();
+    const intl = useIntl();
     const [apiThrottlingPolicy, setApiThrottlingPolicy] = useState(currentApiThrottlingPolicy);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -119,19 +121,32 @@ function APIRateLimiting(props) {
 
     let operationRateLimitMessage = (
         <Typography variant='body1' gutterBottom>
-            You may change the rate limiting policies per operation
+            <FormattedMessage
+                id='Apis.Details.Rate.Limiting.operations.message.body'
+                defaultMessage='You may change the rate limiting policies per operation'
+            />
             <Typography variant='caption' display='block' gutterBottom>
-                Expand an operation below to select a rate limiting policy for an operation
+                <FormattedMessage
+                    id='Apis.Details.Rate.Limiting.operations.message.caption'
+                    defaultMessage='Expand an operation below to select a rate limiting policy for an operation'
+                />
+
             </Typography>
         </Typography>
     );
     if (isAPIProduct) {
         operationRateLimitMessage = (
             <Typography variant='body1' gutterBottom>
-                Rate limiting polices of the source operation will be applied
+                <FormattedMessage
+                    id='Apis.Details.Rate.Limiting.operations.api.product.message.body'
+                    defaultMessage='Rate limiting polices of the source operation will be applied'
+                />
                 <Typography variant='caption' display='block' gutterBottom>
-                    Rate limiting policy of an individual operation will be govern by the policy specified in the source
-                    operation
+                    <FormattedMessage
+                        id='Apis.Details.Rate.Limiting.operations.api.product.message.caption'
+                        defaultMessage={'Rate limiting policy of an individual operation will be'
+                        + 'govern by the policy specified in the source operation'}
+                    />
                 </Typography>
             </Typography>
         );
@@ -142,10 +157,17 @@ function APIRateLimiting(props) {
                 <Grid item md={12} xs={12}>
                     <Box ml={1}>
                         <Typography variant='subtitle1' gutterBottom>
-                            Operations Configuration
+                            <FormattedMessage
+                                id='Apis.Details.Rate.Limiting.operations.configuration'
+                                defaultMessage='Operations Configuration'
+                            />
+
                             <Tooltip
                                 fontSize='small'
-                                title='Configurations that affects on all the resources'
+                                title={intl.formatMessage({
+                                    id: 'Apis.Details.Rate.Limiting.operations.configuration.tooltip',
+                                    defaultMessage: 'Configurations that affects on all the resources',
+                                })}
                                 aria-label='common configurations'
                                 placement='right-end'
                                 interactive
@@ -159,7 +181,12 @@ function APIRateLimiting(props) {
                 <Grid item md={1} xs={1} />
                 <Grid item md={5} xs={11}>
                     <FormControl component='fieldset'>
-                        <FormLabel component='legend'>Rate limiting level</FormLabel>
+                        <FormLabel component='legend'>
+                            <FormattedMessage
+                                id='Apis.Details.Rate.Limiting.rate.limiting.level'
+                                defaultMessage='Rate limiting level'
+                            />
+                        </FormLabel>
                         <RadioGroup
                             aria-label='Apply rate limiting in'
                             value={rateLimitingLevel}
@@ -174,7 +201,10 @@ function APIRateLimiting(props) {
                                         disabled={isRestricted(['apim:api_create'], apiFromContext)}
                                     />
                                 )}
-                                label='API Level'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Details.Rate.Limiting.rate.limiting.level.api.level',
+                                    defaultMessage: 'API Level',
+                                })}
                                 labelPlacement='end'
                                 id='api-rate-limiting-api-level'
                             />
@@ -187,7 +217,10 @@ function APIRateLimiting(props) {
                                     />
                                 )}
                                 className={focusOperationLevel && classes.focusLabel}
-                                label='Operation Level'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Details.Rate.Limiting.rate.limiting.level.operation.level',
+                                    defaultMessage: 'Operation Level',
+                                })}
                                 labelPlacement='end'
                                 id='api-rate-limiting-operation-level'
                             />
@@ -203,11 +236,17 @@ function APIRateLimiting(props) {
                                 disabled={isRestricted(['apim:api_create'], apiFromContext)}
                                 id='operation_throttling_policy'
                                 select
-                                label='Rate limiting policies'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Details.Rate.Limiting.rate.limiting.policies',
+                                    defaultMessage: 'Rate limiting policies',
+                                })}
                                 value={apiThrottlingPolicy}
                                 onChange={({ target: { value } }) => (
                                     onChange ? onChange(value) : setApiThrottlingPolicy(value))}
-                                helperText='Selected rate limiting policy will be applied to whole API'
+                                helperText={intl.formatMessage({
+                                    id: 'Apis.Details.Rate.Limiting.rate.limiting.policies.helper.text',
+                                    defaultMessage: 'Selected rate limiting policy will be applied to whole API',
+                                })}
                                 margin='dense'
                                 variant='outlined'
                             >

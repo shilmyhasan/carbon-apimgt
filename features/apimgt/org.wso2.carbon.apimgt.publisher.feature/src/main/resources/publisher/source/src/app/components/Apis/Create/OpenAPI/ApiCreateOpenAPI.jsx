@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -44,7 +44,7 @@ import ProvideOpenAPI from './Steps/ProvideOpenAPI';
 export default function ApiCreateOpenAPI(props) {
     const [wizardStep, setWizardStep] = useState(0);
     const { history } = props;
-
+    const intl = useIntl();
     /**
      *
      * Reduce the events triggered from API input fields to current state
@@ -142,14 +142,20 @@ export default function ApiCreateOpenAPI(props) {
             ? newAPI.importOpenAPIByFile(inputValue) : newAPI.importOpenAPIByUrl(inputValue);
         promisedResponse
             .then((api) => {
-                Alert.info('API created successfully');
+                Alert.info(intl.formatMessage({
+                    id: 'Apis.Create.OpenAPI.ApiCreateOpenAPI.created.success',
+                    defaultMessage: 'API created successfully',
+                }));
                 history.push(`/apis/${api.id}/overview`);
             })
             .catch((error) => {
                 if (error.response) {
                     Alert.error(error.response.body.description);
                 } else {
-                    Alert.error('Something went wrong while adding the API');
+                    Alert.error(intl.formatMessage({
+                        id: 'Apis.Create.OpenAPI.ApiCreateOpenAPI.created.error',
+                        defaultMessage: 'Something went wrong while adding the API',
+                    }));
                 }
                 console.error(error);
             })
@@ -233,7 +239,10 @@ export default function ApiCreateOpenAPI(props) {
                             )}
                             {wizardStep === 1 && (
                                 <Button onClick={() => setWizardStep((step) => step - 1)}>
-                                    Back
+                                    <FormattedMessage
+                                        id='Apis.Create.OpenAPI.ApiCreateOpenAPI.back'
+                                        defaultMessage='Back'
+                                    />
                                 </Button>
                             )}
                         </Grid>
@@ -246,7 +255,10 @@ export default function ApiCreateOpenAPI(props) {
                                     disabled={!apiInputs.isFormValid}
                                     id='open-api-create-next-btn'
                                 >
-                                    Next
+                                    <FormattedMessage
+                                        id='Apis.Create.OpenAPI.ApiCreateOpenAPI.next'
+                                        defaultMessage='Next'
+                                    />
                                 </Button>
                             )}
                             {wizardStep === 1 && (
@@ -257,7 +269,10 @@ export default function ApiCreateOpenAPI(props) {
                                     onClick={createAPI}
                                     id='open-api-create-btn'
                                 >
-                                    Create
+                                    <FormattedMessage
+                                        id='Apis.Create.OpenAPI.ApiCreateOpenAPI.create'
+                                        defaultMessage='Create'
+                                    />
                                     {' '}
                                     {isCreating && <CircularProgress size={24} />}
                                 </Button>

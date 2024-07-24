@@ -28,6 +28,7 @@ import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
 import Alert from 'AppComponents/Shared/Alert';
 import Grid from '@material-ui/core/Grid';
 import Banner from 'AppComponents/Shared/Banner';
+import { useIntl } from 'react-intl';
 import CloseConfirmation from './CloseConfirmation';
 
 const MonacoEditor = lazy(() => import('react-monaco-editor' /* webpackChunkName: "PolicyEditorMonaco" */));
@@ -57,6 +58,7 @@ const Transition = React.forwardRef((props, ref) => {
 export default function PolicyEditor(props) {
     const classes = useStyles();
     const [api] = useAPI();
+    const intl = useIntl();
     const {
         open,
         onClose,
@@ -106,7 +108,10 @@ export default function PolicyEditor(props) {
         setSaving(true);
         api.updateResourcePolicy(selectedPolicy)
             .then((response) => {
-                Alert.success('Resource policy updated successfully');
+                Alert.success(intl.formatMessage({
+                    id: 'Apis.Details.Resources.Policy.update.success',
+                    defaultMessage: 'Resource policy updated successfully',
+                }));
                 resourcePoliciesDispatcher({ action: 'update', data: { value: response.body, direction } });
                 onClose();
             })
@@ -116,7 +121,11 @@ export default function PolicyEditor(props) {
                     setPageError(error.response.body);
                 } else {
                     // TODO add i18n ~tmkb
-                    const message = error.message || 'Something went wrong while updating resource policy!';
+                    const message = error.message
+                        || intl.formatMessage({
+                            id: 'Apis.Details.Resources.Policy.update.error',
+                            defaultMessage: 'Something went wrong while updating resource policy!',
+                        });
                     Alert.error(message);
                     setPageError(message);
                 }

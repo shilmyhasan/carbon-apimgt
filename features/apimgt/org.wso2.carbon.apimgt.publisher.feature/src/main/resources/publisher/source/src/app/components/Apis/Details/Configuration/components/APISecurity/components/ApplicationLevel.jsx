@@ -35,7 +35,7 @@ import HelpOutline from '@material-ui/icons/HelpOutline';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { isRestricted } from 'AppData/AuthManager';
 import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
 import KeyManager from 'AppComponents/Apis/Details/Configuration/components/KeyManager';
@@ -84,6 +84,7 @@ export default function ApplicationLevel(props) {
     } = props;
     const [apiFromContext] = useAPI();
     const classes = useStyles();
+    const intl = useIntl();
     let mandatoryValue = null;
     let hasResourceWithSecurity;
     if (apiFromContext.apiType === API.CONSTS.APIProduct) {
@@ -120,8 +121,7 @@ export default function ApplicationLevel(props) {
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography className={classes.subHeading} variant='h6'>
                             <FormattedMessage
-                                id='Apis.Details.Configuration.Components.APISecurity.Components.
-                                    ApplicationLevel.http'
+                                id='Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.http'
                                 defaultMessage='Application Level Security'
                             />
                             <Tooltip
@@ -160,7 +160,11 @@ export default function ApplicationLevel(props) {
                                         color='primary'
                                     />
                                 )}
-                                label='OAuth2'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Details.Configuration.Components.APISecurity.Components.'
+                                        + 'ApplicationLevel.security.scheme.oauth2',
+                                    defaultMessage: 'OAuth2',
+                                })}
                             />
                             <FormControlLabel
                                 control={(
@@ -176,7 +180,11 @@ export default function ApplicationLevel(props) {
                                         id='api-security-basic-auth-checkbox'
                                     />
                                 )}
-                                label='Basic'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Details.Configuration.Components.APISecurity.Components.'
+                                        + 'ApplicationLevel.security.scheme.basic',
+                                    defaultMessage: 'Basic',
+                                })}
                             />
                             <FormControlLabel
                                 control={(
@@ -192,7 +200,11 @@ export default function ApplicationLevel(props) {
                                         id='api-security-api-key-checkbox'
                                     />
                                 )}
-                                label='Api Key'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Details.Configuration.Components.APISecurity.Components.'
+                                        + 'ApplicationLevel.security.scheme.api.key',
+                                    defaultMessage: 'Api Key',
+                                })}
                             />
                         </FormGroup>
                         <FormControl className={classes.bottomSpace} component='fieldset'>
@@ -215,7 +227,11 @@ export default function ApplicationLevel(props) {
                                             color='primary'
                                         />
                                     )}
-                                    label='Mandatory'
+                                    label={intl.formatMessage({
+                                        id: 'Apis.Details.Configuration.Components.APISecurity.Components.'
+                                            + 'ApplicationLevel.security.scheme.mandatory',
+                                        defaultMessage: 'Mandatory',
+                                    })}
                                     labelPlacement='end'
                                 />
                                 <FormControlLabel
@@ -227,7 +243,11 @@ export default function ApplicationLevel(props) {
                                             color='primary'
                                         />
                                     )}
-                                    label='Optional'
+                                    label={intl.formatMessage({
+                                        id: 'Apis.Details.Configuration.Components.APISecurity.Components.'
+                                            + 'ApplicationLevel.security.scheme.optional',
+                                        defaultMessage: 'Optional',
+                                    })}
                                     labelPlacement='end'
                                 />
                             </RadioGroup>
@@ -247,15 +267,15 @@ export default function ApplicationLevel(props) {
                         <AuthorizationHeader api={api} configDispatcher={configDispatcher} />
                         <FormControl>
                             {!hasResourceWithSecurity
-                            && (
-                                <FormHelperText>
-                                    <FormattedMessage
-                                        id='Apis.Details.Configuration.components.APISecurity.api.unsecured'
-                                        defaultMessage='Application level security is not required since API
+                                && (
+                                    <FormHelperText>
+                                        <FormattedMessage
+                                            id='Apis.Details.Configuration.components.APISecurity.api.unsecured'
+                                            defaultMessage='Application level security is not required since API
                                         has no secured resources'
-                                    />
-                                </FormHelperText>
-                            )}
+                                        />
+                                    </FormHelperText>
+                                )}
                         </FormControl>
                     </ExpansionPanelDetails>
                 </WrappedExpansionPanel>

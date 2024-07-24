@@ -11,8 +11,7 @@ import Popper from '@material-ui/core/Popper';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
-
-const options = ['Save and deploy', 'Save'];
+import { useIntl } from 'react-intl';
 
 /**
  *
@@ -25,11 +24,27 @@ export default function CustomSplitButton(props) {
     } = props;
     const anchorRef = React.useRef(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const intl = useIntl();
+    const options = [
+        {
+            key: 'Save and deploy',
+            label: intl.formatMessage({
+                id: 'Custom.Split.Button.Save.And.Deploy',
+                defaultMessage: 'Save and deploy',
+            }),
+        },
+        {
+            key: 'Save',
+            label: intl.formatMessage({
+                id: 'Custom.Split.Button.Save',
+                defaultMessage: 'Save',
+            }),
+        }];
 
     const handleClick = (event, index) => {
         setSelectedIndex(index);
         setOpen(false);
-        if (`${options[index]}` === 'Save') {
+        if (`${options[index].key}` === 'Save') {
             handleSave();
         } else {
             handleSaveAndDeploy();
@@ -66,7 +81,7 @@ export default function CustomSplitButton(props) {
                         style={{ width: '200px' }}
                         id={id}
                     >
-                        {options[selectedIndex]}
+                        {options[selectedIndex].label}
                         {isUpdating && <CircularProgress size={24} />}
                     </Button>
                     <Button
@@ -94,11 +109,11 @@ export default function CustomSplitButton(props) {
                                     <MenuList id='split-button-menu'>
                                         {options.map((option, index) => (
                                             <MenuItem
-                                                key={option}
+                                                key={option.key}
                                                 selected={index === selectedIndex}
                                                 onClick={(event) => handleClick(event, index)}
                                             >
-                                                {option}
+                                                {option.label}
                                             </MenuItem>
                                         ))}
                                     </MenuList>

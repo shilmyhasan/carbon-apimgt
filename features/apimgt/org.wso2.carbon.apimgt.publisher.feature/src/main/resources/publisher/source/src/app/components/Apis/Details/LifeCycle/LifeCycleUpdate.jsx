@@ -122,6 +122,7 @@ class LifeCycleUpdate extends Component {
     updateLCStateOfAPI(apiUUID, action) {
         this.setState({ isUpdating: action });
         let promisedUpdate;
+        const { intl } = this.props;
         const lifecycleChecklist = this.props.checkList.map((item) => item.value + ':' + item.checked);
         if (lifecycleChecklist.length > 0) {
             promisedUpdate = this.api.updateLcState(apiUUID, action, lifecycleChecklist.toString());
@@ -140,7 +141,6 @@ class LifeCycleUpdate extends Component {
                     this.setState({ message });
                 }
                 this.setState({ newState });
-                const { intl } = this.props;
 
                 if (workflowStatus === this.WORKFLOW_STATUS.CREATED) {
                     Alert.info(intl.formatMessage({
@@ -179,7 +179,10 @@ class LifeCycleUpdate extends Component {
                     this.setState({ pageError: error.response.body });
                 } else {
                     // TODO add i18n ~tmkb
-                    const message = 'Something went wrong while updating the lifecycle';
+                    const message = intl.formatMessage({
+                        id: 'Apis.Details.LifeCycle.LifeCycleUpdate.error',
+                        defaultMessage: 'Something went wrong while updating the lifecycle',
+                    });
                     Alert.error(message);
                     this.setState({ pageError: error.response.body });
                 }
@@ -231,7 +234,7 @@ class LifeCycleUpdate extends Component {
      */
     render() {
         const {
-            api, lcState, classes, theme, handleChangeCheckList, checkList, certList,
+            api, lcState, classes, theme, handleChangeCheckList, checkList, certList, intl,
         } = this.props;
         const lifecycleStates = [...lcState.availableTransitions];
         const { newState, pageError, isOpen } = this.state;
@@ -243,6 +246,38 @@ class LifeCycleUpdate extends Component {
         lcMap.set('Blocked', 'Block');
         lcMap.set('Created', 'Create');
         lcMap.set('Retired', 'Retire');
+
+        const lifeCycleUpdateEvents = {
+            Deprecate: intl.formatMessage({
+                id: 'Apis.Details.LifeCycle.LifeCycleUpdate.State.Deprecate',
+                defaultMessage: 'Deprecate',
+            }),
+            Block: intl.formatMessage({
+                id: 'Apis.Details.LifeCycle.LifeCycleUpdate.State.Block',
+                defaultMessage: 'Block',
+            }),
+            'Demote to Created': intl.formatMessage({
+                id: 'Apis.Details.LifeCycle.LifeCycleUpdate.State.Demote.to.Created',
+                defaultMessage: 'Demote to Created',
+            }),
+            Publish: intl.formatMessage({
+                id: 'Apis.Details.LifeCycle.LifeCycleUpdate.State.Publish',
+                defaultMessage: 'Publish',
+            }),
+            Prototype: intl.formatMessage({
+                id: 'Apis.Details.LifeCycle.LifeCycleUpdate.State.Prototype',
+                defaultMessage: 'Prototype',
+            }),
+            'Re-Publish': intl.formatMessage({
+                id: 'Apis.Details.LifeCycle.LifeCycleUpdate.State.Re.Publish',
+                defaultMessage: 'Re-Publish',
+            }),
+            Retire: intl.formatMessage({
+                id: 'Apis.Details.LifeCycle.LifeCycleUpdate.State.Retire',
+                defaultMessage: 'Retire',
+            }),
+        };
+
         const isPrototype = api.endpointConfig && api.endpointConfig.implementation_status === 'prototyped';
         const isMutualSSLEnabled = api.securityScheme.includes(API_SECURITY_MUTUAL_SSL_MANDATORY);
         const isAppLayerSecurityMandatory = api.securityScheme.includes(
@@ -352,7 +387,9 @@ class LifeCycleUpdate extends Component {
                                         onClick={this.updateLifeCycleState}
                                         data-testid={transitionState.event + '-btn'}
                                     >
-                                        {transitionState.displayName}
+                                        { transitionState.displayName in lifeCycleUpdateEvents
+                                            ? lifeCycleUpdateEvents[transitionState.displayName]
+                                            : transitionState.displayName }
                                         {this.state.isUpdating === transitionState.event && (
                                             <CircularProgress size={18} />
                                         )}

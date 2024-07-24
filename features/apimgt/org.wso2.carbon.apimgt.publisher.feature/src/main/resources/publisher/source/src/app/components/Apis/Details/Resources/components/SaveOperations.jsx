@@ -104,7 +104,9 @@ export default function SaveOperations(props) {
                         )}
                 </Grid>
                 <Grid item>
-                    <Button onClick={() => setIsOpen(true)}>Reset</Button>
+                    <Button onClick={() => setIsOpen(true)}>
+                        <FormattedMessage id='Apis.Details.Configuration.Resources.reset' defaultMessage='Reset' />
+                    </Button>
                 </Grid>
             </Grid>
             <Dialog

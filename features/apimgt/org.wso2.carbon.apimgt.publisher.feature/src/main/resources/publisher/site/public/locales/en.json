@@ -5,6 +5,12 @@
       "value": "Allow to group APIs that have similar attributes. There has to be pre-defined API categories in the environment in order to be attached to an API."
     }
   ],
+  "Apis.APIProductCreateWrapper.error.errorMessage.create.api.product": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the API Product"
+    }
+  ],
   "Apis.APIProductCreateWrapper.error.errorMessage.create.revision": [
     {
       "type": 0,
@@ -27,6 +33,12 @@
     {
       "type": 0,
       "value": "Cancel"
+    }
+  ],
+  "Apis.Create.APIProduct.APIProductCreateWrapper.created.success": [
+    {
+      "type": 0,
+      "value": "API Product created successfully"
     }
   ],
   "Apis.Create.APIProduct.APIProductCreateWrapper.defineProvide": [
@@ -65,10 +77,28 @@
       "value": "Add Resources"
     }
   ],
+  "Apis.Create.APIProduct.APIProductCreateWrapper.revision.created.success": [
+    {
+      "type": 0,
+      "value": "API Revision created successfully"
+    }
+  ],
+  "Apis.Create.APIProduct.APIProductCreateWrapper.revision.deployed.success": [
+    {
+      "type": 0,
+      "value": "API Revision Deployed Successfully"
+    }
+  ],
   "Apis.Create.APIProduct.APIProductCreateWrapper.sub.heading": [
     {
       "type": 0,
       "value": "Create an API Product by providing a Name, a Context, Resources, and Business Plans (optional)."
+    }
+  ],
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.back": [
+    {
+      "type": 0,
+      "value": "Back"
     }
   ],
   "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.cancel": [
@@ -77,10 +107,34 @@
       "value": "Cancel"
     }
   ],
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.create": [
+    {
+      "type": 0,
+      "value": "Create"
+    }
+  ],
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.created.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the API"
+    }
+  ],
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.created.success": [
+    {
+      "type": 0,
+      "value": "API created successfully"
+    }
+  ],
   "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.heading": [
     {
       "type": 0,
       "value": "Create an API using an AsyncAPI definition."
+    }
+  ],
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.next": [
+    {
+      "type": 0,
+      "value": "Next"
     }
   ],
   "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.sub.heading": [
@@ -135,10 +189,68 @@
       "value": "Input Type"
     }
   ],
+  "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.Input.url.text.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter AsyncAPI URL"
+    }
+  ],
+  "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.file.label": [
+    {
+      "type": 0,
+      "value": "AsyncAPI File"
+    }
+  ],
+  "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.url.helper.text": [
+    {
+      "type": 0,
+      "value": "Click away to validate the URL"
+    }
+  ],
+  "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.url.label": [
+    {
+      "type": 0,
+      "value": "AsyncAPI URL"
+    }
+  ],
+  "Apis.Create.Components.DefaultAPIForm.api.actual.context.helper": [
+    {
+      "type": 0,
+      "value": "API will be exposed in "
+    },
+    {
+      "type": 1,
+      "value": "actualContext"
+    },
+    {
+      "type": 0,
+      "value": "context at the gateway"
+    }
+  ],
   "Apis.Create.Components.DefaultAPIForm.api.context": [
     {
       "type": 0,
       "value": "Context"
+    }
+  ],
+  "Apis.Create.Components.DefaultAPIForm.api.endpoint": [
+    {
+      "type": 0,
+      "value": "Endpoint"
+    }
+  ],
+  "Apis.Create.Components.DefaultAPIForm.api.product.actual.context.helper": [
+    {
+      "type": 0,
+      "value": "API Product will be exposed in "
+    },
+    {
+      "type": 1,
+      "value": "actualContext"
+    },
+    {
+      "type": 0,
+      "value": "context at the gateway"
     }
   ],
   "Apis.Create.Components.DefaultAPIForm.api.product.context": [
@@ -147,10 +259,50 @@
       "value": "Context"
     }
   ],
+  "Apis.Create.Components.DefaultAPIForm.mandatory.fields": [
+    {
+      "type": 0,
+      "value": "Mandatory fields"
+    }
+  ],
   "Apis.Create.Components.DefaultAPIForm.name": [
     {
       "type": 0,
       "value": "Name"
+    }
+  ],
+  "Apis.Create.Components.DefaultAPIForm.validation.error.context.exists": [
+    {
+      "type": 1,
+      "value": "apiContext"
+    },
+    {
+      "type": 0,
+      "value": " context already exists"
+    }
+  ],
+  "Apis.Create.Components.DefaultAPIForm.validation.error.dynamic.context.exists": [
+    {
+      "type": 1,
+      "value": "apiContext"
+    },
+    {
+      "type": 0,
+      "value": " dynamic context already exists"
+    }
+  ],
+  "Apis.Create.Components.DefaultAPIForm.validation.error.name.exists": [
+    {
+      "type": 0,
+      "value": "Name "
+    },
+    {
+      "type": 1,
+      "value": "value"
+    },
+    {
+      "type": 0,
+      "value": " already exists"
     }
   ],
   "Apis.Create.Components.DefaultAPIForm.version": [
@@ -171,10 +323,46 @@
       "value": "Business plan(s)"
     }
   ],
+  "Apis.Create.Default.APICreateDefault.api.created.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the API"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.api.created.success": [
+    {
+      "type": 0,
+      "value": "API created successfully"
+    }
+  ],
   "Apis.Create.Default.APICreateDefault.api.heading": [
     {
       "type": 0,
       "value": "Create an API"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.api.product.created.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the API Product"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.api.product.created.success": [
+    {
+      "type": 0,
+      "value": "API Product created successfully"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.api.revision.created.success": [
+    {
+      "type": 0,
+      "value": "API Revision created successfully"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.api.revision.deployed.success": [
+    {
+      "type": 0,
+      "value": "API Revision Deployed Successfully"
     }
   ],
   "Apis.Create.Default.APICreateDefault.api.sub.heading": [
@@ -201,6 +389,18 @@
       "value": "Cancel"
     }
   ],
+  "Apis.Create.Default.APICreateDefault.create.btn": [
+    {
+      "type": 0,
+      "value": "Create"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.create.publish.btn": [
+    {
+      "type": 0,
+      "value": "Create & Publish"
+    }
+  ],
   "Apis.Create.Default.APICreateDefault.error.errorMessage.create.revision": [
     {
       "type": 0,
@@ -223,6 +423,30 @@
     {
       "type": 0,
       "value": "Throttling policies not available. Contact your administrator"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.streaming.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the API"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.streaming.revision.deployed.": [
+    {
+      "type": 0,
+      "value": "API Revision Deployed Successfully"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.streaming.revision.success": [
+    {
+      "type": 0,
+      "value": "API Revision created successfully"
+    }
+  ],
+  "Apis.Create.Default.APICreateDefault.streaming.success": [
+    {
+      "type": 0,
+      "value": "API created successfully"
     }
   ],
   "Apis.Create.Default.APICreateDefault.success.otherStatus": [
@@ -259,6 +483,22 @@
     {
       "type": 0,
       "value": "Create"
+    }
+  ],
+  "Apis.Create.GraphQL.ApiCreateGraphQL.created.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the API"
+    }
+  ],
+  "Apis.Create.GraphQL.ApiCreateGraphQL.created.success": [
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": " API created successfully"
     }
   ],
   "Apis.Create.GraphQL.ApiCreateGraphQL.error.policies.not.available": [
@@ -347,16 +587,46 @@
       "value": "Provide GraphQL File"
     }
   ],
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.back": [
+    {
+      "type": 0,
+      "value": "Back"
+    }
+  ],
   "Apis.Create.OpenAPI.ApiCreateOpenAPI.cancel": [
     {
       "type": 0,
       "value": "Cancel"
     }
   ],
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.create": [
+    {
+      "type": 0,
+      "value": "Create"
+    }
+  ],
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.created.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the API"
+    }
+  ],
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.created.success": [
+    {
+      "type": 0,
+      "value": "API created successfully"
+    }
+  ],
   "Apis.Create.OpenAPI.ApiCreateOpenAPI.heading": [
     {
       "type": 0,
       "value": "Create an API using an OpenAPI definition."
+    }
+  ],
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.next": [
+    {
+      "type": 0,
+      "value": "Next"
     }
   ],
   "Apis.Create.OpenAPI.ApiCreateOpenAPI.sub.heading": [
@@ -411,6 +681,18 @@
       "value": "Input Type"
     }
   ],
+  "Apis.Create.OpenAPI.create.api.url.helper.text": [
+    {
+      "type": 0,
+      "value": "Click away to validate the URL"
+    }
+  ],
+  "Apis.Create.OpenAPI.create.api.url.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter OpenAPI URL"
+    }
+  ],
   "Apis.Create.StreamingAPI.APICreateStreamingAPI.api.heading": [
     {
       "type": 0,
@@ -429,6 +711,18 @@
       "value": "Create an API by providing a Name, a Version and a Context"
     }
   ],
+  "Apis.Create.WSDL.ApiCreateWSDL.create.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the API"
+    }
+  ],
+  "Apis.Create.WSDL.ApiCreateWSDL.create.success": [
+    {
+      "type": 0,
+      "value": "API created successfully"
+    }
+  ],
   "Apis.Create.WSDL.ApiCreateWSDL.error.policies.not.available": [
     {
       "type": 0,
@@ -439,6 +733,36 @@
     {
       "type": 0,
       "value": "Expose a SOAP Service as a REST API"
+    }
+  ],
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.create.api": [
+    {
+      "type": 0,
+      "value": "Create API"
+    }
+  ],
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.create.api.back.btn": [
+    {
+      "type": 0,
+      "value": "Back"
+    }
+  ],
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.create.api.create.btn": [
+    {
+      "type": 0,
+      "value": "Create"
+    }
+  ],
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.create.api.next.btn": [
+    {
+      "type": 0,
+      "value": "Next"
+    }
+  ],
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.provide.wsdl": [
+    {
+      "type": 0,
+      "value": "Provide WSDL"
     }
   ],
   "Apis.Create.WSDL.ApiCreateWSDL.sub.heading": [
@@ -517,6 +841,36 @@
       "value": "WSDL URL"
     }
   ],
+  "Apis.Create.WSDL.content.validation.file.failed": [
+    {
+      "type": 0,
+      "value": "WSDL content validation failed!"
+    }
+  ],
+  "Apis.Create.WSDL.content.validation.url.failed": [
+    {
+      "type": 0,
+      "value": "Invalid WSDL URL!"
+    }
+  ],
+  "Apis.Create.WSDL.url.helper.text": [
+    {
+      "type": 0,
+      "value": "Click away to validate the URL"
+    }
+  ],
+  "Apis.Create.WSDL.url.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter WSDL URL"
+    }
+  ],
+  "Apis.Create.WSDL.validation.error.response": [
+    {
+      "type": 0,
+      "value": "Error occurred during validation"
+    }
+  ],
   "Apis.Create.asyncAPI.Components.SelectPolicies.business.plans": [
     {
       "type": 0,
@@ -527,6 +881,18 @@
     {
       "type": 0,
       "value": "Protocol"
+    }
+  ],
+  "Apis.Create.streaming.Components.create.and.publish.btn": [
+    {
+      "type": 0,
+      "value": "Create & Publish"
+    }
+  ],
+  "Apis.Create.streaming.Components.create.btn": [
+    {
+      "type": 0,
+      "value": "Create"
     }
   ],
   "Apis.Details.APIDefinition.APIDefinition.api.definition": [
@@ -721,12 +1087,6 @@
       "value": "Unauthorized: Insufficient permissions to update API Definition"
     }
   ],
-  "Apis.Details.APIDefinition.AuditApi\n                                                                    .OverallScoreProgress": [
-    {
-      "type": 1,
-      "value": "overallScore"
-    }
-  ],
   "Apis.Details.APIDefinition.AuditApi.ApiSecurityAuditReport": [
     {
       "type": 0,
@@ -847,6 +1207,12 @@
     {
       "type": 1,
       "value": "overallCriticality"
+    }
+  ],
+  "Apis.Details.APIDefinition.AuditApi.OverallScoreProgress": [
+    {
+      "type": 1,
+      "value": "overallScore"
     }
   ],
   "Apis.Details.APIDefinition.AuditApi.ReferenceSection": [
@@ -1297,6 +1663,48 @@
       "value": "Provide the name of the technical owner"
     }
   ],
+  "Apis.Details.Comments.Comment.Add.blank.error": [
+    {
+      "type": 0,
+      "value": "You cannot enter a blank comment"
+    }
+  ],
+  "Apis.Details.Comments.Comment.Add.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while adding the comment"
+    }
+  ],
+  "Apis.Details.Comments.Comment.delete.confirm": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to delete this comment?"
+    }
+  ],
+  "Apis.Details.Comments.Comment.delete.confirm.cancel.label": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "Apis.Details.Comments.Comment.delete.confirm.title": [
+    {
+      "type": 0,
+      "value": "Confirm Delete"
+    }
+  ],
+  "Apis.Details.Comments.Comment.delete.confirm.yes.label": [
+    {
+      "type": 0,
+      "value": "Yes"
+    }
+  ],
+  "Apis.Details.Comments.Comment.delete.success": [
+    {
+      "type": 0,
+      "value": "Comment has been successfully deleted"
+    }
+  ],
   "Apis.Details.Comments.Comment.load.more.replies": [
     {
       "type": 0,
@@ -1345,6 +1753,16 @@
       "value": "Reply"
     }
   ],
+  "Apis.Details.Comments.delete.comment.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while deleting comment - "
+    },
+    {
+      "type": 1,
+      "value": "commentIdOfCommentToDelete"
+    }
+  ],
   "Apis.Details.Comments.load.previous.comments": [
     {
       "type": 0,
@@ -1363,10 +1781,40 @@
       "value": "No comments available for this API yet"
     }
   ],
+  "Apis.Details.Comments.reply.delete.success": [
+    {
+      "type": 0,
+      "value": "Reply comment has been successfully deleted"
+    }
+  ],
+  "Apis.Details.Comments.retrieve.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while retrieving comments"
+    }
+  ],
   "Apis.Details.Comments.title": [
     {
       "type": 0,
       "value": "Comments"
+    }
+  ],
+  "Apis.Details.Components.async.api.add.property.description.helper.text": [
+    {
+      "type": 0,
+      "value": "Enter property description"
+    }
+  ],
+  "Apis.Details.Components.async.api.add.property.description.text": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Apis.Details.Components.async.api.add.property.select.data.type": [
+    {
+      "type": 0,
+      "value": "Select the data type"
     }
   ],
   "Apis.Details.Configurartion.components.QueryAnalysis": [
@@ -1387,28 +1835,86 @@
       "value": "Edit Complexity Values"
     }
   ],
+  "Apis.Details.Configurartion.components.QueryAnalysis.update.complexity": [
+    {
+      "type": 0,
+      "value": "update complexity"
+    }
+  ],
   "Apis.Details.Configuration.AuthHeader.helper.text": [
     {
       "type": 0,
       "value": "Authorization header name cannot contain spaces or special characters"
     }
   ],
-  "Apis.Details.Configuration.Components.APISecurity.Components.\n                                    ApplicationLevel.http": [
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.http": [
     {
       "type": 0,
       "value": "Application Level Security"
     }
   ],
-  "Apis.Details.Configuration.Components.APISecurity.Components.\n                                    TransportLevel.transport.level.security": [
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.api.key": [
+    {
+      "type": 0,
+      "value": "Api Key"
+    }
+  ],
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.basic": [
+    {
+      "type": 0,
+      "value": "Basic"
+    }
+  ],
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.mandatory": [
+    {
+      "type": 0,
+      "value": "Mandatory"
+    }
+  ],
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.oauth2": [
+    {
+      "type": 0,
+      "value": "OAuth2"
+    }
+  ],
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.optional": [
+    {
+      "type": 0,
+      "value": "Optional"
+    }
+  ],
+  "Apis.Details.Configuration.Components.APISecurity.Components.TransportLevel.transport.level.security": [
     {
       "type": 0,
       "value": "Transport Level Security"
+    }
+  ],
+  "Apis.Details.Configuration.Components.APISecurity.Components.TransportLevel.transport.level.security.mutual.ssl.mandatory": [
+    {
+      "type": 0,
+      "value": "Mandatory"
+    }
+  ],
+  "Apis.Details.Configuration.Components.APISecurity.Components.TransportLevel.transport.level.security.mutual.ssl.optional": [
+    {
+      "type": 0,
+      "value": "Optional"
     }
   ],
   "Apis.Details.Configuration.Components.MaxBackendTps.maximum.backend.throughput": [
     {
       "type": 0,
       "value": "Backend Throughput"
+    }
+  ],
+  "Apis.Details.Configuration.Components.validate.role.error": [
+    {
+      "type": 0,
+      "value": "Error when validating role: "
+    },
+    {
+      "type": 1,
+      "value": "role"
     }
   ],
   "Apis.Details.Configuration.Configuration.AuthHeader.tooltip": [
@@ -1573,13 +2079,61 @@
       "value": "* You are not authorized to update particular fields of the API due to insufficient permissions"
     }
   ],
+  "Apis.Details.Configuration.Design.Configurations.error.occured": [
+    {
+      "type": 0,
+      "value": "Error occurred"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.operation.already.exist.error": [
+    {
+      "type": 0,
+      "value": "Operation(s) already exist!"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.operation.api.update.error": [
+    {
+      "type": 0,
+      "value": "Error while updating the API"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.operation.definition.update.error": [
+    {
+      "type": 0,
+      "value": "Error while updating the definition"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.operation.verbs.already.exist.error": [
+    {
+      "type": 0,
+      "value": "Operation already exist with "
+    },
+    {
+      "type": 1,
+      "value": "data_target"
+    },
+    {
+      "type": 0,
+      "value": " and "
+    },
+    {
+      "type": 1,
+      "value": "currentVerb"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.reset": [
+    {
+      "type": 0,
+      "value": "Reset"
+    }
+  ],
   "Apis.Details.Configuration.Resources.save": [
     {
       "type": 0,
       "value": "Save"
     }
   ],
-  "Apis.Details.Configuration.RuntimeConfiguration.backend.api.\n                                                    product.endpoint": [
+  "Apis.Details.Configuration.RuntimeConfiguration.backend.api.product.endpoint": [
     {
       "type": 0,
       "value": "Please refer respective APIs for endpoint information"
@@ -1619,6 +2173,42 @@
     {
       "type": 0,
       "value": "Runtime Configurations"
+    }
+  ],
+  "Apis.Details.Configuration.Topic.already.exist.error": [
+    {
+      "type": 0,
+      "value": "Operation(s) already exist!"
+    }
+  ],
+  "Apis.Details.Configuration.Topic.already.opreation.verb.exist.error": [
+    {
+      "type": 0,
+      "value": "Operation already exist with "
+    },
+    {
+      "type": 1,
+      "value": "data_target"
+    },
+    {
+      "type": 0,
+      "value": " and "
+    },
+    {
+      "type": 1,
+      "value": "current_Verb"
+    }
+  ],
+  "Apis.Details.Configuration.Topic.update.api.error": [
+    {
+      "type": 0,
+      "value": "Error while updating the API"
+    }
+  ],
+  "Apis.Details.Configuration.Topic.update.definition.error": [
+    {
+      "type": 0,
+      "value": "Error while updating the definition"
     }
   ],
   "Apis.Details.Configuration.components.APILevelRateLimitingPolicies.configuration": [
@@ -1735,34 +2325,40 @@
       "value": "Restricted by roles :"
     }
   ],
-  "Apis.Details.Configuration.components.AccessControl.tooltip.restrict.\n                                    desc": [
+  "Apis.Details.Configuration.components.AccessControl.tooltip.restrict.desc": [
     {
       "type": 0,
       "value": "The API can be viewed and modified only by specific publishers and creators with the roles that you specify"
     }
   ],
-  "Apis.Details.Configuration.components.CORSConfiguration.allow.\n                                                    headers": [
+  "Apis.Details.Configuration.components.CORSConfiguration.allow.all.origins": [
     {
       "type": 0,
-      "value": "Access Control Allow Headers"
-    }
-  ],
-  "Apis.Details.Configuration.components.CORSConfiguration.allow.\n                                                    methods": [
-    {
-      "type": 0,
-      "value": "Access Control Allow Methods"
-    }
-  ],
-  "Apis.Details.Configuration.components.CORSConfiguration.allow.\n                                                    origins": [
-    {
-      "type": 0,
-      "value": "Access Control Allow Origins"
+      "value": "Allow All Origins"
     }
   ],
   "Apis.Details.Configuration.components.CORSConfiguration.allow.credentials": [
     {
       "type": 0,
       "value": "Access Control Allow Credentials"
+    }
+  ],
+  "Apis.Details.Configuration.components.CORSConfiguration.allow.headers": [
+    {
+      "type": 0,
+      "value": "Access Control Allow Headers"
+    }
+  ],
+  "Apis.Details.Configuration.components.CORSConfiguration.allow.methods": [
+    {
+      "type": 0,
+      "value": "Access Control Allow Methods"
+    }
+  ],
+  "Apis.Details.Configuration.components.CORSConfiguration.allow.origins": [
+    {
+      "type": 0,
+      "value": "Access Control Allow Origins"
     }
   ],
   "Apis.Details.Configuration.components.CORSConfiguration.cors.configuration": [
@@ -1891,6 +2487,36 @@
       "value": "Maximum backend transactions per second in integers"
     }
   ],
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput": [
+    {
+      "type": 0,
+      "value": "Maximum Throughput"
+    }
+  ],
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput.specify": [
+    {
+      "type": 0,
+      "value": "Specify"
+    }
+  ],
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput.specify.max.prod.tps": [
+    {
+      "type": 0,
+      "value": "Max Production TPS"
+    }
+  ],
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput.specify.max.sandbox.tps": [
+    {
+      "type": 0,
+      "value": "Max Sandbox TPS"
+    }
+  ],
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput.unlimited": [
+    {
+      "type": 0,
+      "value": "Unlimited"
+    }
+  ],
   "Apis.Details.Configuration.components.MaxBackendTps.tooltip": [
     {
       "type": 0,
@@ -1901,6 +2527,18 @@
     {
       "type": 0,
       "value": "If enabled, the API response will be cached at the gateway level to improve the response time and minimize the backend load"
+    }
+  ],
+  "Apis.Details.Configuration.components.SchemaValidation.btn.no": [
+    {
+      "type": 0,
+      "value": "No"
+    }
+  ],
+  "Apis.Details.Configuration.components.SchemaValidation.btn.yes": [
+    {
+      "type": 0,
+      "value": "Yes"
     }
   ],
   "Apis.Details.Configuration.components.SchemaValidation.description": [
@@ -2081,6 +2719,12 @@
     {
       "type": 0,
       "value": "No API Categories defined."
+    }
+  ],
+  "Apis.Details.Documents.Create.Edit.validate.doc.name.error": [
+    {
+      "type": 0,
+      "value": "Error when validating document name"
     }
   ],
   "Apis.Details.Documents.Create.heading": [
@@ -3033,6 +3677,12 @@
       "value": "Sandbox Endpoint"
     }
   ],
+  "Apis.Details.Endpoints.EndpointOverview.sandbox.endpoint.sandbox.header": [
+    {
+      "type": 0,
+      "value": "Sandbox Endpoint"
+    }
+  ],
   "Apis.Details.Endpoints.EndpointOverview.upload.mediation.message": [
     {
       "type": 0,
@@ -3105,6 +3755,12 @@
       "value": "*You are not authorized to update endpoints of the API due to insufficient permissions"
     }
   ],
+  "Apis.Details.Endpoints.GeneralConfiguration.Certificates.NoCertificatesUploaded": [
+    {
+      "type": 0,
+      "value": "You do not have any certificates uploaded"
+    }
+  ],
   "Apis.Details.Endpoints.GeneralConfiguration.Certificates.certificate.add.success": [
     {
       "type": 0,
@@ -3145,6 +3801,12 @@
     {
       "type": 0,
       "value": "Certificates"
+    }
+  ],
+  "Apis.Details.Endpoints.GeneralConfiguration.Certificates.certificates.AddCertificate": [
+    {
+      "type": 0,
+      "value": "Add Certificate"
     }
   ],
   "Apis.Details.Endpoints.GeneralConfiguration.Certificates.confirm.certificate.delete": [
@@ -3453,6 +4115,18 @@
       "value": "Upload Certificate"
     }
   ],
+  "Apis.Details.Endpoints.GeneralConfiguration.UploadCertificate.uploadCertificate.alias.placeholder": [
+    {
+      "type": 0,
+      "value": "My Alias"
+    }
+  ],
+  "Apis.Details.Endpoints.GeneralConfiguration.UploadCertificate.uploadCertificate.throttle.policy": [
+    {
+      "type": 0,
+      "value": "Select a throttling policy for the certificate"
+    }
+  ],
   "Apis.Details.Endpoints.GeneralConfiguration.certificates.sub.heading": [
     {
       "type": 0,
@@ -3495,16 +4169,34 @@
       "value": "Service URL"
     }
   ],
+  "Apis.Details.Endpoints.GenericEndpoint.service.url.input.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter the Endpoint URL and press + button"
+    }
+  ],
   "Apis.Details.Endpoints.LoadBalanceConfig.algorithm": [
     {
       "type": 0,
       "value": "Algorithm"
     }
   ],
+  "Apis.Details.Endpoints.LoadBalanceConfig.algorithm.helper.text": [
+    {
+      "type": 0,
+      "value": "Please select the Loadbalance Algorithm."
+    }
+  ],
   "Apis.Details.Endpoints.LoadBalanceConfig.class.name.for.algorithm": [
     {
       "type": 0,
       "value": "Class Name for Algorithm"
+    }
+  ],
+  "Apis.Details.Endpoints.LoadBalanceConfig.class.name.for.algorithm.helper.text": [
+    {
+      "type": 0,
+      "value": "Enter the class name of the loadbalance algorithm"
     }
   ],
   "Apis.Details.Endpoints.LoadBalanceConfig.failover": [
@@ -3517,6 +4209,12 @@
     {
       "type": 0,
       "value": "Session Management"
+    }
+  ],
+  "Apis.Details.Endpoints.LoadBalanceConfig.session.management.helper.text": [
+    {
+      "type": 0,
+      "value": "Please select the Session Management mechanism."
     }
   ],
   "Apis.Details.Endpoints.LoadBalanceConfig.session.timeout": [
@@ -3583,6 +4281,24 @@
     {
       "type": 0,
       "value": "Sandbox Loadbalanced Endpoints"
+    }
+  ],
+  "Apis.Details.Endpoints.LoadbalanceFailoverConfig.types.failover": [
+    {
+      "type": 0,
+      "value": "Failover"
+    }
+  ],
+  "Apis.Details.Endpoints.LoadbalanceFailoverConfig.types.load.balanced": [
+    {
+      "type": 0,
+      "value": "Load Balanced"
+    }
+  ],
+  "Apis.Details.Endpoints.LoadbalanceFailoverConfig.types.none": [
+    {
+      "type": 0,
+      "value": "None"
     }
   ],
   "Apis.Details.Endpoints.NewEndpointCreate.add.endpoints.header": [
@@ -3675,30 +4391,6 @@
       "value": "Script"
     }
   ],
-  "Apis.Details.Environments\n                                                                                .deploy.vhost": [
-    {
-      "type": 0,
-      "value": "VHost"
-    }
-  ],
-  "Apis.Details.Environments.Environments\n                                                                    .select.table": [
-    {
-      "type": 0,
-      "value": "Select Revision"
-    }
-  ],
-  "Apis.Details.Environments.Environments\n                                                                    .select.vhost": [
-    {
-      "type": 0,
-      "value": "Select Access URL"
-    }
-  ],
-  "Apis.Details.Environments.Environments\n                                                                .deploy.button": [
-    {
-      "type": 0,
-      "value": "Deploy"
-    }
-  ],
   "Apis.Details.Environments.Environments.APIGateways": [
     {
       "type": 0,
@@ -3729,6 +4421,12 @@
       "value": "Name"
     }
   ],
+  "Apis.Details.Environments.Environments.api.revision.deploy.success": [
+    {
+      "type": 0,
+      "value": "Revision Deployed Successfully"
+    }
+  ],
   "Apis.Details.Environments.Environments.create.cancel": [
     {
       "type": 0,
@@ -3739,6 +4437,12 @@
     {
       "type": 0,
       "value": "Create"
+    }
+  ],
+  "Apis.Details.Environments.Environments.deploy.button": [
+    {
+      "type": 0,
+      "value": "Deploy"
     }
   ],
   "Apis.Details.Environments.Environments.deploy.cancel": [
@@ -3783,12 +4487,6 @@
       "value": "Display Gateway Access URLs in developer portal."
     }
   ],
-  "Apis.Details.Environments.Environments.gateway\n                                                    .deployed.revision": [
-    {
-      "type": 0,
-      "value": "Deployed Revision"
-    }
-  ],
   "Apis.Details.Environments.Environments.gateway.accessUrl": [
     {
       "type": 0,
@@ -3801,16 +4499,28 @@
       "value": "Action"
     }
   ],
-  "Apis.Details.Environments.Environments.revision\n                                                    .description.deploy": [
+  "Apis.Details.Environments.Environments.gateway.deployed.revision": [
     {
       "type": 0,
-      "value": "Add a description to the revision"
+      "value": "Deployed Revision"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.create.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while creating the revision"
     }
   ],
   "Apis.Details.Environments.Environments.revision.create.heading": [
     {
       "type": 0,
       "value": "Create New Revision (From Current API)"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.create.success": [
+    {
+      "type": 0,
+      "value": "Revision Created Successfully"
     }
   ],
   "Apis.Details.Environments.Environments.revision.delete": [
@@ -3863,6 +4573,30 @@
       "value": "Revision Deleted Successfully"
     }
   ],
+  "Apis.Details.Environments.Environments.revision.deploy.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while deploying the revision"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.deploy.success": [
+    {
+      "type": 0,
+      "value": "Deploy revision Successfully"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.description.add": [
+    {
+      "type": 0,
+      "value": "Add a description"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.description.add.optional.text": [
+    {
+      "type": 0,
+      "value": "(optional)"
+    }
+  ],
   "Apis.Details.Environments.Environments.revision.description.create": [
     {
       "type": 0,
@@ -3873,6 +4607,18 @@
     {
       "type": 0,
       "value": "Brief description of the new revision"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.description.deploy.helper": [
+    {
+      "type": 0,
+      "value": "Add a description to the revision"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.description.label": [
+    {
+      "type": 0,
+      "value": "Description"
     }
   ],
   "Apis.Details.Environments.Environments.revision.restore": [
@@ -3913,6 +4659,30 @@
       "value": "Confirm Restore"
     }
   ],
+  "Apis.Details.Environments.Environments.revision.restore.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while restoring the revision"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.restore.success": [
+    {
+      "type": 0,
+      "value": "Revision Restored Successfully"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.undeploy.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while undeploying the revision"
+    }
+  ],
+  "Apis.Details.Environments.Environments.revision.undeploy.success": [
+    {
+      "type": 0,
+      "value": "Revision Undeployed Successfully"
+    }
+  ],
   "Apis.Details.Environments.Environments.select.rev.delete": [
     {
       "type": 0,
@@ -3949,6 +4719,18 @@
       "value": "count"
     }
   ],
+  "Apis.Details.Environments.Environments.select.table": [
+    {
+      "type": 0,
+      "value": "Select Revision"
+    }
+  ],
+  "Apis.Details.Environments.Environments.select.vhost": [
+    {
+      "type": 0,
+      "value": "Select Access URL"
+    }
+  ],
   "Apis.Details.Environments.Environments.undeploy.btn": [
     {
       "type": 0,
@@ -3959,6 +4741,24 @@
     {
       "type": 0,
       "value": "Gateway URL Visibility"
+    }
+  ],
+  "Apis.Details.Environments.deploy.api.gateways.text": [
+    {
+      "type": 0,
+      "value": "API Gateways"
+    }
+  ],
+  "Apis.Details.Environments.deploy.env.text": [
+    {
+      "type": 0,
+      "value": "Deploy API to the Gateway Environment"
+    }
+  ],
+  "Apis.Details.Environments.deploy.text": [
+    {
+      "type": 0,
+      "value": "Deploy the API"
     }
   ],
   "Apis.Details.Environments.deploy.vhost": [
@@ -4071,6 +4871,12 @@
     {
       "type": 0,
       "value": "Page Search"
+    }
+  ],
+  "Apis.Details.Index.get.revisions.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while getting the revisions!"
     }
   ],
   "Apis.Details.LifeCycle.CheckboxLabels.business.plans.selected": [
@@ -4199,10 +5005,70 @@
       "value": "Lifecycle task deleted successfully"
     }
   ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Block": [
+    {
+      "type": 0,
+      "value": "Block"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Demote.to.Created": [
+    {
+      "type": 0,
+      "value": "Demote to Created"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Deprecate": [
+    {
+      "type": 0,
+      "value": "Deprecate"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Prototype": [
+    {
+      "type": 0,
+      "value": "Prototype"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Publish": [
+    {
+      "type": 0,
+      "value": "Publish"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Re.Publish": [
+    {
+      "type": 0,
+      "value": "Re-Publish"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Retire": [
+    {
+      "type": 0,
+      "value": "Retire"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.approve.approveStatus": [
+    {
+      "type": 0,
+      "value": "Lifecycle state change action approved successfully"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while updating the lifecycle"
+    }
+  ],
   "Apis.Details.LifeCycle.LifeCycleUpdate.error.certs": [
     {
       "type": 0,
       "value": "Error while retrieving certificates"
+    }
+  ],
+  "Apis.Details.LifeCycle.LifeCycleUpdate.reject.rejectStatus": [
+    {
+      "type": 0,
+      "value": "Lifecycle state change action rejected due to validation failure"
     }
   ],
   "Apis.Details.LifeCycle.LifeCycleUpdate.success.createStatus": [
@@ -4233,6 +5099,54 @@
     {
       "type": 0,
       "value": "Select a plan for the API product."
+    }
+  ],
+  "Apis.Details.LifeCycle.Policies.update.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while updating the API"
+    }
+  ],
+  "Apis.Details.LifeCycle.Policies.update.success": [
+    {
+      "type": 0,
+      "value": "Lifecycle state updated successfully"
+    }
+  ],
+  "Apis.Details.LifeCycle.State.Status.BLOCKED": [
+    {
+      "type": 0,
+      "value": "BLOCKED"
+    }
+  ],
+  "Apis.Details.LifeCycle.State.Status.CREATED": [
+    {
+      "type": 0,
+      "value": "CREATED"
+    }
+  ],
+  "Apis.Details.LifeCycle.State.Status.DEPRECATED": [
+    {
+      "type": 0,
+      "value": "DEPRECATED"
+    }
+  ],
+  "Apis.Details.LifeCycle.State.Status.PROTOTYPED": [
+    {
+      "type": 0,
+      "value": "PROTOTYPED"
+    }
+  ],
+  "Apis.Details.LifeCycle.State.Status.PUBLISHED": [
+    {
+      "type": 0,
+      "value": "PUBLISHED"
+    }
+  ],
+  "Apis.Details.LifeCycle.State.Status.RETIRED": [
+    {
+      "type": 0,
+      "value": "RETIRED"
     }
   ],
   "Apis.Details.LifeCycle.components.confirm.publish.message": [
@@ -4349,10 +5263,28 @@
       "value": "Message Mediation"
     }
   ],
+  "Apis.Details.MediationPolicies.Mediation.None": [
+    {
+      "type": 0,
+      "value": "None"
+    }
+  ],
+  "Apis.Details.Monetization.BusinessPlans.commercial.no.policies.banner": [
+    {
+      "type": 0,
+      "value": "No commercial policies to monetize"
+    }
+  ],
   "Apis.Details.Monetization.BusinessPlans.commercial.policies": [
     {
       "type": 0,
       "value": "Commercial Policies"
+    }
+  ],
+  "Apis.Details.Monetization.BusinessPlans.commercial.policies.banner.save": [
+    {
+      "type": 0,
+      "value": "Click Save to monetize all unmonetized policies"
     }
   ],
   "Apis.Details.Monetization.BusinessPlans.monetized": [
@@ -4389,6 +5321,12 @@
     {
       "type": 0,
       "value": "Monetization Disabled Successfully"
+    }
+  ],
+  "Apis.Details.Monetization.Index.monetization.enable.label": [
+    {
+      "type": 0,
+      "value": "Enable Monetization"
     }
   ],
   "Apis.Details.Monetization.Index.monetization.properties": [
@@ -4769,6 +5707,12 @@
       "value": "Indicates if this is the default version of the API. If an API is invoked without specifying a version, the API Gateway will route the request to the default version of the API."
     }
   ],
+  "Apis.Details.NewVersion.loading.services.error": [
+    {
+      "type": 0,
+      "value": "Error while loading services version"
+    }
+  ],
   "Apis.Details.Operations.Operation.OperationType": [
     {
       "type": 0,
@@ -4853,16 +5797,22 @@
       "value": "Operations"
     }
   ],
-  "Apis.Details.Operations.operation.operationName": [
+  "Apis.Details.Operations.filter.label": [
     {
       "type": 0,
       "value": "Operation"
     }
   ],
-  "Apis.Details.Overview.\n                                                                    CustomizedStepper.Endpoint": [
+  "Apis.Details.Operations.filter.placeholder": [
     {
       "type": 0,
-      "value": "Endpoint"
+      "value": "Filter Operations"
+    }
+  ],
+  "Apis.Details.Operations.operation.operationName": [
+    {
+      "type": 0,
+      "value": "Operation"
     }
   ],
   "Apis.Details.Overview.CustomizedStepper.Deploy": [
@@ -4875,6 +5825,12 @@
     {
       "type": 0,
       "value": "Develop"
+    }
+  ],
+  "Apis.Details.Overview.CustomizedStepper.Endpoint": [
+    {
+      "type": 0,
+      "value": "Endpoint"
     }
   ],
   "Apis.Details.Overview.CustomizedStepper.Test": [
@@ -4893,6 +5849,12 @@
     {
       "type": 0,
       "value": "Blocked"
+    }
+  ],
+  "Apis.Details.Overview.CustomizedStepper.deploy.revision.tooltip": [
+    {
+      "type": 0,
+      "value": "Deploy a revision of this API to the Gateway"
     }
   ],
   "Apis.Details.Overview.CustomizedStepper.deprecated": [
@@ -4917,6 +5879,12 @@
     {
       "type": 0,
       "value": "Published"
+    }
+  ],
+  "Apis.Details.Overview.CustomizedStepper.publish.btn": [
+    {
+      "type": 0,
+      "value": "Publish"
     }
   ],
   "Apis.Details.Overview.CustomizedStepper.publish.current.api": [
@@ -4967,22 +5935,34 @@
       "value": "Manage Resources"
     }
   ],
-  "Apis.Details.ProductResources.ProductResourcesWorkspace.\n                                                    empty.title": [
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.ApisnotFound": [
+    {
+      "type": 0,
+      "value": "No REST APIs are created yet"
+    }
+  ],
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.empty.title": [
     {
       "type": 0,
       "value": "Use the left side panel to add resources"
     }
   ],
-  "Apis.Details.ProductResources.ProductResourcesWorkspace.\n                                        toolbar.add.selected": [
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.filter.an.api.helper.text": [
     {
       "type": 0,
-      "value": "Add Selected"
+      "value": "Filter by name"
     }
   ],
-  "Apis.Details.ProductResources.ProductResourcesWorkspace.ApisnotFound": [
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.filter.an.api.label": [
     {
       "type": 0,
-      "value": "No REST APIs are created yet"
+      "value": "API"
+    }
+  ],
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.filter.an.api.placeholder": [
+    {
+      "type": 0,
+      "value": "Filter APIs"
     }
   ],
   "Apis.Details.ProductResources.ProductResourcesWorkspace.find.and.select": [
@@ -5003,10 +5983,16 @@
       "value": "Selected resources of API Product"
     }
   ],
-  "Apis.Details.ProductResources.ProductResourcesWorkspace.toolbar.\n                                                add.all": [
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.toolbar.add.all": [
     {
       "type": 0,
       "value": "Add All"
+    }
+  ],
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.toolbar.add.selected": [
+    {
+      "type": 0,
+      "value": "Add Selected"
     }
   ],
   "Apis.Details.Properties.\n                                                            Properties.editable.show.in.devporal": [
@@ -5015,55 +6001,7 @@
       "value": "Show in devportal"
     }
   ],
-  "Apis.Details.Properties.Properties.\n                                                                    show.add.property.invalid.error": [
-    {
-      "type": 0,
-      "value": "Invalid property name"
-    }
-  ],
-  "Apis.Details.Properties.Properties.\n                                                                show.add.property.property.name": [
-    {
-      "type": 0,
-      "value": "Name"
-    }
-  ],
-  "Apis.Details.Properties.Properties.\n                                property.name.exists": [
-    {
-      "type": 0,
-      "value": "Property name already exists"
-    }
-  ],
-  "Apis.Details.Properties.Properties.\n                                show.add.property.invalid.error": [
-    {
-      "type": 0,
-      "value": "Invalid property name"
-    }
-  ],
-  "Apis.Details.Properties.Properties.\n                            property.name.exists": [
-    {
-      "type": 0,
-      "value": "Property name already exists"
-    }
-  ],
-  "Apis.Details.Properties.Properties.\n                    no.changes.to.save": [
-    {
-      "type": 0,
-      "value": "No changes to save"
-    }
-  ],
-  "Apis.Details.Properties.Properties.\n                    property.name.empty.error": [
-    {
-      "type": 0,
-      "value": "Property name/value can not be empty"
-    }
-  ],
-  "Apis.Details.Properties.Properties.\n                    property.name.keyword.error": [
-    {
-      "type": 0,
-      "value": "Property name can not be a system reserved keyword"
-    }
-  ],
-  "Apis.Details.Properties.Properties.APIProduct.\n                                            add.new.property.message.content": [
+  "Apis.Details.Properties.Properties.APIProduct.add.new.property.message.content": [
     {
       "type": 0,
       "value": "Add specific custom properties to your API here."
@@ -5147,7 +6085,7 @@
       "value": "Property Name"
     }
   ],
-  "Apis.Details.Properties.Properties.editable.show.in.devporal": [
+  "Apis.Details.Properties.Properties.editable.show.in.devportal": [
     {
       "type": 0,
       "value": "Show in devportal"
@@ -5177,10 +6115,46 @@
       "value": "Usually, APIs have a pre-defined set of properties such as the name, version, context, etc. API Properties allows you to add specific custom properties to the API."
     }
   ],
+  "Apis.Details.Properties.Properties.no.changes.to.save": [
+    {
+      "type": 0,
+      "value": "No changes to save"
+    }
+  ],
+  "Apis.Details.Properties.Properties.property.name.empty.error": [
+    {
+      "type": 0,
+      "value": "Property name/value can not be empty"
+    }
+  ],
+  "Apis.Details.Properties.Properties.property.name.exists": [
+    {
+      "type": 0,
+      "value": "Property name already exists"
+    }
+  ],
+  "Apis.Details.Properties.Properties.property.name.keyword.error": [
+    {
+      "type": 0,
+      "value": "Property name can not be a system reserved keyword"
+    }
+  ],
   "Apis.Details.Properties.Properties.property.value": [
     {
       "type": 0,
       "value": "Value"
+    }
+  ],
+  "Apis.Details.Properties.Properties.show.add.property.invalid.error": [
+    {
+      "type": 0,
+      "value": "Invalid property name"
+    }
+  ],
+  "Apis.Details.Properties.Properties.show.add.property.property.name": [
+    {
+      "type": 0,
+      "value": "Name"
     }
   ],
   "Apis.Details.Properties.Properties.update.not.allowed": [
@@ -5201,6 +6175,30 @@
       "value": "Sum of the Complexity"
     }
   ],
+  "Apis.Details.QueryAnalysis.UpdateComplexity.table.complexity.value": [
+    {
+      "type": 0,
+      "value": "ComplexityValue"
+    }
+  ],
+  "Apis.Details.QueryAnalysis.UpdateComplexity.table.field": [
+    {
+      "type": 0,
+      "value": "Field"
+    }
+  ],
+  "Apis.Details.QueryAnalysis.UpdateComplexity.type.label": [
+    {
+      "type": 0,
+      "value": "Type"
+    }
+  ],
+  "Apis.Details.QueryAnalysis.UpdateComplexity.type.placeholder": [
+    {
+      "type": 0,
+      "value": "Search By Types"
+    }
+  ],
   "Apis.Details.QueryAnalysis.UpdateComplexity.typeName": [
     {
       "type": 0,
@@ -5213,10 +6211,160 @@
       "value": "Set"
     }
   ],
+  "Apis.Details.Rate.Limiting.operations.api.product.message.body": [
+    {
+      "type": 0,
+      "value": "Rate limiting polices of the source operation will be applied"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.operations.api.product.message.caption": [
+    {
+      "type": 0,
+      "value": "Rate limiting policy of an individual operation will begovern by the policy specified in the source operation"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.operations.configuration": [
+    {
+      "type": 0,
+      "value": "Operations Configuration"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.operations.configuration.tooltip": [
+    {
+      "type": 0,
+      "value": "Configurations that affects on all the resources"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.operations.message.body": [
+    {
+      "type": 0,
+      "value": "You may change the rate limiting policies per operation"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.operations.message.caption": [
+    {
+      "type": 0,
+      "value": "Expand an operation below to select a rate limiting policy for an operation"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.rate.limiting.level": [
+    {
+      "type": 0,
+      "value": "Rate limiting level"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.rate.limiting.level.api.level": [
+    {
+      "type": 0,
+      "value": "API Level"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.rate.limiting.level.operation.level": [
+    {
+      "type": 0,
+      "value": "Operation Level"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.rate.limiting.policies": [
+    {
+      "type": 0,
+      "value": "Rate limiting policies"
+    }
+  ],
+  "Apis.Details.Rate.Limiting.rate.limiting.policies.helper.text": [
+    {
+      "type": 0,
+      "value": "Selected rate limiting policy will be applied to whole API"
+    }
+  ],
   "Apis.Details.Resources.APIOperations.title": [
     {
       "type": 0,
       "value": "Resources"
+    }
+  ],
+  "Apis.Details.Resources.Components.Go.To.Definition": [
+    {
+      "type": 0,
+      "value": "Edit API Definition"
+    }
+  ],
+  "Apis.Details.Resources.Components.Operations.tooltip.clear.selections": [
+    {
+      "type": 0,
+      "value": "Clear selections"
+    }
+  ],
+  "Apis.Details.Resources.Components.Operations.tooltip.delete.selections": [
+    {
+      "type": 0,
+      "value": "Mark all for delete"
+    }
+  ],
+  "Apis.Details.Resources.Components.async.api.description": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Apis.Details.Resources.Components.async.api.description.title": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Apis.Details.Resources.Components.operation.async.api.payload.properties": [
+    {
+      "type": 0,
+      "value": "Payload Properties"
+    }
+  ],
+  "Apis.Details.Resources.Components.operationComponents.parameters.async.api.topic": [
+    {
+      "type": 0,
+      "value": "Topic Parameters"
+    }
+  ],
+  "Apis.Details.Resources.Operation.Components.Description": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Apis.Details.Resources.Operation.Components.Description.title": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Apis.Details.Resources.Operation.Components.Summary": [
+    {
+      "type": 0,
+      "value": "Summary"
+    }
+  ],
+  "Apis.Details.Resources.Operation.Components.Summary.title": [
+    {
+      "type": 0,
+      "value": "Summary"
+    }
+  ],
+  "Apis.Details.Resources.Operation.Parameters": [
+    {
+      "type": 0,
+      "value": "Parameters"
+    }
+  ],
+  "Apis.Details.Resources.Policy.update.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while updating resource policy!"
+    }
+  ],
+  "Apis.Details.Resources.Policy.update.success": [
+    {
+      "type": 0,
+      "value": "Resource policy updated successfully"
     }
   ],
   "Apis.Details.Resources.Resources.api.scope.deleted.successfully": [
@@ -5229,6 +6377,24 @@
     {
       "type": 0,
       "value": "Edit Resources"
+    }
+  ],
+  "Apis.Details.Resources.Resources.edit.resources.title": [
+    {
+      "type": 0,
+      "value": "Product Resources"
+    }
+  ],
+  "Apis.Details.Resources.Resources.resources.reset.button": [
+    {
+      "type": 0,
+      "value": "Reset"
+    }
+  ],
+  "Apis.Details.Resources.Resources.resources.save.button": [
+    {
+      "type": 0,
+      "value": "Save"
     }
   ],
   "Apis.Details.Resources.Resources.something.went.wrong.while.updating.the.api": [
@@ -5259,6 +6425,30 @@
     {
       "type": 0,
       "value": "Operation target or operation verb(s) can't be empty"
+    }
+  ],
+  "Apis.Details.Resources.components.AddOperation.operation.target.topic.name": [
+    {
+      "type": 0,
+      "value": "Enter topic name"
+    }
+  ],
+  "Apis.Details.Resources.components.AddOperation.operation.target.topic.name.label": [
+    {
+      "type": 0,
+      "value": "Topic Name"
+    }
+  ],
+  "Apis.Details.Resources.components.AddOperation.operation.target.uri.pattern": [
+    {
+      "type": 0,
+      "value": "Enter URI pattern"
+    }
+  ],
+  "Apis.Details.Resources.components.AddOperation.operation.target.uri.pattern.label": [
+    {
+      "type": 0,
+      "value": "URI Pattern"
     }
   ],
   "Apis.Details.Resources.components.AddOperation.operation.topic.cannot.have.path.params.warning": [
@@ -5317,6 +6507,18 @@
       "value": "Undo Delete"
     }
   ],
+  "Apis.Details.Resources.components.async.api.runtime.title": [
+    {
+      "type": 0,
+      "value": "Runtime"
+    }
+  ],
+  "Apis.Details.Resources.components.async.api.url.mapping.label": [
+    {
+      "type": 0,
+      "value": "URL Mapping"
+    }
+  ],
   "Apis.Details.Resources.components.operationComponents.AWSLambdaSettings.Title": [
     {
       "type": 0,
@@ -5357,6 +6559,12 @@
     {
       "type": 0,
       "value": "Parameter name already exists"
+    }
+  ],
+  "Apis.Details.Resources.components.operationComponents.AddParameter.type": [
+    {
+      "type": 0,
+      "value": "Parameter Type"
     }
   ],
   "Apis.Details.Resources.components.operationComponents.EditParameter.close": [
@@ -5671,6 +6879,24 @@
       "value": "Data Type"
     }
   ],
+  "Apis.Details.Resources.components.operationComponents.data.type.helper": [
+    {
+      "type": 0,
+      "value": "Select the data type"
+    }
+  ],
+  "Apis.Details.Resources.components.operationComponents.name.helper.text": [
+    {
+      "type": 0,
+      "value": "Enter property name"
+    }
+  ],
+  "Apis.Details.Resources.components.operationComponents.name.label": [
+    {
+      "type": 0,
+      "value": "Name"
+    }
+  ],
   "Apis.Details.Resources.components.operationComponents.parameter.name": [
     {
       "type": 0,
@@ -5701,6 +6927,62 @@
       "value": "Select the parameter type"
     }
   ],
+  "Apis.Details.Scopes.Create.CreateScope.label.display.name": [
+    {
+      "type": 0,
+      "value": "Display Name"
+    }
+  ],
+  "Apis.Details.Scopes.Create.CreateScope.label.name": [
+    {
+      "type": 0,
+      "value": "Name"
+    }
+  ],
+  "Apis.Details.Scopes.Create.CreateScope.placeholder.display.name": [
+    {
+      "type": 0,
+      "value": "Scope Display Name"
+    }
+  ],
+  "Apis.Details.Scopes.Create.CreateScope.placholder.name": [
+    {
+      "type": 0,
+      "value": "Scope Name"
+    }
+  ],
+  "Apis.Details.Scopes.Create.CreateScope.roles.label": [
+    {
+      "type": 0,
+      "value": "Roles"
+    }
+  ],
+  "Apis.Details.Scopes.Create.CreateScope.roles.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter roles and press Enter"
+    }
+  ],
+  "Apis.Details.Scopes.Create.Scope.validate.role.error": [
+    {
+      "type": 0,
+      "value": "Error when validating role: "
+    },
+    {
+      "type": 1,
+      "value": "role"
+    }
+  ],
+  "Apis.Details.Scopes.Create.Scope.validate.scope.error": [
+    {
+      "type": 0,
+      "value": "Error when validating scope: "
+    },
+    {
+      "type": 1,
+      "value": "value"
+    }
+  ],
   "Apis.Details.Scopes.CreateScope.cancel": [
     {
       "type": 0,
@@ -5714,6 +6996,30 @@
     }
   ],
   "Apis.Details.Scopes.CreateScope.description.about.the.scope": [
+    {
+      "type": 0,
+      "value": "Short description about the scope"
+    }
+  ],
+  "Apis.Details.Scopes.CreateScope.description.about.the.scope.label": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Apis.Details.Scopes.CreateScope.description.about.the.scope.placeholder": [
+    {
+      "type": 0,
+      "value": "Short description about the scope"
+    }
+  ],
+  "Apis.Details.Scopes.CreateScope.description.label.about.the.scope": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Apis.Details.Scopes.CreateScope.description.placeholder.about.the.scope": [
     {
       "type": 0,
       "value": "Short description about the scope"
@@ -5755,13 +7061,65 @@
       "value": "Enter Scope Name ( E.g.,: creator )"
     }
   ],
+  "Apis.Details.Scopes.Edit.Scope.validate.role.error": [
+    {
+      "type": 0,
+      "value": "Error when validating role: "
+    },
+    {
+      "type": 1,
+      "value": "role"
+    }
+  ],
   "Apis.Details.Scopes.EditScope.cancel": [
     {
       "type": 0,
       "value": "Cancel"
     }
   ],
+  "Apis.Details.Scopes.EditScope.description.about.the.scope.label": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Apis.Details.Scopes.EditScope.display.name.label": [
+    {
+      "type": 0,
+      "value": "Display Name"
+    }
+  ],
+  "Apis.Details.Scopes.EditScope.display.name.placeholder": [
+    {
+      "type": 0,
+      "value": "Scope Display Name"
+    }
+  ],
+  "Apis.Details.Scopes.EditScope.name.label": [
+    {
+      "type": 0,
+      "value": "Name"
+    }
+  ],
+  "Apis.Details.Scopes.EditScope.roles.label": [
+    {
+      "type": 0,
+      "value": "Roles"
+    }
+  ],
+  "Apis.Details.Scopes.EditScope.roles.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter roles and press Enter"
+    }
+  ],
   "Apis.Details.Scopes.EditScope.short.description.about.the.scope": [
+    {
+      "type": 0,
+      "value": "Short description about the scope"
+    }
+  ],
+  "Apis.Details.Scopes.EditScope.short.description.about.the.scope.placeholder": [
     {
       "type": 0,
       "value": "Short description about the scope"
@@ -6115,6 +7473,18 @@
       "value": "Save"
     }
   ],
+  "Apis.Details.Subscriptions.Subscriptions.update.error": [
+    {
+      "type": 0,
+      "value": "Error occurred while updating subscription configurations"
+    }
+  ],
+  "Apis.Details.Subscriptions.Subscriptions.update.success": [
+    {
+      "type": 0,
+      "value": "Subscription configurations updated successfully"
+    }
+  ],
   "Apis.Details.Subscriptions.SubscriptionsTable.active.subs.state": [
     {
       "type": 0,
@@ -6131,6 +7501,12 @@
     {
       "type": 0,
       "value": "Blocked"
+    }
+  ],
+  "Apis.Details.Subscriptions.SubscriptionsTable.contact.subscribers": [
+    {
+      "type": 0,
+      "value": "Contact Subscribers"
     }
   ],
   "Apis.Details.Subscriptions.SubscriptionsTable.error.subscription.block": [
@@ -6233,6 +7609,12 @@
     {
       "type": 0,
       "value": "Error while retrieving the subscriptions"
+    }
+  ],
+  "Apis.Details.Topic.components.operationComponents.OperationGovernance.security.label": [
+    {
+      "type": 0,
+      "value": "Security"
     }
   ],
   "Apis.Details.Topics.components.AddOperation.op.type": [
@@ -6385,6 +7767,12 @@
       "value": "Shared Scopes"
     }
   ],
+  "Apis.Details.Topics.components.operationComponents.OperationGovernance.security.switch": [
+    {
+      "type": 0,
+      "value": "Security"
+    }
+  ],
   "Apis.Details.Topics.components.operationComponents.OperationGovernance.subTitle": [
     {
       "type": 0,
@@ -6395,6 +7783,12 @@
     {
       "type": 0,
       "value": "Operation Governance"
+    }
+  ],
+  "Apis.Details.TryOutConsole.token.helper": [
+    {
+      "type": 0,
+      "value": "Generate or provide an internal API Key"
     }
   ],
   "Apis.Details.TryOutConsole.token.label": [
@@ -6519,6 +7913,46 @@
       "value": "type"
     }
   ],
+  "Apis.Details.components.api.delete.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while deleting the API!"
+    }
+  ],
+  "Apis.Details.components.api.delete.success": [
+    {
+      "type": 0,
+      "value": "API "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": " deleted Successfully"
+    }
+  ],
+  "Apis.Details.components.api.product.delete.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while deleting the API Product!"
+    }
+  ],
+  "Apis.Details.components.api.product.delete.success": [
+    {
+      "type": 0,
+      "value": "API Product "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": " deleted Successfully"
+    }
+  ],
   "Apis.Details.index.Tryout.menu.name": [
     {
       "type": 0,
@@ -6551,6 +7985,40 @@
       "value": " Environment"
     }
   ],
+  "Apis.Details.index.api.product.update.error": [
+    {
+      "type": 0,
+      "value": "Something went wrong while updating the "
+    },
+    {
+      "type": 1,
+      "value": "apiName"
+    },
+    {
+      "type": 0,
+      "value": " API!!"
+    }
+  ],
+  "Apis.Details.index.api.product.update.success": [
+    {
+      "type": 1,
+      "value": "updatedAPIName"
+    },
+    {
+      "type": 0,
+      "value": " API Product updated successfully"
+    }
+  ],
+  "Apis.Details.index.api.update.success": [
+    {
+      "type": 1,
+      "value": "updatedAPIName"
+    },
+    {
+      "type": 0,
+      "value": " API updated successfully"
+    }
+  ],
   "Apis.Details.index.asyncApi.definition": [
     {
       "type": 0,
@@ -6569,10 +8037,40 @@
       "value": "Comments"
     }
   ],
+  "Apis.Details.index.deploy.title": [
+    {
+      "type": 0,
+      "value": "Deploy"
+    }
+  ],
+  "Apis.Details.index.design.api.configs.title": [
+    {
+      "type": 0,
+      "value": "API Configurations"
+    }
+  ],
+  "Apis.Details.index.design.api.configs.title.tooltip": [
+    {
+      "type": 0,
+      "value": "If you make any changes to the API configuration, you need to redeploy the API to see updates in the API Gateway."
+    }
+  ],
   "Apis.Details.index.design.configs": [
     {
       "type": 0,
       "value": "Basic info"
+    }
+  ],
+  "Apis.Details.index.design.portal.configs.title": [
+    {
+      "type": 0,
+      "value": "Portal Configurations"
+    }
+  ],
+  "Apis.Details.index.develop.title": [
+    {
+      "type": 0,
+      "value": "Develop"
     }
   ],
   "Apis.Details.index.documents": [
@@ -6635,6 +8133,12 @@
       "value": "properties"
     }
   ],
+  "Apis.Details.index.publish.title": [
+    {
+      "type": 0,
+      "value": "Publish"
+    }
+  ],
   "Apis.Details.index.resources": [
     {
       "type": 0,
@@ -6657,6 +8161,12 @@
     {
       "type": 0,
       "value": "subscriptions"
+    }
+  ],
+  "Apis.Details.index.test.title": [
+    {
+      "type": 0,
+      "value": "Test"
     }
   ],
   "Apis.Details.index.topics": [
@@ -6747,6 +8257,12 @@
     {
       "type": 0,
       "value": "Version"
+    }
+  ],
+  "Apis.Listing.Components.Create.API": [
+    {
+      "type": 0,
+      "value": "Create API"
     }
   ],
   "Apis.Listing.Landing.index.no.apis.description": [
@@ -7005,6 +8521,12 @@
     {
       "type": 0,
       "value": "Combine multiple API resources in to a single API"
+    }
+  ],
+  "Apis.Listing.SampleAPIProduct.onboarding.menu.card.name": [
+    {
+      "type": 0,
+      "value": "API Product"
     }
   ],
   "Apis.Listing.TableView.TableView.doc.flag": [
@@ -7269,6 +8791,60 @@
       "value": "page"
     }
   ],
+  "App.Components.Footer.Feedback.response.msg": [
+    {
+      "type": 0,
+      "value": "Thank you for the feedback."
+    }
+  ],
+  "App.Components.Scopes.Create.Scope.validate.role.error": [
+    {
+      "type": 0,
+      "value": "Error when validating role: "
+    },
+    {
+      "type": 1,
+      "value": "role"
+    }
+  ],
+  "App.Components.Scopes.Create.Scope.validate.scope.error": [
+    {
+      "type": 0,
+      "value": "Error when validating role: "
+    },
+    {
+      "type": 1,
+      "value": "scope"
+    }
+  ],
+  "App.Components.Scopes.Edit.Scope.validate.role.error": [
+    {
+      "type": 0,
+      "value": "Error when validating role: "
+    },
+    {
+      "type": 1,
+      "value": "role"
+    }
+  ],
+  "Applications.Details.Invoice.Dialog.No.Data.Available": [
+    {
+      "type": 0,
+      "value": "No Data Available"
+    }
+  ],
+  "Applications.Details.Invoice.Dialog.close": [
+    {
+      "type": 0,
+      "value": "Close"
+    }
+  ],
+  "Applications.Details.Invoice.Dialog.data.not.found": [
+    {
+      "type": 0,
+      "value": "Pending invoice data not found for this subscription."
+    }
+  ],
   "Applications.Details.Invoice.view.btn": [
     {
       "type": 0,
@@ -7431,10 +9007,52 @@
       "value": "Scopes"
     }
   ],
+  "Base.Header.navbar.GlobalNavBar.title.analytics": [
+    {
+      "type": 0,
+      "value": "Analytics"
+    }
+  ],
+  "Base.Header.navbar.GlobalNavBar.title.api.products": [
+    {
+      "type": 0,
+      "value": "API Products"
+    }
+  ],
+  "Base.Header.navbar.GlobalNavBar.title.apis": [
+    {
+      "type": 0,
+      "value": "APIs"
+    }
+  ],
+  "Base.Header.navbar.GlobalNavBar.title.scopes": [
+    {
+      "type": 0,
+      "value": "Scopes"
+    }
+  ],
+  "Base.Header.navbar.GlobalNavBar.title.services": [
+    {
+      "type": 0,
+      "value": "Services"
+    }
+  ],
   "Connection.Timeout": [
     {
       "type": 0,
       "value": "Connection Timeout"
+    }
+  ],
+  "Custom.Split.Button.Save": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
+  "Custom.Split.Button.Save.And.Deploy": [
+    {
+      "type": 0,
+      "value": "Save and deploy"
     }
   ],
   "Endpoint.Suspension.State": [
@@ -7467,6 +9085,36 @@
       "value": "Error 403 : Forbidden"
     }
   ],
+  "Mui.data.table.pagination.display.rows": [
+    {
+      "type": 0,
+      "value": "of"
+    }
+  ],
+  "Mui.data.table.pagination.display.tool.download.csv": [
+    {
+      "type": 0,
+      "value": "Download CSV"
+    }
+  ],
+  "Mui.data.table.pagination.display.tool.print": [
+    {
+      "type": 0,
+      "value": "Print"
+    }
+  ],
+  "Mui.data.table.pagination.display.tool.view.columns": [
+    {
+      "type": 0,
+      "value": "\"View Columns\""
+    }
+  ],
+  "Mui.data.table.pagination.rows.per.page": [
+    {
+      "type": 0,
+      "value": "Rows per page:"
+    }
+  ],
   "Scopes.Create.CreateScope.cancel": [
     {
       "type": 0,
@@ -7483,6 +9131,42 @@
     {
       "type": 0,
       "value": "Scopes"
+    }
+  ],
+  "Scopes.Create.CreateScope.label.display.name": [
+    {
+      "type": 0,
+      "value": "Display Name"
+    }
+  ],
+  "Scopes.Create.CreateScope.label.name": [
+    {
+      "type": 0,
+      "value": "Name"
+    }
+  ],
+  "Scopes.Create.CreateScope.label.roles": [
+    {
+      "type": 0,
+      "value": "Roles"
+    }
+  ],
+  "Scopes.Create.CreateScope.placeholder.display.name": [
+    {
+      "type": 0,
+      "value": "Scope Display Name"
+    }
+  ],
+  "Scopes.Create.CreateScope.placeholder.roles": [
+    {
+      "type": 0,
+      "value": "Enter roles and press Enter"
+    }
+  ],
+  "Scopes.Create.CreateScope.placholder.name": [
+    {
+      "type": 0,
+      "value": "Scope Name"
     }
   ],
   "Scopes.Create.CreateScope.roles.help": [
@@ -7613,16 +9297,52 @@
       "value": "Cancel"
     }
   ],
+  "Scopes.EditScope.description.about.the.scope.label": [
+    {
+      "type": 0,
+      "value": "Description"
+    }
+  ],
+  "Scopes.EditScope.display.name.label": [
+    {
+      "type": 0,
+      "value": "Display Name"
+    }
+  ],
+  "Scopes.EditScope.display.name.placeholder": [
+    {
+      "type": 0,
+      "value": "Scope Display Name"
+    }
+  ],
   "Scopes.EditScope.heading.scope.heading": [
     {
       "type": 0,
       "value": "Scopes"
     }
   ],
+  "Scopes.EditScope.name.label": [
+    {
+      "type": 0,
+      "value": "Name"
+    }
+  ],
   "Scopes.EditScope.roles.help": [
     {
       "type": 0,
       "value": "Enter a valid role and press `Enter`."
+    }
+  ],
+  "Scopes.EditScope.roles.label": [
+    {
+      "type": 0,
+      "value": "Roles"
+    }
+  ],
+  "Scopes.EditScope.roles.placeholder": [
+    {
+      "type": 0,
+      "value": "Enter roles and press Enter"
     }
   ],
   "Scopes.EditScope.scope.updated.successfully": [
@@ -7632,6 +9352,12 @@
     }
   ],
   "Scopes.EditScope.short.description.about.the.scope": [
+    {
+      "type": 0,
+      "value": "Short description about the scope"
+    }
+  ],
+  "Scopes.EditScope.short.description.about.the.scope.placeholder": [
     {
       "type": 0,
       "value": "Short description about the scope"
@@ -7671,6 +9397,12 @@
     {
       "type": 0,
       "value": "Scopes enable fine-grained access control to API resources based on user roles."
+    }
+  ],
+  "Scopes.Listing.Listing.scopes.onboarding.menu.card.name": [
+    {
+      "type": 0,
+      "value": "Scopes"
     }
   ],
   "Scopes.Listing.Listing.scopes.text.editor.edit": [
@@ -7763,6 +9495,12 @@
       "value": "Cancel"
     }
   ],
+  "Scopes.Usage.UsageView.resource.revision": [
+    {
+      "type": 0,
+      "value": "Revision"
+    }
+  ],
   "Scopes.Usage.UsageView.resource.target": [
     {
       "type": 0,
@@ -7779,12 +9517,6 @@
     {
       "type": 0,
       "value": "Verb"
-    }
-  ],
-  "Scopes.Usage.UsageView.resource.revision": [
-    {
-      "type": 0,
-      "value": "Revision"
     }
   ],
   "Scopes.Usage.UsageViewAPI.api.usage": [
@@ -8301,6 +10033,20 @@
     {
       "type": 0,
       "value": "Back"
+    }
+  ],
+  "app.components.Shared.onboarding.insufficient.permissions": [
+    {
+      "type": 0,
+      "value": "*You are not authorized to create or update"
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": " due to insufficient permissions"
     }
   ],
   "block.all": [

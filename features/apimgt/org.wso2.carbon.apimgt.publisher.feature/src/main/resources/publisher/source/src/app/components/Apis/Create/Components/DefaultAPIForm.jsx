@@ -169,7 +169,16 @@ export default function DefaultAPIForm(props) {
                             .name.toLowerCase()) {
                             updateValidity({
                                 ...validity,
-                                name: { details: [{ message: 'Name ' + value + ' already exists' }] },
+                                name: {
+                                    details:
+                                        [{
+                                            message: <FormattedMessage
+                                                id='Apis.Create.Components.DefaultAPIForm.validation.error.name.exists'
+                                                defaultMessage='Name {value} already exists'
+                                                values={{ value }}
+                                            />,
+                                        }],
+                                },
                             });
                         } else {
                             updateValidity({ ...validity, name: nameValidity });
@@ -190,12 +199,32 @@ export default function DefaultAPIForm(props) {
                         if (count > 0 && checkContext(value, result.body.list)) {
                             updateValidity({
                                 ...validity,
-                                context: { details: [{ message: apiContext + ' context already exists' }] },
+                                context: {
+                                    details:
+                                        [{
+                                            message: <FormattedMessage
+                                                id={'Apis.Create.Components.DefaultAPIForm.validation.error'
+                                                + '.context.exists'}
+                                                defaultMessage='{apiContext} context already exists'
+                                                values={{ apiContext }}
+                                            />,
+                                        }],
+                                },
                             });
                         } else if (count > 0 && checkContext(value, result.body.list)) {
                             updateValidity({
                                 ...validity,
-                                context: { details: [{ message: apiContext + ' dynamic context already exists' }] },
+                                context: {
+                                    details:
+                                        [{
+                                            message: <FormattedMessage
+                                                id={'Apis.Create.Components.DefaultAPIForm.validation.error.dynamic'
+                                                + '.context.exists'}
+                                                defaultMessage='{apiContext} dynamic context already exists'
+                                                values={{ apiContext }}
+                                            />,
+                                        }],
+                                },
                             });
                         } else {
                             updateValidity({ ...validity, context: contextValidity, version: null });
@@ -314,7 +343,14 @@ export default function DefaultAPIForm(props) {
                                                     </div>
                                                 );
                                             }))
-                                        || `API will be exposed in ${actualContext(api)} context at the gateway`
+                                        || (
+                                            <FormattedMessage
+                                                id='Apis.Create.Components.DefaultAPIForm.api.actual.context.helper'
+                                                defaultMessage={'API will be exposed in {actualContext}'
+                                                    + 'context at the gateway'}
+                                                values={{ actualContext: actualContext(api) }}
+                                            />
+                                        )
                                     }
                                     classes={{ root: classes.helperTextContext }}
                                     margin='normal'
@@ -383,7 +419,15 @@ export default function DefaultAPIForm(props) {
                                                     </div>
                                                 );
                                             }))
-                                        || `API Product will be exposed in ${actualContext(api)} context at the gateway`
+                                        || (
+                                            <FormattedMessage
+                                                id={'Apis.Create.Components.DefaultAPIForm.api.product.'
+                                                    + 'actual.context.helper'}
+                                                defaultMessage={'API Product will be exposed in {actualContext}'
+                                                    + 'context at the gateway'}
+                                                values={{ actualContext: actualContext(api) }}
+                                            />
+                                        )
                                     }
                                     margin='normal'
                                     variant='outlined'
@@ -397,7 +441,12 @@ export default function DefaultAPIForm(props) {
                     <TextField
                         fullWidth
                         id='itest-id-apiendpoint-input'
-                        label='Endpoint'
+                        label={(
+                            <FormattedMessage
+                                id='Apis.Create.Components.DefaultAPIForm.api.endpoint'
+                                defaultMessage='Endpoint'
+                            />
+                        )}
                         name='endpoint'
                         value={api.endpoint}
                         onChange={onChange}
@@ -459,7 +508,10 @@ export default function DefaultAPIForm(props) {
                     <Typography variant='caption' display='block' gutterBottom>
                         <sup style={{ color: 'red' }}>*</sup>
                         {' '}
-                        Mandatory fields
+                        <FormattedMessage
+                            id='Apis.Create.Components.DefaultAPIForm.mandatory.fields'
+                            defaultMessage='Mandatory fields'
+                        />
                     </Typography>
                 </Grid>
             </Grid>

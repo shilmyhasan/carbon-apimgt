@@ -6,7 +6,7 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Tooltip from '@material-ui/core/Tooltip';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import LaunchIcon from '@material-ui/icons/Launch';
 import Alert from 'AppComponents/Shared/Alert';
 import Grid from '@material-ui/core/Grid';
@@ -152,7 +152,7 @@ export default function CustomizedStepper() {
     const [isUpdating, setUpdating] = useState(false);
     const [deploymentsAvailable, setDeploymentsAvailable] = useState(false);
     const isPrototypedAvailable = api.endpointConfig !== null
-    && api.endpointConfig.implementation_status === 'prototyped';
+        && api.endpointConfig.implementation_status === 'prototyped';
     const isEndpointAvailable = api.endpointConfig !== null;
     const isTierAvailable = api.policies.length !== 0;
     const isPublished = api.lifeCycleStatus === 'PUBLISHED';
@@ -160,6 +160,7 @@ export default function CustomizedStepper() {
     const { settings, user } = useAppContext();
     const userNameSplit = user.name.split('@');
     const tenantDomain = userNameSplit[userNameSplit.length - 1];
+    const intl = useIntl();
     let devportalUrl = `${settings.devportalUrl}/apis/${api.id}/overview`;
     if (tenantList && tenantList.length > 0) {
         devportalUrl = `${settings.devportalUrl}/apis/${api.id}/overview?tenant=${tenantDomain}`;
@@ -205,11 +206,17 @@ export default function CustomizedStepper() {
                         if (error.response) {
                             Alert.error(error.response.body.description);
                         } else {
-                            Alert.error('Something went wrong while updating the API');
+                            Alert.error(intl.formatMessage({
+                                id: 'Apis.Details.LifeCycle.Policies.update.error',
+                                defaultMessage: 'Something went wrong while updating the API',
+                            }));
                         }
                         console.error(error);
                     });
-                Alert.info('Lifecycle state updated successfully');
+                Alert.info(intl.formatMessage({
+                    id: 'Apis.Details.LifeCycle.Policies.update.success',
+                    defaultMessage: 'Lifecycle state updated successfully',
+                }));
             })
             .finally(() => setUpdating(false))
             .catch((errorResponse) => {
@@ -359,7 +366,10 @@ export default function CustomizedStepper() {
                                     || api.isRevision || AuthManager.isNotPublisher()
                                     || api.workflowStatus === 'CREATED'}
                             >
-                                Publish
+                                <FormattedMessage
+                                    id='Apis.Details.Overview.CustomizedStepper.publish.btn'
+                                    defaultMessage='Publish'
+                                />
                                 {isUpdating && <CircularProgress size={20} />}
                             </Button>
                         )}
@@ -376,12 +386,12 @@ export default function CustomizedStepper() {
         }
     }
     const isTestLinkDisabled = api.lifeCycleStatus === 'RETIERD' || !deploymentsAvailable
-    || !isEndpointAvailable
-    || !isTierAvailable
-    || (api.type !== 'HTTP' && api.type !== 'SOAP');
+        || !isEndpointAvailable
+        || !isTierAvailable
+        || (api.type !== 'HTTP' && api.type !== 'SOAP');
     const isDeployLinkDisabled = (((api.type !== 'WEBSUB' && !isEndpointAvailable))
-    || !isTierAvailable
-    || api.workflowStatus === 'CREATED');
+        || !isTierAvailable
+        || api.workflowStatus === 'CREATED');
     return (
         <div id='itest-overview-api-flow' className={classes.root}>
             <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
@@ -444,8 +454,8 @@ export default function CustomizedStepper() {
                                                         >
                                                             <Typography variant='h7'>
                                                                 <FormattedMessage
-                                                                    id='Apis.Details.Overview.
-                                                                    CustomizedStepper.Endpoint'
+                                                                    id={'Apis.Details.Overview.CustomizedStepper.'
+                                                                        + 'Endpoint'}
                                                                     defaultMessage=' Endpoint'
                                                                 />
                                                             </Typography>
@@ -504,7 +514,10 @@ export default function CustomizedStepper() {
                             )}
                             {label === 'Deploy' && (
                                 <Tooltip
-                                    title={deploymentsAvailable ? '' : 'Deploy a revision of this API to the Gateway'}
+                                    title={deploymentsAvailable ? '' : intl.formatMessage({
+                                        id: 'Apis.Details.Overview.CustomizedStepper.deploy.revision.tooltip',
+                                        defaultMessage: 'Deploy a revision of this API to the Gateway',
+                                    })}
                                     placement='bottom'
                                 >
                                     <Grid

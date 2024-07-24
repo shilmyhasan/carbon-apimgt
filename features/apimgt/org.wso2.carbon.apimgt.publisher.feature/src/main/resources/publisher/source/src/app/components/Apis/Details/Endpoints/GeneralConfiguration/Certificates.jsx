@@ -106,7 +106,7 @@ const useStyles = makeStyles((theme) => ({
  */
 function Certificates(props) {
     const {
-        certificates, uploadCertificate, deleteCertificate, isMutualSSLEnabled, apiId, endpoints, aliasList,
+        certificates, uploadCertificate, deleteCertificate, isMutualSSLEnabled, apiId, endpoints, aliasList, intl,
     } = props;
     const [certificateList, setCertificateList] = useState([]);
     const [openCertificateDetails, setOpenCertificateDetails] = useState({ open: false, anchor: null, details: {} });
@@ -193,7 +193,11 @@ function Certificates(props) {
                                 <Icon>add</Icon>
                             </IconButton>
                         </ListItemAvatar>
-                        <ListItemText primary='Add Certificate' />
+                        <ListItemText primary={intl.formatMessage({
+                            id: 'Apis.Details.Endpoints.GeneralConfiguration.Certificates.certificates.AddCertificate',
+                            defaultMessage: 'Add Certificate',
+                        })}
+                        />
                     </ListItem>
                 </List>
                 <List className={classes.certificateList}>
@@ -236,7 +240,13 @@ function Certificates(props) {
                             <ListItemAvatar>
                                 <Icon color='primary'>info</Icon>
                             </ListItemAvatar>
-                            <ListItemText>You do not have any certificates uploaded</ListItemText>
+                            <ListItemText
+                                primary={intl.formatMessage({
+                                    id: 'Apis.Details.Endpoints.GeneralConfiguration.'
+                                    + 'Certificates.NoCertificatesUploaded',
+                                    defaultMessage: 'You do not have any certificates uploaded',
+                                })}
+                            />
                         </ListItem>
                     )}
                 </List>

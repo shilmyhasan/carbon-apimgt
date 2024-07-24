@@ -372,6 +372,18 @@ class Listing extends React.Component {
             viewColumns: false,
             customToolbar: false,
             rowsPerPageOptions: [5, 10, 25, 50, 100],
+            textLabels: {
+                pagination: {
+                    rowsPerPage: intl.formatMessage({
+                        id: 'Mui.data.table.pagination.rows.per.page',
+                        defaultMessage: 'Rows per page:',
+                    }),
+                    displayRows: intl.formatMessage({
+                        id: 'Mui.data.table.pagination.display.rows',
+                        defaultMessage: 'of',
+                    }),
+                },
+            },
         };
 
         if (!scopes) {
@@ -411,7 +423,10 @@ class Listing extends React.Component {
                 >
                     <OnboardingMenuCard
                         to='/scopes/create'
-                        name='Scopes'
+                        name={intl.formatMessage({
+                            id: 'Scopes.Listing.Listing.scopes.onboarding.menu.card.name',
+                            defaultMessage: 'Scopes',
+                        })}
                         iconName={scopesAddIcon}
                         disabled={isRestricted(['apim:shared_scope_manage'])}
                     />

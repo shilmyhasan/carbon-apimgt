@@ -54,7 +54,7 @@ const useStyles = makeStyles(() => ({
  */
 function AddPayloadProperty(props) {
     const {
-        operationsDispatcher, target, verb,
+        operationsDispatcher, target, verb, intl,
     } = props;
 
     /**
@@ -119,11 +119,17 @@ function AddPayloadProperty(props) {
             <Grid item xs={2} md={2}>
                 <TextField
                     id='parameter-name'
-                    label='Name'
+                    label={intl.formatMessage({
+                        id: 'Apis.Details.Resources.components.operationComponents.name.label',
+                        defaultMessage: 'Name',
+                    })}
                     name='name'
                     value={property.name}
                     onChange={({ target: { name, value } }) => newPropertyDispatcher({ type: name, value })}
-                    helperText='Enter property name'
+                    helperText={intl.formatMessage({
+                        id: 'Apis.Details.Resources.components.operationComponents.name.helper.text',
+                        defaultMessage: 'Enter property name',
+                    })}
                     margin='dense'
                     variant='outlined'
                     onKeyPress={(event) => {
@@ -170,17 +176,28 @@ function AddPayloadProperty(props) {
                             })
                         }
                     </Select>
-                    <FormHelperText id='my-helper-text'>Select the data type</FormHelperText>
+                    <FormHelperText id='my-helper-text'>
+                        <FormattedMessage
+                            id='Apis.Details.Components.async.api.add.property.select.data.type'
+                            defaultMessage='Select the data type'
+                        />
+                    </FormHelperText>
                 </FormControl>
             </Grid>
             <Grid item xs={6} md={6}>
                 <TextField
                     id='parameter-description'
-                    label='Description'
+                    label={intl.formatMessage({
+                        id: 'Apis.Details.Components.async.api.add.property.description.text',
+                        defaultMessage: 'Description',
+                    })}
                     name='description'
                     value={property.description}
                     onChange={({ target: { name, value } }) => newPropertyDispatcher({ type: name, value })}
-                    helperText='Enter property description'
+                    helperText={intl.formatMessage({
+                        id: 'Apis.Details.Components.async.api.add.property.description.helper.text',
+                        defaultMessage: 'Enter property description',
+                    })}
                     margin='dense'
                     variant='outlined'
                     onKeyPress={(event) => {

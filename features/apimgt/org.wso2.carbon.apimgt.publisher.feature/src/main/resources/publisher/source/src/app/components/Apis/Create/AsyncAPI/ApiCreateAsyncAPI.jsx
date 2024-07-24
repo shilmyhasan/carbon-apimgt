@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -52,7 +52,7 @@ export default function ApiCreateAsyncAPI(props) {
     // eslint-disable-next-line no-use-before-define
     const classes = useStyles();
     const [hideEndpoint, setHideEndpoint] = useState(true);
-
+    const intl = useIntl();
     /**
      *
      * Reduce the events triggered from API input fields to current state
@@ -191,14 +191,20 @@ export default function ApiCreateAsyncAPI(props) {
             ? newAPI.importAsyncAPIByFile(inputValue) : newAPI.importAsyncAPIByUrl(inputValue);
         promisedResponse
             .then((api) => {
-                Alert.info('API created successfully');
+                Alert.info(intl.formatMessage({
+                    id: 'Apis.Create.AsyncAPI.ApiCreateAsyncAPI.created.success',
+                    defaultMessage: 'API created successfully',
+                }));
                 history.push(`/apis/${api.id}/overview`);
             })
             .catch((error) => {
                 if (error.response) {
                     Alert.error(error.response.body.description);
                 } else {
-                    Alert.error('Something went wrong while adding the API');
+                    Alert.error(intl.formatMessage({
+                        id: 'Apis.Create.AsyncAPI.ApiCreateAsyncAPI.created.error',
+                        defaultMessage: 'Something went wrong while adding the API',
+                    }));
                 }
                 console.error(error);
             })
@@ -323,7 +329,10 @@ export default function ApiCreateAsyncAPI(props) {
                             )}
                             {wizardStep === 1 && (
                                 <Button onClick={() => setWizardStep((step) => step - 1)}>
-                                    Back
+                                    <FormattedMessage
+                                        id='Apis.Create.AsyncAPI.ApiCreateAsyncAPI.back'
+                                        defaultMessage='Back'
+                                    />
                                 </Button>
                             )}
                         </Grid>
@@ -335,7 +344,10 @@ export default function ApiCreateAsyncAPI(props) {
                                     color='primary'
                                     disabled={!apiInputs.isFormValid}
                                 >
-                                    Next
+                                    <FormattedMessage
+                                        id='Apis.Create.AsyncAPI.ApiCreateAsyncAPI.next'
+                                        defaultMessage='Next'
+                                    />
                                 </Button>
                             )}
                             {wizardStep === 1 && (
@@ -345,7 +357,10 @@ export default function ApiCreateAsyncAPI(props) {
                                     disabled={!apiInputs.isFormValid || isCreating}
                                     onClick={createAPI}
                                 >
-                                    Create
+                                    <FormattedMessage
+                                        id='Apis.Create.AsyncAPI.ApiCreateAsyncAPI.create'
+                                        defaultMessage='Create'
+                                    />
                                     {' '}
                                     {isCreating && <CircularProgress size={24} />}
                                 </Button>

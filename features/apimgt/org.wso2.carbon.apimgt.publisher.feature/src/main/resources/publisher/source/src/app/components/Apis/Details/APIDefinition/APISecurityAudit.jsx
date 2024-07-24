@@ -394,7 +394,7 @@ class APISecurityAudit extends Component {
      * @inheritdoc
      */
     render() {
-        const { classes } = this.props;
+        const { classes, intl } = this.props;
         const {
             report, overallScore, numErrors, externalApiId, loading, apiDefinition,
         } = this.state;
@@ -646,6 +646,18 @@ class APISecurityAudit extends Component {
                     );
                 }
             },
+            textLabels: {
+                pagination: {
+                    rowsPerPage: intl.formatMessage({
+                        id: 'Mui.data.table.pagination.rows.per.page',
+                        defaultMessage: 'Rows per page:',
+                    }),
+                    displayRows: intl.formatMessage({
+                        id: 'Mui.data.table.pagination.display.rows',
+                        defaultMessage: 'of',
+                    }),
+                },
+            },
         };
         return (
             <div>
@@ -699,8 +711,7 @@ class APISecurityAudit extends Component {
                                                     className={classes.circularProgressBarScore}
                                                 >
                                                     <FormattedMessage
-                                                        id='Apis.Details.APIDefinition.AuditApi
-                                                                    .OverallScoreProgress'
+                                                        id='Apis.Details.APIDefinition.AuditApi.OverallScoreProgress'
                                                         defaultMessage='{overallScore}'
                                                         values={{
                                                             overallScore: (

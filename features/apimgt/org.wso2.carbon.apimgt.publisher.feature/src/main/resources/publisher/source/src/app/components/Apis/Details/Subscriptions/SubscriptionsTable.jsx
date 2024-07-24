@@ -813,6 +813,14 @@ class SubscriptionsTable extends Component {
                         onChangePage={this.handleChangePage}
                         onChangeRowsPerPage={this.handleChangeRowsPerPage}
                         ActionsComponent={SubscriptionTablePagination}
+                        labelRowsPerPage={intl.formatMessage({
+                            id: 'Mui.data.table.pagination.rows.per.page',
+                            defaultMessage: 'Rows per page:',
+                        })}
+                        labelDisplayedRows={({ from, to, count }) => `${from}-${to} ${intl.formatMessage({
+                            id: 'Mui.data.table.pagination.display.rows',
+                            defaultMessage: 'of',
+                        })} ${count}`}
                     />
                 );
             },
@@ -864,7 +872,10 @@ class SubscriptionsTable extends Component {
                                             disabled={!names}
                                             variant='outlined'
                                         >
-                                            Contact Subscribers
+                                            <FormattedMessage
+                                                id='Apis.Details.Subscriptions.SubscriptionsTable.contact.subscribers'
+                                                defaultMessage='Contact Subscribers'
+                                            />
                                         </Button>
                                     </span>
                                 </Tip>

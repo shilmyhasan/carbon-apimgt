@@ -92,7 +92,11 @@ export default function OperationGovernance(props) {
                                 color='primary'
                             />
                         )}
-                        label='Security'
+                        label={intl.formatMessage({
+                            id: 'Apis.Details.Topics.components.operationComponents.OperationGovernance.'
+                                + 'security.switch',
+                            defaultMessage: 'Security',
+                        })}
                         labelPlacement='start'
                     />
                 </FormControl>

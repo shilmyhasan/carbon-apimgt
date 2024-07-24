@@ -25,7 +25,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import { makeStyles } from '@material-ui/core/styles';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import CheckIcon from '@material-ui/icons/Check';
@@ -66,6 +66,7 @@ export default function ProvideOpenAPI(props) {
     const isFileInput = apiInputs.inputType === 'file';
     const { inputType, inputValue } = apiInputs;
     const classes = useStyles();
+    const intl = useIntl();
     // If valid value is `null`,that means valid, else an error object will be there
     const [isValid, setValidity] = useState({});
     const [isValidating, setIsValidating] = useState(false);
@@ -302,7 +303,10 @@ export default function ProvideOpenAPI(props) {
                             autoFocus
                             id='outlined-full-width'
                             label='OpenAPI URL'
-                            placeholder='Enter OpenAPI URL'
+                            placeholder={intl.formatMessage({
+                                id: 'Apis.Create.OpenAPI.create.api.url.placeholder',
+                                defaultMessage: 'Enter OpenAPI URL',
+                            })}
                             fullWidth
                             margin='normal'
                             variant='outlined'
@@ -318,7 +322,13 @@ export default function ProvideOpenAPI(props) {
                                 endAdornment: urlStateEndAdornment,
                             }}
                             // 'Give the URL of OpenAPI endpoint'
-                            helperText={(isValid.url && isValid.url.message) || 'Click away to validate the URL'}
+                            helperText={(isValid.url && isValid.url.message)
+                                    || (
+                                        <FormattedMessage
+                                            id='Apis.Create.OpenAPI.create.api.url.helper.text'
+                                            defaultMessage='Click away to validate the URL'
+                                        />
+                                    )}
                             error={isInvalidURL}
                             data-testid='swagger-url-endpoint'
                         />
