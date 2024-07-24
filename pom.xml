@@ -810,6 +810,11 @@
                 <version>${apache.poi.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.poi.wso2</groupId>
+                <artifactId>poi-scratchpad</artifactId>
+                <version>${apache.poi.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-core</artifactId>
                 <version>${synapse.version}</version>
