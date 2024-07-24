@@ -178,6 +178,7 @@ public class DocumentIndexer extends RXTIndexer {
             String fileName = filepath.substring(indexOfFiles);
             String extension = FilenameUtils.getExtension(fileName);
             InputStream inputStream = null;
+            BufferedReader reader = null;
             try {
                 inputStream = contentResource.getContentStream();
                 switch (extension) {
@@ -224,7 +225,7 @@ public class DocumentIndexer extends RXTIndexer {
                 case APIConstants.TXT_EXTENSION:
                 case APIConstants.WSDL_EXTENSION:
                 case APIConstants.XML_DOC_EXTENSION:
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    reader = new BufferedReader(new InputStreamReader(inputStream));
                     String line;
                     StringBuilder contentBuilder = new StringBuilder();
                     while ((line = reader.readLine()) != null) {
@@ -234,6 +235,9 @@ public class DocumentIndexer extends RXTIndexer {
                     break;
                 }
             } finally {
+                if (reader != null) {
+                    IOUtils.closeQuietly(reader);
+                }
                 IOUtils.closeQuietly(inputStream);
             }
 

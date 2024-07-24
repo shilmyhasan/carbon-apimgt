@@ -95,11 +95,14 @@ public class OperationPolicy implements Comparable<OperationPolicy> {
 
         if (this == o)
             return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        OperationPolicy policyObj = (OperationPolicy) o;
-        return policyId == policyObj.policyId && policyName == policyObj.policyName && policyVersion == policyObj.policyVersion
-                && direction.equals(policyObj.direction) && parameters.equals(policyObj.parameters);
+        if (o instanceof OperationPolicy) {
+            OperationPolicy policyObj = (OperationPolicy) o;
+            return Objects.equals(policyId, policyObj.policyId) && (Objects.equals(policyName, policyObj.policyName))
+                    && Objects.equals(policyVersion, policyObj.policyVersion)
+                    && Objects.equals(direction, policyObj.direction)
+                    && Objects.equals(parameters, policyObj.parameters);
+        }
+        return false;
     }
 
     @Override

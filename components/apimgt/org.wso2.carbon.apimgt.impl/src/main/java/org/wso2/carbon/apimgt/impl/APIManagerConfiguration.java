@@ -1586,6 +1586,11 @@ public class APIManagerConfiguration {
             if (signatureElement != null) {
                 jwtConfigurationDto.setSignatureAlgorithm(signatureElement.getText());
             }
+            OMElement useSHA256HashElement =
+                    omElement.getFirstChildWithName(new QName(APIConstants.USE_SHA256_HASH));
+            if (useSHA256HashElement != null) {
+                jwtConfigurationDto.setUseSHA256Hash(Boolean.parseBoolean(useSHA256HashElement.getText()));
+            }
             OMElement claimRetrieverImplElement =
                     omElement.getFirstChildWithName(new QName(APIConstants.CLAIMS_RETRIEVER_CLASS));
             if (claimRetrieverImplElement != null) {
