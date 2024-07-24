@@ -122,8 +122,7 @@ public class ApisApiServiceImpl extends ApisApiService {
 
     private static final Log log = LogFactory.getLog(ApisApiServiceImpl.class);
     public static final String UTF8 = "UTF-8";
-    private final boolean allowWhitespaceInApiName = Boolean.parseBoolean(
-            System.getProperty(RestApiConstants.ALLOW_SPACES_IN_API_NAME));
+    private final boolean allowWhitespaceInApiName = Boolean.getBoolean(RestApiConstants.ALLOW_SPACES_IN_API_NAME);
 
     /**
      * Retrieves APIs qualifying under given search condition
