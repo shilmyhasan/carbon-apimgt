@@ -73,6 +73,7 @@ import org.wso2.carbon.apimgt.impl.dto.SoapToRestMediationDto;
 import org.wso2.carbon.apimgt.impl.importexport.APIImportExportException;
 import org.wso2.carbon.apimgt.impl.importexport.ImportExportConstants;
 import org.wso2.carbon.apimgt.impl.importexport.utils.CommonUtil;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.lifecycle.LCManager;
 import org.wso2.carbon.apimgt.impl.lifecycle.LCManagerFactory;
 import org.wso2.carbon.apimgt.impl.utils.APIMWSDLReader;
@@ -802,8 +803,13 @@ public class ImportUtils {
                         } else {
                             // set the default vhost of the given environment
                             if (gatewayEnvironment.getVhosts().isEmpty()) {
-                                throw new APIManagementException("No VHosts defined for the environment: "
-                                        + deploymentName);
+                                String errorMessage = "No VHosts defined for the environment: " + deploymentName;
+                                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                                    throw new APIManagementException(errorMessage,
+                                            ExceptionCodes.NO_VHOSTS_DEFINED_FOR_ENVIRONMENT, deploymentName);
+                                } else {
+                                    throw new APIManagementException(errorMessage);
+                                }
                             }
                             deploymentVhost = gatewayEnvironment.getVhosts().get(0).getHost();
                         }
@@ -1382,9 +1388,15 @@ public class ImportUtils {
             APIDefinitionValidationResponse validationResponse =
                     AsyncApiParserUtil.validateAsyncAPISpecification(asyncApiDefinition, true);
             if (!validationResponse.isValid()) {
-                throw new APIManagementException(
-                        "Error occurred while importing the API. Invalid AsyncAPI definition found. "
-                                + validationResponse.getErrorItems());
+                String errorMessage = "Error occurred while importing the API. Invalid AsyncAPI definition found. "
+                        + validationResponse.getErrorItems();
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.IMPORT_ERROR_INVALID_ASYNC_API_SCHEMA,
+                                    validationResponse.getErrorItems()));
+                } else {
+                    throw new APIManagementException(errorMessage);
+                }
             }
             return validationResponse;
         } catch (IOException e) {
@@ -1429,9 +1441,15 @@ public class ImportUtils {
             GraphQLValidationResponseDTO graphQLValidationResponseDTO = PublisherCommonUtils
                     .validateGraphQLSchema(file.getName(), schemaDefinition);
             if (!graphQLValidationResponseDTO.isIsValid()) {
-                throw new APIManagementException(
-                        "Error occurred while importing the API. Invalid GraphQL schema definition found. "
-                                + graphQLValidationResponseDTO.getErrorMessage());
+                String errorMessage = "Error occurred while importing the API. Invalid GraphQL schema definition found. "
+                                + graphQLValidationResponseDTO.getErrorMessage();
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.IMPORT_ERROR_INVALID_GRAPHQL_SCHEMA,
+                                    graphQLValidationResponseDTO.getErrorMessage()));
+                } else {
+                    throw new APIManagementException(errorMessage);
+                }
             }
             return schemaDefinition;
         } catch (IOException e) {

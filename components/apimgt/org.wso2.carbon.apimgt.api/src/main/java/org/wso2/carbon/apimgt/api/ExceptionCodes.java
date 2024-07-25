@@ -639,6 +639,19 @@ public enum ExceptionCodes implements ErrorHandler {
     REVISION_NOT_FOUND_FOR_REVISION_NUMBER(903228, "No revision found", 404,
             "No revision found for revision number %s"),
 
+    ERROR_PROCESSING_DIRECTORY_TO_IMPORT(903229, "Error extracting and processing the directory", 500,
+            "Error extracting and processing the directory to be imported", true),
+
+    IMPORT_ERROR_INVALID_GRAPHQL_SCHEMA(903230, "Error occurred while importing the API. Invalid " +
+            "GraphQL schema definition found", 400, "Invalid GraphQL schema definition " +
+            "found. %s"),
+
+    IMPORT_ERROR_INVALID_ASYNC_API_SCHEMA(903231, "Error occurred while importing the API. " +
+            "Invalid AsyncAPI definition found.", 400, "Invalid AsyncAPI definition found. %s"),
+
+    NO_VHOSTS_DEFINED_FOR_ENVIRONMENT(903232, "No VHosts defined for the environment", 400,
+            "No VHosts defined for the environment: %s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),

@@ -32,6 +32,7 @@ import org.wso2.carbon.apimgt.api.model.APIProductIdentifier;
 import org.wso2.carbon.apimgt.impl.importexport.APIImportExportException;
 import org.wso2.carbon.apimgt.impl.importexport.ExportFormat;
 import org.wso2.carbon.apimgt.impl.importexport.ImportExportAPI;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
 import org.wso2.carbon.apimgt.rest.api.publisher.v1.common.mappings.APIMappingUtil;
@@ -199,7 +200,12 @@ public class ImportExportAPIServiceImpl implements ImportExportAPI {
         try {
             extractedFolderPath = ImportUtils.getArchivePathOfExtractedDirectory(fileInputStream);
         } catch (APIImportExportException e) {
-            throw new APIManagementException(e);
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException("Error extracting and processing the directory", e,
+                        ExceptionCodes.ERROR_PROCESSING_DIRECTORY_TO_IMPORT);
+            } else {
+                throw new APIManagementException(e);
+            }
         }
         return ImportUtils.importApi(extractedFolderPath, null, preserveProvider, rotateRevision,
                 overwrite, false, tokenScopes, null, organization);

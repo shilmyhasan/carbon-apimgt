@@ -2857,14 +2857,12 @@ public final class APIUtil {
 
         if (context == null || context.isEmpty()) {
             errorMsg = errorMsg + " For API " + apiName + ", context cannot be empty or null";
-            log.error(errorMsg);
-            throw new APIManagementException(errorMsg);
+            handleException(errorMsg, ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, errorMsg));
         }
 
         if (context.endsWith("/")) {
             errorMsg = errorMsg + " For API " + apiName + ", context " + context + " cannot end with /";
-            log.error(errorMsg);
-            throw new APIManagementException(errorMsg);
+            handleException(errorMsg, ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, errorMsg));
         }
 
         Matcher matcher = pattern.matcher(context);
@@ -2877,15 +2875,13 @@ public final class APIUtil {
             for (String param : split) {
                 if (param != null && !APIConstants.VERSION_PLACEHOLDER.equals(param)) {
                     if (param.contains(APIConstants.VERSION_PLACEHOLDER)) {
-                        errorMsg = errorMsg + " For API " + apiName +
-                                ", {version} cannot exist as a substring of a sub-context";
-                        log.error(errorMsg);
-                        throw new APIManagementException(errorMsg);
+                        errorMsg = errorMsg + " For API " + apiName + ", {version} cannot exist as a substring of a sub-context";
+                        handleException(errorMsg,
+                                ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, errorMsg));
                     } else if (param.contains("{") || param.contains("}")) {
-                        errorMsg = errorMsg + " For API " + apiName +
-                                ", { or } cannot exist as a substring of a sub-context";
-                        log.error(errorMsg);
-                        throw new APIManagementException(errorMsg);
+                        errorMsg = errorMsg + " For API " + apiName + ", { or } cannot exist as a substring of a sub-context";
+                        handleException(errorMsg,
+                                ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, errorMsg));
                     }
                 }
             }
@@ -2893,14 +2889,13 @@ public final class APIUtil {
             //check whether the parentheses are balanced
             boolean isBalanced = checkBalancedParentheses(context);
             if (!isBalanced) {
-                errorMsg = errorMsg + " Unbalanced parenthesis cannot be used in context " + context + " for API "
-                        + apiName;
-                throw new APIManagementException(errorMsg);
+                errorMsg = errorMsg + " Unbalanced parenthesis cannot be used in context " + context + " for API " + apiName;
+                handleException(errorMsg,
+                        ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, errorMsg));
             }
         } else {
-            errorMsg = errorMsg + " Special characters cannot be used in context " + context + " for API "+ apiName;
-            log.error(errorMsg);
-            throw new APIManagementException(errorMsg);
+            errorMsg = errorMsg + " Special characters cannot be used in context " + context + " for API " + apiName;
+            handleException(errorMsg, ExceptionCodes.from(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION, errorMsg));
         }
     }
 
