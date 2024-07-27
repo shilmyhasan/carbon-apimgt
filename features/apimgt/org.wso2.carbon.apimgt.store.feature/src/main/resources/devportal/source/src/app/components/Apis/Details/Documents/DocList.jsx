@@ -143,12 +143,35 @@ const styles = (theme) => ({
  */
 function DocList(props) {
     const {
-        classes, documentList, apiId, selectedDoc,
+        classes, documentList, apiId, selectedDoc, intl,
     } = props;
     const [selectedIndexA, changeSelectedIndexA] = useState(0);
     const [selectedIndexB, changeSelectedIndexB] = useState(0);
     const [width] = useWindowSize();
     const [showDocList, setShowDocList] = useState(!(width < 1400));
+    const documentTypes = {
+        HOWTO: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.how.to',
+            defaultMessage: 'HOWTO',
+        }),
+        SAMPLES: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.samples',
+            defaultMessage: 'Samples',
+        }),
+        PUBLIC_FORUM: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.public.forum',
+            defaultMessage: 'PUBLIC_FORUM',
+        }),
+        SUPPORT_FORUM: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.support.forum',
+            defaultMessage: 'SUPPORT_FORUM',
+        }),
+        OTHER: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.other',
+            defaultMessage: 'Other',
+        }),
+    };
+
     const toggleDocList = () => {
         setShowDocList(!showDocList);
     };
@@ -194,7 +217,7 @@ function DocList(props) {
                                                 <CustomIcon strokeColor='#444' width={24} height={24} icon='docs' />
                                             </ListItemIcon>
                                             <ListItemText
-                                                primary={type.docType}
+                                                primary={type.docType in documentTypes ? documentTypes[type.docType] : type.docType}
                                                 classes={{ root: classes.typeText }}
                                             />
                                         </ListItem>

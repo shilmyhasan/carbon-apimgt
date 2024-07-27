@@ -86,6 +86,29 @@ function View(props) {
     const [isFileAvailable, setIsFileAvailable] = useState(false);
     const restAPI = new API();
 
+    const documentTypes = {
+        HOWTO: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.how.to',
+            defaultMessage: 'HOWTO',
+        }),
+        SAMPLES: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.samples',
+            defaultMessage: 'Samples',
+        }),
+        PUBLIC_FORUM: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.public.forum',
+            defaultMessage: 'PUBLIC_FORUM',
+        }),
+        SUPPORT_FORUM: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.support.forum',
+            defaultMessage: 'SUPPORT_FORUM',
+        }),
+        OTHER: intl.formatMessage({
+            id: 'Apis.Details.Documents.Documentation.type.other',
+            defaultMessage: 'Other',
+        }),
+    };
+
     const loadContentForDoc = () => {
         const docPromise = restAPI.getInlineContentOfDocument(apiId, doc.documentId);
         docPromise
@@ -180,7 +203,11 @@ function View(props) {
     };
     return (
         <>
-            {!fullScreen && <div className={classes.docBadge}>{doc.type}</div>}
+            {!fullScreen && (
+                <div className={classes.docBadge}>
+                    { doc.type in documentTypes ? documentTypes[doc.type] : doc.type }
+                </div>
+            )}
 
             {(!dontShowName && doc.summary) && (
                 <Typography variant='body1' className={classes.docSummary}>

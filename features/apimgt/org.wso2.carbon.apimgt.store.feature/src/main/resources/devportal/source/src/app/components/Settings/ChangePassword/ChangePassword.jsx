@@ -18,7 +18,7 @@
 
 import React, { useReducer } from 'react';
 import classNames from 'classnames';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import AuthManager from 'AppData/AuthManager';
 import Settings from 'Settings';
 import Joi from '@hapi/joi';
@@ -70,6 +70,7 @@ const ChangePassword = () => {
         }
     } = useSettingsContext();
     const classes = useStyles();
+    const intl = useIntl();
     const username = AuthManager.getUser().name;
     const initialState = {
         currentPassword: undefined,
@@ -184,10 +185,10 @@ const ChangePassword = () => {
     const handleSave = () => {
         if (repeatedNewPassword && newPassword !== repeatedNewPassword) {
             Alert.error(
-                <FormattedMessage
-                    id='Change.Password.password.mismatch'
-                    defaultMessage={'Password doesn\'t match'}
-                />
+                intl.formatMessage({
+                    id: 'Change.Password.password.mismatch',
+                    defaultMessage: 'Password doesn\'t match',
+                }),
             );
         } else {
             const restApi = new API();
@@ -195,10 +196,10 @@ const ChangePassword = () => {
                 .changePassword(currentPassword, newPassword)
                 .then((res) => {
                     Alert.success(
-                        <FormattedMessage
-                            id='Change.Password.password.changed.success'
-                            defaultMessage='User password changed successfully. Please use the new password on next sign in'
-                        />
+                        intl.formatMessage({
+                            id: 'Change.Password.password.changed.success',
+                            defaultMessage: 'User password changed successfully. Please use the new password on next sign in',
+                        }),
                     );
                     window.history.back();
                 })
@@ -207,26 +208,26 @@ const ChangePassword = () => {
                     switch (errorCode) {
                         case 901450:
                             Alert.error(
-                                <FormattedMessage
-                                    id='Change.Password.password.change.disabled'
-                                    defaultMessage='Password change disabled'
-                                />
+                                intl.formatMessage({
+                                    id: 'Change.Password.password.change.disabled',
+                                    defaultMessage: 'Password change disabled',
+                                }),
                             );
                             break;
                         case 901451:
                             Alert.error(
-                                <FormattedMessage
-                                    id='Change.Password.current.password.incorrect'
-                                    defaultMessage='Current password is incorrect'
-                                />
+                                intl.formatMessage({
+                                    id: 'Change.Password.current.password.incorrect',
+                                    defaultMessage: 'Current password is incorrect',
+                                }),
                             );
                             break;
                         case 901452:
                             Alert.error(
-                                <FormattedMessage
-                                    id='Change.Password.password.pattern.invalid'
-                                    defaultMessage='Invalid password pattern'
-                                />
+                                intl.formatMessage({
+                                    id: 'Change.Password.password.pattern.invalid',
+                                    defaultMessage: 'Invalid password pattern',
+                                }),
                             );
                             break;
                     }

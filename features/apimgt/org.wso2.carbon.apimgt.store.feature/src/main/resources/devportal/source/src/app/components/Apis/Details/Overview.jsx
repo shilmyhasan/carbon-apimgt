@@ -158,6 +158,28 @@ function Overview() {
             descriptionIsBig = true;
         }
     }
+    const subscriptionTimeUnits = {
+        min: intl.formatMessage({
+            id: 'Apis.Details.Overview.business.plans.time.unit.min',
+            defaultMessage: 'min',
+        }),
+        hours: intl.formatMessage({
+            id: 'Apis.Details.Overview.business.plans.time.unit.hours',
+            defaultMessage: 'hours',
+        }),
+        days: intl.formatMessage({
+            id: 'Apis.Details.Overview.business.plans.time.unit.days',
+            defaultMessage: 'days',
+        }),
+        months: intl.formatMessage({
+            id: 'Apis.Details.Overview.business.plans.time.unit.months',
+            defaultMessage: 'months',
+        }),
+        years: intl.formatMessage({
+            id: 'Apis.Details.Overview.business.plans.time.unit.years',
+            defaultMessage: 'years',
+        }),
+    };
 
     const isApiPolicy = (policyName) => {
         const filteredApiPolicies = api.tiers.filter((t) => t.tierName === policyName);
@@ -446,8 +468,15 @@ function Overview() {
                                         </Box>
                                         <Box>
                                             <Typography className={classes.requestUnit} color='textSecondary'>
-                                                Requests/
-                                                {tier.timeUnit}
+                                                <FormattedMessage
+                                                    id='Apis.Details.Overview.business.plans.requests.unit'
+                                                    defaultMessage='Requests/{timeUnit}'
+                                                    values={{
+                                                        timeUnit: tier.timeUnit in subscriptionTimeUnits
+                                                            ? subscriptionTimeUnits[tier.timeUnit]
+                                                            : tier.timeUnit,
+                                                    }}
+                                                />
                                             </Typography>
                                         </Box>
                                     </CardContent>
