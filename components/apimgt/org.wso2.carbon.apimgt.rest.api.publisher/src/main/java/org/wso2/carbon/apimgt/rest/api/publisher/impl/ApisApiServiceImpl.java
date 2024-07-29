@@ -122,7 +122,6 @@ public class ApisApiServiceImpl extends ApisApiService {
 
     private static final Log log = LogFactory.getLog(ApisApiServiceImpl.class);
     public static final String UTF8 = "UTF-8";
-    private final boolean allowWhitespaceInApiName = Boolean.getBoolean(RestApiConstants.ALLOW_SPACES_IN_API_NAME);
 
     /**
      * Retrieves APIs qualifying under given search condition
@@ -261,7 +260,7 @@ public class ApisApiServiceImpl extends ApisApiService {
                 RestApiUtil.handleBadRequest("Error occurred while adding API. API with name " + body.getName()
                         + " already exists.", log);
             }
-            if (!allowWhitespaceInApiName && body.getName().contains(RestApiConstants.EMPTY_STRING)) {
+            if (body.getName().contains(RestApiConstants.EMPTY_STRING)) {
                 RestApiUtil.handleBadRequest("Error occurred while adding API. API name "
                         + "cannot contains white spaces.", log);
             }
