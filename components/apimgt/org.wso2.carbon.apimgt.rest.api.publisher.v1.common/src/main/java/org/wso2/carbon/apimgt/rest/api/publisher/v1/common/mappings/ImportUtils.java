@@ -806,7 +806,8 @@ public class ImportUtils {
                                 String errorMessage = "No VHosts defined for the environment: " + deploymentName;
                                 if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
                                     throw new APIManagementException(errorMessage,
-                                            ExceptionCodes.NO_VHOSTS_DEFINED_FOR_ENVIRONMENT, deploymentName);
+                                            ExceptionCodes.from(ExceptionCodes.NO_VHOSTS_DEFINED_FOR_ENVIRONMENT,
+                                                    deploymentName));
                                 } else {
                                     throw new APIManagementException(errorMessage);
                                 }
@@ -1393,7 +1394,7 @@ public class ImportUtils {
                 if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
                     throw new APIManagementException(errorMessage,
                             ExceptionCodes.from(ExceptionCodes.IMPORT_ERROR_INVALID_ASYNC_API_SCHEMA,
-                                    validationResponse.getErrorItems()));
+                                    StringUtils.join(validationResponse.getErrorItems(), ", ")));
                 } else {
                     throw new APIManagementException(errorMessage);
                 }
@@ -1441,8 +1442,8 @@ public class ImportUtils {
             GraphQLValidationResponseDTO graphQLValidationResponseDTO = PublisherCommonUtils
                     .validateGraphQLSchema(file.getName(), schemaDefinition);
             if (!graphQLValidationResponseDTO.isIsValid()) {
-                String errorMessage = "Error occurred while importing the API. Invalid GraphQL schema definition found. "
-                                + graphQLValidationResponseDTO.getErrorMessage();
+                String errorMessage = "Error occurred while importing the API. Invalid GraphQL schema definition " +
+                        "found. " + graphQLValidationResponseDTO.getErrorMessage();
                 if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
                     throw new APIManagementException(errorMessage,
                             ExceptionCodes.from(ExceptionCodes.IMPORT_ERROR_INVALID_GRAPHQL_SCHEMA,
