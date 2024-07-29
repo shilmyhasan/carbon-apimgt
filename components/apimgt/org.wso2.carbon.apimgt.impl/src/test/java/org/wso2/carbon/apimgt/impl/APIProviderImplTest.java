@@ -45,9 +45,11 @@ import org.wso2.carbon.apimgt.api.PolicyDeploymentFailureException;
 import org.wso2.carbon.apimgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
+import org.wso2.carbon.apimgt.api.model.APIProductIdentifier;
 import org.wso2.carbon.apimgt.api.model.APIPublisher;
 import org.wso2.carbon.apimgt.api.model.APIStateChangeResponse;
 import org.wso2.carbon.apimgt.api.model.APIStore;
+import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.api.model.BlockConditionsDTO;
 import org.wso2.carbon.apimgt.api.model.CORSConfiguration;
 import org.wso2.carbon.apimgt.api.model.Documentation;
@@ -4070,5 +4072,65 @@ public class APIProviderImplTest {
         JSONObject jsonObject2 = apiProvider.getSecurityAuditAttributesFromConfig("admin");
         Assert.assertEquals(jsonObject2.get(APIConstants.SECURITY_AUDIT_API_TOKEN), apiToken);
         Assert.assertEquals(jsonObject2.get(APIConstants.SECURITY_AUDIT_COLLECTION_ID), collectionId);
+    }
+
+    /**
+     * Tests the `updateSubscription` method of the `APIProviderImpl` class.
+     *
+     * This test verifies that the `updateSubscription` method correctly interacts with the mocked
+     * `APIMgtDAO` when updating subscriptions. It ensures that the method works as expected for both
+     * API and API Product subscriptions.
+     *
+     * The test initializes mock objects for `SubscribedAPI`, `Application`, `Tier`, `APIIdentifier`, and
+     * `APIProductIdentifier`. It sets up mock behaviors for these objects and verifies the interactions
+     * with the `APIMgtDAO`.
+     *
+     * @throws APIManagementException if an error occurs during the update process.
+     */
+    @Test
+    public void testUpdateSubscription() throws APIManagementException {
+        // Initialize constants
+        final String API_UUID = "testUUID";
+        final String PROVIDER_NAME = "admin@carbon.super";
+
+        // Create mock objects
+        SubscribedAPI subscribedAPI = Mockito.mock(SubscribedAPI.class);
+        Application application = Mockito.mock(Application.class);
+        Tier tier = Mockito.mock(Tier.class);
+
+        Mockito.when(subscribedAPI.getUUID()).thenReturn(API_UUID);
+        Mockito.when(subscribedAPI.getApplication()).thenReturn(application);
+        Mockito.when(application.getId()).thenReturn(1);
+        Mockito.when(application.getUUID()).thenReturn("applicationUUID");
+        Mockito.when(subscribedAPI.getTier()).thenReturn(tier);
+        Mockito.when(tier.getName()).thenReturn("Gold");
+        Mockito.when(subscribedAPI.getSubStatus()).thenReturn("UNBLOCKED");
+        Mockito.when(subscribedAPI.getSubscriptionId()).thenReturn(1);
+
+        APIProviderImplWrapper apiProvider = new APIProviderImplWrapper(apimgtDAO, scopesDAO, null, null);
+
+        // Mock the DAO methods
+        Mockito.doNothing().when(apimgtDAO).updateSubscription(subscribedAPI);
+        Mockito.when(apimgtDAO.getSubscriptionByUUID(API_UUID)).thenReturn(subscribedAPI);
+
+        // Invoke updateSubscription method when the API is used
+        APIIdentifier apiIdentifier = Mockito.mock(APIIdentifier.class);
+        Mockito.when(subscribedAPI.getApiId()).thenReturn(apiIdentifier);
+        Mockito.when(subscribedAPI.getProductId()).thenReturn(null);
+        Mockito.when(apiIdentifier.getProviderName()).thenReturn(PROVIDER_NAME);
+        apiProvider.updateSubscription(subscribedAPI);
+
+        // Invoke updateSubscription method when the APIProduct is used
+        APIProductIdentifier productIdentifier = Mockito.mock(APIProductIdentifier.class);
+        Mockito.when(subscribedAPI.getApiId()).thenReturn(null);
+        Mockito.when(subscribedAPI.getProductId()).thenReturn(productIdentifier);
+        Mockito.when(productIdentifier.getProviderName()).thenReturn(PROVIDER_NAME);
+        apiProvider.updateSubscription(subscribedAPI);
+
+        // Verify the interactions
+        Mockito.verify(apimgtDAO, Mockito.times(2)).updateSubscription(subscribedAPI);
+        Mockito.verify(apimgtDAO, Mockito.times(2)).getSubscriptionByUUID(API_UUID);
+        Mockito.verify(subscribedAPI, Mockito.times(3)).getApiId();
+        Mockito.verify(subscribedAPI, Mockito.times(1)).getProductId();
     }
 }
