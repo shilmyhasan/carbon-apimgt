@@ -884,18 +884,33 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
             apiRevisionDeployment.setRevisionUUID(revisionId);
             String environment = apiRevisionDeploymentDTO.getName();
             if (environments.get(environment) == null) {
-                RestApiUtil.handleBadRequest("Gateway environment not found: " + environment, log);
+                String errorMessage = "Gateway environment not found: " + environment;
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.PROVIDED_GATEWAY_ENVIRONMENT_NOT_FOUND, environment));
+                } else {
+                    RestApiUtil.handleBadRequest(errorMessage, log);
+                }
             }
             apiRevisionDeployment.setDeployment(environment);
             apiRevisionDeployment.setVhost(apiRevisionDeploymentDTO.getVhost());
             if (StringUtils.isEmpty(apiRevisionDeploymentDTO.getVhost())) {
-                // vhost is only required when deploying an revision, not required when un-deploying a revision
+                // vhost is only required when deploying a revision, not required when un-deploying a revision
                 // since the same scheme 'APIRevisionDeployment' is used for deploy and undeploy, handle it here.
-                RestApiUtil.handleBadRequest(
-                        "Required field 'vhost' not found in deployment", log
-                );
+                String errorMessage = "Required field 'vhost' not found in deployment";
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.GATEWAY_ENVIRONMENT_VHOST_NOT_PROVIDED);
+                } else {
+                    RestApiUtil.handleBadRequest(errorMessage, log);
+                }
             }
-            apiRevisionDeployment.setDisplayOnDevportal(apiRevisionDeploymentDTO.isDisplayOnDevportal());
+            if (apiRevisionDeploymentDTO.isDisplayOnDevportal() == null) {
+                // Set default value as true. If null, there will be a NullPointer exception when setting the value here.
+                apiRevisionDeployment.setDisplayOnDevportal(true);
+            } else {
+                apiRevisionDeployment.setDisplayOnDevportal(apiRevisionDeploymentDTO.isDisplayOnDevportal());
+            }
             apiRevisionDeployments.add(apiRevisionDeployment);
         }
         apiProvider.deployAPIProductRevision(apiProductId, revisionId, apiRevisionDeployments);

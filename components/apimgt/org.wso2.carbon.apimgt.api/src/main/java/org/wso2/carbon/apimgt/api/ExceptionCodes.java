@@ -652,6 +652,9 @@ public enum ExceptionCodes implements ErrorHandler {
     NO_VHOSTS_DEFINED_FOR_ENVIRONMENT(903232, "No VHosts defined for the environment", 400,
             "No VHosts defined for the environment: %s"),
 
+    PROVIDED_GATEWAY_ENVIRONMENT_NOT_FOUND(903233, "Gateway environment not found", 400,
+            "Provided gateway environment %s is not found"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),
