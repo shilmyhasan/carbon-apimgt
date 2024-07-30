@@ -38,6 +38,7 @@ import com.amazonaws.services.securitytoken.model.AssumeRoleResult;
 import com.amazonaws.services.securitytoken.model.Credentials;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.axis2.AxisFault;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -157,11 +158,16 @@ public class AWSLambdaMediator extends AbstractMediator {
             if (log.isDebugEnabled()) {
                 log.debug("AWS Lambda function: " + resourceName + " is invoked successfully.");
             }
-            JsonUtil.setJsonStream(axis2MessageContext, new ByteArrayInputStream(invokeResult.getPayload().array()));
-            axis2MessageContext.setProperty(APIMgtGatewayConstants.HTTP_SC, invokeResult.getStatusCode());
-            axis2MessageContext.setProperty(APIMgtGatewayConstants.REST_MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-            axis2MessageContext.setProperty(APIMgtGatewayConstants.REST_CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
-            axis2MessageContext.removeProperty(APIConstants.NO_ENTITY_BODY);
+            try {
+                JsonUtil.getNewJsonPayload(axis2MessageContext, new ByteArrayInputStream(
+                        invokeResult.getPayload().array()), true, true);
+                axis2MessageContext.setProperty(APIMgtGatewayConstants.HTTP_SC, invokeResult.getStatusCode());
+                axis2MessageContext.setProperty(APIMgtGatewayConstants.REST_MESSAGE_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+                axis2MessageContext.setProperty(APIMgtGatewayConstants.REST_CONTENT_TYPE, APIConstants.APPLICATION_JSON_MEDIA_TYPE);
+                axis2MessageContext.removeProperty(APIConstants.NO_ENTITY_BODY);
+            } catch (AxisFault e) {
+                log.error("Error while setting JSON payload");
+            }
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("Failed to invoke AWS Lambda function: " + resourceName);
