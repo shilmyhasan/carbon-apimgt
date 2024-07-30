@@ -109,6 +109,7 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
     private static APIMgtUsageDataPublisher usageDataPublisher;
     private GraphQLRequestProcessor graphQLRequestProcessor = new GraphQLRequestProcessor();
     private final String API_PROPERTIES = "API_PROPERTIES";
+    private final String API_CONTEXT_URI = "API_CONTEXT_URI";
     private final String WEB_SC_API_UT = "api.ut.WS_SC";
 
     public WebsocketInboundHandler() {
@@ -199,6 +200,9 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                     apiContextUri.substring(0, apiContextUri.length() - 1) :
                     apiContextUri;
             inboundMessageContext.setApiContextUri(apiContextUri);
+            Map<String, String> apiContextUriMap = new HashMap<>();
+            apiContextUriMap.put("apiContextUri", apiContextUri);
+            ctx.channel().attr(AttributeKey.valueOf(API_CONTEXT_URI)).set(apiContextUriMap);
             inboundMessageContext.setVersion(getVersionFromUrl(inboundMessageContext.getUri()));
 
             if (log.isDebugEnabled()) {
@@ -224,7 +228,7 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
                         WebsocketUtil.getApi(req.uri(), inboundMessageContext.getTenantDomain()));
             } else {
                 handleHandshakeError(channelId, responseDTO, ctx, inboundMessageContext, msg,
-                        APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE_MESSAGE + ":" + apiContextUri,
+                        APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE_MESSAGE,
                         APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE,
                         WebsocketUtil.resolveHttpCodeForWebSocketErrorCode(responseDTO.getErrorCode()));
             }
@@ -860,13 +864,22 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        Attribute<Object> attributes = ctx.channel().attr(AttributeKey.valueOf(API_PROPERTIES));
-        if (cause instanceof CorruptedWebSocketFrameException && attributes != null) {
-            HashMap apiProperties = (HashMap) attributes.get();
+        Attribute<Object> apiPropertiesAttributes = ctx.channel().attr(AttributeKey.valueOf(API_PROPERTIES));
+        HashMap apiProperties = (HashMap) apiPropertiesAttributes.get();
+        Attribute<Object> apiContextUriAttributes = ctx.channel().attr(AttributeKey.valueOf(API_CONTEXT_URI));
+        HashMap apiContextUris = (HashMap) apiContextUriAttributes.get();
+        String apiContextUri = (String) apiContextUris.get("apiContextUri");
+        if (cause instanceof CorruptedWebSocketFrameException && apiPropertiesAttributes != null) {
             CorruptedWebSocketFrameException corruptedWebSocketFrameException = ((CorruptedWebSocketFrameException) cause);
             apiProperties.put(WEB_SC_API_UT, corruptedWebSocketFrameException.closeStatus().code());
         }
-        super.exceptionCaught(ctx, cause);
+        if (apiContextUri != null) {
+            Throwable newCause = new Throwable(cause.getMessage() + " For the URI: " + apiContextUri);
+            newCause.initCause(cause);
+            super.exceptionCaught(ctx, newCause);
+        } else {
+            super.exceptionCaught(ctx, cause);
+        }
     }
 
     private static org.apache.synapse.MessageContext createSynapseMessageContext(String tenantDomain) throws AxisFault {
