@@ -55,6 +55,7 @@ import org.wso2.carbon.apimgt.impl.importexport.APIImportExportException;
 import org.wso2.carbon.apimgt.impl.importexport.ExportFormat;
 import org.wso2.carbon.apimgt.impl.importexport.ImportExportAPI;
 import org.wso2.carbon.apimgt.impl.importexport.utils.APIImportExportUtil;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.restapi.publisher.ApiProductsApiServiceImplUtils;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
@@ -844,7 +845,13 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
             return Response.created(createdApiUri).entity(createdApiRevisionDTO).build();
         } catch (APIManagementException e) {
             String errorMessage = "Error while adding new API Revision for API Product: " + apiProductId;
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())
+                    && e.getErrorHandler().getErrorCode()
+                    == ExceptionCodes.MAXIMUM_REVISIONS_REACHED.getErrorCode()) {
+                throw e;
+            } else {
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
         } catch (URISyntaxException e) {
             String errorMessage = "Error while retrieving created revision API location for API Product: "
                     + apiProductId;
