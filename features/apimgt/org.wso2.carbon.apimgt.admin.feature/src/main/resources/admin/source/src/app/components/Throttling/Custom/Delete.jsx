@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import FormDialogBase from 'AppComponents/AdminPages/Addons/FormDialogBase';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl} from 'react-intl';
 import API from 'AppData/api';
 
 /**
@@ -34,7 +34,8 @@ function Delete(props) {
     const {
         dataRow, updateList,
     } = props;
-
+    const intl = useIntl();
+    
     const formSaveCallback = () => {
         const { policyId } = dataRow;
         const promiseAPICall = restApi
@@ -42,18 +43,18 @@ function Delete(props) {
             .then(() => {
                 updateList();
                 return (
-                    <FormattedMessage
-                        id='Throttling.Custom.Policy.policy.delete.success'
-                        defaultMessage='Custom Policy successfully deleted.'
-                    />
+                    intl.formatMessage({
+                        id: 'Throttling.Custom.Policy.policy.delete.success',
+                        defaultMessage: 'Custom Policy successfully deleted.'
+                    })
                 );
             })
             .catch(() => {
                 return (
-                    <FormattedMessage
-                        id='Throttling.Custom.Policy.policy.delete.error'
-                        defaultMessage='Custom Policy could not be deleted.'
-                    />
+                    intl.formatMessage({
+                        id: 'Throttling.Custom.Policy.policy.delete.error',
+                        defaultMessage: 'Custom Policy could not be deleted.'
+                    })
                 );
             });
 
@@ -62,8 +63,14 @@ function Delete(props) {
 
     return (
         <FormDialogBase
-            title='Delete Custom Policy?'
-            saveButtonText='Delete'
+            title={intl.formatMessage({
+                id: 'Throttling.Custom.Policy.policy.delete.title',
+                defaultMessage: 'Delete Custom Policy?'
+            })}
+            saveButtonText={intl.formatMessage({
+                id: 'Throttling.Custom.Policy.policy.delete.btn',
+                defaultMessage: 'Delete'
+            })}
             icon={<DeleteForeverIcon />}
             formSaveCallback={formSaveCallback}
         >

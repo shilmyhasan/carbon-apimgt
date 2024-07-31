@@ -272,10 +272,10 @@ function AddEdit(props) {
             return promisedAddApplicationPolicy
                 .then(() => {
                     return (
-                        <FormattedMessage
-                            id='Throttling.Application.Policy.policy.edit.success'
-                            defaultMessage='Application Rate Limiting Policy edited successfully.'
-                        />
+                        intl.formatMessage({
+                            id: 'Throttling.Application.Policy.policy.edit.success',
+                            defaultMessage: 'Application Rate Limiting Policy edited successfully.'
+                        })
                     );
                 })
                 .catch((error) => {
@@ -295,10 +295,10 @@ function AddEdit(props) {
             return promisedAddApplicationPolicy
                 .then(() => {
                     return (
-                        <FormattedMessage
-                            id='Throttling.Application.Policy.policy.add.success'
-                            defaultMessage='Application Rate Limiting Policy added successfully.'
-                        />
+                        intl.formatMessage({
+                            id: 'Throttling.Application.Policy.policy.add.success',
+                            defaultMessage: 'Application Rate Limiting Policy added successfully.'
+                        })
                     );
                 })
                 .catch((error) => {
@@ -355,7 +355,10 @@ function AddEdit(props) {
     return (
         <FormDialogBase
             title={title}
-            saveButtonText='Save'
+            saveButtonText={intl.formatMessage({
+                id: 'Admin.Throttling.Application.Throttling.Policy.add.save.btn',
+                defaultMessage: 'Save',
+            })}
             icon={icon}
             triggerButtonText={triggerButtonText}
             formSaveCallback={formSaveCallback}
@@ -373,7 +376,12 @@ function AddEdit(props) {
                 autoFocus
                 margin='dense'
                 name='policyName'
-                label='Name'
+                label={(
+                    <FormattedMessage
+                        id='Admin.Throttling.Application.Throttling.Policy.form.policyName'
+                        defaultMessage='Name'
+                    />
+                )}
                 fullWidth
                 required
                 variant='outlined'
@@ -398,7 +406,12 @@ function AddEdit(props) {
             <TextField
                 margin='dense'
                 name='description'
-                label='Description'
+                label={(
+                    <FormattedMessage
+                        id='Admin.Throttling.Application.Throttling.Policy.form.description'
+                        defaultMessage='Description'
+                    />
+                )}
                 fullWidth
                 variant='outlined'
                 helperText={(
@@ -430,13 +443,23 @@ function AddEdit(props) {
                     <FormControlLabel
                         value='REQUESTCOUNTLIMIT'
                         control={<Radio color='primary' />}
-                        label='Request Count '
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Application.Throttling.Policy.option.request.count.label'
+                                defaultMessage='Request Count '
+                            />
+                        )}
                         labelPlacement='end'
                     />
                     <FormControlLabel
                         value='BANDWIDTHLIMIT'
                         control={<Radio color='primary' />}
-                        label='Request Bandwidth'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Application.Throttling.Policy.option.request.bandwidth.label'
+                                defaultMessage='Request Bandwidth'
+                            />
+                        )}
                         labelPlacement='end'
                     />
                 </RadioGroup>
@@ -444,7 +467,12 @@ function AddEdit(props) {
                     <TextField
                         margin='dense'
                         name='requestCount'
-                        label='Request Count'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Application.Throttling.Policy.option.request.count.text'
+                                defaultMessage='Request Count'
+                            />
+                        )}
                         fullWidth
                         value={requestCount}
                         type='number'
@@ -471,7 +499,12 @@ function AddEdit(props) {
                         <TextField
                             margin='dense'
                             name='dataAmount'
-                            label='Data Bandwith'
+                            label={(
+                                <FormattedMessage
+                                    id='Admin.Throttling.Application.Throttling.Policy.option.request.bandwidth.text'
+                                    defaultMessage='Data Bandwith'
+                                />
+                            )}
                             fullWidth
                             required
                             type='number'
@@ -513,7 +546,12 @@ function AddEdit(props) {
                     <TextField
                         margin='dense'
                         name='unitTime'
-                        label='Unit Time'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Application.Throttling.Policy.option.request.unit.time.text'
+                                defaultMessage='Unit Time'
+                            />
+                        )}
                         type='number'
                         fullWidth
                         variant='outlined'
@@ -542,12 +580,42 @@ function AddEdit(props) {
                             onChange={onChange}
                             fullWidth
                         >
-                            <MenuItem value='min'>Minute(s)</MenuItem>
-                            <MenuItem value='hour'>Hour(s)</MenuItem>
-                            <MenuItem value='day'>Day(s)</MenuItem>
-                            <MenuItem value='week'>Week(s)</MenuItem>
-                            <MenuItem value='month'>Month(s)</MenuItem>
-                            <MenuItem value='year'>Year(s)</MenuItem>
+                            <MenuItem value='min'>
+                                <FormattedMessage
+                                    id='Admin.Throttling.Application.Throttling.Policy.add.time.minutes'
+                                    defaultMessage='Minute(s)'
+                                />
+                            </MenuItem>
+                            <MenuItem value='hour'>
+                                <FormattedMessage
+                                    id='Admin.Throttling.Application.Throttling.Policy.add.time.hours'
+                                    defaultMessage='Hour(s)'
+                                />
+                            </MenuItem>
+                            <MenuItem value='day'>
+                                <FormattedMessage
+                                    id='Admin.Throttling.Application.Throttling.Policy.add.time.days'
+                                    defaultMessage='Day(s)'
+                                />
+                            </MenuItem>
+                            <MenuItem value='week'>
+                                <FormattedMessage
+                                    id='Admin.Throttling.Application.Throttling.Policy.add.time.weeks'
+                                    defaultMessage='Week(s)'
+                                />
+                            </MenuItem>
+                            <MenuItem value='month'>
+                                <FormattedMessage
+                                    id='Admin.Throttling.Application.Throttling.Policy.add.time.months'
+                                    defaultMessage='Month(s)'
+                                />
+                            </MenuItem>
+                            <MenuItem value='year'>
+                                <FormattedMessage
+                                    id='Admin.Throttling.Application.Throttling.Policy.add.time.years'
+                                    defaultMessage='Year(s)'
+                                />
+                            </MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>

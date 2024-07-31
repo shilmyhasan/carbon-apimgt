@@ -26,7 +26,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Alert from 'AppComponents/Shared/Alert';
-
+import { FormattedMessage } from 'react-intl';
 /**
  * Render base for dialogs.
  * @returns {JSX} Header AppBar components.
@@ -92,7 +92,10 @@ function FormDialogBase({
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>
-                        Cancel
+                        <FormattedMessage
+                            id='Form.Dialog.Base.cancel.btn'
+                            defaultMessage='Cancel'
+                        />
                     </Button>
                     <Button onClick={saveTriggerd} color='primary' variant='contained' disabled={saving}>
                         {saving ? (<CircularProgress size={16} />) : (<>{saveButtonText}</>)}
