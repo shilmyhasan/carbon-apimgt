@@ -2014,9 +2014,15 @@ public class PublisherCommonUtils {
 
         String[] nextAllowedStates = (String[]) apiLCData.get(APIConstants.LC_NEXT_STATES);
         if (!ArrayUtils.contains(nextAllowedStates, action)) {
-            throw new APIManagementException("Action '" + action + "' is not allowed. Allowed actions are "
-                    + Arrays.toString(nextAllowedStates), ExceptionCodes.from(ExceptionCodes
-                    .UNSUPPORTED_LIFECYCLE_ACTION, action));
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                throw new APIManagementException("Action '" + action + "' is not allowed. Allowed actions are "
+                        + Arrays.toString(nextAllowedStates), ExceptionCodes.from(ExceptionCodes
+                        .UNSUPPORTED_AND_ALLOWED_LIFECYCLE_ACTIONS, action, Arrays.toString(nextAllowedStates)));
+            } else {
+                throw new APIManagementException("Action '" + action + "' is not allowed. Allowed actions are "
+                        + Arrays.toString(nextAllowedStates), ExceptionCodes.from(ExceptionCodes
+                        .UNSUPPORTED_LIFECYCLE_ACTION, action));
+            }
         }
 
         //check and set lifecycle check list items including "Deprecate Old Versions" and "Require Re-Subscription".

@@ -655,6 +655,9 @@ public enum ExceptionCodes implements ErrorHandler {
     PROVIDED_GATEWAY_ENVIRONMENT_NOT_FOUND(903233, "Gateway environment not found", 400,
             "Provided gateway environment %s is not found"),
 
+    UNSUPPORTED_AND_ALLOWED_LIFECYCLE_ACTIONS(903234, "Unsupported state change action", 400,
+            "Lifecycle state change action %s is not allowed for this API. Allowed actions are %s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),
