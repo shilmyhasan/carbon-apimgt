@@ -278,17 +278,17 @@ function AddEditGWEnvironment(props) {
         return promiseAPICall.then(() => {
             if (dataRow) {
                 return (
-                    <FormattedMessage
-                        id='GatewayEnvironments.AddEditGWEnvironment.form.info.edit.successful'
-                        defaultMessage='Gateway Environment edited successfully'
-                    />
+                    intl.formatMessage({
+                        id: 'GatewayEnvironments.AddEditGWEnvironment.form.info.edit.successful',
+                        defaultMessage: 'Gateway Environment edited successfully'
+                    })
                 );
             } else {
                 return (
-                    <FormattedMessage
-                        id='GatewayEnvironments.AddEditGWEnvironment.form.info.add.successful'
-                        defaultMessage='Gateway Environment added successfully'
-                    />
+                    intl.formatMessage({
+                        id: 'GatewayEnvironments.AddEditGWEnvironment.form.info.add.successful',
+                        defaultMessage: 'Gateway Environment added successfully'
+                    })
                 );
             }
         }).catch((error) => {
@@ -356,7 +356,11 @@ function AddEditGWEnvironment(props) {
                     )}
                     fullWidth
                     error={hasErrors('name', name)}
-                    helperText={hasErrors('name', name) || 'Name of the Gateway Environment'}
+                    helperText={hasErrors('name', name) || 
+                        <FormattedMessage
+                            id='GatewayEnvironments.AddEditGWEnvironment.form.name.help'
+                            defaultMessage='Name of the Gateway Environment'
+                        />}
                     variant='outlined'
                     disabled={editMode}
                 />
@@ -388,7 +392,10 @@ function AddEditGWEnvironment(props) {
                     name='description'
                     value={description}
                     onChange={onChange}
-                    label='Description'
+                    label={<FormattedMessage
+                        id='GatewayEnvironments.AddEditGWEnvironment.form.description.label'
+                        defaultMessage='Description'
+                    />}
                     fullWidth
                     multiline
                     helperText={(
