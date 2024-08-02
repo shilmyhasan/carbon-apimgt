@@ -124,7 +124,7 @@ public class APIMgtLatencyStatsHandler extends AbstractHandler {
     }
 
     /**
-     * This method iterate through openAPI paths and convert header parameter names to lowercase for each operation
+     * This method iterate through openAPI paths and convert header parameter names to lowercase for each operation.
      *
      * @param openAPI openAPI object
      */
@@ -157,8 +157,8 @@ public class APIMgtLatencyStatsHandler extends AbstractHandler {
         List<Parameter> modifiedHeaderParameters = new ArrayList<>();
 
         for (Parameter param : parameters) {
-            if (param.getIn().equalsIgnoreCase("header")) {
-                if (!param.getName().equalsIgnoreCase("Content-Type")) {
+            if ("header".equalsIgnoreCase(param.getIn())) {
+                if (!"Content-Type".equalsIgnoreCase(param.getName())) {
                     headerParameters.add(param);
                 }
             } else {
@@ -167,7 +167,7 @@ public class APIMgtLatencyStatsHandler extends AbstractHandler {
         }
 
         for (Parameter param : headerParameters) {
-            modifiedHeaderParameters.add(APIMgtLatencyStatsHandler.replaceLowerCaseHeaderName(param));
+            modifiedHeaderParameters.add(replaceLowerCaseHeaderName(param));
         }
 
         params.addAll(modifiedHeaderParameters);
