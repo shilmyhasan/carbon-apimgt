@@ -131,5 +131,4 @@ public class APIMgtLatencyStatsHandlerTest {
         Assert.assertTrue(requestTime <= System.currentTimeMillis());
         Assert.assertEquals(synCtx.getProperty(APIMgtGatewayConstants.OPEN_API_STRING), swaggerValue);
     }
-
 }
