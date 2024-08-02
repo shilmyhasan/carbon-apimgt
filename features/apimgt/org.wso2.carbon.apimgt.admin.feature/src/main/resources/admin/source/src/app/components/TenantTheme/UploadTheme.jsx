@@ -256,7 +256,11 @@ function UploadTheme() {
                                 href={Configurations.app.docUrl
         + 'develop/customizations/customizing-the-developer-portal/overriding-developer-portal-theme/#tenant-theming'}
                             >
-                                API Manager theme format
+                                {' '}
+                                <FormattedMessage
+                                    id='TenantTheme.Upload.Theme.info.message.link'
+                                    defaultMessage='API Manager theme format'
+                                />
                             </Link>
                         </Typography>
                     </Grid>
