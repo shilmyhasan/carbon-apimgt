@@ -20,7 +20,7 @@ import React, { useReducer, useEffect, useState } from 'react';
 import API from 'AppData/api';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { makeStyles } from '@material-ui/core/styles';
 import FormDialogBase from 'AppComponents/AdminPages/Addons/FormDialogBase';
 import Alert from 'AppComponents/Shared/Alert';
@@ -55,6 +55,7 @@ function reducer(state, { field, value }) {
  */
 function AddEdit(props) {
     const classes = useStyles();
+    const intl = useIntl();
     const {
         updateList, dataRow, icon, triggerButtonText, title,
     } = props;
@@ -169,7 +170,10 @@ function AddEdit(props) {
     return (
         <FormDialogBase
             title={title}
-            saveButtonText='Save'
+            saveButtonText={intl.formatMessage({
+                id: 'AdminPages.ApiCategories.AddEdit.form.save.btn',
+                defaultMessage: 'Save',
+            })}
             icon={icon}
             triggerButtonText={triggerButtonText}
             formSaveCallback={formSaveCallback}
@@ -189,7 +193,11 @@ function AddEdit(props) {
                 )}
                 fullWidth
                 error={hasErrors('name', name)}
-                helperText={hasErrors('name', name) || 'Name of the API category'}
+                helperText={hasErrors('name', name)
+                    || intl.formatMessage({
+                        id: 'AdminPages.ApiCategories.AddEdit.form.name.helper.text',
+                        defaultMessage: 'Name of the API category',
+                    })}
                 variant='outlined'
                 disabled={editMode}
             />
@@ -198,10 +206,16 @@ function AddEdit(props) {
                 name='description'
                 value={description}
                 onChange={onChange}
-                label='Description'
+                label={intl.formatMessage({
+                    id: 'AdminPages.ApiCategories.AddEdit.form.description',
+                    defaultMessage: 'Description',
+                })}
                 fullWidth
                 multiline
-                helperText='Description of the API category'
+                helperText={intl.formatMessage({
+                    id: 'AdminPages.ApiCategories.AddEdit.form.description.helper.text',
+                    defaultMessage: 'Description of the API category',
+                })}
                 variant='outlined'
             />
         </FormDialogBase>
