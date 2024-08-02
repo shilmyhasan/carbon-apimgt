@@ -36,6 +36,8 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
     @Activate protected void activate(ComponentContext ctxt) {
         log.info("Activating PersistenceManagerComponent ");
+        boolean isDetailedErrorResponsesEnabled = Boolean.parseBoolean(System.getProperty("detailedErrorResponses"));
+        ServiceReferenceHolder.getInstance().setIsDetailedErrorResponses(isDetailedErrorResponsesEnabled);
     }
 
     @Deactivate protected void deactivate(ComponentContext context) {

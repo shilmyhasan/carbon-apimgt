@@ -1627,20 +1627,35 @@ public class PublisherCommonUtils {
                     ExceptionCodes.DOCUMENT_NAME_ILLEGAL_CHARACTERS);
         }
         if (documentDto.getType() == null) {
-            throw new APIManagementException("Documentation type cannot be empty",
-                    ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            String errorMessage = "Documentation type cannot be empty";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION, errorMessage));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            }
         }
         if (documentDto.getType() == DocumentDTO.TypeEnum.OTHER && StringUtils
                 .isBlank(documentDto.getOtherTypeName())) {
             //check otherTypeName for not null if doc type is OTHER
-            throw new APIManagementException("otherTypeName cannot be empty if type is OTHER.",
-                    ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            String errorMessage = "otherTypeName cannot be empty if type is OTHER.";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION, errorMessage));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            }
         }
         String sourceUrl = documentDto.getSourceUrl();
         if (documentDto.getSourceType() == DocumentDTO.SourceTypeEnum.URL && (
                 org.apache.commons.lang3.StringUtils.isBlank(sourceUrl) || !RestApiCommonUtil.isURL(sourceUrl))) {
-            throw new APIManagementException("Invalid document sourceUrl Format",
-                    ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            String errorMessage = "Invalid document sourceUrl Format";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION, errorMessage));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            }
         }
 
         if (apiProvider.isDocumentationExist(apiId, documentName, organization)) {

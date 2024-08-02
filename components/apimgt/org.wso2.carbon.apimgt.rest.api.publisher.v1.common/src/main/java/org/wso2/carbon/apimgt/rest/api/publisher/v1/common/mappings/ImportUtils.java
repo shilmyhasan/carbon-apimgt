@@ -2524,7 +2524,11 @@ public class ImportUtils {
                                     importedApiProduct.getId().getVersion());
                         }
                     } else {
-                        throw new APIManagementException(e);
+                        if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                            throw e;
+                        } else {
+                            throw new APIManagementException(e);
+                        }
                     }
                 }
 

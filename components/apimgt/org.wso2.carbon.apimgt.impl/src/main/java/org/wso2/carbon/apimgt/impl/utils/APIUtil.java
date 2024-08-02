@@ -8818,7 +8818,13 @@ public final class APIUtil {
             }
             return endpointSecurityMap;
         } catch (ParseException e) {
-            throw new APIManagementException("Error while parsing Endpoint Config json", e);
+            String errorMessage = "Error while parsing Endpoint Config json";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage, e,
+                        ExceptionCodes.ERROR_PARSING_ENDPOINT_CONFIG);
+            } else {
+                throw new APIManagementException(errorMessage, e);
+            }
         }
     }
 

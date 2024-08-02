@@ -658,6 +658,39 @@ public enum ExceptionCodes implements ErrorHandler {
     UNSUPPORTED_AND_ALLOWED_LIFECYCLE_ACTIONS(903234, "Unsupported state change action", 400,
             "Lifecycle state change action %s is not allowed for this API. Allowed actions are %s"),
 
+    NO_CORRESPONDING_RESOURCE_FOUND_IN_API(903235, "No corresponding resource found in API", 400,
+            "API with id %s does not have a resource %s with http method %s"),
+
+    API_PRODUCT_CONTEXT_MALFORMED_EXCEPTION(903236, "The API product context is malformed.",
+            400, "'%s'"),
+
+    ERROR_PARSING_MONETIZATION_PROPERTIES(903237, "Error when parsing monetization properties",
+            400, "Error when parsing monetization properties"),
+
+    API_NAME_CANNOT_BE_NULL(903238, "API name is required", 400,
+            "API name is required and cannot be null"),
+
+    API_NAME_ILLEGAL_CHARACTERS(903239, "API name contains illegal characters", 400,
+            "API name %s contains one or more illegal characters from (%s)"),
+
+    API_VERSION_CANNOT_BE_NULL(903240, "API version is required", 400,
+            "API version is required and cannot be null"),
+
+    API_VERSION_ILLEGAL_CHARACTERS(903241, "API version contains illegal characters", 400,
+            "API version %s contains one or more illegal characters from (%s)"),
+
+    UNSUPPORTED_CONTEXT(903242, "Unsupported context", 400,
+            "Unsupported context %s"),
+
+    ERROR_PARSING_ENDPOINT_CONFIG(903243, "Error when parsing endpoint configuration",
+            400, "Error when parsing endpoint configuration"),
+
+    NOT_IN_OPEN_API_FORMAT(903244, "Not in Open API format",
+            400, "The API definition is not in Open API format"),
+
+    PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION(900700, "Parameter value missing", 400,
+            "Some of the mandatory parameter values were missing. %s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),

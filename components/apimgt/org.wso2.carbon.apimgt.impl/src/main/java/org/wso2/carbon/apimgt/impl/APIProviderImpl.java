@@ -4493,9 +4493,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     uriTemplate.setId(templateMap.get(key).getId());
 
                 } else {
-                    throw new APIManagementException("API with id " + apiProductResource.getApiId()
+                    String errorMessage = "API with id " + apiProductResource.getApiId()
                             + " does not have a resource " + uriTemplate.getUriTemplate()
-                            + " with http method " + uriTemplate.getHTTPVerb());
+                            + " with http method " + uriTemplate.getHTTPVerb();
+                    if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                        throw new APIManagementException(errorMessage,
+                                ExceptionCodes.from(ExceptionCodes.NO_CORRESPONDING_RESOURCE_FOUND_IN_API,
+                                        apiProductResource.getApiId(), uriTemplate.getUriTemplate(),
+                                        uriTemplate.getHTTPVerb()));
+                    } else {
+                        throw new APIManagementException(errorMessage);
+                    }
                 }
             }
         }
@@ -4520,7 +4528,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     JSONObject jsonObj = (JSONObject) parser.parse(gson.toJson(newMonetizationProperties));
                     product.setMonetizationProperties(jsonObj);
                 } catch (ParseException e) {
-                    throw new APIManagementException("Error when parsing monetization properties ", e);
+                    String errorMessage = "Error when parsing monetization properties ";
+                    if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                        throw new APIManagementException(errorMessage, e,
+                                ExceptionCodes.ERROR_PARSING_MONETIZATION_PROPERTIES);
+                    } else {
+                        throw new APIManagementException(errorMessage, e);
+                    }
                 }
             }
         }
@@ -4593,18 +4607,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     private void validateApiProductInfo(APIProduct product) throws APIManagementException {
         String apiName = product.getId().getName();
         if (apiName == null) {
-            handleException("API Name is required.");
+            String errorMessage = "API Name is required.";
+            APIUtil.handleException(errorMessage, ExceptionCodes.API_NAME_CANNOT_BE_NULL);
         } else if (containsIllegals(apiName)) {
-            handleException("API Name contains one or more illegal characters  " +
-                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )");
+            String errorMessage = "API Name contains one or more illegal characters  " + "( "
+                    + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
+            APIUtil.handleException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.API_NAME_ILLEGAL_CHARACTERS, apiName,
+                            APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA));
         }
         String apiVersion = product.getId().getVersion();
 
         if (apiVersion == null) {
-            handleException("API Version is required.");
+            String errorMessage = "API Version is required.";
+            APIUtil.handleException(errorMessage, ExceptionCodes.API_VERSION_CANNOT_BE_NULL);
         } else if (containsIllegals(apiVersion)) {
-            handleException("API Version contains one or more illegal characters  " +
-                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )");
+            String errorMessage = "API Version contains one or more illegal characters  " +
+                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
+            APIUtil.handleException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.API_VERSION_ILLEGAL_CHARACTERS, apiVersion,
+                            APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA));
         }
 
         if (!hasValidLength(apiName, APIConstants.MAX_LENGTH_API_NAME)
@@ -4629,9 +4651,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         //Validate if the API Product has an unsupported context
         String invalidContext = "/" + APIConstants.VERSION_PLACEHOLDER;
         if (invalidContext.equals(contextTemplate)) {
-            throw new APIManagementException(
-                    "Cannot add API Product : " + product.getId() + " with unsupported context : "
-                            + contextTemplate);
+            String errorMessage = "Cannot add API Product : " + product.getId() + " with unsupported context : "
+                    + contextTemplate;
+            APIUtil.handleException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.UNSUPPORTED_CONTEXT, contextTemplate));
         }
     }
 
@@ -4692,7 +4715,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     new Organization(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()),
                     publisherAPIProduct);
         } catch (APIPersistenceException e) {
-            throw new APIManagementException("Error while creating API product ");
+            String errorMessage = "Error while creating API product ";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())
+                    && e.getErrorHandler().getErrorCode()
+                    == ExceptionCodes.API_PRODUCT_CONTEXT_MALFORMED_EXCEPTION.getErrorCode()) {
+                throw new APIManagementException(errorMessage + apiProduct.getId().getName(), e);
+            } else {
+                throw new APIManagementException(errorMessage);
+            }
         }
     }
 

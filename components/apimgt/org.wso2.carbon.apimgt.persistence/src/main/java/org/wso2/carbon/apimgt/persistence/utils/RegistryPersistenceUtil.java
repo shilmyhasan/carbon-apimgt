@@ -29,6 +29,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APICategory;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
@@ -1503,15 +1504,29 @@ public class RegistryPersistenceUtil {
             if (APIConstants.SUPER_TENANT_DOMAIN.equals(tenantDomain)) {
                 String invalidContext = File.separator + APIConstants.VERSION_PLACEHOLDER;
                 if (invalidContext.equals(apiProduct.getContextTemplate())) {
-                    throw new APIManagementException("API : " + apiProduct.getId() + " has an unsupported context : " +
-                            apiProduct.getContextTemplate());
+                    String errorMessage = "API : " + apiProduct.getId() + " has an unsupported context : "
+                            + apiProduct.getContextTemplate();
+                    if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                        throw new APIManagementException(errorMessage,
+                                ExceptionCodes.from(ExceptionCodes.API_PRODUCT_CONTEXT_MALFORMED_EXCEPTION,
+                                        errorMessage));
+                    } else {
+                        throw new APIManagementException(errorMessage);
+                    }
                 }
             } else {
                 String invalidContext =
                         APIConstants.TENANT_PREFIX + tenantDomain + File.separator + APIConstants.VERSION_PLACEHOLDER;
                 if (invalidContext.equals(apiProduct.getContextTemplate())) {
-                    throw new APIManagementException("API : " + apiProduct.getId() + " has an unsupported context : " +
-                            apiProduct.getContextTemplate());
+                    String errorMessage = "API : " + apiProduct.getId() + " has an unsupported context : " +
+                            apiProduct.getContextTemplate();
+                    if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                        throw new APIManagementException(errorMessage,
+                                ExceptionCodes.from(ExceptionCodes.API_PRODUCT_CONTEXT_MALFORMED_EXCEPTION,
+                                        errorMessage));
+                    } else {
+                        throw new APIManagementException(errorMessage);
+                    }
                 }
             }
 
