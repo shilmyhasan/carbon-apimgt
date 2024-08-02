@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.apimgt.gateway.handlers.security;
 
+import io.swagger.parser.OpenAPIParser;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.parser.core.models.ParseOptions;
 import com.google.gson.GsonBuilder;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -213,6 +216,11 @@ public class TestSchemaValidator {
                 getResource("swaggerEntry/swagger.json").getFile());
         String swaggerValue = FileUtils.readFileToString(swaggerJsonFile);
 
+        OpenAPIParser parser = new OpenAPIParser();
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolveFully(true);
+        OpenAPI openAPI = parser.readLocation(swaggerValue, null, parseOptions).getOpenAPI();
+
         Mockito.doReturn(env).when(messageContext).getEnvelope();
         // Mockito.when()
 
@@ -237,6 +245,8 @@ public class TestSchemaValidator {
                 thenReturn(httpMethod);
         Mockito.when((String) axis2MsgContext.getProperty(APIMgtGatewayConstants.HTTP_REQUEST_METHOD)).
                 thenReturn(httpMethod);
+        Mockito.when((OpenAPI) messageContext.getProperty(APIMgtGatewayConstants.OPEN_API_OBJECT))
+                .thenReturn(openAPI);
         Mockito.when((String) messageContext.getProperty(APIMgtGatewayConstants.OPEN_API_STRING))
                 .thenReturn(swaggerValue);
     }
