@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.wso2.carbon.apimgt</groupId>
         <artifactId>apimgt</artifactId>
-        <version>6.6.163.133-SNAPSHOT</version>
+        <version>6.6.163.152-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -123,8 +123,8 @@
                             org.slf4j.*,
                             io.opentracing.*; version="${jaeger.client.version}",
                             io.opentracing.*; version="${jaeger.client.version}",
-                            zipkin2.reporter.*; version="${zipkin.reporter.version}",
-                            zipkin2.reporter.okhttp3.*; version="${zipkin.sender.okhttp3.version}",
+                            zipkin2.reporter.*; version="${zipkin.reporter.version.range}",
+                            zipkin2.reporter.okhttp3.*; version="${zipkin.reporter.version.range}",
                             org.apache.commons.logging.*; version="${import.package.version.commons.logging}",
                             org.wso2.carbon.apimgt.impl.*; version="${carbon.apimgt.imp.pkg.version}",
                             org.wso2.carbon.utils.*,
@@ -134,6 +134,7 @@
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
+                            zipkin2.reporter.*; version="${zipkin.reporter.version}",
                             !org.wso2.carbon.apimgt.tracing.internal.*,
                             org.wso2.carbon.apimgt.tracing.*;version="${carbon.apimgt.version}"
                         </Export-Package>

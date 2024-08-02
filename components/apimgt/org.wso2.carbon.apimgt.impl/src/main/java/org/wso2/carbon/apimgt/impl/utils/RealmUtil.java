@@ -23,7 +23,7 @@ import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 
 /**
- * This Class used as a utility for Realm  related services.
+ * This class used as a utility for Realm  related services.
  */
 public class RealmUtil {
 

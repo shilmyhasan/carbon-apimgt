@@ -46,6 +46,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -213,13 +215,15 @@ public class RestApiPublisherUtils {
             APIIdentifier apiIdentifier = APIMappingUtil
                     .getAPIIdentifierFromUUID(apiId, tenantDomain);
 
-            RestApiUtil.transferFile(inputStream, filename, docFile.getAbsolutePath());
-            docInputStream = new FileInputStream(docFile.getAbsolutePath() + File.separator + filename);
+            Path resolvedPath = resolveFilePath(docFile.getAbsolutePath(), filename);
+
+            RestApiUtil.transferFile(inputStream, resolvedPath.getFileName().toString(), resolvedPath.getParent().toString());
+            docInputStream = new FileInputStream(resolvedPath.toString());
             String mediaType = fileDetails.getHeader(RestApiConstants.HEADER_CONTENT_TYPE);
             mediaType = mediaType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : mediaType;
             apiProvider.addFileToDocumentation(apiIdentifier, documentation, filename, docInputStream, mediaType);
             apiProvider.updateDocumentation(apiIdentifier, documentation);
-            docFile.deleteOnExit();
+            docFile.delete();
         } catch (FileNotFoundException e) {
             RestApiUtil.handleInternalServerError("Unable to read the file from path ", e, log);
         } finally {
@@ -299,13 +303,15 @@ public class RestApiPublisherUtils {
             APIProductIdentifier productIdentifier = APIMappingUtil
                     .getAPIProductIdentifierFromUUID(productId, tenantDomain);
 
-            RestApiUtil.transferFile(inputStream, filename, docFile.getAbsolutePath());
-            docInputStream = new FileInputStream(docFile.getAbsolutePath() + File.separator + filename);
+            Path resolvedPath = resolveFilePath(docFile.getAbsolutePath(), filename);
+
+            RestApiUtil.transferFile(inputStream, resolvedPath.getFileName().toString(), resolvedPath.getParent().toString());
+            docInputStream = new FileInputStream(resolvedPath.toString());
             String mediaType = fileDetails.getHeader(RestApiConstants.HEADER_CONTENT_TYPE);
             mediaType = mediaType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : mediaType;
             apiProvider.addFileToProductDocumentation(productIdentifier, documentation, filename, docInputStream, mediaType);
             apiProvider.updateDocumentation(productIdentifier, documentation);
-            docFile.deleteOnExit();
+            docFile.delete();
         } catch (FileNotFoundException e) {
             RestApiUtil.handleInternalServerError("Unable to read the file from path ", e, log);
         } finally {
@@ -345,5 +351,49 @@ public class RestApiPublisherUtils {
                 + "{\"description\":\"SOAPAction header for soap 1.1\",\"name\":\"SOAPAction\",\"type\":\"string\","
                 + "\"required\":false,\"in\":\"header\"}],\"responses\":{\"200\":{\"description\":\"OK\"}}," +
                 "\"security\":[{\"default\":[]}],\"consumes\":[\"text/xml\",\"application/soap+xml\"]}}}";
+    }
+
+    /**
+     * Resolves an untrusted user-specified path against the base directory.
+     * Paths that try to escape the base directory are rejected.
+     * @param baseDirPathString the absolute path of the base directory that all
+     *                     user-specified paths should be within
+     * @param userPathString  the untrusted path provided by the user
+     * @return Resolved Path
+     * @throws APIManagementException if resolution fails.
+     */
+    private static Path resolveFilePath(final String baseDirPathString,
+                                        final String userPathString) throws APIManagementException {
+        Path baseDirPath = Paths.get(baseDirPathString);
+        Path userPath = Paths.get(userPathString);
+        if (!baseDirPath.isAbsolute()) {
+            throw new APIManagementException("Invalid base path provided." +
+                    " Base path must be absolute. Base Path: " + baseDirPath);
+        }
+
+        if (userPath.isAbsolute()){
+            throw new APIManagementException("Invalid user path provided." +
+                    " User path should not be absolute. User Path: " + userPath);
+        }
+
+        /*
+         * Combines the absolute base directory path and the user-specified relative path.
+         * Then, normalizes the path to handle any ".." elements in the userPath.
+         * For example, if the baseDirPath is "/foo/bar/baz" and userPath is "../attack",
+         * the resulting resolvedPath will be "/foo/bar/attack".
+         */
+        final Path resolvedPath = baseDirPath.resolve(userPath).normalize();
+
+        /*
+         * Verifies that the resolved path is still within the expected base directory.
+         * If the resolved path does not start with the base directory path,
+         * it indicates an attempt to escape the intended directory structure.
+         */
+        if (!resolvedPath.startsWith(baseDirPath)) {
+            throw new APIManagementException("Error resolving path. " +
+                    "The user path attempts to escape the base directory.");
+        }
+
+        return resolvedPath;
     }
 }

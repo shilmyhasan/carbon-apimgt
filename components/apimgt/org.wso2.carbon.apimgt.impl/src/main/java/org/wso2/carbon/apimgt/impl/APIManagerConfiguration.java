@@ -102,6 +102,8 @@ public class APIManagerConfiguration {
     private static Properties realtimeNotifierProperties;
     private static Properties persistentNotifierProperties;
     private static String tokenRevocationClassName;
+    private boolean renewWithoutRevokingExistingEnabled;
+    private ArrayList<String> allowedGrantTypes = new ArrayList<>();
 
     public static Properties getRealtimeTokenRevocationNotifierProperties() {
         return realtimeNotifierProperties;
@@ -433,6 +435,8 @@ public class APIManagerConfiguration {
                 setRecommendationConfigurations(element);
             } else if (APIConstants.GlobalCacheInvalidation.GLOBAL_CACHE_INVALIDATION.equals(localName)) {
                 setGlobalCacheInvalidationConfiguration(element);
+            } else if (APIConstants.RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_CONFIG.equals(localName)){
+                configureTokenRenewalWithoutRevokingExisting(element);
             }
             readChildElements(element, nameStack);
             nameStack.pop();
@@ -1421,5 +1425,39 @@ public class APIManagerConfiguration {
     public JWTConfigurationDto getJwtConfigurationDto() {
 
         return jwtConfigurationDto;
+    }
+
+    public void configureTokenRenewalWithoutRevokingExisting(OMElement omElement) {
+
+        OMElement tokenEnableElement = omElement.getFirstChildWithName(new QName(APIConstants
+                        .RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_ENABLE_CONFIG));
+        renewWithoutRevokingExistingEnabled = Boolean.parseBoolean(tokenEnableElement.getText());
+        OMElement allowedGrantTypesElement =
+                omElement.getFirstChildWithName(new QName(APIConstants
+                        .RENEW_TOKEN_WITHOUT_REVOKING_EXISTING_ALLOWED_GRANT_TYPES_CONFIG));
+        if (renewWithoutRevokingExistingEnabled) {
+            if (allowedGrantTypesElement != null) {
+                Iterator<OMElement> childElements = allowedGrantTypesElement.getChildElements();
+                while (childElements.hasNext()) {
+                    OMElement childElement = childElements.next();
+                    String grant_type = childElement.getText();
+                    allowedGrantTypes.add(grant_type);
+                }
+            } else {
+                allowedGrantTypes.add(APIConstants.CLIENT_CREDENTIALS_GRANT_TYPE);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Allowed grant types for renewing token without revoking existing token: "
+                        + allowedGrantTypes);
+            }
+        }
+    }
+
+    public Boolean tokenRenewalWithoutRevokingExistingEnabled() {
+        return renewWithoutRevokingExistingEnabled;
+    }
+
+    public ArrayList<String> getAllowedGrantTypes() {
+        return allowedGrantTypes;
     }
 }

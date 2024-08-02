@@ -27,6 +27,8 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.model.Application;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.keymgt.JWTAccessTokenIssuerDTO;
 import org.wso2.carbon.apimgt.keymgt.util.APIMTokenIssuerUtil;
@@ -39,7 +41,9 @@ import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.authz.OAuthAuthzReqMessageContext;
 import org.wso2.carbon.identity.oauth2.token.OAuthTokenReqMessageContext;
 import org.wso2.carbon.identity.oauth2.token.OauthTokenIssuerImpl;
+import org.wso2.carbon.identity.oauth2.token.bindings.TokenBinding;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
+import org.wso2.carbon.registry.core.utils.UUIDGenerator;
 
 import java.text.ParseException;
 
@@ -100,6 +104,39 @@ public class APIMTokenIssuer extends OauthTokenIssuerImpl {
                 jwtAccessTokenIssuerDTO.setScopeList(scopes);
                 jwtAccessTokenIssuerDTO.setValidityPeriod(validityPeriod);
                 jwtAccessTokenIssuerDTO.setTokenReqMessageContext(tokReqMsgCtx);
+
+                /**
+                 * If OAuth.JWT.RenewTokenWithoutRevokingExisting is enabled from configurations, and current token
+                 * binding is null,then we will add a new token binding (request binding) to the token binding with
+                 * a value of a random UUID.
+                 * The purpose of this new token binding type is to add a random value to the token binding so that
+                 * "User, Application, Scope, Binding" combination will be unique for each token.
+                 * Previously, if a token issue request come for the same combination of "User, Application, Scope, Binding",
+                 * the existing JWT token will be revoked and issue a new token. but with this way, we can issue new tokens
+                 * without revoking the old ones.
+                 *
+                 * Add following configuration to deployment.toml file to enable this feature.
+                 *     [oauth.jwt.renew_token_without_revoking_existing]
+                 *     enable = true
+                 *
+                 * By default, the allowed grant type for this feature is "client_credentials". If you need to enable for
+                 * other grant types, add the following configuration to deployment.toml file.
+                 *     [oauth.jwt.renew_token_without_revoking_existing]
+                 *     enable = true
+                 *     allowed_grant_types = ["client_credentials","password", ...]
+                 */
+                APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+
+                if (apiManagerConfiguration.tokenRenewalWithoutRevokingExistingEnabled() && tokReqMsgCtx.getTokenBinding() == null) {
+                    if (apiManagerConfiguration.getAllowedGrantTypes()
+                            .contains(tokReqMsgCtx.getOauth2AccessTokenReqDTO().getGrantType())) {
+                        String tokenBindingValue = UUIDGenerator.generateUUID();
+                        tokReqMsgCtx.setTokenBinding(
+                                new TokenBinding(APIConstants.REQUEST_BINDING_TYPE, OAuth2Util.getTokenBindingReference(tokenBindingValue),
+                                        tokenBindingValue));
+                    }
+                }
 
                 if (tokReqMsgCtx.getTokenBinding() != null && StringUtils
                         .isNotBlank(tokReqMsgCtx.getTokenBinding().getBindingReference()) &&

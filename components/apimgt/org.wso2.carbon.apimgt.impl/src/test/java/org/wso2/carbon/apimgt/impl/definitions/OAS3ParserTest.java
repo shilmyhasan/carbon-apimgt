@@ -1,8 +1,10 @@
 package org.wso2.carbon.apimgt.impl.definitions;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -186,12 +188,14 @@ public class OAS3ParserTest extends OASTestBase {
         Assert.assertThat(openAPI.getSecurity(), hasItems(secReq));
     }
 
-    // Test case for an API with clientCredentials security scheme
-    @Test
-    public void testProcessOtherSchemeScopesWithClientCredentialsScheme() throws Exception {
+    /**
+     * Test case for an API with clientCredentials security scheme
+     *
+     */
+    @Test public void testProcessOtherSchemeScopesWithClientCredentialsScheme() throws Exception {
+        String securitySchemeFile = "oas3_client_credential_security_scheme.yaml";
         //Read the API definition file
-        String relativePath = "definitions" + File.separator + "oas3" + File.separator
-                + "oas3_client_credential_security_scheme.yaml";
+        String relativePath = "definitions" + File.separator + "oas3" + File.separator + securitySchemeFile;
         String swaggerContent = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath),
                 "UTF-8");
         swaggerContent = oas3Parser.processOtherSchemeScopes(swaggerContent);
@@ -210,4 +214,34 @@ public class OAS3ParserTest extends OASTestBase {
         Assert.assertNull(defaultSecScheme.getFlows().getClientCredentials().getScopes());
     }
 
+    /**
+     * Test case to cover scenario with OpenAPI v3 definition with empty description in response
+     * @throws Exception
+     */
+    @Test
+    public void testOpenApi3WithEmptyDescriptionsInResponseObjects() throws Exception {
+        String relativePath = "definitions" + File.separator + "oas3" + File.separator + "oas3_uri_template.json";
+        String openAPISpec300 =
+                IOUtils.toString(getClass().getClassLoader().getResourceAsStream(relativePath), "UTF-8");
+        OpenAPI openAPI = oas3Parser.getOpenAPI(openAPISpec300);
+        Paths paths = openAPI.getPaths();
+        for (String pathKey : paths.keySet()) {
+            Map<PathItem.HttpMethod, Operation> operationsMap = paths.get(pathKey).readOperationsMap();
+            for (Map.Entry<PathItem.HttpMethod, Operation> entry : operationsMap.entrySet()) {
+                Operation operation = entry.getValue();
+                for (String responseEntry : operation.getResponses().keySet()) {
+                    String description = operation.getResponses().get(responseEntry).getDescription();
+                    Assert.assertEquals("", description);
+                }
+            }
+        }
+
+        Components components = openAPI.getComponents();
+        if (components != null && components.getResponses() != null) {
+            for (String responseEntry : components.getResponses().keySet()) {
+                String description = components.getResponses().get(responseEntry).getDescription();
+                Assert.assertEquals("", description);
+            }
+        }
+    }
 }
