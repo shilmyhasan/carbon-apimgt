@@ -176,10 +176,10 @@ function UploadTheme() {
             .then(() => {
                 setIsUploadUnsuccessful(false);
                 Alert.success(
-                    <FormattedMessage
-                        id='TenantTheme.Upload.Theme.upload.successful'
-                        defaultMessage='Theme uploaded successfully'
-                    />,
+                    intl.formatMessage({
+                        id: 'TenantTheme.Upload.Theme.upload.successful',
+                        defaultMessage: 'Theme uploaded successfully',
+                    }),
                 );
                 setThemeFile([]);
             })
