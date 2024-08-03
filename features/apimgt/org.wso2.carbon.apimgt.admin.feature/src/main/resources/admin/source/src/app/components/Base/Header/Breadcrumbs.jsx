@@ -38,19 +38,19 @@ function getPageDetails(routeMenuMapping, currentPath, pageDetails = []) {
             if (typeof routeDetail.children !== 'undefined') {
                 const result = getPageDetails(routeDetail.children, currentPath, pageDetails);
                 if (result !== '') {
-                    result.unshift({ id: routeDetail.id, displayText: routeDetail.displayText, path: routeDetail.path });
+                    result.unshift({ id: routeDetail.displayText, path: routeDetail.path });
                     return result;
                 }
             } else if (typeof routeDetail.addEditPageDetails !== 'undefined') {
                 const result = getPageDetails(routeDetail.addEditPageDetails, currentPath, pageDetails);
                 if (result !== '') {
-                    result.unshift({ id: routeDetail.id, displayText: routeDetail.displayText, path: routeDetail.path });
+                    result.unshift({ id: routeDetail.displayText, path: routeDetail.path });
                     return result;
                 }
             }
 
             if (routeDetail.path && currentPath.match(routeDetail.path)) {
-                return [{ id: routeDetail.id, displayText: routeDetail.displayText, path: currentPath }];
+                return [{ id: routeDetail.displayText, path: currentPath }];
             }
         }
     }
@@ -73,12 +73,12 @@ function Breadcrumbs(props) {
             if (page.path) {
                 breadcrumbElements.push(
                     <Link component={RouterLink} color='inherit' to={page.path}>
-                        {page.displayText}
+                        {page.id}
                     </Link>,
                 );
             } else {
                 breadcrumbElements.push(
-                    <Typography color='textPrimary'>{page.displayText}</Typography>,
+                    <Typography color='textPrimary'>{page.id}</Typography>,
                 );
             }
         });

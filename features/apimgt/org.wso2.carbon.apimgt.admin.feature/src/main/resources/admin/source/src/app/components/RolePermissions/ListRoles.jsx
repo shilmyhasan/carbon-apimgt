@@ -40,16 +40,20 @@ const headCells = [
         id: 'role',
         numeric: false,
         disablePadding: false,
-        label: <FormattedMessage id='RolePermissions.ListRoles.table.column.role'
-            defaultMessage='Roles' />,
+        label: <FormattedMessage
+            id='RolePermissions.ListRoles.table.column.role'
+            defaultMessage='Roles'
+        />,
         enableSort: true,
     },
     {
         id: 'permissions',
         numeric: false,
         disablePadding: false,
-        label: <FormattedMessage id='RolePermissions.ListRoles.table.column.scope.assignments'
-            defaultMessage='Scope Assignments' />,
+        label: <FormattedMessage
+            id='RolePermissions.ListRoles.table.column.scope.assignments'
+            defaultMessage='Scope Assignments'
+        />,
     },
 ];
 
@@ -272,7 +276,8 @@ export default function ListRoles() {
                 id: 'RolePermissions.ListRoles.title.role.permissions',
                 defaultMessage: 'Scope Assignments',
             })}
-            pageDescription={pageDesc}>
+            pageDescription={pageDesc}
+        >
             <ListAddOns>
                 <Grid item>
                     <Button

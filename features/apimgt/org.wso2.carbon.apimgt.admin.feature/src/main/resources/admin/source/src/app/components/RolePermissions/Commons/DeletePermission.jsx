@@ -63,8 +63,8 @@ export default function DeletePermission(props) {
                                 defaultMessage: 'Scope Assignments {role} deleted successfully',
                             },
                             {
-                                role: <b>{role}</b>
-                            }
+                                role: <b>{role}</b>,
+                            },
                         )}
                     </span>,
                 );
@@ -109,8 +109,8 @@ export default function DeletePermission(props) {
                             defaultMessage: 'Delete scope assignments of {role} ?',
                         },
                         {
-                            role: <Typography display='inline' variant='subtitle2'>{role}</Typography>
-                        }
+                            role: <Typography display='inline' variant='subtitle2'>{role}</Typography>,
+                        },
                     )}
                 </DialogTitle>
                 <DialogContent dividers>
@@ -122,16 +122,16 @@ export default function DeletePermission(props) {
                                     + '{role} ?',
                             },
                             {
-                                role: <b>{role}</b>
-                            }
+                                role: <b>{role}</b>,
+                            },
                         )}
                     </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>
                         <FormattedMessage
-                                id='RolePermissions.ListRoles.scope.assignment.cancel.button'
-                                defaultMessage='Cancel'
+                            id='RolePermissions.ListRoles.scope.assignment.cancel.button'
+                            defaultMessage='Cancel'
                         />
                     </Button>
                     <Button

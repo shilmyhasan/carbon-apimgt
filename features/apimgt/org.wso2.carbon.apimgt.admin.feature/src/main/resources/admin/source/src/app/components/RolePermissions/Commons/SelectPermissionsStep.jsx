@@ -54,7 +54,7 @@ export default function SelectPermissionsStep(props) {
                     control={<Radio color='primary' />}
                     label={intl.formatMessage({
                         id: 'RolePermissions.Common.AddRoleWizard.add.role.alias.label',
-                        defaultMessage: 'Role alias'
+                        defaultMessage: 'Role alias',
                     })}
                 />
                 <Box width={400} display='inline' pl={7} pt={2} pb={2}>
@@ -77,9 +77,9 @@ export default function SelectPermissionsStep(props) {
                                     <>
                                         <FormattedMessage
                                             id='RolePermissions.Common.AddRoleWizard.selected.role'
-                                            defaultMessage="Role {role_value} will be mapped to the selected role"
+                                            defaultMessage='Role {role_value} will be mapped to the selected role'
                                             values={{
-                                                role_value: 
+                                                role_value: (
                                                     <Box
                                                         pl={0.5}
                                                         pr={0.5}
@@ -89,6 +89,7 @@ export default function SelectPermissionsStep(props) {
                                                     >
                                                         {role}
                                                     </Box>
+                                                ),
                                             }}
                                         />
                                     </>
@@ -97,7 +98,7 @@ export default function SelectPermissionsStep(props) {
                                 size='small'
                                 label={intl.formatMessage({
                                     id: 'RolePermissions.Common.AddRoleWizard.add.role.mapping.label',
-                                    defaultMessage: 'Mapping role'
+                                    defaultMessage: 'Mapping role',
                                 })}
                                 variant='outlined'
                                 inputProps={{
@@ -113,7 +114,7 @@ export default function SelectPermissionsStep(props) {
                     control={<Radio color='primary' />}
                     label={intl.formatMessage({
                         id: 'RolePermissions.Common.AddRoleWizard.add.role.custom.scope.assignments',
-                        defaultMessage: 'Custom scope assignments'
+                        defaultMessage: 'Custom scope assignments',
                     })}
                 />
                 <Box pl={7} pt={2}>

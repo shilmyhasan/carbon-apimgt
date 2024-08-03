@@ -35,7 +35,7 @@ function Delete(props) {
         dataRow, updateList,
     } = props;
     const intl = useIntl();
-    
+
     const formSaveCallback = () => {
         const policyId = dataRow.conditionId;
         const promiseAPICall = restApi
@@ -45,7 +45,7 @@ function Delete(props) {
                 return (
                     intl.formatMessage({
                         id: 'Throttling.Blacklist.Policy.policy.delete.success',
-                        defaultMessage: 'Deny Policy successfully deleted.'
+                        defaultMessage: 'Deny Policy successfully deleted.',
                     })
                 );
             })
@@ -65,11 +65,11 @@ function Delete(props) {
         <FormDialogBase
             title={intl.formatMessage({
                 id: 'Throttling.Blacklist.Policy.policy.delete.dialog.title',
-                defaultMessage: 'Delete Deny Policy?'
+                defaultMessage: 'Delete Deny Policy?',
             })}
             saveButtonText={intl.formatMessage({
                 id: 'Admin.components.form.delete.btn',
-                defaultMessage: 'Delete'
+                defaultMessage: 'Delete',
             })}
             icon={<DeleteForeverIcon />}
             formSaveCallback={formSaveCallback}

@@ -45,7 +45,7 @@ function Delete(props) {
                 return (
                     intl.formatMessage({
                         id: 'Throttling.Application.Policy.policy.delete.success',
-                        defaultMessage: 'Application Rate Limiting Policy successfully deleted.'
+                        defaultMessage: 'Application Rate Limiting Policy successfully deleted.',
                     })
                 );
             })
@@ -53,7 +53,7 @@ function Delete(props) {
                 return (
                     intl.formatMessage({
                         id: 'Throttling.Application.Policy.policy.delete.error',
-                        defaultMessage: 'Application Rate Limiting Policy could not be deleted.'
+                        defaultMessage: 'Application Rate Limiting Policy could not be deleted.',
                     })
                 );
             });
@@ -65,11 +65,11 @@ function Delete(props) {
         <FormDialogBase
             title={intl.formatMessage({
                 id: 'Throttling.Application.Policy.policy.dialog.delete.title',
-                defaultMessage: 'Delete Application Policy?'
+                defaultMessage: 'Delete Application Policy?',
             })}
             saveButtonText={intl.formatMessage({
                 id: 'Throttling.Application.Policy.policy.dialog.delete.btn',
-                defaultMessage: 'Delete'
+                defaultMessage: 'Delete',
             })}
             icon={<DeleteForeverIcon />}
             formSaveCallback={formSaveCallback}

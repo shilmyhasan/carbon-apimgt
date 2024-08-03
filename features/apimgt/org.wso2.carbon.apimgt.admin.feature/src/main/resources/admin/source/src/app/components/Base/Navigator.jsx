@@ -186,7 +186,12 @@ function Navigator(props) {
                         )}
                         {children && (
                             <React.Fragment key={id}>
-                                <NavigatorChildren navChildren={children} navId={id} navText={displayText} classes={classes} />
+                                <NavigatorChildren
+                                    navChildren={children}
+                                    navId={id}
+                                    navText={displayText}
+                                    classes={classes}
+                                />
                             </React.Fragment>
                         )}
 

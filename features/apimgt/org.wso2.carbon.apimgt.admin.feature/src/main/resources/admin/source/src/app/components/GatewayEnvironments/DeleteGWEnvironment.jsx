@@ -41,7 +41,7 @@ function Delete({ updateList, dataRow }) {
                 return (
                     intl.formatMessage({
                         id: 'AdminPages.Gateways.Delete.form.delete.successful',
-                        defaultMessage: 'Gateway Environment deleted successfully'
+                        defaultMessage: 'Gateway Environment deleted successfully',
                     })
                 );
             })

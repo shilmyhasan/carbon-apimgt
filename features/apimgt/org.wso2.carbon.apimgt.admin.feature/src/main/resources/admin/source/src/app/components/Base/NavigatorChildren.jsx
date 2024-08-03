@@ -37,7 +37,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 function NavigatorChildren(props) {
     const { isSuperTenant } = useAppContext();
     const [open, setOpen] = React.useState(true);
-    const { navChildren, navId, navText, classes } = props;
+    const { navChildren, navText, classes } = props;
     const handleClick = () => {
         setOpen(!open);
     };

@@ -274,7 +274,7 @@ function AddEdit(props) {
                     return (
                         intl.formatMessage({
                             id: 'Throttling.Application.Policy.policy.edit.success',
-                            defaultMessage: 'Application Rate Limiting Policy edited successfully.'
+                            defaultMessage: 'Application Rate Limiting Policy edited successfully.',
                         })
                     );
                 })
@@ -297,7 +297,7 @@ function AddEdit(props) {
                     return (
                         intl.formatMessage({
                             id: 'Throttling.Application.Policy.policy.add.success',
-                            defaultMessage: 'Application Rate Limiting Policy added successfully.'
+                            defaultMessage: 'Application Rate Limiting Policy added successfully.',
                         })
                     );
                 })

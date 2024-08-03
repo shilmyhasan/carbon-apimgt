@@ -86,11 +86,11 @@ export default function PermissionsSelector(props) {
                         {intl.formatMessage(
                             {
                                 id: 'RolePermissions.TreeView.PermissionsSelector.update.scope.success',
-                                defaultMessage: 'Update permissions for {role} successfully' ,
+                                defaultMessage: 'Update permissions for {role} successfully',
                             },
                             {
-                                role: <b>{role}</b>
-                            }
+                                role: <b>{role}</b>,
+                            },
                         )}
                     </span>,
                 );

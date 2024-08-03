@@ -35,7 +35,7 @@ function Delete(props) {
         dataRow, updateList,
     } = props;
     const intl = useIntl();
-    
+
     const formSaveCallback = () => {
         const policyId = dataRow[6];
         const promiseAPICall = restApi
@@ -45,7 +45,7 @@ function Delete(props) {
                 return (
                     intl.formatMessage({
                         id: 'Throttling.Subscription.Policy.policy.delete.success',
-                        defaultMessage: 'Subscription Rate Limiting Policy successfully deleted.'
+                        defaultMessage: 'Subscription Rate Limiting Policy successfully deleted.',
                     })
                 );
             })
@@ -53,7 +53,7 @@ function Delete(props) {
                 return (
                     intl.formatMessage({
                         id: 'Throttling.Subscription.Policy.policy.delete.error',
-                        defaultMessage: 'Subscription Rate Limiting Policy could not be deleted.'
+                        defaultMessage: 'Subscription Rate Limiting Policy could not be deleted.',
                     })
                 );
             });
@@ -65,11 +65,11 @@ function Delete(props) {
         <FormDialogBase
             title={intl.formatMessage({
                 id: 'Throttling.Subscription.Policy.policy.delete.title',
-                defaultMessage: 'Delete Subscription Policy?'
+                defaultMessage: 'Delete Subscription Policy?',
             })}
             saveButtonText={intl.formatMessage({
                 id: 'Throttling.Subscription.Policy.policy.delete.btn',
-                defaultMessage: 'Delete'
+                defaultMessage: 'Delete',
             })}
             icon={<DeleteForeverIcon />}
             formSaveCallback={formSaveCallback}

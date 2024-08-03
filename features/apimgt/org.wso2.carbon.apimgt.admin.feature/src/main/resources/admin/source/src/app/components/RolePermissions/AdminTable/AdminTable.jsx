@@ -114,18 +114,19 @@ export default function AdminTable(props) {
                         onChangePage={handleChangePage}
                         onChangeRowsPerPage={handleChangeRowsPerPage}
                         labelDisplayedRows={({ from, to, count }) => {
-                            if (count !== -1)
+                            if (count !== -1) {
                                 return intl.formatMessage({
                                     id: 'Role.permissions.Role.Permissions.Admin.Table.displayed.rows.range.label',
-                                    defaultMessage: '{from}-{to} of {count}'},
-                                    { from, to, count }
-                                );
+                                    defaultMessage: '{from}-{to} of {count}',
+                                },
+                                { from, to, count });
+                            }
                             return intl.formatMessage({
                                 id: 'Role.permissions.Role.Permissions.Admin.Table.displayed.rows.more.than.label',
-                                defaultMessage: 'more than {to}'},
-                                { to }
-                            )}
-                        }
+                                defaultMessage: 'more than {to}',
+                            },
+                            { to });
+                        }}
                         labelRowsPerPage={intl.formatMessage({
                             id: 'Role.permissions.Role.Permissions.Admin.Table.row.per.page.label',
                             defaultMessage: 'Rows per page:',

@@ -264,7 +264,7 @@ function AddEdit(props) {
                         intl.formatMessage({
                             id: 'Throttling.Custom.Policy.policy.edit.success',
                             defaultMessage: 'Custom Policy edited successfully',
-                        })
+                        }),
                     );
                     history.push('/throttling/custom');
                 })
@@ -289,7 +289,7 @@ function AddEdit(props) {
                     Alert.success(
                         intl.formatMessage({
                             id: 'Throttling.Custom.Policy.policy.add.success',
-                            defaultMessage: 'Custom Policy added successfully.'
+                            defaultMessage: 'Custom Policy added successfully.',
                         }),
                     );
                     history.push('/throttling/custom');

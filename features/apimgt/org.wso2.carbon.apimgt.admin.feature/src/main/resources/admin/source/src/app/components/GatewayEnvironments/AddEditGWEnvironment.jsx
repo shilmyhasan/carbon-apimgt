@@ -280,14 +280,14 @@ function AddEditGWEnvironment(props) {
                 return (
                     intl.formatMessage({
                         id: 'GatewayEnvironments.AddEditGWEnvironment.form.info.edit.successful',
-                        defaultMessage: 'Gateway Environment edited successfully'
+                        defaultMessage: 'Gateway Environment edited successfully',
                     })
                 );
             } else {
                 return (
                     intl.formatMessage({
                         id: 'GatewayEnvironments.AddEditGWEnvironment.form.info.add.successful',
-                        defaultMessage: 'Gateway Environment added successfully'
+                        defaultMessage: 'Gateway Environment added successfully',
                     })
                 );
             }
@@ -356,11 +356,12 @@ function AddEditGWEnvironment(props) {
                     )}
                     fullWidth
                     error={hasErrors('name', name)}
-                    helperText={hasErrors('name', name) || 
+                    helperText={hasErrors('name', name) || (
                         <FormattedMessage
                             id='GatewayEnvironments.AddEditGWEnvironment.form.name.help'
                             defaultMessage='Name of the Gateway Environment'
-                        />}
+                        />
+                    )}
                     variant='outlined'
                     disabled={editMode}
                 />
@@ -392,10 +393,12 @@ function AddEditGWEnvironment(props) {
                     name='description'
                     value={description}
                     onChange={onChange}
-                    label={<FormattedMessage
-                        id='GatewayEnvironments.AddEditGWEnvironment.form.description.label'
-                        defaultMessage='Description'
-                    />}
+                    label={(
+                        <FormattedMessage
+                            id='GatewayEnvironments.AddEditGWEnvironment.form.description.label'
+                            defaultMessage='Description'
+                        />
+                    )}
                     fullWidth
                     multiline
                     helperText={(
