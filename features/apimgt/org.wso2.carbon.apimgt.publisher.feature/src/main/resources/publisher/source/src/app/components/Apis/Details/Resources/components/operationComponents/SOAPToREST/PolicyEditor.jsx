@@ -28,7 +28,7 @@ import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
 import Alert from 'AppComponents/Shared/Alert';
 import Grid from '@material-ui/core/Grid';
 import Banner from 'AppComponents/Shared/Banner';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import CloseConfirmation from './CloseConfirmation';
 
 const MonacoEditor = lazy(() => import('react-monaco-editor' /* webpackChunkName: "PolicyEditorMonaco" */));
@@ -147,13 +147,19 @@ export default function PolicyEditor(props) {
                                 className={classes.title}
                                 onClick={save}
                             >
-                                save & close
+                                <FormattedMessage
+                                    id='Apis.Details.Resources.Policy.Dialog.save.and.close.btn'
+                                    defaultMessage='save & close'
+                                />
                                 {saving && <CircularProgress size={18} />}
                             </Button>
                         </Grid>
                         <Grid item>
                             <Button color='inherit' className={classes.title} onClick={confirmAndClose}>
-                                close
+                                <FormattedMessage
+                                    id='Apis.Details.Resources.Policy.Dialog.close.editor.btn'
+                                    defaultMessage='close'
+                                />
                             </Button>
                         </Grid>
                     </Grid>

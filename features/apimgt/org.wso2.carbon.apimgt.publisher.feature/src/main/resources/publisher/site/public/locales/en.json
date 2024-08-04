@@ -1799,6 +1799,30 @@
       "value": "Comments"
     }
   ],
+  "Apis.Details.Components.SOAP.To.REST.edit.btn": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "Apis.Details.Components.SOAP.To.REST.mediation.text": [
+    {
+      "type": 0,
+      "value": "Mediation"
+    }
+  ],
+  "Apis.Details.Components.SOAP.To.REST.tabs.In.text": [
+    {
+      "type": 0,
+      "value": "In"
+    }
+  ],
+  "Apis.Details.Components.SOAP.To.REST.tabs.Out.text": [
+    {
+      "type": 0,
+      "value": "Out"
+    }
+  ],
   "Apis.Details.Components.async.api.add.property.description.helper.text": [
     {
       "type": 0,
@@ -2125,6 +2149,30 @@
     {
       "type": 0,
       "value": "Reset"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.reset.dialog.close.btn": [
+    {
+      "type": 0,
+      "value": "CLOSE"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.reset.dialog.content": [
+    {
+      "type": 0,
+      "value": "Please confirm the discard all changes action"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.reset.dialog.reset.btn": [
+    {
+      "type": 0,
+      "value": "RESET"
+    }
+  ],
+  "Apis.Details.Configuration.Resources.reset.dialog.title": [
+    {
+      "type": 0,
+      "value": "Discard changes"
     }
   ],
   "Apis.Details.Configuration.Resources.save": [
@@ -2589,10 +2637,40 @@
       "value": "Public"
     }
   ],
+  "Apis.Details.Configuration.components.Subscription.algorithm.helper.text": [
+    {
+      "type": 0,
+      "value": "Select an algorithm to sign the message"
+    }
+  ],
+  "Apis.Details.Configuration.components.Subscription.configuration": [
+    {
+      "type": 0,
+      "value": "Subscription Configuration"
+    }
+  ],
+  "Apis.Details.Configuration.components.Subscription.enable.switch": [
+    {
+      "type": 0,
+      "value": "Enable"
+    }
+  ],
+  "Apis.Details.Configuration.components.Subscription.http.header.helper.text": [
+    {
+      "type": 0,
+      "value": "Set the HTTP header use by the provider to send the signature"
+    }
+  ],
   "Apis.Details.Configuration.components.Subscription.secret": [
     {
       "type": 0,
       "value": "Secret"
+    }
+  ],
+  "Apis.Details.Configuration.components.Subscription.secret.helper.text": [
+    {
+      "type": 0,
+      "value": "Use the above secret key while registering at the provider"
     }
   ],
   "Apis.Details.Configuration.components.Subscription.signature.header": [
@@ -2719,6 +2797,12 @@
     {
       "type": 0,
       "value": "No API Categories defined."
+    }
+  ],
+  "Apis.Details.Configurations.api.categories.helper.text": [
+    {
+      "type": 0,
+      "value": "Select API Categories for the API"
     }
   ],
   "Apis.Details.Documents.Create.Edit.validate.doc.name.error": [
@@ -5149,6 +5233,12 @@
       "value": "RETIRED"
     }
   ],
+  "Apis.Details.LifeCycle.components.confirm.publish.btn": [
+    {
+      "type": 0,
+      "value": "Publish"
+    }
+  ],
   "Apis.Details.LifeCycle.components.confirm.publish.message": [
     {
       "type": 0,
@@ -6220,7 +6310,7 @@
   "Apis.Details.Rate.Limiting.operations.api.product.message.caption": [
     {
       "type": 0,
-      "value": "Rate limiting policy of an individual operation will begovern by the policy specified in the source operation"
+      "value": "Rate limiting policy of an individual operation will be govern by the policy specified in the source operation"
     }
   ],
   "Apis.Details.Rate.Limiting.operations.configuration": [
@@ -6353,6 +6443,18 @@
     {
       "type": 0,
       "value": "Parameters"
+    }
+  ],
+  "Apis.Details.Resources.Policy.Dialog.close.editor.btn": [
+    {
+      "type": 0,
+      "value": "close"
+    }
+  ],
+  "Apis.Details.Resources.Policy.Dialog.save.and.close.btn": [
+    {
+      "type": 0,
+      "value": "save & close"
     }
   ],
   "Apis.Details.Resources.Policy.update.error": [
@@ -9525,6 +9627,20 @@
       "value": "List of APIs"
     }
   ],
+  "ServiceCatalog.CreateApi.api.actual.context.helper": [
+    {
+      "type": 0,
+      "value": "API will be exposed in "
+    },
+    {
+      "type": 1,
+      "value": "actualContext"
+    },
+    {
+      "type": 0,
+      "value": " context at the gateway"
+    }
+  ],
   "ServiceCatalog.CreateApi.api.context.label": [
     {
       "type": 0,
@@ -10038,7 +10154,7 @@
   "app.components.Shared.onboarding.insufficient.permissions": [
     {
       "type": 0,
-      "value": "*You are not authorized to create or update"
+      "value": "*You are not authorized to create or update "
     },
     {
       "type": 1,

@@ -212,6 +212,11 @@ const APIDetailsTopMenu = (props) => {
         return array.join(', ');
     }
 
+    function getApiLifeCycleStatus(apiLifeCycleStatus) {
+        return apiLifeCycleStatus in ApiLifeCycleStates
+            ? ApiLifeCycleStates[apiLifeCycleStatus] : apiLifeCycleStatus;
+    }
+
     // todo: need to support rev proxy ~tmkb
     return (
         <div className={classes.root}>
@@ -243,7 +248,7 @@ const APIDetailsTopMenu = (props) => {
             <VerticalDivider height={70} />
             <div className={classes.infoItem}>
                 <Typography data-testid='itest-api-state' variant='subtitle1'>
-                    {isAPIProduct ? ApiLifeCycleStates[api.state] : ApiLifeCycleStates[api.lifeCycleStatus]}
+                    {isAPIProduct ? getApiLifeCycleStatus(api.state) : getApiLifeCycleStatus(api.lifeCycleStatus)}
                 </Typography>
                 <Typography variant='caption' align='left'>
                     <FormattedMessage

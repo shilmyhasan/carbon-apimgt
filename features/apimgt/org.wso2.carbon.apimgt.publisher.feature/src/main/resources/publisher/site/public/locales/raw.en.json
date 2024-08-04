@@ -780,6 +780,18 @@
   "Apis.Details.Comments.title": {
     "defaultMessage": "Comments"
   },
+  "Apis.Details.Components.SOAP.To.REST.edit.btn": {
+    "defaultMessage": "Edit"
+  },
+  "Apis.Details.Components.SOAP.To.REST.mediation.text": {
+    "defaultMessage": "Mediation"
+  },
+  "Apis.Details.Components.SOAP.To.REST.tabs.In.text": {
+    "defaultMessage": "In"
+  },
+  "Apis.Details.Components.SOAP.To.REST.tabs.Out.text": {
+    "defaultMessage": "Out"
+  },
   "Apis.Details.Components.async.api.add.property.description.helper.text": {
     "defaultMessage": "Enter property description"
   },
@@ -935,6 +947,18 @@
   },
   "Apis.Details.Configuration.Resources.reset": {
     "defaultMessage": "Reset"
+  },
+  "Apis.Details.Configuration.Resources.reset.dialog.close.btn": {
+    "defaultMessage": "CLOSE"
+  },
+  "Apis.Details.Configuration.Resources.reset.dialog.content": {
+    "defaultMessage": "Please confirm the discard all changes action"
+  },
+  "Apis.Details.Configuration.Resources.reset.dialog.reset.btn": {
+    "defaultMessage": "RESET"
+  },
+  "Apis.Details.Configuration.Resources.reset.dialog.title": {
+    "defaultMessage": "Discard changes"
   },
   "Apis.Details.Configuration.Resources.save": {
     "defaultMessage": "Save"
@@ -1161,8 +1185,23 @@
   "Apis.Details.Configuration.components.StoreVisibility.dropdown.public": {
     "defaultMessage": "Public"
   },
+  "Apis.Details.Configuration.components.Subscription.algorithm.helper.text": {
+    "defaultMessage": "Select an algorithm to sign the message"
+  },
+  "Apis.Details.Configuration.components.Subscription.configuration": {
+    "defaultMessage": "Subscription Configuration"
+  },
+  "Apis.Details.Configuration.components.Subscription.enable.switch": {
+    "defaultMessage": "Enable"
+  },
+  "Apis.Details.Configuration.components.Subscription.http.header.helper.text": {
+    "defaultMessage": "Set the HTTP header use by the provider to send the signature"
+  },
   "Apis.Details.Configuration.components.Subscription.secret": {
     "defaultMessage": "Secret"
+  },
+  "Apis.Details.Configuration.components.Subscription.secret.helper.text": {
+    "defaultMessage": "Use the above secret key while registering at the provider"
   },
   "Apis.Details.Configuration.components.Subscription.signature.header": {
     "defaultMessage": "Signature Header"
@@ -1226,6 +1265,9 @@
   },
   "Apis.Details.Configurations.api.categories.empty": {
     "defaultMessage": "No API Categories defined."
+  },
+  "Apis.Details.Configurations.api.categories.helper.text": {
+    "defaultMessage": "Select API Categories for the API"
   },
   "Apis.Details.Documents.Create.Edit.validate.doc.name.error": {
     "defaultMessage": "Error when validating document name"
@@ -2409,6 +2451,9 @@
   "Apis.Details.LifeCycle.State.Status.RETIRED": {
     "defaultMessage": "RETIRED"
   },
+  "Apis.Details.LifeCycle.components.confirm.publish.btn": {
+    "defaultMessage": "Publish"
+  },
   "Apis.Details.LifeCycle.components.confirm.publish.message": {
     "defaultMessage": "The API will not be available for consumption unless it is deployed."
   },
@@ -2944,7 +2989,7 @@
     "defaultMessage": "Rate limiting polices of the source operation will be applied"
   },
   "Apis.Details.Rate.Limiting.operations.api.product.message.caption": {
-    "defaultMessage": "Rate limiting policy of an individual operation will begovern by the policy specified in the source operation"
+    "defaultMessage": "Rate limiting policy of an individual operation will be govern by the policy specified in the source operation"
   },
   "Apis.Details.Rate.Limiting.operations.configuration": {
     "defaultMessage": "Operations Configuration"
@@ -3011,6 +3056,12 @@
   },
   "Apis.Details.Resources.Operation.Parameters": {
     "defaultMessage": "Parameters"
+  },
+  "Apis.Details.Resources.Policy.Dialog.close.editor.btn": {
+    "defaultMessage": "close"
+  },
+  "Apis.Details.Resources.Policy.Dialog.save.and.close.btn": {
+    "defaultMessage": "save & close"
   },
   "Apis.Details.Resources.Policy.update.error": {
     "defaultMessage": "Something went wrong while updating resource policy!"
@@ -4524,6 +4575,9 @@
   "Scopes.Usage.UsageViewAPI.api.usage": {
     "defaultMessage": "List of APIs"
   },
+  "ServiceCatalog.CreateApi.api.actual.context.helper": {
+    "defaultMessage": "API will be exposed in {actualContext} context at the gateway"
+  },
   "ServiceCatalog.CreateApi.api.context.label": {
     "defaultMessage": "Context"
   },
@@ -4768,7 +4822,7 @@
     "defaultMessage": "Back"
   },
   "app.components.Shared.onboarding.insufficient.permissions": {
-    "defaultMessage": "*You are not authorized to create or update{name} due to insufficient permissions"
+    "defaultMessage": "*You are not authorized to create or update {name} due to insufficient permissions"
   },
   "block.all": {
     "defaultMessage": "Block All"

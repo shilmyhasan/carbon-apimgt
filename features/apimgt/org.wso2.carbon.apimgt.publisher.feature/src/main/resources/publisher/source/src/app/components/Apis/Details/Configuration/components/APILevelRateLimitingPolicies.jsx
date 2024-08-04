@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import HelpOutline from '@material-ui/icons/HelpOutline';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -71,6 +71,7 @@ const useStyles = makeStyles((theme) => ({
 export default function APILevelRateLimitingPolicies(props) {
     const [apiFromContext] = useAPI();
     const classes = useStyles();
+    const intl = useIntl();
     const {
         configDispatcher,
         api: { apiThrottlingPolicy },
@@ -135,7 +136,10 @@ export default function APILevelRateLimitingPolicies(props) {
                                 select
                                 value={apiThrottlingPolicy}
                                 onChange={handleChange}
-                                label='Rate limiting policies'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Details.Rate.Limiting.rate.limiting.policies',
+                                    defaultMessage: 'Rate limiting policies',
+                                })}
                                 margin='dense'
                                 variant='outlined'
                                 style={{ display: 'flex', minWidth: 180 }}

@@ -100,8 +100,10 @@ const LifeCycleHistory = (props) => {
                                     id='Apis.Details.LifeCycle.LifeCycleHistory.lifecycle.state.history'
                                     defaultMessage='LC has changed from {previous} to {post}'
                                     values={{
-                                        previous: LifeCycleStates[entry.previousState],
-                                        post: LifeCycleStates[entry.postState],
+                                        previous: entry.previousState in LifeCycleStates
+                                            ? LifeCycleStates[entry.previousState] : entry.previousState,
+                                        post: entry.postState in LifeCycleStates
+                                            ? LifeCycleStates[entry.postState] : entry.postState,
                                     }}
                                 />
                             </TableCell>

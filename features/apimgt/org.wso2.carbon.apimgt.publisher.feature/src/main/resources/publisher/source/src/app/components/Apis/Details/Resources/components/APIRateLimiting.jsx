@@ -145,7 +145,7 @@ function APIRateLimiting(props) {
                     <FormattedMessage
                         id='Apis.Details.Rate.Limiting.operations.api.product.message.caption'
                         defaultMessage={'Rate limiting policy of an individual operation will be'
-                        + 'govern by the policy specified in the source operation'}
+                        + ' govern by the policy specified in the source operation'}
                     />
                 </Typography>
             </Typography>
