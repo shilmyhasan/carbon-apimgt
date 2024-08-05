@@ -7534,6 +7534,9 @@ public final class APIUtil {
                 .getFirstProperty(APIConstants.HTTP_CLIENT_MAX_TOTAL);
         String defaultMaxPerRoute = configuration
                 .getFirstProperty(APIConstants.HTTP_CLIENT_DEFAULT_MAX_PER_ROUTE);
+        String connectionTimeoutProperty = configuration.getFirstProperty(
+                APIConstants.HTTP_CLIENT_CONNECTION_TIMEOUT);
+        int connectionTimeout = connectionTimeoutProperty != null ? Integer.parseInt(connectionTimeoutProperty) : -1;
 
         String proxyEnabled = configuration.getFirstProperty(APIConstants.PROXY_ENABLE);
         String proxyHost = configuration.getFirstProperty(APIConstants.PROXY_HOST);
@@ -7556,7 +7559,10 @@ public final class APIUtil {
         pool.setMaxTotal(Integer.parseInt(maxTotal));
         pool.setDefaultMaxPerRoute(Integer.parseInt(defaultMaxPerRoute));
 
-        RequestConfig params = RequestConfig.custom().build();
+        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+        requestConfigBuilder.setConnectTimeout(connectionTimeout);
+        RequestConfig params = requestConfigBuilder.build();
+
         HttpClientBuilder clientBuilder = HttpClients.custom().setConnectionManager(pool)
                 .setDefaultRequestConfig(params);
 
