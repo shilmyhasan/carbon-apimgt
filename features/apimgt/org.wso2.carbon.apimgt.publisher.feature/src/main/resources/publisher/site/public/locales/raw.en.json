@@ -2,6 +2,9 @@
   "Api.category.dropdown.tooltip": {
     "defaultMessage": "Allow to group APIs that have similar attributes. There has to be pre-defined API categories in the environment in order to be attached to an API."
   },
+  "Apis.APIProductCreateWrapper.error.errorMessage.create.api.product": {
+    "defaultMessage": "Something went wrong while adding the API Product"
+  },
   "Apis.APIProductCreateWrapper.error.errorMessage.create.revision": {
     "defaultMessage": "Something went wrong while creating the API Revision"
   },
@@ -13,6 +16,9 @@
   },
   "Apis.Create.APIProduct.APIProductCreateWrapper.cancel": {
     "defaultMessage": "Cancel"
+  },
+  "Apis.Create.APIProduct.APIProductCreateWrapper.created.success": {
+    "defaultMessage": "API Product created successfully"
   },
   "Apis.Create.APIProduct.APIProductCreateWrapper.defineProvide": {
     "defaultMessage": "Define API Product"
@@ -32,14 +38,35 @@
   "Apis.Create.APIProduct.APIProductCreateWrapper.resources": {
     "defaultMessage": "Add Resources"
   },
+  "Apis.Create.APIProduct.APIProductCreateWrapper.revision.created.success": {
+    "defaultMessage": "API Revision created successfully"
+  },
+  "Apis.Create.APIProduct.APIProductCreateWrapper.revision.deployed.success": {
+    "defaultMessage": "API Revision Deployed Successfully"
+  },
   "Apis.Create.APIProduct.APIProductCreateWrapper.sub.heading": {
     "defaultMessage": "Create an API Product by providing a Name, a Context, Resources, and Business Plans (optional)."
+  },
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.back": {
+    "defaultMessage": "Back"
   },
   "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.cancel": {
     "defaultMessage": "Cancel"
   },
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.create": {
+    "defaultMessage": "Create"
+  },
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.created.error": {
+    "defaultMessage": "Something went wrong while adding the API"
+  },
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.created.success": {
+    "defaultMessage": "API created successfully"
+  },
   "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.heading": {
     "defaultMessage": "Create an API using an AsyncAPI definition."
+  },
+  "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.next": {
+    "defaultMessage": "Next"
   },
   "Apis.Create.AsyncAPI.ApiCreateAsyncAPI.sub.heading": {
     "defaultMessage": "Create an API using an existing AsyncAPI definition file or URL."
@@ -59,14 +86,47 @@
   "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.Input.type": {
     "defaultMessage": "Input Type"
   },
+  "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.Input.url.text.placeholder": {
+    "defaultMessage": "Enter AsyncAPI URL"
+  },
+  "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.file.label": {
+    "defaultMessage": "AsyncAPI File"
+  },
+  "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.url.helper.text": {
+    "defaultMessage": "Click away to validate the URL"
+  },
+  "Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.url.label": {
+    "defaultMessage": "AsyncAPI URL"
+  },
+  "Apis.Create.Components.DefaultAPIForm.api.actual.context.helper": {
+    "defaultMessage": "API will be exposed in {actualContext}context at the gateway"
+  },
   "Apis.Create.Components.DefaultAPIForm.api.context": {
     "defaultMessage": "Context"
+  },
+  "Apis.Create.Components.DefaultAPIForm.api.endpoint": {
+    "defaultMessage": "Endpoint"
+  },
+  "Apis.Create.Components.DefaultAPIForm.api.product.actual.context.helper": {
+    "defaultMessage": "API Product will be exposed in {actualContext}context at the gateway"
   },
   "Apis.Create.Components.DefaultAPIForm.api.product.context": {
     "defaultMessage": "Context"
   },
+  "Apis.Create.Components.DefaultAPIForm.mandatory.fields": {
+    "defaultMessage": "Mandatory fields"
+  },
   "Apis.Create.Components.DefaultAPIForm.name": {
     "defaultMessage": "Name"
+  },
+  "Apis.Create.Components.DefaultAPIForm.validation.error.context.exists": {
+    "defaultMessage": "{apiContext} context already exists"
+  },
+  "Apis.Create.Components.DefaultAPIForm.validation.error.dynamic.context.exists": {
+    "defaultMessage": "{apiContext} dynamic context already exists"
+  },
+  "Apis.Create.Components.DefaultAPIForm.validation.error.name.exists": {
+    "defaultMessage": "Name {value} already exists"
   },
   "Apis.Create.Components.DefaultAPIForm.version": {
     "defaultMessage": "Version"
@@ -77,8 +137,26 @@
   "Apis.Create.Components.SelectPolicies.business.plans": {
     "defaultMessage": "Business plan(s)"
   },
+  "Apis.Create.Default.APICreateDefault.api.created.error": {
+    "defaultMessage": "Something went wrong while adding the API"
+  },
+  "Apis.Create.Default.APICreateDefault.api.created.success": {
+    "defaultMessage": "API created successfully"
+  },
   "Apis.Create.Default.APICreateDefault.api.heading": {
     "defaultMessage": "Create an API"
+  },
+  "Apis.Create.Default.APICreateDefault.api.product.created.error": {
+    "defaultMessage": "Something went wrong while adding the API Product"
+  },
+  "Apis.Create.Default.APICreateDefault.api.product.created.success": {
+    "defaultMessage": "API Product created successfully"
+  },
+  "Apis.Create.Default.APICreateDefault.api.revision.created.success": {
+    "defaultMessage": "API Revision created successfully"
+  },
+  "Apis.Create.Default.APICreateDefault.api.revision.deployed.success": {
+    "defaultMessage": "API Revision Deployed Successfully"
   },
   "Apis.Create.Default.APICreateDefault.api.sub.heading": {
     "defaultMessage": "Create an API by providing a Name, a Version, a Context and Backend Endpoint (optional)"
@@ -92,6 +170,12 @@
   "Apis.Create.Default.APICreateDefault.cancel": {
     "defaultMessage": "Cancel"
   },
+  "Apis.Create.Default.APICreateDefault.create.btn": {
+    "defaultMessage": "Create"
+  },
+  "Apis.Create.Default.APICreateDefault.create.publish.btn": {
+    "defaultMessage": "Create & Publish"
+  },
   "Apis.Create.Default.APICreateDefault.error.errorMessage.create.revision": {
     "defaultMessage": "Something went wrong while creating the API Revision"
   },
@@ -103,6 +187,18 @@
   },
   "Apis.Create.Default.APICreateDefault.error.policies.not.available": {
     "defaultMessage": "Throttling policies not available. Contact your administrator"
+  },
+  "Apis.Create.Default.APICreateDefault.streaming.error": {
+    "defaultMessage": "Something went wrong while adding the API"
+  },
+  "Apis.Create.Default.APICreateDefault.streaming.revision.deployed.": {
+    "defaultMessage": "API Revision Deployed Successfully"
+  },
+  "Apis.Create.Default.APICreateDefault.streaming.revision.success": {
+    "defaultMessage": "API Revision created successfully"
+  },
+  "Apis.Create.Default.APICreateDefault.streaming.success": {
+    "defaultMessage": "API created successfully"
   },
   "Apis.Create.Default.APICreateDefault.success.otherStatus": {
     "defaultMessage": "API updated successfully"
@@ -121,6 +217,12 @@
   },
   "Apis.Create.GraphQL.ApiCreateGraphQL.create": {
     "defaultMessage": "Create"
+  },
+  "Apis.Create.GraphQL.ApiCreateGraphQL.created.error": {
+    "defaultMessage": "Something went wrong while adding the API"
+  },
+  "Apis.Create.GraphQL.ApiCreateGraphQL.created.success": {
+    "defaultMessage": "{name} API created successfully"
   },
   "Apis.Create.GraphQL.ApiCreateGraphQL.error.policies.not.available": {
     "defaultMessage": "Throttling policies not available. Contact your administrator"
@@ -149,11 +251,26 @@
   "Apis.Create.GraphQL.Steps.ProvideGraphQL.Input.type": {
     "defaultMessage": "Provide GraphQL File"
   },
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.back": {
+    "defaultMessage": "Back"
+  },
   "Apis.Create.OpenAPI.ApiCreateOpenAPI.cancel": {
     "defaultMessage": "Cancel"
   },
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.create": {
+    "defaultMessage": "Create"
+  },
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.created.error": {
+    "defaultMessage": "Something went wrong while adding the API"
+  },
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.created.success": {
+    "defaultMessage": "API created successfully"
+  },
   "Apis.Create.OpenAPI.ApiCreateOpenAPI.heading": {
     "defaultMessage": "Create an API using an OpenAPI definition."
+  },
+  "Apis.Create.OpenAPI.ApiCreateOpenAPI.next": {
+    "defaultMessage": "Next"
   },
   "Apis.Create.OpenAPI.ApiCreateOpenAPI.sub.heading": {
     "defaultMessage": "Create an API using an existing OpenAPI definition file or URL."
@@ -173,6 +290,12 @@
   "Apis.Create.OpenAPI.Steps.ProvideOpenAPI.Input.type": {
     "defaultMessage": "Input Type"
   },
+  "Apis.Create.OpenAPI.create.api.url.helper.text": {
+    "defaultMessage": "Click away to validate the URL"
+  },
+  "Apis.Create.OpenAPI.create.api.url.placeholder": {
+    "defaultMessage": "Enter OpenAPI URL"
+  },
   "Apis.Create.StreamingAPI.APICreateStreamingAPI.api.heading": {
     "defaultMessage": "Create a Streaming API"
   },
@@ -182,11 +305,32 @@
   "Apis.Create.StreamingAPI.APICreateStreamingAPI.websub.api.sub.heading": {
     "defaultMessage": "Create an API by providing a Name, a Version and a Context"
   },
+  "Apis.Create.WSDL.ApiCreateWSDL.create.error": {
+    "defaultMessage": "Something went wrong while adding the API"
+  },
+  "Apis.Create.WSDL.ApiCreateWSDL.create.success": {
+    "defaultMessage": "API created successfully"
+  },
   "Apis.Create.WSDL.ApiCreateWSDL.error.policies.not.available": {
     "defaultMessage": "Throttling policies not available. Contact your administrator"
   },
   "Apis.Create.WSDL.ApiCreateWSDL.heading": {
     "defaultMessage": "Expose a SOAP Service as a REST API"
+  },
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.create.api": {
+    "defaultMessage": "Create API"
+  },
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.create.api.back.btn": {
+    "defaultMessage": "Back"
+  },
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.create.api.create.btn": {
+    "defaultMessage": "Create"
+  },
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.create.api.next.btn": {
+    "defaultMessage": "Next"
+  },
+  "Apis.Create.WSDL.ApiCreateWSDL.step.label.provide.wsdl": {
+    "defaultMessage": "Provide WSDL"
   },
   "Apis.Create.WSDL.ApiCreateWSDL.sub.heading": {
     "defaultMessage": "Expose an existing SOAP service as a REST API by importing the WSDL of the SOAP service."
@@ -218,11 +362,32 @@
   "Apis.Create.WSDL.Steps.ProvideWSDL.url.label": {
     "defaultMessage": "WSDL URL"
   },
+  "Apis.Create.WSDL.content.validation.file.failed": {
+    "defaultMessage": "WSDL content validation failed!"
+  },
+  "Apis.Create.WSDL.content.validation.url.failed": {
+    "defaultMessage": "Invalid WSDL URL!"
+  },
+  "Apis.Create.WSDL.url.helper.text": {
+    "defaultMessage": "Click away to validate the URL"
+  },
+  "Apis.Create.WSDL.url.placeholder": {
+    "defaultMessage": "Enter WSDL URL"
+  },
+  "Apis.Create.WSDL.validation.error.response": {
+    "defaultMessage": "Error occurred during validation"
+  },
   "Apis.Create.asyncAPI.Components.SelectPolicies.business.plans": {
     "defaultMessage": "Protocol"
   },
   "Apis.Create.streaming.Components.SelectPolicies.business.plans": {
     "defaultMessage": "Protocol"
+  },
+  "Apis.Create.streaming.Components.create.and.publish.btn": {
+    "defaultMessage": "Create & Publish"
+  },
+  "Apis.Create.streaming.Components.create.btn": {
+    "defaultMessage": "Create"
   },
   "Apis.Details.APIDefinition.APIDefinition.api.definition": {
     "defaultMessage": "API Definition"
@@ -320,9 +485,6 @@
   "Apis.Details.APIDefinition.APIDefinition.update.not.allowed": {
     "defaultMessage": "Unauthorized: Insufficient permissions to update API Definition"
   },
-  "Apis.Details.APIDefinition.AuditApi\n                                                                    .OverallScoreProgress": {
-    "defaultMessage": "{overallScore}"
-  },
   "Apis.Details.APIDefinition.AuditApi.ApiSecurityAuditReport": {
     "defaultMessage": "API Security Audit Report"
   },
@@ -361,6 +523,9 @@
   },
   "Apis.Details.APIDefinition.AuditApi.OverallCriticality": {
     "defaultMessage": "{overallCriticalityText} {overallCriticality}"
+  },
+  "Apis.Details.APIDefinition.AuditApi.OverallScoreProgress": {
+    "defaultMessage": "{overallScore}"
   },
   "Apis.Details.APIDefinition.AuditApi.ReferenceSection": {
     "defaultMessage": "Visit this {link} to view a detailed description, possible exploits and remediation for this issue.",
@@ -549,6 +714,27 @@
   "Apis.Details.BusinessInformation.BusinessInformation.technical.owner.name.helper.text": {
     "defaultMessage": "Provide the name of the technical owner"
   },
+  "Apis.Details.Comments.Comment.Add.blank.error": {
+    "defaultMessage": "You cannot enter a blank comment"
+  },
+  "Apis.Details.Comments.Comment.Add.error": {
+    "defaultMessage": "Something went wrong while adding the comment"
+  },
+  "Apis.Details.Comments.Comment.delete.confirm": {
+    "defaultMessage": "Are you sure you want to delete this comment?"
+  },
+  "Apis.Details.Comments.Comment.delete.confirm.cancel.label": {
+    "defaultMessage": "Cancel"
+  },
+  "Apis.Details.Comments.Comment.delete.confirm.title": {
+    "defaultMessage": "Confirm Delete"
+  },
+  "Apis.Details.Comments.Comment.delete.confirm.yes.label": {
+    "defaultMessage": "Yes"
+  },
+  "Apis.Details.Comments.Comment.delete.success": {
+    "defaultMessage": "Comment has been successfully deleted"
+  },
   "Apis.Details.Comments.Comment.load.more.replies": {
     "defaultMessage": "Show More Replies"
   },
@@ -573,6 +759,9 @@
   "Apis.Details.Comments.CommentOptions.reply": {
     "defaultMessage": "Reply"
   },
+  "Apis.Details.Comments.delete.comment.error": {
+    "defaultMessage": "Something went wrong while deleting comment - {commentIdOfCommentToDelete}"
+  },
   "Apis.Details.Comments.load.previous.comments": {
     "defaultMessage": "Show More"
   },
@@ -582,8 +771,35 @@
   "Apis.Details.Comments.no.comments.content": {
     "defaultMessage": "No comments available for this API yet"
   },
+  "Apis.Details.Comments.reply.delete.success": {
+    "defaultMessage": "Reply comment has been successfully deleted"
+  },
+  "Apis.Details.Comments.retrieve.error": {
+    "defaultMessage": "Something went wrong while retrieving comments"
+  },
   "Apis.Details.Comments.title": {
     "defaultMessage": "Comments"
+  },
+  "Apis.Details.Components.SOAP.To.REST.edit.btn": {
+    "defaultMessage": "Edit"
+  },
+  "Apis.Details.Components.SOAP.To.REST.mediation.text": {
+    "defaultMessage": "Mediation"
+  },
+  "Apis.Details.Components.SOAP.To.REST.tabs.In.text": {
+    "defaultMessage": "In"
+  },
+  "Apis.Details.Components.SOAP.To.REST.tabs.Out.text": {
+    "defaultMessage": "Out"
+  },
+  "Apis.Details.Components.async.api.add.property.description.helper.text": {
+    "defaultMessage": "Enter property description"
+  },
+  "Apis.Details.Components.async.api.add.property.description.text": {
+    "defaultMessage": "Description"
+  },
+  "Apis.Details.Components.async.api.add.property.select.data.type": {
+    "defaultMessage": "Select the data type"
   },
   "Apis.Details.Configurartion.components.QueryAnalysis": {
     "defaultMessage": "Query Analysis"
@@ -594,17 +810,44 @@
   "Apis.Details.Configurartion.components.QueryAnalysis.edit": {
     "defaultMessage": "Edit Complexity Values"
   },
+  "Apis.Details.Configurartion.components.QueryAnalysis.update.complexity": {
+    "defaultMessage": "update complexity"
+  },
   "Apis.Details.Configuration.AuthHeader.helper.text": {
     "defaultMessage": "Authorization header name cannot contain spaces or special characters"
   },
-  "Apis.Details.Configuration.Components.APISecurity.Components.\n                                    ApplicationLevel.http": {
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.http": {
     "defaultMessage": "Application Level Security"
   },
-  "Apis.Details.Configuration.Components.APISecurity.Components.\n                                    TransportLevel.transport.level.security": {
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.api.key": {
+    "defaultMessage": "Api Key"
+  },
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.basic": {
+    "defaultMessage": "Basic"
+  },
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.mandatory": {
+    "defaultMessage": "Mandatory"
+  },
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.oauth2": {
+    "defaultMessage": "OAuth2"
+  },
+  "Apis.Details.Configuration.Components.APISecurity.Components.ApplicationLevel.security.scheme.optional": {
+    "defaultMessage": "Optional"
+  },
+  "Apis.Details.Configuration.Components.APISecurity.Components.TransportLevel.transport.level.security": {
     "defaultMessage": "Transport Level Security"
+  },
+  "Apis.Details.Configuration.Components.APISecurity.Components.TransportLevel.transport.level.security.mutual.ssl.mandatory": {
+    "defaultMessage": "Mandatory"
+  },
+  "Apis.Details.Configuration.Components.APISecurity.Components.TransportLevel.transport.level.security.mutual.ssl.optional": {
+    "defaultMessage": "Optional"
   },
   "Apis.Details.Configuration.Components.MaxBackendTps.maximum.backend.throughput": {
     "defaultMessage": "Backend Throughput"
+  },
+  "Apis.Details.Configuration.Components.validate.role.error": {
+    "defaultMessage": "Error when validating role: {role}"
   },
   "Apis.Details.Configuration.Configuration.AuthHeader.tooltip": {
     "defaultMessage": "The header name that is used to send the authorization information. \"Authorization\" is the default header."
@@ -687,10 +930,40 @@
   "Apis.Details.Configuration.Configuration.update.not.allowed": {
     "defaultMessage": "* You are not authorized to update particular fields of the API due to insufficient permissions"
   },
+  "Apis.Details.Configuration.Design.Configurations.error.occured": {
+    "defaultMessage": "Error occurred"
+  },
+  "Apis.Details.Configuration.Resources.operation.already.exist.error": {
+    "defaultMessage": "Operation(s) already exist!"
+  },
+  "Apis.Details.Configuration.Resources.operation.api.update.error": {
+    "defaultMessage": "Error while updating the API"
+  },
+  "Apis.Details.Configuration.Resources.operation.definition.update.error": {
+    "defaultMessage": "Error while updating the definition"
+  },
+  "Apis.Details.Configuration.Resources.operation.verbs.already.exist.error": {
+    "defaultMessage": "Operation already exist with {data_target} and {currentVerb}"
+  },
+  "Apis.Details.Configuration.Resources.reset": {
+    "defaultMessage": "Reset"
+  },
+  "Apis.Details.Configuration.Resources.reset.dialog.close.btn": {
+    "defaultMessage": "CLOSE"
+  },
+  "Apis.Details.Configuration.Resources.reset.dialog.content": {
+    "defaultMessage": "Please confirm the discard all changes action"
+  },
+  "Apis.Details.Configuration.Resources.reset.dialog.reset.btn": {
+    "defaultMessage": "RESET"
+  },
+  "Apis.Details.Configuration.Resources.reset.dialog.title": {
+    "defaultMessage": "Discard changes"
+  },
   "Apis.Details.Configuration.Resources.save": {
     "defaultMessage": "Save"
   },
-  "Apis.Details.Configuration.RuntimeConfiguration.backend.api.\n                                                    product.endpoint": {
+  "Apis.Details.Configuration.RuntimeConfiguration.backend.api.product.endpoint": {
     "defaultMessage": "Please refer respective APIs for endpoint information"
   },
   "Apis.Details.Configuration.RuntimeConfiguration.no.km.error": {
@@ -710,6 +983,18 @@
   },
   "Apis.Details.Configuration.RuntimeConfigurationWebSocket.topic.header": {
     "defaultMessage": "Runtime Configurations"
+  },
+  "Apis.Details.Configuration.Topic.already.exist.error": {
+    "defaultMessage": "Operation(s) already exist!"
+  },
+  "Apis.Details.Configuration.Topic.already.opreation.verb.exist.error": {
+    "defaultMessage": "Operation already exist with {data_target} and {current_Verb}"
+  },
+  "Apis.Details.Configuration.Topic.update.api.error": {
+    "defaultMessage": "Error while updating the API"
+  },
+  "Apis.Details.Configuration.Topic.update.definition.error": {
+    "defaultMessage": "Error while updating the definition"
   },
   "Apis.Details.Configuration.components.APILevelRateLimitingPolicies.configuration": {
     "defaultMessage": "Rate Limiting Configuration"
@@ -768,20 +1053,23 @@
   "Apis.Details.Configuration.components.AccessControl.tooltip.restrict": {
     "defaultMessage": "Restricted by roles :"
   },
-  "Apis.Details.Configuration.components.AccessControl.tooltip.restrict.\n                                    desc": {
+  "Apis.Details.Configuration.components.AccessControl.tooltip.restrict.desc": {
     "defaultMessage": "The API can be viewed and modified only by specific publishers and creators with the roles that you specify"
   },
-  "Apis.Details.Configuration.components.CORSConfiguration.allow.\n                                                    headers": {
-    "defaultMessage": "Access Control Allow Headers"
-  },
-  "Apis.Details.Configuration.components.CORSConfiguration.allow.\n                                                    methods": {
-    "defaultMessage": "Access Control Allow Methods"
-  },
-  "Apis.Details.Configuration.components.CORSConfiguration.allow.\n                                                    origins": {
-    "defaultMessage": "Access Control Allow Origins"
+  "Apis.Details.Configuration.components.CORSConfiguration.allow.all.origins": {
+    "defaultMessage": "Allow All Origins"
   },
   "Apis.Details.Configuration.components.CORSConfiguration.allow.credentials": {
     "defaultMessage": "Access Control Allow Credentials"
+  },
+  "Apis.Details.Configuration.components.CORSConfiguration.allow.headers": {
+    "defaultMessage": "Access Control Allow Headers"
+  },
+  "Apis.Details.Configuration.components.CORSConfiguration.allow.methods": {
+    "defaultMessage": "Access Control Allow Methods"
+  },
+  "Apis.Details.Configuration.components.CORSConfiguration.allow.origins": {
+    "defaultMessage": "Access Control Allow Origins"
   },
   "Apis.Details.Configuration.components.CORSConfiguration.cors.configuration": {
     "defaultMessage": "CORS Configuration"
@@ -846,11 +1134,32 @@
   "Apis.Details.Configuration.components.MaxBackendTps.formattedMessage": {
     "defaultMessage": "Maximum backend transactions per second in integers"
   },
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput": {
+    "defaultMessage": "Maximum Throughput"
+  },
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput.specify": {
+    "defaultMessage": "Specify"
+  },
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput.specify.max.prod.tps": {
+    "defaultMessage": "Max Production TPS"
+  },
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput.specify.max.sandbox.tps": {
+    "defaultMessage": "Max Sandbox TPS"
+  },
+  "Apis.Details.Configuration.components.MaxBackendTps.max.throughput.unlimited": {
+    "defaultMessage": "Unlimited"
+  },
   "Apis.Details.Configuration.components.MaxBackendTps.tooltip": {
     "defaultMessage": "Limits the total number of calls the API Manager is allowed to make to the backend"
   },
   "Apis.Details.Configuration.components.ResponseCaching.tooltip": {
     "defaultMessage": "If enabled, the API response will be cached at the gateway level to improve the response time and minimize the backend load"
+  },
+  "Apis.Details.Configuration.components.SchemaValidation.btn.no": {
+    "defaultMessage": "No"
+  },
+  "Apis.Details.Configuration.components.SchemaValidation.btn.yes": {
+    "defaultMessage": "Yes"
   },
   "Apis.Details.Configuration.components.SchemaValidation.description": {
     "defaultMessage": "Enabling JSON schema validation will cause to build the payload in every request and response. This will impact the round trip time of an API request!"
@@ -876,8 +1185,23 @@
   "Apis.Details.Configuration.components.StoreVisibility.dropdown.public": {
     "defaultMessage": "Public"
   },
+  "Apis.Details.Configuration.components.Subscription.algorithm.helper.text": {
+    "defaultMessage": "Select an algorithm to sign the message"
+  },
+  "Apis.Details.Configuration.components.Subscription.configuration": {
+    "defaultMessage": "Subscription Configuration"
+  },
+  "Apis.Details.Configuration.components.Subscription.enable.switch": {
+    "defaultMessage": "Enable"
+  },
+  "Apis.Details.Configuration.components.Subscription.http.header.helper.text": {
+    "defaultMessage": "Set the HTTP header use by the provider to send the signature"
+  },
   "Apis.Details.Configuration.components.Subscription.secret": {
     "defaultMessage": "Secret"
+  },
+  "Apis.Details.Configuration.components.Subscription.secret.helper.text": {
+    "defaultMessage": "Use the above secret key while registering at the provider"
   },
   "Apis.Details.Configuration.components.Subscription.signature.header": {
     "defaultMessage": "Signature Header"
@@ -941,6 +1265,12 @@
   },
   "Apis.Details.Configurations.api.categories.empty": {
     "defaultMessage": "No API Categories defined."
+  },
+  "Apis.Details.Configurations.api.categories.helper.text": {
+    "defaultMessage": "Select API Categories for the API"
+  },
+  "Apis.Details.Documents.Create.Edit.validate.doc.name.error": {
+    "defaultMessage": "Error when validating document name"
   },
   "Apis.Details.Documents.Create.heading": {
     "defaultMessage": "Documents"
@@ -1413,6 +1743,9 @@
   "Apis.Details.Endpoints.EndpointOverview.sandbox.endpoint": {
     "defaultMessage": "Sandbox Endpoint"
   },
+  "Apis.Details.Endpoints.EndpointOverview.sandbox.endpoint.sandbox.header": {
+    "defaultMessage": "Sandbox Endpoint"
+  },
   "Apis.Details.Endpoints.EndpointOverview.upload.mediation.message": {
     "defaultMessage": "Please upload a mediation sequence file to Message Mediation Policies, which sets the endpoints."
   },
@@ -1449,6 +1782,9 @@
   "Apis.Details.Endpoints.Endpoints.update.not.allowed": {
     "defaultMessage": "*You are not authorized to update endpoints of the API due to insufficient permissions"
   },
+  "Apis.Details.Endpoints.GeneralConfiguration.Certificates.NoCertificatesUploaded": {
+    "defaultMessage": "You do not have any certificates uploaded"
+  },
   "Apis.Details.Endpoints.GeneralConfiguration.Certificates.certificate.add.success": {
     "defaultMessage": "Certificate added successfully"
   },
@@ -1469,6 +1805,9 @@
   },
   "Apis.Details.Endpoints.GeneralConfiguration.Certificates.certificates": {
     "defaultMessage": "Certificates"
+  },
+  "Apis.Details.Endpoints.GeneralConfiguration.Certificates.certificates.AddCertificate": {
+    "defaultMessage": "Add Certificate"
   },
   "Apis.Details.Endpoints.GeneralConfiguration.Certificates.confirm.certificate.delete": {
     "defaultMessage": "Do you want to delete"
@@ -1623,6 +1962,12 @@
   "Apis.Details.Endpoints.GeneralConfiguration.UploadCertificate.uploadCertificate": {
     "defaultMessage": "Upload Certificate"
   },
+  "Apis.Details.Endpoints.GeneralConfiguration.UploadCertificate.uploadCertificate.alias.placeholder": {
+    "defaultMessage": "My Alias"
+  },
+  "Apis.Details.Endpoints.GeneralConfiguration.UploadCertificate.uploadCertificate.throttle.policy": {
+    "defaultMessage": "Select a throttling policy for the certificate"
+  },
   "Apis.Details.Endpoints.GeneralConfiguration.certificates.sub.heading": {
     "defaultMessage": "Certificates"
   },
@@ -1644,17 +1989,29 @@
   "Apis.Details.Endpoints.GenericEndpoint.service.url.input": {
     "defaultMessage": "Service URL"
   },
+  "Apis.Details.Endpoints.GenericEndpoint.service.url.input.placeholder": {
+    "defaultMessage": "Enter the Endpoint URL and press + button"
+  },
   "Apis.Details.Endpoints.LoadBalanceConfig.algorithm": {
     "defaultMessage": "Algorithm"
   },
+  "Apis.Details.Endpoints.LoadBalanceConfig.algorithm.helper.text": {
+    "defaultMessage": "Please select the Loadbalance Algorithm."
+  },
   "Apis.Details.Endpoints.LoadBalanceConfig.class.name.for.algorithm": {
     "defaultMessage": "Class Name for Algorithm"
+  },
+  "Apis.Details.Endpoints.LoadBalanceConfig.class.name.for.algorithm.helper.text": {
+    "defaultMessage": "Enter the class name of the loadbalance algorithm"
   },
   "Apis.Details.Endpoints.LoadBalanceConfig.failover": {
     "defaultMessage": "Enable Failover"
   },
   "Apis.Details.Endpoints.LoadBalanceConfig.session.management": {
     "defaultMessage": "Session Management"
+  },
+  "Apis.Details.Endpoints.LoadBalanceConfig.session.management.helper.text": {
+    "defaultMessage": "Please select the Session Management mechanism."
   },
   "Apis.Details.Endpoints.LoadBalanceConfig.session.timeout": {
     "defaultMessage": "Session Timeout (Millis)"
@@ -1688,6 +2045,15 @@
   },
   "Apis.Details.Endpoints.LoadbalanceFailoverConfig.sandbox.loadbalance.endpoint": {
     "defaultMessage": "Sandbox Loadbalanced Endpoints"
+  },
+  "Apis.Details.Endpoints.LoadbalanceFailoverConfig.types.failover": {
+    "defaultMessage": "Failover"
+  },
+  "Apis.Details.Endpoints.LoadbalanceFailoverConfig.types.load.balanced": {
+    "defaultMessage": "Load Balanced"
+  },
+  "Apis.Details.Endpoints.LoadbalanceFailoverConfig.types.none": {
+    "defaultMessage": "None"
   },
   "Apis.Details.Endpoints.NewEndpointCreate.add.endpoints.header": {
     "defaultMessage": "Select an Endpoint Type to Add"
@@ -1734,18 +2100,6 @@
   "Apis.Details.Endpoints.Prototype.InlineEndpoints.script": {
     "defaultMessage": "Script"
   },
-  "Apis.Details.Environments\n                                                                                .deploy.vhost": {
-    "defaultMessage": "VHost"
-  },
-  "Apis.Details.Environments.Environments\n                                                                    .select.table": {
-    "defaultMessage": "Select Revision"
-  },
-  "Apis.Details.Environments.Environments\n                                                                    .select.vhost": {
-    "defaultMessage": "Select Access URL"
-  },
-  "Apis.Details.Environments.Environments\n                                                                .deploy.button": {
-    "defaultMessage": "Deploy"
-  },
   "Apis.Details.Environments.Environments.APIGateways": {
     "defaultMessage": "API Gateways"
   },
@@ -1761,11 +2115,17 @@
   "Apis.Details.Environments.Environments.api.gateways.name": {
     "defaultMessage": "Name"
   },
+  "Apis.Details.Environments.Environments.api.revision.deploy.success": {
+    "defaultMessage": "Revision Deployed Successfully"
+  },
   "Apis.Details.Environments.Environments.create.cancel": {
     "defaultMessage": "Cancel"
   },
   "Apis.Details.Environments.Environments.create.create": {
     "defaultMessage": "Create"
+  },
+  "Apis.Details.Environments.Environments.deploy.button": {
+    "defaultMessage": "Deploy"
   },
   "Apis.Details.Environments.Environments.deploy.cancel": {
     "defaultMessage": "Cancel"
@@ -1788,20 +2148,23 @@
   "Apis.Details.Environments.Environments.display.devportal": {
     "defaultMessage": "Display Gateway Access URLs in developer portal."
   },
-  "Apis.Details.Environments.Environments.gateway\n                                                    .deployed.revision": {
-    "defaultMessage": "Deployed Revision"
-  },
   "Apis.Details.Environments.Environments.gateway.accessUrl": {
     "defaultMessage": "Gateway Access URL"
   },
   "Apis.Details.Environments.Environments.gateway.action": {
     "defaultMessage": "Action"
   },
-  "Apis.Details.Environments.Environments.revision\n                                                    .description.deploy": {
-    "defaultMessage": "Add a description to the revision"
+  "Apis.Details.Environments.Environments.gateway.deployed.revision": {
+    "defaultMessage": "Deployed Revision"
+  },
+  "Apis.Details.Environments.Environments.revision.create.error": {
+    "defaultMessage": "Something went wrong while creating the revision"
   },
   "Apis.Details.Environments.Environments.revision.create.heading": {
     "defaultMessage": "Create New Revision (From Current API)"
+  },
+  "Apis.Details.Environments.Environments.revision.create.success": {
+    "defaultMessage": "Revision Created Successfully"
   },
   "Apis.Details.Environments.Environments.revision.delete": {
     "defaultMessage": "Delete"
@@ -1824,11 +2187,29 @@
   "Apis.Details.Environments.Environments.revision.delete.success": {
     "defaultMessage": "Revision Deleted Successfully"
   },
+  "Apis.Details.Environments.Environments.revision.deploy.error": {
+    "defaultMessage": "Something went wrong while deploying the revision"
+  },
+  "Apis.Details.Environments.Environments.revision.deploy.success": {
+    "defaultMessage": "Deploy revision Successfully"
+  },
+  "Apis.Details.Environments.Environments.revision.description.add": {
+    "defaultMessage": "Add a description"
+  },
+  "Apis.Details.Environments.Environments.revision.description.add.optional.text": {
+    "defaultMessage": "(optional)"
+  },
   "Apis.Details.Environments.Environments.revision.description.create": {
     "defaultMessage": "Brief description of the new revision"
   },
   "Apis.Details.Environments.Environments.revision.description.deploy": {
     "defaultMessage": "Brief description of the new revision"
+  },
+  "Apis.Details.Environments.Environments.revision.description.deploy.helper": {
+    "defaultMessage": "Add a description to the revision"
+  },
+  "Apis.Details.Environments.Environments.revision.description.label": {
+    "defaultMessage": "Description"
   },
   "Apis.Details.Environments.Environments.revision.restore": {
     "defaultMessage": "Restore"
@@ -1845,6 +2226,18 @@
   "Apis.Details.Environments.Environments.revision.restore.confirm.title": {
     "defaultMessage": "Confirm Restore"
   },
+  "Apis.Details.Environments.Environments.revision.restore.error": {
+    "defaultMessage": "Something went wrong while restoring the revision"
+  },
+  "Apis.Details.Environments.Environments.revision.restore.success": {
+    "defaultMessage": "Revision Restored Successfully"
+  },
+  "Apis.Details.Environments.Environments.revision.undeploy.error": {
+    "defaultMessage": "Something went wrong while undeploying the revision"
+  },
+  "Apis.Details.Environments.Environments.revision.undeploy.success": {
+    "defaultMessage": "Revision Undeployed Successfully"
+  },
   "Apis.Details.Environments.Environments.select.rev.delete": {
     "defaultMessage": "Revision to delete"
   },
@@ -1857,11 +2250,26 @@
   "Apis.Details.Environments.Environments.select.rev.warning": {
     "defaultMessage": "Please delete a revision as the number of revisions have reached a maximum of {count}"
   },
+  "Apis.Details.Environments.Environments.select.table": {
+    "defaultMessage": "Select Revision"
+  },
+  "Apis.Details.Environments.Environments.select.vhost": {
+    "defaultMessage": "Select Access URL"
+  },
   "Apis.Details.Environments.Environments.undeploy.btn": {
     "defaultMessage": "Undeploy"
   },
   "Apis.Details.Environments.Environments.visibility.in.devportal": {
     "defaultMessage": "Gateway URL Visibility"
+  },
+  "Apis.Details.Environments.deploy.api.gateways.text": {
+    "defaultMessage": "API Gateways"
+  },
+  "Apis.Details.Environments.deploy.env.text": {
+    "defaultMessage": "Deploy API to the Gateway Environment"
+  },
+  "Apis.Details.Environments.deploy.text": {
+    "defaultMessage": "Deploy the API"
   },
   "Apis.Details.Environments.deploy.vhost": {
     "defaultMessage": "VHost"
@@ -1910,6 +2318,9 @@
   },
   "Apis.Details.GoTo.button.placeholder": {
     "defaultMessage": "Page Search"
+  },
+  "Apis.Details.Index.get.revisions.error": {
+    "defaultMessage": "Something went wrong while getting the revisions!"
   },
   "Apis.Details.LifeCycle.CheckboxLabels.business.plans.selected": {
     "defaultMessage": "Business Plan(s) selected"
@@ -1968,8 +2379,38 @@
   "Apis.Details.LifeCycle.LifeCycleUpdate.LifecyclePending.success": {
     "defaultMessage": "Lifecycle task deleted successfully"
   },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Block": {
+    "defaultMessage": "Block"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Demote.to.Created": {
+    "defaultMessage": "Demote to Created"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Deprecate": {
+    "defaultMessage": "Deprecate"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Prototype": {
+    "defaultMessage": "Prototype"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Publish": {
+    "defaultMessage": "Publish"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Re.Publish": {
+    "defaultMessage": "Re-Publish"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.State.Retire": {
+    "defaultMessage": "Retire"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.approve.approveStatus": {
+    "defaultMessage": "Lifecycle state change action approved successfully"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.error": {
+    "defaultMessage": "Something went wrong while updating the lifecycle"
+  },
   "Apis.Details.LifeCycle.LifeCycleUpdate.error.certs": {
     "defaultMessage": "Error while retrieving certificates"
+  },
+  "Apis.Details.LifeCycle.LifeCycleUpdate.reject.rejectStatus": {
+    "defaultMessage": "Lifecycle state change action rejected due to validation failure"
   },
   "Apis.Details.LifeCycle.LifeCycleUpdate.success.createStatus": {
     "defaultMessage": "Lifecycle state change request has been sent"
@@ -1985,6 +2426,33 @@
   },
   "Apis.Details.LifeCycle.Policies.select.plan.api.product": {
     "defaultMessage": "Select a plan for the API product."
+  },
+  "Apis.Details.LifeCycle.Policies.update.error": {
+    "defaultMessage": "Something went wrong while updating the API"
+  },
+  "Apis.Details.LifeCycle.Policies.update.success": {
+    "defaultMessage": "Lifecycle state updated successfully"
+  },
+  "Apis.Details.LifeCycle.State.Status.BLOCKED": {
+    "defaultMessage": "BLOCKED"
+  },
+  "Apis.Details.LifeCycle.State.Status.CREATED": {
+    "defaultMessage": "CREATED"
+  },
+  "Apis.Details.LifeCycle.State.Status.DEPRECATED": {
+    "defaultMessage": "DEPRECATED"
+  },
+  "Apis.Details.LifeCycle.State.Status.PROTOTYPED": {
+    "defaultMessage": "PROTOTYPED"
+  },
+  "Apis.Details.LifeCycle.State.Status.PUBLISHED": {
+    "defaultMessage": "PUBLISHED"
+  },
+  "Apis.Details.LifeCycle.State.Status.RETIRED": {
+    "defaultMessage": "RETIRED"
+  },
+  "Apis.Details.LifeCycle.components.confirm.publish.btn": {
+    "defaultMessage": "Publish"
   },
   "Apis.Details.LifeCycle.components.confirm.publish.message": {
     "defaultMessage": "The API will not be available for consumption unless it is deployed."
@@ -2043,8 +2511,17 @@
   "Apis.Details.MediationPolicies.Mediation": {
     "defaultMessage": "Message Mediation"
   },
+  "Apis.Details.MediationPolicies.Mediation.None": {
+    "defaultMessage": "None"
+  },
+  "Apis.Details.Monetization.BusinessPlans.commercial.no.policies.banner": {
+    "defaultMessage": "No commercial policies to monetize"
+  },
   "Apis.Details.Monetization.BusinessPlans.commercial.policies": {
     "defaultMessage": "Commercial Policies"
+  },
+  "Apis.Details.Monetization.BusinessPlans.commercial.policies.banner.save": {
+    "defaultMessage": "Click Save to monetize all unmonetized policies"
   },
   "Apis.Details.Monetization.BusinessPlans.monetized": {
     "defaultMessage": "Monetized"
@@ -2063,6 +2540,9 @@
   },
   "Apis.Details.Monetization.Index.monetization.disabled.successfully": {
     "defaultMessage": "Monetization Disabled Successfully"
+  },
+  "Apis.Details.Monetization.Index.monetization.enable.label": {
+    "defaultMessage": "Enable Monetization"
   },
   "Apis.Details.Monetization.Index.monetization.properties": {
     "defaultMessage": "Monetization Properties"
@@ -2253,6 +2733,9 @@
   "Apis.Details.NewVersion.NewVersion.tooltip": {
     "defaultMessage": "Indicates if this is the default version of the API. If an API is invoked without specifying a version, the API Gateway will route the request to the default version of the API."
   },
+  "Apis.Details.NewVersion.loading.services.error": {
+    "defaultMessage": "Error while loading services version"
+  },
   "Apis.Details.Operations.Operation.OperationType": {
     "defaultMessage": "Operation Type"
   },
@@ -2295,17 +2778,23 @@
   "Apis.Details.Operations.Operations.title": {
     "defaultMessage": "Operations"
   },
-  "Apis.Details.Operations.operation.operationName": {
+  "Apis.Details.Operations.filter.label": {
     "defaultMessage": "Operation"
   },
-  "Apis.Details.Overview.\n                                                                    CustomizedStepper.Endpoint": {
-    "defaultMessage": "Endpoint"
+  "Apis.Details.Operations.filter.placeholder": {
+    "defaultMessage": "Filter Operations"
+  },
+  "Apis.Details.Operations.operation.operationName": {
+    "defaultMessage": "Operation"
   },
   "Apis.Details.Overview.CustomizedStepper.Deploy": {
     "defaultMessage": "Deploy"
   },
   "Apis.Details.Overview.CustomizedStepper.Develop": {
     "defaultMessage": "Develop"
+  },
+  "Apis.Details.Overview.CustomizedStepper.Endpoint": {
+    "defaultMessage": "Endpoint"
   },
   "Apis.Details.Overview.CustomizedStepper.Test": {
     "defaultMessage": "Test"
@@ -2315,6 +2804,9 @@
   },
   "Apis.Details.Overview.CustomizedStepper.blocked": {
     "defaultMessage": "Blocked"
+  },
+  "Apis.Details.Overview.CustomizedStepper.deploy.revision.tooltip": {
+    "defaultMessage": "Deploy a revision of this API to the Gateway"
   },
   "Apis.Details.Overview.CustomizedStepper.deprecated": {
     "defaultMessage": "Deprecated"
@@ -2327,6 +2819,9 @@
   },
   "Apis.Details.Overview.CustomizedStepper.publish": {
     "defaultMessage": "Published"
+  },
+  "Apis.Details.Overview.CustomizedStepper.publish.btn": {
+    "defaultMessage": "Publish"
   },
   "Apis.Details.Overview.CustomizedStepper.publish.current.api": {
     "defaultMessage": "(Current API)"
@@ -2352,14 +2847,20 @@
   "Apis.Details.ProductResources.ProductResourcesEdit.title": {
     "defaultMessage": "Manage Resources"
   },
-  "Apis.Details.ProductResources.ProductResourcesWorkspace.\n                                                    empty.title": {
-    "defaultMessage": "Use the left side panel to add resources"
-  },
-  "Apis.Details.ProductResources.ProductResourcesWorkspace.\n                                        toolbar.add.selected": {
-    "defaultMessage": "Add Selected"
-  },
   "Apis.Details.ProductResources.ProductResourcesWorkspace.ApisnotFound": {
     "defaultMessage": "No REST APIs are created yet"
+  },
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.empty.title": {
+    "defaultMessage": "Use the left side panel to add resources"
+  },
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.filter.an.api.helper.text": {
+    "defaultMessage": "Filter by name"
+  },
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.filter.an.api.label": {
+    "defaultMessage": "API"
+  },
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.filter.an.api.placeholder": {
+    "defaultMessage": "Filter APIs"
   },
   "Apis.Details.ProductResources.ProductResourcesWorkspace.find.and.select": {
     "defaultMessage": "Find and select resources for the API Product"
@@ -2370,37 +2871,16 @@
   "Apis.Details.ProductResources.ProductResourcesWorkspace.selected": {
     "defaultMessage": "Selected resources of API Product"
   },
-  "Apis.Details.ProductResources.ProductResourcesWorkspace.toolbar.\n                                                add.all": {
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.toolbar.add.all": {
     "defaultMessage": "Add All"
+  },
+  "Apis.Details.ProductResources.ProductResourcesWorkspace.toolbar.add.selected": {
+    "defaultMessage": "Add Selected"
   },
   "Apis.Details.Properties.\n                                                            Properties.editable.show.in.devporal": {
     "defaultMessage": "Show in devportal"
   },
-  "Apis.Details.Properties.Properties.\n                                                                    show.add.property.invalid.error": {
-    "defaultMessage": "Invalid property name"
-  },
-  "Apis.Details.Properties.Properties.\n                                                                show.add.property.property.name": {
-    "defaultMessage": "Name"
-  },
-  "Apis.Details.Properties.Properties.\n                                property.name.exists": {
-    "defaultMessage": "Property name already exists"
-  },
-  "Apis.Details.Properties.Properties.\n                                show.add.property.invalid.error": {
-    "defaultMessage": "Invalid property name"
-  },
-  "Apis.Details.Properties.Properties.\n                            property.name.exists": {
-    "defaultMessage": "Property name already exists"
-  },
-  "Apis.Details.Properties.Properties.\n                    no.changes.to.save": {
-    "defaultMessage": "No changes to save"
-  },
-  "Apis.Details.Properties.Properties.\n                    property.name.empty.error": {
-    "defaultMessage": "Property name/value can not be empty"
-  },
-  "Apis.Details.Properties.Properties.\n                    property.name.keyword.error": {
-    "defaultMessage": "Property name can not be a system reserved keyword"
-  },
-  "Apis.Details.Properties.Properties.APIProduct.\n                                            add.new.property.message.content": {
+  "Apis.Details.Properties.Properties.APIProduct.add.new.property.message.content": {
     "defaultMessage": "Add specific custom properties to your API here."
   },
   "Apis.Details.Properties.Properties.add": {
@@ -2442,7 +2922,7 @@
   "Apis.Details.Properties.Properties.editable.row.property.name": {
     "defaultMessage": "Property Name"
   },
-  "Apis.Details.Properties.Properties.editable.show.in.devporal": {
+  "Apis.Details.Properties.Properties.editable.show.in.devportal": {
     "defaultMessage": "Show in devportal"
   },
   "Apis.Details.Properties.Properties.editable.update": {
@@ -2457,8 +2937,26 @@
   "Apis.Details.Properties.Properties.help.main": {
     "defaultMessage": "Usually, APIs have a pre-defined set of properties such as the name, version, context, etc. API Properties allows you to add specific custom properties to the API."
   },
+  "Apis.Details.Properties.Properties.no.changes.to.save": {
+    "defaultMessage": "No changes to save"
+  },
+  "Apis.Details.Properties.Properties.property.name.empty.error": {
+    "defaultMessage": "Property name/value can not be empty"
+  },
+  "Apis.Details.Properties.Properties.property.name.exists": {
+    "defaultMessage": "Property name already exists"
+  },
+  "Apis.Details.Properties.Properties.property.name.keyword.error": {
+    "defaultMessage": "Property name can not be a system reserved keyword"
+  },
   "Apis.Details.Properties.Properties.property.value": {
     "defaultMessage": "Value"
+  },
+  "Apis.Details.Properties.Properties.show.add.property.invalid.error": {
+    "defaultMessage": "Invalid property name"
+  },
+  "Apis.Details.Properties.Properties.show.add.property.property.name": {
+    "defaultMessage": "Name"
   },
   "Apis.Details.Properties.Properties.update.not.allowed": {
     "defaultMessage": "*You are not authorized to update properties of the API due to insufficient permissions"
@@ -2469,20 +2967,122 @@
   "Apis.Details.QueryAnalysis.UpdateComplexity.fieldcomplexitysum": {
     "defaultMessage": "Sum of the Complexity"
   },
+  "Apis.Details.QueryAnalysis.UpdateComplexity.table.complexity.value": {
+    "defaultMessage": "ComplexityValue"
+  },
+  "Apis.Details.QueryAnalysis.UpdateComplexity.table.field": {
+    "defaultMessage": "Field"
+  },
+  "Apis.Details.QueryAnalysis.UpdateComplexity.type.label": {
+    "defaultMessage": "Type"
+  },
+  "Apis.Details.QueryAnalysis.UpdateComplexity.type.placeholder": {
+    "defaultMessage": "Search By Types"
+  },
   "Apis.Details.QueryAnalysis.UpdateComplexity.typeName": {
     "defaultMessage": "Type"
   },
   "Apis.Details.QyeryAnalysis.UpdateComplexity.save": {
     "defaultMessage": "Set"
   },
+  "Apis.Details.Rate.Limiting.operations.api.product.message.body": {
+    "defaultMessage": "Rate limiting polices of the source operation will be applied"
+  },
+  "Apis.Details.Rate.Limiting.operations.api.product.message.caption": {
+    "defaultMessage": "Rate limiting policy of an individual operation will be govern by the policy specified in the source operation"
+  },
+  "Apis.Details.Rate.Limiting.operations.configuration": {
+    "defaultMessage": "Operations Configuration"
+  },
+  "Apis.Details.Rate.Limiting.operations.configuration.tooltip": {
+    "defaultMessage": "Configurations that affects on all the resources"
+  },
+  "Apis.Details.Rate.Limiting.operations.message.body": {
+    "defaultMessage": "You may change the rate limiting policies per operation"
+  },
+  "Apis.Details.Rate.Limiting.operations.message.caption": {
+    "defaultMessage": "Expand an operation below to select a rate limiting policy for an operation"
+  },
+  "Apis.Details.Rate.Limiting.rate.limiting.level": {
+    "defaultMessage": "Rate limiting level"
+  },
+  "Apis.Details.Rate.Limiting.rate.limiting.level.api.level": {
+    "defaultMessage": "API Level"
+  },
+  "Apis.Details.Rate.Limiting.rate.limiting.level.operation.level": {
+    "defaultMessage": "Operation Level"
+  },
+  "Apis.Details.Rate.Limiting.rate.limiting.policies": {
+    "defaultMessage": "Rate limiting policies"
+  },
+  "Apis.Details.Rate.Limiting.rate.limiting.policies.helper.text": {
+    "defaultMessage": "Selected rate limiting policy will be applied to whole API"
+  },
   "Apis.Details.Resources.APIOperations.title": {
     "defaultMessage": "Resources"
+  },
+  "Apis.Details.Resources.Components.Go.To.Definition": {
+    "defaultMessage": "Edit API Definition"
+  },
+  "Apis.Details.Resources.Components.Operations.tooltip.clear.selections": {
+    "defaultMessage": "Clear selections"
+  },
+  "Apis.Details.Resources.Components.Operations.tooltip.delete.selections": {
+    "defaultMessage": "Mark all for delete"
+  },
+  "Apis.Details.Resources.Components.async.api.description": {
+    "defaultMessage": "Description"
+  },
+  "Apis.Details.Resources.Components.async.api.description.title": {
+    "defaultMessage": "Description"
+  },
+  "Apis.Details.Resources.Components.operation.async.api.payload.properties": {
+    "defaultMessage": "Payload Properties"
+  },
+  "Apis.Details.Resources.Components.operationComponents.parameters.async.api.topic": {
+    "defaultMessage": "Topic Parameters"
+  },
+  "Apis.Details.Resources.Operation.Components.Description": {
+    "defaultMessage": "Description"
+  },
+  "Apis.Details.Resources.Operation.Components.Description.title": {
+    "defaultMessage": "Description"
+  },
+  "Apis.Details.Resources.Operation.Components.Summary": {
+    "defaultMessage": "Summary"
+  },
+  "Apis.Details.Resources.Operation.Components.Summary.title": {
+    "defaultMessage": "Summary"
+  },
+  "Apis.Details.Resources.Operation.Parameters": {
+    "defaultMessage": "Parameters"
+  },
+  "Apis.Details.Resources.Policy.Dialog.close.editor.btn": {
+    "defaultMessage": "close"
+  },
+  "Apis.Details.Resources.Policy.Dialog.save.and.close.btn": {
+    "defaultMessage": "save & close"
+  },
+  "Apis.Details.Resources.Policy.update.error": {
+    "defaultMessage": "Something went wrong while updating resource policy!"
+  },
+  "Apis.Details.Resources.Policy.update.success": {
+    "defaultMessage": "Resource policy updated successfully"
   },
   "Apis.Details.Resources.Resources.api.scope.deleted.successfully": {
     "defaultMessage": "API Scope deleted successfully!"
   },
   "Apis.Details.Resources.Resources.edit.resources.button": {
     "defaultMessage": "Edit Resources"
+  },
+  "Apis.Details.Resources.Resources.edit.resources.title": {
+    "defaultMessage": "Product Resources"
+  },
+  "Apis.Details.Resources.Resources.resources.reset.button": {
+    "defaultMessage": "Reset"
+  },
+  "Apis.Details.Resources.Resources.resources.save.button": {
+    "defaultMessage": "Save"
   },
   "Apis.Details.Resources.Resources.something.went.wrong.while.updating.the.api": {
     "defaultMessage": "Error occurred while updating API"
@@ -2498,6 +3098,18 @@
   },
   "Apis.Details.Resources.components.AddOperation.operation.target.or.verb.cannot.be.empty.warning": {
     "defaultMessage": "Operation target or operation verb(s) can't be empty"
+  },
+  "Apis.Details.Resources.components.AddOperation.operation.target.topic.name": {
+    "defaultMessage": "Enter topic name"
+  },
+  "Apis.Details.Resources.components.AddOperation.operation.target.topic.name.label": {
+    "defaultMessage": "Topic Name"
+  },
+  "Apis.Details.Resources.components.AddOperation.operation.target.uri.pattern": {
+    "defaultMessage": "Enter URI pattern"
+  },
+  "Apis.Details.Resources.components.AddOperation.operation.target.uri.pattern.label": {
+    "defaultMessage": "URI Pattern"
   },
   "Apis.Details.Resources.components.AddOperation.operation.topic.cannot.have.path.params.warning": {
     "defaultMessage": "WebSub topic can't have path parameters"
@@ -2523,6 +3135,12 @@
   "Apis.Details.Resources.components.Operation.undo.delete": {
     "defaultMessage": "Undo Delete"
   },
+  "Apis.Details.Resources.components.async.api.runtime.title": {
+    "defaultMessage": "Runtime"
+  },
+  "Apis.Details.Resources.components.async.api.url.mapping.label": {
+    "defaultMessage": "URL Mapping"
+  },
   "Apis.Details.Resources.components.operationComponents.AWSLambdaSettings.Title": {
     "defaultMessage": "AWS Lambda Settings"
   },
@@ -2543,6 +3161,9 @@
   },
   "Apis.Details.Resources.components.operationComponents.AddParameter.parameter.name.already.exists": {
     "defaultMessage": "Parameter name already exists"
+  },
+  "Apis.Details.Resources.components.operationComponents.AddParameter.type": {
+    "defaultMessage": "Parameter Type"
   },
   "Apis.Details.Resources.components.operationComponents.EditParameter.close": {
     "defaultMessage": "Close"
@@ -2700,6 +3321,15 @@
   "Apis.Details.Resources.components.operationComponents.data.type": {
     "defaultMessage": "Data Type"
   },
+  "Apis.Details.Resources.components.operationComponents.data.type.helper": {
+    "defaultMessage": "Select the data type"
+  },
+  "Apis.Details.Resources.components.operationComponents.name.helper.text": {
+    "defaultMessage": "Enter property name"
+  },
+  "Apis.Details.Resources.components.operationComponents.name.label": {
+    "defaultMessage": "Name"
+  },
   "Apis.Details.Resources.components.operationComponents.parameter.name": {
     "defaultMessage": "Parameter Name"
   },
@@ -2715,6 +3345,30 @@
   "Apis.Details.Resources.components.operationComponents.select.parameter.type": {
     "defaultMessage": "Select the parameter type"
   },
+  "Apis.Details.Scopes.Create.CreateScope.label.display.name": {
+    "defaultMessage": "Display Name"
+  },
+  "Apis.Details.Scopes.Create.CreateScope.label.name": {
+    "defaultMessage": "Name"
+  },
+  "Apis.Details.Scopes.Create.CreateScope.placeholder.display.name": {
+    "defaultMessage": "Scope Display Name"
+  },
+  "Apis.Details.Scopes.Create.CreateScope.placholder.name": {
+    "defaultMessage": "Scope Name"
+  },
+  "Apis.Details.Scopes.Create.CreateScope.roles.label": {
+    "defaultMessage": "Roles"
+  },
+  "Apis.Details.Scopes.Create.CreateScope.roles.placeholder": {
+    "defaultMessage": "Enter roles and press Enter"
+  },
+  "Apis.Details.Scopes.Create.Scope.validate.role.error": {
+    "defaultMessage": "Error when validating role: {role}"
+  },
+  "Apis.Details.Scopes.Create.Scope.validate.scope.error": {
+    "defaultMessage": "Error when validating scope: {value}"
+  },
   "Apis.Details.Scopes.CreateScope.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -2722,6 +3376,18 @@
     "defaultMessage": "Create New Scope"
   },
   "Apis.Details.Scopes.CreateScope.description.about.the.scope": {
+    "defaultMessage": "Short description about the scope"
+  },
+  "Apis.Details.Scopes.CreateScope.description.about.the.scope.label": {
+    "defaultMessage": "Description"
+  },
+  "Apis.Details.Scopes.CreateScope.description.about.the.scope.placeholder": {
+    "defaultMessage": "Short description about the scope"
+  },
+  "Apis.Details.Scopes.CreateScope.description.label.about.the.scope": {
+    "defaultMessage": "Description"
+  },
+  "Apis.Details.Scopes.CreateScope.description.placeholder.about.the.scope": {
     "defaultMessage": "Short description about the scope"
   },
   "Apis.Details.Scopes.CreateScope.roles.help": {
@@ -2742,10 +3408,34 @@
   "Apis.Details.Scopes.CreateScope.short.description.name": {
     "defaultMessage": "Enter Scope Name ( E.g.,: creator )"
   },
+  "Apis.Details.Scopes.Edit.Scope.validate.role.error": {
+    "defaultMessage": "Error when validating role: {role}"
+  },
   "Apis.Details.Scopes.EditScope.cancel": {
     "defaultMessage": "Cancel"
   },
+  "Apis.Details.Scopes.EditScope.description.about.the.scope.label": {
+    "defaultMessage": "Description"
+  },
+  "Apis.Details.Scopes.EditScope.display.name.label": {
+    "defaultMessage": "Display Name"
+  },
+  "Apis.Details.Scopes.EditScope.display.name.placeholder": {
+    "defaultMessage": "Scope Display Name"
+  },
+  "Apis.Details.Scopes.EditScope.name.label": {
+    "defaultMessage": "Name"
+  },
+  "Apis.Details.Scopes.EditScope.roles.label": {
+    "defaultMessage": "Roles"
+  },
+  "Apis.Details.Scopes.EditScope.roles.placeholder": {
+    "defaultMessage": "Enter roles and press Enter"
+  },
   "Apis.Details.Scopes.EditScope.short.description.about.the.scope": {
+    "defaultMessage": "Short description about the scope"
+  },
+  "Apis.Details.Scopes.EditScope.short.description.about.the.scope.placeholder": {
     "defaultMessage": "Short description about the scope"
   },
   "Apis.Details.Scopes.EditScope.update": {
@@ -2922,6 +3612,12 @@
   "Apis.Details.Subscriptions.Subscriptions.save": {
     "defaultMessage": "Save"
   },
+  "Apis.Details.Subscriptions.Subscriptions.update.error": {
+    "defaultMessage": "Error occurred while updating subscription configurations"
+  },
+  "Apis.Details.Subscriptions.Subscriptions.update.success": {
+    "defaultMessage": "Subscription configurations updated successfully"
+  },
   "Apis.Details.Subscriptions.SubscriptionsTable.active.subs.state": {
     "defaultMessage": "Active"
   },
@@ -2930,6 +3626,9 @@
   },
   "Apis.Details.Subscriptions.SubscriptionsTable.blocked.subs.state": {
     "defaultMessage": "Blocked"
+  },
+  "Apis.Details.Subscriptions.SubscriptionsTable.contact.subscribers": {
+    "defaultMessage": "Contact Subscribers"
   },
   "Apis.Details.Subscriptions.SubscriptionsTable.error.subscription.block": {
     "defaultMessage": "Error: Unable to block subscription. (Reason: {message})"
@@ -2969,6 +3668,9 @@
   },
   "Apis.Details.Subscriptions.SubscriptionsTable.subscriptions.error": {
     "defaultMessage": "Error while retrieving the subscriptions"
+  },
+  "Apis.Details.Topic.components.operationComponents.OperationGovernance.security.label": {
+    "defaultMessage": "Security"
   },
   "Apis.Details.Topics.components.AddOperation.op.type": {
     "defaultMessage": "Type"
@@ -3045,11 +3747,17 @@
   "Apis.Details.Topics.components.operationComponents.OperationGovernance.operation.scope.select.shared": {
     "defaultMessage": "Shared Scopes"
   },
+  "Apis.Details.Topics.components.operationComponents.OperationGovernance.security.switch": {
+    "defaultMessage": "Security"
+  },
   "Apis.Details.Topics.components.operationComponents.OperationGovernance.subTitle": {
     "defaultMessage": "(Security & Scopes)"
   },
   "Apis.Details.Topics.components.operationComponents.OperationGovernance.title": {
     "defaultMessage": "Operation Governance"
+  },
+  "Apis.Details.TryOutConsole.token.helper": {
+    "defaultMessage": "Generate or provide an internal API Key"
   },
   "Apis.Details.TryOutConsole.token.label": {
     "defaultMessage": "Internal API Key"
@@ -3093,6 +3801,18 @@
   "Apis.Details.components.DeleteApiButton.title": {
     "defaultMessage": "Delete {type}"
   },
+  "Apis.Details.components.api.delete.error": {
+    "defaultMessage": "Something went wrong while deleting the API!"
+  },
+  "Apis.Details.components.api.delete.success": {
+    "defaultMessage": "API {name} deleted Successfully"
+  },
+  "Apis.Details.components.api.product.delete.error": {
+    "defaultMessage": "Something went wrong while deleting the API Product!"
+  },
+  "Apis.Details.components.api.product.delete.success": {
+    "defaultMessage": "API Product {name} deleted Successfully"
+  },
   "Apis.Details.index.Tryout.menu.name": {
     "defaultMessage": "Try Out"
   },
@@ -3105,6 +3825,15 @@
   "Apis.Details.index.api.not.found.title": {
     "defaultMessage": "API is not found in the {environmentLabel} Environment"
   },
+  "Apis.Details.index.api.product.update.error": {
+    "defaultMessage": "Something went wrong while updating the {apiName} API!!"
+  },
+  "Apis.Details.index.api.product.update.success": {
+    "defaultMessage": "{updatedAPIName} API Product updated successfully"
+  },
+  "Apis.Details.index.api.update.success": {
+    "defaultMessage": "{updatedAPIName} API updated successfully"
+  },
   "Apis.Details.index.asyncApi.definition": {
     "defaultMessage": "AsyncAPI Definition"
   },
@@ -3114,8 +3843,23 @@
   "Apis.Details.index.comments": {
     "defaultMessage": "Comments"
   },
+  "Apis.Details.index.deploy.title": {
+    "defaultMessage": "Deploy"
+  },
+  "Apis.Details.index.design.api.configs.title": {
+    "defaultMessage": "API Configurations"
+  },
+  "Apis.Details.index.design.api.configs.title.tooltip": {
+    "defaultMessage": "If you make any changes to the API configuration, you need to redeploy the API to see updates in the API Gateway."
+  },
   "Apis.Details.index.design.configs": {
     "defaultMessage": "Basic info"
+  },
+  "Apis.Details.index.design.portal.configs.title": {
+    "defaultMessage": "Portal Configurations"
+  },
+  "Apis.Details.index.develop.title": {
+    "defaultMessage": "Develop"
   },
   "Apis.Details.index.documents": {
     "defaultMessage": "documents"
@@ -3147,6 +3891,9 @@
   "Apis.Details.index.properties": {
     "defaultMessage": "properties"
   },
+  "Apis.Details.index.publish.title": {
+    "defaultMessage": "Publish"
+  },
   "Apis.Details.index.resources": {
     "defaultMessage": "resources"
   },
@@ -3158,6 +3905,9 @@
   },
   "Apis.Details.index.subscriptions": {
     "defaultMessage": "subscriptions"
+  },
+  "Apis.Details.index.test.title": {
+    "defaultMessage": "Test"
   },
   "Apis.Details.index.topics": {
     "defaultMessage": "topics"
@@ -3203,6 +3953,9 @@
   },
   "Apis.Listing.ApiThumb.version": {
     "defaultMessage": "Version"
+  },
+  "Apis.Listing.Components.Create.API": {
+    "defaultMessage": "Create API"
   },
   "Apis.Listing.Landing.index.no.apis.description": {
     "defaultMessage": "If you think this is by mistake, please contact your administrator"
@@ -3333,6 +4086,9 @@
   "Apis.Listing.SampleAPIProduct.description": {
     "defaultMessage": "Combine multiple API resources in to a single API"
   },
+  "Apis.Listing.SampleAPIProduct.onboarding.menu.card.name": {
+    "defaultMessage": "API Product"
+  },
   "Apis.Listing.TableView.TableView.doc.flag": {
     "defaultMessage": "[Doc]"
   },
@@ -3462,6 +4218,27 @@
   "Apis.Shared.RedirectToLogin.you.will.be.redirected.to": {
     "defaultMessage": "You will be redirected to {page}"
   },
+  "App.Components.Footer.Feedback.response.msg": {
+    "defaultMessage": "Thank you for the feedback."
+  },
+  "App.Components.Scopes.Create.Scope.validate.role.error": {
+    "defaultMessage": "Error when validating role: {role}"
+  },
+  "App.Components.Scopes.Create.Scope.validate.scope.error": {
+    "defaultMessage": "Error when validating role: {scope}"
+  },
+  "App.Components.Scopes.Edit.Scope.validate.role.error": {
+    "defaultMessage": "Error when validating role: {role}"
+  },
+  "Applications.Details.Invoice.Dialog.No.Data.Available": {
+    "defaultMessage": "No Data Available"
+  },
+  "Applications.Details.Invoice.Dialog.close": {
+    "defaultMessage": "Close"
+  },
+  "Applications.Details.Invoice.Dialog.data.not.found": {
+    "defaultMessage": "Pending invoice data not found for this subscription."
+  },
   "Applications.Details.Invoice.view.btn": {
     "defaultMessage": "View Invoice"
   },
@@ -3543,8 +4320,29 @@
   "Base.Header.navbar.GlobalNavBar.scopes": {
     "defaultMessage": "Scopes"
   },
+  "Base.Header.navbar.GlobalNavBar.title.analytics": {
+    "defaultMessage": "Analytics"
+  },
+  "Base.Header.navbar.GlobalNavBar.title.api.products": {
+    "defaultMessage": "API Products"
+  },
+  "Base.Header.navbar.GlobalNavBar.title.apis": {
+    "defaultMessage": "APIs"
+  },
+  "Base.Header.navbar.GlobalNavBar.title.scopes": {
+    "defaultMessage": "Scopes"
+  },
+  "Base.Header.navbar.GlobalNavBar.title.services": {
+    "defaultMessage": "Services"
+  },
   "Connection.Timeout": {
     "defaultMessage": "Connection Timeout"
+  },
+  "Custom.Split.Button.Save": {
+    "defaultMessage": "Save"
+  },
+  "Custom.Split.Button.Save.And.Deploy": {
+    "defaultMessage": "Save and deploy"
   },
   "Endpoint.Suspension.State": {
     "defaultMessage": "Endpoint Suspension State"
@@ -3561,6 +4359,21 @@
   "LoginDenied.title": {
     "defaultMessage": "Error 403 : Forbidden"
   },
+  "Mui.data.table.pagination.display.rows": {
+    "defaultMessage": "of"
+  },
+  "Mui.data.table.pagination.display.tool.download.csv": {
+    "defaultMessage": "Download CSV"
+  },
+  "Mui.data.table.pagination.display.tool.print": {
+    "defaultMessage": "Print"
+  },
+  "Mui.data.table.pagination.display.tool.view.columns": {
+    "defaultMessage": "\"View Columns\""
+  },
+  "Mui.data.table.pagination.rows.per.page": {
+    "defaultMessage": "Rows per page:"
+  },
   "Scopes.Create.CreateScope.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -3569,6 +4382,24 @@
   },
   "Scopes.Create.CreateScope.heading.scope.heading": {
     "defaultMessage": "Scopes"
+  },
+  "Scopes.Create.CreateScope.label.display.name": {
+    "defaultMessage": "Display Name"
+  },
+  "Scopes.Create.CreateScope.label.name": {
+    "defaultMessage": "Name"
+  },
+  "Scopes.Create.CreateScope.label.roles": {
+    "defaultMessage": "Roles"
+  },
+  "Scopes.Create.CreateScope.placeholder.display.name": {
+    "defaultMessage": "Scope Display Name"
+  },
+  "Scopes.Create.CreateScope.placeholder.roles": {
+    "defaultMessage": "Enter roles and press Enter"
+  },
+  "Scopes.Create.CreateScope.placholder.name": {
+    "defaultMessage": "Scope Name"
   },
   "Scopes.Create.CreateScope.roles.help": {
     "defaultMessage": "Enter a valid role and press `Enter`."
@@ -3630,16 +4461,37 @@
   "Scopes.EditScope.cancel": {
     "defaultMessage": "Cancel"
   },
+  "Scopes.EditScope.description.about.the.scope.label": {
+    "defaultMessage": "Description"
+  },
+  "Scopes.EditScope.display.name.label": {
+    "defaultMessage": "Display Name"
+  },
+  "Scopes.EditScope.display.name.placeholder": {
+    "defaultMessage": "Scope Display Name"
+  },
   "Scopes.EditScope.heading.scope.heading": {
     "defaultMessage": "Scopes"
   },
+  "Scopes.EditScope.name.label": {
+    "defaultMessage": "Name"
+  },
   "Scopes.EditScope.roles.help": {
     "defaultMessage": "Enter a valid role and press `Enter`."
+  },
+  "Scopes.EditScope.roles.label": {
+    "defaultMessage": "Roles"
+  },
+  "Scopes.EditScope.roles.placeholder": {
+    "defaultMessage": "Enter roles and press Enter"
   },
   "Scopes.EditScope.scope.updated.successfully": {
     "defaultMessage": "Scope updated successfully"
   },
   "Scopes.EditScope.short.description.about.the.scope": {
+    "defaultMessage": "Short description about the scope"
+  },
+  "Scopes.EditScope.short.description.about.the.scope.placeholder": {
     "defaultMessage": "Short description about the scope"
   },
   "Scopes.EditScope.short.description.display.name": {
@@ -3659,6 +4511,9 @@
   },
   "Scopes.Listing.Listing.scopes.enable.fine.gained.access.control": {
     "defaultMessage": "Scopes enable fine-grained access control to API resources based on user roles."
+  },
+  "Scopes.Listing.Listing.scopes.onboarding.menu.card.name": {
+    "defaultMessage": "Scopes"
   },
   "Scopes.Listing.Listing.scopes.text.editor.edit": {
     "defaultMessage": "Edit"
@@ -3705,6 +4560,9 @@
   "Scopes.Usage.Usage.usage.cancel": {
     "defaultMessage": "Cancel"
   },
+  "Scopes.Usage.UsageView.resource.revision": {
+    "defaultMessage": "Revision"
+  },
   "Scopes.Usage.UsageView.resource.target": {
     "defaultMessage": "Target"
   },
@@ -3716,6 +4574,9 @@
   },
   "Scopes.Usage.UsageViewAPI.api.usage": {
     "defaultMessage": "List of APIs"
+  },
+  "ServiceCatalog.CreateApi.api.actual.context.helper": {
+    "defaultMessage": "API will be exposed in {actualContext} context at the gateway"
   },
   "ServiceCatalog.CreateApi.api.context.label": {
     "defaultMessage": "Context"
@@ -3959,6 +4820,9 @@
   },
   "app.components.Shared.Banner.back": {
     "defaultMessage": "Back"
+  },
+  "app.components.Shared.onboarding.insufficient.permissions": {
+    "defaultMessage": "*You are not authorized to create or update {name} due to insufficient permissions"
   },
   "block.all": {
     "defaultMessage": "Block All"

@@ -28,7 +28,7 @@ import CreateApi from 'AppComponents/ServiceCatalog/CreateApi';
 import { isRestricted } from 'AppData/AuthManager';
 import MUIDataTable from 'mui-datatables';
 import moment from 'moment';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
     ScopeValidation, resourceMethod, resourcePath, client,
 } from 'AppData/ScopeValidation';
@@ -108,6 +108,7 @@ function ServicesTableView(props) {
     const { serviceList, onDelete } = props;
 
     const classes = useStyles();
+    const intl = useIntl();
 
     const getDefinitionTypeDisplayName = (definitionType) => {
         return Configurations.serviceCatalogDefinitionTypes[definitionType] || definitionType;
@@ -330,6 +331,18 @@ function ServicesTableView(props) {
         customToolbar: false,
         rowsPerPageOptions: [5, 10, 25, 50, 100],
         elevation: 1,
+        textLabels: {
+            pagination: {
+                rowsPerPage: intl.formatMessage({
+                    id: 'Mui.data.table.pagination.rows.per.page',
+                    defaultMessage: 'Rows per page:',
+                }),
+                displayRows: intl.formatMessage({
+                    id: 'Mui.data.table.pagination.display.rows',
+                    defaultMessage: 'of',
+                }),
+            },
+        },
     };
 
     return (

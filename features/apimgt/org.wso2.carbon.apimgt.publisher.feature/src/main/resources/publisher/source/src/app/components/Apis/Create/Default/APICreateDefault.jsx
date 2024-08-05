@@ -156,7 +156,10 @@ function APICreateDefault(props) {
             promisedCreatedAPI = newAPIProduct
                 .saveProduct(apiData)
                 .then((apiProduct) => {
-                    Alert.info('API Product created successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Create.Default.APICreateDefault.api.product.created.success',
+                        defaultMessage: 'API Product created successfully',
+                    }));
                     history.push(`/api-products/${apiProduct.id}/overview`);
                     return apiProduct;
                 })
@@ -166,7 +169,10 @@ function APICreateDefault(props) {
                         setPageError(error.response.body);
                     } else {
                         // TODO add i18n ~tmkb
-                        const message = 'Something went wrong while adding the API Product';
+                        const message = intl.formatMessage({
+                            id: 'Apis.Create.Default.APICreateDefault.api.product.created.error',
+                            defaultMessage: 'Something went wrong while adding the API Product',
+                        });
                         Alert.error(message);
                         setPageError(message);
                     }
@@ -177,7 +183,12 @@ function APICreateDefault(props) {
             promisedCreatedAPI = newAPI
                 .save()
                 .then((api) => {
-                    Alert.info('API created successfully');
+                    Alert.info(
+                        intl.formatMessage({
+                            id: 'Apis.Create.Default.APICreateDefault.api.created.success',
+                            defaultMessage: 'API created successfully',
+                        }),
+                    );
                     return api;
                 })
                 .catch((error) => {
@@ -185,7 +196,10 @@ function APICreateDefault(props) {
                         Alert.error(error.response.body.description);
                         setPageError(error.response.body);
                     } else {
-                        const message = 'Something went wrong while adding the API';
+                        const message = intl.formatMessage({
+                            id: 'Apis.Create.Default.APICreateDefault.api.created.error',
+                            defaultMessage: 'Something went wrong while adding the API',
+                        });
                         Alert.error(message);
                         setPageError(message);
                     }
@@ -213,7 +227,10 @@ function APICreateDefault(props) {
             restApi.createRevision(api.id, body)
                 .then((api1) => {
                     const revisionId = api1.body.id;
-                    Alert.info('API Revision created successfully');
+                    Alert.info(intl.formatMessage({
+                        id: 'Apis.Create.Default.APICreateDefault.api.revision.created.success',
+                        defaultMessage: 'API Revision created successfully',
+                    }));
                     setIsRevisioning(false);
                     const envList = settings.environment.map((env) => env.name);
                     const body1 = [];
@@ -241,7 +258,10 @@ function APICreateDefault(props) {
                     setIsDeploying(true);
                     restApi.deployRevision(api.id, revisionId, body1)
                         .then(() => {
-                            Alert.info('API Revision Deployed Successfully');
+                            Alert.info(intl.formatMessage({
+                                id: 'Apis.Create.Default.APICreateDefault.api.revision.deployed.success',
+                                defaultMessage: 'API Revision Deployed Successfully',
+                            }));
                             setIsDeploying(false);
                             // Publishing API after deploying
                             setIsPublishing(true);
@@ -421,7 +441,10 @@ function APICreateDefault(props) {
                                 disabled={isAPICreateDisabled || !apiInputs.isFormValid}
                                 onClick={createAPIOnly}
                             >
-                                Create
+                                <FormattedMessage
+                                    id='Apis.Create.Default.APICreateDefault.create.btn'
+                                    defaultMessage='Create'
+                                />
                                 {' '}
                                 {isCreating && !isPublishButtonClicked && <CircularProgress size={24} />}
                             </Button>
@@ -436,7 +459,13 @@ function APICreateDefault(props) {
                                         || isAPICreateDisabled || !apiInputs.isFormValid}
                                     onClick={createAndPublish}
                                 >
-                                    {(!isPublishing && !isRevisioning && !isDeploying) && 'Create & Publish'}
+                                    {(!isPublishing && !isRevisioning && !isDeploying)
+                                        && (
+                                            <FormattedMessage
+                                                id='Apis.Create.Default.APICreateDefault.create.publish.btn'
+                                                defaultMessage='Create & Publish'
+                                            />
+                                        )}
                                     {(isPublishing || isRevisioning || isDeploying) && <CircularProgress size={24} />}
                                     {isCreating && isPublishing && 'Creating API . . .'}
                                     {!isCreating && isRevisioning && !isDeploying && 'Creating Revision . . .'}

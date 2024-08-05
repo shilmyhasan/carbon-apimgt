@@ -31,7 +31,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import queryString from 'query-string';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import cloneDeep from 'lodash.clonedeep';
@@ -187,7 +187,7 @@ function ProductResourcesEdit(props) {
     const {
         apiResources, setApiResources, isStateCreate, api, resourceNotFountMessage,
     } = props;
-
+    const intl = useIntl();
     // Define states
     const [allApis, setAllApis] = useState([]);
     const [notFound, setNotFound] = useState(false);
@@ -509,10 +509,24 @@ function ProductResourcesEdit(props) {
                                 <ListItem className={classes.searchWrapper}>
                                     <TextField
                                         id='outlined-full-width'
-                                        label='API'
+                                        label={(
+                                            <FormattedMessage
+                                                id={'Apis.Details.ProductResources.ProductResourcesWorkspace.filter.'
+                                                    + 'an.api.label'}
+                                                defaultMessage='API'
+                                            />
+                                        )}
                                         style={{ margin: 8 }}
-                                        placeholder='Filter APIs'
-                                        helperText='Filter by name'
+                                        placeholder={intl.formatMessage({
+                                            id: 'Apis.Details.ProductResources.ProductResourcesWorkspace.filter.'
+                                                + 'an.api.placeholder',
+                                            defaultMessage: 'Filter APIs',
+                                        })}
+                                        helperText={intl.formatMessage({
+                                            id: 'Apis.Details.ProductResources.ProductResourcesWorkspace.filter.'
+                                                + 'an.api.helper.text',
+                                            defaultMessage: 'Filter by name',
+                                        })}
                                         onChange={handleSearchTextChange}
                                         value={searchText}
                                         fullWidth
@@ -579,8 +593,8 @@ function ProductResourcesEdit(props) {
                                     >
                                         <Typography variant='body2'>
                                             <FormattedMessage
-                                                id='Apis.Details.ProductResources.ProductResourcesWorkspace.
-                                        toolbar.add.selected'
+                                                id={'Apis.Details.ProductResources.ProductResourcesWorkspace.'
+                                                    + 'toolbar.add.selected'}
                                                 defaultMessage='Add Selected'
                                             />
                                         </Typography>
@@ -594,8 +608,8 @@ function ProductResourcesEdit(props) {
                                     >
                                         <Typography variant='body2'>
                                             <FormattedMessage
-                                                id='Apis.Details.ProductResources.ProductResourcesWorkspace.toolbar.
-                                                add.all'
+                                                id={'Apis.Details.ProductResources.ProductResourcesWorkspace.'
+                                                    + 'toolbar.add.all'}
                                                 defaultMessage='Add All'
                                             />
                                         </Typography>
@@ -712,8 +726,8 @@ function ProductResourcesEdit(props) {
                                             <div className={classes.messageWrapper}>
                                                 <Typography component='p'>
                                                     <FormattedMessage
-                                                        id='Apis.Details.ProductResources.ProductResourcesWorkspace.
-                                                    empty.title'
+                                                        id={'Apis.Details.ProductResources.ProductResourcesWorkspace.'
+                                                            + 'empty.title'}
                                                         defaultMessage='Use the left side panel to add resources'
                                                     />
                                                 </Typography>

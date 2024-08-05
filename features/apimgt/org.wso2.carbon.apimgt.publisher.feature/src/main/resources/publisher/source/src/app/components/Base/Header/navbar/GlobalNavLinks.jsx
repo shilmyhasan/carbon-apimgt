@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import Box from '@material-ui/core/Box';
 import LaunchIcon from '@material-ui/icons/Launch';
 import { useTheme } from '@material-ui/styles';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import AuthManager from 'AppData/AuthManager';
 import { makeStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
@@ -48,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
 function GlobalNavLinks(props) {
     const publisherUser = !AuthManager.isNotPublisher();
     const classes = useStyles();
+    const intl = useIntl();
     const { selected } = props;
     const theme = useTheme();
     const analyticsMenuEnabled = theme.custom.leftMenuAnalytics.enable;
@@ -57,7 +58,10 @@ function GlobalNavLinks(props) {
             <GlobalNavLink
                 to='/apis'
                 type='apis'
-                title='APIs'
+                title={intl.formatMessage({
+                    id: 'Base.Header.navbar.GlobalNavBar.title.apis',
+                    defaultMessage: 'APIs',
+                })}
                 active={selected === 'apis'}
             >
                 <FormattedMessage
@@ -68,7 +72,10 @@ function GlobalNavLinks(props) {
             <GlobalNavLink
                 to='/service-catalog'
                 type='service-catalog'
-                title='Services'
+                title={intl.formatMessage({
+                    id: 'Base.Header.navbar.GlobalNavBar.title.services',
+                    defaultMessage: 'Services',
+                })}
                 active={selected === 'service-catalog'}
             >
                 <FormattedMessage
@@ -81,7 +88,10 @@ function GlobalNavLinks(props) {
                     <GlobalNavLink
                         to='/api-products'
                         type='api-product'
-                        title='API Products'
+                        title={intl.formatMessage({
+                            id: 'Base.Header.navbar.GlobalNavBar.title.api.products',
+                            defaultMessage: 'API Products',
+                        })}
                         active={selected === 'api-products'}
                     >
                         <FormattedMessage
@@ -93,7 +103,10 @@ function GlobalNavLinks(props) {
             <GlobalNavLink
                 to='/scopes'
                 type='scopes'
-                title='Scopes'
+                title={intl.formatMessage({
+                    id: 'Base.Header.navbar.GlobalNavBar.title.scopes',
+                    defaultMessage: 'Scopes',
+                })}
                 active={selected === 'scopes'}
             >
                 <FormattedMessage id='Base.Header.navbar.GlobalNavBar.scopes' defaultMessage='Scopes' />
@@ -105,7 +118,10 @@ function GlobalNavLinks(props) {
                         <GlobalNavLink
                             isExternalLink
                             type='analytics'
-                            title='Analytics'
+                            title={intl.formatMessage({
+                                id: 'Base.Header.navbar.GlobalNavBar.title.analytics',
+                                defaultMessage: 'Analytics',
+                            })}
                         >
                             <div style={{ flexDirection: 'row', display: 'flex' }}>
                                 <FormattedMessage

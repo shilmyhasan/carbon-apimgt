@@ -23,7 +23,7 @@ import Grid from '@material-ui/core/Grid';
 import Tooltip from '@material-ui/core/Tooltip';
 import Checkbox from '@material-ui/core/Checkbox';
 import HelpOutline from '@material-ui/icons/HelpOutline';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import Typography from '@material-ui/core/Typography';
 import WrappedExpansionPanel from 'AppComponents/Shared/WrappedExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -66,6 +66,7 @@ const useStyles = makeStyles((theme) => ({
  */
 export default function CORSConfiguration(props) {
     const [apiFromContext] = useAPI();
+    const intl = useIntl();
     const {
         configDispatcher,
         api: { corsConfiguration },
@@ -127,8 +128,7 @@ export default function CORSConfiguration(props) {
                                 <Grid item md={12}>
                                     <Typography variant='subtitle1'>
                                         <FormattedMessage
-                                            id='Apis.Details.Configuration.components.CORSConfiguration.allow.
-                                                    origins'
+                                            id='Apis.Details.Configuration.components.CORSConfiguration.allow.origins'
                                             defaultMessage='Access Control Allow Origins'
                                         />
                                     </Typography>
@@ -150,7 +150,11 @@ export default function CORSConfiguration(props) {
                                                         color='primary'
                                                     />
                                                 )}
-                                                label='Allow All Origins'
+                                                label={intl.formatMessage({
+                                                    id: 'Apis.Details.Configuration.components.CORSConfiguration.'
+                                                        + 'allow.all.origins',
+                                                    defaultMessage: 'Allow All Origins',
+                                                })}
                                             />
                                         </Grid>
                                         {!isAllowAllOrigins && (
@@ -202,8 +206,7 @@ export default function CORSConfiguration(props) {
                                 <Grid item md={12}>
                                     <Typography variant='subtitle1'>
                                         <FormattedMessage
-                                            id='Apis.Details.Configuration.components.CORSConfiguration.allow.
-                                                    headers'
+                                            id='Apis.Details.Configuration.components.CORSConfiguration.allow.headers'
                                             defaultMessage='Access Control Allow Headers'
                                         />
                                     </Typography>
@@ -246,8 +249,7 @@ export default function CORSConfiguration(props) {
                                 <Grid item md={12}>
                                     <Typography variant='subtitle1'>
                                         <FormattedMessage
-                                            id='Apis.Details.Configuration.components.CORSConfiguration.allow.
-                                                    methods'
+                                            id='Apis.Details.Configuration.components.CORSConfiguration.allow.methods'
                                             defaultMessage='Access Control Allow Methods'
                                         />
                                     </Typography>

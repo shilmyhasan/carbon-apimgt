@@ -288,8 +288,7 @@ function Properties(props) {
             additionalPropertiesCopy.forEach((property) => {
                 if (property.name === fieldKey) {
                     Alert.warning(intl.formatMessage({
-                        id: `Apis.Details.Properties.Properties.
-                            property.name.exists`,
+                        id: 'Apis.Details.Properties.Properties.property.name.exists',
                         defaultMessage: 'Property name already exists',
                     }));
                     valid = false;
@@ -301,8 +300,7 @@ function Properties(props) {
             additionalPropertiesCopy.forEach((property) => {
                 if (property.name === fieldKey) {
                     Alert.warning(intl.formatMessage({
-                        id: `Apis.Details.Properties.Properties.
-                                property.name.exists`,
+                        id: 'Apis.Details.Properties.Properties.property.name.exists',
                         defaultMessage: 'Property name already exists',
                     }));
                     valid = false;
@@ -311,18 +309,16 @@ function Properties(props) {
             return valid;
         } else if (validateEmpty(fieldKey) || validateEmpty(fieldValue)) {
             Alert.warning(intl.formatMessage({
-                id: `Apis.Details.Properties.Properties.
-                    property.name.empty.error`,
+                id: 'Apis.Details.Properties.Properties.property.name.empty.error',
                 defaultMessage: 'Property name/value can not be empty',
             }));
             return false;
         } else if (isKeyword(fieldKey)) {
             Alert.warning(intl.formatMessage({
                 id:
-                `Apis.Details.Properties.Properties.
-                    property.name.keyword.error`,
+                    'Apis.Details.Properties.Properties.property.name.keyword.error',
                 defaultMessage:
-                'Property name can not be a system reserved keyword',
+                    'Property name can not be a system reserved keyword',
             }));
             return false;
         } else {
@@ -344,8 +340,7 @@ function Properties(props) {
         const { newKey, newValue, display } = newRow;
         if (oldKey === newKey && oldValue === newValue && isDisplayInStore === display) {
             Alert.warning(intl.formatMessage({
-                id: `Apis.Details.Properties.Properties.
-                    no.changes.to.save`,
+                id: 'Apis.Details.Properties.Properties.no.changes.to.save',
                 defaultMessage: 'No changes to save',
             }));
             return false;
@@ -521,11 +516,11 @@ function Properties(props) {
                                 ? (
                                     <Typography component='p' className={classes.content}>
                                         <FormattedMessage
-                                            id='Apis.Details.Properties.Properties.APIProduct.
-                                            add.new.property.message.content'
+                                            id={'Apis.Details.Properties.Properties.APIProduct.add.new.property.'
+                                                + 'message.content'}
                                             defaultMessage={
                                                 'Add specific custom properties to your '
-                                        + 'API here.'
+                                                + 'API here.'
                                             }
                                         />
                                     </Typography>
@@ -536,7 +531,7 @@ function Properties(props) {
                                             id='Apis.Details.Properties.Properties.add.new.property.message.content'
                                             defaultMessage={
                                                 'Add specific custom properties to your '
-                                        + 'API here.'
+                                                + 'API here.'
                                             }
                                         />
                                     </Typography>
@@ -598,8 +593,8 @@ function Properties(props) {
                                                         required
                                                         id='property-name'
                                                         label={intl.formatMessage({
-                                                            id: `Apis.Details.Properties.Properties.
-                                                                show.add.property.property.name`,
+                                                            id: 'Apis.Details.Properties.Properties.show.add.property.'
+                                                                + 'property.name',
                                                             defaultMessage: 'Name',
                                                         })}
                                                         margin='dense'
@@ -610,8 +605,8 @@ function Properties(props) {
                                                         onKeyDown={handleKeyDown('propertyKey')}
                                                         helperText={validateEmpty(propertyKey) ? ''
                                                             : iff(isKeyword(propertyKey), intl.formatMessage({
-                                                                id: `Apis.Details.Properties.Properties.
-                                                                    show.add.property.invalid.error`,
+                                                                id: 'Apis.Details.Properties.Properties.show.'
+                                                                + 'add.property.invalid.error',
                                                                 defaultMessage: 'Invalid property name',
                                                             }), '')}
                                                         error={validateEmpty(propertyKey) || isKeyword(propertyKey)}

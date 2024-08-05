@@ -25,7 +25,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import { makeStyles } from '@material-ui/core/styles';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Button from '@material-ui/core/Button';
@@ -67,7 +67,7 @@ export default function ProvideWSDL(props) {
     const [isError, setValidity] = useState(); // If valid value is `null` else an error object will be there
     const [isValidating, setIsValidating] = useState(false);
     const isCreateMode = apiInputs.mode === 'create';
-
+    const intl = useIntl();
     /**
      * Handles WSDL validation response and returns the state.
      *
@@ -86,9 +86,25 @@ export default function ProvideWSDL(props) {
             }
             success = true;
         } else if (type === 'file') {
-            setValidity({ ...isError, file: { message: 'WSDL content validation failed!' } });
+            setValidity({
+                ...isError,
+                file: {
+                    message: intl.formatMessage({
+                        id: 'Apis.Create.WSDL.content.validation.file.failed',
+                        defaultMessage: 'WSDL content validation failed!',
+                    }),
+                },
+            });
         } else {
-            setValidity({ ...isError, url: { message: 'Invalid WSDL URL!' } });
+            setValidity({
+                ...isError,
+                url: {
+                    message: intl.formatMessage({
+                        id: 'Apis.Create.WSDL.content.validation.url.failed',
+                        defaultMessage: 'Invalid WSDL URL!',
+                    }),
+                },
+            });
         }
         onValidate(isWSDLValid);
         setIsValidating(false);
@@ -102,7 +118,10 @@ export default function ProvideWSDL(props) {
      * @param type {string} file/url type
      */
     function handleWSDLValidationErrorResponse(error, type) {
-        let message = 'Error occurred during validation';
+        let message = intl.formatMessage({
+            id: 'Apis.Create.WSDL.validation.error.response',
+            defaultMessage: 'Error occurred during validation',
+        });
         if (error.response && error.response.body.description) {
             message = error.response.body.description;
         }
@@ -381,7 +400,10 @@ export default function ProvideWSDL(props) {
                                 autoFocus
                                 id='outlined-full-width'
                                 label='WSDL URL'
-                                placeholder='Enter WSDL URL'
+                                placeholder={intl.formatMessage({
+                                    id: 'Apis.Create.WSDL.url.placeholder',
+                                    defaultMessage: 'Enter WSDL URL',
+                                })}
                                 fullWidth
                                 margin='normal'
                                 variant='outlined'
@@ -397,7 +419,11 @@ export default function ProvideWSDL(props) {
                                     endAdornment: urlStateEndAdornment,
                                 }}
                                 helperText={
-                                    (isError && isError.url && isError.url.message) || 'Click away to validate the URL'
+                                    (isError && isError.url && isError.url.message)
+                                    || intl.formatMessage({
+                                        id: 'Apis.Create.WSDL.url.helper.text',
+                                        defaultMessage: 'Click away to validate the URL',
+                                    })
                                 }
                                 error={isError && Boolean(isError.url)}
                                 disabled={isValidating}

@@ -33,6 +33,7 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { isRestricted } from 'AppData/AuthManager';
 import CONSTS from 'AppData/Constants';
 import Configurations from 'Config';
+import { useIntl } from 'react-intl';
 import Operation from './components/Operation';
 import GroupOfOperations from './components/GroupOfOperations';
 import SpecErrors from './components/SpecErrors';
@@ -44,7 +45,6 @@ import {
 } from './operationUtils';
 import OperationsSelector from './components/OperationsSelector';
 import SaveOperations from './components/SaveOperations';
-
 /**
  * This component handles the Resource page in API details though it's written in a sharable way
  * that anyone could use this to render resources in anywhere else if needed.
@@ -74,7 +74,7 @@ export default function Resources(props) {
     const [arns, setArns] = useState([]);
     const [resolvedSpec, setResolvedSpec] = useState({ spec: {}, errors: [] });
     const [focusOperationLevel, setFocusOperationLevel] = useState(false);
-
+    const intl = useIntl();
     /**
      *
      *
@@ -214,7 +214,14 @@ export default function Resources(props) {
                 let alreadyExistCount = 0;
                 for (const currentVerb of data.verbs) {
                     if (addedOperations[data.target][currentVerb]) {
-                        const message = `Operation already exist with ${data.target} and ${currentVerb}`;
+                        const message = intl.formatMessage({
+                            id: 'Apis.Details.Configuration.Resources.operation.verbs.already.exist.error',
+                            defaultMessage: 'Operation already exist with {data_target} and {currentVerb}',
+                        },
+                        {
+                            data_target: data.target,
+                            currentVerb,
+                        });
                         Alert.warning(message);
                         console.warn(message);
                         alreadyExistCount++;
@@ -229,7 +236,10 @@ export default function Resources(props) {
                     }
                 }
                 if (alreadyExistCount === data.verbs.length) {
-                    Alert.error('Operation(s) already exist!');
+                    Alert.error(intl.formatMessage({
+                        id: 'Apis.Details.Configuration.Resources.operation.already.exist.error',
+                        defaultMessage: 'Operation(s) already exist!',
+                    }));
                     return currentOperations;
                 }
                 return addedOperations;
@@ -388,7 +398,10 @@ export default function Resources(props) {
                 if (error.response) {
                     setPageError(error.response.body);
                 } else {
-                    Alert.error('Error while updating the definition');
+                    Alert.error(intl.formatMessage({
+                        id: 'Apis.Details.Configuration.Resources.operation.definition.update.error',
+                        defaultMessage: 'Error while updating the definition',
+                    }));
                 }
             });
     }
@@ -475,7 +488,10 @@ export default function Resources(props) {
             return updateAPI({ apiThrottlingPolicy })
                 .catch((error) => {
                     console.error(error);
-                    Alert.error('Error while updating the API');
+                    Alert.error(intl.formatMessage({
+                        id: 'Apis.Details.Configuration.Resources.operation.api.update.error',
+                        defaultMessage: 'Error while updating the API',
+                    }));
                 })
                 .then(() => updateSwagger({ ...openAPISpec, paths: copyOfOperations }));
         } else {

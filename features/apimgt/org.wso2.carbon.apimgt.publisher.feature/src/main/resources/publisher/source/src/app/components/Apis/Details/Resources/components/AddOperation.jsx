@@ -299,7 +299,13 @@ function AddOperation(props) {
                 <Grid item md={5} xs={8}>
                     <TextField
                         id='operation-target'
-                        label={isAsyncAPI ? 'Topic Name' : 'URI Pattern'}
+                        label={isAsyncAPI ? intl.formatMessage({
+                            id: 'Apis.Details.Resources.components.AddOperation.operation.target.topic.name.label',
+                            defaultMessage: 'Topic Name',
+                        }) : intl.formatMessage({
+                            id: 'Apis.Details.Resources.components.AddOperation.operation.target.uri.pattern.label',
+                            defaultMessage: 'URI Pattern',
+                        })}
                         error={Boolean(newOperations.error)}
                         autoFocus
                         name='target'
@@ -308,8 +314,20 @@ function AddOperation(props) {
                             type: name,
                             value: !isWebSub && !value.startsWith('/') ? `/${value}` : value,
                         })}
-                        placeholder={isAsyncAPI ? 'Enter topic name' : 'Enter URI pattern'}
-                        helperText={newOperations.error || (isAsyncAPI ? 'Enter topic name' : 'Enter URI pattern')}
+                        placeholder={isAsyncAPI ? intl.formatMessage({
+                            id: 'Apis.Details.Resources.components.AddOperation.operation.target.topic.name',
+                            defaultMessage: 'Enter topic name',
+                        }) : intl.formatMessage({
+                            id: 'Apis.Details.Resources.components.AddOperation.operation.target.uri.pattern',
+                            defaultMessage: 'Enter URI pattern',
+                        })}
+                        helperText={newOperations.error || (isAsyncAPI ? intl.formatMessage({
+                            id: 'Apis.Details.Resources.components.AddOperation.operation.target.topic.name',
+                            defaultMessage: 'Enter topic name',
+                        }) : intl.formatMessage({
+                            id: 'Apis.Details.Resources.components.AddOperation.operation.target.uri.pattern',
+                            defaultMessage: 'Enter URI pattern',
+                        }))}
                         fullWidth
                         margin='dense'
                         variant='outlined'

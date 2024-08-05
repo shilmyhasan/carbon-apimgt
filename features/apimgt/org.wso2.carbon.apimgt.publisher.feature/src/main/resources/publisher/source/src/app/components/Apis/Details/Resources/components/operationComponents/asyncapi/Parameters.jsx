@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
+import { FormattedMessage } from 'react-intl';
 import ListParameters from './ListParameters';
 
 /*
@@ -45,7 +46,10 @@ export default function Parameters(props) {
         <>
             <Grid item xs={12} md={12}>
                 <Typography variant='subtitle1'>
-                    Topic Parameters
+                    <FormattedMessage
+                        id='Apis.Details.Resources.Components.operationComponents.parameters.async.api.topic'
+                        defaultMessage='Topic Parameters'
+                    />
                     <Divider variant='middle' />
                 </Typography>
             </Grid>

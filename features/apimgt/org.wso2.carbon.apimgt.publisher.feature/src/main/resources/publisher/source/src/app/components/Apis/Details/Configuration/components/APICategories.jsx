@@ -139,7 +139,12 @@ function APICategories(props) {
                     InputProps={{
                         id: 'itest-id-categories-input',
                     }}
-                    helperText='Select API Categories for the API'
+                    helperText={(
+                        <FormattedMessage
+                            id='Apis.Details.Configurations.api.categories.helper.text'
+                            defaultMessage='Select API Categories for the API'
+                        />
+                    )}
                 >
                     { categories.list.map((category) => (
                         <MenuItem

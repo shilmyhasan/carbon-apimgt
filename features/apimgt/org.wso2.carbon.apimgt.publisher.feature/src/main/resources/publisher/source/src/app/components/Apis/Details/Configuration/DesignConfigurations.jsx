@@ -31,7 +31,7 @@ import { Link } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CONSTS from 'AppData/Constants';
 import Alert from 'AppComponents/Shared/Alert';
@@ -216,6 +216,7 @@ export default function DesignConfigurations() {
     const [isUpdating, setIsUpdating] = useState(false);
     const [apiConfig, configDispatcher] = useReducer(configReducer, copyAPIConfig(api));
     const classes = useStyles();
+    const intl = useIntl();
     const [descriptionType, setDescriptionType] = useState('');
     const [overview, setOverview] = useState('');
     const [overviewDocument, setOverviewDocument] = useState(null);
@@ -334,7 +335,10 @@ export default function DesignConfigurations() {
                 }
                 const { status } = error;
                 if (status === 404) {
-                    Alert.error('Error occurred');
+                    Alert.error(intl.formatMessage({
+                        id: 'Apis.Details.Configuration.Design.Configurations.error.occured',
+                        defaultMessage: 'Error occurred',
+                    }));
                 }
             });
     }, []);

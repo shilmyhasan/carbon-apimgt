@@ -28,7 +28,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 const styles = (theme) => ({
     firstCol: {
@@ -42,8 +42,31 @@ const styles = (theme) => ({
         height: 25,
     },
 });
+
 const LifeCycleHistory = (props) => {
     const { classes } = props;
+    const intl = useIntl();
+    const LifeCycleStates = {
+        CREATED: intl.formatMessage({
+            id: 'Apis.Details.LifeCycle.State.Status.CREATED', defaultMessage: 'CREATED',
+        }),
+        PUBLISHED: intl.formatMessage({
+            id: 'Apis.Details.LifeCycle.State.Status.PUBLISHED', defaultMessage: 'PUBLISHED',
+        }),
+        DEPRECATED: intl.formatMessage({
+            id: 'Apis.Details.LifeCycle.State.Status.DEPRECATED', defaultMessage: 'DEPRECATED',
+        }),
+        RETIRED: intl.formatMessage({
+            id: 'Apis.Details.LifeCycle.State.Status.RETIRED', defaultMessage: 'RETIRED',
+        }),
+        BLOCKED: intl.formatMessage({
+            id: 'Apis.Details.LifeCycle.State.Status.BLOCKED', defaultMessage: 'BLOCKED',
+        }),
+        PROTOTYPED: intl.formatMessage({
+            id: 'Apis.Details.LifeCycle.State.Status.PROTOTYPED', defaultMessage: 'PROTOTYPED',
+        }),
+    };
+
     return (
         <Paper>
             <Table className={classes.table}>
@@ -76,7 +99,12 @@ const LifeCycleHistory = (props) => {
                                 <FormattedMessage
                                     id='Apis.Details.LifeCycle.LifeCycleHistory.lifecycle.state.history'
                                     defaultMessage='LC has changed from {previous} to {post}'
-                                    values={{ previous: entry.previousState, post: entry.postState }}
+                                    values={{
+                                        previous: entry.previousState in LifeCycleStates
+                                            ? LifeCycleStates[entry.previousState] : entry.previousState,
+                                        post: entry.postState in LifeCycleStates
+                                            ? LifeCycleStates[entry.postState] : entry.postState,
+                                    }}
                                 />
                             </TableCell>
                             <TableCell>{moment(entry.updatedTime).fromNow()}</TableCell>

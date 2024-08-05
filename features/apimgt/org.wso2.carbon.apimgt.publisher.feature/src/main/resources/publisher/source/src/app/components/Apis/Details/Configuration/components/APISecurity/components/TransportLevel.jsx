@@ -193,8 +193,8 @@ function TransportLevel(props) {
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography className={classes.subHeading} variant='h6'>
                             <FormattedMessage
-                                id='Apis.Details.Configuration.Components.APISecurity.Components.
-                                    TransportLevel.transport.level.security'
+                                id={'Apis.Details.Configuration.Components.APISecurity.Components.'
+                                + 'TransportLevel.transport.level.security'}
                                 defaultMessage='Transport Level Security'
                             />
                         </Typography>
@@ -231,11 +231,15 @@ function TransportLevel(props) {
                                         control={(
                                             <Radio
                                                 disabled={!haveMultiLevelSecurity
-                                                || isRestricted(['apim:api_create'], apiFromContext)}
+                                                    || isRestricted(['apim:api_create'], apiFromContext)}
                                                 color='primary'
                                             />
                                         )}
-                                        label='Mandatory'
+                                        label={intl.formatMessage({
+                                            id: 'Apis.Details.Configuration.Components.APISecurity.Components.'
+                                                + 'TransportLevel.transport.level.security.mutual.ssl.mandatory',
+                                            defaultMessage: 'Mandatory',
+                                        })}
                                         labelPlacement='end'
                                     />
                                     <FormControlLabel
@@ -243,11 +247,15 @@ function TransportLevel(props) {
                                         control={(
                                             <Radio
                                                 disabled={!haveMultiLevelSecurity
-                                                || isRestricted(['apim:api_create'], apiFromContext)}
+                                                    || isRestricted(['apim:api_create'], apiFromContext)}
                                                 color='primary'
                                             />
                                         )}
-                                        label='Optional'
+                                        label={intl.formatMessage({
+                                            id: 'Apis.Details.Configuration.Components.APISecurity.Components.'
+                                                + 'TransportLevel.transport.level.security.mutual.ssl.optional',
+                                            defaultMessage: 'Optional',
+                                        })}
                                         labelPlacement='end'
                                     />
                                 </RadioGroup>

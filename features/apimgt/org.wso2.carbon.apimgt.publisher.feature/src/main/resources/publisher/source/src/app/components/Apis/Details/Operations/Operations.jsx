@@ -281,7 +281,7 @@ class Operations extends React.Component {
      * @inheritdoc
      */
     render() {
-        const { api, resourceNotFoundMessage } = this.props;
+        const { api, resourceNotFoundMessage, intl } = this.props;
         const {
             operations, apiPolicies, apiThrottlingPolicy, isSaving, filterKeyWord, notFound, sharedScopes,
         } = this.state;
@@ -317,8 +317,16 @@ class Operations extends React.Component {
                             <div className={classes.searchWrapper}>
                                 <TextField
                                     id='outlined-full-width'
-                                    label='Operation'
-                                    placeholder='Filter Operations'
+                                    label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.Operations.filter.label'
+                                            defaultMessage='Operation'
+                                        />
+                                    )}
+                                    placeholder={intl.formatMessage({
+                                        id: 'Apis.Details.Operations.filter.placeholder',
+                                        defaultMessage: 'Filter Operations',
+                                    })}
                                     onChange={(e) => this.setFilterByKeyWord(e, api.operations)}
                                     fullWidth
                                     variant='outlined'

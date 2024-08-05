@@ -25,7 +25,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import { makeStyles } from '@material-ui/core/styles';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import CheckIcon from '@material-ui/icons/Check';
@@ -68,6 +68,7 @@ export default function ProvideAsyncAPI(props) {
     const [isValid, setValidity] = useState({});
     const [isValidating, setIsValidating] = useState(false);
     const [validationErrors, setValidationErrors] = useState([]);
+    const intl = useIntl();
 
     /**
      *
@@ -207,12 +208,18 @@ export default function ProvideAsyncAPI(props) {
                             <FormControlLabel
                                 value={ProvideAsyncAPI.INPUT_TYPES.URL}
                                 control={<Radio color='primary' />}
-                                label='AsyncAPI URL'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.url.label',
+                                    defaultMessage: 'AsyncAPI URL',
+                                })}
                             />
                             <FormControlLabel
                                 value={ProvideAsyncAPI.INPUT_TYPES.FILE}
                                 control={<Radio color='primary' />}
-                                label='AsyncAPI File'
+                                label={intl.formatMessage({
+                                    id: 'Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.file.label',
+                                    defaultMessage: 'AsyncAPI File',
+                                })}
                             />
                         </RadioGroup>
                     </FormControl>
@@ -294,7 +301,10 @@ export default function ProvideAsyncAPI(props) {
                             autoFocus
                             id='outlined-full-width'
                             label='AsyncAPI URL'
-                            placeholder='Enter AsyncAPI URL'
+                            placeholder={intl.formatMessage({
+                                id: 'Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.Input.url.text.placeholder',
+                                defaultMessage: 'Enter AsyncAPI URL',
+                            })}
                             fullWidth
                             margin='normal'
                             variant='outlined'
@@ -310,7 +320,13 @@ export default function ProvideAsyncAPI(props) {
                                 endAdornment: urlStateEndAdornment,
                             }}
                             // 'Give the URL of AsyncAPI endpoint'
-                            helperText={(isValid.url && isValid.url.message) || 'Click away to validate the URL'}
+                            helperText={(isValid.url && isValid.url.message)
+                                || (
+                                    <FormattedMessage
+                                        id='Apis.Create.AsyncAPI.Steps.ProvideAsyncAPI.url.helper.text'
+                                        defaultMessage='Click away to validate the URL'
+                                    />
+                                )}
                             error={isInvalidURL}
                         />
                     )}

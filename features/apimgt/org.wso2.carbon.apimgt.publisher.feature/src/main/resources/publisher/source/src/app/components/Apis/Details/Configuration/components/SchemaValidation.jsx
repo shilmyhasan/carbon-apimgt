@@ -131,7 +131,7 @@ class SchemaValidation extends React.Component {
                                     <FormattedMessage
                                         id='Apis.Details.Configuration.components.schema.validation.tooltip'
                                         defaultMessage={'Enable the request and response '
-                                        + 'validation against the OpenAPI definition'}
+                                            + 'validation against the OpenAPI definition'}
                                     />
                                 )}
                                 aria-label='Schema Validation'
@@ -188,7 +188,7 @@ class SchemaValidation extends React.Component {
                                 <b>
                                     <FormattedMessage
                                         id={'Apis.Details.Configuration.components.SchemaValidation'
-                                        + '.description.question'}
+                                            + '.description.question'}
                                         defaultMessage='Do you want to enable schema validation?'
                                     />
                                 </b>
@@ -202,7 +202,11 @@ class SchemaValidation extends React.Component {
                             onClick={() => this.setIsOpen(false)}
                             id='schema-validation-yes-btn'
                         >
-                            Yes
+                            <FormattedMessage
+                                id='Apis.Details.Configuration.components.SchemaValidation.btn.yes'
+                                defaultMessage='Yes'
+                            />
+
                         </Button>
                         <Button
                             onClick={() => {
@@ -214,7 +218,10 @@ class SchemaValidation extends React.Component {
                             }}
                             color='primary'
                         >
-                            No
+                            <FormattedMessage
+                                id='Apis.Details.Configuration.components.SchemaValidation.btn.no'
+                                defaultMessage='No'
+                            />
                         </Button>
                     </DialogActions>
                 </Dialog>

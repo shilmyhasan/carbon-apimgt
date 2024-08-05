@@ -24,6 +24,7 @@ import Grid from '@material-ui/core/Grid';
 import Alert from 'AppComponents/Shared/Alert';
 import ConfirmDialog from 'AppComponents/Shared/ConfirmDialog';
 import API from 'AppData/api';
+import { injectIntl } from 'react-intl';
 import CommentEdit from './CommentEdit';
 import CommentOptions from './CommentOptions';
 
@@ -139,7 +140,9 @@ class CommentReply extends React.Component {
     handleClickDeleteComment() {
         const Api = new API();
         const { deleteComment } = this.state;
-        const { api, allComments, commentsUpdate } = this.props;
+        const {
+            api, allComments, commentsUpdate, intl,
+        } = this.props;
         const commentIdOfCommentToDelete = deleteComment.commentId;
         const parentCommentIdOfCommentToDelete = deleteComment.parentCommentId;
         const apiId = api.id;
@@ -162,7 +165,13 @@ class CommentReply extends React.Component {
                 if (error.response) {
                     Alert.error(error.response.body.message);
                 } else {
-                    Alert.error(`Something went wrong while deleting comment - ${commentIdOfCommentToDelete}`);
+                    Alert.error(intl.formatMessage({
+                        id: 'Apis.Details.Comments.delete.comment.error',
+                        defaultMessage: 'Something went wrong while deleting comment - {commentIdOfCommentToDelete}',
+                    },
+                    {
+                        commentIdOfCommentToDelete,
+                    }));
                 }
             });
     }
@@ -204,7 +213,7 @@ class CommentReply extends React.Component {
      */
     render() {
         const {
-            classes, comments, api, allComments, commentsUpdate,
+            classes, comments, api, allComments, commentsUpdate, intl,
         } = this.props;
         const { editIndex, openDialog } = this.state;
         const props = { api, allComments, commentsUpdate };
@@ -243,10 +252,22 @@ class CommentReply extends React.Component {
                 )),
             <ConfirmDialog
                 key='key-dialog'
-                labelCancel='Cancel'
-                title='Confirm Delete'
-                message='Are you sure you want to delete this comment?'
-                labelOk='Yes'
+                labelCancel={intl.formatMessage({
+                    id: 'Apis.Details.Comments.Comment.delete.confirm.cancel.label',
+                    defaultMessage: 'Cancel',
+                })}
+                title={intl.formatMessage({
+                    id: 'Apis.Details.Comments.Comment.delete.confirm.title',
+                    defaultMessage: 'Confirm Delete',
+                })}
+                message={intl.formatMessage({
+                    id: 'Apis.Details.Comments.Comment.delete.confirm',
+                    defaultMessage: 'Are you sure you want to delete this comment?',
+                })}
+                labelOk={intl.formatMessage({
+                    id: 'Apis.Details.Comments.Comment.delete.confirm.yes.label',
+                    defaultMessage: 'Yes',
+                })}
                 callback={this.handleConfirmDialog}
                 open={openDialog}
             />,
@@ -266,4 +287,4 @@ CommentReply.propTypes = {
     comments: PropTypes.instanceOf(Array).isRequired,
 };
 
-export default withStyles(styles)(CommentReply);
+export default injectIntl(withStyles(styles)(CommentReply));

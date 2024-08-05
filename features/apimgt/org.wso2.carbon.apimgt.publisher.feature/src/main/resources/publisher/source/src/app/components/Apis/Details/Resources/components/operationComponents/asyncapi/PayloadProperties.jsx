@@ -21,9 +21,9 @@ import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
+import { FormattedMessage } from 'react-intl';
 import AddPayloadProperty from './AddPayloadProperty';
 import ListPayloadProperties from './ListPayloadProperties';
-
 /*
     Paramters will contain: name, description, type
 */
@@ -43,7 +43,10 @@ export default function PayloadProperties(props) {
         <>
             <Grid item xs={12} md={12}>
                 <Typography variant='subtitle1'>
-                    Payload Properties
+                    <FormattedMessage
+                        id='Apis.Details.Resources.Components.operation.async.api.payload.properties'
+                        defaultMessage='Payload Properties'
+                    />
                     <Divider variant='middle' />
                 </Typography>
             </Grid>

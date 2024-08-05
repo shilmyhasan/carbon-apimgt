@@ -23,25 +23,13 @@ import Button from '@material-ui/core/Button';
 import MUIDataTable from 'mui-datatables';
 import API from 'AppData/api';
 import APIProduct from 'AppData/APIProduct';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 
 const columns = ['Name', 'Value'];
-
-const options = {
-    filterType: 'checkbox',
-    sort: false,
-    search: false,
-    viewColumns: false,
-    filter: false,
-    selectableRowsHeader: false,
-    selectableRows: 'none',
-    pagination: false,
-    download: false,
-};
 
 // eslint-disable-next-line require-jsdoc
 function Invoice(props) {
@@ -54,6 +42,31 @@ function Invoice(props) {
     const [showPopup, setShowPopup] = useState(false);
     const [showErrorPopup, setShowErrorPopup] = useState(false);
     const [invoice, setInvoice] = useState(null);
+    const intl = useIntl();
+
+    const options = {
+        filterType: 'checkbox',
+        sort: false,
+        search: false,
+        viewColumns: false,
+        filter: false,
+        selectableRowsHeader: false,
+        selectableRows: 'none',
+        pagination: false,
+        download: false,
+        textLabels: {
+            pagination: {
+                rowsPerPage: intl.formatMessage({
+                    id: 'Mui.data.table.pagination.rows.per.page',
+                    defaultMessage: 'Rows per page:',
+                }),
+                displayRows: intl.formatMessage({
+                    id: 'Mui.data.table.pagination.display.rows',
+                    defaultMessage: 'of',
+                }),
+            },
+        },
+    };
 
     /**
    * Handle the popup for invoice
@@ -133,15 +146,26 @@ function Invoice(props) {
                 )}
             </Dialog>
             <Dialog open={showErrorPopup} onClose={handleAlertClose} fullWidth='true'>
-                <DialogTitle>No Data Available</DialogTitle>
+                <DialogTitle>
+                    <FormattedMessage
+                        id='Applications.Details.Invoice.Dialog.No.Data.Available'
+                        defaultMessage='No Data Available'
+                    />
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText id='invoice-dialog-description'>
-                        Pending invoice data not found for this subscription.
+                        <FormattedMessage
+                            id='Applications.Details.Invoice.Dialog.data.not.found'
+                            defaultMessage='Pending invoice data not found for this subscription.'
+                        />
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleAlertClose} color='primary'>
-                        Close
+                        <FormattedMessage
+                            id='Applications.Details.Invoice.Dialog.close'
+                            defaultMessage='Close'
+                        />
                     </Button>
                 </DialogActions>
             </Dialog>

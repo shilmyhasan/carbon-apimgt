@@ -31,6 +31,7 @@ import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import PolicyEditor from './PolicyEditor';
 
@@ -69,6 +70,7 @@ export default function SOAPToRESTListing(props) {
         value: selectedPolicy.content,
         options: editorOptions,
     };
+    const intl = useIntl();
 
     /**
      *
@@ -86,7 +88,10 @@ export default function SOAPToRESTListing(props) {
         <>
             <Grid item xs={12} md={12}>
                 <Typography variant='subtitle1'>
-                    Mediation
+                    <FormattedMessage
+                        id='Apis.Details.Components.SOAP.To.REST.mediation.text'
+                        defaultMessage='Mediation'
+                    />
                     <Divider variant='middle' />
                 </Typography>
             </Grid>
@@ -98,12 +103,27 @@ export default function SOAPToRESTListing(props) {
                     onChange={(event, tab) => setTabIndex(tab)}
                     aria-label='Resource mediation in/out tabs'
                 >
-                    <Tab value='in' label='In' />
-                    <Tab value='out' label='Out' />
+                    <Tab
+                        value='in'
+                        label={intl.formatMessage({
+                            id: 'Apis.Details.Components.SOAP.To.REST.tabs.In.text',
+                            defaultMessage: 'In',
+                        })}
+                    />
+                    <Tab
+                        value='out'
+                        label={intl.formatMessage({
+                            id: 'Apis.Details.Components.SOAP.To.REST.tabs.Out.text',
+                            defaultMessage: 'Out',
+                        })}
+                    />
                 </Tabs>
                 <Box p={1}>
                     <Button onClick={() => setOpenEditor(true)} variant='outlined' size='small' color='primary'>
-                        Edit
+                        <FormattedMessage
+                            id='Apis.Details.Components.SOAP.To.REST.edit.btn'
+                            defaultMessage='Edit'
+                        />
                         {' '}
                         <EditIcon />
                     </Button>

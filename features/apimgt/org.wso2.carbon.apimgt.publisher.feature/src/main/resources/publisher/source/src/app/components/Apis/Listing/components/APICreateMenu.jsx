@@ -32,6 +32,7 @@ import GraphqlAPIMenu from 'AppComponents/Apis/Listing/Landing/Menus/GraphqlAPIM
 import StreamingAPIMenu from 'AppComponents/Apis/Listing/Landing/Menus/StreamingAPIMenu';
 import ServiceCatalogMenu from 'AppComponents/Apis/Listing/Landing/Menus/ServiceCatalogMenu';
 import MenuButton from 'AppComponents/Shared/MenuButton';
+import { FormattedMessage } from 'react-intl';
 
 const useStyles = makeStyles((theme) => {
     return {
@@ -96,7 +97,7 @@ const APICreateMenu = () => {
                     </Grid>
                 )}
             >
-                Create API
+                <FormattedMessage id='Apis.Listing.Components.Create.API' defaultMessage='Create API' />
             </MenuButton>
         )
     );

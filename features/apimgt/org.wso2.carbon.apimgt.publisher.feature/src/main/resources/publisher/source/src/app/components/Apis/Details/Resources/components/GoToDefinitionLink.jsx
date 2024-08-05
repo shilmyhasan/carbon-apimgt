@@ -21,7 +21,7 @@ import Box from '@material-ui/core/Box';
 import LaunchIcon from '@material-ui/icons/Launch';
 import { Link } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
-
+import { useIntl } from 'react-intl';
 /**
  *
  * Simply reders the edit api definition link in the bottom of the resources listing
@@ -31,11 +31,16 @@ import Typography from '@material-ui/core/Typography';
  */
 export default function GoToDefinitionLink(props) {
     const { api, message } = props;
+    const intl = useIntl();
     return (
         <Box m={1}>
             <Link to={`/apis/${api.id}/api definition`}>
                 <Typography style={{ marginLeft: '10px' }} color='primary' display='inline' variant='caption'>
-                    {message}
+                    {message
+                        || intl.formatMessage({
+                            id: 'Apis.Details.Resources.Components.Go.To.Definition',
+                            defaultMessage: 'Edit API Definition',
+                        })}
                     <LaunchIcon style={{ marginLeft: '2px' }} fontSize='small' />
                 </Typography>
             </Link>
@@ -43,7 +48,7 @@ export default function GoToDefinitionLink(props) {
     );
 }
 GoToDefinitionLink.defaultProps = {
-    message: 'Edit API Definition',
+    message: undefined,
 };
 GoToDefinitionLink.propTypes = {
     api: PropTypes.shape({ id: PropTypes.string }).isRequired,

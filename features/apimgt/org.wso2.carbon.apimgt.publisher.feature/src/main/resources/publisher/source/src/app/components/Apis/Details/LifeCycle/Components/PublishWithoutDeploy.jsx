@@ -112,7 +112,10 @@ export default function PublishWithoutDeploy(props) {
                     color='primary'
                     onClick={handleClick}
                 >
-                    Publish
+                    <FormattedMessage
+                        id='Apis.Details.LifeCycle.components.confirm.publish.btn'
+                        defaultMessage='Publish'
+                    />
                 </Button>
                 <Button
                     variant='contained'

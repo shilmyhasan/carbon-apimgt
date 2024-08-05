@@ -197,14 +197,20 @@ export default function ApiProductCreateWrapper(props) {
         newAPIProduct
             .saveProduct(apiData)
             .then((apiProduct) => {
-                Alert.info('API Product created successfully');
+                Alert.info(intl.formatMessage({
+                    id: 'Apis.Create.APIProduct.APIProductCreateWrapper.created.success',
+                    defaultMessage: 'API Product created successfully',
+                }));
                 const body = {
                     description: 'Initial Revision',
                 };
                 newAPIProduct.createProductRevision(apiProduct.id, body)
                     .then((api1) => {
                         const revisionId = api1.body.id;
-                        Alert.info('API Revision created successfully');
+                        Alert.info(intl.formatMessage({
+                            id: 'Apis.Create.APIProduct.APIProductCreateWrapper.revision.created.success',
+                            defaultMessage: 'API Revision created successfully',
+                        }));
                         const envList = settings.environment.map((env) => env.name);
                         const body1 = [];
                         const getFirstVhost = (envName) => {
@@ -230,7 +236,10 @@ export default function ApiProductCreateWrapper(props) {
                         }
                         newAPIProduct.deployProductRevision(apiProduct.id, revisionId, body1)
                             .then(() => {
-                                Alert.info('API Revision Deployed Successfully');
+                                Alert.info(intl.formatMessage({
+                                    id: 'Apis.Create.APIProduct.APIProductCreateWrapper.revision.deployed.success',
+                                    defaultMessage: 'API Revision Deployed Successfully',
+                                }));
                             })
                             .catch((error) => {
                                 if (error.response) {
@@ -261,7 +270,10 @@ export default function ApiProductCreateWrapper(props) {
                 if (error.response) {
                     Alert.error(error.response.body.description);
                 } else {
-                    Alert.error('Something went wrong while adding the API Product');
+                    Alert.error(intl.formatMessage({
+                        id: 'Apis.APIProductCreateWrapper.error.errorMessage.create.api.product',
+                        defaultMessage: 'Something went wrong while adding the API Product',
+                    }));
                 }
             })
             .finally(() => setCreating(false));

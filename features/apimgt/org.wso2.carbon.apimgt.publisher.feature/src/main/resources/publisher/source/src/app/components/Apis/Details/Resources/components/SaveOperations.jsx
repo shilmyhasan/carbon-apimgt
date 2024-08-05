@@ -104,7 +104,9 @@ export default function SaveOperations(props) {
                         )}
                 </Grid>
                 <Grid item>
-                    <Button onClick={() => setIsOpen(true)}>Reset</Button>
+                    <Button onClick={() => setIsOpen(true)}>
+                        <FormattedMessage id='Apis.Details.Configuration.Resources.reset' defaultMessage='Reset' />
+                    </Button>
                 </Grid>
             </Grid>
             <Dialog
@@ -113,14 +115,27 @@ export default function SaveOperations(props) {
                 aria-describedby='bulk-delete-dialog-description'
                 onBackdropClick={() => setIsOpen(false)}
             >
-                <DialogTitle id='bulk-delete-dialog-title'>Discard changes</DialogTitle>
+                <DialogTitle id='bulk-delete-dialog-title'>
+                    <FormattedMessage
+                        id='Apis.Details.Configuration.Resources.reset.dialog.title'
+                        defaultMessage='Discard changes'
+                    />
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText id='bulk-delete-dialog-description'>
-                        Please confirm the discard all changes action
+                        <FormattedMessage
+                            id='Apis.Details.Configuration.Resources.reset.dialog.content'
+                            defaultMessage='Please confirm the discard all changes action'
+                        />
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setIsOpen(false)}>CLOSE</Button>
+                    <Button onClick={() => setIsOpen(false)}>
+                        <FormattedMessage
+                            id='Apis.Details.Configuration.Resources.reset.dialog.close.btn'
+                            defaultMessage='CLOSE'
+                        />
+                    </Button>
                     <Box ml={1}>
                         <Button
                             onClick={() => {
@@ -129,7 +144,10 @@ export default function SaveOperations(props) {
                             }}
                             color='error'
                         >
-                            RESET
+                            <FormattedMessage
+                                id='Apis.Details.Configuration.Resources.reset.dialog.reset.btn'
+                                defaultMessage='RESET'
+                            />
                         </Button>
                     </Box>
                 </DialogActions>

@@ -22,6 +22,7 @@ import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 /**
  * Renders the operation summary and description sections
@@ -33,11 +34,15 @@ export default function DescriptionAndSummary(props) {
     const {
         operation, operationsDispatcher, disableUpdate, target, verb,
     } = props;
+    const intl = useIntl();
     return (
         <>
             <Grid item xs={12} md={12}>
                 <Typography variant='subtitle1'>
-                    Description
+                    <FormattedMessage
+                        id='Apis.Details.Resources.Components.async.api.description.title'
+                        defaultMessage='Description'
+                    />
                     <Divider variant='middle' />
                 </Typography>
             </Grid>
@@ -46,7 +51,10 @@ export default function DescriptionAndSummary(props) {
                 <TextField
                     margin='dense'
                     fullWidth
-                    label='Description'
+                    label={intl.formatMessage({
+                        id: 'Apis.Details.Resources.Components.async.api.description',
+                        defaultMessage: 'Description',
+                    })}
                     multiline
                     disabled={disableUpdate}
                     rows='4'

@@ -28,7 +28,7 @@ import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
 import API from 'AppData/api';
 import CONSTS from 'AppData/Constants';
 import Progress from 'AppComponents/Shared/Progress';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { useAppContext } from 'AppComponents/Shared/AppContext';
 import { isRestricted } from 'AppData/AuthManager';
 import SubscriptionsTable from './SubscriptionsTable';
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 function Subscriptions(props) {
     const classes = useStyles();
     const [api] = useAPI();
-    const { updateAPI } = props;
+    const { updateAPI, intl } = props;
     const restApi = new API();
     const [tenants, setTenants] = useState(null);
     const [policies, setPolices] = useState([...api.policies]);
@@ -75,11 +75,17 @@ function Subscriptions(props) {
         };
         updateAPI(newApi)
             .then(() => {
-                Alert.info('Subscription configurations updated successfully');
+                Alert.info(intl.formatMessage({
+                    id: 'Apis.Details.Subscriptions.Subscriptions.update.success',
+                    defaultMessage: 'Subscription configurations updated successfully',
+                }));
             })
             .catch((error) => {
                 console.error(error);
-                Alert.error('Error occurred while updating subscription configurations');
+                Alert.error(intl.formatMessage({
+                    id: 'Apis.Details.Subscriptions.Subscriptions.update.error',
+                    defaultMessage: 'Error occurred while updating subscription configurations',
+                }));
             }).finally(() => {
                 setUpdateInProgress(false);
             });
@@ -156,4 +162,4 @@ Subscriptions.propTypes = {
     updateAPI: PropTypes.func.isRequired,
 };
 
-export default withStyles(makeStyles)(Subscriptions);
+export default injectIntl(withStyles(makeStyles)(Subscriptions));
