@@ -814,12 +814,14 @@ public class ThrottleHandler extends AbstractHandler implements ManagedLifecycle
             clientIp = (String) axis2MsgContext.getProperty(org.apache.axis2.context.MessageContext.REMOTE_ADDR);
         }
         if (StringUtils.isEmpty(clientIp)) {
+
             return null;
         }
         if (clientIp.contains(":") && clientIp.split(":").length == 2) {
             log.debug("Port will be ignored and only the IP address will be picked from " + clientIp);
             clientIp = clientIp.split(":")[0];
         }
+
         return clientIp;
     }
 
