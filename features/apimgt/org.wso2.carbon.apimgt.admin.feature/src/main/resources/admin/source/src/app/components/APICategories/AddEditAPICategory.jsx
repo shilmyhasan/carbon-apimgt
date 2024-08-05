@@ -86,13 +86,25 @@ function AddEdit(props) {
                     break;
                 }
                 if (value === '') {
-                    error = 'Name is Empty';
+                    error = intl.formatMessage({
+                        id: 'AdminPages.ApiCategories.AddEdit.form.error.name.empty',
+                        defaultMessage: 'Name is Empty',
+                    });
                 } else if (value.length > 255) {
-                    error = 'API Category name is too long';
+                    error = intl.formatMessage({
+                        id: 'AdminPages.ApiCategories.AddEdit.form.error.name.too.long',
+                        defaultMessage: 'API Category name is too long',
+                    });
                 } else if (/\s/.test(value)) {
-                    error = 'Name contains spaces';
+                    error = intl.formatMessage({
+                        id: 'AdminPages.ApiCategories.AddEdit.form.error.name.has.spaces',
+                        defaultMessage: 'Name contains spaces',
+                    });
                 } else if (/[!@#$%^&*(),?"{}[\]|<>\t\n]/i.test(value)) {
-                    error = 'Name field contains special characters';
+                    error = intl.formatMessage({
+                        id: 'AdminPages.ApiCategories.AddEdit.form.error.name.has.special.chars',
+                        defaultMessage: 'Name field contains special characters',
+                    });
                 } else {
                     error = false;
                 }
@@ -136,17 +148,17 @@ function AddEdit(props) {
             .then(() => {
                 if (dataRow) {
                     return (
-                        <FormattedMessage
-                            id='AdminPages.ApiCategories.AddEdit.form.edit.successful'
-                            defaultMessage='API Category edited successfully'
-                        />
+                        intl.formatMessage({
+                            id: 'AdminPages.ApiCategories.AddEdit.form.edit.successful',
+                            defaultMessage: 'API Category edited successfully',
+                        })
                     );
                 } else {
                     return (
-                        <FormattedMessage
-                            id='AdminPages.ApiCategories.AddEdit.form.add.successful'
-                            defaultMessage='API Category added successfully'
-                        />
+                        intl.formatMessage({
+                            id: 'AdminPages.ApiCategories.AddEdit.form.add.successful',
+                            defaultMessage: 'API Category added successfully',
+                        })
                     );
                 }
             })

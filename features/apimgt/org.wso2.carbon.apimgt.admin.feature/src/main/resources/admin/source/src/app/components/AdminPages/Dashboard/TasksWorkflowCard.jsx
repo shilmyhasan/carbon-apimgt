@@ -290,18 +290,18 @@ export default function TasksWorkflowCard() {
         restApi.updateWorkflow(referenceId, body)
             .then(() => {
                 Alert.success(
-                    <FormattedMessage
-                        id='Dashboard.tasksWorkflow.card.task.update.success'
-                        defaultMessage='Task status updated successfully'
-                    />,
+                    intl.formatMessage({
+                        id: 'Dashboard.tasksWorkflow.card.task.update.success',
+                        defaultMessage: 'Task status updated successfully',
+                    }),
                 );
             })
             .catch(() => {
                 Alert.error(
-                    <FormattedMessage
-                        id='Dashboard.tasksWorkflow.card.task.update.failed'
-                        defaultMessage='Task status updated failed'
-                    />,
+                    intl.formatMessage({
+                        id: 'Dashboard.tasksWorkflow.card.task.update.failed',
+                        defaultMessage: 'Task status updated failed',
+                    }),
                 );
             })
             .finally(() => {
