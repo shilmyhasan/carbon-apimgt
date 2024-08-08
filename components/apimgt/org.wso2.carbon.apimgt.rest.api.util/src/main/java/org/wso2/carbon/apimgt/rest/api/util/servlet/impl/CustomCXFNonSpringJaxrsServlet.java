@@ -23,7 +23,15 @@ package org.wso2.carbon.apimgt.rest.api.util.servlet.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -51,6 +59,7 @@ import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
@@ -87,6 +96,8 @@ public class CustomCXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String SPACE_PARAMETER_SPLIT_CHAR = "space";
 
     private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
+    private static final String CORS_SYSTEM_PROPERTIES_PREFIX = "{systemProperties['";
+    private static final String CORS_SYSTEM_PROPERTIES_PATTERN = "^\\{systemProperties\\['|'\\]\\}$";
     private static Map<String, String> systemPropMap = new HashMap();
     private ClassLoader classLoader;
     private Application application;
@@ -203,6 +214,7 @@ public class CustomCXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         if (properties != null) {
             bean.getProperties(true).putAll(properties);
         }
+        updateCORSAllowedOrigins(bean);
     }
 
     /**
