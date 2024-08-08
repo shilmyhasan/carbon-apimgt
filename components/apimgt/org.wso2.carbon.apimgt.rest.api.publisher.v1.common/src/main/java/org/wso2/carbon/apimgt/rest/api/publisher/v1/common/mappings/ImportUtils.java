@@ -2620,8 +2620,18 @@ public class ImportUtils {
                         // Product does not have corresponding API resources neither inside the importing directory nor
                         // inside the APIM
                         if (!invalidApiOperations.isEmpty()) {
-                            throw new APIMgtResourceNotFoundException(
-                                    "Cannot find API resources for some API Product resources.");
+                            List<String> invalidOperationList = new ArrayList();
+                            for (APIOperationsDTO dto : invalidApiOperations) {
+                                invalidOperationList.add(dto.getVerb() + ":" + dto.getTarget());
+                            }
+                            String errorMessage = "Cannot find API resources for some API Product resources.";
+                            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                                throw new APIManagementException(errorMessage,
+                                        ExceptionCodes.from(ExceptionCodes.INVALID_API_RESOURCES_FOR_API_PRODUCT,
+                                                StringUtils.join(invalidOperationList, ", ")));
+                            } else {
+                                throw new APIMgtResourceNotFoundException(errorMessage);
+                            }
                         }
                     }
                 }

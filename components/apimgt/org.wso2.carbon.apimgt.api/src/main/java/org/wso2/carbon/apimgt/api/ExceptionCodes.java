@@ -688,8 +688,11 @@ public enum ExceptionCodes implements ErrorHandler {
     NOT_IN_OPEN_API_FORMAT(903244, "Not in Open API format",
             400, "The API definition is not in Open API format"),
 
-    PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION(900700, "Parameter value missing", 400,
+    PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION(903245, "Parameter value missing", 400,
             "Some of the mandatory parameter values were missing. %s"),
+
+    INVALID_API_RESOURCES_FOR_API_PRODUCT(903246, "Cannot find API resources for some API Product " +
+            "resources.", 404, "Some of the resources in the API Product are not found as API resources. %s"),
 
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
