@@ -1765,17 +1765,29 @@ public class PublisherCommonUtils {
         Set<Tier> definedTiers = apiProvider.getTiers();
         List<String> invalidTiers = PublisherCommonUtils.getInvalidTierNames(definedTiers, tiersFromDTO);
         if (!invalidTiers.isEmpty()) {
-            throw new APIManagementException(
-                    "Specified tier(s) " + Arrays.toString(invalidTiers.toArray()) + " are invalid",
-                    ExceptionCodes.TIER_NAME_INVALID);
+            String errorMessage = "Specified tier(s) " + Arrays.toString(invalidTiers.toArray()) + " are invalid";
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.TIER_NAME_INVALID_WITH_TIER_INFO,
+                                Arrays.toString(invalidTiers.toArray())));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.TIER_NAME_INVALID);
+            }
         }
         if (apiProductDtoToUpdate.getAdditionalProperties() != null) {
-            String errorMessage = PublisherCommonUtils
-                    .validateAdditionalProperties(apiProductDtoToUpdate.getAdditionalProperties());
+            String errorMessage = PublisherCommonUtils.validateAdditionalProperties(
+                    apiProductDtoToUpdate.getAdditionalProperties());
             if (!errorMessage.isEmpty()) {
-                throw new APIManagementException(errorMessage, ExceptionCodes
-                        .from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES, originalAPIProduct.getId().getName(),
-                                originalAPIProduct.getId().getVersion()));
+                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES_WITH_ERROR,
+                                    originalAPIProduct.getId().getName(), originalAPIProduct.getId().getVersion(),
+                                    errorMessage));
+                } else {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES,
+                                    originalAPIProduct.getId().getName(), originalAPIProduct.getId().getVersion()));
+                }
             }
         }
 
@@ -1838,16 +1850,27 @@ public class PublisherCommonUtils {
         Set<Tier> definedTiers = apiProvider.getTiers();
         List<String> invalidTiers = PublisherCommonUtils.getInvalidTierNames(definedTiers, tiersFromDTO);
         if (!invalidTiers.isEmpty()) {
-            throw new APIManagementException(
-                    "Specified tier(s) " + Arrays.toString(invalidTiers.toArray()) + " are invalid",
-                    ExceptionCodes.TIER_NAME_INVALID);
+            String errorMessage = "Specified tier(s) " + Arrays.toString(invalidTiers.toArray()) + " are invalid";
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.TIER_NAME_INVALID_WITH_TIER_INFO,
+                                Arrays.toString(invalidTiers.toArray())));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.TIER_NAME_INVALID);
+            }
         }
         if (apiProductDTO.getAdditionalProperties() != null) {
             String errorMessage = PublisherCommonUtils
                     .validateAdditionalProperties(apiProductDTO.getAdditionalProperties());
             if (!errorMessage.isEmpty()) {
-                throw new APIManagementException(errorMessage,
-                        ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES, apiProductDTO.getName()));
+                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES_WITH_ERROR,
+                                    apiProductDTO.getName(), apiProductDTO.getVersion(), errorMessage));
+                } else {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES, apiProductDTO.getName()));
+                }
             }
         }
         if (apiProductDTO.getVisibility() == null) {

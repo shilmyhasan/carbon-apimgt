@@ -694,6 +694,14 @@ public enum ExceptionCodes implements ErrorHandler {
     INVALID_API_RESOURCES_FOR_API_PRODUCT(903246, "Cannot find API resources for some API Product " +
             "resources.", 404, "Some of the resources in the API Product are not found as API resources. %s"),
 
+    INVALID_ADDITIONAL_PROPERTIES_WITH_ERROR(903247, "Invalid additional properties", 400,
+            "Invalid additional properties for API: %s:%s Error: %s"),
+
+    TIER_NAME_INVALID_WITH_TIER_INFO(903248, "The tier name is invalid.", 400,
+            "The tier name(s) %s are invalid"),
+
+    LENGTH_EXCEEDS_ERROR(903249, "Character length exceeds the allowable limit", 400, "%s"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),
