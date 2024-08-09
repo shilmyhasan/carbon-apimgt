@@ -42,7 +42,7 @@ public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
 
     private ErrorDTO e500 = new ErrorDTO();
 
-    GlobalThrowableMapper() {
+    public GlobalThrowableMapper() {
         e500.setCode((long) 500);
         e500.setMessage("Internal server error");
         e500.setMoreInfo("");

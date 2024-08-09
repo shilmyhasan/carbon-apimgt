@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.apimgt.internal.service.dto.BlockConditionsDTO;
 import org.wso2.carbon.apimgt.internal.service.dto.IPLevelDTO;
 import org.wso2.carbon.apimgt.internal.service.dto.RevokedJWTDTO;
@@ -55,55 +56,6 @@ public final class BlockConditionDBUtil {
     private static Set<String> keyTemplates;
     private static final String GET_GLOBAL_POLICY_KEY_TEMPLATES = " SELECT KEY_TEMPLATE FROM AM_POLICY_GLOBAL";
 
-    public static void initialize() throws Exception {
-
-        if (dataSource != null) {
-            return;
-        }
-        Properties properties = new Properties();
-        properties.load(new ClassPathResource("../throttle.properties").getInputStream());
-        String dataSourceName = (String) properties.get("block.datasource.name");
-        synchronized (BlockConditionDBUtil.class) {
-            if (dataSource == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Initializing data source");
-                }
-
-                if (dataSourceName != null) {
-                    try {
-                        Context ctx = new InitialContext();
-                        dataSource = (DataSource) ctx.lookup(dataSourceName);
-                    } catch (NamingException e) {
-                        throw new Exception("Error while looking up the data " +
-                                "source: " + dataSourceName, e);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Utility method to get a new database connection
-     *
-     * @return Connection
-     * @throws SQLException if failed to get Connection
-     */
-    public static Connection getConnection() throws SQLException {
-
-        if (dataSource != null) {
-            return dataSource.getConnection();
-        } else {
-            try {
-                initialize();
-                return dataSource.getConnection();
-
-            } catch (Exception e) {
-                throw new SQLException("Data source is not configured properly.", e);
-            }
-        }
-
-    }
-
     public static BlockConditionsDTO getBlockConditions() {
 
         Connection conn = null;
@@ -117,7 +69,7 @@ public final class BlockConditionDBUtil {
         String sqlQuery = "select * from AM_BLOCK_CONDITIONS";
         List subscription = new ArrayList();
         try {
-            conn = BlockConditionDBUtil.getConnection();
+            conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(sqlQuery);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -274,7 +226,7 @@ public final class BlockConditionDBUtil {
         ResultSet rs = null;
 
         try {
-            conn = BlockConditionDBUtil.getConnection();
+            conn = APIMgtDBUtil.getConnection();
 
             String sqlQuery = GET_GLOBAL_POLICY_KEY_TEMPLATES;
 
@@ -304,7 +256,7 @@ public final class BlockConditionDBUtil {
         RevokedJWTListDTO revokedJWTListDTO = new RevokedJWTListDTO();
         String sqlQuery = "SELECT SIGNATURE,EXPIRY_TIMESTAMP FROM AM_REVOKED_JWT";
         try {
-            conn = BlockConditionDBUtil.getConnection();
+            conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(sqlQuery);
             rs = ps.executeQuery();
             while (rs.next()) {
