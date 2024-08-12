@@ -431,7 +431,7 @@ public class SynapseAnalyticsDataProvider implements AnalyticsDataProvider {
         return System.currentTimeMillis() - backendEndTime;
     }
 
-    public int getResponseSize() {
+    public long getResponseSize() {
         int responseSize = 0;
         if (buildResponseMessage == null) {
             Map<String,String> configs = APIManagerConfiguration.getAnalyticsProperties();

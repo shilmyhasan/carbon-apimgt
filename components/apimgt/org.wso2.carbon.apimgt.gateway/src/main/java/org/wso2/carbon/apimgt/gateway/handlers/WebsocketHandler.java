@@ -105,7 +105,6 @@ public class WebsocketHandler extends CombinedChannelDuplexHandler<WebsocketInbo
                 if (log.isDebugEnabled()) {
                     log.debug("Sending Outbound Websocket frame." + ctx.channel().toString());
                 }
-                outboundHandler().write(ctx, msg, promise);
                 // publish analytics events if analytics is enabled
                 if (APIUtil.isAnalyticsEnabled()) {
                     if (msg instanceof TextWebSocketFrame) {
@@ -114,6 +113,7 @@ public class WebsocketHandler extends CombinedChannelDuplexHandler<WebsocketInbo
                                 ((TextWebSocketFrame) msg).text().length());
                     }
                 }
+                outboundHandler().write(ctx, msg, promise);
                 publishSubscribeEvent(ctx);
             }
         } else {
