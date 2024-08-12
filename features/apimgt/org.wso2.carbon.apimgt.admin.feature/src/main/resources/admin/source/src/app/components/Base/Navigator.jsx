@@ -96,10 +96,7 @@ function Navigator(props) {
         if (pathname.indexOf('dashboard') !== -1) {
             history.push('/tasks/user-creation');
         }
-        routeMenuMapping = routeMenuMapping.filter(((route) => route.id === intl.formatMessage({
-            id: 'Base.RouteMenuMapping.tasks',
-            defaultMessage: 'Tasks',
-        })));
+        routeMenuMapping = routeMenuMapping.filter(((route) => route.id === 'Tasks'));
     }
 
     const updateAllRoutePaths = (path) => {
@@ -157,7 +154,7 @@ function Navigator(props) {
                 </ListItem>
 
                 {routeMenuMapping.map(({
-                    id, children, icon: parentIcon, path: parentPath, active: parentActive,
+                    id, displayText, children, icon: parentIcon, path: parentPath, active: parentActive,
                 }) => (
                     <>
                         {!children && (
@@ -182,14 +179,19 @@ function Navigator(props) {
                                             primary: classes.itemPrimary,
                                         }}
                                     >
-                                        {id}
+                                        {displayText}
                                     </ListItemText>
                                 </ListItem>
                             </Link>
                         )}
                         {children && (
                             <React.Fragment key={id}>
-                                <NavigatorChildren navChildren={children} navId={id} classes={classes} />
+                                <NavigatorChildren
+                                    navChildren={children}
+                                    navId={id}
+                                    navText={displayText}
+                                    classes={classes}
+                                />
                             </React.Fragment>
                         )}
 

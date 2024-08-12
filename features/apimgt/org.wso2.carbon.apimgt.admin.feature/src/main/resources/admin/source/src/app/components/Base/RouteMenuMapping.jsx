@@ -55,7 +55,8 @@ import AccountTreeIcon from '@material-ui/icons/AccountTree';
 
 const RouteMenuMapping = (intl) => [
     {
-        id: intl.formatMessage({
+        id: 'Dashboard',
+        displayText: intl.formatMessage({
             id: 'Base.RouteMenuMapping.dashboard',
             defaultMessage: 'Dashboard',
         }),
@@ -65,13 +66,15 @@ const RouteMenuMapping = (intl) => [
         exact: true,
     },
     {
-        id: intl.formatMessage({
+        id: 'Rate Limiting Policies',
+        displayText: intl.formatMessage({
             id: 'Base.RouteMenuMapping.throttling.policies',
             defaultMessage: 'Rate Limiting Policies',
         }),
         children: [
             {
-                id: intl.formatMessage({
+                id: 'Advanced Policies',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.advanced.throttling.policies',
                     defaultMessage: 'Advanced Policies',
                 }),
@@ -80,14 +83,16 @@ const RouteMenuMapping = (intl) => [
                 icon: <PolicyIcon />,
                 addEditPageDetails: [
                     {
-                        id: intl.formatMessage({
+                        id: 'Add Advanced Policy',
+                        displayText: intl.formatMessage({
                             id: 'Base.RouteMenuMapping.advanced.throttling.policies.Adding',
                             defaultMessage: 'Add Advanced Policy',
                         }),
                         path: '/throttling/advanced/create',
                     },
                     {
-                        id: intl.formatMessage({
+                        id: 'Edit Advanced Policy',
+                        displayText: intl.formatMessage({
                             id: 'Base.RouteMenuMapping.advanced.throttling.policies.Editing',
                             defaultMessage: 'Edit Advanced Policy',
                         }),
@@ -96,7 +101,8 @@ const RouteMenuMapping = (intl) => [
                 ],
             },
             {
-                id: intl.formatMessage({
+                id: 'Application Policies',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.application.throttling.policies',
                     defaultMessage: 'Application Policies',
                 }),
@@ -105,7 +111,8 @@ const RouteMenuMapping = (intl) => [
                 icon: <PhonelinkSetupIcon />,
             },
             {
-                id: intl.formatMessage({
+                id: 'Subscription Policies',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.subscription.throttling.policies',
                     defaultMessage: 'Subscription Policies',
                 }),
@@ -114,14 +121,16 @@ const RouteMenuMapping = (intl) => [
                 icon: <AssignmentTurnedInIcon />,
                 addEditPageDetails: [
                     {
-                        id: intl.formatMessage({
+                        id: 'Add Subscription Policy',
+                        displayText: intl.formatMessage({
                             id: 'Base.RouteMenuMapping.subscription.throttling.policies.Adding',
                             defaultMessage: 'Add Subscription Policy',
                         }),
                         path: '/throttling/subscription/add',
                     },
                     {
-                        id: intl.formatMessage({
+                        id: 'Edit Subscription Policy',
+                        displayText: intl.formatMessage({
                             id: 'Base.RouteMenuMapping.subscription.throttling.policies.Editing',
                             defaultMessage: 'Edit Subscription Policy',
                         }),
@@ -130,7 +139,8 @@ const RouteMenuMapping = (intl) => [
                 ],
             },
             {
-                id: intl.formatMessage({
+                id: 'Custom Policies',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.custom.throttling.policies',
                     defaultMessage: 'Custom Policies',
                 }),
@@ -139,14 +149,16 @@ const RouteMenuMapping = (intl) => [
                 icon: <AssignmentIcon />,
                 addEditPageDetails: [
                     {
-                        id: intl.formatMessage({
+                        id: 'Add Custom Policy',
+                        displayText: intl.formatMessage({
                             id: 'Base.RouteMenuMapping.custom.throttling.policies.items.Adding',
                             defaultMessage: 'Add Custom Policy',
                         }),
                         path: '/throttling/custom/create',
                     },
                     {
-                        id: intl.formatMessage({
+                        id: 'Edit Custom Policy',
+                        displayText: intl.formatMessage({
                             id: 'Base.RouteMenuMapping.custom.throttling.policies.items.Editing',
                             defaultMessage: 'Edit Custom Policy',
                         }),
@@ -155,7 +167,8 @@ const RouteMenuMapping = (intl) => [
                 ],
             },
             {
-                id: intl.formatMessage({
+                id: 'Deny Policies',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.blacklisted.items',
                     defaultMessage: 'Deny Policies',
                 }),
@@ -166,7 +179,8 @@ const RouteMenuMapping = (intl) => [
         ],
     },
     {
-        id: intl.formatMessage({
+        id: 'Gateways',
+        displayText: intl.formatMessage({
             id: 'Base.RouteMenuMapping.gateways',
             defaultMessage: 'Gateways',
         }),
@@ -175,7 +189,8 @@ const RouteMenuMapping = (intl) => [
         icon: <GamesIcon />,
     },
     {
-        id: intl.formatMessage({
+        id: 'API Categories',
+        displayText: intl.formatMessage({
             id: 'Base.RouteMenuMapping.api.categories',
             defaultMessage: 'API Categories',
         }),
@@ -184,7 +199,8 @@ const RouteMenuMapping = (intl) => [
         icon: <CategoryIcon />,
     },
     {
-        id: intl.formatMessage({
+        id: 'Key Managers',
+        displayText: intl.formatMessage({
             id: 'Base.RouteMenuMapping.keymanagers',
             defaultMessage: 'Key Managers',
         }),
@@ -193,14 +209,16 @@ const RouteMenuMapping = (intl) => [
         icon: <SecurityIcon />,
         addEditPageDetails: [
             {
-                id: intl.formatMessage({
+                id: 'Add Key Manager',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.keymanagers.items.Adding',
                     defaultMessage: 'Add Key Manager',
                 }),
                 path: '/settings/key-managers/create',
             },
             {
-                id: intl.formatMessage({
+                id: 'Edit Key Manager',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.keymanagers.items.Editing',
                     defaultMessage: 'Edit Key Manager',
                 }),
@@ -209,13 +227,15 @@ const RouteMenuMapping = (intl) => [
         ],
     },
     {
-        id: intl.formatMessage({
+        id: 'Tasks',
+        displayText: intl.formatMessage({
             id: 'Base.RouteMenuMapping.tasks',
             defaultMessage: 'Tasks',
         }),
         children: [
             {
-                id: intl.formatMessage({
+                id: 'User Creation',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.user.creation',
                     defaultMessage: 'User Creation',
                 }),
@@ -224,7 +244,8 @@ const RouteMenuMapping = (intl) => [
                 icon: <PeopleIcon />,
             },
             {
-                id: intl.formatMessage({
+                id: 'Application Creation',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.application.creation',
                     defaultMessage: 'Application Creation',
                 }),
@@ -233,7 +254,8 @@ const RouteMenuMapping = (intl) => [
                 icon: <DnsRoundedIcon />,
             },
             {
-                id: intl.formatMessage({
+                id: 'Subscription Creation',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.subscription.creation',
                     defaultMessage: 'Subscription Creation',
                 }),
@@ -242,7 +264,8 @@ const RouteMenuMapping = (intl) => [
                 icon: <TouchAppIcon />,
             },
             {
-                id: intl.formatMessage({
+                id: 'Subscription Update',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.subscription.update',
                     defaultMessage: 'Subscription Update',
                 }),
@@ -252,12 +275,20 @@ const RouteMenuMapping = (intl) => [
             },
             {
                 id: 'Application Registration',
+                displayText: intl.formatMessage({
+                    id: 'Base.RouteMenuMapping.application.registration',
+                    defaultMessage: 'Application Registration',
+                }),
                 path: '/tasks/application-registration',
                 component: RegistrationCreation,
                 icon: <VpnKeyIcon />,
             },
             {
                 id: 'API State Change',
+                displayText: intl.formatMessage({
+                    id: 'Base.RouteMenuMapping.api.state.change',
+                    defaultMessage: 'API State Change',
+                }),
                 path: '/tasks/api-state-change',
                 component: APIStateChange,
                 icon: <SettingsEthernetIcon />,
@@ -265,13 +296,15 @@ const RouteMenuMapping = (intl) => [
         ],
     },
     {
-        id: intl.formatMessage({
+        id: 'Settings',
+        displayText: intl.formatMessage({
             id: 'Base.RouteMenuMapping.settings',
             defaultMessage: 'Settings',
         }),
         children: [
             {
-                id: intl.formatMessage({
+                id: 'Applications',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.applications',
                     defaultMessage: 'Applications',
                 }),
@@ -280,7 +313,8 @@ const RouteMenuMapping = (intl) => [
                 icon: <SettingsIcon />,
             },
             {
-                id: intl.formatMessage({
+                id: 'Scope Assignments',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.role.permissions',
                     defaultMessage: 'Scope Assignments',
                 }),
@@ -289,7 +323,8 @@ const RouteMenuMapping = (intl) => [
                 icon: <AccountTreeIcon />,
             },
             {
-                id: intl.formatMessage({
+                id: 'Tenant Theme',
+                displayText: intl.formatMessage({
                     id: 'Base.RouteMenuMapping.tenant.theme',
                     defaultMessage: 'Tenant Theme',
                 }),

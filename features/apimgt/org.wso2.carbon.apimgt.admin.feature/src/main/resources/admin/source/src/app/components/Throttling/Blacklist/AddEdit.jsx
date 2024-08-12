@@ -16,6 +16,7 @@
  * under the License.
  */
 
+/* eslint-disable no-template-curly-in-string */
 import React, { useReducer, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
@@ -264,10 +265,10 @@ function AddEdit(props) {
         return promisedAddBlacklistPolicy
             .then(() => {
                 return (
-                    <FormattedMessage
-                        id='Throttling.Blacklist.Policy.policy.add.success'
-                        defaultMessage='Deny Policy added successfully.'
-                    />
+                    intl.formatMessage({
+                        id: 'Throttling.Blacklist.Policy.policy.add.success',
+                        defaultMessage: 'Deny Policy added successfully.',
+                    })
                 );
             })
             .catch((error) => {
@@ -285,7 +286,10 @@ function AddEdit(props) {
     return (
         <FormDialogBase
             title={title}
-            saveButtonText='Deny'
+            saveButtonText={intl.formatMessage({
+                id: 'Admin.Throttling.Blacklist.Throttling.Policy.add.dialog.btn.deny',
+                defaultMessage: 'Deny',
+            })}
             icon={icon}
             triggerButtonText={triggerButtonText}
             formSaveCallback={formSaveCallback}
@@ -311,31 +315,56 @@ function AddEdit(props) {
                     <FormControlLabel
                         value='API'
                         control={<Radio color='primary' />}
-                        label='API Context '
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.api.context'
+                                defaultMessage='API Context '
+                            />
+                        )}
                         labelPlacement='end'
                     />
                     <FormControlLabel
                         value='APPLICATION'
                         control={<Radio color='primary' />}
-                        label='Application'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.application'
+                                defaultMessage='Application'
+                            />
+                        )}
                         labelPlacement='end'
                     />
                     <FormControlLabel
                         value='IP'
                         control={<Radio color='primary' />}
-                        label='IP Address'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.ip.address'
+                                defaultMessage='IP Address'
+                            />
+                        )}
                         labelPlacement='end'
                     />
                     <FormControlLabel
                         value='IPRANGE'
                         control={<Radio color='primary' />}
-                        label='IP Range'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.ip.range'
+                                defaultMessage='IP Range'
+                            />
+                        )}
                         labelPlacement='end'
                     />
                     <FormControlLabel
                         value='USER'
                         control={<Radio color='primary' />}
-                        label='User'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.User'
+                                defaultMessage='User'
+                            />
+                        )}
                         labelPlacement='end'
                     />
                 </RadioGroup>
@@ -344,7 +373,12 @@ function AddEdit(props) {
                         autoFocus
                         margin='dense'
                         name='conditionValue'
-                        label='Value'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.value.label'
+                                defaultMessage='Value'
+                            />
+                        )}
                         fullWidth
                         onChange={onChange}
                         variant='outlined'
@@ -352,8 +386,20 @@ function AddEdit(props) {
                         helperText={(
                             <>
                                 {/* eslint-disable-next-line no-template-curly-in-string */ }
-                                <FormHelperText className={classes.helperText}>{'Format : ${context}'}</FormHelperText>
-                                <FormHelperText className={classes.helperText}>Eg : /test/1.0.0</FormHelperText>
+                                <FormHelperText className={classes.helperText}>
+                                    <FormattedMessage
+                                        id={'Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.api.'
+                                            + 'context.format'}
+                                        defaultMessage='Format : ${context}'
+                                    />
+                                </FormHelperText>
+                                <FormHelperText className={classes.helperText}>
+                                    <FormattedMessage
+                                        id='Admin.Throttling.Blacklist.Throttling.Policy.example.abbr'
+                                        defaultMessage='Eg'
+                                    />
+                                    : /test/1.0.0
+                                </FormHelperText>
                             </>
                         )}
                     />
@@ -363,7 +409,12 @@ function AddEdit(props) {
                         autoFocus
                         margin='dense'
                         name='conditionValue'
-                        label='Value'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.value.label'
+                                defaultMessage='Value'
+                            />
+                        )}
                         fullWidth
                         onChange={onChange}
                         variant='outlined'
@@ -372,10 +423,18 @@ function AddEdit(props) {
                             <>
                                 <FormHelperText className={classes.helperText}>
                                     {/* eslint-disable-next-line no-template-curly-in-string */}
-                                    {'Format : ${userName}:${applicationName}'}
+                                    <FormattedMessage
+                                        id={'Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.'
+                                            + 'application.format'}
+                                        defaultMessage='Format : ${userName}:${applicationName}'
+                                    />
                                 </FormHelperText>
                                 <FormHelperText className={classes.helperText}>
-                                    Eg : admin:DefaultApplication
+                                    <FormattedMessage
+                                        id='Admin.Throttling.Blacklist.Throttling.Policy.example.abbr'
+                                        defaultMessage='Eg'
+                                    />
+                                    : admin:DefaultApplication
                                 </FormHelperText>
                             </>
                         )}
@@ -386,7 +445,12 @@ function AddEdit(props) {
                         autoFocus
                         margin='dense'
                         name='fixedIp'
-                        label='Value'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.value.label'
+                                defaultMessage='Value'
+                            />
+                        )}
                         fullWidth
                         onChange={onChange}
                         variant='outlined'
@@ -395,10 +459,17 @@ function AddEdit(props) {
                             <>
                                 <FormHelperText className={classes.helperText}>
                                     {/* eslint-disable-next-line no-template-curly-in-string */}
-                                    {'Format : ${ip}'}
+                                    <FormattedMessage
+                                        id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.ip.format'
+                                        defaultMessage='Format : ${ip}'
+                                    />
                                 </FormHelperText>
                                 <FormHelperText className={classes.helperText}>
-                                    Eg : 127.0.0.1
+                                    <FormattedMessage
+                                        id='Admin.Throttling.Blacklist.Throttling.Policy.example.abbr'
+                                        defaultMessage='Eg'
+                                    />
+                                    : 127.0.0.1
                                 </FormHelperText>
                             </>
                         )}
@@ -410,7 +481,13 @@ function AddEdit(props) {
                             autoFocus
                             margin='dense'
                             name='startingIp'
-                            label='Start IP Address'
+                            label={(
+                                <FormattedMessage
+                                    id={'Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.value.ip'
+                                        + '.start.address'}
+                                    defaultMessage='Start IP Address'
+                                />
+                            )}
                             fullWidth
                             onChange={onChange}
                             variant='outlined'
@@ -419,7 +496,13 @@ function AddEdit(props) {
                         <TextField
                             margin='dense'
                             name='endingIp'
-                            label='End IP Address'
+                            label={(
+                                <FormattedMessage
+                                    id={'Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.value.ip'
+                                        + '.end.address'}
+                                    defaultMessage='End IP Address'
+                                />
+                            )}
                             fullWidth
                             onChange={onChange}
                             variant='outlined'
@@ -448,7 +531,12 @@ function AddEdit(props) {
                         autoFocus
                         margin='dense'
                         name='conditionValue'
-                        label='Value'
+                        label={(
+                            <FormattedMessage
+                                id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.value.label'
+                                defaultMessage='Value'
+                            />
+                        )}
                         fullWidth
                         onChange={onChange}
                         variant='outlined'
@@ -457,10 +545,17 @@ function AddEdit(props) {
                             <>
                                 <FormHelperText className={classes.helperText}>
                                     {/* eslint-disable-next-line no-template-curly-in-string */}
-                                    {'Format : ${userName}'}
+                                    <FormattedMessage
+                                        id='Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type.user.format'
+                                        defaultMessage='Format : ${userName}'
+                                    />
                                 </FormHelperText>
                                 <FormHelperText className={classes.helperText}>
-                                    Eg : admin
+                                    <FormattedMessage
+                                        id='Admin.Throttling.Blacklist.Throttling.Policy.example.abbr'
+                                        defaultMessage='Eg'
+                                    />
+                                    : admin
                                 </FormHelperText>
                             </>
                         )}
@@ -472,7 +567,13 @@ function AddEdit(props) {
                             checked={conditionStatus}
                             onChange={onChange}
                             name='conditionStatus'
-                            label='Enable Condition'
+                            label={(
+                                <FormattedMessage
+                                    id={'Admin.Throttling.Blacklist.Throttling.Policy.add.condition.type'
+                                        + '.enable.condition'}
+                                    defaultMessage='Enable Condition'
+                                />
+                            )}
                             color='primary'
                         />
                     )}

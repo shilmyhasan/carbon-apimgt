@@ -21,7 +21,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableContainer from '@material-ui/core/TableContainer';
 import TablePagination from '@material-ui/core/TablePagination';
-
+import { useIntl } from 'react-intl';
 import { TableContextProvider } from './AdminTableContext';
 
 const useStyles = makeStyles((theme) => ({
@@ -49,6 +49,7 @@ export default function AdminTable(props) {
         children, multiSelect, rowsPerPageOptions, dataIDs,
     } = props;
     const classes = useStyles();
+    const intl = useIntl();
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('role');
     const [selected, setSelected] = React.useState([]);
@@ -112,6 +113,24 @@ export default function AdminTable(props) {
                         page={page}
                         onChangePage={handleChangePage}
                         onChangeRowsPerPage={handleChangeRowsPerPage}
+                        labelDisplayedRows={({ from, to, count }) => {
+                            if (count !== -1) {
+                                return intl.formatMessage({
+                                    id: 'Role.permissions.Role.Permissions.Admin.Table.displayed.rows.range.label',
+                                    defaultMessage: '{from}-{to} of {count}',
+                                },
+                                { from, to, count });
+                            }
+                            return intl.formatMessage({
+                                id: 'Role.permissions.Role.Permissions.Admin.Table.displayed.rows.more.than.label',
+                                defaultMessage: 'more than {to}',
+                            },
+                            { to });
+                        }}
+                        labelRowsPerPage={intl.formatMessage({
+                            id: 'Role.permissions.Role.Permissions.Admin.Table.row.per.page.label',
+                            defaultMessage: 'Rows per page:',
+                        })}
                     />
                 </TableContainer>
 

@@ -150,7 +150,10 @@ function ListBase(props) {
         columns.push(
             {
                 name: '',
-                label: 'Actions',
+                label: <FormattedMessage
+                    id='Throttling.Advanced.AddEdit.form.actions.label'
+                    defaultMessage='Actions'
+                />,
                 options: {
                     filter: false,
                     sort: false,
@@ -226,6 +229,24 @@ function ListBase(props) {
         responsive: 'stacked',
         searchText,
         onColumnSortChange,
+        textLabels: {
+            body: {
+                noMatch: intl.formatMessage({
+                    id: 'Mui.data.table.search.no.records.found',
+                    defaultMessage: 'Sorry, no matching records found',
+                }),
+            },
+            pagination: {
+                rowsPerPage: intl.formatMessage({
+                    id: 'Mui.data.table.pagination.rows.per.page',
+                    defaultMessage: 'Rows per page:',
+                }),
+                displayRows: intl.formatMessage({
+                    id: 'Mui.data.table.pagination.display.rows',
+                    defaultMessage: 'of',
+                }),
+            },
+        },
     };
 
     // If no apiCall is provided OR,

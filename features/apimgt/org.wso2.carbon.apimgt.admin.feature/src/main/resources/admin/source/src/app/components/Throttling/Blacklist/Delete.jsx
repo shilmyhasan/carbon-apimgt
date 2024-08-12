@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import FormDialogBase from 'AppComponents/AdminPages/Addons/FormDialogBase';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import API from 'AppData/api';
 
 /**
@@ -34,6 +34,7 @@ function Delete(props) {
     const {
         dataRow, updateList,
     } = props;
+    const intl = useIntl();
 
     const formSaveCallback = () => {
         const policyId = dataRow.conditionId;
@@ -42,10 +43,10 @@ function Delete(props) {
             .then(() => {
                 updateList();
                 return (
-                    <FormattedMessage
-                        id='Throttling.Blacklist.Policy.policy.delete.success'
-                        defaultMessage='Deny Policy successfully deleted.'
-                    />
+                    intl.formatMessage({
+                        id: 'Throttling.Blacklist.Policy.policy.delete.success',
+                        defaultMessage: 'Deny Policy successfully deleted.',
+                    })
                 );
             })
             .catch(() => {
@@ -62,8 +63,14 @@ function Delete(props) {
 
     return (
         <FormDialogBase
-            title='Delete Deny Policy?'
-            saveButtonText='Delete'
+            title={intl.formatMessage({
+                id: 'Throttling.Blacklist.Policy.policy.delete.dialog.title',
+                defaultMessage: 'Delete Deny Policy?',
+            })}
+            saveButtonText={intl.formatMessage({
+                id: 'Admin.components.form.delete.btn',
+                defaultMessage: 'Delete',
+            })}
             icon={<DeleteForeverIcon />}
             formSaveCallback={formSaveCallback}
         >

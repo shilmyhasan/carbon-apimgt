@@ -37,10 +37,23 @@ import AddRoleWizard from './Commons/AddRoleWizard';
 
 const headCells = [
     {
-        id: 'role', numeric: false, disablePadding: false, label: 'Roles', enableSort: true,
+        id: 'role',
+        numeric: false,
+        disablePadding: false,
+        label: <FormattedMessage
+            id='RolePermissions.ListRoles.table.column.role'
+            defaultMessage='Roles'
+        />,
+        enableSort: true,
     },
     {
-        id: 'permissions', numeric: false, disablePadding: false, label: 'Scope Assignments',
+        id: 'permissions',
+        numeric: false,
+        disablePadding: false,
+        label: <FormattedMessage
+            id='RolePermissions.ListRoles.table.column.scope.assignments'
+            defaultMessage='Scope Assignments'
+        />,
     },
 ];
 
@@ -258,7 +271,13 @@ export default function ListRoles() {
         );
     }
     return (
-        <ContentBase title='Scope Assignments' pageDescription={pageDesc}>
+        <ContentBase
+            title={intl.formatMessage({
+                id: 'RolePermissions.ListRoles.title.role.permissions',
+                defaultMessage: 'Scope Assignments',
+            })}
+            pageDescription={pageDesc}
+        >
             <ListAddOns>
                 <Grid item>
                     <Button

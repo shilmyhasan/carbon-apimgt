@@ -787,17 +787,33 @@ function AddEdit(props) {
                                 <FormControlLabel
                                     value='REQUESTCOUNTLIMIT'
                                     control={<Radio />}
-                                    label='Request Count'
+                                    label={(
+                                        <FormattedMessage
+                                            id='Throttling.Subscription.AddEdit.quota.policies.add.limits.request.count'
+                                            defaultMessage='Request Count'
+                                        />
+                                    )}
                                 />
                                 <FormControlLabel
                                     value='BANDWIDTHLIMIT'
                                     control={<Radio />}
-                                    label='Request Bandwidth'
+                                    label={(
+                                        <FormattedMessage
+                                            id={'Throttling.Subscription.AddEdit.quota.policies.add.limits.'
+                                                + 'request.bandwidth'}
+                                            defaultMessage='Request Bandwidth'
+                                        />
+                                    )}
                                 />
                                 <FormControlLabel
                                     value='EVENTCOUNTLIMIT'
                                     control={<Radio />}
-                                    label='Event Based (Async API)'
+                                    label={(
+                                        <FormattedMessage
+                                            id='Throttling.Subscription.AddEdit.quota.policies.add.limits.event.count'
+                                            defaultMessage='Event Based (Async API)'
+                                        />
+                                    )}
                                 />
                             </RadioGroup>
                         </Box>
@@ -825,7 +841,14 @@ function AddEdit(props) {
                                         )}
                                         fullWidth
                                         error={validationError.requestCount}
-                                        helperText={validationError.requestCount || 'Number of requests allowed'}
+                                        helperText={validationError.requestCount
+                                            || (
+                                                <FormattedMessage
+                                                    id={'Admin.Throttling.Subscription.Throttling.Policy.add.'
+                                                        + 'request.count.helper.text'}
+                                                    defaultMessage='Number of requests allowed'
+                                                />
+                                            )}
                                         variant='outlined'
                                     />
                                 </Box>
@@ -853,7 +876,11 @@ function AddEdit(props) {
                                         )}
                                         fullWidth
                                         error={validationError.dataAmount}
-                                        helperText={validationError.dataAmount || 'Bandwidth allowed'}
+                                        helperText={validationError.dataAmount
+                                            || intl.formatMessage({
+                                                id: 'Throttling.Subscription.AddEdit.form.add.data.amount.helper.text',
+                                                defaultMessage: 'Bandwidth allowed',
+                                            })}
                                         variant='outlined'
                                     />
                                     <FormControl variant='outlined' className={classes.formControlSelect}>
@@ -893,7 +920,11 @@ function AddEdit(props) {
                                         )}
                                         fullWidth
                                         error={validationError.eventCount}
-                                        helperText={validationError.eventCount || 'Number of events allowed'}
+                                        helperText={validationError.eventCount
+                                            || intl.formatMessage({
+                                                id: 'Throttling.Subscription.AddEdit.form.eventCount.count.helper.text',
+                                                defaultMessage: 'Number of events allowed',
+                                            })}
                                         variant='outlined'
                                     />
                                 </Box>
@@ -905,7 +936,12 @@ function AddEdit(props) {
                                     value={unitTime}
                                     onChange={onChange}
                                     type='number'
-                                    label='Unit Time'
+                                    label={(
+                                        <FormattedMessage
+                                            id='Throttling.Subscription.AddEdit.form.unit.time.label'
+                                            defaultMessage='Unit Time'
+                                        />
+                                    )}
                                     required
                                     InputProps={{
                                         id: 'unitTime',
@@ -929,11 +965,36 @@ function AddEdit(props) {
                                         onChange={onChange}
                                         classes={{ root: classes.selectRoot }}
                                     >
-                                        <MenuItem value='min'>Minute(s)</MenuItem>
-                                        <MenuItem value='hours'>Hour(s)</MenuItem>
-                                        <MenuItem value='days'>Day(s)</MenuItem>
-                                        <MenuItem value='months'>Month(s)</MenuItem>
-                                        <MenuItem value='years'>Year(s)</MenuItem>
+                                        <MenuItem value='min'>
+                                            <FormattedMessage
+                                                id='Admin.Throttling.Subscription.Throttling.Policy.add.time.minutes'
+                                                defaultMessage='Minute(s)'
+                                            />
+                                        </MenuItem>
+                                        <MenuItem value='hours'>
+                                            <FormattedMessage
+                                                id='Admin.Throttling.Subscription.Throttling.Policy.add.time.hours'
+                                                defaultMessage='Hour(s)'
+                                            />
+                                        </MenuItem>
+                                        <MenuItem value='days'>
+                                            <FormattedMessage
+                                                id='Admin.Throttling.Subscription.Throttling.Policy.add.time.days'
+                                                defaultMessage='Day(s)'
+                                            />
+                                        </MenuItem>
+                                        <MenuItem value='months'>
+                                            <FormattedMessage
+                                                id='Admin.Throttling.Subscription.Throttling.Policy.add.time.months'
+                                                defaultMessage='Month(s)'
+                                            />
+                                        </MenuItem>
+                                        <MenuItem value='years'>
+                                            <FormattedMessage
+                                                id='Admin.Throttling.Subscription.Throttling.Policy.add.time.years'
+                                                defaultMessage='Year(s)'
+                                            />
+                                        </MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -996,8 +1057,20 @@ function AddEdit(props) {
                                         onChange={onChange}
                                         classes={{ root: classes.selectRoot }}
                                     >
-                                        <MenuItem value='sec'>Requests/s</MenuItem>
-                                        <MenuItem value='min'>Requests/min</MenuItem>
+                                        <MenuItem value='sec'>
+                                            <FormattedMessage
+                                                id={'Throttling.Subscription.AddEdit.burst.control.'
+                                                    + 'limit.time.unit.second'}
+                                                defaultMessage='Requests/s'
+                                            />
+                                        </MenuItem>
+                                        <MenuItem value='min'>
+                                            <FormattedMessage
+                                                id={'Throttling.Subscription.AddEdit.burst.control.'
+                                                    + 'limit.time.unit.minute'}
+                                                defaultMessage='Requests/min'
+                                            />
+                                        </MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -1171,12 +1244,22 @@ function AddEdit(props) {
                                         <FormControlLabel
                                             value='FREE'
                                             control={<Radio />}
-                                            label='Free'
+                                            label={(
+                                                <FormattedMessage
+                                                    id='Throttling.Subscription.Billing.Plan.type.free'
+                                                    defaultMessage='Free'
+                                                />
+                                            )}
                                         />
                                         <FormControlLabel
                                             value='COMMERCIAL'
                                             control={<Radio />}
-                                            label='Commercial'
+                                            label={(
+                                                <FormattedMessage
+                                                    id='Throttling.Subscription.Billing.Plan.type.commercial'
+                                                    defaultMessage='Commercial'
+                                                />
+                                            )}
                                         />
                                     </RadioGroup>
                                 </Box>
@@ -1218,8 +1301,18 @@ function AddEdit(props) {
                                                     value={monetizationPlan}
                                                     onChange={onChange}
                                                 >
-                                                    <MenuItem value='FIXEDRATE'>Fixed Rate</MenuItem>
-                                                    <MenuItem value='DYNAMICRATE'>Dynamic Usage</MenuItem>
+                                                    <MenuItem value='FIXEDRATE'>
+                                                        <FormattedMessage
+                                                            id='Throttling.Subscription.monetization.plan.fixed.rate'
+                                                            defaultMessage='Fixed Rate'
+                                                        />
+                                                    </MenuItem>
+                                                    <MenuItem value='DYNAMICRATE'>
+                                                        <FormattedMessage
+                                                            id='Throttling.Subscription.monetization.plan.dynamic.usage'
+                                                            defaultMessage='Dynamic Usage'
+                                                        />
+                                                    </MenuItem>
                                                 </Select>
                                             </FormControl>
                                         </Box>
@@ -1255,7 +1348,12 @@ function AddEdit(props) {
                                                     name='fixedPrice'
                                                     value={fixedPrice}
                                                     onChange={onChange}
-                                                    label='Fixed Rate'
+                                                    label={(
+                                                        <FormattedMessage
+                                                            id='Throttling.Subscription.Fixed.Rate'
+                                                            defaultMessage='Fixed Rate'
+                                                        />
+                                                    )}
                                                     fullWidth
                                                     variant='outlined'
                                                 />
@@ -1294,7 +1392,12 @@ function AddEdit(props) {
                                                     name='pricePerRequest'
                                                     value={pricePerRequest}
                                                     onChange={onChange}
-                                                    label='Price Per Request'
+                                                    label={(
+                                                        <FormattedMessage
+                                                            id='Throttling.Subscription.price.per.request'
+                                                            defaultMessage='Price Per Request'
+                                                        />
+                                                    )}
                                                     fullWidth
                                                     variant='outlined'
                                                 />
@@ -1316,7 +1419,12 @@ function AddEdit(props) {
                                                 name='currencyType'
                                                 value={currencyType}
                                                 onChange={onChange}
-                                                label='Currency'
+                                                label={(
+                                                    <FormattedMessage
+                                                        id='Throttling.Subscription.currency'
+                                                        defaultMessage='Currency'
+                                                    />
+                                                )}
                                                 fullWidth
                                                 variant='outlined'
                                             />
@@ -1342,9 +1450,24 @@ function AddEdit(props) {
                                                     value={billingCycle}
                                                     onChange={onChange}
                                                 >
-                                                    <MenuItem value='week'>Week</MenuItem>
-                                                    <MenuItem value='month'>Month</MenuItem>
-                                                    <MenuItem value='year'>Year</MenuItem>
+                                                    <MenuItem value='week'>
+                                                        <FormattedMessage
+                                                            id='Throttling.Subscription.billing.cycle.menu.week'
+                                                            defaultMessage='Week'
+                                                        />
+                                                    </MenuItem>
+                                                    <MenuItem value='month'>
+                                                        <FormattedMessage
+                                                            id='Throttling.Subscription.billing.cycle.menu.month'
+                                                            defaultMessage='Month'
+                                                        />
+                                                    </MenuItem>
+                                                    <MenuItem value='year'>
+                                                        <FormattedMessage
+                                                            id='Throttling.Subscription.billing.cycle.menu.year'
+                                                            defaultMessage='Year'
+                                                        />
+                                                    </MenuItem>
                                                 </Select>
                                             </FormControl>
                                         </Box>
@@ -1512,14 +1635,20 @@ function AddEdit(props) {
                                 && (
                                     <Box display='flex' flexDirection='row' alignItems='center'>
                                         <ChipInput
-                                            label='Roles'
+                                            label={intl.formatMessage({
+                                                id: 'Throttling.Subscription.AddEdit.permissions.add.role.label',
+                                                defaultMessage: 'Roles',
+                                            })}
                                             InputLabelProps={{
                                                 shrink: true,
                                             }}
                                             variant='outlined'
                                             value={validRoles.concat(invalidRoles)}
                                             alwaysShowPlaceholder={false}
-                                            placeholder='Enter roles and press Enter'
+                                            placeholder={intl.formatMessage({
+                                                id: 'Throttling.Subscription.AddEdit.permissions.add.role.placeholder',
+                                                defaultMessage: 'Enter roles and press Enter',
+                                            })}
                                             blurBehavior='clear'
                                             InputProps={{
                                                 endAdornment: !roleValidity && (
@@ -1586,9 +1715,36 @@ function AddEdit(props) {
                                     className={classes.radioGroup}
                                     defaultValue='NONE'
                                 >
-                                    <FormControlLabel value='NONE' control={<Radio />} label='None' />
-                                    <FormControlLabel value='ALLOW' control={<Radio />} label='Allow' />
-                                    <FormControlLabel value='DENY' control={<Radio />} label='Deny' />
+                                    <FormControlLabel
+                                        value='NONE'
+                                        control={<Radio />}
+                                        label={(
+                                            <FormattedMessage
+                                                id='Apis.Details.Scopes.permission.status.none'
+                                                defaultMessage='None'
+                                            />
+                                        )}
+                                    />
+                                    <FormControlLabel
+                                        value='ALLOW'
+                                        control={<Radio />}
+                                        label={(
+                                            <FormattedMessage
+                                                id='Apis.Details.Scopes.permission.status.allow'
+                                                defaultMessage='Allow'
+                                            />
+                                        )}
+                                    />
+                                    <FormControlLabel
+                                        value='DENY'
+                                        control={<Radio />}
+                                        label={(
+                                            <FormattedMessage
+                                                id='Apis.Details.Scopes.permission.status.deny'
+                                                defaultMessage='Deny'
+                                            />
+                                        )}
+                                    />
                                 </RadioGroup>
                             </Box>
                         </Box>
