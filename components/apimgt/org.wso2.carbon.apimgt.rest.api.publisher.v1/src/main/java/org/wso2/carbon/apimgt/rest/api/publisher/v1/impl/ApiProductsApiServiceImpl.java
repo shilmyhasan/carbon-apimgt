@@ -512,7 +512,7 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
 
     @Override
     public Response updateAPIProduct(String apiProductId, APIProductDTO body, String ifMatch,
-            MessageContext messageContext) {
+            MessageContext messageContext) throws APIManagementException {
         try {
             String username = RestApiCommonUtil.getLoggedInUsername();
             String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
@@ -525,7 +525,18 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
                     apiProvider, username, tenantDomain);
             APIProductDTO updatedProductDTO = getAPIProductByID(apiProductId, apiProvider);
             return Response.ok().entity(updatedProductDTO).build();
-        } catch (APIManagementException | FaultGatewaysException e) {
+        } catch (APIManagementException e) {
+            if (isAuthorizationFailure(e)) {
+                RestApiUtil.handleAuthorizationFailure("User is not authorized to access the API", e, log);
+            } else {
+                String errorMessage = "Error while updating API Product : " + apiProductId;
+                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                    throw e;
+                } else {
+                    RestApiUtil.handleInternalServerError(errorMessage, e, log);
+                }
+            }
+        } catch (FaultGatewaysException e) {
             if (isAuthorizationFailure(e)) {
                 RestApiUtil.handleAuthorizationFailure("User is not authorized to access the API", e, log);
             } else {
