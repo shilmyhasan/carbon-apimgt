@@ -28,7 +28,7 @@
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>
-            org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
+            org.wso2.carbon.apimgt.rest.api.util.servlet.impl.CustomCXFNonSpringJaxrsServlet
         </servlet-class>
         <load-on-startup>1</load-on-startup>
 
@@ -82,6 +82,7 @@
             <param-name>jaxrs.properties</param-name>
             <param-value>
                 map.cxf.interceptor.fault=true
+                attachment-max-size={systemProperties['rest.api.gateway.attachment.max.size']}
             </param-value>
         </init-param>
     </servlet>
