@@ -37,7 +37,6 @@ public class Constants {
     public static final String RESPONSE_CONTENT_TYPE = "responseContentType";
     public static final String BUILD_RESPONSE_MESSAGE_CONFIG = "build_response_message";
 
-
     public static final String REGION_ID_PROP = "apim.gw.region";
     public static final String DEFAULT_REGION_ID = "default";
     public static final String SUCCESS_EVENT_TYPE = "response";
