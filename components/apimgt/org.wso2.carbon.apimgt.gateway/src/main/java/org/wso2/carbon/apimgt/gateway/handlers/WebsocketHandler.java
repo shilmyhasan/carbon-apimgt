@@ -105,8 +105,15 @@ public class WebsocketHandler extends CombinedChannelDuplexHandler<WebsocketInbo
                 if (log.isDebugEnabled()) {
                     log.debug("Sending Outbound Websocket frame." + ctx.channel().toString());
                 }
-                outboundHandler().write(ctx, msg, promise);
                 // publish analytics events if analytics is enabled
+                if (APIUtil.isAnalyticsEnabled()) {
+                    if (msg instanceof TextWebSocketFrame) {
+                        WebSocketUtils.setApiPropertyToChannel(ctx,
+                                org.wso2.carbon.apimgt.gateway.handlers.analytics.Constants.RESPONSE_SIZE,
+                                ((TextWebSocketFrame) msg).text().length());
+                    }
+                }
+                outboundHandler().write(ctx, msg, promise);
                 publishSubscribeEvent(ctx);
             }
         } else {
