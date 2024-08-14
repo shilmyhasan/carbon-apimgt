@@ -1974,8 +1974,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     ExceptionCodes.from(ExceptionCodes.API_NOT_FOUND, existingApiId));
         }
         if (newVersion.equals(existingAPI.getId().getVersion())) {
-            throw new APIMgtResourceAlreadyExistsException(
-                    "Version " + newVersion + " exists for api " + existingAPI.getId().getApiName());
+            String errorMessage = "Version " + newVersion + " exists for api " + existingAPI.getId().getApiName();
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.API_VERSION_ALREADY_EXISTS, newVersion,
+                                existingAPI.getId().getApiName()));
+            } else {
+                throw new APIMgtResourceAlreadyExistsException(errorMessage);
+            }
         }
         if (APIUtil.isSequenceDefined(existingAPI.getInSequence()) || APIUtil.isSequenceDefined(existingAPI.getOutSequence())
                 || APIUtil.isSequenceDefined(existingAPI.getFaultSequence())) {

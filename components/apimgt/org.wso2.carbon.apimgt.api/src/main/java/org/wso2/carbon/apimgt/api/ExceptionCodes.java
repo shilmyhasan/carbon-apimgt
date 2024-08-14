@@ -702,6 +702,9 @@ public enum ExceptionCodes implements ErrorHandler {
 
     LENGTH_EXCEEDS_ERROR(903249, "Character length exceeds the allowable limit", 400, "%s"),
 
+    ROLE_OF_SCOPE_DOES_NOT_EXIST(903250, "Role does not exist", 404,
+            "Role %s does not exist"),
+
     OPERATION_OR_RESOURCE_TYPE_OR_METHOD_NOT_DEFINED(902031,
             "Operation type/http method is not specified for the operation/resource", 400,
             "Operation type/http method is not specified for the operation/resource: %s", false),

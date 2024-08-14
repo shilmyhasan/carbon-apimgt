@@ -845,8 +845,13 @@ public class PublisherCommonUtils {
                 for (String aRole : scope.getRoles().split(",")) {
                     boolean isValidRole = APIUtil.isRoleNameExist(username, aRole);
                     if (!isValidRole) {
-                        throw new APIManagementException("Role '" + aRole + "' does not exist.",
-                                ExceptionCodes.ROLE_DOES_NOT_EXIST);
+                        String errorMessage = "Role '" + aRole + "' does not exist.";
+                        if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                            throw new APIManagementException(errorMessage,
+                                    ExceptionCodes.from(ExceptionCodes.ROLE_OF_SCOPE_DOES_NOT_EXIST, aRole));
+                        } else {
+                            throw new APIManagementException(errorMessage, ExceptionCodes.ROLE_DOES_NOT_EXIST);
+                        }
                     }
                 }
             }
@@ -1470,7 +1475,13 @@ public class PublisherCommonUtils {
                 for (String aRole : roles.split(",")) {
                     boolean isValidRole = APIUtil.isRoleNameExist(RestApiCommonUtil.getLoggedInUsername(), aRole);
                     if (!isValidRole) {
-                        throw new APIManagementException("Role '" + aRole + "' Does not exist.");
+                        String errorMessage = "Role '" + aRole + "' Does not exist.";
+                        if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                            throw new APIManagementException(errorMessage,
+                                    ExceptionCodes.from(ExceptionCodes.ROLE_OF_SCOPE_DOES_NOT_EXIST, aRole));
+                        } else {
+                            throw new APIManagementException(errorMessage);
+                        }
                     }
                 }
             }
