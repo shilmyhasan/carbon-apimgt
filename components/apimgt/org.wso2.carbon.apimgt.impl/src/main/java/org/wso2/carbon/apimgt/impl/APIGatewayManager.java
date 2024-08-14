@@ -462,8 +462,7 @@ public class APIGatewayManager {
         if (isSecureVaultEnabled) {
             // Handle migrated APIs
             if (api.isEndpointSecured()) {
-                String secureVaultAlias =
-                        api.getId().getProviderName() + "--" + api.getId().getApiName() + api.getId().getVersion();
+                String secureVaultAlias = api.getId().getApiName() + api.getId().getVersion();
 
                 CredentialDto credentialDto = new CredentialDto();
                 credentialDto.setAlias(secureVaultAlias);
@@ -493,8 +492,7 @@ public class APIGatewayManager {
                     isSandboxEndpointSecured =
                             (boolean) sandboxEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_ENABLED);
                 }
-                String secureVaultAlias = api.getId().getProviderName() + "--" + api.getId().getApiName() +
-                        api.getId().getVersion();
+                String secureVaultAlias = api.getId().getApiName() + api.getId().getVersion();
                 //for production endpoints
                 if (isProductionEndpointSecured && !productionEndpointSecurity.isNull("type")
                         && "BASIC".equals(productionEndpointSecurity.getString("type"))) {

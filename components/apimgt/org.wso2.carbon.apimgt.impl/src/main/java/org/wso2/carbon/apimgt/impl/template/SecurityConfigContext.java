@@ -96,8 +96,7 @@ public class SecurityConfigContext extends ConfigContextDecorator {
                 getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE));
         if (api != null) {
             Map<String, EndpointSecurityModel> endpointSecurityModelMap = new HashMap<>();
-            String alias = api.getId().getProviderName() + "--" + api.getId().getApiName()
-                    + api.getId().getVersion();
+            String alias = api.getId().getApiName() + api.getId().getVersion();
             endpointSecurityModelMap.put(APIConstants.ENDPOINT_SECURITY_PRODUCTION, new EndpointSecurityModel());
             endpointSecurityModelMap.put(APIConstants.ENDPOINT_SECURITY_SANDBOX, new EndpointSecurityModel());
             if (api.isEndpointSecured()) {
