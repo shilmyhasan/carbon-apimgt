@@ -75,7 +75,7 @@ public class SecurityConfigContextTest {
                     new String(Base64.encodeBase64("admin:admin123".getBytes()))
                             .equalsIgnoreCase(endpointSecurityModelEntry.getValue().getBase64EncodedPassword()));
             Assert.assertTrue("Property securevault_alias does not match.",
-                    "admin--TestAPI1.0.0".equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
+                    "TestAPI1.0.0".equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
         }
         Assert.assertTrue("Property isSecureVaultEnabled cannot be false. ",
                 velocityContext.get("isSecureVaultEnabled").equals(true));
@@ -116,7 +116,7 @@ public class SecurityConfigContextTest {
                 new String(Base64.encodeBase64("admin:admin123#QA".getBytes()))
                         .equalsIgnoreCase(production.getBase64EncodedPassword()));
         Assert.assertTrue("Property securevault_alias does not match.",
-                "admin--TestAPI1.0.0--production".equalsIgnoreCase(production.getAlias()));
+                "TestAPI1.0.0--production".equalsIgnoreCase(production.getAlias()));
         Assert.assertTrue("Property isSecureVaultEnabled cannot be false. ",
                 velocityContext.get("isSecureVaultEnabled").equals(true));
         EndpointSecurityModel sandbox = endpointSecurityModelMap.get("sandbox");
@@ -163,7 +163,7 @@ public class SecurityConfigContextTest {
                 new String(Base64.encodeBase64("admin:admin123#QA".getBytes()))
                         .equalsIgnoreCase(production.getBase64EncodedPassword()));
         Assert.assertTrue("Property securevault_alias does not match.",
-                "admin--TestAPI1.0.0--production".equalsIgnoreCase(production.getAlias()));
+                "TestAPI1.0.0--production".equalsIgnoreCase(production.getAlias()));
         EndpointSecurityModel sandbox = endpointSecurityModelMap.get("sandbox");
         Assert.assertTrue("Property enabled cannot be false.", sandbox.isEnabled());
         Assert.assertTrue("Property type cannot be other.", sandbox.getType().equalsIgnoreCase("digest"));
@@ -172,7 +172,7 @@ public class SecurityConfigContextTest {
                 new String(Base64.encodeBase64("admin:admin123".getBytes()))
                         .equalsIgnoreCase(sandbox.getBase64EncodedPassword()));
         Assert.assertTrue("Property securevault_alias does not match.",
-                "admin--TestAPI1.0.0--sandbox".equalsIgnoreCase(sandbox.getAlias()));
+                "TestAPI1.0.0--sandbox".equalsIgnoreCase(sandbox.getAlias()));
         Assert.assertTrue("Property isSecureVaultEnabled cannot be false. ",
                 velocityContext.get("isSecureVaultEnabled").equals(true));
     }
@@ -211,7 +211,7 @@ public class SecurityConfigContextTest {
                 new String(Base64.encodeBase64("admin:admin123#QA".getBytes()))
                         .equalsIgnoreCase(sandbox.getBase64EncodedPassword()));
         Assert.assertTrue("Property securevault_alias does not match.",
-                "admin--TestAPI1.0.0--sandbox".equalsIgnoreCase(sandbox.getAlias()));
+                "TestAPI1.0.0--sandbox".equalsIgnoreCase(sandbox.getAlias()));
         Assert.assertTrue("Property isSecureVaultEnabled cannot be false. ",
                 velocityContext.get("isSecureVaultEnabled").equals(true));
         EndpointSecurityModel production = endpointSecurityModelMap.get("production");
@@ -262,7 +262,7 @@ public class SecurityConfigContextTest {
                         new String(Base64.encodeBase64("admin:admin123".getBytes()))
                                 .equalsIgnoreCase(endpointSecurityModelEntry.getValue().getBase64EncodedPassword()));
                 Assert.assertTrue("Property securevault_alias does not match.",
-                        "admin--TestAPI1.0.0".equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
+                        "TestAPI1.0.0".equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
             } else {
                 Assert.assertTrue("Property username does not match.",
                         "overrideSandboxuser".equals(endpointSecurityModelEntry.getValue().getUsername()));
@@ -270,7 +270,7 @@ public class SecurityConfigContextTest {
                         new String(Base64.encodeBase64("overrideSandboxuser:overrideSandboxpassword".getBytes()))
                                 .equalsIgnoreCase(endpointSecurityModelEntry.getValue().getBase64EncodedPassword()));
                 Assert.assertTrue("Property securevault_alias does not match.",
-                        "admin--TestAPI1.0.0".concat("--sandbox").equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
+                        "TestAPI1.0.0".concat("--sandbox").equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
 
             }
         }
@@ -321,7 +321,7 @@ public class SecurityConfigContextTest {
                         new String(Base64.encodeBase64("admin:admin123".getBytes()))
                                 .equalsIgnoreCase(endpointSecurityModelEntry.getValue().getBase64EncodedPassword()));
                 Assert.assertTrue("Property securevault_alias does not match.",
-                        "admin--TestAPI1.0.0".equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
+                        "TestAPI1.0.0".equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
             } else {
                 Assert.assertTrue("Property username does not match.",
                         "overrideProductionUser".equals(endpointSecurityModelEntry.getValue().getUsername()));
@@ -329,7 +329,7 @@ public class SecurityConfigContextTest {
                         new String(Base64.encodeBase64("overrideProductionUser:overrideProductionPassword".getBytes()))
                                 .equalsIgnoreCase(endpointSecurityModelEntry.getValue().getBase64EncodedPassword()));
                 Assert.assertTrue("Property securevault_alias does not match.",
-                        "admin--TestAPI1.0.0".concat("--production").equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
+                        "TestAPI1.0.0".concat("--production").equalsIgnoreCase(endpointSecurityModelEntry.getValue().getAlias()));
 
             }
         }
