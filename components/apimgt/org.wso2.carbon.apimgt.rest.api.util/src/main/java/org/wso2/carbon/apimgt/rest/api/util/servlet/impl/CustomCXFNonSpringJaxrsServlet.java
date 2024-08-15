@@ -106,7 +106,7 @@ public class CustomCXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         systemPropMap.put("rest.api.admin.attachment.max.size", "10485760");
         systemPropMap.put("rest.api.devportal.attachment.max.size", "10485760");
         systemPropMap.put("rest.api.publisher.attachment.max.size", "10485760");
-        systemPropMap.put("rest.api.service.catalog.attachment.max.size", "10485760");
+        systemPropMap.put("rest.api.gateway.attachment.max.size", "10485760");
     }
 
     public CustomCXFNonSpringJaxrsServlet() {
