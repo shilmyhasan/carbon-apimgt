@@ -2823,8 +2823,8 @@ public final class APIUtil {
         if (!hasValidLength(apiName, APIConstants.MAX_LENGTH_API_NAME)) {
             String errorMessage = "API name exceeds allowed character length";
             if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
-                throw new APIManagementException(errorMessage,
-                        ExceptionCodes.from(ExceptionCodes.LENGTH_EXCEEDS_ERROR, errorMessage));
+                throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes.LENGTH_EXCEEDS_ERROR,
+                        errorMessage + " of " + APIConstants.MAX_LENGTH_API_NAME));
             } else {
                 throw new APIManagementException(errorMessage, ExceptionCodes.LENGTH_EXCEEDS);
             }
@@ -2832,8 +2832,8 @@ public final class APIUtil {
         if (!hasValidLength(context, APIConstants.MAX_LENGTH_CONTEXT)) {
             String errorMessage = "API context exceeds allowed character length";
             if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
-                throw new APIManagementException(errorMessage,
-                        ExceptionCodes.from(ExceptionCodes.LENGTH_EXCEEDS_ERROR, errorMessage));
+                throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes.LENGTH_EXCEEDS_ERROR,
+                        errorMessage + " of " + APIConstants.MAX_LENGTH_CONTEXT));
             } else {
                 throw new APIManagementException(errorMessage, ExceptionCodes.LENGTH_EXCEEDS);
             }
@@ -2841,8 +2841,8 @@ public final class APIUtil {
         if (!hasValidLength(provider, APIConstants.MAX_LENGTH_PROVIDER)) {
             String errorMessage = "API provider name exceeds allowed character length";
             if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
-                throw new APIManagementException(errorMessage,
-                        ExceptionCodes.from(ExceptionCodes.LENGTH_EXCEEDS_ERROR, errorMessage));
+                throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes.LENGTH_EXCEEDS_ERROR,
+                        errorMessage + " of " + APIConstants.MAX_LENGTH_PROVIDER));
             } else {
                 throw new APIManagementException(errorMessage, ExceptionCodes.LENGTH_EXCEEDS);
             }

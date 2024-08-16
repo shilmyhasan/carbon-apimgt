@@ -612,8 +612,7 @@ public enum ExceptionCodes implements ErrorHandler {
     ASYNCAPI_RETRIEVAL_ERROR(903219, "Error while retrieving the Async API definition", 500,
             "Error while retrieving the Async API definition for API with UUID %s"),
 
-    ERROR_RETRIEVING_API(903220, "Failed to get API", 500,
-            "Failed to get API with UUID %s"),
+    ERROR_RETRIEVING_API(903220, "Failed to get API", 500, "Failed to get API with UUID %s"),
 
     ERROR_CHANGING_REGISTRY_LIFECYCLE_STATE(903221, "Error changing registry lifecycle state", 500,
             "Error changing registry lifecycle state for API/API Product with UUID %s"),

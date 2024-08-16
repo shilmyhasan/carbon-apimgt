@@ -1976,7 +1976,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         if (newVersion.equals(existingAPI.getId().getVersion())) {
             String errorMessage = "Version " + newVersion + " exists for api " + existingAPI.getId().getApiName();
             if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
-                throw new APIManagementException(errorMessage,
+                throw new APIMgtResourceAlreadyExistsException(errorMessage,
                         ExceptionCodes.from(ExceptionCodes.API_VERSION_ALREADY_EXISTS, newVersion,
                                 existingAPI.getId().getApiName()));
             } else {
