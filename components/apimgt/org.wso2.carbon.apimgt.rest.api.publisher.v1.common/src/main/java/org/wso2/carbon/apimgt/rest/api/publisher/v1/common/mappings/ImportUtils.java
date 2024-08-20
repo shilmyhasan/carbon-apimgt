@@ -2626,7 +2626,7 @@ public class ImportUtils {
                             }
                             String errorMessage = "Cannot find API resources for some API Product resources.";
                             if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
-                                throw new APIManagementException(errorMessage,
+                                throw new APIMgtResourceNotFoundException(errorMessage,
                                         ExceptionCodes.from(ExceptionCodes.INVALID_API_RESOURCES_FOR_API_PRODUCT,
                                                 StringUtils.join(invalidOperationList, ", ")));
                             } else {

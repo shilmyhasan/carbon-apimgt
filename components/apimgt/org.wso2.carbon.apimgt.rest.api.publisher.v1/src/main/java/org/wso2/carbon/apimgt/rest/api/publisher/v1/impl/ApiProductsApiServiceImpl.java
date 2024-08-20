@@ -537,12 +537,8 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
                 }
             }
         } catch (FaultGatewaysException e) {
-            if (isAuthorizationFailure(e)) {
-                RestApiUtil.handleAuthorizationFailure("User is not authorized to access the API", e, log);
-            } else {
-                String errorMessage = "Error while updating API Product : " + apiProductId;
-                RestApiUtil.handleInternalServerError(errorMessage, e, log);
-            }
+            String errorMessage = "Error while updating API Product : " + apiProductId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }
@@ -925,12 +921,7 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
                     RestApiUtil.handleBadRequest(errorMessage, log);
                 }
             }
-            if (apiRevisionDeploymentDTO.isDisplayOnDevportal() == null) {
-                // Set default value as true. If null, there will be a NullPointer exception when setting the value here.
-                apiRevisionDeployment.setDisplayOnDevportal(true);
-            } else {
-                apiRevisionDeployment.setDisplayOnDevportal(apiRevisionDeploymentDTO.isDisplayOnDevportal());
-            }
+            apiRevisionDeployment.setDisplayOnDevportal(apiRevisionDeploymentDTO.isDisplayOnDevportal());
             apiRevisionDeployments.add(apiRevisionDeployment);
         }
         apiProvider.deployAPIProductRevision(apiProductId, revisionId, apiRevisionDeployments);
@@ -1043,12 +1034,7 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
                 }
                 apiRevisionDeployment.setDeployment(environment);
                 apiRevisionDeployment.setVhost(apiRevisionDeploymentDTO.getVhost());
-                if (apiRevisionDeploymentDTO.isDisplayOnDevportal() == null) {
-                    // Set default value as true. If null, there will be a NullPointer exception when setting the value here.
-                    apiRevisionDeployment.setDisplayOnDevportal(true);
-                } else {
-                    apiRevisionDeployment.setDisplayOnDevportal(apiRevisionDeploymentDTO.isDisplayOnDevportal());
-                }
+                apiRevisionDeployment.setDisplayOnDevportal(apiRevisionDeploymentDTO.isDisplayOnDevportal());
                 apiRevisionDeployments.add(apiRevisionDeployment);
             }
         }

@@ -4616,7 +4616,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String errorMessage = "API Name is required.";
             APIUtil.handleException(errorMessage, ExceptionCodes.API_NAME_CANNOT_BE_NULL);
         } else if (containsIllegals(apiName)) {
-            String errorMessage = "API Name contains one or more illegal characters  " + "( "
+            String errorMessage = "API Name contains one or more illegal characters  ( "
                     + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
             APIUtil.handleException(errorMessage,
                     ExceptionCodes.from(ExceptionCodes.API_NAME_ILLEGAL_CHARACTERS, apiName,
@@ -4628,8 +4628,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String errorMessage = "API Version is required.";
             APIUtil.handleException(errorMessage, ExceptionCodes.API_VERSION_CANNOT_BE_NULL);
         } else if (containsIllegals(apiVersion)) {
-            String errorMessage = "API Version contains one or more illegal characters  " +
-                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
+            String errorMessage = "API Version contains one or more illegal characters  ( "
+                    + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
             APIUtil.handleException(errorMessage,
                     ExceptionCodes.from(ExceptionCodes.API_VERSION_ILLEGAL_CHARACTERS, apiVersion,
                             APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA));

@@ -2063,13 +2063,13 @@ public class PublisherCommonUtils {
 
         String[] nextAllowedStates = (String[]) apiLCData.get(APIConstants.LC_NEXT_STATES);
         if (!ArrayUtils.contains(nextAllowedStates, action)) {
+            String errorMessage = "Action '" + action + "' is not allowed. Allowed actions are "
+                    + Arrays.toString(nextAllowedStates);
             if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
-                throw new APIManagementException("Action '" + action + "' is not allowed. Allowed actions are "
-                        + Arrays.toString(nextAllowedStates), ExceptionCodes.from(ExceptionCodes
+                throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes
                         .UNSUPPORTED_AND_ALLOWED_LIFECYCLE_ACTIONS, action, Arrays.toString(nextAllowedStates)));
             } else {
-                throw new APIManagementException("Action '" + action + "' is not allowed. Allowed actions are "
-                        + Arrays.toString(nextAllowedStates), ExceptionCodes.from(ExceptionCodes
+                throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes
                         .UNSUPPORTED_LIFECYCLE_ACTION, action));
             }
         }

@@ -3656,8 +3656,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                     throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes.
                             THIRD_PARTY_API_REVISION_CREATION_UNSUPPORTED, apiId));
                 } else {
-                    throw new APIManagementException("Creating API Revisions is not supported for third party APIs: "
-                            + apiId);
+                    throw new APIManagementException(errorMessage);
                 }
             }
 
@@ -3769,18 +3768,17 @@ public class ApisApiServiceImpl implements ApisApiService {
                 throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes.
                         RETIRED_API_REVISION_DEPLOYMENT_UNSUPPORTED, apiId));
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).entity("Deploying API Revisions is not supported " +
-                        "for retired APIs. ApiId: " + apiId).build();
+                return Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
             }
         }
-        if (apiDto != null && apiDto.getAdvertiseInfo() != null && Boolean.TRUE.equals(apiDto.getAdvertiseInfo().isAdvertised())) {
+        if (apiDto != null && apiDto.getAdvertiseInfo() != null && Boolean.TRUE.equals(
+                apiDto.getAdvertiseInfo().isAdvertised())) {
             String errorMessage = "Deploying API Revisions is not supported for third party APIs: " + apiId;
             if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
-                throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes.
-                        THIRD_PARTY_API_REVISION_DEPLOYMENT_UNSUPPORTED, apiId));
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.THIRD_PARTY_API_REVISION_DEPLOYMENT_UNSUPPORTED, apiId));
             } else {
-                throw new APIManagementException("Deploying API Revisions is not supported for third party APIs: "
-                        + apiId);
+                throw new APIManagementException(errorMessage);
             }
         }
 
