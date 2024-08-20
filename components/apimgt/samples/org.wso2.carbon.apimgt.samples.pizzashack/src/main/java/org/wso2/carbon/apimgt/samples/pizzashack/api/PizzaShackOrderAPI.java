@@ -33,6 +33,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+/**
+ * APIM sample Pizzashack /order API
+ */
+
 @Path("/order")
 public class PizzaShackOrderAPI {			
 	

@@ -25,6 +25,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+/**
+ * APIM sample Pizzashack /menu API
+ */
+
 
 @Path("/menu")
 public class PizzaShackMenuAPI {
