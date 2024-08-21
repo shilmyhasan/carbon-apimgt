@@ -2146,6 +2146,8 @@ public class ImportUtils {
             String data = provider.getLifecycleConfiguration(tenantDomain);
             DocumentBuilderFactory factory = APIUtil.getSecuredDocumentBuilder();
             factory.setNamespaceAware(true);
+            factory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+                    true);
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             factory.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
                     false);
