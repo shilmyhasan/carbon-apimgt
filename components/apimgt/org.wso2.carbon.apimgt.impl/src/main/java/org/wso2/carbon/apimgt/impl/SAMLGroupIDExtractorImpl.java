@@ -76,7 +76,6 @@ public class SAMLGroupIDExtractorImpl implements NewPostLoginExecutor {
             }
             samlResponseStream = getByteArrayInputStream(loginResponse);
             DocumentBuilderFactory builderFactory = APIUtil.getSecuredDocumentBuilder();
-            builderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             builderFactory.setNamespaceAware(true);
             docBuilder = builderFactory.newDocumentBuilder();
             Document document = docBuilder.parse(samlResponseStream);
@@ -255,7 +254,6 @@ public class SAMLGroupIDExtractorImpl implements NewPostLoginExecutor {
             }
             samlResponseStream = getByteArrayInputStream(loginResponse);
             DocumentBuilderFactory builderFactory = APIUtil.getSecuredDocumentBuilder();
-            builderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             builderFactory.setNamespaceAware(true);
             docBuilder = builderFactory.newDocumentBuilder();
             Document document = docBuilder.parse(samlResponseStream);
