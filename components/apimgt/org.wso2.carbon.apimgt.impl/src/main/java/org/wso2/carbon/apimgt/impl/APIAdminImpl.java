@@ -951,6 +951,9 @@ public class APIAdminImpl implements APIAdmin {
             //Parse the message body and extract the content in XML form
             DocumentBuilderFactory factory = APIUtil.getSecuredDocumentBuilder();
 
+            factory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+                    true);
+
             // Enable secure processing
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 

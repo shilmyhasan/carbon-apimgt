@@ -317,6 +317,10 @@ public class APIMWSDLReader {
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             // Enable namespace awareness
             factory.setNamespaceAware(true);
+
+            factory.setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+                    true);
+
             // Disable external entities to prevent XXE attacks
             factory.setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
                     false);
