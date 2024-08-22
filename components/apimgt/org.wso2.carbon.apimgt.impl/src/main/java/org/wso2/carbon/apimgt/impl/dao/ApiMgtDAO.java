@@ -6704,7 +6704,11 @@ public class ApiMgtDAO {
                 uriTemplate.setHTTPVerb(rs.getString("HTTP_METHOD"));
                 uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
                 uriTemplate.setUriTemplate(rs.getString("URL_PATTERN"));
-                uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
+                if (rs.getString(APIConstants.THROTTLING_TIER).isEmpty()) {
+                    uriTemplate.setThrottlingTier(APIConstants.UNLIMITED_TIER);
+                } else {
+                    uriTemplate.setThrottlingTier(rs.getString(APIConstants.THROTTLING_TIER));
+                }
                 InputStream mediationScriptBlob = rs.getBinaryStream("MEDIATION_SCRIPT");
                 if (mediationScriptBlob != null) {
                     script = APIMgtDBUtil.getStringFromInputStream(mediationScriptBlob);
@@ -6798,7 +6802,12 @@ public class ApiMgtDAO {
             String httpVerb = rs.getString("HTTP_METHOD");
             String authType = rs.getString("AUTH_SCHEME");
             String urlPattern = rs.getString("URL_PATTERN");
-            String policyName = rs.getString("THROTTLING_TIER");
+            String policyName;
+            if(rs.getString(APIConstants.THROTTLING_TIER).isEmpty()){
+                policyName = APIConstants.UNLIMITED_TIER;
+            } else {
+                policyName = rs.getString(APIConstants.THROTTLING_TIER);
+            }
             String conditionGroupId = rs.getString("CONDITION_GROUP_ID");
             String applicableLevel = rs.getString("APPLICABLE_LEVEL");
             String policyConditionGroupId = "_condition_" + conditionGroupId;
@@ -7324,7 +7333,12 @@ public class ApiMgtDAO {
                 String uriPattern = resultSet.getString("URL_PATTERN");
                 String httpMethod = resultSet.getString("HTTP_METHOD");
                 String authScheme = resultSet.getString("AUTH_SCHEME");
-                String throttlingTier = resultSet.getString("THROTTLING_TIER");
+                String throttlingTier;
+                if(resultSet.getString(APIConstants.THROTTLING_TIER).isEmpty()){
+                    throttlingTier = APIConstants.UNLIMITED_TIER;
+                } else {
+                    throttlingTier = resultSet.getString(APIConstants.THROTTLING_TIER);
+                }
                 InputStream mediationScriptBlob = resultSet.getBinaryStream("MEDIATION_SCRIPT");
                 if (mediationScriptBlob != null) {
                     script = APIMgtDBUtil.getStringFromInputStream(mediationScriptBlob);
@@ -7393,7 +7407,12 @@ public class ApiMgtDAO {
                         uriTemplate.setHttpVerbs(verb);
                         uriTemplate.setId(uriTemplateId);
                         String authType = rs.getString("AUTH_SCHEME");
-                        String throttlingTier = rs.getString("THROTTLING_TIER");
+                        String throttlingTier;
+                        if(rs.getString(APIConstants.THROTTLING_TIER).isEmpty()) {
+                            throttlingTier = APIConstants.UNLIMITED_TIER;
+                        } else {
+                            throttlingTier = rs.getString(APIConstants.THROTTLING_TIER);
+                        }
                         if (StringUtils.isNotEmpty(scopeName)) {
                             Scope scope = new Scope();
                             scope.setKey(scopeName);
@@ -7453,7 +7472,12 @@ public class ApiMgtDAO {
                         uriTemplate.setHTTPVerb(verb);
                         uriTemplate.setHttpVerbs(verb);
                         String authType = rs.getString("AUTH_SCHEME");
-                        String throttlingTier = rs.getString("THROTTLING_TIER");
+                        String throttlingTier;
+                        if (rs.getString(APIConstants.THROTTLING_TIER).isEmpty()) {
+                            throttlingTier = APIConstants.UNLIMITED_TIER;
+                        } else {
+                            throttlingTier = rs.getString(APIConstants.THROTTLING_TIER);
+                        }
                         if (StringUtils.isNotEmpty(scopeName)) {
                             Scope scope = new Scope();
                             scope.setKey(scopeName);
@@ -7521,7 +7545,12 @@ public class ApiMgtDAO {
                     uriTemplate.setHTTPVerb(verb);
                     uriTemplate.setHttpVerbs(verb);
                     String authType = rs.getString("AUTH_SCHEME");
-                    String throttlingTier = rs.getString("THROTTLING_TIER");
+                    String throttlingTier;
+                    if (rs.getString(APIConstants.THROTTLING_TIER).isEmpty()) {
+                        throttlingTier = APIConstants.UNLIMITED_TIER;
+                    } else {
+                        throttlingTier = rs.getString(APIConstants.THROTTLING_TIER);
+                    }
                     if (StringUtils.isNotEmpty(scopeName)) {
                         Scope scope = new Scope();
                         scope.setKey(scopeName);
@@ -14833,7 +14862,11 @@ public class ApiMgtDAO {
                         uriTemplate.setHTTPVerb(rs.getString("HTTP_METHOD"));
                         uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
                         uriTemplate.setUriTemplate(rs.getString("URL_PATTERN"));
-                        uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
+                        if(rs.getString(APIConstants.THROTTLING_TIER).isEmpty()){
+                            uriTemplate.setThrottlingTier(APIConstants.UNLIMITED_TIER);
+                        } else {
+                            uriTemplate.setThrottlingTier(rs.getString(APIConstants.THROTTLING_TIER));
+                        }
                         String script = null;
                         InputStream mediationScriptBlob = rs.getBinaryStream("MEDIATION_SCRIPT");
                         if (mediationScriptBlob != null) {
@@ -15227,8 +15260,11 @@ public class ApiMgtDAO {
                             int uriTemplateId = rs.getInt("URL_MAPPING_ID");
                             uriTemplate.setId(uriTemplateId);
                             uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
-                            uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
-
+                            if(rs.getString(APIConstants.THROTTLING_TIER).isEmpty()){
+                                uriTemplate.setThrottlingTier(APIConstants.UNLIMITED_TIER);
+                            } else {
+                                uriTemplate.setThrottlingTier(rs.getString(APIConstants.THROTTLING_TIER));
+                            }
                             try (PreparedStatement scopesStatement = connection.
                                     prepareStatement(SQLConstants.GET_SCOPE_KEYS_BY_URL_MAPPING_ID)) {
                                 scopesStatement.setInt(1, uriTemplateId);
@@ -15285,7 +15321,11 @@ public class ApiMgtDAO {
                             int uriTemplateId = rs.getInt("URL_MAPPING_ID");
                             uriTemplate.setId(uriTemplateId);
                             uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
-                            uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
+                            if(rs.getString(APIConstants.THROTTLING_TIER).isEmpty()){
+                                uriTemplate.setThrottlingTier(APIConstants.UNLIMITED_TIER);
+                            } else {
+                                uriTemplate.setThrottlingTier(rs.getString(APIConstants.THROTTLING_TIER));
+                            }
 
                             try (PreparedStatement scopesStatement = connection.
                                     prepareStatement(SQLConstants.GET_SCOPE_KEYS_BY_URL_MAPPING_ID)) {
@@ -18114,7 +18154,11 @@ public class ApiMgtDAO {
                         uriTemplate.setHTTPVerb(httpMethod);
                         uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
                         uriTemplate.setUriTemplate(rs.getString("URL_PATTERN"));
-                        uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
+                        if(rs.getString(APIConstants.THROTTLING_TIER).isEmpty()){
+                            uriTemplate.setThrottlingTier(APIConstants.UNLIMITED_TIER);
+                        } else {
+                            uriTemplate.setThrottlingTier(rs.getString(APIConstants.THROTTLING_TIER));
+                        }
                         InputStream mediationScriptBlob = rs.getBinaryStream("MEDIATION_SCRIPT");
                         if (mediationScriptBlob != null) {
                             script = APIMgtDBUtil.getStringFromInputStream(mediationScriptBlob);
