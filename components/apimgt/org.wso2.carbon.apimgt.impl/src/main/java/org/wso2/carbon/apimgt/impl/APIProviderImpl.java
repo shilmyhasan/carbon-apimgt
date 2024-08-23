@@ -4721,14 +4721,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     new Organization(CarbonContext.getThreadLocalCarbonContext().getTenantDomain()),
                     publisherAPIProduct);
         } catch (APIPersistenceException e) {
-            String errorMessage = "Error while creating API product ";
-            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())
-                    && e.getErrorHandler().getErrorCode()
-                    == ExceptionCodes.API_PRODUCT_CONTEXT_MALFORMED_EXCEPTION.getErrorCode()) {
-                throw new APIManagementException(errorMessage + apiProduct.getId().getName(), e);
-            } else {
-                throw new APIManagementException(errorMessage);
-            }
+            throw new APIManagementException("Error while creating API product ");
         }
     }
 

@@ -3679,9 +3679,10 @@ public class ApisApiServiceImpl implements ApisApiService {
             return Response.created(createdApiUri).entity(createdApiRevisionDTO).build();
         } catch (APIManagementException e) {
             String errorMessage = "Error while adding new API Revision for API : " + apiId;
-            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())
-                    && e.getErrorHandler().getErrorCode()
-                    == ExceptionCodes.THIRD_PARTY_API_REVISION_CREATION_UNSUPPORTED.getErrorCode()) {
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) && ((e.getErrorHandler()
+                    .getErrorCode() == ExceptionCodes.THIRD_PARTY_API_REVISION_CREATION_UNSUPPORTED.getErrorCode())
+                    || (e.getErrorHandler().getErrorCode() == ExceptionCodes.MAXIMUM_REVISIONS_REACHED.getErrorCode())))
+            {
                 throw e;
             } else {
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);

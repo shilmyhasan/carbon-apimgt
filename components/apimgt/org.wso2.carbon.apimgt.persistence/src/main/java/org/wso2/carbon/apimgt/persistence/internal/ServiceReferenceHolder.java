@@ -30,7 +30,6 @@ public class ServiceReferenceHolder {
     private RealmService realmService;
     private TenantIndexingLoader indexLoader;
     private static UserRealm userRealm;
-    private boolean isDetailedErrorResponsesEnabled = false;
 
     private RegistryService registryService;
 
@@ -93,11 +92,4 @@ public class ServiceReferenceHolder {
         this.apiPersistence = apiPersistence;
     }
 
-    public void setIsDetailedErrorResponses(boolean isDetailedErrorResponsesEnabled) {
-        this.isDetailedErrorResponsesEnabled = isDetailedErrorResponsesEnabled;
-    }
-
-    public boolean isDetailedErrorResponsesEnabled() {
-        return isDetailedErrorResponsesEnabled;
-    }
 }

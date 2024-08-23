@@ -660,9 +660,6 @@ public enum ExceptionCodes implements ErrorHandler {
     NO_CORRESPONDING_RESOURCE_FOUND_IN_API(903235, "No corresponding resource found in API", 400,
             "API with id %s does not have a resource %s with http method %s"),
 
-    API_PRODUCT_CONTEXT_MALFORMED_EXCEPTION(903236, "The API product context is malformed.",
-            400, "'%s'"),
-
     ERROR_PARSING_MONETIZATION_PROPERTIES(903237, "Error when parsing monetization properties",
             400, "Error when parsing monetization properties"),
 
