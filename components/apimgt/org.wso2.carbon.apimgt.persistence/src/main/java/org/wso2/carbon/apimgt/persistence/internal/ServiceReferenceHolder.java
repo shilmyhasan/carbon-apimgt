@@ -91,5 +91,4 @@ public class ServiceReferenceHolder {
     public void setApiPersistence(APIPersistence apiPersistence) {
         this.apiPersistence = apiPersistence;
     }
-
 }
