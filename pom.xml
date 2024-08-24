@@ -1849,11 +1849,18 @@
                 <artifactId>javax.jms-api</artifactId>
                 <version>${javax.jms.version}</version>
             </dependency>
-                <dependency>
-                    <groupId>com.damnhandy.wso2</groupId>
-                    <artifactId>handy-uri-templates</artifactId>
-                    <version>${damnhandy.version}</version>
-                </dependency>
+            <dependency>
+                <groupId>com.damnhandy.wso2</groupId>
+                <artifactId>handy-uri-templates</artifactId>
+                <version>${damnhandy.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
+            <dependency>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>Saxon-HE</artifactId>
+                <version>10.3</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
