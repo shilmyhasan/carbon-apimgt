@@ -97,6 +97,8 @@ public class ServiceReferenceHolder {
     private AnalyticsCustomDataProvider analyticsCustomDataProvider;
 
     private Set<String> activeTenants = new ConcurrentSkipListSet<>();
+
+    private RedisCacheUtils redisCacheUtils;
     private JedisPool redisPool;
 
     public ThrottleDataHolder getThrottleDataHolder() {
@@ -393,6 +395,11 @@ public class ServiceReferenceHolder {
 
     public void setRedisCacheUtil(RedisCacheUtils redisCacheUtils) {
 
+    }
+
+    public RedisCacheUtils getRedisCacheUtils() {
+
+        return redisCacheUtils;
     }
 
     public boolean isRedisEnabled() {
