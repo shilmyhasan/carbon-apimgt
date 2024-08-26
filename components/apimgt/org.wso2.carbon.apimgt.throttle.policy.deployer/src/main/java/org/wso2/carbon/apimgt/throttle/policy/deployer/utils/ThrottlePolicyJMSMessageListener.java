@@ -36,7 +36,6 @@ import org.wso2.carbon.apimgt.throttle.policy.deployer.dto.ApplicationPolicy;
 import org.wso2.carbon.apimgt.throttle.policy.deployer.dto.GlobalPolicy;
 import org.wso2.carbon.apimgt.throttle.policy.deployer.dto.SubscriptionPolicy;
 import org.wso2.carbon.apimgt.throttle.policy.deployer.exception.ThrottlePolicyDeployerException;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
@@ -103,110 +102,96 @@ public class ThrottlePolicyJMSMessageListener implements MessageListener {
         byte[] eventDecoded = Base64.decodeBase64(encodedEvent);
         String eventJson = new String(eventDecoded, StandardCharsets.UTF_8);
 
-        PolicyEvent throttlePolicyEvent = new Gson().fromJson(eventJson, PolicyEvent.class);
-        String tenantDomain = throttlePolicyEvent.getTenantDomain();
+        if (APIConstants.EventType.POLICY_CREATE.toString().equals(eventType)
+                || APIConstants.EventType.POLICY_UPDATE.toString().equals(eventType)
+                || APIConstants.EventType.POLICY_DELETE.toString().equals(eventType)
+        ) {
 
-        boolean tenantFlowStarted = false;
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-            tenantFlowStarted = true;
-
-            if (APIConstants.EventType.POLICY_CREATE.toString()
-                    .equals(eventType) || APIConstants.EventType.POLICY_UPDATE.toString()
-                    .equals(eventType) || APIConstants.EventType.POLICY_DELETE.toString().equals(eventType)) {
-
-                boolean updatePolicy = APIConstants.EventType.POLICY_CREATE.toString()
-                        .equals(eventType) || APIConstants.EventType.POLICY_UPDATE.toString().equals(eventType);
-                boolean deletePolicy = APIConstants.EventType.POLICY_DELETE.toString().equals(eventType);
-                Runnable task = null;
-                PolicyEvent event = new Gson().fromJson(eventJson, PolicyEvent.class);
-                if (event.getPolicyType() == APIConstants.PolicyType.SUBSCRIPTION) {
-                    // handle subscription policies
-                    SubscriptionPolicyEvent policyEvent = new Gson().fromJson(eventJson, SubscriptionPolicyEvent.class);
-                    if (!(APIConstants.UNLIMITED_TIER.equalsIgnoreCase(
-                            policyEvent.getPolicyName()) ||
-                            APIConstants.DEFAULT_SUB_POLICY_ASYNC_UNLIMITED.equalsIgnoreCase(
-                            policyEvent.getPolicyName()) ||
-                            APIConstants.DEFAULT_SUB_POLICY_ASYNC_WH_UNLIMITED.equalsIgnoreCase(
-                            policyEvent.getPolicyName()))) {
-                        task = () -> {
-                            try {
-                                if (updatePolicy) {
-                                    SubscriptionPolicy subscriptionPolicy = policyRetriever.getSubscriptionPolicy(
-                                            policyEvent.getPolicyName(), policyEvent.getTenantDomain());
-                                    PolicyUtil.deployPolicy(subscriptionPolicy, policyEvent);
-                                } else if (deletePolicy) {
-                                    PolicyUtil.undeployPolicy(policyEvent);
-                                }
-                            } catch (ThrottlePolicyDeployerException e) {
-                                log.error("Error in retrieving subscription policy metadata from the database", e);
-                            }
-                        };
-                    }
-
-                } else if (event.getPolicyType() == APIConstants.PolicyType.APPLICATION) {
-                    // handle application policies
-                    ApplicationPolicyEvent policyEvent = new Gson().fromJson(eventJson, ApplicationPolicyEvent.class);
-                    if (!APIConstants.UNLIMITED_TIER.equalsIgnoreCase(policyEvent.getPolicyName())) {
-                        task = () -> {
-                            try {
-                                if (updatePolicy) {
-                                    ApplicationPolicy applicationPolicy = policyRetriever.getApplicationPolicy(
-                                            policyEvent.getPolicyName(), policyEvent.getTenantDomain());
-                                    PolicyUtil.deployPolicy(applicationPolicy, policyEvent);
-                                } else if (deletePolicy) {
-                                    PolicyUtil.undeployPolicy(policyEvent);
-                                }
-                            } catch (ThrottlePolicyDeployerException e) {
-                                log.error("Error in retrieving application policy metadata from the database", e);
-                            }
-                        };
-                    }
-                } else if (event.getPolicyType() == APIConstants.PolicyType.API) {
-                    // handle API policies
-                    APIPolicyEvent policyEvent = new Gson().fromJson(eventJson, APIPolicyEvent.class);
-                    if (!APIConstants.UNLIMITED_TIER.equalsIgnoreCase(policyEvent.getPolicyName())) {
-
-                        task = () -> {
-                            try {
-                                if (updatePolicy) {
-                                    ApiPolicy apiPolicy = policyRetriever.getApiPolicy(policyEvent.getPolicyName(),
-                                            policyEvent.getTenantDomain());
-                                    PolicyUtil.deployPolicy(apiPolicy, policyEvent);
-                                } else if (deletePolicy) {
-                                    PolicyUtil.undeployPolicy(policyEvent);
-                                }
-                            } catch (ThrottlePolicyDeployerException e) {
-                                log.error("Error in retrieving API policy metadata from the database", e);
-                            }
-                        };
-                    }
-                } else if (event.getPolicyType() == APIConstants.PolicyType.GLOBAL) {
-                    // handle global policies
-                    GlobalPolicyEvent policyEvent = new Gson().fromJson(eventJson, GlobalPolicyEvent.class);
+            boolean updatePolicy = APIConstants.EventType.POLICY_CREATE.toString().equals(eventType)
+                    || APIConstants.EventType.POLICY_UPDATE.toString().equals(eventType);
+            boolean deletePolicy = APIConstants.EventType.POLICY_DELETE.toString().equals(eventType);
+            Runnable task = null;
+            PolicyEvent event = new Gson().fromJson(eventJson, PolicyEvent.class);
+            if (event.getPolicyType() == APIConstants.PolicyType.SUBSCRIPTION) {
+                // handle subscription policies
+                SubscriptionPolicyEvent policyEvent = new Gson().fromJson(eventJson, SubscriptionPolicyEvent.class);
+                if (!(APIConstants.UNLIMITED_TIER.equalsIgnoreCase(policyEvent.getPolicyName())
+                        || APIConstants.DEFAULT_SUB_POLICY_ASYNC_UNLIMITED.
+                        equalsIgnoreCase(policyEvent.getPolicyName())
+                        || APIConstants.DEFAULT_SUB_POLICY_ASYNC_WH_UNLIMITED.
+                        equalsIgnoreCase(policyEvent.getPolicyName()))) {
                     task = () -> {
-
                         try {
                             if (updatePolicy) {
-                                GlobalPolicy globalPolicy = policyRetriever.getGlobalPolicy(policyEvent.getPolicyName(),
-                                        policyEvent.getTenantDomain());
-                                PolicyUtil.deployPolicy(globalPolicy, policyEvent);
+                                SubscriptionPolicy subscriptionPolicy = policyRetriever.getSubscriptionPolicy(
+                                        policyEvent.getPolicyName(), policyEvent.getTenantDomain());
+                                PolicyUtil.deployPolicy(subscriptionPolicy, policyEvent);
                             } else if (deletePolicy) {
                                 PolicyUtil.undeployPolicy(policyEvent);
                             }
                         } catch (ThrottlePolicyDeployerException e) {
-                            log.error("Error in retrieving Global policy metadata from the database", e);
+                            log.error("Error in retrieving subscription policy metadata from the database", e);
                         }
                     };
                 }
-                if (task != null) {
-                    policyRetrievalScheduler.schedule(task, 1, TimeUnit.MILLISECONDS);
+
+            } else if (event.getPolicyType() == APIConstants.PolicyType.APPLICATION) {
+                // handle application policies
+                ApplicationPolicyEvent policyEvent = new Gson().fromJson(eventJson, ApplicationPolicyEvent.class);
+                if (!APIConstants.UNLIMITED_TIER.equalsIgnoreCase(policyEvent.getPolicyName())) {
+                    task = () -> {
+                        try {
+                            if (updatePolicy) {
+                                ApplicationPolicy applicationPolicy = policyRetriever.getApplicationPolicy(
+                                        policyEvent.getPolicyName(), policyEvent.getTenantDomain());
+                                PolicyUtil.deployPolicy(applicationPolicy, policyEvent);
+                            } else if (deletePolicy) {
+                                PolicyUtil.undeployPolicy(policyEvent);
+                            }
+                        } catch (ThrottlePolicyDeployerException e) {
+                            log.error("Error in retrieving application policy metadata from the database", e);
+                        }
+                    };
                 }
+            } else if (event.getPolicyType() == APIConstants.PolicyType.API) {
+                // handle API policies
+                APIPolicyEvent policyEvent = new Gson().fromJson(eventJson, APIPolicyEvent.class);
+                if (!APIConstants.UNLIMITED_TIER.equalsIgnoreCase(policyEvent.getPolicyName())) {
+
+                    task = () -> {
+                        try {
+                            if (updatePolicy) {
+                                ApiPolicy apiPolicy = policyRetriever.getApiPolicy(
+                                        policyEvent.getPolicyName(), policyEvent.getTenantDomain());
+                                PolicyUtil.deployPolicy(apiPolicy, policyEvent);
+                            } else if (deletePolicy) {
+                                PolicyUtil.undeployPolicy(policyEvent);
+                            }
+                        } catch (ThrottlePolicyDeployerException e) {
+                            log.error("Error in retrieving API policy metadata from the database", e);
+                        }
+                    };
+                }
+            } else if (event.getPolicyType() == APIConstants.PolicyType.GLOBAL) {
+                // handle global policies
+                GlobalPolicyEvent policyEvent = new Gson().fromJson(eventJson, GlobalPolicyEvent.class);
+                task = () -> {
+
+                    try {
+                        if (updatePolicy) {
+                            GlobalPolicy globalPolicy = policyRetriever.getGlobalPolicy(
+                                    policyEvent.getPolicyName(), policyEvent.getTenantDomain());
+                            PolicyUtil.deployPolicy(globalPolicy, policyEvent);
+                        } else if (deletePolicy) {
+                            PolicyUtil.undeployPolicy(policyEvent);
+                        }
+                    } catch (ThrottlePolicyDeployerException e) {
+                        log.error("Error in retrieving Global policy metadata from the database", e);
+                    }
+                };
             }
-        } finally {
-            if (tenantFlowStarted) {
-                PrivilegedCarbonContext.endTenantFlow();
+            if (task != null) {
+                policyRetrievalScheduler.schedule(task, 1, TimeUnit.MILLISECONDS);
             }
         }
     }

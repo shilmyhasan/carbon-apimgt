@@ -74,16 +74,10 @@ public class PolicyUtil {
         Map<String, String> policiesToDeploy = new HashMap<>();
         List<String> policiesToUndeploy = new ArrayList<>();
 
-        String tenantDomain = APIConstants.SUPER_TENANT_DOMAIN;
-        if (policyEvent != null) {
-            tenantDomain = policyEvent.getTenantDomain();
-        }
-
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                    .setTenantDomain(tenantDomain, true);
-
+                    .setTenantDomain(APIConstants.SUPER_TENANT_DOMAIN, true);
             String policyFile;
             String policyString;
             if (Policy.PolicyType.SUBSCRIPTION.equals(policy.getType()) && policy instanceof SubscriptionPolicy) {
