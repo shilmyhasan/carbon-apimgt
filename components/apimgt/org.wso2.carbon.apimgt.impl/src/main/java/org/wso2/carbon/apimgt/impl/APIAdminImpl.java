@@ -25,6 +25,7 @@ import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.impl.Constants;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
@@ -75,9 +76,11 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -633,6 +636,7 @@ public class APIAdminImpl implements APIAdmin {
             if (bodyContentNode != null) {
                 StringWriter writer = new StringWriter();
                 Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
                 transformer.transform(new DOMSource(bodyContentNode), new StreamResult(writer));
                 String output = writer.toString();
                 content = output.substring(output.indexOf("?>") + 2); //remove <?xml version="1.0" encoding="UTF-8"?>
