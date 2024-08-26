@@ -596,6 +596,7 @@ public final class APIConstants {
 
     public static String DELEM_COLON = ":";
     public static final String CHAR_ASTERIX = "*";
+    public static final String JWT_HEADER_ACCESS_TOKEN_TYPE = "at+jwt";
 
     public static class TokenStatus {
 
@@ -2591,6 +2592,11 @@ public final class APIConstants {
         public static final String HEADERS = "headers";
         public static final String ALL = "all";
         public static final String BODY = "body";
+    }
+
+    public static class TokenValidationConstants {
+        public static final String TOKEN_VALIDATION_CONFIG = "TokenValidation";
+        public static final String ENFORCE_JWT_TYPE_HEADER_VALIDATION = "EnforceTypeHeaderValidation";
     }
         
     public static final String CASE_SENSITIVE_CHECK_PATH =    "caseSensitiveRoleValidation";
