@@ -55,6 +55,7 @@ import org.wso2.carbon.apimgt.impl.importexport.APIImportExportException;
 import org.wso2.carbon.apimgt.impl.importexport.ExportFormat;
 import org.wso2.carbon.apimgt.impl.importexport.ImportExportAPI;
 import org.wso2.carbon.apimgt.impl.importexport.utils.APIImportExportUtil;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.restapi.publisher.ApiProductsApiServiceImplUtils;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.apimgt.rest.api.common.RestApiCommonUtil;
@@ -511,7 +512,7 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
 
     @Override
     public Response updateAPIProduct(String apiProductId, APIProductDTO body, String ifMatch,
-            MessageContext messageContext) {
+            MessageContext messageContext) throws APIManagementException {
         try {
             String username = RestApiCommonUtil.getLoggedInUsername();
             String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();
@@ -524,13 +525,20 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
                     apiProvider, username, tenantDomain);
             APIProductDTO updatedProductDTO = getAPIProductByID(apiProductId, apiProvider);
             return Response.ok().entity(updatedProductDTO).build();
-        } catch (APIManagementException | FaultGatewaysException e) {
+        } catch (APIManagementException e) {
             if (isAuthorizationFailure(e)) {
                 RestApiUtil.handleAuthorizationFailure("User is not authorized to access the API", e, log);
             } else {
                 String errorMessage = "Error while updating API Product : " + apiProductId;
-                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                    throw e;
+                } else {
+                    RestApiUtil.handleInternalServerError(errorMessage, e, log);
+                }
             }
+        } catch (FaultGatewaysException e) {
+            String errorMessage = "Error while updating API Product : " + apiProductId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }
@@ -795,13 +803,22 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
                     RestApiConstants.RESOURCE_PATH_API_PRODUCTS + "/" + createdApiProductDTO.getId());
             return Response.created(createdApiProductUri).entity(createdApiProductDTO).build();
 
-        } catch (APIManagementException | FaultGatewaysException e) {
+        } catch (APIManagementException e) {
             if (e.getMessage().contains(ExceptionCodes.API_CONTEXT_MALFORMED_EXCEPTION.getErrorMessage())) {
-                RestApiUtil.handleBadRequest("Error while adding new API Product. "
-                        + e.getMessage().replace("API", "API Product"), e, log);
+                RestApiUtil.handleBadRequest(
+                        "Error while adding new API Product. " + e.getMessage().replace("API",
+                                "API Product"), e, log);
             }
-            String errorMessage = "Error while adding new API Product : " + provider + "-" + body.getName()
-                    + " - " + e.getMessage();
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                throw e;
+            } else {
+                String errorMessage = "Error while adding new API Product : " + provider + "-" + body.getName()
+                        + " - " + e.getMessage();
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        } catch (FaultGatewaysException e) {
+            String errorMessage = "Error while adding new API Product : " + provider + "-" + body.getName() + " - "
+                    + e.getMessage();
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (URISyntaxException e) {
             String errorMessage = "Error while retrieving API Product location : " + provider + "-"
@@ -844,7 +861,13 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
             return Response.created(createdApiUri).entity(createdApiRevisionDTO).build();
         } catch (APIManagementException e) {
             String errorMessage = "Error while adding new API Revision for API Product: " + apiProductId;
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())
+                    && e.getErrorHandler().getErrorCode()
+                    == ExceptionCodes.MAXIMUM_REVISIONS_REACHED.getErrorCode()) {
+                throw e;
+            } else {
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
         } catch (URISyntaxException e) {
             String errorMessage = "Error while retrieving created revision API location for API Product: "
                     + apiProductId;
@@ -877,16 +900,26 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
             apiRevisionDeployment.setRevisionUUID(revisionId);
             String environment = apiRevisionDeploymentDTO.getName();
             if (environments.get(environment) == null) {
-                RestApiUtil.handleBadRequest("Gateway environment not found: " + environment, log);
+                String errorMessage = "Gateway environment not found: " + environment;
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.PROVIDED_GATEWAY_ENVIRONMENT_NOT_FOUND, environment));
+                } else {
+                    RestApiUtil.handleBadRequest(errorMessage, log);
+                }
             }
             apiRevisionDeployment.setDeployment(environment);
             apiRevisionDeployment.setVhost(apiRevisionDeploymentDTO.getVhost());
             if (StringUtils.isEmpty(apiRevisionDeploymentDTO.getVhost())) {
-                // vhost is only required when deploying an revision, not required when un-deploying a revision
+                // vhost is only required when deploying a revision, not required when un-deploying a revision
                 // since the same scheme 'APIRevisionDeployment' is used for deploy and undeploy, handle it here.
-                RestApiUtil.handleBadRequest(
-                        "Required field 'vhost' not found in deployment", log
-                );
+                String errorMessage = "Required field 'vhost' not found in deployment";
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.GATEWAY_ENVIRONMENT_VHOST_NOT_PROVIDED);
+                } else {
+                    RestApiUtil.handleBadRequest(errorMessage, log);
+                }
             }
             apiRevisionDeployment.setDisplayOnDevportal(apiRevisionDeploymentDTO.isDisplayOnDevportal());
             apiRevisionDeployments.add(apiRevisionDeployment);
@@ -971,7 +1004,13 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
         if (revisionId == null && revisionNumber != null) {
             revisionId = apiProvider.getAPIRevisionUUID(revisionNumber, apiProductId);
             if (revisionId == null) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(null).build();
+                if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                    throw new APIManagementException(
+                            "Revision " + revisionNumber + " is not found for API Product with UUID " + apiProductId,
+                            ExceptionCodes.from(ExceptionCodes.API_REVISION_NOT_FOUND, revisionNumber));
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).entity(null).build();
+                }
             }
         }
         String organization = RestApiUtil.getValidatedOrganization(messageContext);
@@ -985,7 +1024,13 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
                 apiRevisionDeployment.setRevisionUUID(revisionId);
                 String environment = apiRevisionDeploymentDTO.getName();
                 if (environments.get(environment) == null) {
-                    RestApiUtil.handleBadRequest("Gateway environment not found: " + environment, log);
+                    String errorMessage = "Gateway environment not found: " + environment;
+                    if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                        throw new APIManagementException(errorMessage,
+                                ExceptionCodes.from(ExceptionCodes.PROVIDED_GATEWAY_ENVIRONMENT_NOT_FOUND, environment));
+                    } else {
+                        RestApiUtil.handleBadRequest(errorMessage, log);
+                    }
                 }
                 apiRevisionDeployment.setDeployment(environment);
                 apiRevisionDeployment.setVhost(apiRevisionDeploymentDTO.getVhost());

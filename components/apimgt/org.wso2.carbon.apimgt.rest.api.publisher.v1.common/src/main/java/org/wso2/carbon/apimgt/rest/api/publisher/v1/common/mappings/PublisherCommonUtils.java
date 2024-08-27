@@ -845,8 +845,13 @@ public class PublisherCommonUtils {
                 for (String aRole : scope.getRoles().split(",")) {
                     boolean isValidRole = APIUtil.isRoleNameExist(username, aRole);
                     if (!isValidRole) {
-                        throw new APIManagementException("Role '" + aRole + "' does not exist.",
-                                ExceptionCodes.ROLE_DOES_NOT_EXIST);
+                        String errorMessage = "Role '" + aRole + "' does not exist.";
+                        if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                            throw new APIManagementException(errorMessage,
+                                    ExceptionCodes.from(ExceptionCodes.ROLE_OF_SCOPE_DOES_NOT_EXIST, aRole));
+                        } else {
+                            throw new APIManagementException(errorMessage, ExceptionCodes.ROLE_DOES_NOT_EXIST);
+                        }
                     }
                 }
             }
@@ -1470,7 +1475,13 @@ public class PublisherCommonUtils {
                 for (String aRole : roles.split(",")) {
                     boolean isValidRole = APIUtil.isRoleNameExist(RestApiCommonUtil.getLoggedInUsername(), aRole);
                     if (!isValidRole) {
-                        throw new APIManagementException("Role '" + aRole + "' Does not exist.");
+                        String errorMessage = "Role '" + aRole + "' Does not exist.";
+                        if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                            throw new APIManagementException(errorMessage,
+                                    ExceptionCodes.from(ExceptionCodes.ROLE_OF_SCOPE_DOES_NOT_EXIST, aRole));
+                        } else {
+                            throw new APIManagementException(errorMessage);
+                        }
                     }
                 }
             }
@@ -1627,20 +1638,35 @@ public class PublisherCommonUtils {
                     ExceptionCodes.DOCUMENT_NAME_ILLEGAL_CHARACTERS);
         }
         if (documentDto.getType() == null) {
-            throw new APIManagementException("Documentation type cannot be empty",
-                    ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            String errorMessage = "Documentation type cannot be empty";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION, errorMessage));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            }
         }
         if (documentDto.getType() == DocumentDTO.TypeEnum.OTHER && StringUtils
                 .isBlank(documentDto.getOtherTypeName())) {
             //check otherTypeName for not null if doc type is OTHER
-            throw new APIManagementException("otherTypeName cannot be empty if type is OTHER.",
-                    ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            String errorMessage = "otherTypeName cannot be empty if type is OTHER.";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION, errorMessage));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            }
         }
         String sourceUrl = documentDto.getSourceUrl();
         if (documentDto.getSourceType() == DocumentDTO.SourceTypeEnum.URL && (
                 org.apache.commons.lang3.StringUtils.isBlank(sourceUrl) || !RestApiCommonUtil.isURL(sourceUrl))) {
-            throw new APIManagementException("Invalid document sourceUrl Format",
-                    ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            String errorMessage = "Invalid document sourceUrl Format";
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.PARAMETER_NOT_PROVIDED_FOR_DOCUMENTATION, errorMessage));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.PARAMETER_NOT_PROVIDED);
+            }
         }
 
         if (apiProvider.isDocumentationExist(apiId, documentName, organization)) {
@@ -1750,17 +1776,29 @@ public class PublisherCommonUtils {
         Set<Tier> definedTiers = apiProvider.getTiers();
         List<String> invalidTiers = PublisherCommonUtils.getInvalidTierNames(definedTiers, tiersFromDTO);
         if (!invalidTiers.isEmpty()) {
-            throw new APIManagementException(
-                    "Specified tier(s) " + Arrays.toString(invalidTiers.toArray()) + " are invalid",
-                    ExceptionCodes.TIER_NAME_INVALID);
+            String errorMessage = "Specified tier(s) " + Arrays.toString(invalidTiers.toArray()) + " are invalid";
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.TIER_NAME_INVALID_WITH_TIER_INFO,
+                                Arrays.toString(invalidTiers.toArray())));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.TIER_NAME_INVALID);
+            }
         }
         if (apiProductDtoToUpdate.getAdditionalProperties() != null) {
-            String errorMessage = PublisherCommonUtils
-                    .validateAdditionalProperties(apiProductDtoToUpdate.getAdditionalProperties());
+            String errorMessage = PublisherCommonUtils.validateAdditionalProperties(
+                    apiProductDtoToUpdate.getAdditionalProperties());
             if (!errorMessage.isEmpty()) {
-                throw new APIManagementException(errorMessage, ExceptionCodes
-                        .from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES, originalAPIProduct.getId().getName(),
-                                originalAPIProduct.getId().getVersion()));
+                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES_WITH_ERROR,
+                                    originalAPIProduct.getId().getName(), originalAPIProduct.getId().getVersion(),
+                                    errorMessage));
+                } else {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES,
+                                    originalAPIProduct.getId().getName(), originalAPIProduct.getId().getVersion()));
+                }
             }
         }
 
@@ -1823,16 +1861,27 @@ public class PublisherCommonUtils {
         Set<Tier> definedTiers = apiProvider.getTiers();
         List<String> invalidTiers = PublisherCommonUtils.getInvalidTierNames(definedTiers, tiersFromDTO);
         if (!invalidTiers.isEmpty()) {
-            throw new APIManagementException(
-                    "Specified tier(s) " + Arrays.toString(invalidTiers.toArray()) + " are invalid",
-                    ExceptionCodes.TIER_NAME_INVALID);
+            String errorMessage = "Specified tier(s) " + Arrays.toString(invalidTiers.toArray()) + " are invalid";
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                throw new APIManagementException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.TIER_NAME_INVALID_WITH_TIER_INFO,
+                                Arrays.toString(invalidTiers.toArray())));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.TIER_NAME_INVALID);
+            }
         }
         if (apiProductDTO.getAdditionalProperties() != null) {
             String errorMessage = PublisherCommonUtils
                     .validateAdditionalProperties(apiProductDTO.getAdditionalProperties());
             if (!errorMessage.isEmpty()) {
-                throw new APIManagementException(errorMessage,
-                        ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES, apiProductDTO.getName()));
+                if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES_WITH_ERROR,
+                                    apiProductDTO.getName(), apiProductDTO.getVersion(), errorMessage));
+                } else {
+                    throw new APIManagementException(errorMessage,
+                            ExceptionCodes.from(ExceptionCodes.INVALID_ADDITIONAL_PROPERTIES, apiProductDTO.getName()));
+                }
             }
         }
         if (apiProductDTO.getVisibility() == null) {
@@ -2014,9 +2063,15 @@ public class PublisherCommonUtils {
 
         String[] nextAllowedStates = (String[]) apiLCData.get(APIConstants.LC_NEXT_STATES);
         if (!ArrayUtils.contains(nextAllowedStates, action)) {
-            throw new APIManagementException("Action '" + action + "' is not allowed. Allowed actions are "
-                    + Arrays.toString(nextAllowedStates), ExceptionCodes.from(ExceptionCodes
-                    .UNSUPPORTED_LIFECYCLE_ACTION, action));
+            String errorMessage = "Action '" + action + "' is not allowed. Allowed actions are "
+                    + Arrays.toString(nextAllowedStates);
+            if (ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled()) {
+                throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes
+                        .UNSUPPORTED_AND_ALLOWED_LIFECYCLE_ACTIONS, action, Arrays.toString(nextAllowedStates)));
+            } else {
+                throw new APIManagementException(errorMessage, ExceptionCodes.from(ExceptionCodes
+                        .UNSUPPORTED_LIFECYCLE_ACTION, action));
+            }
         }
 
         //check and set lifecycle check list items including "Deprecate Old Versions" and "Require Re-Subscription".

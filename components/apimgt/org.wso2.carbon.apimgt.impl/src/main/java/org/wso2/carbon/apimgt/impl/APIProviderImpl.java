@@ -1974,8 +1974,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     ExceptionCodes.from(ExceptionCodes.API_NOT_FOUND, existingApiId));
         }
         if (newVersion.equals(existingAPI.getId().getVersion())) {
-            throw new APIMgtResourceAlreadyExistsException(
-                    "Version " + newVersion + " exists for api " + existingAPI.getId().getApiName());
+            String errorMessage = "Version " + newVersion + " exists for api " + existingAPI.getId().getApiName();
+            if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                throw new APIMgtResourceAlreadyExistsException(errorMessage,
+                        ExceptionCodes.from(ExceptionCodes.API_VERSION_ALREADY_EXISTS, newVersion,
+                                existingAPI.getId().getApiName()));
+            } else {
+                throw new APIMgtResourceAlreadyExistsException(errorMessage);
+            }
         }
         if (APIUtil.isSequenceDefined(existingAPI.getInSequence()) || APIUtil.isSequenceDefined(existingAPI.getOutSequence())
                 || APIUtil.isSequenceDefined(existingAPI.getFaultSequence())) {
@@ -3031,6 +3037,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public APIStateChangeResponse changeLifeCycleStatus(String orgId, ApiTypeWrapper apiTypeWrapper, String action,
                                                         Map<String, Boolean> checklist) throws APIManagementException{
         APIStateChangeResponse response = new APIStateChangeResponse();
+        String uuid = null;
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
@@ -3043,7 +3050,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String apiType;
             String apiVersion;
             String currentStatus;
-            String uuid;
             int apiOrApiProductId;
             boolean isApiProduct = apiTypeWrapper.isAPIProduct();
             String workflowType;
@@ -3108,7 +3114,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         APIConstants.AuditLogConstants.LIFECYCLE_CHANGED, this.username);
             }
         } catch (APIPersistenceException e) {
-            handleException("Error while accessing persistence layer", e);
+            APIUtil.handleException("Error while accessing persistence layer",
+                    ExceptionCodes.from(ExceptionCodes.ERROR_CHANGING_REGISTRY_LIFECYCLE_STATE, uuid), e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
@@ -4492,9 +4499,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     uriTemplate.setId(templateMap.get(key).getId());
 
                 } else {
-                    throw new APIManagementException("API with id " + apiProductResource.getApiId()
+                    String errorMessage = "API with id " + apiProductResource.getApiId()
                             + " does not have a resource " + uriTemplate.getUriTemplate()
-                            + " with http method " + uriTemplate.getHTTPVerb());
+                            + " with http method " + uriTemplate.getHTTPVerb();
+                    if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                        throw new APIManagementException(errorMessage,
+                                ExceptionCodes.from(ExceptionCodes.NO_CORRESPONDING_RESOURCE_FOUND_IN_API,
+                                        apiProductResource.getApiId(), uriTemplate.getUriTemplate(),
+                                        uriTemplate.getHTTPVerb()));
+                    } else {
+                        throw new APIManagementException(errorMessage);
+                    }
                 }
             }
         }
@@ -4519,7 +4534,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     JSONObject jsonObj = (JSONObject) parser.parse(gson.toJson(newMonetizationProperties));
                     product.setMonetizationProperties(jsonObj);
                 } catch (ParseException e) {
-                    throw new APIManagementException("Error when parsing monetization properties ", e);
+                    String errorMessage = "Error when parsing monetization properties ";
+                    if ((ServiceReferenceHolder.getInstance().isDetailedErrorResponsesEnabled())) {
+                        throw new APIManagementException(errorMessage, e,
+                                ExceptionCodes.ERROR_PARSING_MONETIZATION_PROPERTIES);
+                    } else {
+                        throw new APIManagementException(errorMessage, e);
+                    }
                 }
             }
         }
@@ -4592,18 +4613,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     private void validateApiProductInfo(APIProduct product) throws APIManagementException {
         String apiName = product.getId().getName();
         if (apiName == null) {
-            handleException("API Name is required.");
+            String errorMessage = "API Name is required.";
+            APIUtil.handleException(errorMessage, ExceptionCodes.API_NAME_CANNOT_BE_NULL);
         } else if (containsIllegals(apiName)) {
-            handleException("API Name contains one or more illegal characters  " +
-                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )");
+            String errorMessage = "API Name contains one or more illegal characters  ( "
+                    + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
+            APIUtil.handleException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.API_NAME_ILLEGAL_CHARACTERS, apiName,
+                            APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA));
         }
         String apiVersion = product.getId().getVersion();
 
         if (apiVersion == null) {
-            handleException("API Version is required.");
+            String errorMessage = "API Version is required.";
+            APIUtil.handleException(errorMessage, ExceptionCodes.API_VERSION_CANNOT_BE_NULL);
         } else if (containsIllegals(apiVersion)) {
-            handleException("API Version contains one or more illegal characters  " +
-                    "( " + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )");
+            String errorMessage = "API Version contains one or more illegal characters  ( "
+                    + APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA + " )";
+            APIUtil.handleException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.API_VERSION_ILLEGAL_CHARACTERS, apiVersion,
+                            APIConstants.REGEX_ILLEGAL_CHARACTERS_FOR_API_METADATA));
         }
 
         if (!hasValidLength(apiName, APIConstants.MAX_LENGTH_API_NAME)
@@ -4628,9 +4657,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         //Validate if the API Product has an unsupported context
         String invalidContext = "/" + APIConstants.VERSION_PLACEHOLDER;
         if (invalidContext.equals(contextTemplate)) {
-            throw new APIManagementException(
-                    "Cannot add API Product : " + product.getId() + " with unsupported context : "
-                            + contextTemplate);
+            String errorMessage = "Cannot add API Product : " + product.getId() + " with unsupported context : "
+                    + contextTemplate;
+            APIUtil.handleException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.UNSUPPORTED_CONTEXT, contextTemplate));
         }
     }
 
@@ -5126,14 +5156,19 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 throw new APIMgtResourceNotFoundException(msg);
             }
         } catch (APIPersistenceException e) {
-            throw new APIManagementException("Failed to get API", e);
+            APIUtil.handleException("Failed to get API", ExceptionCodes.from(ExceptionCodes.ERROR_RETRIEVING_API, uuid),
+                    e);
         } catch (OASPersistenceException e) {
-            throw new APIManagementException("Error while retrieving the OAS definition", e);
+            APIUtil.handleException("Error while retrieving the OAS definition",
+                    ExceptionCodes.from(ExceptionCodes.OPENAPI_RETRIEVAL_ERROR, uuid), e);
         } catch (ParseException e) {
-            throw new APIManagementException("Error while parsing the OAS definition", e);
+            APIUtil.handleException("Error while parsing the OAS definition",
+                    ExceptionCodes.from(ExceptionCodes.OPENAPI_PARSE_EXCEPTION, uuid), e);
         } catch (AsyncSpecPersistenceException e) {
-            throw new APIManagementException("Error while retrieving the Async API definition", e);
+            APIUtil.handleException("Error while retrieving the Async API definition",
+                    ExceptionCodes.from(ExceptionCodes.ASYNCAPI_RETRIEVAL_ERROR, uuid), e);
         }
+        return null;
     }
 
     /**
@@ -5390,8 +5425,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         } catch (APIPersistenceException e) {
             String msg = "Failed to get API with uuid " + uuid;
-            throw new APIManagementException(msg, e);
+            APIUtil.handleException(msg, ExceptionCodes.from(ExceptionCodes.ERROR_RETRIEVING_API, uuid),
+                    e);
         }
+        return null;
     }
 
     @Override
@@ -5603,8 +5640,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     return;
                 }
             }
-
-            throw new APIManagementException(APIConstants.UN_AUTHORIZED_ERROR_MESSAGE + " view or modify the api");
+            String errorMessage = APIConstants.UN_AUTHORIZED_ERROR_MESSAGE + " view or modify the api";
+            APIUtil.handleException(errorMessage,
+                    ExceptionCodes.from(ExceptionCodes.UN_AUTHORIZED_TO_VIEW_MODIFY_API, username));
         }
 
     }
