@@ -1999,7 +1999,7 @@
 
         <carbon.commons.version>4.7.52</carbon.commons.version>
         <carbon.registry.version>4.7.51</carbon.registry.version>
-        <carbon.mediation.version>4.7.188</carbon.mediation.version>
+        <carbon.mediation.version>4.7.188.6</carbon.mediation.version>
 
         <!-- Carbon Identity versions -->
         <carbon.identity.version>5.17.118</carbon.identity.version>
