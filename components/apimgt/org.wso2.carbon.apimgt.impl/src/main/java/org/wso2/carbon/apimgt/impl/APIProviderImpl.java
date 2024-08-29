@@ -6526,7 +6526,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         API api = getAPIbyUUID(apiId, organization);
         if (APIUtil.isSequenceDefined(api.getInSequence()) || APIUtil.isSequenceDefined(api.getOutSequence())
                 || APIUtil.isSequenceDefined(api.getFaultSequence())) {
-            updateAPI(api, tenantId, userNameWithoutChange);
+            migrateMediationPoliciesOfAPI(api, tenantDomain, true);
         }
 
         Set<URITemplate> uriTemplatesWithPolicies = apiMgtDAO.getURITemplatesWithOperationPolicies(apiId);
