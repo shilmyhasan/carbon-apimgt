@@ -39,6 +39,7 @@ import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
 import org.wso2.carbon.apimgt.impl.dto.JWKSConfigurationDTO;
 import org.wso2.carbon.apimgt.impl.dto.JWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
+import org.wso2.carbon.apimgt.impl.dto.TokenValidationDto;
 import org.wso2.carbon.apimgt.impl.dto.TokenIssuerDto;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowProperties;
 import org.wso2.carbon.apimgt.impl.recommendationmgt.RecommendationEnvironment;
@@ -113,6 +114,7 @@ public class APIManagerConfiguration {
     private static Properties persistentNotifierProperties;
     private static String tokenRevocationClassName;
     private static boolean advancedSwaggerValidationEnabled = false;
+    private TokenValidationDto tokenValidationDto = new TokenValidationDto();
 
     public static Properties getRealtimeTokenRevocationNotifierProperties() {
 
@@ -526,9 +528,25 @@ public class APIManagerConfiguration {
                 setContainerMgtConfigurations(element);
             } else if (APIConstants.SWAGGER_VALIDATION.equals(localName)) {
                 setSwaggerValidationProperties(element);
+            } else if (APIConstants.TokenValidationConstants.TOKEN_VALIDATION_CONFIG.equals(localName)) {
+                setTokenValidation(element);
             }
             readChildElements(element, nameStack);
             nameStack.pop();
+        }
+    }
+
+    /**
+     * Set token validation configurations from the api-manager.xml file
+     *
+     * @param omElement OMElement of the TokenValidation configuration block
+     */
+    private void setTokenValidation(OMElement omElement) {
+        OMElement enforceTypeHeaderValidation = omElement.getFirstChildWithName(new QName(
+                APIConstants.TokenValidationConstants.ENFORCE_JWT_TYPE_HEADER_VALIDATION));
+        if (enforceTypeHeaderValidation != null) {
+            tokenValidationDto.setEnforceTypeHeaderValidation(Boolean.parseBoolean(
+                    enforceTypeHeaderValidation.getText()));
         }
     }
 
@@ -1892,5 +1910,9 @@ public class APIManagerConfiguration {
     public void setAdvancedSwaggerValidationEnabled(boolean advancedSwaggerValidationEnabled) {
 
         APIManagerConfiguration.advancedSwaggerValidationEnabled = advancedSwaggerValidationEnabled;
+    }
+
+    public TokenValidationDto getTokenValidationDto() {
+        return tokenValidationDto;
     }
 }
