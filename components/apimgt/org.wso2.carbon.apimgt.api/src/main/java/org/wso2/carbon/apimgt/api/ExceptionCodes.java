@@ -236,6 +236,7 @@ public enum ExceptionCodes implements ErrorHandler {
     INVALID_OAS3_FOUND(900762, "Invalid OpenAPI V3 definition found", 400, "Invalid OpenAPI V3 definition found"),
     NO_RESOURCES_FOUND(900763, "No resources found", 404, "API must have at least one resource defined"),
     ERROR_REMOVING_EXAMPLES(900764, "Internal Error While Processing Swagger Definition", 500, "Couldn't remove one or more examples from the swagger definition"),
+    ERROR_RETRIEVE_KM_INFORMATION(900765, "Failed to retrieve key manager information", 500, "Couldn't get the key manager information by name or UUID"),
     APICTL_OPENAPI_PARSE_EXCEPTION(OPENAPI_PARSE_EXCEPTION.getErrorCode(), OPENAPI_PARSE_EXCEPTION.getErrorMessage(), OPENAPI_PARSE_EXCEPTION.getHttpStatusCode(), "%s"),
 
 
