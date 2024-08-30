@@ -51,7 +51,6 @@ import io.swagger.parser.util.DeserializationUtils;
 import io.swagger.parser.util.SwaggerDeserializationResult;
 import io.swagger.util.Json;
 import io.swagger.util.Yaml;
-import io.swagger.v3.oas.models.security.OAuthFlow;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +72,18 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.user.core.UserStoreException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -886,7 +896,6 @@ public class OAS2Parser extends APIDefinition {
         if (Objects.nonNull(grantTypes)) {
             // This will generate only supported flows by OAS2
             for (String grantType : grantTypes) {
-                OAuthFlow flow = new OAuthFlow();
                 if (APIConstants.KeyManager.APPLICATION_GRANT_TYPE.equals(grantType)) {
                     oAuth2Definition = new OAuth2Definition().application(
                             keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT)
