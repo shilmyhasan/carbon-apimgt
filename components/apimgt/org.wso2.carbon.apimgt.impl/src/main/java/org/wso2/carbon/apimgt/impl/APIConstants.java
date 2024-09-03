@@ -2496,6 +2496,12 @@ public final class APIConstants {
         public static final String REFRESH_TOKEN_EXPIRY_TIME = "refresh_token_expiry_time";
         public static final String ID_TOKEN_EXPIRY_TIME = "id_token_expiry_time";
         public static final String NOT_APPLICABLE_VALUE = "N/A";
+        public static final String AUTHORIZATION_CODE_GRANT_TYPE = "authorization_code";
+        public static final String IMPLICIT_GRANT_TYPE = "implicit";
+        public static final String PASSWORD_GRANT_TYPE = "password";
+        public static final String CLIENT_CREDENTIALS_GRANT_TYPE = "client_credentials";
+        public static final String APPLICATION_GRANT_TYPE = "application";
+        public static final String ACCESS_CODE_GRANT_TYPE = "accessCode";
 
         public static class KeyManagerEvent {
 
