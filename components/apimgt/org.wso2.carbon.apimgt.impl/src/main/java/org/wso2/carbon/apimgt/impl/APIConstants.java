@@ -1364,6 +1364,7 @@ public final class APIConstants {
         public static final String EXPIRES_IN = "expires_in";
         public static final String OAUTH_MEDIATION_CONFIG = "OAuth.";
         public static final String EXPIRES_IN_CONFIG = "ExpiresIn";
+        public static final String ENABLE_RETRY_CALL_WITH_NEW_TOKEN = "EnableRetryCallWithNewToken";
 
         // Properties in Endpoint Config
         public static final String ENDPOINT_SECURITY_PRODUCTION = "production";
@@ -1640,6 +1641,7 @@ public final class APIConstants {
     public static final String ENDPOINT_URL = "url";
     public static final String ENDPOINT_SPECIFIC_CONFIG = "config";
     public static final String ENDPOINT_CONFIG_ACTION_DURATION = "actionDuration";
+    public static final String ENABLE_RETRY_CALL_WITH_NEW_OAUTH_TOKEN = "enableRetryCallWithNewOauthToken";
 
     public static final String ENDPOINT_SECURITY_TYPE = "type";
     public static final String ENDPOINT_SECURITY_TYPE_BASIC = "basic";

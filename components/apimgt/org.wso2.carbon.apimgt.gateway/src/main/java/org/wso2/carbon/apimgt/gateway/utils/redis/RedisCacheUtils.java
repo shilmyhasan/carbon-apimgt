@@ -274,4 +274,8 @@ public class RedisCacheUtils {
 
         jedisPool.destroy();
     }
+
+    public boolean isRedisCacheSessionActive() {
+        return jedisPool != null && !jedisPool.isClosed();
+    }
 }
