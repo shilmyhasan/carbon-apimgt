@@ -1110,23 +1110,33 @@ public class OAS3Parser extends APIDefinition {
                 securityScheme.getFlows().setImplicit(oAuthFlow);
             }
             oAuthFlow.setAuthorizationUrl(authUrl);
-            Scopes oas3Scopes = new Scopes();
-            Set<Scope> scopes = swaggerData.getScopes();
-            if (scopes != null && !scopes.isEmpty()) {
-                Map<String, String> scopeBindings = new HashMap<>();
-                for (Scope scope : scopes) {
-                    String description = scope.getDescription() != null ? scope.getDescription() : "";
-                    oas3Scopes.put(scope.getKey(), description);
-                    String roles = (StringUtils.isNotBlank(scope.getRoles())
-                            && scope.getRoles().trim().split(",").length > 0) ? scope.getRoles() : StringUtils.EMPTY;
-                    scopeBindings.put(scope.getKey(), roles);
-                }
-                oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
-            }
-            oAuthFlow.setScopes(oas3Scopes);
+            setScopesToOAuthFlow(oAuthFlow, swaggerData);
         } else {
-            addSecuritySchemeToOpenAPI(openAPI, keyManagerConfigurationDTO, authUrl);
+            addSecuritySchemeToOpenAPI(openAPI, keyManagerConfigurationDTO, authUrl, swaggerData);
         }
+    }
+
+    /**
+     * Add scopes for OAuth flow
+     *
+     * @param oAuthFlow     existing oauthFlow object
+     * @param swaggerData   Swagger related API data
+     */
+    private void setScopesToOAuthFlow(OAuthFlow oAuthFlow, SwaggerData swaggerData){
+        Scopes oas3Scopes = new Scopes();
+        Set<Scope> scopes = swaggerData.getScopes();
+        if (scopes != null && !scopes.isEmpty()) {
+            Map<String, String> scopeBindings = new HashMap<>();
+            for (Scope scope : scopes) {
+                String description = scope.getDescription() != null ? scope.getDescription() : "";
+                oas3Scopes.put(scope.getKey(), description);
+                String roles = (StringUtils.isNotBlank(scope.getRoles())
+                        && scope.getRoles().trim().split(",").length > 0) ? scope.getRoles() : StringUtils.EMPTY;
+                scopeBindings.put(scope.getKey(), roles);
+            }
+            oAuthFlow.addExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
+        }
+        oAuthFlow.setScopes(oas3Scopes);
     }
 
     /**
@@ -1136,7 +1146,8 @@ public class OAS3Parser extends APIDefinition {
      * @param keyManagerConfig  Key manager information
      * @param authUrl           Default authorization url for the value not existing cases
      */
-    private void addSecuritySchemeToOpenAPI(OpenAPI openAPI, KeyManagerConfigurationDTO keyManagerConfig, String authUrl) {
+    private void addSecuritySchemeToOpenAPI(OpenAPI openAPI, KeyManagerConfigurationDTO keyManagerConfig,
+            String authUrl, SwaggerData swaggerData) {
 
         if (openAPI.getComponents() == null) {
             openAPI.setComponents(new Components());
@@ -1150,7 +1161,7 @@ public class OAS3Parser extends APIDefinition {
 
         SecurityScheme securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.OAUTH2)
-                .flows(generateOAuthFlows(keyManagerConfig, authUrl));
+                .flows(generateOAuthFlows(keyManagerConfig, authUrl, swaggerData));
 
         // Add the security scheme to components using key manager type as the key
         openAPI.getComponents().addSecuritySchemes(keyManagerConfig.getType(), securityScheme);
@@ -1163,26 +1174,42 @@ public class OAS3Parser extends APIDefinition {
      * @param authUrl           Default authorization url for the value not existing cases
      * @return OAuthFlows object with generated flows
      */
-    private OAuthFlows generateOAuthFlows(KeyManagerConfigurationDTO keyManagerConfig, String authUrl) {
+    private OAuthFlows generateOAuthFlows(KeyManagerConfigurationDTO keyManagerConfig, String authUrl,
+            SwaggerData swaggerData) {
         OAuthFlows oAuthFlows = new OAuthFlows();
-
         List<String> grantTypes = (List<String>) keyManagerConfig.getAdditionalProperties().get("grant_types");
 
         if (Objects.nonNull(grantTypes)) {
+            String tokenEP = null;
+            String authorizeEP = null;
+            if (keyManagerConfig.getAdditionalProperties() != null) {
+                // To keep tokenEP and authorizeEP remains null if the values get null when retrieving
+                tokenEP = Objects.toString(
+                        keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT), "");
+                authorizeEP = Objects.toString(
+                        keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT), "");
+            }
             // This will generate only supported flows by OAS3
             for (String grantType : grantTypes) {
                 OAuthFlow flow = new OAuthFlow();
-                if (APIConstants.KeyManager.AUTHORIZATION_CODE_GRANT_TYPE.equals(grantType)) {
-                    configureAuthorizationCodeFlow(flow, keyManagerConfig, authUrl);
+                if (APIConstants.KeyManager.AUTHORIZATION_CODE_GRANT_TYPE.equals(grantType) && !StringUtils.isEmpty(
+                        tokenEP)) {
+                    configureAuthorizationCodeFlow(flow, authUrl, authorizeEP, tokenEP);
+                    setScopesToOAuthFlow(flow, swaggerData);
                     oAuthFlows.authorizationCode(flow);
                 } else if (APIConstants.KeyManager.IMPLICIT_GRANT_TYPE.equals(grantType)) {
-                    configureImplicitFlow(flow, keyManagerConfig, authUrl);
+                    configureImplicitFlow(flow, authUrl, authorizeEP);
+                    setScopesToOAuthFlow(flow, swaggerData);
                     oAuthFlows.implicit(flow);
-                } else if (APIConstants.KeyManager.PASSWORD_GRANT_TYPE.equals(grantType)) {
-                    configurePasswordFlow(flow, keyManagerConfig);
+                } else if (APIConstants.KeyManager.PASSWORD_GRANT_TYPE.equals(grantType) && !StringUtils.isEmpty(
+                        tokenEP)) {
+                    configurePasswordFlow(flow, tokenEP);
+                    setScopesToOAuthFlow(flow, swaggerData);
                     oAuthFlows.password(flow);
-                } else if (APIConstants.KeyManager.CLIENT_CREDENTIALS_GRANT_TYPE.equals(grantType)) {
-                    configureClientCredentialsFlow(flow, keyManagerConfig);
+                } else if (APIConstants.KeyManager.CLIENT_CREDENTIALS_GRANT_TYPE.equals(grantType)
+                        && !StringUtils.isEmpty(tokenEP)) {
+                    configureClientCredentialsFlow(flow, tokenEP);
+                    setScopesToOAuthFlow(flow, swaggerData);
                     oAuthFlows.clientCredentials(flow);
                 }
             }
@@ -1194,34 +1221,29 @@ public class OAS3Parser extends APIDefinition {
      * set authorization code flow information to the flow
      *
      * @param flow              flow of adding the information
-     * @param keyManagerConfig  Key manager information
      * @param authUrl           Default authorization url for the value not existing cases
+     * @param authorizeEP       authorization endpoint url
+     * @param tokenEP           token endpoint url
      */
-    private void configureAuthorizationCodeFlow(OAuthFlow flow, KeyManagerConfigurationDTO keyManagerConfig,
-            String authUrl) {
-        if (keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT) != null) {
-            flow.setAuthorizationUrl(
-                    keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT)
-                            .toString());
+    private void configureAuthorizationCodeFlow(OAuthFlow flow, String authUrl, String authorizeEP, String tokenEP) {
+        if (!StringUtils.isEmpty(authorizeEP)) {
+            flow.setAuthorizationUrl(authorizeEP);
         } else {
             flow.setAuthorizationUrl(authUrl);
         }
-        flow.setTokenUrl(
-                keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT).toString());
+        flow.setTokenUrl(tokenEP);
     }
 
     /**
      * set implicit flow information to the flow
      *
      * @param flow              flow of adding the information
-     * @param keyManagerConfig  Key manager information
      * @param authUrl           Default authorization url for the value not existing cases
+     * @param authorizeEP       authorization endpoint url
      */
-    private void configureImplicitFlow(OAuthFlow flow, KeyManagerConfigurationDTO keyManagerConfig, String authUrl) {
-        if (keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT) != null) {
-            flow.setAuthorizationUrl(
-                    keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT)
-                            .toString());
+    private void configureImplicitFlow(OAuthFlow flow, String authUrl, String authorizeEP) {
+        if (!StringUtils.isEmpty(authorizeEP)) {
+            flow.setAuthorizationUrl(authorizeEP);
         } else {
             flow.setAuthorizationUrl(authUrl);
         }
@@ -1231,22 +1253,20 @@ public class OAS3Parser extends APIDefinition {
      * set password flow information to the flow
      *
      * @param flow              flow of adding the information
-     * @param keyManagerConfig  Key manager information
+     * @param tokenEP           token endpoint url
      */
-    private void configurePasswordFlow(OAuthFlow flow, KeyManagerConfigurationDTO keyManagerConfig) {
-        flow.setTokenUrl(
-                keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT).toString());
+    private void configurePasswordFlow(OAuthFlow flow, String tokenEP) {
+        flow.setTokenUrl(tokenEP);
     }
 
     /**
      * set client credentials flow information to the flow
      *
      * @param flow              flow of adding the information
-     * @param keyManagerConfig  Key manager information
+     * @param tokenEP           token endpoint url
      */
-    private void configureClientCredentialsFlow(OAuthFlow flow, KeyManagerConfigurationDTO keyManagerConfig) {
-        flow.setTokenUrl(
-                keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT).toString());
+    private void configureClientCredentialsFlow(OAuthFlow flow, String tokenEP) {
+        flow.setTokenUrl(tokenEP);
     }
 
     /**
@@ -1425,8 +1445,13 @@ public class OAS3Parser extends APIDefinition {
                         APIConstants.KeyManager.DEFAULT_KEY_MANAGER);
             }
         } catch (APIManagementException | UserStoreException e) {
-            throw new APIManagementException("Failed to retrieve key manager information by name or ID",
-                    ExceptionCodes.ERROR_RETRIEVE_KM_INFORMATION);
+            if (!StringUtils.isEmpty(kmId)) {
+                throw new APIManagementException("Failed to retrieve key manager information by ID: " + kmId,
+                        ExceptionCodes.ERROR_RETRIEVE_KM_INFORMATION);
+            } else {
+                throw new APIManagementException("Failed to retrieve key manager information "
+                        + APIConstants.KeyManager.DEFAULT_KEY_MANAGER, ExceptionCodes.ERROR_RETRIEVE_KM_INFORMATION);
+            }
         }
 
         String authUrl;

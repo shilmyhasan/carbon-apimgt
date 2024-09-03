@@ -889,47 +889,34 @@ public class OAS2Parser extends APIDefinition {
     /**
      * Update swagger with security definition
      *
-     * @param swagger     swagger object
-     * @param swaggerData Swagger related data
+     * @param swagger           swagger object
+     * @param swaggerData       Swagger related data
+     * @param keyManagerConfig  key manager configuration info
      */
     private void updateSwaggerSecurityDefinition(Swagger swagger, SwaggerData swaggerData, String authUrl,
             KeyManagerConfigurationDTO keyManagerConfig) {
-        List<String> grantTypes = (List<String>) keyManagerConfig.getAdditionalProperties().get("grant_types");
-        // Retain the previous approach for setting the default value if none of the conditions below are met
-        // with the values from the KeyManagerConfigurationDTO.
-        OAuth2Definition oAuth2Definition = new OAuth2Definition().implicit(authUrl);
-        if (Objects.nonNull(grantTypes)) {
-            // This will generate only supported flows by OAS2
-            for (String grantType : grantTypes) {
-                if (APIConstants.KeyManager.APPLICATION_GRANT_TYPE.equals(grantType)) {
-                    oAuth2Definition = new OAuth2Definition().application(
-                            keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT)
-                                    .toString());
-                } else if (APIConstants.KeyManager.IMPLICIT_GRANT_TYPE.equals(grantType)) {
-                    if (keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT)
-                            != null) {
-                        oAuth2Definition = new OAuth2Definition().implicit(keyManagerConfig.getAdditionalProperties()
-                                .get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT).toString());
-                    } else {
-                        oAuth2Definition = new OAuth2Definition().implicit(authUrl);
-                    }
-                } else if (APIConstants.KeyManager.PASSWORD_GRANT_TYPE.equals(grantType)) {
-                    oAuth2Definition = new OAuth2Definition().password(
-                            keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT)
-                                    .toString());
-                } else if (APIConstants.KeyManager.ACCESS_CODE_GRANT_TYPE.equals(grantType)) {
-                    if (keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT)
-                            != null) {
-                        authUrl = keyManagerConfig.getAdditionalProperties()
-                                .get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT).toString();
-                    }
-                    oAuth2Definition = new OAuth2Definition().accessCode(authUrl,
-                            keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT)
-                                    .toString());
-                }
+        if (keyManagerConfig == null || StringUtils.isEmpty(keyManagerConfig.getUuid())) {
+            OAuth2Definition defaultOAuth2Definition = new OAuth2Definition().implicit(authUrl);
+            setVendorExtensionsToOAuth2Definition(swaggerData, defaultOAuth2Definition);
+            swagger.addSecurityDefinition(APIConstants.SWAGGER_APIM_DEFAULT_SECURITY, defaultOAuth2Definition);
+            if (swagger.getSecurity() == null) {
+                SecurityRequirement securityRequirement = new SecurityRequirement();
+                securityRequirement.setRequirements(APIConstants.SWAGGER_APIM_DEFAULT_SECURITY,
+                        new ArrayList<String>());
+                swagger.addSecurity(securityRequirement);
             }
+        } else {
+            addSecurityDefinitionsToSwagger(swagger, swaggerData, keyManagerConfig, authUrl);
         }
+    }
 
+    /**
+     * Set VendorExtensions to the OAuth2 Definition
+     *
+     * @param swaggerData       Swagger related data
+     * @param oAuth2Definition  existing oAuth2Definition object
+     */
+    private void setVendorExtensionsToOAuth2Definition(SwaggerData swaggerData, OAuth2Definition oAuth2Definition){
         Set<Scope> scopes = swaggerData.getScopes();
         if (scopes != null && !scopes.isEmpty()) {
             Map<String, String> scopeBindings = new HashMap<>();
@@ -942,12 +929,69 @@ public class OAS2Parser extends APIDefinition {
             }
             oAuth2Definition.setVendorExtension(APIConstants.SWAGGER_X_SCOPES_BINDINGS, scopeBindings);
         }
-        swagger.addSecurityDefinition(APIConstants.SWAGGER_APIM_DEFAULT_SECURITY, oAuth2Definition);
-        if (swagger.getSecurity() == null) {
-            SecurityRequirement securityRequirement = new SecurityRequirement();
-            securityRequirement.setRequirements(APIConstants.SWAGGER_APIM_DEFAULT_SECURITY, new ArrayList<String>());
-            swagger.addSecurity(securityRequirement);
+    }
+
+    /**
+     * Add Security Definitions to the Swagger
+     *
+     * @param swagger           swagger object
+     * @param swaggerData       Swagger related data
+     * @param keyManagerConfig  key manager configuration info
+     * @param authUrl           default authorization url
+     */
+    private void addSecurityDefinitionsToSwagger(Swagger swagger, SwaggerData swaggerData,
+            KeyManagerConfigurationDTO keyManagerConfig, String authUrl) {
+        List<String> grantTypes = (List<String>) keyManagerConfig.getAdditionalProperties().get("grant_types");
+
+        // Create a map for security definitions
+        Map<String, SecuritySchemeDefinition> securityDefinitions = new HashMap<>();
+
+        if (Objects.nonNull(grantTypes)) {
+            String tokenEP = null;
+            String authrizeEP = null;
+            if (keyManagerConfig.getAdditionalProperties() != null) {
+                // To keep tokenEP and authrizeEP remains null if the values get null when retrieving
+                tokenEP = Objects.toString(
+                        keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.TOKEN_ENDPOINT), "");
+                authrizeEP = Objects.toString(
+                        keyManagerConfig.getAdditionalProperties().get(APIConstants.KeyManager.AUTHORIZE_ENDPOINT), "");
+            }
+
+            // This will generate only supported flows by OAS2
+            for (String grantType : grantTypes) {
+                OAuth2Definition oAuth2DefinitionTemp = null; // Initialize for each iteration
+
+                if (APIConstants.KeyManager.APPLICATION_GRANT_TYPE.equals(grantType) && !StringUtils.isEmpty(tokenEP)) {
+                    oAuth2DefinitionTemp = new OAuth2Definition().application(tokenEP);
+                    setVendorExtensionsToOAuth2Definition(swaggerData, oAuth2DefinitionTemp);
+                    securityDefinitions.put(APIConstants.KeyManager.APPLICATION_GRANT_TYPE, oAuth2DefinitionTemp);
+                } else if (APIConstants.KeyManager.IMPLICIT_GRANT_TYPE.equals(grantType)) {
+                    if (!StringUtils.isEmpty(authrizeEP)) {
+                        oAuth2DefinitionTemp = new OAuth2Definition().implicit(authrizeEP);
+                    } else {
+                        oAuth2DefinitionTemp = new OAuth2Definition().implicit(authUrl);
+                    }
+                    setVendorExtensionsToOAuth2Definition(swaggerData, oAuth2DefinitionTemp);
+                    securityDefinitions.put(APIConstants.KeyManager.IMPLICIT_GRANT_TYPE, oAuth2DefinitionTemp);
+                } else if (APIConstants.KeyManager.PASSWORD_GRANT_TYPE.equals(grantType) && !StringUtils.isEmpty(
+                        tokenEP)) {
+                    oAuth2DefinitionTemp = new OAuth2Definition().password(tokenEP);
+                    setVendorExtensionsToOAuth2Definition(swaggerData, oAuth2DefinitionTemp);
+                    securityDefinitions.put(APIConstants.KeyManager.PASSWORD_GRANT_TYPE, oAuth2DefinitionTemp);
+                } else if (APIConstants.KeyManager.ACCESS_CODE_GRANT_TYPE.equals(grantType) && !StringUtils.isEmpty(
+                        tokenEP)) {
+                    if (!StringUtils.isEmpty(authrizeEP)) {
+                        authUrl = authrizeEP;
+                    }
+                    oAuth2DefinitionTemp = new OAuth2Definition().accessCode(authUrl, tokenEP);
+                    setVendorExtensionsToOAuth2Definition(swaggerData, oAuth2DefinitionTemp);
+                    securityDefinitions.put(APIConstants.KeyManager.ACCESS_CODE_GRANT_TYPE, oAuth2DefinitionTemp);
+                }
+            }
         }
+
+        // Set the security definitions in the OAS2 definition
+        swagger.setSecurityDefinitions(securityDefinitions);
     }
 
     /**
@@ -1338,8 +1382,13 @@ public class OAS2Parser extends APIDefinition {
                         APIConstants.KeyManager.DEFAULT_KEY_MANAGER);
             }
         } catch (APIManagementException | UserStoreException e) {
-            throw new APIManagementException("Failed to retrieve key manager information by name or ID",
-                    ExceptionCodes.ERROR_RETRIEVE_KM_INFORMATION);
+            if (!StringUtils.isEmpty(kmId)) {
+                throw new APIManagementException("Failed to retrieve key manager information by ID: " + kmId,
+                        ExceptionCodes.ERROR_RETRIEVE_KM_INFORMATION);
+            } else {
+                throw new APIManagementException("Failed to retrieve key manager information "
+                        + APIConstants.KeyManager.DEFAULT_KEY_MANAGER, ExceptionCodes.ERROR_RETRIEVE_KM_INFORMATION);
+            }
         }
 
         String authUrl;
