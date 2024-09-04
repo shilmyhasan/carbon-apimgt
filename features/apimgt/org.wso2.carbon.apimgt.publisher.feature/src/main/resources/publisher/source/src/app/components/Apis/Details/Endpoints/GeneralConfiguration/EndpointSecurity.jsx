@@ -17,13 +17,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import {
-    Grid, TextField, MenuItem, InputAdornment,
+    Grid, TextField, MenuItem,
     Icon,
     ListItem,
     ListItemAvatar,
     ListItemText,
 } from '@material-ui/core';
-import { RemoveRedEye } from '@material-ui/icons';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -94,7 +93,7 @@ function EndpointSecurity(props) {
     const [securityValidity, setSecurityValidity] = useState();
 
     const [showAddParameter, setShowAddParameter] = useState(false);
-    const [clientSecretIsMasked, setClientSecretIsMasked] = useState(true);
+    const [clientSecretIsMasked] = useState(true);
     // Implementation of useState variables for parameter name and value
     const [parameterName, setParameterName] = useState(null);
     const [parameterValue, setParameterValue] = useState(null);
@@ -218,12 +217,6 @@ function EndpointSecurity(props) {
         setShowAddParameter(!showAddParameter);
     };
 
-    /**
-     * Show or hide the Client Secret
-     */
-    const toggleClientSecretMask = () => {
-        setClientSecretIsMasked(!clientSecretIsMasked);
-    };
 
     /**
      * Set the custom parameter name or value property
@@ -525,14 +518,6 @@ function EndpointSecurity(props) {
                                         onBlur={() => validateAndUpdateSecurityInfo('clientSecret')}
                                         InputProps={{
                                             autoComplete: 'new-password',
-                                            endAdornment: (
-                                                <InputAdornment position='end'>
-                                                    <RemoveRedEye
-                                                        className={classes.eye}
-                                                        onClick={toggleClientSecretMask}
-                                                    />
-                                                </InputAdornment>
-                                            ),
                                         }}
                                     />
                                 </Grid>
