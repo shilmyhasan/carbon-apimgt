@@ -227,8 +227,8 @@ const KeyConfiguration = (props) => {
                         margin='normal'
                         variant='outlined'
                         disabled={!isUserOwner
-                            || (props.keyRequest.supportedGrantTypes && !props.keyRequest.supportedGrantTypes.includes('authorization_code')
-                                && !props.keyRequest.supportedGrantTypes.includes('implicit'))}
+                            || (supportedGrantTypes && !supportedGrantTypes.includes('authorization_code')
+                                && !supportedGrantTypes.includes('implicit'))}
                         error={isCalbackUrlError}
                         placeholder={intl.formatMessage({
                             defaultMessage: 'http://url-to-webapp',
