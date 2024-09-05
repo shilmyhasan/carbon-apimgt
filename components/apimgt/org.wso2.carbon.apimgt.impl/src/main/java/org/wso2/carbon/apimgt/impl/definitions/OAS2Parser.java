@@ -684,7 +684,7 @@ public class OAS2Parser extends APIDefinition {
             if (uriTemplates.size() == 0) {
                 validationResponse.setValid(false);
                 OASParserUtil.addErrorToValidationResponse(validationResponse,
-                        "No resource paths found in the swagger definition");
+                        "Empty resource paths found in the swagger definition");
                 return validationResponse;
             } else {
                 for (URITemplate uriTemplate : uriTemplates) {
