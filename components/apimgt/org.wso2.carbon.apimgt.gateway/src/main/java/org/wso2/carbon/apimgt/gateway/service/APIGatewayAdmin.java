@@ -674,45 +674,44 @@ public class APIGatewayAdmin extends org.wso2.carbon.core.AbstractAdmin {
             log.debug("Start to undeploy API" + gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion());
         }
 
-        synchronized (ServiceReferenceHolder.getInstance().getSynapseConfigurationService().getSynapseConfiguration()) {
-            unDeployAPI(certificateManager, sequenceAdminServiceProxy, restapiAdminServiceProxy, localEntryServiceProxy,
-                    endpointAdminServiceProxy, gatewayAPIDTO, mediationSecurityAdminServiceProxy);
-            if (log.isDebugEnabled()) {
-                log.debug(gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion() + " undeployed");
-                log.debug("Start to deploy Local entries" + gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion());
-            }
-            // Add Local Entries
-            if (gatewayAPIDTO.getLocalEntriesToBeAdd() != null) {
-                for (GatewayContentDTO localEntry : gatewayAPIDTO.getLocalEntriesToBeAdd()) {
-                    if (localEntryServiceProxy.isEntryExists(localEntry.getName())) {
-                        if (!APIConstants.GA_CONF_KEY.equals(localEntry.getName()) && gatewayAPIDTO.isOverride()) {
-                            localEntryServiceProxy.deleteEntry(localEntry.getName());
-                            localEntryServiceProxy.addLocalEntry(localEntry.getContent());
-                        }
-                    } else {
+        unDeployAPI(certificateManager, sequenceAdminServiceProxy, restapiAdminServiceProxy, localEntryServiceProxy,
+                endpointAdminServiceProxy, gatewayAPIDTO, mediationSecurityAdminServiceProxy);
+        if (log.isDebugEnabled()) {
+            log.debug(gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion() + " undeployed");
+            log.debug("Start to deploy Local entries" + gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion());
+        }
+        // Add Local Entries
+        if (gatewayAPIDTO.getLocalEntriesToBeAdd() != null) {
+            for (GatewayContentDTO localEntry : gatewayAPIDTO.getLocalEntriesToBeAdd()) {
+                if (localEntryServiceProxy.isEntryExists(localEntry.getName())) {
+                    if (!APIConstants.GA_CONF_KEY.equals(localEntry.getName()) && gatewayAPIDTO.isOverride()) {
+                        localEntryServiceProxy.deleteEntry(localEntry.getName());
                         localEntryServiceProxy.addLocalEntry(localEntry.getContent());
                     }
-                }
-            }
-            if (log.isDebugEnabled()) {
-                log.debug(gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion() + " Local Entries deployed");
-                log.debug("Start to deploy Endpoint entries" + gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion());
-            }
-
-            // Add Endpoints
-            if (gatewayAPIDTO.getEndpointEntriesToBeAdd() != null) {
-                for (GatewayContentDTO endpointEntry : gatewayAPIDTO.getEndpointEntriesToBeAdd()) {
-                    if (endpointAdminServiceProxy.isEndpointExist(endpointEntry.getName())) {
-                        if (gatewayAPIDTO.isOverride()) {
-                            endpointAdminServiceProxy.deleteEndpoint(endpointEntry.getName());
-                            endpointAdminServiceProxy.addEndpoint(endpointEntry.getContent());
-                        }
-                    } else {
-                        endpointAdminServiceProxy.addEndpoint(endpointEntry.getContent());
-                    }
+                } else {
+                    localEntryServiceProxy.addLocalEntry(localEntry.getContent());
                 }
             }
         }
+        if (log.isDebugEnabled()) {
+            log.debug(gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion() + " Local Entries deployed");
+            log.debug("Start to deploy Endpoint entries" + gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion());
+        }
+
+        // Add Endpoints
+        if (gatewayAPIDTO.getEndpointEntriesToBeAdd() != null) {
+            for (GatewayContentDTO endpointEntry : gatewayAPIDTO.getEndpointEntriesToBeAdd()) {
+                if (endpointAdminServiceProxy.isEndpointExist(endpointEntry.getName())) {
+                    if (gatewayAPIDTO.isOverride()) {
+                        endpointAdminServiceProxy.deleteEndpoint(endpointEntry.getName());
+                        endpointAdminServiceProxy.addEndpoint(endpointEntry.getContent());
+                    }
+                } else {
+                    endpointAdminServiceProxy.addEndpoint(endpointEntry.getContent());
+                }
+            }
+        }
+
         if (log.isDebugEnabled()) {
             log.debug(gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion() + " Endpoints deployed");
             log.debug("Start to deploy Client certificates" + gatewayAPIDTO.getName() + ":" + gatewayAPIDTO.getVersion());
