@@ -121,6 +121,9 @@ const KeyConfiguration = (props) => {
                     newGrantTypes = [...newGrantTypes, currentTarget.id];
                 } else {
                     newGrantTypes = newRequest.supportedGrantTypes.filter(item => item !== currentTarget.id);
+                    if (!(newGrantTypes.includes('implicit') || newGrantTypes.includes('authorization_code'))) {
+                        newRequest.callbackUrl = '';
+                    }
                 }
                 newRequest.supportedGrantTypes = newGrantTypes;
                 break;
@@ -128,16 +131,6 @@ const KeyConfiguration = (props) => {
                 break;
         }
         updateKeyRequest(newRequest);
-    };
-
-    /**
-     * returns whether grant type checkbox should be disabled or not
-     * @param grantType
-     */
-    const isGrantTypeDisabled = (grantType) => {
-        const { keyRequest, isUserOwner } = props;
-        const { callbackUrl } = keyRequest;
-        return !(isUserOwner && !(!callbackUrl && (grantType === 'authorization_code' || grantType === 'implicit')));
     };
 
     /**
@@ -176,11 +169,10 @@ const KeyConfiguration = (props) => {
                                         <Checkbox
                                             id={key}
                                             checked={!!(supportedGrantTypes
-                                                    && supportedGrantTypes.includes(key))
-                                                    && !isGrantTypeDisabled(key)}
+                                                    && supportedGrantTypes.includes(key))}
                                             onChange={e => handleChange('grantType', e)}
                                             value={value}
-                                            disabled={isGrantTypeDisabled(key)}
+                                            disabled={!isUserOwner}
                                             color='primary'
                                         />
                                     )}
@@ -234,7 +226,9 @@ const KeyConfiguration = (props) => {
                         }
                         margin='normal'
                         variant='outlined'
-                        disabled={!isUserOwner}
+                        disabled={!isUserOwner
+                            || (supportedGrantTypes && !supportedGrantTypes.includes('authorization_code')
+                                && !supportedGrantTypes.includes('implicit'))}
                         error={isCalbackUrlError}
                         placeholder={intl.formatMessage({
                             defaultMessage: 'http://url-to-webapp',
