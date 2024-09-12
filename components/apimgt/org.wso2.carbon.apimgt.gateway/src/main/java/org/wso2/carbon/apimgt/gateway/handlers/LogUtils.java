@@ -133,11 +133,16 @@ class LogUtils {
             API searchedAPI = (API) selectedAPIS.get(selectedPath);
             if (searchedAPI != null) {
                 String apiCtx = searchedAPI.getContext();
+                if(searchedAPI.isDefaultVersion() && !path.contains(apiCtx)){
+                    String contextWithoutVersion = apiCtx.split(searchedAPI.getApiVersion())[0];
+                    String resource = path.substring(contextWithoutVersion.length());
+                    path = apiCtx + "/" + resource;
+                }
                 for (Map.Entry<String, String> entry : logProperties.entrySet()) {
                     String key = entry.getKey().substring(1);
                     if (apiCtx.startsWith("/" + key) || apiCtx.equals(key)) {
                         ctx.setProperty(LogsHandler.LOG_LEVEL, entry.getValue());
-                        ctx.setProperty("API_TO", apiCtx);
+                        ctx.setProperty("API_TO", path);
                         return entry.getValue();
                     }
                 }
