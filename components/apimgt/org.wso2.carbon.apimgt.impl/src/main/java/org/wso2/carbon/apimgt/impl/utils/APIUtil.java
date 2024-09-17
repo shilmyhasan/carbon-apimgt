@@ -11767,6 +11767,27 @@ public final class APIUtil {
     }
 
     /**
+     * Get UUID by the API identifier and tenant domain
+     *
+     * @param apiName       Name of the API
+     * @param apiVersion    Version of the API
+     * @param tenantDomain  Tenant domain of the API
+     * @return UUID of the API
+     * @throws APIManagementException Exception while retrieving UUID
+     */
+    public static String getUUIDFromIdentifierAndTenantDomain(String apiName, String apiVersion, String tenantDomain)
+            throws APIManagementException {
+        List<APIIdentifier> apiIdentifierList = ApiMgtDAO.getInstance().getAPIsFromNameAndVersion(apiName, apiVersion);
+        for (APIIdentifier apiIdentifier : apiIdentifierList) {
+            String apiProviderTenantDomain = MultitenantUtils.getTenantDomain(apiIdentifier.getProviderName());
+            if (tenantDomain.equals(apiProviderTenantDomain)) {
+                return apiIdentifier.getUUID();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get UUID by the API Identifier.
      *
      * @param identifier

@@ -8082,6 +8082,36 @@ public class ApiMgtDAO {
     }
 
     /**
+     * Get API identifier list from API name and version
+     *
+     * @param name Name of the API
+     * @param version Version of the API
+     * @return List of API identifiers with the name and version
+     * @throws APIManagementException Error occurred while retrieving the API list
+     */
+    public List<APIIdentifier> getAPIsFromNameAndVersion(String name, String version) throws APIManagementException {
+
+        List<APIIdentifier> apiIdentifierList = new ArrayList<>();
+        String sql = SQLConstants.RETRIEVE_API_INFO_BY_IDENTIFIER_SQL;
+        try (Connection connection = APIMgtDBUtil.getConnection()) {
+            PreparedStatement prepStmt = connection.prepareStatement(sql);
+            prepStmt.setString(1, name);
+            prepStmt.setString(2, version);
+            try (ResultSet resultSet = prepStmt.executeQuery()) {
+                while (resultSet.next()) {
+                    String uuid = resultSet.getString("API_UUID");
+                    String provider = resultSet.getString("API_PROVIDER");
+                    APIIdentifier apiIdentifier = new APIIdentifier(provider, name, version, uuid);
+                    apiIdentifierList.add(apiIdentifier);
+                }
+            }
+        } catch (SQLException e) {
+            handleException("Failed to get APIs with API name: " + name + ", and version: " + version, e);
+        }
+        return apiIdentifierList;
+    }
+
+    /**
      * Get API UUID by passed parameters.
      *
      * @param provider Provider of the API

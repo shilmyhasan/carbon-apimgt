@@ -116,6 +116,8 @@ import org.wso2.carbon.apimgt.impl.definitions.GraphQLSchemaDefinition;
 import org.wso2.carbon.apimgt.impl.definitions.OAS2Parser;
 import org.wso2.carbon.apimgt.impl.definitions.OAS3Parser;
 import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
+import org.wso2.carbon.apimgt.impl.dto.RuntimeArtifactDto;
+import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.RuntimeArtifactGeneratorUtil;
 import org.wso2.carbon.apimgt.impl.importexport.APIImportExportException;
 import org.wso2.carbon.apimgt.impl.importexport.ExportFormat;
 import org.wso2.carbon.apimgt.impl.importexport.ImportExportAPI;
@@ -208,6 +210,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -218,6 +221,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import static org.wso2.carbon.apimgt.api.ExceptionCodes.API_VERSION_ALREADY_EXISTS;
 
@@ -3797,28 +3801,61 @@ public class ApisApiServiceImpl implements ApisApiService {
      * @param preserveStatus Preserve API status on export
      * @return
      */
-    @Override public Response exportAPI(String apiId, String name, String version, String revisionNum,
-                                        String providerName, String format, Boolean preserveStatus,
-                                        Boolean exportLatestRevision, MessageContext messageContext) {
+    @Override
+    public Response exportAPI(String apiId, String name, String version, String revisionNum, String providerName,
+                              String format, Boolean preserveStatus, Boolean exportLatestRevision,
+                              String gatewayEnvironment, MessageContext messageContext) throws APIManagementException {
 
-        //If not specified status is preserved by default
-        preserveStatus = preserveStatus == null || preserveStatus;
+        if (StringUtils.isEmpty(gatewayEnvironment)) {
+            //If not specified status is preserved by default
+            preserveStatus = preserveStatus == null || preserveStatus;
 
-        // Default export format is YAML
-        ExportFormat exportFormat = StringUtils.isNotEmpty(format) ?
-                ExportFormat.valueOf(format.toUpperCase()) :
-                ExportFormat.YAML;
-        try {
-            ImportExportAPI importExportAPI = APIImportExportUtil.getImportExportAPI();
-            File file = importExportAPI
-                    .exportAPI(apiId, name, version, revisionNum, providerName, preserveStatus, exportFormat,
-                            Boolean.TRUE, Boolean.FALSE, exportLatestRevision, StringUtils.EMPTY);
-            return Response.ok(file).header(RestApiConstants.HEADER_CONTENT_DISPOSITION,
-                    "attachment; filename=\"" + file.getName() + "\"").build();
-        } catch (APIManagementException | APIImportExportException e) {
-            RestApiUtil.handleInternalServerError("Error while exporting " + RestApiConstants.RESOURCE_API, e, log);
+            // Default export format is YAML
+            ExportFormat exportFormat = StringUtils.isNotEmpty(format) ?
+                    ExportFormat.valueOf(format.toUpperCase()) :
+                    ExportFormat.YAML;
+            try {
+                ImportExportAPI importExportAPI = APIImportExportUtil.getImportExportAPI();
+                File file = importExportAPI
+                        .exportAPI(apiId, name, version, revisionNum, providerName, preserveStatus, exportFormat,
+                                Boolean.TRUE, Boolean.FALSE, exportLatestRevision, StringUtils.EMPTY);
+                return Response.ok(file).header(RestApiConstants.HEADER_CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + file.getName() + "\"").build();
+            } catch (APIManagementException | APIImportExportException e) {
+                RestApiUtil.handleInternalServerError("Error while exporting " + RestApiConstants.RESOURCE_API, e, log);
+            }
+            return null;
+        } else {
+            String tenantDomain = RestApiCommonUtil.getLoggedInUserTenantDomain();;
+            if (StringUtils.isEmpty(apiId) && (StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(version))) {
+                apiId = APIUtil.getUUIDFromIdentifierAndTenantDomain(name, version, tenantDomain);
+                if (StringUtils.isEmpty(apiId)) {
+                    throw new APIManagementException("API not found for the given name: " + name + ", and version : "
+                            + version, ExceptionCodes.from(ExceptionCodes.API_NOT_FOUND, name + "-" + version));
+                }
+            }
+            RuntimeArtifactDto runtimeArtifactDto = null;
+            if (StringUtils.isNotEmpty(tenantDomain)) {
+                runtimeArtifactDto = RuntimeArtifactGeneratorUtil.generateRuntimeArtifact(apiId, name, version,
+                        gatewayEnvironment, APIConstants.API_GATEWAY_TYPE_ENVOY, tenantDomain);
+            }
+            if (runtimeArtifactDto != null) {
+                if (runtimeArtifactDto.isFile()) {
+                    File artifact = (File) runtimeArtifactDto.getArtifact();
+                    StreamingOutput streamingOutput = (outputStream) -> {
+                        try {
+                            Files.copy(artifact.toPath(), outputStream);
+                        } finally {
+                            Files.delete(artifact.toPath());
+                        }
+                    };
+                    return Response.ok(streamingOutput).header(RestApiConstants.HEADER_CONTENT_DISPOSITION,
+                            "attachment; filename=apis.zip").header(RestApiConstants.HEADER_CONTENT_TYPE,
+                            APIConstants.APPLICATION_ZIP).build();
+                }
+            }
+            throw new APIManagementException("No API Artifacts", ExceptionCodes.NO_API_ARTIFACT_FOUND);
         }
-        return null;
     }
 
     @Override
