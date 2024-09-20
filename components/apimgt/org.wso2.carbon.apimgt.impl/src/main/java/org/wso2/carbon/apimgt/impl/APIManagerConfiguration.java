@@ -1938,7 +1938,20 @@ public class APIManagerConfiguration {
             while (labelsIterator.hasNext()) {
                 OMElement labelElement = (OMElement) labelsIterator.next();
                 if (labelElement != null) {
-                    gatewayArtifactSynchronizerProperties.getGatewayLabels().add(labelElement.getText());
+                    gatewayArtifactSynchronizerProperties.getFileBasedApiContexts().add(labelElement.getText());
+                }
+            }
+        }
+
+        OMElement gatewayFileBasedContextsElement = omElement
+                .getFirstChildWithName(new QName(APIConstants.GatewayArtifactSynchronizer.FILE_BASED_API_CONTEXTS));
+        if (gatewayFileBasedContextsElement != null) {
+            Iterator contextsIterator = gatewayFileBasedContextsElement
+                    .getChildrenWithLocalName(APIConstants.GatewayArtifactSynchronizer.FILE_BASED_API_CONTEXT);
+            while (contextsIterator.hasNext()) {
+                OMElement contextElement = (OMElement) contextsIterator.next();
+                if (contextElement != null) {
+                    gatewayArtifactSynchronizerProperties.getGatewayLabels().add(contextElement.getText());
                 }
             }
         }

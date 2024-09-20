@@ -1396,6 +1396,13 @@
          {% endif %}
         </LocalEntries>
         </SkipList>
+        <FileBasedApiContexts>
+            {% if apim.sync_runtime_artifacts.gateway.file_based_api_contexts is defined %}
+                {%- for context in apim.sync_runtime_artifacts.gateway.file_based_api_contexts -%}
+                    <FileBasedApiContext>{{context}}</FileBasedApiContext>
+                {% endfor %}
+            {% endif %}
+        </FileBasedApiContexts>
     </SyncRuntimeArtifactsGateway>
     {% endif %}
 

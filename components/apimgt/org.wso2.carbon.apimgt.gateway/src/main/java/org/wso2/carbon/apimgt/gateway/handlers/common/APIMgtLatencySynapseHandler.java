@@ -20,10 +20,12 @@ package org.wso2.carbon.apimgt.gateway.handlers.common;
 
 import org.apache.synapse.AbstractSynapseHandler;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.api.ApiUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
+import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.tracing.TracingSpan;
 import org.wso2.carbon.apimgt.tracing.TracingTracer;
 import org.wso2.carbon.apimgt.tracing.Util;
@@ -39,6 +41,12 @@ public class APIMgtLatencySynapseHandler extends AbstractSynapseHandler {
         TracingTracer tracer = ServiceReferenceHolder.getInstance().getTracer();
 
         if (Util.tracingEnabled()) {
+            String path = ApiUtils.getFullRequestPath(messageContext);
+            String tenantDomain = GatewayUtils.getTenantDomain();
+            if (GatewayUtils.checkForFileBasedApiContexts(path, tenantDomain)) {
+                return true;
+            }
+
             org.apache.axis2.context.MessageContext axis2MessageContext =
                     ((Axis2MessageContext) messageContext).getAxis2MessageContext();
             Map headersMap =
