@@ -1938,7 +1938,7 @@ public class APIManagerConfiguration {
             while (labelsIterator.hasNext()) {
                 OMElement labelElement = (OMElement) labelsIterator.next();
                 if (labelElement != null) {
-                    gatewayArtifactSynchronizerProperties.getFileBasedApiContexts().add(labelElement.getText());
+                    gatewayArtifactSynchronizerProperties.getGatewayLabels().add(labelElement.getText());
                 }
             }
         }
@@ -1951,7 +1951,7 @@ public class APIManagerConfiguration {
             while (contextsIterator.hasNext()) {
                 OMElement contextElement = (OMElement) contextsIterator.next();
                 if (contextElement != null) {
-                    gatewayArtifactSynchronizerProperties.getGatewayLabels().add(contextElement.getText());
+                    gatewayArtifactSynchronizerProperties.getFileBasedApiContexts().add(contextElement.getText());
                 }
             }
         }

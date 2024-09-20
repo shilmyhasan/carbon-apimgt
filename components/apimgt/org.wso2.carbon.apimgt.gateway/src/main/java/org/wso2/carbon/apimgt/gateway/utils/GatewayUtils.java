@@ -497,7 +497,7 @@ public class GatewayUtils {
 
     public static String getQualifiedApiName(String apiName, String version) {
 
-        return apiName + ":v" + version;
+        return apiName + ( version != null? ":v" + version: "");
     }
 
     public static String getQualifiedDefaultApiName(String apiName) {
@@ -1454,22 +1454,13 @@ public class GatewayUtils {
     /**
      * This method returns True if the given path contains a file based API context
      *
-     * @param path  Invoked path
+     * @param path  Full Request Path
      * @param tenantDomain  Tenant domain
      * @return True if the given path contains a file based API context
      */
     public static boolean checkForFileBasedApiContexts(String path, String tenantDomain){
-        if (APIConstants.SUPER_TENANT_DOMAIN.equalsIgnoreCase(tenantDomain)) {
-            return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration()
-                    .getGatewayArtifactSynchronizerProperties().getFileBasedApiContexts().contains(path);
-        } else {
-            for (String fileBasedApiContext : ServiceReferenceHolder.getInstance().getAPIManagerConfiguration()
-                    .getGatewayArtifactSynchronizerProperties().getFileBasedApiContexts()) {
-                if (path.equals(APIConstants.TENANT_PREFIX + tenantDomain + fileBasedApiContext)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        path = path.replace(APIConstants.TENANT_PREFIX + tenantDomain, "");
+        return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration()
+                .getGatewayArtifactSynchronizerProperties().getFileBasedApiContexts().contains(path);
     }
 }

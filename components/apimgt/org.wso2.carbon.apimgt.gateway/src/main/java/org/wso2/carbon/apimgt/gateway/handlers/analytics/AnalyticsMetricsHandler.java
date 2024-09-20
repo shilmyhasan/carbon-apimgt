@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.AbstractExtendedSynapseHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.api.ApiUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.apimgt.common.analytics.collectors.AnalyticsDataProvider;
 import org.wso2.carbon.apimgt.common.analytics.collectors.impl.GenericRequestDataCollector;
@@ -78,7 +79,12 @@ public class AnalyticsMetricsHandler extends AbstractExtendedSynapseHandler {
 
     @Override
     public boolean handleResponseOutFlow(MessageContext messageContext) {
-        Object skipPublishMetrics = messageContext.getProperty(Constants.SKIP_DEFAULT_METRICS_PUBLISHING);
+        if (GatewayUtils.checkForFileBasedApiContexts(ApiUtils.getFullRequestPath(messageContext),
+                GatewayUtils.getTenantDomain())) {
+            return true;
+        }
+
+        Object skipPublishMetrics = messageContext.getProperty(Constants.SKIP_METRICS_PUBLISHING);
         if (skipPublishMetrics != null && (Boolean) skipPublishMetrics) {
             return true;
         }
@@ -92,8 +98,8 @@ public class AnalyticsMetricsHandler extends AbstractExtendedSynapseHandler {
             return true;
         }
         AnalyticsDataProvider provider;
-        Object isAsync = messageContext.getProperty(Constants.IS_ASYNC_API);
-        if (isAsync != null && (Boolean) isAsync) {
+        Object isAsyncAPI = messageContext.getProperty(Constants.IS_ASYNC_API);
+        if (isAsyncAPI != null && (Boolean) isAsyncAPI) {
             provider = new AsyncAnalyticsDataProvider(messageContext);
         } else {
             provider = new SynapseAnalyticsDataProvider(messageContext,  ServiceReferenceHolder.getInstance()

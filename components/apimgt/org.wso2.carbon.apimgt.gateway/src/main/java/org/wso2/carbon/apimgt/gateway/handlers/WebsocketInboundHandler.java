@@ -51,6 +51,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
 import org.json.JSONObject;
 import org.wso2.carbon.apimgt.api.APIManagementException;
+import org.wso2.carbon.apimgt.common.gateway.constants.HealthCheckConstants;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APIKeyValidator;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
@@ -144,6 +145,29 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
             setUris(req);
             inboundName = getInboundName(ctx);
             setTenantDomain(requestPath);
+
+            if (req.headers() != null && !req.headers().contains(HttpHeaders.UPGRADE)
+                    && HealthCheckConstants.HEALTH_CHECK_API_CONTEXT.equals(req.uri())) {
+                boolean isAllApisDeployed = GatewayUtils.isAllApisDeployed();
+                if (isAllApisDeployed) {
+                    FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                            HttpResponseStatus.OK);
+                    httpResponse.headers().set(APIConstants.HEADER_CONTENT_TYPE, "text/plain; charset=UTF-8");
+                    httpResponse.headers().set(APIConstants.HEADER_CONTENT_LENGTH,
+                            httpResponse.content().readableBytes());
+                    ctx.writeAndFlush(httpResponse);
+                    return;
+                } else {
+                    FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                            HttpResponseStatus.INTERNAL_SERVER_ERROR);
+                    httpResponse.headers().set(APIConstants.HEADER_CONTENT_TYPE, "text/plain; charset=UTF-8");
+                    httpResponse.headers().set(APIConstants.HEADER_CONTENT_LENGTH,
+                            httpResponse.content().readableBytes());
+                    ctx.writeAndFlush(httpResponse);
+                    return;
+                }
+            }
+
             String matchingResource = getMatchingResource(ctx, req);
 
             String useragent = req.headers().get(HttpHeaders.USER_AGENT);

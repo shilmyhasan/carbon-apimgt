@@ -30,7 +30,6 @@ import org.apache.synapse.api.ApiUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
-import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
@@ -85,10 +84,8 @@ public class LogsHandler extends AbstractSynapseHandler {
 
     public boolean handleRequestInFlow(MessageContext messageContext) {
         if (isEnabled()) {
-            String path = ApiUtils.getFullRequestPath(messageContext);
-            String tenantDomain = GatewayUtils.getTenantDomain();
-
-            if (GatewayUtils.checkForFileBasedApiContexts(path, tenantDomain)) {
+            if (GatewayUtils.checkForFileBasedApiContexts(ApiUtils.getFullRequestPath(messageContext)
+                    , GatewayUtils.getTenantDomain())) {
                 return true;
             }
 

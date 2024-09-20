@@ -41,9 +41,8 @@ public class APIMgtLatencySynapseHandler extends AbstractSynapseHandler {
         TracingTracer tracer = ServiceReferenceHolder.getInstance().getTracer();
 
         if (Util.tracingEnabled()) {
-            String path = ApiUtils.getFullRequestPath(messageContext);
-            String tenantDomain = GatewayUtils.getTenantDomain();
-            if (GatewayUtils.checkForFileBasedApiContexts(path, tenantDomain)) {
+            if (GatewayUtils.checkForFileBasedApiContexts(ApiUtils.getFullRequestPath(messageContext),
+                    GatewayUtils.getTenantDomain())) {
                 return true;
             }
 

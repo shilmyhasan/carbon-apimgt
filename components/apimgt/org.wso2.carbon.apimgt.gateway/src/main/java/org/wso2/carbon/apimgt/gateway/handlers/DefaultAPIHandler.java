@@ -25,8 +25,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.api.ApiUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.RESTConstants;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.common.gateway.constants.HealthCheckConstants;
 import org.wso2.carbon.apimgt.gateway.InMemoryAPIDeployer;
 import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
@@ -48,27 +46,6 @@ public class DefaultAPIHandler extends AbstractSynapseHandler {
         }
         String path = ApiUtils.getFullRequestPath(messageContext);
         String tenantDomain = GatewayUtils.getTenantDomain();
-
-        // Handle Health Check API calls
-        boolean isHttpsHealthCheckEndpoint = false;
-        if (APIConstants.SUPER_TENANT_DOMAIN.equalsIgnoreCase(tenantDomain)) {
-            if (path.equals(HealthCheckConstants.HTTPS_HEALTH_CHECK_API_CONTEXT)) {
-                isHttpsHealthCheckEndpoint = true;
-            }
-        } else {
-            if (path.equals(APIConstants.TENANT_PREFIX + tenantDomain + HealthCheckConstants.HTTPS_HEALTH_CHECK_API_CONTEXT)) {
-                isHttpsHealthCheckEndpoint = true;
-            }
-        }
-
-        if (isHttpsHealthCheckEndpoint) {
-            try {
-                InMemoryAPIDeployer.deployHttpsHealthCheckSynapseAPI(tenantDomain);
-            } catch(APIManagementException e){
-                log.error("Error while deploying Https Health Check API for tenant domain :" + tenantDomain, e);
-            }
-            return true;
-        }
 
         if (GatewayUtils.checkForFileBasedApiContexts(path, tenantDomain)) {
             return true;
