@@ -34,7 +34,6 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
-import org.wso2.carbon.apimgt.gateway.handlers.Utils;
 import org.wso2.carbon.apimgt.gateway.exception.DataNotFoundException;
 import org.wso2.carbon.apimgt.gateway.handlers.analytics.Constants;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
@@ -71,7 +70,7 @@ public class SubscribersPersistMediator extends AbstractMediator {
             String mode = queryParams.get(APIConstants.Webhooks.HUB_MODE_QUERY_PARAM);
             String secret = queryParams.get(APIConstants.Webhooks.HUB_SECRET_QUERY_PARAM);
             String leaseSeconds = queryParams.get(APIConstants.Webhooks.HUB_LEASE_SECONDS_QUERY_PARAM);
-            messageContext.setProperty(Constants.SKIP_DEFAULT_METRICS_PUBLISHING, true);
+            messageContext.setProperty(Constants.IS_ASYNC_API, true);
             org.apache.axis2.context.MessageContext axisCtx =
                     ((Axis2MessageContext) messageContext).getAxis2MessageContext();
             axisCtx.setProperty(PassThroughConstants.SYNAPSE_ARTIFACT_TYPE, APIConstants.API_TYPE_WEBSUB);
