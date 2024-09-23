@@ -27,6 +27,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
@@ -37,6 +38,7 @@ import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -377,6 +379,7 @@ public class WebsocketUtil extends GraphQLProcessor {
 				Unpooled.copiedBuffer(errorMessage, CharsetUtil.UTF_8));
 		httpResponse.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
 		httpResponse.headers().set(HttpHeaderNames.CONTENT_LENGTH, httpResponse.content().readableBytes());
+		ctx.channel().attr(AttributeKey.valueOf(SynapseConstants.ERROR_CODE)).set(errorCode);
 		ctx.writeAndFlush(httpResponse);
 		if (log.isDebugEnabled()) {
 			log.debug(ctx.channel().id().asLongText() + " -- API request failed due to " + errorMessage
