@@ -10355,4 +10355,16 @@ public final class APIUtil {
         }
         return applications.subList(offset, endIndex);
     }
+
+    public static boolean isPassRequestParamsToLambdaEnabled() {
+
+        APIManagerConfiguration apiManagerConfiguration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String passRequestParamsToLambdaEnabled =
+                apiManagerConfiguration.getFirstProperty(APIConstants.PASS_REQUEST_PARAMS_TO_LAMBDA_FUNCTION);
+        if (StringUtils.isNotEmpty(passRequestParamsToLambdaEnabled)) {
+            return Boolean.parseBoolean(passRequestParamsToLambdaEnabled);
+        }
+        return false;
+    }
 }

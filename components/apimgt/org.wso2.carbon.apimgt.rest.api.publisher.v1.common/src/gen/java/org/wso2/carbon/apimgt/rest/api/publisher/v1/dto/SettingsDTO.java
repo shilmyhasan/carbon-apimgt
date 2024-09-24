@@ -38,6 +38,7 @@ public class SettingsDTO   {
     private String defaultSubscriptionPolicy = null;
     private String authorizationHeader = null;
     private Boolean isAPIPoliciesEnabled = null;
+    private Boolean passRequestParamsToLambdaEnabled = false;
 
   /**
    * The Developer Portal URL
@@ -272,6 +273,24 @@ public class SettingsDTO   {
     this.isAPIPoliciesEnabled = isAPIPoliciesEnabled;
   }
 
+  /**
+   * Defines whether or not the request params should be sent to lambda function 
+   **/
+  public SettingsDTO passRequestParamsToLambdaEnabled(Boolean passRequestParamsToLambdaEnabled) {
+    this.passRequestParamsToLambdaEnabled = passRequestParamsToLambdaEnabled;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "false", value = "Defines whether or not the request params should be sent to lambda function ")
+  @JsonProperty("passRequestParamsToLambdaEnabled")
+  public Boolean isPassRequestParamsToLambdaEnabled() {
+    return passRequestParamsToLambdaEnabled;
+  }
+  public void setPassRequestParamsToLambdaEnabled(Boolean passRequestParamsToLambdaEnabled) {
+    this.passRequestParamsToLambdaEnabled = passRequestParamsToLambdaEnabled;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -294,12 +313,13 @@ public class SettingsDTO   {
         Objects.equals(defaultAdvancePolicy, settings.defaultAdvancePolicy) &&
         Objects.equals(defaultSubscriptionPolicy, settings.defaultSubscriptionPolicy) &&
         Objects.equals(authorizationHeader, settings.authorizationHeader) &&
-        Objects.equals(isAPIPoliciesEnabled, settings.isAPIPoliciesEnabled);
+        Objects.equals(isAPIPoliciesEnabled, settings.isAPIPoliciesEnabled) &&
+        Objects.equals(passRequestParamsToLambdaEnabled, settings.passRequestParamsToLambdaEnabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(devportalUrl, environment, scopes, monetizationAttributes, subscriberContactAttributes, securityAuditProperties, externalStoresEnabled, docVisibilityEnabled, crossTenantSubscriptionEnabled, defaultAdvancePolicy, defaultSubscriptionPolicy, authorizationHeader, isAPIPoliciesEnabled);
+    return Objects.hash(devportalUrl, environment, scopes, monetizationAttributes, subscriberContactAttributes, securityAuditProperties, externalStoresEnabled, docVisibilityEnabled, crossTenantSubscriptionEnabled, defaultAdvancePolicy, defaultSubscriptionPolicy, authorizationHeader, isAPIPoliciesEnabled, passRequestParamsToLambdaEnabled);
   }
 
   @Override
@@ -320,6 +340,7 @@ public class SettingsDTO   {
     sb.append("    defaultSubscriptionPolicy: ").append(toIndentedString(defaultSubscriptionPolicy)).append("\n");
     sb.append("    authorizationHeader: ").append(toIndentedString(authorizationHeader)).append("\n");
     sb.append("    isAPIPoliciesEnabled: ").append(toIndentedString(isAPIPoliciesEnabled)).append("\n");
+    sb.append("    passRequestParamsToLambdaEnabled: ").append(toIndentedString(passRequestParamsToLambdaEnabled)).append("\n");
     sb.append("}");
     return sb.toString();
   }

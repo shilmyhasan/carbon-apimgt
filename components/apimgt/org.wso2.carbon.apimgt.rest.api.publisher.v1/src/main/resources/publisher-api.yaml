@@ -10778,6 +10778,8 @@ components:
           example: ""
         amznResourceTimeout:
           type: integer
+        amznResourceContentEncode:
+          type: boolean
         payloadSchema:
           type: string
           example: ""
@@ -11523,6 +11525,12 @@ components:
           type: boolean
           description: Is API level policy support feature enabled
           example: false
+        passRequestParamsToLambdaEnabled:
+          type: boolean
+          description: |
+            Defines whether or not the request params should be sent to lambda function
+          example: false
+          default: false
     SecurityAuditAttribute:
       title: SecurityAuditAttributeDTO
       type: object

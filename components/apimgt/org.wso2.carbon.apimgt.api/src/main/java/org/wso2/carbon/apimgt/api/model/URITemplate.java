@@ -48,6 +48,7 @@ public class URITemplate implements Serializable{
     private Set<APIProductIdentifier> usedByProducts = new HashSet<>();
     private String amznResourceName;
     private int amznResourceTimeout;
+    private boolean amznResourceContentEncoded;
     private List<OperationPolicy> operationPolicies = new ArrayList<>();
 
     public ConditionGroupDTO[] getConditionGroups() {
@@ -250,7 +251,7 @@ public class URITemplate implements Serializable{
         }
         return stringBuilder.toString().trim();
     }
-    
+
     public boolean checkContentAwareFromThrottlingTiers() {
         // use the content aware property appended  to throttling tiers
         if (!throttlingTiers.isEmpty()) {
@@ -435,6 +436,14 @@ public class URITemplate implements Serializable{
 
     public int getAmznResourceTimeout() {
         return amznResourceTimeout;
+    }
+
+    public void setAmznResourceContentEncoded(boolean amznResourceContentEncoded) {
+        this.amznResourceContentEncoded = amznResourceContentEncoded;
+    }
+
+    public boolean getAmznResourceContentEncoded() {
+        return amznResourceContentEncoded;
     }
 
     public void setOperationPolicies(List<OperationPolicy> operationPolicies) {
