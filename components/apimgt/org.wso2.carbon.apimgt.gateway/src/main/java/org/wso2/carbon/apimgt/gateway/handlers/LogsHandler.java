@@ -26,9 +26,11 @@ import org.apache.http.HttpHeaders;
 import org.apache.log4j.MDC;
 import org.apache.synapse.AbstractSynapseHandler;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.api.ApiUtils;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.apimgt.gateway.APIMgtGatewayConstants;
+import org.wso2.carbon.apimgt.gateway.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
 import java.io.IOException;
@@ -82,6 +84,11 @@ public class LogsHandler extends AbstractSynapseHandler {
 
     public boolean handleRequestInFlow(MessageContext messageContext) {
         if (isEnabled()) {
+            if (GatewayUtils.checkForFileBasedApiContexts(ApiUtils.getFullRequestPath(messageContext)
+                    , GatewayUtils.getTenantDomain())) {
+                return true;
+            }
+
             try {
                 apiTo = LogUtils.getTo(messageContext);
             } catch (Exception e) {

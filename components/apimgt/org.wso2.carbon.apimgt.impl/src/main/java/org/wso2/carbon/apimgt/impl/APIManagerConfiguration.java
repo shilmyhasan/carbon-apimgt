@@ -1943,6 +1943,19 @@ public class APIManagerConfiguration {
             }
         }
 
+        OMElement gatewayFileBasedContextsElement = omElement
+                .getFirstChildWithName(new QName(APIConstants.GatewayArtifactSynchronizer.FILE_BASED_API_CONTEXTS));
+        if (gatewayFileBasedContextsElement != null) {
+            Iterator contextsIterator = gatewayFileBasedContextsElement
+                    .getChildrenWithLocalName(APIConstants.GatewayArtifactSynchronizer.FILE_BASED_API_CONTEXT);
+            while (contextsIterator.hasNext()) {
+                OMElement contextElement = (OMElement) contextsIterator.next();
+                if (contextElement != null) {
+                    gatewayArtifactSynchronizerProperties.getFileBasedApiContexts().add(contextElement.getText());
+                }
+            }
+        }
+
         OMElement eventWaitingTimeElement = omElement
                 .getFirstChildWithName(new QName(APIConstants.EVENT_WAITING_TIME_CONFIG));
         if (eventWaitingTimeElement != null) {
