@@ -537,6 +537,15 @@ function EndpointOverview(props) {
     };
 
     const saveEndpointSecurityConfig = (endpointSecurityObj, enType) => {
+        const secretPlaceholder = '******';
+        endpointSecurityInfo.production.clientSecret = endpointSecurityInfo.production.clientSecret
+            === secretPlaceholder ? '' : endpointSecurityInfo.production.clientSecret;
+        endpointSecurityInfo.production.password = endpointSecurityInfo.production.password
+            === secretPlaceholder ? '' : endpointSecurityInfo.production.password;
+        endpointSecurityInfo.sandbox.clientSecret = endpointSecurityInfo.sandbox.clientSecret
+            === secretPlaceholder ? '' : endpointSecurityInfo.sandbox.clientSecret;
+        endpointSecurityInfo.sandbox.password = endpointSecurityInfo.sandbox.password
+            === secretPlaceholder ? '' : endpointSecurityInfo.sandbox.password;
         endpointsDispatcher({
             action: 'endpointSecurity',
             value: {
