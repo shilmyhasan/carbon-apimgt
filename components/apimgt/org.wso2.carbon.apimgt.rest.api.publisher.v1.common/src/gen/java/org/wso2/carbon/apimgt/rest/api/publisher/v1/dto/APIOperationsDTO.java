@@ -32,6 +32,7 @@ public class APIOperationsDTO   {
     private List<String> usedProductIds = new ArrayList<String>();
     private String amznResourceName = null;
     private Integer amznResourceTimeout = null;
+    private Boolean amznResourceContentEncode = null;
     private String payloadSchema = null;
     private String uriMapping = null;
     private APIOperationPoliciesDTO operationPolicies = null;
@@ -60,7 +61,7 @@ public class APIOperationsDTO   {
     return this;
   }
 
-
+  
   @ApiModelProperty(example = "/order/{orderId}", value = "")
   @JsonProperty("target")
   public String getTarget() {
@@ -77,7 +78,7 @@ public class APIOperationsDTO   {
     return this;
   }
 
-
+  
   @ApiModelProperty(example = "POST", value = "")
   @JsonProperty("verb")
   public String getVerb() {
@@ -191,6 +192,23 @@ public class APIOperationsDTO   {
 
   /**
    **/
+  public APIOperationsDTO amznResourceContentEncode(Boolean amznResourceContentEncode) {
+    this.amznResourceContentEncode = amznResourceContentEncode;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("amznResourceContentEncode")
+  public Boolean isAmznResourceContentEncode() {
+    return amznResourceContentEncode;
+  }
+  public void setAmznResourceContentEncode(Boolean amznResourceContentEncode) {
+    this.amznResourceContentEncode = amznResourceContentEncode;
+  }
+
+  /**
+   **/
   public APIOperationsDTO payloadSchema(String payloadSchema) {
     this.payloadSchema = payloadSchema;
     return this;
@@ -260,6 +278,7 @@ public class APIOperationsDTO   {
         Objects.equals(usedProductIds, apIOperations.usedProductIds) &&
         Objects.equals(amznResourceName, apIOperations.amznResourceName) &&
         Objects.equals(amznResourceTimeout, apIOperations.amznResourceTimeout) &&
+        Objects.equals(amznResourceContentEncode, apIOperations.amznResourceContentEncode) &&
         Objects.equals(payloadSchema, apIOperations.payloadSchema) &&
         Objects.equals(uriMapping, apIOperations.uriMapping) &&
         Objects.equals(operationPolicies, apIOperations.operationPolicies);
@@ -267,7 +286,7 @@ public class APIOperationsDTO   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, target, verb, authType, throttlingPolicy, scopes, usedProductIds, amznResourceName, amznResourceTimeout, payloadSchema, uriMapping, operationPolicies);
+    return Objects.hash(id, target, verb, authType, throttlingPolicy, scopes, usedProductIds, amznResourceName, amznResourceTimeout, amznResourceContentEncode, payloadSchema, uriMapping, operationPolicies);
   }
 
   @Override
@@ -284,6 +303,7 @@ public class APIOperationsDTO   {
     sb.append("    usedProductIds: ").append(toIndentedString(usedProductIds)).append("\n");
     sb.append("    amznResourceName: ").append(toIndentedString(amznResourceName)).append("\n");
     sb.append("    amznResourceTimeout: ").append(toIndentedString(amznResourceTimeout)).append("\n");
+    sb.append("    amznResourceContentEncode: ").append(toIndentedString(amznResourceContentEncode)).append("\n");
     sb.append("    payloadSchema: ").append(toIndentedString(payloadSchema)).append("\n");
     sb.append("    uriMapping: ").append(toIndentedString(uriMapping)).append("\n");
     sb.append("    operationPolicies: ").append(toIndentedString(operationPolicies)).append("\n");

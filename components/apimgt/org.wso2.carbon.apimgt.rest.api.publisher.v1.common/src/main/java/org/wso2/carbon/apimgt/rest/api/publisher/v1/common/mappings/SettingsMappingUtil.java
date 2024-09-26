@@ -96,6 +96,7 @@ public class SettingsMappingUtil {
             }
             settingsDTO.setAuthorizationHeader(authorizationHeader);
             settingsDTO.setIsAPIPoliciesEnabled(APIUtil.isAPILevelPolicySupportEnabled());
+            settingsDTO.setPassRequestParamsToLambdaEnabled(APIUtil.isPassRequestParamsToLambdaEnabled());
         }
         return settingsDTO;
     }
