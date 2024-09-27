@@ -444,7 +444,7 @@ public class InMemoryAPIDeployer {
                     + "            <send>\n"
                     + "                <endpoint name=\"" + HealthCheckConstants.HEALTH_CHECK_API_NAME + "\">\n"
                     + "                     <address uri=\"https://localhost:"
-                    + System.getProperty(APIConstants.KEYMANAGER_PORT)
+                    + System.getProperty(APIConstants.HTTPS_TRANSPORT_PORT)
                     + "/api/am/gateway/v2/server-startup-healthcheck\" format=\"GET\">\n"
                     + "                           <timeout>\n"
                     + "                                <duration>30000</duration>\n"

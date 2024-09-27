@@ -497,7 +497,7 @@ public class GatewayUtils {
 
     public static String getQualifiedApiName(String apiName, String version) {
 
-        return apiName + ( version != null? ":v" + version: "");
+        return apiName + ":v" + version;
     }
 
     public static String getQualifiedDefaultApiName(String apiName) {
@@ -1460,6 +1460,7 @@ public class GatewayUtils {
      */
     public static boolean checkForFileBasedApiContexts(String path, String tenantDomain){
         path = path.replace(APIConstants.TENANT_PREFIX + tenantDomain, "");
+        path = path.split("\\?")[0];
         return ServiceReferenceHolder.getInstance().getAPIManagerConfiguration()
                 .getGatewayArtifactSynchronizerProperties().getFileBasedApiContexts().contains(path);
     }

@@ -132,6 +132,8 @@ public class APIHandlerServiceComponent {
         CacheProvider.createGatewayInternalKeyCache();
         CacheProvider.createGatewayInternalKeyDataCache();
         CacheProvider.createInvalidInternalKeyCache();
+
+        setTransportHttpsPort();
     }
 
     @Deactivate
@@ -468,6 +470,13 @@ public class APIHandlerServiceComponent {
                 }
                 ServiceReferenceHolder.getInstance().setRedisCacheUtil(redisCacheUtils);
         }
+    }
+
+    private void setTransportHttpsPort() {
+        ConfigurationContextService configurationContextService =
+                ServiceReferenceHolder.getInstance().getConfigurationContextService();
+        System.setProperty(APIConstants.HTTPS_TRANSPORT_PORT,
+                Integer.toString(CarbonUtils.getTransportPort(configurationContextService, APIConstants.HTTPS_PROTOCOL)));
     }
 }
 
