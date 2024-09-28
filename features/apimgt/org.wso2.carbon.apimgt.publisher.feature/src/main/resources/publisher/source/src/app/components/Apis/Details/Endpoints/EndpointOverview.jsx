@@ -538,14 +538,22 @@ function EndpointOverview(props) {
 
     const saveEndpointSecurityConfig = (endpointSecurityObj, enType) => {
         const secretPlaceholder = '******';
-        endpointSecurityInfo.production.clientSecret = endpointSecurityInfo.production.clientSecret
-            === secretPlaceholder ? '' : endpointSecurityInfo.production.clientSecret;
-        endpointSecurityInfo.production.password = endpointSecurityInfo.production.password
-            === secretPlaceholder ? '' : endpointSecurityInfo.production.password;
-        endpointSecurityInfo.sandbox.clientSecret = endpointSecurityInfo.sandbox.clientSecret
-            === secretPlaceholder ? '' : endpointSecurityInfo.sandbox.clientSecret;
-        endpointSecurityInfo.sandbox.password = endpointSecurityInfo.sandbox.password
-            === secretPlaceholder ? '' : endpointSecurityInfo.sandbox.password;
+        if (endpointSecurityInfo.production) {
+            endpointSecurityInfo.production.clientSecret = endpointSecurityInfo.production.clientSecret
+                === secretPlaceholder ? '' : endpointSecurityInfo.production.clientSecret;
+        }
+        if (endpointSecurityInfo.production) {
+            endpointSecurityInfo.production.password = endpointSecurityInfo.production.password
+                === secretPlaceholder ? '' : endpointSecurityInfo.production.password;
+        }
+        if (endpointSecurityInfo.sandbox) {
+            endpointSecurityInfo.sandbox.clientSecret = endpointSecurityInfo.sandbox.clientSecret
+                === secretPlaceholder ? '' : endpointSecurityInfo.sandbox.clientSecret;
+        }
+        if (endpointSecurityInfo.sandbox) {
+            endpointSecurityInfo.sandbox.password = endpointSecurityInfo.sandbox.password
+                === secretPlaceholder ? '' : endpointSecurityInfo.sandbox.password;
+        }
         endpointsDispatcher({
             action: 'endpointSecurity',
             value: {
