@@ -33,6 +33,7 @@ import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
@@ -149,6 +150,8 @@ public class WebsocketInboundHandler extends ChannelInboundHandlerAdapter {
             if (req.headers() != null && !req.headers().contains(HttpHeaders.UPGRADE)
                     && HealthCheckConstants.HEALTH_CHECK_API_CONTEXT.equals(req.uri())) {
                 boolean isAllApisDeployed = GatewayUtils.isAllApisDeployed();
+                ctx.channel().attr(AttributeKey.valueOf(HealthCheckConstants.HEALTH_CHECK))
+                        .set(APIConstants.WEB_SOCKET_HEALTH_CHECK_PATH);
                 if (isAllApisDeployed) {
                     FullHttpResponse httpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                             HttpResponseStatus.OK);

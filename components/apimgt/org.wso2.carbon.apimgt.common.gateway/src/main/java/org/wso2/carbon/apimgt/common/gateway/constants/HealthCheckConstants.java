@@ -24,5 +24,5 @@ package org.wso2.carbon.apimgt.common.gateway.constants;
 public class HealthCheckConstants {
     public static final String HEALTH_CHECK_API_NAME = "_HealthCheckAPI_";
     public static final String HEALTH_CHECK_API_CONTEXT = "/health-check";
-
+    public static final String HEALTH_CHECK = "HEALTH_CHECK";
 }
