@@ -35,6 +35,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+//dummy comment
 public class ApiCategoriesApiServiceImpl implements ApiCategoriesApiService {
     private static final Log log = LogFactory.getLog(ApiCategoriesApiServiceImpl.class);
     

@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+//dummy comment
 public class AlertSubscriptionsApiServiceImpl implements AlertSubscriptionsApiService {
 
     private static final Log log = LogFactory.getLog(AlertSubscriptionsApiServiceImpl.class);
