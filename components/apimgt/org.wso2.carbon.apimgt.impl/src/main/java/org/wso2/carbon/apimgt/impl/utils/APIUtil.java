@@ -404,12 +404,12 @@ public final class APIUtil {
         }
         if (apiManagerConfiguration.getEventHubConfigurationDto().getMaxRetryCount() != -1) {
             maxRetryCount = apiManagerConfiguration.getEventHubConfigurationDto().getMaxRetryCount();
-        } else if (apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryDuration() != -1) {
+        } else if (apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getMaxRetryCount() != -1) {
             maxRetryCount = apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getMaxRetryCount();
         }
         if (apiManagerConfiguration.getEventHubConfigurationDto().getRetryProgressionFactor() != -1) {
             retryProgressionFactor = apiManagerConfiguration.getEventHubConfigurationDto().getRetryProgressionFactor();
-        } else if (apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryDuration() != -1) {
+        } else if (apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryProgressionFactor() != -1) {
             retryProgressionFactor =
                     apiManagerConfiguration.getGatewayArtifactSynchronizerProperties().getRetryProgressionFactor();
         }
