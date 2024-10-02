@@ -1352,9 +1352,11 @@ public class PublisherCommonUtils {
     public static API addGraphQLSchema(API originalAPI, String schemaDefinition, APIProvider apiProvider)
             throws APIManagementException, FaultGatewaysException {
 
+        GraphQLSchemaDefinition graphql = new GraphQLSchemaDefinition();
+        List<URITemplate> operationList = graphql.extractGraphQLOperationList(schemaDefinition);
+        List<APIOperationsDTO> operationArray = APIMappingUtil.fromURITemplateListToOprationList(operationList);
         List<APIOperationsDTO> operationListWithOldData = APIMappingUtil
-                .getOperationListWithOldData(originalAPI.getUriTemplates(),
-                        extractGraphQLOperationList(schemaDefinition));
+                .getOperationListWithOldData(originalAPI.getUriTemplates(), operationArray);
 
         Set<URITemplate> uriTemplates = APIMappingUtil.getURITemplates(originalAPI, operationListWithOldData);
         originalAPI.setUriTemplates(uriTemplates);
@@ -1363,33 +1365,6 @@ public class PublisherCommonUtils {
         apiProvider.updateAPI(originalAPI);
 
         return originalAPI;
-    }
-
-    /**
-     * Extract GraphQL Operations from given schema.
-     *
-     * @param schema graphQL Schema
-     * @return the arrayList of APIOperationsDTOextractGraphQLOperationList
-     */
-    public static List<APIOperationsDTO> extractGraphQLOperationList(String schema) {
-
-        List<APIOperationsDTO> operationArray = new ArrayList<>();
-        SchemaParser schemaParser = new SchemaParser();
-        TypeDefinitionRegistry typeRegistry = schemaParser.parse(schema);
-        Map<java.lang.String, TypeDefinition> operationList = typeRegistry.types();
-        for (Map.Entry<String, TypeDefinition> entry : operationList.entrySet()) {
-            if (entry.getValue().getName().equals(APIConstants.GRAPHQL_QUERY) || entry.getValue().getName()
-                    .equals(APIConstants.GRAPHQL_MUTATION) || entry.getValue().getName()
-                    .equals(APIConstants.GRAPHQL_SUBSCRIPTION)) {
-                for (FieldDefinition fieldDef : ((ObjectTypeDefinition) entry.getValue()).getFieldDefinitions()) {
-                    APIOperationsDTO operation = new APIOperationsDTO();
-                    operation.setVerb(entry.getKey());
-                    operation.setTarget(fieldDef.getName());
-                    operationArray.add(operation);
-                }
-            }
-        }
-        return operationArray;
     }
 
     /**
