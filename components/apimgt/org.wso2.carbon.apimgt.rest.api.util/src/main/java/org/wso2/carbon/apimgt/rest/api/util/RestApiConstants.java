@@ -297,4 +297,6 @@ public final class RestApiConstants {
 
     public static final Set<String> ALLOWED_THUMBNAIL_EXTENSIONS = new HashSet<String>(
             Arrays.asList("jpg", "png", "jpeg", "gif", "json"));
+
+    public static final String ALLOWED_ORIGINS_DEFAULT = "{}";
 }

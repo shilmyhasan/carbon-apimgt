@@ -28,7 +28,7 @@
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>
-            org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
+            org.wso2.carbon.apimgt.rest.api.util.servlet.impl.CustomCXFNonSpringJaxrsServlet
         </servlet-class>
         <init-param>
             <param-name>service-list-path</param-name>
