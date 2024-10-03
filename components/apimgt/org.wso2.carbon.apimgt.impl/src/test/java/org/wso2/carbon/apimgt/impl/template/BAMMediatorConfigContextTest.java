@@ -40,7 +40,7 @@ public class BAMMediatorConfigContextTest {
         api.setContextTemplate("/");
         PowerMockito.mockStatic(APIUtil.class);
         PowerMockito.when(APIUtil.isAnalyticsEnabled()).thenReturn(false);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         BAMMediatorConfigContext bamMediatorConfigContext = new BAMMediatorConfigContext(configcontext);
         Assert.assertFalse((Boolean) bamMediatorConfigContext.getContext().get("statsEnabled"));
         PowerMockito.when(APIUtil.isAnalyticsEnabled()).thenReturn(true);

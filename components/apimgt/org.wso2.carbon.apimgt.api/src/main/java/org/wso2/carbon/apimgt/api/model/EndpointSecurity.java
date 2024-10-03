@@ -44,6 +44,16 @@ public class EndpointSecurity {
 
     private Map additionalProperties = new HashMap();
 
+    private int connectionTimeoutDuration = -1;
+
+    private int connectionRequestTimeoutDuration = -1;
+
+    private int socketTimeoutDuration = -1;
+
+    private String clientSecretAlias;
+
+    private String passwordAlias;
+
     public String getUniqueIdentifier() {
         return uniqueIdentifier;
     }
@@ -142,11 +152,67 @@ public class EndpointSecurity {
         this.additionalProperties = additionalProperties;
     }
 
-    @Override public String toString() {
-        return "EndpointSecurity{" + "uniqueIdentifier='" + uniqueIdentifier + '\'' + ", password='" + password + '\''
-                + ", type='" + type + '\'' + ", enabled=" + enabled + ", username='" + username + '\'' + ", grantType='"
-                + grantType + '\'' + ", tokenUrl='" + tokenUrl + '\'' + ", clientId='" + clientId + '\''
-                + ", clientSecret='" + clientSecret + '\'' + ", customParameters='" + customParameters + '\''
-                + ", additionalProperties=" + additionalProperties + '}';
+    public int getConnectionTimeoutDuration() {
+        return connectionTimeoutDuration;
+    }
+
+    public void setConnectionTimeoutDuration(int connectionTimeoutDuration) {
+        this.connectionTimeoutDuration = connectionTimeoutDuration;
+    }
+
+    public int getConnectionRequestTimeoutDuration() {
+        return connectionRequestTimeoutDuration;
+    }
+
+    public void setConnectionRequestTimeoutDuration(int connectionRequestTimeoutDuration) {
+        this.connectionRequestTimeoutDuration = connectionRequestTimeoutDuration;
+    }
+
+    public int getSocketTimeoutDuration() {
+        return socketTimeoutDuration;
+    }
+
+    public void setSocketTimeoutDuration(int socketTimeoutDuration) {
+        this.socketTimeoutDuration = socketTimeoutDuration;
+    }
+
+    public String getClientSecretAlias() {
+
+        return clientSecretAlias;
+    }
+
+    public void setClientSecretAlias(String clientSecretAlias) {
+
+        this.clientSecretAlias = clientSecretAlias;
+    }
+
+    public String getPasswordAlias() {
+
+        return passwordAlias;
+    }
+
+    public void setPasswordAlias(String passwordAlias) {
+
+        this.passwordAlias = passwordAlias;
+    }
+
+    @Override
+    public String toString() {
+        return "EndpointSecurity{" +
+                "uniqueIdentifier='" + uniqueIdentifier + '\'' +
+                ", password='" + password + '\'' +
+                ", type='" + type + '\'' +
+                ", enabled=" + enabled +
+                ", username='" + username + '\'' +
+                ", grantType='" + grantType + '\'' +
+                ", tokenUrl='" + tokenUrl + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", clientSecret='" + clientSecret + '\'' +
+                ", customParameters='" + customParameters + '\'' +
+                ", additionalProperties=" + additionalProperties +
+                ", connectionTimeoutDuration=" + connectionTimeoutDuration +
+                ", connectionRequestTimeoutDuration=" + connectionRequestTimeoutDuration +
+                ", socketTimeoutDuration=" + socketTimeoutDuration +
+                '}';
     }
 }

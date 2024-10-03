@@ -10201,6 +10201,12 @@ definitions:
         description: |
           Is Document Visibility configuration enabled
         example: false
+      retryCallWithNewOAuthTokenEnabled:
+        type: boolean
+        description: |
+          Is Retry Call With New OAuth Token Enabled
+        example: false
+        default: false
       crossTenantSubscriptionEnabled:
         type: boolean
         description: |

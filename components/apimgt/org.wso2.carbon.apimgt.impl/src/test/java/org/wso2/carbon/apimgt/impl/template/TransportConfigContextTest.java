@@ -35,13 +35,13 @@ public class TransportConfigContextTest {
         api.setStatus(APIConstants.CREATED);
         api.setContextTemplate("/");
         api.setTransports(Constants.TRANSPORT_HTTP);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         TransportConfigContext transportConfigContext = new TransportConfigContext(configcontext, api);
         transportConfigContext.validate();
         Assert.assertTrue(Constants.TRANSPORT_HTTP.equalsIgnoreCase
                 (transportConfigContext.getContext().get("transport").toString()));
         api.setTransports(Constants.TRANSPORT_HTTP + "," + Constants.TRANSPORT_HTTPS);
-        configcontext = new APIConfigContext(api);
+        configcontext = new APIConfigContextWrapper(api);
         transportConfigContext = new TransportConfigContext(configcontext, api);
         Assert.assertTrue(StringUtils.EMPTY.equalsIgnoreCase
                 (transportConfigContext.getContext().get("transport").toString()));

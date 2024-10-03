@@ -17,7 +17,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import {
-    Grid, TextField, MenuItem, InputAdornment,
+    Divider, Grid, TextField, Typography, MenuItem, InputAdornment,
     Icon,
     ListItem,
     ListItemAvatar,
@@ -38,6 +38,7 @@ import { isRestricted } from 'AppData/AuthManager';
 import APIContext from 'AppComponents/Apis/Details/components/ApiContext';
 import APIValidation from 'AppData/APIValidation';
 import Alert from 'AppComponents/Shared/Alert';
+import { useAppContext } from 'AppComponents/Shared/AppContext';
 import EditableParameterRow from './EditableParameterRow';
 
 const styles = () => ({
@@ -76,6 +77,7 @@ const styles = () => ({
  */
 function EndpointSecurity(props) {
     const { api } = useContext(APIContext);
+    const { settings } = useAppContext();
     const {
         intl, securityInfo, onChangeEndpointAuth, classes, isProduction,
         saveEndpointSecurityConfig,
@@ -90,6 +92,9 @@ function EndpointSecurity(props) {
         clientId: '',
         clientSecret: '',
         customParameters: {},
+        connectionTimeoutDuration: -1,
+        connectionRequestTimeoutDuration: -1,
+        socketTimeoutDuration: -1,
     });
     const [securityValidity, setSecurityValidity] = useState();
 
@@ -156,6 +161,7 @@ function EndpointSecurity(props) {
             tmpSecurity = { ...securityInfo };
             const {
                 type, username, password, grantType, tokenUrl, clientId, clientSecret, customParameters,
+                connectionTimeoutDuration, connectionRequestTimeoutDuration, socketTimeoutDuration,
             } = securityInfo;
             tmpSecurity.type = type === null ? 'NONE' : type;
             tmpSecurity.username = username;
@@ -165,6 +171,9 @@ function EndpointSecurity(props) {
             tmpSecurity.clientId = clientId === '' ? '********' : clientId;
             tmpSecurity.clientSecret = clientSecret === '' ? '********' : clientSecret;
             tmpSecurity.customParameters = customParameters;
+            tmpSecurity.connectionTimeoutDuration = connectionTimeoutDuration;
+            tmpSecurity.connectionRequestTimeoutDuration = connectionRequestTimeoutDuration;
+            tmpSecurity.socketTimeoutDuration = socketTimeoutDuration;
         }
         setEndpointSecurityInfo(tmpSecurity);
     }, [props]);
@@ -629,34 +638,128 @@ function EndpointSecurity(props) {
             {endpointSecurityInfo.type === 'OAUTH' && (endpointSecurityInfo.grantType === 'CLIENT_CREDENTIALS'
             || endpointSecurityInfo.grantType === 'PASSWORD')
             && (
-                <Grid item xs={12}>
-                    <ListItem
-                        className={classes.listItem}
-                    >
-                        <ListItemAvatar>
-                            <Icon color='primary'>info</Icon>
-                        </ListItemAvatar>
-                        <ListItemText>
+                <>
+                    {settings && settings.retryCallWithNewOAuthTokenEnabled && (
+                        <>
+                            <Grid item xs={12}>
+                                <Divider />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <Typography className={classes.subTitle}>
+                                    <FormattedMessage
+                                        id='Apis.Details.Endpoints.GeneralConfiguration.EndpointSecurity.token.endpoint.
+                                            connection.configurations'
+                                        defaultMessage='Token Endpoint Connection Configurations'
+                                    />
+                                </Typography>
+                            </Grid>
+
+                            <Grid item xs={6}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    className={classes.textField}
+                                    id='auth-connectionTimeoutDuration'
+                                    label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.Endpoints.GeneralConfiguration.EndpointSecurity.connection.
+                                                timeout.duration'
+                                            defaultMessage='Connection Timeout Duration (ms)'
+                                        />
+                                    )}
+                                    type='number'
+                                    margin='normal'
+                                    onChange={(event) => setEndpointSecurityInfo(
+                                        { ...endpointSecurityInfo, connectionTimeoutDuration: event.target.value },
+                                    )}
+                                    defaultValue={-1}
+                                    value={endpointSecurityInfo.connectionTimeoutDuration}
+                                    onBlur={() => validateAndUpdateSecurityInfo('connectionTimeoutDuration')}
+                                />
+                            </Grid>
+
+                            <Grid item xs={6}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    className={classes.textField}
+                                    id='duration-connectionRequestTimeoutDuration'
+                                    label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.Endpoints.GeneralConfiguration.EndpointSecurity.connection.
+                                                request.timeout.duration'
+                                            defaultMessage='Connection Request Timeout Duration (ms)'
+                                        />
+                                    )}
+                                    type='number'
+                                    margin='normal'
+                                    onChange={(event) => setEndpointSecurityInfo({
+                                        ...endpointSecurityInfo,
+                                        connectionRequestTimeoutDuration: event.target.value,
+                                    })}
+                                    defaultValue={-1}
+                                    value={endpointSecurityInfo.connectionRequestTimeoutDuration}
+                                    onBlur={() => validateAndUpdateSecurityInfo('connectionRequestTimeoutDuration')}
+                                />
+                            </Grid>
+
+                            <Grid item xs={6}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    className={classes.textField}
+                                    id='duration-socketTimeoutDuration'
+                                    label={(
+                                        <FormattedMessage
+                                            id='Apis.Details.Endpoints.GeneralConfiguration.EndpointSecurity.socket.
+                                                timeout.duration'
+                                            defaultMessage='Socket Timeout Duration (ms)'
+                                        />
+                                    )}
+                                    type='number'
+                                    margin='normal'
+                                    onChange={(event) => setEndpointSecurityInfo(
+                                        { ...endpointSecurityInfo, socketTimeoutDuration: event.target.value },
+                                    )}
+                                    defaultValue={-1}
+                                    value={endpointSecurityInfo.socketTimeoutDuration}
+                                    onBlur={() => validateAndUpdateSecurityInfo('socketTimeoutDuration')}
+                                />
+                            </Grid>
+                        </>
+                    )}
+
+                    <Grid item xs={12}>
+                        <ListItem
+                            className={classes.listItem}
+                        >
+                            <ListItemAvatar>
+                                <Icon color='primary'>info</Icon>
+                            </ListItemAvatar>
+                            <ListItemText>
+                                <FormattedMessage
+                                    id='Apis.Details.Endpoints.GeneralConfiguration.EndpointSecurity.add.new.parameter.
+                                    info'
+                                    defaultMessage={'You can add any additional payload parameters'
+                                    + ' required for the endpoint below'}
+                                />
+                            </ListItemText>
+                        </ListItem>
+                        <Button
+                            size='medium'
+                            className={classes.button}
+                            onClick={toggleAddParameter}
+                            disabled={isRestricted(['apim:api_create', 'apim:api_publish'], api)}
+                        >
+                            <AddCircle className={classes.buttonIcon} />
                             <FormattedMessage
-                                id='Apis.Details.Endpoints.GeneralConfiguration.EndpointSecurity.add.new.parameter.info'
-                                defaultMessage={'You can add any additional payload parameters'
-                                + ' required for the endpoint below'}
+                                id='Apis.Details.Endpoints.GeneralConfiguration.EndpointSecurity.add.new.parameter'
+                                defaultMessage='Add New Parameter'
                             />
-                        </ListItemText>
-                    </ListItem>
-                    <Button
-                        size='medium'
-                        className={classes.button}
-                        onClick={toggleAddParameter}
-                        disabled={isRestricted(['apim:api_create', 'apim:api_publish'], api)}
-                    >
-                        <AddCircle className={classes.buttonIcon} />
-                        <FormattedMessage
-                            id='Apis.Details.Endpoints.GeneralConfiguration.EndpointSecurity.add.new.parameter'
-                            defaultMessage='Add New Parameter'
-                        />
-                    </Button>
-                </Grid>
+                        </Button>
+                    </Grid>
+                </>
             )}
 
             <Grid item xs={12} />

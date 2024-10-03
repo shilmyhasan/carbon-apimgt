@@ -54,7 +54,7 @@ public class SecurityConfigContextTest {
         api.setEndpointUTPassword("admin123");
         api.setEndpointSecured(true);
         api.setEndpointAuthDigest(true);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE)).thenReturn("true");
         SecurityConfigContext securityConfigContext =
                 new SecurityConfigContextWrapper(configcontext, api, apiManagerConfiguration);
@@ -99,7 +99,7 @@ public class SecurityConfigContextTest {
         api.setContextTemplate("/");
         api.setTransports(Constants.TRANSPORT_HTTP);
         api.setEndpointConfig(json);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE)).thenReturn("true");
         SecurityConfigContext securityConfigContext =
                 new SecurityConfigContextWrapper(configcontext, api, apiManagerConfiguration);
@@ -146,7 +146,7 @@ public class SecurityConfigContextTest {
         api.setContextTemplate("/");
         api.setTransports(Constants.TRANSPORT_HTTP);
         api.setEndpointConfig(json);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE)).thenReturn("true");
         SecurityConfigContext securityConfigContext =
                 new SecurityConfigContextWrapper(configcontext, api, apiManagerConfiguration);
@@ -194,7 +194,7 @@ public class SecurityConfigContextTest {
         api.setContextTemplate("/");
         api.setTransports(Constants.TRANSPORT_HTTP);
         api.setEndpointConfig(json);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE)).thenReturn("true");
         SecurityConfigContext securityConfigContext =
                 new SecurityConfigContextWrapper(configcontext, api, apiManagerConfiguration);
@@ -240,7 +240,7 @@ public class SecurityConfigContextTest {
         api.setEndpointUTPassword("admin123");
         api.setEndpointSecured(true);
         api.setEndpointAuthDigest(true);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE)).thenReturn("true");
         SecurityConfigContext securityConfigContext =
                 new SecurityConfigContextWrapper(configcontext, api, apiManagerConfiguration);
@@ -299,7 +299,7 @@ public class SecurityConfigContextTest {
         api.setEndpointUTPassword("admin123");
         api.setEndpointSecured(true);
         api.setEndpointAuthDigest(true);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE)).thenReturn("true");
         SecurityConfigContext securityConfigContext =
                 new SecurityConfigContextWrapper(configcontext, api, apiManagerConfiguration);
@@ -357,7 +357,7 @@ public class SecurityConfigContextTest {
         apiProductResource.setEndpointSecurityMap(endpointSecurityMap);
         apiProductResourceList.add(apiProductResource);
         apiProduct.setProductResources(apiProductResourceList);
-        ConfigContext configcontext = new APIConfigContext(apiProduct);
+        ConfigContext configcontext = new APIConfigContextWrapper(apiProduct);
         Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.API_SECUREVAULT_ENABLE)).thenReturn("true");
         SecurityConfigContext securityConfigContext =
                 new SecurityConfigContextWrapper(configcontext, apiProduct, apiManagerConfiguration);

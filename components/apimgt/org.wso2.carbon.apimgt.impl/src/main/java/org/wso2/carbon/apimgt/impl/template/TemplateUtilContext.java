@@ -16,8 +16,13 @@
 
 package org.wso2.carbon.apimgt.impl.template;
 
+import com.google.gson.Gson;
 import org.apache.velocity.VelocityContext;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.wso2.carbon.core.util.CryptoException;
+import org.wso2.carbon.core.util.CryptoUtil;
+
+import java.util.Map;
 
 /**
  * This is a utility class with a bunch of methods to help in Template
@@ -39,5 +44,27 @@ public class TemplateUtilContext extends ConfigContextDecorator {
 
     public String escapeXml(String url){
         return StringEscapeUtils.escapeXml(StringEscapeUtils.unescapeXml(url)).trim();
+    }
+
+    /**
+     * This function converts a JSON string to a Map and this is used when rendering the templates.
+     *
+     * @param jsonString the JSON string to be converted
+     * @return a Map representation of the JSON string
+     */
+    public Map jsonStringToMap(String jsonString) {
+        return new Gson().fromJson(jsonString, Map.class);
+    }
+
+    /**
+     * Decrypts the provided Base64 encoded ciphertext using the default cryptographic utility when rendering the
+     * templates.
+     *
+     * @param cipherText the Base64 encoded ciphertext to be decrypted
+     * @return the decrypted plaintext as a String
+     * @throws CryptoException if an error occurs during decryption
+     */
+    public String decrypt(String cipherText) throws CryptoException {
+        return new String(CryptoUtil.getDefaultCryptoUtil().base64DecodeAndDecrypt(cipherText));
     }
 }

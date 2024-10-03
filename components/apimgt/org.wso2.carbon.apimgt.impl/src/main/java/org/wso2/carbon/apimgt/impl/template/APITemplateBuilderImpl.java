@@ -238,6 +238,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
             configcontext = new EndpointBckConfigContext(configcontext, api);
             configcontext = new EndpointConfigContext(configcontext, api);
             configcontext = new TemplateUtilContext(configcontext);
+            configcontext = new SecurityConfigContext(configcontext, api);
 
             configcontext.validate();
 

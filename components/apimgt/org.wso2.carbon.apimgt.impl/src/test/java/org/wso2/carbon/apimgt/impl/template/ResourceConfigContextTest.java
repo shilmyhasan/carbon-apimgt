@@ -38,7 +38,7 @@ public class ResourceConfigContextTest {
         api.setStatus(APIConstants.CREATED);
         api.setContextTemplate("/");
         api.setUriTemplates(setAPIUriTemplates());
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         ResourceConfigContext resourceConfigContext = new ResourceConfigContext(configcontext, api);
         resourceConfigContext.validate();
         Assert.assertNotNull(resourceConfigContext.getContext().get("resources"));
@@ -46,7 +46,7 @@ public class ResourceConfigContextTest {
         //assign an empty URITemplate set and check the result
         Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
         api.setUriTemplates(uriTemplates);
-        configcontext = new APIConfigContext(api);
+        configcontext = new APIConfigContextWrapper(api);
         resourceConfigContext = new ResourceConfigContext(configcontext, api);
         String errorClass = "org.wso2.carbon.apimgt.api.APIManagementException";
         String expectedErrorMessage = "At least one resource is required";
@@ -58,7 +58,7 @@ public class ResourceConfigContextTest {
         }
         //set a null value for URITemplate and check the result
         api.setUriTemplates(null);
-        configcontext = new APIConfigContext(api);
+        configcontext = new APIConfigContextWrapper(api);
         resourceConfigContext = new ResourceConfigContext(configcontext, api);
         try {
             resourceConfigContext.validate();

@@ -36,6 +36,7 @@ import org.wso2.carbon.apimgt.impl.dto.ClaimMappingDto;
 import org.wso2.carbon.apimgt.impl.dto.Environment;
 import org.wso2.carbon.apimgt.impl.dto.EventHubConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
+import org.wso2.carbon.apimgt.impl.dto.RedisConfig;
 import org.wso2.carbon.apimgt.impl.dto.JWKSConfigurationDTO;
 import org.wso2.carbon.apimgt.impl.dto.JWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
@@ -109,12 +110,12 @@ public class APIManagerConfiguration {
     private JWTConfigurationDto jwtConfigurationDto = new JWTConfigurationDto();
     private WorkflowProperties workflowProperties = new WorkflowProperties();
     private Map<String, Environment> apiGatewayEnvironments = new LinkedHashMap<String, Environment>();
-    private static JSONObject redisConfigProperties = new JSONObject();
     private static Properties realtimeNotifierProperties;
     private static Properties persistentNotifierProperties;
     private static String tokenRevocationClassName;
     private static boolean advancedSwaggerValidationEnabled = false;
     private TokenValidationDto tokenValidationDto = new TokenValidationDto();
+    private RedisConfig redisConfig = new RedisConfig();
 
     public static Properties getRealtimeTokenRevocationNotifierProperties() {
 
@@ -321,19 +322,16 @@ public class APIManagerConfiguration {
                 OMElement redisConnectionTimeout = element.getFirstChildWithName(new QName("RedisConnectionTimeout"));
                 OMElement redisIsSslEnabled = element.getFirstChildWithName(new QName("RedisIsSslEnabled"));
 
-                if (redisHost != null && redisPort != null) {
-                    redisConfigProperties.put("isRedisEnabled", true);
-                    redisConfigProperties.put("host", redisHost.getText());
-                    redisConfigProperties.put("port", Integer.parseInt(redisPort.getText()));
-
-                    if (redisUser != null && redisPassword != null && redisDatabaseId != null
-                            && redisConnectionTimeout != null && redisIsSslEnabled != null) {
-                        redisConfigProperties.put("user", redisUser.getText());
-                        redisConfigProperties.put("password", redisPassword.getText().toCharArray());
-                        redisConfigProperties.put("databaseId", Integer.parseInt(redisDatabaseId.getText()));
-                        redisConfigProperties.put("connectionTimeout", Integer.parseInt(redisConnectionTimeout.getText()));
-                        redisConfigProperties.put("isSslEnabled", Boolean.parseBoolean(redisIsSslEnabled.getText()));
-                    }
+                redisConfig.setRedisEnabled(true);
+                redisConfig.setHost(redisHost.getText());
+                redisConfig.setPort(Integer.parseInt(redisPort.getText()));
+                if (redisUser != null && redisPassword != null && redisDatabaseId != null
+                        && redisConnectionTimeout != null && redisIsSslEnabled != null) {
+                    redisConfig.setUser(redisUser.getText());
+                    redisConfig.setPassword(redisPassword.getText().toCharArray());
+                    redisConfig.setDatabaseId(Integer.parseInt(redisDatabaseId.getText()));
+                    redisConfig.setConnectionTimeout(Integer.parseInt(redisConnectionTimeout.getText()));
+                    redisConfig.setSslEnabled(Boolean.parseBoolean(redisIsSslEnabled.getText()));
                 }
             } else if (elementHasText(element)) {
                 String key = getKey(nameStack);
@@ -1428,9 +1426,9 @@ public class APIManagerConfiguration {
         return workflowProperties;
     }
 
-    public JSONObject getRedisConfigProperties() {
+    public RedisConfig getRedisConfigProperties() {
 
-        return redisConfigProperties;
+        return redisConfig;
     }
 
     /**

@@ -32,8 +32,8 @@ import org.apache.synapse.transport.passthru.TargetResponse;
 import org.wso2.carbon.apimgt.gateway.handlers.Utils;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
+import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.mediators.oauth.conf.OAuthEndpoint;
-import org.wso2.carbon.apimgt.gateway.utils.redis.RedisCacheUtils;
 
 /**
  * OAuthResponseMediator to handle error responses from OAuth 2.0 protected backends
@@ -59,8 +59,8 @@ public class OAuthResponseMediator extends AbstractMediator implements ManagedLi
             if (statusCode == 401) {
                 try {
                     OAuthEndpoint oAuthEndpoint = OAuthMediator.oAuthEndpoint;
-                    if (OAuthMediator.isRedisEnabled) {
-                        RedisCacheUtils.getInstance().deleteKey(oAuthEndpoint.getId());
+                    if (ServiceReferenceHolder.getInstance().isRedisEnabled()) {
+                        ServiceReferenceHolder.getInstance().getRedisCacheUtils().deleteKey(oAuthEndpoint.getId());
                     } else {
                         TokenCache.getInstance().getTokenMap().put(oAuthEndpoint.getId(), null);
                     }

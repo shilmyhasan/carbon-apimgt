@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.apimgt.gateway.mediators.oauth;
 
-import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,11 +33,7 @@ import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.apimgt.gateway.mediators.oauth.client.TokenResponse;
 import org.wso2.carbon.apimgt.gateway.mediators.oauth.conf.OAuthEndpoint;
-import org.wso2.carbon.apimgt.gateway.utils.redis.RedisCacheUtils;
-import org.wso2.carbon.apimgt.gateway.utils.redis.RedisConfig;
-import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIConstants.OAuthConstants;
-import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.core.util.CryptoUtil;
 
@@ -51,22 +46,17 @@ import java.util.concurrent.CountDownLatch;
 public class OAuthMediator extends AbstractMediator implements ManagedLifecycle {
 
     private static final Log log = LogFactory.getLog(OAuthMediator.class);
-    private static RedisConfig redisConfig;
-    public static RedisCacheUtils redisCacheUtils;
-    public static boolean isRedisEnabled = false;
     public static OAuthEndpoint oAuthEndpoint;
 
     // Interface methods are being implemented here
     @Override
     public void init(SynapseEnvironment synapseEnvironment) {
-        getRedisConfig();
+
     }
 
     @Override
     public void destroy() {
-        if (isRedisEnabled) {
-            redisCacheUtils.stopRedisCacheSession();
-        }
+
     }
 
     @Override
@@ -154,32 +144,6 @@ public class OAuthMediator extends AbstractMediator implements ManagedLifecycle 
             log.error("Failed to parse OAuth Custom Parameters", e);
         }
         return true;
-    }
-
-    /**
-     * This method retrieves the Redis Config Properties from the API Manager Configuration
-     * and passes it to an instance of RedisCacheUtils
-     */
-    public static void getRedisConfig() {
-        JSONObject redisConfigProperties = ServiceReferenceHolder.getInstance()
-                .getAPIManagerConfigurationService().getAPIManagerConfiguration().getRedisConfigProperties();
-
-        redisConfig = new Gson().fromJson(String.valueOf(redisConfigProperties), RedisConfig.class);
-
-        if (redisConfig != null) {
-            isRedisEnabled = redisConfig.isRedisEnabled();
-            if (isRedisEnabled) {
-                if (redisConfig.getUser() != null
-                        && redisConfig.getPassword() != null
-                        && redisConfig.getConnectionTimeout() != 0) {
-                    redisCacheUtils = new RedisCacheUtils(redisConfig.getHost(), redisConfig.getPort(),
-                            redisConfig.getConnectionTimeout(), redisConfig.getUser(),
-                            redisConfig.getPassword(), redisConfig.getDatabaseId(), redisConfig.isSslEnabled());
-                } else {
-                    redisCacheUtils = new RedisCacheUtils(redisConfig.getHost(), redisConfig.getPort());
-                }
-            }
-        }
     }
 
     @Override

@@ -31,6 +31,7 @@ import org.wso2.carbon.apimgt.api.model.EndpointSecurity;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.impl.utils.GatewayUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -130,6 +131,16 @@ public class SecurityConfigContext extends ConfigContextDecorator {
                             endpointSecurityModel.setUniqueIdentifier(api.getId() + "-" + UUID.randomUUID().toString());
                             endpointSecurityModel.setAlias(
                                     alias.concat("--").concat(APIConstants.ENDPOINT_SECURITY_PRODUCTION));
+
+                            if (isSecureVaultEnabled && APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.equalsIgnoreCase(
+                                    endpointSecurityModel.getType())) {
+                                endpointSecurityModel.setClientSecretAlias(GatewayUtils.retrieveOauthClientSecretAlias(
+                                        api.getId().getApiName(), api.getId().getVersion(), APIConstants.
+                                                ENDPOINT_SECURITY_PRODUCTION));
+                                endpointSecurityModel.setPasswordAlias(GatewayUtils.retrieveOAuthPasswordAlias(
+                                        api.getId().getApiName(), api.getId().getVersion(), APIConstants.
+                                                ENDPOINT_SECURITY_PRODUCTION));
+                            }
                         }
                         endpointSecurityModelMap.put(APIConstants.ENDPOINT_SECURITY_PRODUCTION, endpointSecurityModel);
                     }
@@ -148,6 +159,16 @@ public class SecurityConfigContext extends ConfigContextDecorator {
                             endpointSecurityModel.setUniqueIdentifier(api.getId() + "-" + UUID.randomUUID().toString());
                             endpointSecurityModel.setAlias(
                                     alias.concat("--").concat(APIConstants.ENDPOINT_SECURITY_SANDBOX));
+
+                            if (isSecureVaultEnabled && APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.equalsIgnoreCase(
+                                    endpointSecurityModel.getType())) {
+                                endpointSecurityModel.setClientSecretAlias(GatewayUtils.retrieveOauthClientSecretAlias(
+                                        api.getId().getApiName(), api.getId().getVersion(), APIConstants.
+                                                ENDPOINT_SECURITY_SANDBOX));
+                                endpointSecurityModel.setPasswordAlias(GatewayUtils.retrieveOAuthPasswordAlias(
+                                        api.getId().getApiName(), api.getId().getVersion(), APIConstants.
+                                                ENDPOINT_SECURITY_SANDBOX));
+                            }
                         }
                         endpointSecurityModelMap.put(APIConstants.ENDPOINT_SECURITY_SANDBOX, endpointSecurityModel);
                     }
@@ -187,6 +208,16 @@ public class SecurityConfigContext extends ConfigContextDecorator {
                             endpointSecurityModel.setTokenUrl(endpointSecurityEntry.getValue().getTokenUrl());
                             endpointSecurityModel.setClientId(endpointSecurityEntry.getValue().getClientId());
                             endpointSecurityModel.setClientSecret(endpointSecurityEntry.getValue().getClientSecret());
+
+                            if (isSecureVaultEnabled) {
+                                endpointSecurityModel.setClientSecretAlias(GatewayUtils.retrieveOauthClientSecretAlias(
+                                        apiProduct.getId().getName(), apiProduct.getId().getVersion(),
+                                        endpointSecurityEntry.getKey()));
+                                endpointSecurityModel.setPasswordAlias(GatewayUtils.retrieveOAuthPasswordAlias(
+                                        apiProduct.getId().getName(), apiProduct.getId().getVersion(),
+                                        endpointSecurityEntry.getKey()));
+                            }
+
                             if (endpointSecurityEntry.getValue().getCustomParameters() != null) {
                                 endpointSecurityModel.setCustomParameters(
                                         endpointSecurityEntry.getValue().getCustomParameters());

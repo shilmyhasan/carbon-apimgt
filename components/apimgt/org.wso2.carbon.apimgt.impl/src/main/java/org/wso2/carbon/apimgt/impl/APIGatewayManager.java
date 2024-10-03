@@ -63,8 +63,11 @@ import org.wso2.carbon.apimgt.impl.template.APITemplateBuilderImpl;
 import org.wso2.carbon.apimgt.impl.template.APITemplateException;
 import org.wso2.carbon.apimgt.impl.utils.APIGatewayAdminClient;
 import org.wso2.carbon.apimgt.impl.utils.APIUtil;
+import org.wso2.carbon.apimgt.impl.utils.GatewayUtils;
 import org.wso2.carbon.apimgt.impl.utils.LocalEntryAdminClient;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.util.CryptoException;
+import org.wso2.carbon.core.util.CryptoUtil;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -87,6 +90,7 @@ public class APIGatewayManager {
 
     private final String ENDPOINT_PRODUCTION = "_PRODUCTION_";
     private final String ENDPOINT_SANDBOX = "_SANDBOX_";
+    private final String ENDPOINT_TYPE_KEY = "type";
     private static final String PRODUCT_PREFIX = "prod";
     private static final String PRODUCT_VERSION = "1.0.0";
 
@@ -523,8 +527,83 @@ public class APIGatewayManager {
                                 api.getId().getApiName());
                     }
                 }
+
+                handleOAuthEndpointSecurity(isProductionEndpointSecured, productionEndpointSecurity,
+                        APIConstants.ENDPOINT_SECURITY_PRODUCTION, api, gatewayAPIDTO);
+                handleOAuthEndpointSecurity(isSandboxEndpointSecured, sandboxEndpointSecurity,
+                        APIConstants.ENDPOINT_SECURITY_SANDBOX, api, gatewayAPIDTO);
             }
         }
+    }
+
+    /**
+     * Handles the OAuth-based endpoint security configuration by creating and adding credentials
+     * (client secret and password) to the {@link GatewayAPIDTO} object if the security type is OAuth.
+     *
+     * @param isSecured        Indicates if the endpoint is secured.
+     * @param endpointSecurity A {@link JSONObject} containing the endpoint security configurations.
+     * @param endpointType     The type of the endpoint (production or sandbox).
+     * @param api              The {@link API} object containing API details.
+     * @param gatewayAPIDTO    The {@link GatewayAPIDTO} object to which the OAuth credentials are added.
+     */
+    private void handleOAuthEndpointSecurity(boolean isSecured, JSONObject endpointSecurity, String endpointType,
+                                             API api, GatewayAPIDTO gatewayAPIDTO) {
+        if (isSecured && !endpointSecurity.isNull(ENDPOINT_TYPE_KEY) && APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.
+                equalsIgnoreCase(endpointSecurity.getString(ENDPOINT_TYPE_KEY))) {
+            CredentialDto clientSecretDto = createCredentialDto(api, endpointSecurity, APIConstants.
+                    ENDPOINT_SECURITY_CLIENT_SECRET, endpointType);
+            gatewayAPIDTO.setCredentialsToBeAdd(addCredentialsToList(clientSecretDto, gatewayAPIDTO.
+                    getCredentialsToBeAdd()));
+
+            if (endpointSecurity.has(APIConstants.ENDPOINT_SECURITY_PASSWORD) && !endpointSecurity.isNull(APIConstants.
+                    ENDPOINT_SECURITY_PASSWORD) && StringUtils.isNotEmpty(endpointSecurity.get(APIConstants.
+                    ENDPOINT_SECURITY_PASSWORD).toString())) {
+                CredentialDto passwordDto = createCredentialDto(api, endpointSecurity, APIConstants.
+                        ENDPOINT_SECURITY_PASSWORD, endpointType);
+                gatewayAPIDTO.setCredentialsToBeAdd(addCredentialsToList(passwordDto, gatewayAPIDTO.
+                        getCredentialsToBeAdd()));
+            }
+        }
+    }
+
+    /**
+     * Creates a {@link CredentialDto} object by setting the alias and the password from the provided endpoint security
+     * details.
+     *
+     * @param api              The {@link API} object containing API details.
+     * @param endpointSecurity A {@link JSONObject} containing endpoint security configurations.
+     * @param securityField    The security field name within the {@code endpointSecurity} object.
+     * @param endpointType     The type of endpoint security, either client secret or password.
+     * @return A {@link CredentialDto} object with the alias and the password.
+     */
+    private CredentialDto createCredentialDto(API api, JSONObject endpointSecurity, String securityField,
+                                              String endpointType) {
+        CredentialDto credentialDto = new CredentialDto();
+        if (APIConstants.ENDPOINT_SECURITY_CLIENT_SECRET.equals(securityField)) {
+            credentialDto.setAlias(GatewayUtils.retrieveOauthClientSecretAlias(api.getId().getApiName(),
+                    api.getId().getVersion(), endpointType));
+            credentialDto.setPassword(decrypt(endpointSecurity.get(securityField).toString()));
+        } else if (APIConstants.ENDPOINT_SECURITY_PASSWORD.equals(securityField)) {
+            credentialDto.setAlias(GatewayUtils.retrieveOAuthPasswordAlias(api.getId().getApiName(),
+                    api.getId().getVersion(), endpointType));
+            credentialDto.setPassword(endpointSecurity.get(securityField).toString());
+        }
+        return credentialDto;
+    }
+
+    /**
+     * Decrypts the given Base64-encoded cipher text using the default cryptographic utility.
+     *
+     * @param cipherText The Base64-encoded cipher text to be decrypted.
+     * @return The decrypted plain text, or {@code null} if an error occurs during decryption.
+     */
+    private String decrypt(String cipherText) {
+        try {
+            return new String(CryptoUtil.getDefaultCryptoUtil().base64DecodeAndDecrypt(cipherText));
+        } catch (CryptoException e) {
+            log.error("Error while decrypting the cipher text", e);
+        }
+        return null;
     }
 
     private CredentialDto[] addCredentialsToList(CredentialDto credential, CredentialDto[] credentials) {

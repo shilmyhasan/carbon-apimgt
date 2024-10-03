@@ -89,6 +89,7 @@ public class SettingsMappingUtil {
             settingsDTO.setDocVisibilityEnabled(APIUtil.isDocVisibilityLevelsEnabled());
             settingsDTO.setCrossTenantSubscriptionEnabled(APIUtil.isCrossTenantSubscriptionsEnabled());
             settingsDTO.setValidationForWSEnabled(APIUtil.isCORSValidationEnabledForWS());
+            settingsDTO.setRetryCallWithNewOAuthTokenEnabled(APIUtil.isRetryCallWithNewOAuthTokenEnabled());
             String authorizationHeader = APIUtil.getOAuthConfiguration(tenantId, APIConstants.AUTHORIZATION_HEADER);
 
             if (authorizationHeader == null) {

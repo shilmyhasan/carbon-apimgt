@@ -34,7 +34,7 @@ public class EndpointBckConfigContextTest {
         String url = "http://maps.googleapis.com/maps/api/geocode/json?address=Colombo";
         api.setUrl(url);
         api.setSandboxUrl(url);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         EndpointBckConfigContext endpointBckConfigContext = new EndpointBckConfigContext(configcontext, api);
         Assert.assertTrue(api.getEndpointConfig().contains(url));
         //setting an empty string as the endpoint config and checking the value which is returned

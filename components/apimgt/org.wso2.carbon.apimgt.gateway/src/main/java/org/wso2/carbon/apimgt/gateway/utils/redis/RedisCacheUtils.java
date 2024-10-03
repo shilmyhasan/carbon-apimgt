@@ -37,15 +37,7 @@ import java.util.Map;
 public class RedisCacheUtils {
     private static final Log log = LogFactory.getLog(RedisCacheUtils.class);
 
-    private static final RedisCacheUtils instance = new RedisCacheUtils();
-
     private static JedisPool jedisPool;
-
-    /**
-     * Private constructor
-     */
-    private RedisCacheUtils(){
-    }
 
     /**
      * RedisCacheUtils constructor to create new JedisPool instance
@@ -72,14 +64,6 @@ public class RedisCacheUtils {
             int database, boolean ssl) {
         jedisPool = new JedisPool(new JedisPoolConfig(), host, port,
                 timeout, username, String.valueOf(password), database, ssl);
-    }
-
-    /**
-     * Get RedisCacheUtils Instance
-     * @return RedisCacheUtils Instance
-     */
-    public static RedisCacheUtils getInstance() {
-        return instance;
     }
 
     /**
@@ -257,5 +241,14 @@ public class RedisCacheUtils {
      */
     public void stopRedisCacheSession() {
         jedisPool.destroy();
+    }
+
+    /**
+     * Checks if the Redis cache session is active.
+     *
+     * @return true if the Redis cache session (Jedis pool) is initialized and open, false otherwise.
+     */
+    public boolean isRedisCacheSessionActive() {
+        return jedisPool != null && !jedisPool.isClosed();
     }
 }

@@ -39,7 +39,7 @@ public class EnvironmentConfigContextTest {
         api.setEndpointConfig(endpointConfig);
         api.setUrl(url);
         api.setSandboxUrl(url);
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         Environment environment = new Environment();
         environment.setType("production");
         EnvironmentConfigContext environmentConfigContext = new EnvironmentConfigContext(configcontext, environment);

@@ -34,7 +34,7 @@ public class HandlerConfigContextTest {
         API api = new API(new APIIdentifier("admin", "TestAPI", "1.0.0"));
         api.setStatus(APIConstants.CREATED);
         api.setContextTemplate("/");
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         List<HandlerConfig> handlers = new ArrayList<HandlerConfig>();
         HandlerConfigContex handlerConfigContex = new HandlerConfigContex(configcontext, handlers);
         Assert.assertNotNull(handlerConfigContex.getContext().get("handlers"));

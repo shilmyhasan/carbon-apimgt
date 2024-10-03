@@ -17,10 +17,11 @@
 package org.wso2.carbon.apimgt.gateway.internal;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.wso2.carbon.apimgt.gateway.handlers.security.jwt.generator.AbstractAPIMgtGatewayJWTGenerator;
 import org.wso2.carbon.apimgt.gateway.throttling.ThrottleDataHolder;
 import org.wso2.carbon.apimgt.gateway.throttling.publisher.ThrottleDataPublisher;
+import org.wso2.carbon.apimgt.gateway.utils.redis.RedisCacheUtils;
+import org.wso2.carbon.apimgt.impl.dto.RedisConfig;
 import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
 import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
 import org.wso2.carbon.apimgt.impl.caching.CacheInvalidationService;
@@ -71,6 +72,7 @@ public class ServiceReferenceHolder {
     private APIThrottleDataService throttleDataService;
     private Set<String> activeTenants = new ConcurrentSkipListSet<>();
     private SynapseConfigurationService synapseConfigurationService;
+    private RedisCacheUtils redisCacheUtils;
 
     private JWTValidationService jwtValidationService;
     private KeyManagerDataService keyManagerDataService;
@@ -322,5 +324,21 @@ public class ServiceReferenceHolder {
 
     public void setSynapseConfigurationService(SynapseConfigurationService synapseConfigurationService) {
         this.synapseConfigurationService = synapseConfigurationService;
+    }
+
+    public void setRedisCacheUtil(RedisCacheUtils redisCacheUtils) {
+
+        this.redisCacheUtils = redisCacheUtils;
+    }
+
+    public RedisCacheUtils getRedisCacheUtils() {
+
+        return redisCacheUtils;
+    }
+
+    public boolean isRedisEnabled() {
+
+        RedisConfig redisConfigProperties = getAPIManagerConfiguration().getRedisConfigProperties();
+        return redisConfigProperties != null && redisConfigProperties.isRedisEnabled();
     }
 }

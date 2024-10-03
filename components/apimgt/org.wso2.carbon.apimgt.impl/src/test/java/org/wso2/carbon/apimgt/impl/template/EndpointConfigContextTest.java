@@ -20,14 +20,35 @@ package org.wso2.carbon.apimgt.impl.template;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.APIManagerConfiguration;
+import org.wso2.carbon.apimgt.impl.APIManagerConfigurationService;
+import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ServiceReferenceHolder.class})
 public class EndpointConfigContextTest {
 
     @Test (expected = APITemplateException.class)
     public void testEndpointConfigContext() throws Exception {
+
+        ServiceReferenceHolder serviceReferenceHolder = Mockito.mock(ServiceReferenceHolder.class);
+        PowerMockito.mockStatic(ServiceReferenceHolder.class);
+        PowerMockito.when(ServiceReferenceHolder.getInstance()).thenReturn(serviceReferenceHolder);
+        APIManagerConfiguration apiManagerConfiguration = Mockito.mock(APIManagerConfiguration.class);
+        APIManagerConfigurationService apiManagerConfigurationService = Mockito.mock(APIManagerConfigurationService.class);
+        Mockito.when(serviceReferenceHolder.getAPIManagerConfigurationService()).thenReturn(apiManagerConfigurationService);
+        Mockito.when(apiManagerConfigurationService.getAPIManagerConfiguration()).thenReturn(apiManagerConfiguration);
+        Mockito.when(apiManagerConfiguration.getFirstProperty(APIConstants.MEDIATOR_CONFIG + APIConstants.
+                OAuthConstants.OAUTH_MEDIATION_CONFIG + APIConstants.OAuthConstants.
+                ENABLE_RETRY_CALL_WITH_NEW_TOKEN)).thenReturn("true");
 
         API api = new API(new APIIdentifier("admin", "TestAPI", "1.0.0"));
         api.setStatus(APIConstants.CREATED);
@@ -42,6 +63,11 @@ public class EndpointConfigContextTest {
         EndpointConfigContext endpointConfigContext = new EndpointConfigContext(configcontext, api);
         endpointConfigContext.validate();
         Assert.assertNotNull(endpointConfigContext.getContext().get("endpoint_config"));
+
+        // Check enable retry call with new Oauth token is enabled
+        Assert.assertTrue((Boolean) configcontext.getContext().get(APIConstants.
+                ENABLE_RETRY_CALL_WITH_NEW_OAUTH_TOKEN));
+
         //set an empty string and check the validation
         endpointConfig = "";
         api.setEndpointConfig(endpointConfig);

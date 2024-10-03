@@ -24,6 +24,9 @@ import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIIdentifier;
 import org.wso2.carbon.apimgt.impl.APIConstants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TemplateUtilContextTest {
 
     @Test
@@ -31,7 +34,7 @@ public class TemplateUtilContextTest {
         API api = new API(new APIIdentifier("admin", "TestAPI", "1.0.0"));
         api.setStatus(APIConstants.CREATED);
         api.setContextTemplate("/");
-        ConfigContext configcontext = new APIConfigContext(api);
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
         TemplateUtilContext templateUtilContext = new TemplateUtilContext(configcontext);
         String xmlSampleText = "<data>TemplateUtilContextTest Class</data>";
         String xmlEscapedText = "&lt;data&gt;TemplateUtilContextTest Class&lt;/data&gt;";
@@ -39,5 +42,29 @@ public class TemplateUtilContextTest {
         Assert.assertTrue("Failed to escape XML tags in the provided string : " + xmlSampleText,
                 xmlEscapedText.equalsIgnoreCase(result));
         Assert.assertNotNull(templateUtilContext.getContext().get("util"));
+    }
+
+    @Test
+    public void testJsonStringToMap() {
+        API api = new API(new APIIdentifier("admin", "TestAPI", "1.0.0"));
+        api.setStatus(APIConstants.CREATED);
+        api.setContextTemplate("/");
+        ConfigContext configcontext = new APIConfigContextWrapper(api);
+        TemplateUtilContext templateUtilContext = new TemplateUtilContext(configcontext);
+
+        // Define the JSON string
+        String jsonString = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
+
+        // Define the expected map
+        Map<String, Object> expectedMap = new HashMap<>();
+        expectedMap.put("key1", "value1");
+        expectedMap.put("key2", "value2");
+
+        // Call the method
+        Map<String, Object> resultMap = templateUtilContext.jsonStringToMap(jsonString);
+
+        // Verify the result
+        Assert.assertNotNull("Result map should not be null", resultMap);
+        Assert.assertEquals("Map does not match expected value", expectedMap, resultMap);
     }
 }

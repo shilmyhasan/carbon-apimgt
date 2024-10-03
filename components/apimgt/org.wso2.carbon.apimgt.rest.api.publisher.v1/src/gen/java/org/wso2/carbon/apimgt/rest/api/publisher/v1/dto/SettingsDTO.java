@@ -28,6 +28,7 @@ public class SettingsDTO   {
     private Object securityAuditProperties = null;
     private Boolean externalStoresEnabled = null;
     private Boolean docVisibilityEnabled = null;
+    private Boolean retryCallWithNewOAuthTokenEnabled = false;
     private Boolean crossTenantSubscriptionEnabled = false;
     private Boolean validationForWSEnabled = false;
     private String defaultAdvancePolicy = null;
@@ -175,6 +176,24 @@ public class SettingsDTO   {
   }
 
   /**
+   * Is Retry Call With New OAuth Token Enabled 
+   **/
+  public SettingsDTO retryCallWithNewOAuthTokenEnabled(Boolean retryCallWithNewOAuthTokenEnabled) {
+    this.retryCallWithNewOAuthTokenEnabled = retryCallWithNewOAuthTokenEnabled;
+    return this;
+  }
+
+  
+  @ApiModelProperty(example = "false", value = "Is Retry Call With New OAuth Token Enabled ")
+  @JsonProperty("retryCallWithNewOAuthTokenEnabled")
+  public Boolean isRetryCallWithNewOAuthTokenEnabled() {
+    return retryCallWithNewOAuthTokenEnabled;
+  }
+  public void setRetryCallWithNewOAuthTokenEnabled(Boolean retryCallWithNewOAuthTokenEnabled) {
+    this.retryCallWithNewOAuthTokenEnabled = retryCallWithNewOAuthTokenEnabled;
+  }
+
+  /**
    * Is Cross Tenant Subscriptions Enabled 
    **/
   public SettingsDTO crossTenantSubscriptionEnabled(Boolean crossTenantSubscriptionEnabled) {
@@ -299,6 +318,7 @@ public class SettingsDTO   {
         Objects.equals(securityAuditProperties, settings.securityAuditProperties) &&
         Objects.equals(externalStoresEnabled, settings.externalStoresEnabled) &&
         Objects.equals(docVisibilityEnabled, settings.docVisibilityEnabled) &&
+        Objects.equals(retryCallWithNewOAuthTokenEnabled, settings.retryCallWithNewOAuthTokenEnabled) &&
         Objects.equals(crossTenantSubscriptionEnabled, settings.crossTenantSubscriptionEnabled) &&
         Objects.equals(validationForWSEnabled, settings.validationForWSEnabled) &&
         Objects.equals(defaultAdvancePolicy, settings.defaultAdvancePolicy) &&
@@ -309,7 +329,7 @@ public class SettingsDTO   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(storeUrl, environment, scopes, monetizationAttributes, subscriberContactAttributes, securityAuditProperties, externalStoresEnabled, docVisibilityEnabled, crossTenantSubscriptionEnabled, validationForWSEnabled, defaultAdvancePolicy, defaultSubscriptionPolicy, deployments, authorizationHeader);
+    return Objects.hash(storeUrl, environment, scopes, monetizationAttributes, subscriberContactAttributes, securityAuditProperties, externalStoresEnabled, docVisibilityEnabled, retryCallWithNewOAuthTokenEnabled, crossTenantSubscriptionEnabled, validationForWSEnabled, defaultAdvancePolicy, defaultSubscriptionPolicy, deployments, authorizationHeader);
   }
 
   @Override
@@ -325,6 +345,7 @@ public class SettingsDTO   {
     sb.append("    securityAuditProperties: ").append(toIndentedString(securityAuditProperties)).append("\n");
     sb.append("    externalStoresEnabled: ").append(toIndentedString(externalStoresEnabled)).append("\n");
     sb.append("    docVisibilityEnabled: ").append(toIndentedString(docVisibilityEnabled)).append("\n");
+    sb.append("    retryCallWithNewOAuthTokenEnabled: ").append(toIndentedString(retryCallWithNewOAuthTokenEnabled)).append("\n");
     sb.append("    crossTenantSubscriptionEnabled: ").append(toIndentedString(crossTenantSubscriptionEnabled)).append("\n");
     sb.append("    validationForWSEnabled: ").append(toIndentedString(validationForWSEnabled)).append("\n");
     sb.append("    defaultAdvancePolicy: ").append(toIndentedString(defaultAdvancePolicy)).append("\n");
