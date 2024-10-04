@@ -36,7 +36,6 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-//dummy comment
 /**
  * API logging internal service implementation.
  */

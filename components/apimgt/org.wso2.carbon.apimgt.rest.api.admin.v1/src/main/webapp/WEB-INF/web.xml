@@ -73,7 +73,7 @@
                 allowHeaders=content-type
                 exposeHeaders=Content-Disposition
                 allowCredentials=true
-                allowOrigins=*
+                allowOrigins={systemProperties['rest.api.admin.allowed.origins']}
             )
         </param-value>
     </init-param>

@@ -77,7 +77,6 @@ import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.OAUTH_CLIENT
 import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.OAUTH_CLIENT_USERNAME;
 import static org.wso2.carbon.apimgt.api.model.ApplicationConstants.OAUTH_REDIRECT_URIS;
 
-//dummy comment
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class RegistrationServiceImpl implements RegistrationService {
