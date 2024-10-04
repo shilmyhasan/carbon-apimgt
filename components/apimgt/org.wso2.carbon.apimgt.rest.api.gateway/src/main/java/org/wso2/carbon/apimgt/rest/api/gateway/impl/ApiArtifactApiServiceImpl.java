@@ -32,7 +32,6 @@ import org.wso2.carbon.apimgt.rest.api.util.utils.RestApiUtil;
 
 import javax.ws.rs.core.Response;
 
-//dummy comment
 public class ApiArtifactApiServiceImpl implements ApiArtifactApiService {
 
     private static final Log log = LogFactory.getLog(ApiArtifactApiServiceImpl.class);
