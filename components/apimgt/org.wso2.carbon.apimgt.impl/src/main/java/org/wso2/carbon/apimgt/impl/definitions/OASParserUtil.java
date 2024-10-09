@@ -764,7 +764,13 @@ public class OASParserUtil {
             if (ref == null) {
                 if (schema instanceof ArraySchema) {
                     ArraySchema arraySchema = (ArraySchema) schema;
-                    ref = arraySchema.getItems().get$ref();
+                    Schema itemsSchema = arraySchema.getItems();
+                    // Process $ref items
+                    ref = itemsSchema.get$ref();
+                    if (ref == null) {
+                        // Process items in the form of Composed Schema such as allOf, oneOf, anyOf
+                        extractReferenceFromSchema(itemsSchema, context);
+                    }
                 } else if (schema instanceof ObjectSchema) {
                     references = addSchemaOfSchema(schema);
                 } else if (schema instanceof MapSchema) {
