@@ -3110,25 +3110,23 @@ public class APIMappingUtil {
         if (endpointSecurityElement.get(APIConstants.ENDPOINT_SECURITY_SANDBOX) != null) {
             JSONObject sandboxEndpointSecurity =
                     (JSONObject) endpointSecurityElement.get(APIConstants.ENDPOINT_SECURITY_SANDBOX);
+            if (APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.equalsIgnoreCase((String) sandboxEndpointSecurity
+                    .get(APIConstants.ENDPOINT_SECURITY_TYPE))) {
+                sandboxEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_SECRET, "");
+            }
             if (sandboxEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_PASSWORD) != null) {
                 sandboxEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_PASSWORD, EMPTY_STRING);
-                if (APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.equals(
-                        sandboxEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_TYPE))) {
-                    sandboxEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_ID, EMPTY_STRING);
-                    sandboxEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_SECRET, EMPTY_STRING);
-                }
             }
         }
         if (endpointSecurityElement.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION) != null) {
             JSONObject productionEndpointSecurity =
                     (JSONObject) endpointSecurityElement.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION);
+            if (APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.equalsIgnoreCase((String) productionEndpointSecurity
+                    .get(APIConstants.ENDPOINT_SECURITY_TYPE))) {
+                productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_SECRET, "");
+            }
             if (productionEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_PASSWORD) != null) {
                 productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_PASSWORD, EMPTY_STRING);
-                if (APIConstants.ENDPOINT_SECURITY_TYPE_OAUTH.equals(
-                        productionEndpointSecurity.get(APIConstants.ENDPOINT_SECURITY_TYPE))) {
-                    productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_ID, EMPTY_STRING);
-                    productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_CLIENT_SECRET, EMPTY_STRING);
-                }
             }
         }
         return endpointSecurityElement;
