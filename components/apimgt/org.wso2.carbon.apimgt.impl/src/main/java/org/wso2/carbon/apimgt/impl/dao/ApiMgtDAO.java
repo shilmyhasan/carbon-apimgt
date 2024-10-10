@@ -8100,12 +8100,13 @@ public class ApiMgtDAO {
         }
         String uuid = null;
         try (Connection connection = APIMgtDBUtil.getConnection()) {
-            PreparedStatement prepStmt = connection.prepareStatement(sql);
-            prepStmt.setString(1, name);
-            prepStmt.setString(2, version);
-            try (ResultSet resultSet = prepStmt.executeQuery()) {
-                while (resultSet.next()) {
-                    uuid = resultSet.getString(1);
+            try (PreparedStatement prepStmt = connection.prepareStatement(sql)) {
+                prepStmt.setString(1, name);
+                prepStmt.setString(2, version);
+                try (ResultSet resultSet = prepStmt.executeQuery()) {
+                    while (resultSet.next()) {
+                        uuid = resultSet.getString(1);
+                    }
                 }
             }
         } catch (SQLException e) {
