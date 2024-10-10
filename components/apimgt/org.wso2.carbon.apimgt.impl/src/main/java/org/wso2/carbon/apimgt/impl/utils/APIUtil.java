@@ -11777,14 +11777,7 @@ public final class APIUtil {
      */
     public static String getUUIDFromIdentifierAndTenantDomain(String apiName, String apiVersion, String tenantDomain)
             throws APIManagementException {
-        List<APIIdentifier> apiIdentifierList = ApiMgtDAO.getInstance().getAPIsFromNameAndVersion(apiName, apiVersion);
-        for (APIIdentifier apiIdentifier : apiIdentifierList) {
-            String apiProviderTenantDomain = MultitenantUtils.getTenantDomain(apiIdentifier.getProviderName());
-            if (tenantDomain.equals(apiProviderTenantDomain)) {
-                return apiIdentifier.getUUID();
-            }
-        }
-        return null;
+        return ApiMgtDAO.getInstance().getAPIIdentifierFromNameAndVersion(apiName, apiVersion, tenantDomain);
     }
 
     /**
