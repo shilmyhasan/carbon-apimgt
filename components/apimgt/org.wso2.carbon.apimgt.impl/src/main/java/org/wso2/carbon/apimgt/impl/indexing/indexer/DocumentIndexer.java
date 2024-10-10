@@ -27,11 +27,11 @@ import org.apache.pdfbox.io.RandomAccessBufferedFileInputStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.cos.COSDocument;
-import org.apache.poi.hslf.extractor.PowerPointExtractor;
+import org.apache.poi.hslf.usermodel.HSLFSlideShow;
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
+import org.apache.poi.sl.extractor.SlideShowExtractor;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -233,15 +233,15 @@ public class DocumentIndexer extends RXTIndexer {
                     contentString = xssfExcelExtractor.getText();
                     break;
                 case APIConstants.PPT_EXTENSION: {
-                    POIFSFileSystem fs = new POIFSFileSystem(inputStream);
-                    PowerPointExtractor extractor = new PowerPointExtractor(fs);
+                    HSLFSlideShow slideShow = new HSLFSlideShow(inputStream);
+                    SlideShowExtractor extractor = new SlideShowExtractor(slideShow);
                     contentString = extractor.getText();
                     break;
                 }
                 case APIConstants.PPTX_EXTENSION:
-                    XMLSlideShow xmlSlideShow = new XMLSlideShow(inputStream);
-                    XSLFPowerPointExtractor xslfPowerPointExtractor = new XSLFPowerPointExtractor(xmlSlideShow);
-                    contentString = xslfPowerPointExtractor.getText();
+                    XMLSlideShow slideShow = new XMLSlideShow(inputStream);
+                    SlideShowExtractor extractor = new SlideShowExtractor(slideShow);
+                    contentString = extractor.getText();
                     break;
                 case APIConstants.TXT_EXTENSION:
                 case APIConstants.WSDL_EXTENSION:
