@@ -8018,7 +8018,7 @@ public class ApiMgtDAO {
      * Get API UUID by the API Identifier.
      *
      * @param identifier API Identifier
-     * @return String UUID
+     * @return String UUID of the API
      * @throws APIManagementException if an error occurs
      */
     public String getUUIDFromIdentifier(APIIdentifier identifier) throws APIManagementException {
@@ -8075,7 +8075,7 @@ public class ApiMgtDAO {
      *
      * @param identifier API Identifier
      * @param organization identifier of the organization
-     * @return String UUID
+     * @return String UUID of the API
      * @throws APIManagementException if an error occurs
      */
     public String getUUIDFromIdentifier(APIIdentifier identifier, String organization) throws APIManagementException {
