@@ -81,8 +81,12 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.poi.wso2</groupId>
+            <groupId>org.wso2.orbit.org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.wsdl4j</groupId>
@@ -350,6 +354,16 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
