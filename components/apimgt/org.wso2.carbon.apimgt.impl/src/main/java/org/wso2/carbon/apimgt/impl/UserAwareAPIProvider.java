@@ -401,8 +401,8 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
-    public CertificateInformationDTO getCertificateStatus(String alias) throws APIManagementException {
-        return super.getCertificateStatus(alias);
+    public CertificateInformationDTO getCertificateStatus(String tenantDomain, String alias) throws APIManagementException {
+        return super.getCertificateStatus(tenantDomain, alias);
     }
 
     @Override
@@ -418,8 +418,8 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
-    public ByteArrayInputStream getCertificateContent(String alias) throws APIManagementException {
-        return super.getCertificateContent(alias);
+    public ByteArrayInputStream getCertificateContent(String tenantDomain, String alias) throws APIManagementException {
+        return super.getCertificateContent(tenantDomain, alias);
     }
 
     @Override
