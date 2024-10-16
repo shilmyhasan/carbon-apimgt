@@ -168,7 +168,6 @@ import org.wso2.carbon.apimgt.impl.dto.SubscriptionPolicyDTO;
 import org.wso2.carbon.apimgt.impl.dto.ThrottleProperties;
 import org.wso2.carbon.apimgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.exception.DataLoadingException;
-import org.wso2.carbon.apimgt.impl.importexport.ImportExportConstants;
 import org.wso2.carbon.apimgt.impl.internal.APIManagerComponent;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.impl.kmclient.ApacheFeignHttpClient;
@@ -9845,9 +9844,8 @@ public final class APIUtil {
                                 OperationPolicyData policyData = new OperationPolicyData();
                                 policyData.setSpecification(policySpec);
                                 policyData.setOrganization(organization);
-                                //since the directory contains common policies only, files are not renamed with type
                                 String policyFileName = getOperationPolicyFileName(policySpec.getName(),
-                                        policySpec.getVersion(), null);
+                                        policySpec.getVersion());
                                 OperationPolicyDefinition synapsePolicyDefinition =
                                         getOperationPolicyDefinitionFromFile(policyDefinitionLocation,
                                                 policyFileName, APIConstants.SYNAPSE_POLICY_DEFINITION_EXTENSION);
@@ -10109,14 +10107,11 @@ public final class APIUtil {
     }
 
 
-    public static String getOperationPolicyFileName(String policyName, String policyVersion, String policyType) {
+    public static String getOperationPolicyFileName(String policyName, String policyVersion) {
         if (StringUtils.isEmpty(policyVersion)) {
             policyVersion = "v1";
         }
-        if (policyType == null) {
-            return policyName + "_" + policyVersion;
-        }
-        return policyName + "_" + policyVersion + "_" + policyType;
+        return policyName + "_" + policyVersion;
     }
 
     public static void initializeVelocityContext(VelocityEngine velocityEngine){

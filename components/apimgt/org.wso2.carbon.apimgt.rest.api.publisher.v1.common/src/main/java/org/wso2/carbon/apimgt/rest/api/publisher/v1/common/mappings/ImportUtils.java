@@ -517,7 +517,7 @@ public class ImportUtils {
         String policyDirectory = extractedFolderPath + File.separator + ImportExportConstants.POLICIES_DIRECTORY;
         appliedPolicy.setPolicyId(null);
         String policyFileName = APIUtil.getOperationPolicyFileName(appliedPolicy.getPolicyName(),
-                appliedPolicy.getPolicyVersion(), appliedPolicy.getPolicyType());
+                appliedPolicy.getPolicyVersion());
         OperationPolicySpecification policySpec = null;
 
         if (visitedPoliciesMap.containsKey(policyFileName)) {
@@ -626,7 +626,7 @@ public class ImportUtils {
             boolean policyImported = false;
             try {
                 String policyFileName = APIUtil.getOperationPolicyFileName(policy.getPolicyName(),
-                        policy.getPolicyVersion(), policy.getPolicyType());
+                        policy.getPolicyVersion());
                 String policyID = null;
                 if (!importedPolicies.containsKey(policyFileName)) {
                     OperationPolicySpecification policySpec =
@@ -660,8 +660,7 @@ public class ImportUtils {
                         }
                         operationPolicyData.setMd5Hash(
                                 APIUtil.getMd5OfOperationPolicy(operationPolicyData));
-                        policyID = provider.importOperationPolicyOfGivenType(operationPolicyData,
-                                policy.getPolicyType(), tenantDomain);
+                        policyID = provider.importOperationPolicy(operationPolicyData, tenantDomain);
                         importedPolicies.put(policyFileName, policyID);
                         policyImported = true;
                     } else {

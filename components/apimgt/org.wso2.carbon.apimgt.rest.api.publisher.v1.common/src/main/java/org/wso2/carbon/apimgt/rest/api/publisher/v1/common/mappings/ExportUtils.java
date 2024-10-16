@@ -648,25 +648,19 @@ public class ExportUtils {
                 List<OperationPolicy> operationPolicies = uriTemplate.getOperationPolicies();
                 if (operationPolicies != null && !operationPolicies.isEmpty()) {
                     for (OperationPolicy policy : operationPolicies) {
-                        if (!exportedPolicies.contains(policy.getPolicyName() + "_" + policy.getPolicyVersion() + "_" +
-                                policy.getPolicyType())) {
+                        if (!exportedPolicies.contains(policy.getPolicyName() + "_" + policy.getPolicyVersion())) {
+                            String policyFileName = APIUtil.getOperationPolicyFileName(policy.getPolicyName(),
+                                    policy.getPolicyVersion());
                             if (policy.getPolicyId() != null) {
-                                String policyFileName = APIUtil.getOperationPolicyFileName(policy.getPolicyName(),
-                                        policy.getPolicyVersion(), policy.getPolicyType());
-
                                 OperationPolicyData policyData =
                                         apiProvider.getAPISpecificOperationPolicyByPolicyId(policy.getPolicyId(),
                                                 currentApiUuid, tenantDomain, true);
                                 if (policyData != null) {
                                     exportPolicyData(policyFileName, policyData, archivePath, exportFormat);
-                                    exportedPolicies.add(policy.getPolicyName() + "_" + policy.getPolicyVersion() + "_"
-                                            + policy.getPolicyType());
+                                    exportedPolicies.add(policy.getPolicyName() + "_" + policy.getPolicyVersion());
                                 }
                             } else {
                                 // This path is to handle migrated APIs with mediation policies attached
-                                // These are considered as API policies by default
-                                String policyFileName = APIUtil.getOperationPolicyFileName(policy.getPolicyName(),
-                                        policy.getPolicyVersion(), ImportExportConstants.POLICY_TYPE_API);
                                 if (APIUtil.isSequenceDefined(api.getInSequence())
                                         || APIUtil.isSequenceDefined(api.getOutSequence())
                                         || APIUtil.isSequenceDefined(api.getFaultSequence())) {
@@ -681,8 +675,7 @@ public class ExportUtils {
                                             policy.getDirection(), tenantDomain);
                                     if (policyData != null) {
                                         exportPolicyData(policyFileName, policyData, archivePath, exportFormat);
-                                        exportedPolicies.add(policy.getPolicyName() + "_" + policy.getPolicyVersion() +
-                                                "_" + ImportExportConstants.POLICY_TYPE_API);
+                                        exportedPolicies.add(policy.getPolicyName() + "_" + policy.getPolicyVersion());
                                     }
                                 }
                             }
@@ -695,14 +688,13 @@ public class ExportUtils {
                     && APIUtil.isAPILevelPolicySupportEnabled()) {
                 for (OperationPolicy policy : api.getApiPolicies()) {
                     String policyFileName = APIUtil.getOperationPolicyFileName(policy.getPolicyName(),
-                            policy.getPolicyVersion(), policy.getPolicyType());
+                            policy.getPolicyVersion());
                     if (!exportedPolicies.contains(policyFileName)) {
                         OperationPolicyData policyData = apiProvider.getAPISpecificOperationPolicyByPolicyId(
                                 policy.getPolicyId(), currentApiUuid, tenantDomain, true);
                         if (policyData != null) {
                             exportPolicyData(policyFileName, policyData, archivePath, exportFormat);
-                            exportedPolicies.add(policy.getPolicyName() + "_" + policy.getPolicyVersion() + "_" +
-                                    policy.getPolicyType());
+                            exportedPolicies.add(policy.getPolicyName() + "_" + policy.getPolicyVersion());
                         }
                     }
                 }
