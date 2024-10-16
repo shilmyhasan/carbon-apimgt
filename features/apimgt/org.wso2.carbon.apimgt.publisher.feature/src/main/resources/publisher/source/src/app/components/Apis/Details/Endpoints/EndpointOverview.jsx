@@ -555,12 +555,16 @@ function EndpointOverview(props) {
     };
 
     const saveEndpointSecurityConfig = (endpointSecurityObj, enType) => {
+        const secretPlaceholder = '********';
+
         endpointsDispatcher({
             action: 'endpointSecurity',
             value: {
                 ...endpointSecurityInfo,
                 [enType]: {
                     ...endpointSecurityInfo[enType],
+                    clientSecret: endpointSecurityInfo[enType].clientSecret === secretPlaceholder
+                        ? '' : endpointSecurityInfo[enType].clientSecret,
                     enabled: endpointSecurityObj.type !== 'NONE'
                         ? endpointSecurityInfo[enType].enabled = true : endpointSecurityInfo[enType].enabled = false,
                 },
