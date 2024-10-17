@@ -25,6 +25,7 @@ public class OperationPolicy implements Comparable<OperationPolicy> {
 
     private String policyName = "";
     private String policyVersion = "v1";
+    private String policyType = null;
     private String direction = null;
     private Map<String, Object> parameters = null;
     private String policyId = null;
@@ -48,6 +49,16 @@ public class OperationPolicy implements Comparable<OperationPolicy> {
     public void setPolicyVersion(String policyVersion) {
 
         this.policyVersion = policyVersion;
+    }
+
+    public String getPolicyType() {
+
+        return policyType;
+    }
+
+    public void setPolicyType(String policyType) {
+
+        this.policyType = policyType;
     }
 
     public Map<String, Object> getParameters() {
@@ -99,7 +110,7 @@ public class OperationPolicy implements Comparable<OperationPolicy> {
             return false;
         OperationPolicy policyObj = (OperationPolicy) o;
         return policyId == policyObj.policyId && policyName == policyObj.policyName && policyVersion == policyObj.policyVersion
-                && direction.equals(policyObj.direction) && parameters.equals(policyObj.parameters);
+                && direction.equals(policyObj.direction) && policyType.equals(policyObj.policyType) && parameters.equals(policyObj.parameters);
     }
 
     @Override
