@@ -5132,6 +5132,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             OperationPolicyData basicPolicyData =
                     getAPISpecificOperationPolicyByPolicyId(policy.getPolicyId(),
                             apiUUId, tenantDomain, false);
+            // In an api product resource update scenario, when existing policy has been removed from an api,
+            // there's no entry attached to api policy id and apiId in AM_API_OPERATION_POLICY table
+            if (basicPolicyData == null) {
+                return null;
+            }
             if (basicPolicyData.getClonedCommonPolicyId() == null) {
                 policyType = ImportExportConstants.POLICY_TYPE_API;
             } else {
@@ -5139,6 +5144,19 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         }
         return policyType;
+    }
+
+    public String getProductPolicyType(OperationPolicy policy, String productUUID, String apiUUID, String tenantDomain)
+            throws APIManagementException {
+
+        OperationPolicyData basicPolicyData =
+                getAPISpecificOperationPolicyByPolicyId(policy.getPolicyId(),
+                        productUUID, tenantDomain, false);
+        String originatedPolicyId = basicPolicyData.getClonedCommonPolicyId();
+
+        policy.setPolicyId(originatedPolicyId);
+        return getPolicyType(policy, apiUUID, tenantDomain);
+
     }
 
     public API addPolicyTypeFieldToApi(API api, String tenantDomain)
@@ -5169,6 +5187,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             api.setApiPolicies(apiPolicies);
         }
         return api;
+    }
+
+    public APIProduct addPolicyTypeFieldToApiProduct(APIProduct product) throws APIManagementException {
+
+        List<APIProductResource> productResources = product.getProductResources();
+        for (APIProductResource resource : productResources) {
+            URITemplate uriTemplate = resource.getUriTemplate();
+            List<OperationPolicy> operationPolicies = uriTemplate.getOperationPolicies();
+            if (!operationPolicies.isEmpty()) {
+                for (OperationPolicy operationPolicy : operationPolicies) {
+                    String policyType = getProductPolicyType(operationPolicy, product.getUuid(), resource.getApiId(),
+                            tenantDomain);
+                    operationPolicy.setPolicyType(policyType);
+                }
+            }
+            uriTemplate.setOperationPolicies(operationPolicies);
+            resource.setUriTemplate(uriTemplate);
+        }
+        product.setProductResources(productResources);
+        return product;
     }
 
     @Override
@@ -5342,6 +5380,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 if (migrationEnabled == null) {
                     populateDefaultVersion(product);
                 }
+                product = addPolicyTypeFieldToApiProduct(product);
                 return product;
             } else {
                 String msg = "Failed to get API Product. API Product artifact corresponding to artifactId " + uuid
