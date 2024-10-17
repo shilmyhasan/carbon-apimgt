@@ -5132,6 +5132,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             OperationPolicyData basicPolicyData =
                     getAPISpecificOperationPolicyByPolicyId(policy.getPolicyId(),
                             apiUUId, tenantDomain, false);
+            // In an api product resource update scenario, when existing policy has been removed from an api,
+            // there's no entry attached to api policy id and apiId in AM_API_OPERATION_POLICY table
+            if (basicPolicyData == null) {
+                return null;
+            }
             if (basicPolicyData.getClonedCommonPolicyId() == null) {
                 policyType = ImportExportConstants.POLICY_TYPE_API;
             } else {
