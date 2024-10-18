@@ -65,8 +65,6 @@ public class SequenceGeneratorTest {
     @Test
     public void testGenerateSequencesFromSwaggerWithOrder() throws Exception {
         String[] names = new String[]{"userName", "credential", "claims", "profileName", "requirePasswordChange"};
-
-        System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
         List<SOAPToRestSequence> sequenceList = SequenceGenerator.generateSequencesFromSwagger(getSwagger(), null);
         OMElement element = extractParameterElements(sequenceList);
         int count = 0;
