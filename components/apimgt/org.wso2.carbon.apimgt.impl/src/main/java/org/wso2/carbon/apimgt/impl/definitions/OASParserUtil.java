@@ -659,6 +659,13 @@ public class OASParserUtil {
                     addToReferenceObjectMap(ref, context);
                 }
             }
+
+            Map<String, Header> headers = response.getHeaders();
+            if (headers != null) {
+                for (Header header : headers.values()) {
+                    setRefOfApiResponseHeader(header, context);
+                }
+            }
         }
     }
 
@@ -688,9 +695,14 @@ public class OASParserUtil {
             if (content != null) {
                 extractReferenceFromContent(content, context);
             } else {
-                String ref = header.get$ref();
-                if (ref != null) {
-                    addToReferenceObjectMap(ref, context);
+                Schema schema = header.getSchema();
+                if (schema != null) {
+                    extractReferenceFromSchema(schema, context);
+                } else {
+                    String ref = header.get$ref();
+                    if (ref != null) {
+                        addToReferenceObjectMap(ref, context);
+                    }
                 }
             }
         }
@@ -786,7 +798,7 @@ public class OASParserUtil {
                         extractReferenceFromSchema(itemsSchema, context);
                     }
                 } else if (schema instanceof ObjectSchema) {
-                    references = addSchemaOfSchema(schema);
+                    references = addSchemaOfSchema(schema, context);
                 } else if (schema instanceof MapSchema) {
                     Schema additionalPropertiesSchema = (Schema) schema.getAdditionalProperties();
                     extractReferenceFromSchema(additionalPropertiesSchema, context);
@@ -794,7 +806,7 @@ public class OASParserUtil {
                     if (((ComposedSchema) schema).getAllOf() != null) {
                         for (Schema sc : ((ComposedSchema) schema).getAllOf()) {
                             if (OBJECT_DATA_TYPE.equalsIgnoreCase(sc.getType())) {
-                                references.addAll(addSchemaOfSchema(sc));
+                                references.addAll(addSchemaOfSchema(sc, context));
                             } else {
                                 String schemaRef = sc.get$ref();
                                 if (schemaRef != null) {
@@ -808,7 +820,7 @@ public class OASParserUtil {
                     if (((ComposedSchema) schema).getAnyOf() != null) {
                         for (Schema sc : ((ComposedSchema) schema).getAnyOf()) {
                             if (OBJECT_DATA_TYPE.equalsIgnoreCase(sc.getType())) {
-                                references.addAll(addSchemaOfSchema(sc));
+                                references.addAll(addSchemaOfSchema(sc, context));
                             } else {
                                 String schemaRef = sc.get$ref();
                                 if (schemaRef != null) {
@@ -822,7 +834,7 @@ public class OASParserUtil {
                     if (((ComposedSchema) schema).getOneOf() != null) {
                         for (Schema sc : ((ComposedSchema) schema).getOneOf()) {
                             if (OBJECT_DATA_TYPE.equalsIgnoreCase(sc.getType())) {
-                                references.addAll(addSchemaOfSchema(sc));
+                                references.addAll(addSchemaOfSchema(sc, context));
                             } else {
                                 String schemaRef = sc.get$ref();
                                 if (schemaRef != null) {
@@ -871,13 +883,14 @@ public class OASParserUtil {
         }
     }
 
-    private static List<String> addSchemaOfSchema(Schema schema) {
+    private static List<String> addSchemaOfSchema(Schema schema, SwaggerUpdateContext context) {
         List<String> references = new ArrayList<String>();
         ObjectSchema os = (ObjectSchema) schema;
         if (os.getProperties() != null) {
             for (String propertyName : os.getProperties().keySet()) {
-                if (os.getProperties().get(propertyName) instanceof ComposedSchema) {
-                    ComposedSchema cs = (ComposedSchema) os.getProperties().get(propertyName);
+                Schema propertySchema = os.getProperties().get(propertyName);
+                if (propertySchema instanceof ComposedSchema) {
+                    ComposedSchema cs = (ComposedSchema) propertySchema;
                     if (cs.getAllOf() != null) {
                         for (Schema sc : cs.getAllOf()) {
                             references.add(sc.get$ref());
@@ -893,6 +906,9 @@ public class OASParserUtil {
                     } else {
                         log.error("Unidentified schema. The schema is not available in the API definition.");
                     }
+                } else if (propertySchema instanceof ObjectSchema ||
+                        propertySchema instanceof ArraySchema) {
+                    extractReferenceFromSchema(propertySchema, context);
                 }
             }
         }
