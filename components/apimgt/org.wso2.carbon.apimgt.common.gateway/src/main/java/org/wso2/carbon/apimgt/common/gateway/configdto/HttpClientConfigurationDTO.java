@@ -36,6 +36,7 @@ public class HttpClientConfigurationDTO {
     private String proxyUsername;
     private char[] proxyPassword = new char[]{};
     private String[] nonProxyHosts = new String[]{};
+    private String[] targetProxyHosts = new String[]{};
     private String proxyProtocol;
     private SSLContext sslContext;
     private HostnameVerifier hostnameVerifier;
@@ -79,6 +80,10 @@ public class HttpClientConfigurationDTO {
         return Arrays.copyOf(nonProxyHosts, nonProxyHosts.length);
     }
 
+    public String[] getTargetProxyHosts() {
+        return Arrays.copyOf(targetProxyHosts, targetProxyHosts.length);
+    }
+
     public String getProxyProtocol() {
         return proxyProtocol;
     }
@@ -100,6 +105,7 @@ public class HttpClientConfigurationDTO {
         private String proxyUsername;
         private char[] proxyPassword = new char[]{};
         private String[] nonProxyHosts = new String[]{};
+        private String[] targetProxyHosts = new String[]{};
         private String proxyProtocol;
         private SSLContext sslContext;
         private HostnameVerifier hostnameVerifier;
@@ -111,7 +117,7 @@ public class HttpClientConfigurationDTO {
         }
 
         public Builder withProxy(String proxyHost, int proxyPort, String proxyUsername, String proxyPassword,
-                                 String proxyProtocol, String[] nonProxyHosts) {
+                                 String proxyProtocol, String[] nonProxyHosts, String[] targetProxyHosts) {
             this.proxyEnabled = true;
             this.proxyHost = proxyHost;
             this.proxyPort = proxyPort;
@@ -120,6 +126,9 @@ public class HttpClientConfigurationDTO {
             this.proxyProtocol = proxyProtocol;
             this.nonProxyHosts = nonProxyHosts != null ?
                     Arrays.copyOf(nonProxyHosts, nonProxyHosts.length) : new String[]{};
+            this.targetProxyHosts = targetProxyHosts != null ?
+                    Arrays.copyOf(targetProxyHosts, targetProxyHosts.length) :
+                    new String[] {};
             return this;
         }
 

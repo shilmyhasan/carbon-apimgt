@@ -34,6 +34,7 @@ public class ExtendedProxyRoutePlanner extends DefaultProxyRoutePlanner {
     private static final Log log = LogFactory.getLog(ExtendedProxyRoutePlanner.class);
     private final HttpClientConfigurationDTO configuration;
     String[] nonProxyHosts;
+    String[] targetProxyHosts;
     String proxyHost;
     int proxyPort;
     String protocol;
@@ -45,6 +46,7 @@ public class ExtendedProxyRoutePlanner extends DefaultProxyRoutePlanner {
         this.proxyHost = configuration.getProxyHost();
         this.proxyPort = configuration.getProxyPort();
         this.protocol = configuration.getProxyProtocol();
+        this.targetProxyHosts = configuration.getTargetProxyHosts();
     }
 
     private HttpHost getProxy(String scheme) {
@@ -67,20 +69,33 @@ public class ExtendedProxyRoutePlanner extends DefaultProxyRoutePlanner {
         String uriHost = target.getHostName();
         String uriScheme = target.getSchemeName();
         String[] nonProxyHosts = configuration.getNonProxyHosts();
-        int nphLength = nonProxyHosts != null ? nonProxyHosts.length : 0;
-        if (nonProxyHosts == null || nphLength < 1) {
-            log.debug("scheme:'" + uriScheme + "', host:'" + uriHost + "' : DEFAULT (0 non proxy host)");
-            return false;
-        }
-        for (String nonProxyHost : nonProxyHosts) {
-            if (uriHost.matches(nonProxyHost)) {
-                log.debug("scheme:'" + uriScheme + "', host:'" + uriHost + "' matches nonProxyHost '" +
-                        nonProxyHost + "' : NO PROXY");
-                return true;
+        String[] targetProxyHosts = configuration.getTargetProxyHosts();
+
+        if (nonProxyHosts != null) {
+            for (String nonProxyHost : nonProxyHosts) {
+                if ("*".equals(nonProxyHost)) {
+                    return true;
+                }
+                if (uriHost.matches(nonProxyHost)) {
+                    log.debug("sheme:'" + uriScheme + "', host:'" + uriHost + "' matches nonProxyHost '" + nonProxyHost
+                            + "' : NO PROXY");
+                    return true;
+                }
             }
         }
-        log.debug("scheme:'" + uriScheme + "', host:'" + uriHost + "' : DEFAULT  (no match of " + nphLength +
-                " non proxy host)");
+
+        if (targetProxyHosts != null) {
+            for (String targetProxyHost : targetProxyHosts) {
+                if ("*".equals(targetProxyHost)) {
+                    return false;
+                }
+                if (uriHost.matches(targetProxyHost)) {
+                    return false;
+                }
+            }
+        }
+
+        log.debug("sheme:'" + uriScheme + "', host:'" + uriHost + "' : DEFAULT  (no match of non proxy hosts)");
         return false;
     }
 
