@@ -154,6 +154,7 @@ public class HttpClientConfigurationDTO {
             configuration.proxyPassword = this.proxyPassword;
             configuration.proxyProtocol = this.proxyProtocol;
             configuration.nonProxyHosts = this.nonProxyHosts;
+            configuration.targetProxyHosts = this.targetProxyHosts;
             configuration.hostnameVerifier = this.hostnameVerifier;
             if (this.sslContext != null) {
                 configuration.sslContext = this.sslContext;
