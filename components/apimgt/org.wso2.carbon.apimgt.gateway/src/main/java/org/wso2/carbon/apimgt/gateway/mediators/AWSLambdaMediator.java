@@ -160,7 +160,7 @@ public class AWSLambdaMediator extends AbstractMediator {
                     if (isMultipartContent) {
                         payload.addProperty(BODY_PARAMETER, body);
                     } else {
-                        payload.add(BODY_PARAMETER, new JsonParser().parse(body).getAsJsonObject());
+                        payload.addProperty(BODY_PARAMETER, body);
                     }
                 }
                 payload.addProperty(IS_BASE64_ENCODED_PARAMETER, isContentEncodingEnabled);
