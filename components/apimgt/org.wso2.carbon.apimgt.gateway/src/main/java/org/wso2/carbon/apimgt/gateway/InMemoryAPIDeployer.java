@@ -44,6 +44,7 @@ import org.wso2.carbon.apimgt.gateway.internal.DataHolder;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.service.APIGatewayAdmin;
 import org.wso2.carbon.apimgt.impl.APIConstants;
+import org.wso2.carbon.apimgt.impl.dto.ExtendedJWTConfigurationDto;
 import org.wso2.carbon.apimgt.impl.dto.GatewayArtifactSynchronizerProperties;
 import org.wso2.carbon.apimgt.impl.dto.GatewayCleanupSkipList;
 import org.wso2.carbon.apimgt.impl.gatewayartifactsynchronizer.ArtifactRetriever;
@@ -199,7 +200,11 @@ public class InMemoryAPIDeployer {
 
         boolean result = false;
         try {
-            deployJWKSSynapseAPI(tenantDomain); // Deploy JWKS API
+            boolean isJWKSApiEnabled =  ServiceReferenceHolder
+                    .getInstance().getAPIManagerConfiguration().getJwtConfigurationDto().isJWKSApiEnabled();
+            if(isJWKSApiEnabled) {
+                deployJWKSSynapseAPI(tenantDomain); // Deploy JWKS API
+            }
         } catch (APIManagementException e) {
             log.error("Error while deploying JWKS API for tenant domain :" + tenantDomain, e);
         }
