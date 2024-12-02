@@ -107,7 +107,6 @@ public class AWSLambdaMediator extends AbstractMediator {
             boolean passRequestParamsToLambdaFunction = APIUtil.passRequestParamsToLambdaFunction();
 
             String body;
-            boolean isMultipartContent = false;
             if (JsonUtil.hasAJsonPayload(axis2MessageContext)) {
                 body = JsonUtil.jsonPayloadToString(axis2MessageContext);
             } else {
@@ -115,7 +114,6 @@ public class AWSLambdaMediator extends AbstractMediator {
                 String multipartContent = extractFormDataContent(axis2MessageContext);
                 if (StringUtils.isNotEmpty(multipartContent)) {
                     body = multipartContent;
-                    isMultipartContent = true;
                 }
             }
 
@@ -157,11 +155,7 @@ public class AWSLambdaMediator extends AbstractMediator {
                     payload.addProperty(BODY_PARAMETER, Base64.encodeBase64String(body.getBytes(
                             StandardCharsets.UTF_8)));
                 } else {
-                    if (isMultipartContent) {
-                        payload.addProperty(BODY_PARAMETER, body);
-                    } else {
-                        payload.addProperty(BODY_PARAMETER, body);
-                    }
+                    payload.addProperty(BODY_PARAMETER, body);
                 }
                 payload.addProperty(IS_BASE64_ENCODED_PARAMETER, isContentEncodingEnabled);
                 payload.addProperty(HTTP_METHOD, (String) messageContext.getProperty(APIConstants.REST_METHOD));
