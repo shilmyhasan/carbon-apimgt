@@ -35,7 +35,8 @@
     <JWTConfiguration>
         <!-- Enable/Disable JWT generation. Default is false. -->
         <EnableJWTGeneration>{{apim.jwt.enable}}</EnableJWTGeneration>
-
+        <!-- Enable/Disable JWKS in memory API deployment. Default is true. -->
+        <EnableJWKSApi>{{apim.jwt.enable_jwks_api}}</EnableJWKSApi>
         <!-- Name of the security context header to be added to the validated requests. -->
         <JWTHeader>{{apim.jwt.header}}</JWTHeader>
 
@@ -80,14 +81,6 @@
         <!-- This parameter specifies which implementation should be used for generating the Token. For URL safe JWT
              Token generation the implementation is provided in URLSafeJWTGenerator -->
         <!--<JWTGeneratorImpl>org.wso2.carbon.apimgt.keymgt.token.URLSafeJWTGenerator</JWTGeneratorImpl>-->
-
-        <!-- Set the JWT decoding method. Options are "base64url" or "base64". The default value is "base64". -->
-        {% if apim.jwt.decoding %}
-        <JWTDecoding>{{apim.jwt.decoding}}</JWTDecoding>
-        {% elif apim.jwt.encoding %}
-        <JWTDecoding>{{apim.jwt.encoding}}</JWTDecoding>
-        {% endif %}
-  
        {% if apim.jwt.enable_tenant_based_signing is defined %}
         <EnableTenantBasedSigning>{{apim.jwt.enable_tenant_based_signing}}</EnableTenantBasedSigning>
         {% endif %}
@@ -102,6 +95,9 @@
             </ExcludedClaims>
             <EnableUserClaimRetrievalFromKeyManager>{{apim.jwt.gateway_generator.enable_claim_retrieval}}</EnableUserClaimRetrievalFromKeyManager>
             </Configuration>
+            {% if apim.jwt.enable_base64_padding is defined %}
+            <EnableBase64Padding>{{apim.jwt.enable_base64_padding}}</EnableBase64Padding>
+            {% endif %}
         </GatewayJWTGeneration>
     </JWTConfiguration>
 
@@ -312,7 +308,6 @@
             <Property name="{{key}}">{{value}}</Property>
             {% endfor %}
         </Properties>
-
         <MaskProperties>
             {% for key,value in apim.analytics.mask.items() %}
             <Property name="{{key}}">{{value}}</Property>
@@ -756,6 +751,10 @@
                 <URI>/api/am/service-catalog/{serviceCatalogVersion}/oas.yaml</URI>
                 <HTTPMethods>GET,HEAD</HTTPMethods>
             </AllowedURI>
+            <AllowedURI>
+                <URI>/api/am/gateway/v2/server-startup-healthcheck</URI>
+                <HTTPMethods>GET</HTTPMethods>
+            </AllowedURI>
         </AllowedURIs>
         <ETagSkipList>
             <ETagSkipURI>
@@ -1023,6 +1022,9 @@
         <EnableQueryParamConditions>{{apim.throttling.enable_query_param_based_throttling}}</EnableQueryParamConditions>
         <SkipRedeployingPolicies>RequestPreProcessorExecutionPlan{% for policy in apim.throttling.skip_redeploying_policies %}{{ "," if loop.first }}{{policy}}{{ "," if not loop.last }}{% endfor %}</SkipRedeployingPolicies>
         <EnablePolicyDeployment>{{apim.throttling.enable_policy_deployment}}</EnablePolicyDeployment>
+        {% if apim.throttling.set_header_based_throttling_case_insensitive is defined %}
+        <SetHeaderConditionsCaseInsensitive>{{apim.throttling.set_header_based_throttling_case_insensitive}}</SetHeaderConditionsCaseInsensitive>
+        {% endif %}
     </ThrottlingConfigurations>
 
     <WorkflowConfigurations>
@@ -1137,6 +1139,11 @@
         <LogTracer>
             <Enabled>{{apim.open_telemetry.log_tracer.enable}}</Enabled>
         </LogTracer>
+        <ResourceAttributes>
+            {% for attribute in apim.open_telemetry.resource_attributes %}
+            <{{attribute.name}}>{{attribute.value}}</{{attribute.name}}>
+            {% endfor %}
+        </ResourceAttributes>
     </OpenTelemetry>
 
     <OpenTracer>
@@ -1151,14 +1158,6 @@
                 {% endif %}
                 {% if apim.open_tracer.remote_tracer.properties.sampler_param is defined %}
                 <SamplerParam>{{apim.open_tracer.remote_tracer.properties.sampler_param}}</SamplerParam>
-                {% if apim.open_tracer.remote_tracer.properties.proxy_host is defined %}
-                <ProxyHost>{{apim.open_tracer.remote_tracer.properties.proxy_host}}</ProxyHost>
-                {% endif %}
-                {% if apim.open_tracer.remote_tracer.properties.proxy_port is defined %}
-                <ProxyPort>{{apim.open_tracer.remote_tracer.properties.proxy_port}}</ProxyPort>
-                {% endif %}
-                {% if apim.open_tracer.remote_tracer.properties.endpoint_url is defined %}
-                <EndpointUrl>{{apim.open_tracer.remote_tracer.properties.endpoint_url}}</EndpointUrl>
                 {% endif %}
             </Properties>
         </RemoteTracer>
@@ -1177,36 +1176,47 @@
     {% endif %}
 
     {% if apim.redis_config is defined %}
-        <RedisConfig>
-            {% if apim.redis_config.host is defined %}
-            <RedisHost>{{apim.redis_config.host}}</RedisHost>
+    <RedisConfig>
+        {% if apim.redis_config.host is defined %}
+        <RedisHost>{{apim.redis_config.host}}</RedisHost>
+        {% endif %}
+        {% if apim.redis_config.port is defined %}
+        <RedisPort>{{apim.redis_config.port}}</RedisPort>
+        {% endif %}
+        {% if apim.redis_config.user is defined %}
+        <RedisUser>{{apim.redis_config.user}}</RedisUser>
+        {% endif %}
+        {% if apim.redis_config.password is defined %}
+        <RedisPassword>{{apim.redis_config.password}}</RedisPassword>
+        {% endif %}
+        {% if apim.redis_config.database_id is defined %}
+        <RedisDatabaseId>{{apim.redis_config.database_id}}</RedisDatabaseId>
+        {% endif %}
+        {% if apim.redis_config.connection_timeout is defined %}
+        <RedisConnectionTimeout>{{apim.redis_config.connection_timeout}}</RedisConnectionTimeout>
+        {% endif %}
+        {% if apim.redis_config.ssl is defined %}
+        <RedisIsSslEnabled>{{apim.redis_config.ssl}}</RedisIsSslEnabled>
+        {% endif %}
+        {% if apim.redis_config.gateway_id is defined %}
+        <GatewayId>{{apim.redis_config.gateway_id}}</GatewayId>
+        {% endif %}
+        {% if apim.redis_config.min_gateway_count is defined %}
+        <MinGatewayCount>{{apim.redis_config.min_gateway_count}}</MinGatewayCount>
+        {% endif %}
+        {% if apim.redis_config.key_lock_retrieval_timeout is defined %}
+        <KeyLockRetrievalTimeout>{{apim.redis_config.key_lock_retrieval_timeout}}</KeyLockRetrievalTimeout>
+        {% else %}
+        <KeyLockRetrievalTimeout>50</KeyLockRetrievalTimeout>
+        {% endif %}
+        <Properties>
+            {% if apim.redis_config.pool_options is defined %}
+            {% for property_name,property_value in apim.redis_config.pool_options.items() %}
+             <{{property_name}}>{{property_value}}</{{property_name}}>
+            {% endfor %}
             {% endif %}
-            {% if apim.redis_config.port is defined %}
-            <RedisPort>{{apim.redis_config.port}}</RedisPort>
-            {% endif %}
-            {% if apim.redis_config.user is defined %}
-            <RedisUser>{{apim.redis_config.user}}</RedisUser>
-            {% endif %}
-            {% if apim.redis_config.password is defined %}
-            <RedisPassword>{{apim.redis_config.password}}</RedisPassword>
-            {% endif %}
-            {% if apim.redis_config.database_id is defined %}
-            <RedisDatabaseId>{{apim.redis_config.database_id}}</RedisDatabaseId>
-            {% endif %}
-            {% if apim.redis_config.connection_timeout is defined %}
-            <RedisConnectionTimeout>{{apim.redis_config.connection_timeout}}</RedisConnectionTimeout>
-            {% endif %}
-            {% if apim.redis_config.ssl is defined %}
-            <RedisIsSslEnabled>{{apim.redis_config.ssl}}</RedisIsSslEnabled>
-            {% endif %}
-            <Properties>
-                {% if apim.redis_config.pool_options is defined %}
-                {% for property_name,property_value in apim.redis_config.pool_options.items() %}
-                 <{{property_name}}>{{property_value}}</{{property_name}}>
-                {% endfor %}
-                {% endif %}
-            </Properties>
-        </RedisConfig>
+        </Properties>
+    </RedisConfig>
     {% endif %}
 
     {% if apim.devportal.application_attributes is defined %}
@@ -1536,6 +1546,16 @@
      <!--This parameter is used to Enable the password changing feature in devportal. When this is enabled, a user can
       change his/her password via devportal. By default this feature is enabled.-->
      <EnableChangePassword>{{apim.enable_change_password}}</EnableChangePassword>
+
+    {% if apim.lambda_mediator_config is defined %}
+    <LambdaMediatorConfig>
+        <PassRequestParamsToLambdaFunction>{{apim.lambda_mediator_config.pass_request_params}}</PassRequestParamsToLambdaFunction>
+    </LambdaMediatorConfig>
+    {% else %}
+    <LambdaMediatorConfig>
+        <PassRequestParamsToLambdaFunction>true</PassRequestParamsToLambdaFunction>
+    </LambdaMediatorConfig>
+    {% endif %}
 
     {% if apim.extension.listener is defined %}
     <ExtensionListeners>
