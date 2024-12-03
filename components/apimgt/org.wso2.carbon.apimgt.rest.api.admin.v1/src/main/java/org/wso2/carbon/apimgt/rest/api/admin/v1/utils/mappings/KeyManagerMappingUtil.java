@@ -362,6 +362,7 @@ public class KeyManagerMappingUtil {
                 keyManagerCertificatesDTO.setValue(openIdConnectConfiguration.getJwksEndpoint());
                 keyManagerDto.setCertificates(keyManagerCertificatesDTO);
             }
+            keyManagerDto.setUserInfoEndpoint(openIdConnectConfiguration.getUserInfoEndpoint());
             keyManagerWellKnownResponseDTO.setValue(keyManagerDto);
         }
         return keyManagerWellKnownResponseDTO;
