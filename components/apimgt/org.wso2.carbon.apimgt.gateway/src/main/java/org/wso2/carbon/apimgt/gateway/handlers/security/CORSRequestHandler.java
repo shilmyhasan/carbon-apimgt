@@ -50,6 +50,7 @@ import org.wso2.carbon.metrics.manager.Timer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -167,16 +168,20 @@ public class CORSRequestHandler extends AbstractHandler implements ManagedLifecy
 
             if (selectedApi != null) {
                 Resource[] allAPIResources = selectedApi.getResources();
-                Set<Resource> acceptableResources = new LinkedHashSet<>();
+                List<Resource> acceptableResourcesList = new LinkedList<>();
 
                 for (Resource resource : allAPIResources) {
-                    //If the requesting method is OPTIONS or if the Resource contains the requesting method
-                    if ((RESTConstants.METHOD_OPTIONS.equals(httpMethod) && resource.getMethods() != null &&
+                    if (resource.getMethods() != null && Arrays.asList(resource.getMethods()).contains(httpMethod) &&
+                            RESTConstants.METHOD_OPTIONS.equals(httpMethod)) {
+                        acceptableResourcesList.add(0, resource);
+                    } else if ((RESTConstants.METHOD_OPTIONS.equals(httpMethod) && resource.getMethods() != null &&
                             Arrays.asList(resource.getMethods()).contains(corsRequestMethod)) ||
                             (resource.getMethods() != null && Arrays.asList(resource.getMethods()).contains(httpMethod))) {
-                        acceptableResources.add(resource);
+                        acceptableResourcesList.add(resource);
                     }
                 }
+
+                Set<Resource> acceptableResources = new LinkedHashSet<>(acceptableResourcesList);
 
                 if (!acceptableResources.isEmpty()) {
                     for (RESTDispatcher dispatcher : RESTUtils.getDispatchers()) {
