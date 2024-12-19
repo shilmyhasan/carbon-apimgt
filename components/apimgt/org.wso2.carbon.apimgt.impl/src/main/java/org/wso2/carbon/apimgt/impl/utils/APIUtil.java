@@ -291,6 +291,7 @@ import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.security.cert.X509Certificate;
 import javax.validation.constraints.NotNull;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
