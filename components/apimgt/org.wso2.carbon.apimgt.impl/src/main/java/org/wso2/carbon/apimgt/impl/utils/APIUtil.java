@@ -10372,4 +10372,20 @@ public final class APIUtil {
         }
         return false;
     }
+
+    /**
+     * Checks if organization-wide application updates are enabled.
+     * <p>
+     * This method retrieves the value of the system property defined by
+     * ORGANIZATION_WIDE_APPLICATION_UPDATE_ENABLED.
+     * If the property is not set, it returns false by default.
+     *
+     * @return {true} if organization-wide application updates are enabled;
+     *         {false} otherwise.
+     */
+    public static Boolean isOrgWideAppUpdateEnabled() {
+
+        return Boolean.getBoolean(
+                APIConstants.ORGANIZATION_WIDE_APPLICATION_UPDATE_ENABLED);
+    }
 }
