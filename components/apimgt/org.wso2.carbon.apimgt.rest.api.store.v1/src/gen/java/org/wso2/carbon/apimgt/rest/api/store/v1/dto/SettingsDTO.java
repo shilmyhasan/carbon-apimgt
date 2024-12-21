@@ -39,6 +39,7 @@ public class SettingsDTO   {
     private Integer passwordPolicyMinLength = null;
     private Integer passwordPolicyMaxLength = null;
     private Boolean crossTenantSubscriptionEnabled = false;
+    private Boolean orgWideAppUpdateEnabled = false;
 
   /**
    **/
@@ -318,6 +319,23 @@ public class SettingsDTO   {
     this.crossTenantSubscriptionEnabled = crossTenantSubscriptionEnabled;
   }
 
+  /**
+   **/
+  public SettingsDTO orgWideAppUpdateEnabled(Boolean orgWideAppUpdateEnabled) {
+    this.orgWideAppUpdateEnabled = orgWideAppUpdateEnabled;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "")
+  @JsonProperty("orgWideAppUpdateEnabled")
+  public Boolean isOrgWideAppUpdateEnabled() {
+    return orgWideAppUpdateEnabled;
+  }
+  public void setOrgWideAppUpdateEnabled(Boolean orgWideAppUpdateEnabled) {
+    this.orgWideAppUpdateEnabled = orgWideAppUpdateEnabled;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -343,12 +361,13 @@ public class SettingsDTO   {
         Objects.equals(passwordPolicyPattern, settings.passwordPolicyPattern) &&
         Objects.equals(passwordPolicyMinLength, settings.passwordPolicyMinLength) &&
         Objects.equals(passwordPolicyMaxLength, settings.passwordPolicyMaxLength) &&
-        Objects.equals(crossTenantSubscriptionEnabled, settings.crossTenantSubscriptionEnabled);
+        Objects.equals(crossTenantSubscriptionEnabled, settings.crossTenantSubscriptionEnabled) &&
+        Objects.equals(orgWideAppUpdateEnabled, settings.orgWideAppUpdateEnabled);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, monetizationEnabled, recommendationEnabled, isUnlimitedTierPaid, identityProvider, isAnonymousModeEnabled, isPasswordChangeEnabled, userStorePasswordPattern, passwordPolicyPattern, passwordPolicyMinLength, passwordPolicyMaxLength, crossTenantSubscriptionEnabled);
+    return Objects.hash(grantTypes, scopes, applicationSharingEnabled, mapExistingAuthApps, apiGatewayEndpoint, monetizationEnabled, recommendationEnabled, isUnlimitedTierPaid, identityProvider, isAnonymousModeEnabled, isPasswordChangeEnabled, userStorePasswordPattern, passwordPolicyPattern, passwordPolicyMinLength, passwordPolicyMaxLength, crossTenantSubscriptionEnabled, orgWideAppUpdateEnabled);
   }
 
   @Override
@@ -372,6 +391,7 @@ public class SettingsDTO   {
     sb.append("    passwordPolicyMinLength: ").append(toIndentedString(passwordPolicyMinLength)).append("\n");
     sb.append("    passwordPolicyMaxLength: ").append(toIndentedString(passwordPolicyMaxLength)).append("\n");
     sb.append("    crossTenantSubscriptionEnabled: ").append(toIndentedString(crossTenantSubscriptionEnabled)).append("\n");
+    sb.append("    orgWideAppUpdateEnabled: ").append(toIndentedString(orgWideAppUpdateEnabled)).append("\n");
     sb.append("}");
     return sb.toString();
   }

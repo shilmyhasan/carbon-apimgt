@@ -5344,6 +5344,9 @@ components:
           description: Is Cross Tenant Subscriptions Enabled
           example: false
           default: false
+        orgWideAppUpdateEnabled:
+          type: boolean
+          default: false
     ApplicationAttribute:
       title: Application attributes
       type: object
