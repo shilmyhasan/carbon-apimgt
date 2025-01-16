@@ -105,6 +105,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.wso2.carbon.apimgt.api.model.policy.PolicyConstants.EVENT_COUNT_TYPE;
+
 /**
  * This is a publisher rest api utility class.
  */
@@ -319,14 +321,26 @@ public class PublisherCommonUtils {
         //validation for tiers
         List<String> tiersFromDTO = apiDtoToUpdate.getPolicies();
         String originalStatus = originalAPI.getStatus();
-        if (apiSecurity != null && (apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) || apiSecurity
-                .contains(APIConstants.API_SECURITY_API_KEY))) {
-            if ((tiersFromDTO == null || tiersFromDTO.isEmpty() && !(APIConstants.CREATED.equals(originalStatus)
-                    || APIConstants.PROTOTYPED.equals(originalStatus)))
-                    && !apiDtoToUpdate.getAdvertiseInfo().isAdvertised()) {
-                throw new APIManagementException(
-                        "A tier should be defined if the API is not in CREATED or PROTOTYPED state",
-                        ExceptionCodes.TIER_CANNOT_BE_NULL);
+        if (apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) || apiSecurity
+                .contains(APIConstants.API_SECURITY_API_KEY)) {
+            if (tiersFromDTO == null || tiersFromDTO.isEmpty() && !(APIConstants.CREATED.equals(originalStatus)
+                    || APIConstants.PROTOTYPED.equals(originalStatus))) {
+                Set<Tier> availableThrottlingPolicyList = apiProvider.getTiers();
+                tiersFromDTO = new ArrayList<>();
+                for (Tier tier : availableThrottlingPolicyList) {
+                    if ((isAsyncAPI && EVENT_COUNT_TYPE.equals(tier.getQuotaPolicyType())) ||
+                            (!isAsyncAPI && !EVENT_COUNT_TYPE.equals(tier.getQuotaPolicyType()))) {
+                        tiersFromDTO.add(tier.getName());
+                        break;
+                    }
+                }
+                apiDtoToUpdate.setPolicies(tiersFromDTO);
+
+                if (tiersFromDTO.isEmpty()) {
+                    throw new APIManagementException(
+                            "A tier should be defined if the API is not in CREATED or PROTOTYPED state",
+                            ExceptionCodes.TIER_CANNOT_BE_NULL);
+                }
             }
         }
 
