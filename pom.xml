@@ -2215,6 +2215,7 @@
         <apache.felix.version>1.0.0</apache.felix.version>
         <maven.scr.plugin.version>1.26.0</maven.scr.plugin.version>
         <org.json.version.range>[3.0.0,4.0.0)</org.json.version.range>
+        <org.slf4j.version.range>[1.7.0,2.1.0)</org.slf4j.version.range>
         <pax.logging.api.version>1.11.2</pax.logging.api.version>
         <import.package.version.commons.logging>[1.2.0,2.0.0)</import.package.version.commons.logging>
         <import.package.version.commons.io>[2.4.0,2.5.0)</import.package.version.commons.io>
