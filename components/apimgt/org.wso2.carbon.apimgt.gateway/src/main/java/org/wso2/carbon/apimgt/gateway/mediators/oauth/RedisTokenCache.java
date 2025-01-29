@@ -31,6 +31,8 @@ public class RedisTokenCache implements TokenCacheProvider {
 
     // Singleton instance of RedisTokenCache
     private static final RedisTokenCache instance = new RedisTokenCache();
+    private static final RedisCacheUtils redisCacheUtils = new RedisCacheUtils(ServiceReferenceHolder.getInstance().
+            getRedisPool());
 
     private RedisTokenCache() {
     }
@@ -53,7 +55,7 @@ public class RedisTokenCache implements TokenCacheProvider {
      */
     @Override
     public void putToken(String id, String token) {
-        ServiceReferenceHolder.getInstance().getRedisCacheUtils().setValue(id, token);
+        redisCacheUtils.setValue(id, token);
     }
 
     /**
@@ -64,7 +66,7 @@ public class RedisTokenCache implements TokenCacheProvider {
      */
     @Override
     public String getToken(String id) {
-        return ServiceReferenceHolder.getInstance().getRedisCacheUtils().getValue(id);
+        return redisCacheUtils.getValue(id);
     }
 
     /**
@@ -74,8 +76,8 @@ public class RedisTokenCache implements TokenCacheProvider {
      */
     @Override
     public void removeToken(String id) {
-        if (ServiceReferenceHolder.getInstance().getRedisCacheUtils().isRedisCacheSessionActive()) {
-            ServiceReferenceHolder.getInstance().getRedisCacheUtils().deleteKey(id);
+        if (redisCacheUtils.isRedisCacheSessionActive()) {
+            redisCacheUtils.deleteKey(id);
         }
     }
 }
