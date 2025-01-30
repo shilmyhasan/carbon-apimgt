@@ -35,6 +35,7 @@ import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -335,6 +336,20 @@ public class CertificateMgtDAO {
         List<CertificateMetadataDTO> certificateMetadataList = new ArrayList<>();
 
         if (StringUtils.isNotEmpty(alias) || StringUtils.isNotEmpty(endpoint)) {
+            if (StringUtils.isNotEmpty(endpoint)) {
+                try {
+                    if (log.isDebugEnabled()) {
+                        log.debug("The endpoint is not empty. Generating fqdn from endpoint " + endpoint);
+                    }
+
+                    // Extract fully qualified domain name form given endpoint
+                    URI uri = new URI(endpoint);
+                    endpoint = uri.getScheme() + "://" + uri.getHost();
+                } catch (Exception e) {
+                    handleException("Invalid endpoint URL. Cannot get fqdn from given endpoint", e);
+                }
+            }
+
             if (log.isDebugEnabled()) {
                 log.debug("The alias and endpoint are not empty. Invoking the search query with parameters " +
                         "alias = " + alias + " endpoint = " + endpoint);
@@ -354,7 +369,8 @@ public class CertificateMgtDAO {
 
                 if (StringUtils.isNotEmpty(alias) || StringUtils.isNotEmpty(endpoint)) {
                     preparedStatement.setString(2, alias);
-                    preparedStatement.setString(3, endpoint);
+                    preparedStatement.setString(3,
+                            StringUtils.isNotEmpty(endpoint) ? endpoint + "%" : endpoint);
                 }
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
