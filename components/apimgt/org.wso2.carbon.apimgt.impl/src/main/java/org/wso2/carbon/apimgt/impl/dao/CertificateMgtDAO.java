@@ -342,11 +342,14 @@ public class CertificateMgtDAO {
                         log.debug("The endpoint is not empty. Generating fqdn from endpoint " + endpoint);
                     }
 
+                    // Remove any placeholders (curly braces with contents inside)
+                    String sanitizedEndpoint = endpoint.replaceAll("\\{.*?}", "");
+
                     // Extract fully qualified domain name form given endpoint
-                    URI uri = new URI(endpoint);
+                    URI uri = new URI(sanitizedEndpoint);
                     endpoint = uri.getScheme() + "://" + uri.getHost();
                 } catch (Exception e) {
-                    handleException("Invalid endpoint URL. Cannot get fqdn from given endpoint", e);
+                    log.warn("Unable to extract FQDN from the provided endpoint URL", e);
                 }
             }
 
