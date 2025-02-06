@@ -1096,6 +1096,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                         endpointSecurity.setClientId(oldEndpointSecurity.getClientId());
                                         endpointSecurity.setClientSecret(oldEndpointSecurity.getClientSecret());
                                         endpointSecurity.setCustomParameters(oldEndpointSecurity.getCustomParameters());
+                                        endpointSecurity.setProxyConfigs(oldEndpointSecurity.getProxyConfigs());
                                     }
                                 }
                                 endpointSecurityJson.replace(APIConstants.ENDPOINT_SECURITY_PRODUCTION, new JSONParser()
@@ -1149,6 +1150,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                         endpointSecurity.setClientId(oldEndpointSecurity.getClientId());
                                         endpointSecurity.setClientSecret(oldEndpointSecurity.getClientSecret());
                                         endpointSecurity.setCustomParameters(oldEndpointSecurity.getCustomParameters());
+                                        endpointSecurity.setProxyConfigs(oldEndpointSecurity.getProxyConfigs());
                                     }
                                 }
                                 endpointSecurityJson.replace(APIConstants.ENDPOINT_SECURITY_SANDBOX,
