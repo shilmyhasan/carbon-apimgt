@@ -22,6 +22,8 @@ import org.apache.synapse.endpoints.auth.oauth.TokenCacheProvider;
 import org.wso2.carbon.apimgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.apimgt.gateway.utils.redis.RedisCacheUtils;
 
+import java.util.Set;
+
 /**
  * Singleton class implementing TokenCacheProvider for caching OAuth tokens using Redis.
  * This class allows storing, retrieving, and removing tokens from Redis via RedisCacheUtils
@@ -78,6 +80,26 @@ public class RedisTokenCache implements TokenCacheProvider {
     public void removeToken(String id) {
         if (redisCacheUtils.isRedisCacheSessionActive()) {
             redisCacheUtils.deleteKey(id);
+        }
+    }
+
+    /**
+     * This method is called to remove all tokens from the Redis cache when the endpoint is destroyed that are
+     * associated with a specific OAuth handler. The keys of the tokens that need to be removed should start with the
+     * provided oauthHandlerId.
+     *
+     * @param oauthHandlerId the ID of the OAuth handler whose tokens should be removed
+     */
+    @Override
+    public void removeTokens(String oauthHandlerId) {
+        if (redisCacheUtils.isRedisCacheSessionActive()) {
+            // Retrieve all keys that match the given pattern
+            Set<String> keys = redisCacheUtils.getKeys(oauthHandlerId + "*");
+
+            // Remove all tokens with keys that match the pattern
+            for (String key : keys) {
+                redisCacheUtils.deleteKey(key);
+            }
         }
     }
 }
