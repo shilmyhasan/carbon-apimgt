@@ -20948,11 +20948,14 @@ public class ApiMgtDAO {
             databaseMetaData = connection.getMetaData();
             String driverName = databaseMetaData.getDriverName();
 
-            if (!driverName.contains("Oracle") && !driverName.contains("H2")) {
+            if (!driverName.contains("Oracle") && !driverName.contains("H2") && !databaseMetaData.
+                    getDatabaseProductName().contains("DB2")) {
                 tableName = tableName.toLowerCase();
             }
 
-            resultSet = databaseMetaData.getTables(null, null, tableName, null);
+            // Specify the database name to avoid searching in other databases
+            String databaseName = connection.getCatalog();  // Get current database (catalog)
+            resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
             if (resultSet.next()) {
                 isExists = true;
             }
