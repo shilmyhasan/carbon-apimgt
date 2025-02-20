@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.wso2.carbon.apimgt</groupId>
         <artifactId>apimgt</artifactId>
-        <version>9.28.116.275-SNAPSHOT</version>
+        <version>9.28.116.291-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -577,8 +577,8 @@
                             javax.xml.*;version="0.0.0",
                             org.json.simple.*,
                             org.json.*;version="${org.json.version.range}",
-                            org.slf4j,
-                            org.slf4j.ext,
+                            org.slf4j;version="${org.slf4j.version.range}",
+                            org.slf4j.ext;version="${org.slf4j.version.range}",
                             org.w3c.dom,
                             com.ibm.wsdl.*; version="${wsdl4j.version.range}";resolution:=optional,
                             net.sf.saxon.*,

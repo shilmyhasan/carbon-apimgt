@@ -30,7 +30,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.carbon.apimgt.api.APIDefinition;
-import org.wso2.carbon.apimgt.api.APIDefinitionValidationResponse;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.dto.ClientCertificateDTO;
 import org.wso2.carbon.apimgt.api.gateway.CredentialDto;
@@ -48,6 +47,7 @@ import org.wso2.carbon.apimgt.common.gateway.graphql.GraphQLSchemaDefinitionUtil
 import org.wso2.carbon.apimgt.impl.APIConstants;
 import org.wso2.carbon.apimgt.impl.certificatemgt.exceptions.CertificateManagementException;
 import org.wso2.carbon.apimgt.impl.definitions.GraphQLSchemaDefinition;
+import org.wso2.carbon.apimgt.impl.definitions.OASParserUtil;
 import org.wso2.carbon.apimgt.impl.dto.SoapToRestMediationDto;
 import org.wso2.carbon.apimgt.impl.importexport.ImportExportConstants;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
@@ -451,26 +451,22 @@ public class TemplateBuilderUtil {
     }
 
     public static GatewayAPIDTO retrieveGatewayAPIDto(API api, Environment environment, String tenantDomain,
-                                                      APIDTO apidto, String extractedFolderPath,
-                                                      APIDefinitionValidationResponse apiDefinitionValidationResponse)
-            throws APIManagementException, XMLStreamException, APITemplateException, CertificateManagementException {
+                                                      APIDTO apidto, String extractedFolderPath, String apiDefinition)
+            throws APIManagementException, XMLStreamException, APITemplateException {
 
-        if (apiDefinitionValidationResponse.isValid()) {
-            APIDefinition parser = apiDefinitionValidationResponse.getParser();
-            String definition = apiDefinitionValidationResponse.getJsonContent();
-            if (parser != null) {
-                Set<URITemplate> uriTemplates = parser.getURITemplates(definition);
-                for (URITemplate uriTemplate : uriTemplates) {
-                    for (URITemplate template : api.getUriTemplates()) {
-                        if (template.getHTTPVerb().equalsIgnoreCase(uriTemplate.getHTTPVerb()) &&
-                                template.getUriTemplate().equals(uriTemplate.getUriTemplate())) {
-                            template.setMediationScript(uriTemplate.getMediationScript());
-                            template.setMediationScripts(uriTemplate.getHTTPVerb(), uriTemplate.getMediationScript());
-                            template.setAmznResourceName(uriTemplate.getAmznResourceName());
-                            template.setAmznResourceTimeout(uriTemplate.getAmznResourceTimeout());
-                            template.setAmznResourceContentEncoded(uriTemplate.getAmznResourceContentEncoded());
-                            break;
-                        }
+        APIDefinition parser = OASParserUtil.getOASParser(apiDefinition);
+        if (parser != null) {
+            Set<URITemplate> uriTemplates = parser.getURITemplates(apiDefinition);
+            for (URITemplate uriTemplate : uriTemplates) {
+                for (URITemplate template : api.getUriTemplates()) {
+                    if (template.getHTTPVerb().equalsIgnoreCase(uriTemplate.getHTTPVerb()) &&
+                            template.getUriTemplate().equals(uriTemplate.getUriTemplate())) {
+                        template.setMediationScript(uriTemplate.getMediationScript());
+                        template.setMediationScripts(uriTemplate.getHTTPVerb(), uriTemplate.getMediationScript());
+                        template.setAmznResourceName(uriTemplate.getAmznResourceName());
+                        template.setAmznResourceTimeout(uriTemplate.getAmznResourceTimeout());
+                        template.setAmznResourceContentEncoded(uriTemplate.getAmznResourceContentEncoded());
+                        break;
                     }
                 }
             }

@@ -16,8 +16,11 @@
 
 package org.wso2.carbon.apimgt.rest.api.publisher.v1.common.template;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.velocity.VelocityContext;
+
+import java.util.Map;
 
 /**
  * This is a utility class with a bunch of methods to help in Template.
@@ -39,5 +42,9 @@ public class TemplateUtilContext extends ConfigContextDecorator {
 
     public String escapeXml(String url) {
         return StringEscapeUtils.escapeXml(StringEscapeUtils.unescapeXml(url)).trim();
+    }
+
+    public Map jsonStringToMap(String jsonString) {
+        return new Gson().fromJson(jsonString, Map.class);
     }
 }

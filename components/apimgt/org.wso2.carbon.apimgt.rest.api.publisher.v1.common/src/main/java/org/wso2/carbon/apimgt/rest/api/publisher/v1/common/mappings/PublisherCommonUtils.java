@@ -321,10 +321,11 @@ public class PublisherCommonUtils {
         //validation for tiers
         List<String> tiersFromDTO = apiDtoToUpdate.getPolicies();
         String originalStatus = originalAPI.getStatus();
-        if (apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) || apiSecurity
-                .contains(APIConstants.API_SECURITY_API_KEY)) {
-            if (tiersFromDTO == null || tiersFromDTO.isEmpty() && !(APIConstants.CREATED.equals(originalStatus)
-                    || APIConstants.PROTOTYPED.equals(originalStatus))) {
+        if (apiSecurity != null && (apiSecurity.contains(APIConstants.DEFAULT_API_SECURITY_OAUTH2) || apiSecurity
+                .contains(APIConstants.API_SECURITY_API_KEY))) {
+            if ((tiersFromDTO == null || tiersFromDTO.isEmpty() && !(APIConstants.CREATED.equals(originalStatus)
+                    || APIConstants.PROTOTYPED.equals(originalStatus)))
+                    && !apiDtoToUpdate.getAdvertiseInfo().isAdvertised()) {
                 Set<Tier> availableThrottlingPolicyList = apiProvider.getTiers();
                 tiersFromDTO = new ArrayList<>();
                 for (Tier tier : availableThrottlingPolicyList) {
