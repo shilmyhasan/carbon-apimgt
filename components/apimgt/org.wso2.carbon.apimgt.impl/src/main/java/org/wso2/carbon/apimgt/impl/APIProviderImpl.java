@@ -75,6 +75,7 @@ import org.wso2.carbon.apimgt.impl.notifier.events.*;
 import org.wso2.carbon.apimgt.impl.notifier.events.SubscriptionEvent;
 import org.wso2.carbon.apimgt.impl.notifier.events.CertificateEvent;
 import org.wso2.carbon.apimgt.impl.notifier.events.ScopeEvent;
+import org.wso2.carbon.apimgt.impl.notifier.events.ScopesEvent;
 import org.wso2.carbon.apimgt.impl.notifier.events.ApplicationPolicyEvent;
 import org.wso2.carbon.apimgt.impl.publishers.WSO2APIPublisher;
 import org.wso2.carbon.apimgt.impl.recommendationmgt.RecommendationEnvironment;
@@ -1003,8 +1004,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         // Update the resource scopes of the API in KM.
         // Need to remove the old local scopes and register new local scopes and, update the resource scope mappings
         // using the updated URI templates of the API.
-        deleteScopes(oldLocalScopeKeys, tenantId);
-        addScopes(newLocalScopes, tenantId);
+        updateScopes(newLocalScopes, oldLocalScopeKeys, tenantId);
         Map<String, KeyManagerDto> tenantKeyManagers = KeyManagerHolder.getGlobalAndTenantKeyManagers(tenantDomain);
         for (Map.Entry<String, KeyManagerDto> keyManagerDtoEntry : tenantKeyManagers.entrySet()) {
             KeyManager keyManager = keyManagerDtoEntry.getValue().getKeyManager();
@@ -5080,6 +5080,45 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
         }
 
+    }
+
+    /**
+     * This method updates scopes in the database and notify the SCOPE_DELETE and SCOPE_CREATE events as a consolidated event.
+     */
+    private void updateScopes(Set<Scope> addedScopes, Set<String> deletedScopes, int tenantId) throws APIManagementException {
+        ScopesEvent scopesEvent = new ScopesEvent(UUID.randomUUID().toString(), System.currentTimeMillis(),
+                APIConstants.EventType.SCOPES_UPDATE.name(), tenantId, tenantDomain);
+
+        if (deletedScopes != null) {
+            for (String scopeKey : deletedScopes) {
+                if (StringUtils.isNotEmpty(scopeKey)) {
+                    scopesDAO.deleteScope(scopeKey, tenantId);
+                    scopesEvent.addScopeEvent(new ScopeEvent(UUID.randomUUID().toString(), System.currentTimeMillis(),
+                            APIConstants.EventType.SCOPE_DELETE.name(), tenantId, tenantDomain, scopeKey, null, null));
+                    if (log.isDebugEnabled()) {
+                        log.debug("Scope :" + scopeKey + " deleted successfully.");
+                    }
+                }
+            }
+        }
+        if (addedScopes != null) {
+            scopesDAO.addScopes(addedScopes, tenantId);
+            for (Scope scope : addedScopes) {
+                ScopeEvent scopeEvent = new ScopeEvent(UUID.randomUUID().toString(), System.currentTimeMillis(),
+                        APIConstants.EventType.SCOPE_CREATE.name(), tenantId, tenantDomain, scope.getKey(), scope.getName(),
+                        scope.getDescription());
+                if (StringUtils.isNotEmpty(scope.getRoles()) && scope.getRoles().trim().length() > 0) {
+                    scopeEvent.setRoles(Arrays.asList(scope.getRoles().split(",")));
+                }
+                scopesEvent.addScopeEvent(scopeEvent);
+                if (log.isDebugEnabled()) {
+                    log.debug("Scope :" + scope.getKey() + " added successfully.");
+                }
+            }
+        }
+        if (scopesEvent.getScopeEvents().size() > 0) {
+            APIUtil.sendNotification(scopesEvent, APIConstants.NotifierType.SCOPE.name());
+        }
     }
 
     private void updateScope(Scope scope, int tenantId) throws APIManagementException {
