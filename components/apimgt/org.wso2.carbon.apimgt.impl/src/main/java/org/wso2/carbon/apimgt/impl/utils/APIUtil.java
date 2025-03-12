@@ -201,6 +201,7 @@ import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.identity.core.util.IdentityCoreConstants;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.OAuthAdminService;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.registry.core.ActionConstants;
@@ -2368,6 +2369,10 @@ public final class APIUtil {
             return authorized;
         }
 
+        if (!IdentityUtil.isUserStoreInUsernameCaseSensitive(userNameWithoutChange)) {
+            userNameWithoutChange = userNameWithoutChange.toLowerCase();
+        }
+
         if (APIConstants.Permissions.APIM_ADMIN.equals(permission) || APIConstants.Permissions.API_CREATE.equals(permission)
                 || APIConstants.Permissions.API_PUBLISH.equals(permission)) {
             String cacheKey = userNameWithoutChange + ":" + permission;
@@ -2462,6 +2467,10 @@ public final class APIUtil {
             } else {
                 throw new APIManagementException(errMsg);
             }
+        }
+
+        if (!IdentityUtil.isUserStoreInUsernameCaseSensitive(username)) {
+            username = username.toLowerCase();
         }
 
         String[] roles = getValueFromCache(APIConstants.API_USER_ROLE_CACHE, username);
