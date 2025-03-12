@@ -19738,6 +19738,50 @@ public class ApiMgtDAO {
         return policyData;
     }
 
+    /**
+     * Get the list of API specific operation policy IDs from AM_API_OPERATION_POLICY table where cloned policy ID is
+     * non null. This method is intended to get the common operation policy IDs which have been attached to the
+     * given API.
+     *
+     * @param apiUUID                UUID of the API
+     * @return operation policy
+     * @throws APIManagementException
+     */
+    public Map<String, String> getClonedIdsMappedApiSpecificOperationPolicies(String apiUUID)
+            throws APIManagementException {
+
+        try (Connection connection = APIMgtDBUtil.getConnection()) {
+            return getClonedIdsMappedApiSpecificOperationPolicies(connection, apiUUID);
+        } catch (SQLException e) {
+            handleException("Failed to get the API specific operation policy IDs from API "
+                    + apiUUID, e);
+        }
+        return null;
+    }
+
+    private Map<String, String> getClonedIdsMappedApiSpecificOperationPolicies(Connection connection, String apiUUID)
+            throws SQLException, APIManagementException {
+
+        String dbQuery;
+        boolean isAPIRevision = checkAPIUUIDIsARevisionUUID(apiUUID) != null;
+        if (isAPIRevision) {
+            dbQuery = SQLConstants.OperationPolicyConstants.
+                    GET_REVISION_SPECIFIC_OPERATION_POLICY_IDS_FROM_REVISION_UUID;
+        } else {
+            dbQuery = SQLConstants.OperationPolicyConstants.GET_API_SPECIFIC_OPERATION_POLICY_IDS_FROM_API_UUID;
+        }
+        Map<String, String> policyMap = new HashMap<>();
+        try (PreparedStatement statement = connection.prepareStatement(dbQuery)) {
+            statement.setString(1, apiUUID);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    policyMap.put(rs.getString("POLICY_UUID"), rs.getString("CLONED_POLICY_UUID"));
+                }
+            }
+        }
+        return policyMap;
+    }
+
     private List<OperationPolicyDefinition> getPolicyDefinitionForPolicyId(Connection connection, String policyId)
             throws SQLException {
 

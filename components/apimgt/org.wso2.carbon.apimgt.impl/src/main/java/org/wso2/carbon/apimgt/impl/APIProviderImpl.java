@@ -5165,82 +5165,75 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
     }
 
-    public String getPolicyType(OperationPolicy policy, String apiUUId, String tenantDomain)
+    /**
+     *
+     * @param policy
+     * @param apiOperationPolicyIdToClonedPolicyIdMap
+     * @return
+     * @throws APIManagementException
+     */
+    public String getPolicyType(OperationPolicy policy, Map<String, String> apiOperationPolicyIdToClonedPolicyIdMap)
             throws APIManagementException {
-        String policyType = null;
         if (policy.getPolicyId() == null) {
-            policyType = ImportExportConstants.POLICY_TYPE_API;
+            return ImportExportConstants.POLICY_TYPE_API;
         } else {
-            OperationPolicyData basicPolicyData =
-                    getAPISpecificOperationPolicyByPolicyId(policy.getPolicyId(),
-                            apiUUId, tenantDomain, false);
-            // In an api product resource update scenario, when existing policy has been removed from an api,
-            // there's no entry attached to api policy id and apiId in AM_API_OPERATION_POLICY table
-            if (basicPolicyData == null) {
-                return null;
-            }
-            if (basicPolicyData.getClonedCommonPolicyId() == null) {
-                policyType = ImportExportConstants.POLICY_TYPE_API;
+            // check if cloned policy id is null
+            if (apiOperationPolicyIdToClonedPolicyIdMap.get(policy.getPolicyId()) == null) {
+                return ImportExportConstants.POLICY_TYPE_API;
             } else {
-                policyType = ImportExportConstants.POLICY_TYPE_COMMON;
+                return ImportExportConstants.POLICY_TYPE_COMMON;
             }
         }
-        return policyType;
     }
 
-    public String getProductPolicyType(OperationPolicy policy, String productUUID, String apiUUID, String tenantDomain)
+    public String getProductPolicyType(OperationPolicy policy, String apiUUID,
+                                       Map<String, String> apiProductOperationPolicyIdToClonedPolicyIdMap)
             throws APIManagementException {
 
-        OperationPolicyData basicPolicyData =
-                getAPISpecificOperationPolicyByPolicyId(policy.getPolicyId(),
-                        productUUID, tenantDomain, false);
-        String originatedPolicyId = basicPolicyData.getClonedCommonPolicyId();
-
+        String originatedPolicyId = apiProductOperationPolicyIdToClonedPolicyIdMap.get(policy.getPolicyId());
+        Map<String, String> apiOperationPolicyIdToClonedPolicyIdMap =
+                getClonedAPISpecificOperationPolicyIdsList(apiUUID);
         policy.setPolicyId(originatedPolicyId);
-        return getPolicyType(policy, apiUUID, tenantDomain);
-
+        return getPolicyType(policy, apiOperationPolicyIdToClonedPolicyIdMap);
     }
 
-    public API addPolicyTypeFieldToApi(API api, String tenantDomain)
-            throws APIManagementException {
+    public void populatePolicyTypeInAPI(API api) throws APIManagementException {
 
+        Map<String, String> apiOperationPolicyIdToClonedPolicyIdMap = getClonedAPISpecificOperationPolicyIdsList(api.getUuid());
         Set<URITemplate> uriTemplates = api.getUriTemplates();
         for (URITemplate uriTemplate : uriTemplates) {
             List<OperationPolicy> operationPolicies = uriTemplate.getOperationPolicies();
             if (!operationPolicies.isEmpty()) {
                 for (OperationPolicy operationPolicy : operationPolicies) {
-                    String policyType = getPolicyType(operationPolicy, api.getUuid(),
-                            tenantDomain);
+                    String policyType = getPolicyType(operationPolicy, apiOperationPolicyIdToClonedPolicyIdMap);
                     operationPolicy.setPolicyType(policyType);
                 }
             }
         }
         api.setUriTemplates(uriTemplates);
 
-        if (isAPILevelPolicySupportEnabled) {
-            List<OperationPolicy> apiPolicies = api.getApiPolicies();
-            if (apiPolicies != null && !apiPolicies.isEmpty()) {
-                for (OperationPolicy policy : apiPolicies) {
-                    String policyType = getPolicyType(policy, api.getUuid(),
-                            tenantDomain);
-                    policy.setPolicyType(policyType);
-                }
+        List<OperationPolicy> apiPolicies = api.getApiPolicies();
+        if (apiPolicies != null && !apiPolicies.isEmpty()) {
+            for (OperationPolicy policy : apiPolicies) {
+                String policyType = getPolicyType(policy, apiOperationPolicyIdToClonedPolicyIdMap);
+                policy.setPolicyType(policyType);
             }
-            api.setApiPolicies(apiPolicies);
         }
-        return api;
+        api.setApiPolicies(apiPolicies);
     }
 
-    public APIProduct addPolicyTypeFieldToApiProduct(APIProduct product) throws APIManagementException {
+    public void populatePolicyTypeInApiProduct(APIProduct product) throws APIManagementException {
 
+        Map<String, String> apiProductOperationPolicyIdToClonedPolicyIdMap =
+                getClonedAPISpecificOperationPolicyIdsList(product.getUuid());
         List<APIProductResource> productResources = product.getProductResources();
         for (APIProductResource resource : productResources) {
             URITemplate uriTemplate = resource.getUriTemplate();
             List<OperationPolicy> operationPolicies = uriTemplate.getOperationPolicies();
             if (!operationPolicies.isEmpty()) {
                 for (OperationPolicy operationPolicy : operationPolicies) {
-                    String policyType = getProductPolicyType(operationPolicy, product.getUuid(), resource.getApiId(),
-                            tenantDomain);
+                    String policyType = getProductPolicyType(operationPolicy, resource.getApiId(),
+                            apiProductOperationPolicyIdToClonedPolicyIdMap);
                     operationPolicy.setPolicyType(policyType);
                 }
             }
@@ -5248,7 +5241,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             resource.setUriTemplate(uriTemplate);
         }
         product.setProductResources(productResources);
-        return product;
     }
 
     @Override
@@ -5279,7 +5271,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
                 populateAPIStatus(api);
                 populateDefaultVersion(api);
-                api = addPolicyTypeFieldToApi(api, organization);
+                populatePolicyTypeInAPI(api);
                 return api;
             } else {
                 String msg = "Failed to get API. API artifact corresponding to artifactId " + uuid + " does not exist";
@@ -5422,7 +5414,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 if (migrationEnabled == null) {
                     populateDefaultVersion(product);
                 }
-                product = addPolicyTypeFieldToApiProduct(product);
+                populatePolicyTypeInApiProduct(product);
                 return product;
             } else {
                 String msg = "Failed to get API Product. API Product artifact corresponding to artifactId " + uuid
@@ -6754,23 +6746,23 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         return policyId;
     }
+
     @Override
     public String importOperationPolicyOfGivenType(OperationPolicyData importedPolicyData, String policyType,
-                                                   String organization)
-            throws APIManagementException {
+                                                   String organization) throws APIManagementException {
 
         OperationPolicySpecification importedSpec = importedPolicyData.getSpecification();
         OperationPolicyData existingOperationPolicy;
 
         String policyId = null;
         if (policyType == null) {
-            /*To handle scenarios where api is exported from a previous U2 version. API and Common policies with same name
-             and same version is not supported there
+            /*To handle scenarios where api is exported from a previous U2 version. API and Common policies with
+                same name and same version is not supported there
              */
             policyId = importOperationPolicy(importedPolicyData, organization);
         } else if (policyType.equalsIgnoreCase(ImportExportConstants.POLICY_TYPE_COMMON)) {
             existingOperationPolicy = getCommonOperationPolicyByPolicyName(importedSpec.getName(),
-                    importedSpec.getVersion(),organization, false);
+                    importedSpec.getVersion(), organization, false);
 
             if (existingOperationPolicy != null) {
                 if (existingOperationPolicy.getMd5Hash().equals(importedPolicyData.getMd5Hash())) {
@@ -6799,9 +6791,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 policyId = addAPISpecificOperationPolicy(importedPolicyData.getApiUUID(), importedPolicyData,
                         organization);
                 if (log.isDebugEnabled()) {
-                    log.debug(
-                            "There aren't any existing common policy for the imported policy. " +
-                                    "A new policy created with ID " + policyId);
+                    log.debug("There is no common policy currently available for the imported policy. " +
+                            "A new policy created with ID " + policyId);
                 }
             }
         } else { //api level policy by default
@@ -6880,6 +6871,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         return apiMgtDAO
                 .getAPISpecificOperationPolicyByPolicyID(policyId, apiUUID, organization, isWithPolicyDefinition);
+    }
+
+    public Map<String, String> getClonedAPISpecificOperationPolicyIdsList(String apiUUID)
+            throws APIManagementException {
+
+        return apiMgtDAO
+                .getClonedIdsMappedApiSpecificOperationPolicies(apiUUID);
     }
 
     @Override
