@@ -214,5 +214,4 @@ public class RegistrationProfile {
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
     }
-
 }
