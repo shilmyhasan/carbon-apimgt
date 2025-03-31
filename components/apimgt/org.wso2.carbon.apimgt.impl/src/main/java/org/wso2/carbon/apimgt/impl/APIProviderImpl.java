@@ -4460,7 +4460,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         Identifier identifier = product.getId();
         identifier.setOrganization(product.getOrganization());
         String prevDefaultVersion = getDefaultVersion(identifier);
-        String publishedDefaultVersion = getPublishedDefaultVersion(product.getId());
+        String publishedDefaultVersion = getPublishedDefaultVersion(identifier);
         for (APIProductResource apiProductResource : resources) {
             API api;
             APIProductIdentifier productIdentifier = apiProductResource.getProductIdentifier();
