@@ -415,6 +415,7 @@ public class APIMgtDAOTest {
         api.setContext("/subForward");
         api.setContextTemplate("/subForward/{version}");
         api.setVersionTimestamp(String.valueOf(System.currentTimeMillis()));
+        api.setOrganization("testOrg");
         api.getId().setId(apiMgtDAO.addAPI(api, MultitenantConstants.SUPER_TENANT_ID, "testOrg"));
         ApiTypeWrapper apiTypeWrapper = new ApiTypeWrapper(api);
         // Add a subscription and update state to BLOCKED
@@ -430,6 +431,7 @@ public class APIMgtDAOTest {
         api2.setContext("/context1");
         api2.setContextTemplate("/context1/{version}");
         api2.setUuid(UUID.randomUUID().toString());
+        api2.setOrganization("testOrg");
         api2.getId().setId(apiMgtDAO.addAPI(api2, MultitenantConstants.SUPER_TENANT_ID, "testOrg"));
         // once API v2.0.0 is added, v1.0.0 becomes an older version hence add it to oldApiVersionList
         oldApiVersionList.add(api);
@@ -453,6 +455,7 @@ public class APIMgtDAOTest {
         API api3 = new API(apiId3);
         api3.setContext("/context1");
         api3.setContextTemplate("/context1/{version}");
+        api3.setOrganization("testOrg");
         api3.getId().setId(apiMgtDAO.addAPI(api3, MultitenantConstants.SUPER_TENANT_ID, "testOrg"));
         // Once API v2.0.0 is added, v2.0.0 becomes an older version hence add it to oldApiVersionList
         // This needs to be sorted as latest API last.

@@ -798,8 +798,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         validateAndSetTransports(api);
         validateAndSetAPISecurity(api);
         validateKeyManagers(api);
-        String publishedDefaultVersion = getPublishedDefaultVersion(api.getId());
-        String prevDefaultVersion = getDefaultVersion(api.getId());
+        Identifier identifier = api.getId();
+        identifier.setOrganization(api.getOrganization());
+        String prevDefaultVersion = getDefaultVersion(identifier);
+        String publishedDefaultVersion = getPublishedDefaultVersion(identifier);
         api.setMonetizationEnabled(existingAPI.isMonetizationEnabled());
         Gson gson = new Gson();
         String organization = api.getOrganization();
@@ -3213,7 +3215,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     private List<API> getAPIVersionsByProviderAndName(String provider, String apiName, String organization)
             throws APIManagementException {
-        return apiMgtDAO.getAllAPIVersions(apiName, provider);
+        return apiMgtDAO.getAllAPIVersions(apiName, provider, organization);
     }
 
 
@@ -4383,6 +4385,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public void deleteAPIProduct(APIProduct apiProduct) throws APIManagementException {
 
         APIProductIdentifier identifier = apiProduct.getId();
+        if (identifier != null) {
+            identifier.setOrganization(apiProduct.getOrganization());
+        }
 
         try {
             //int apiId = apiMgtDAO.getAPIID(identifier, null);
@@ -4452,7 +4457,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         Map<API, List<APIProductResource>> apiToProductResourceMapping = new HashMap<>();
         //validate resources and set api identifiers and resource ids to product
         List<APIProductResource> resources = product.getProductResources();
-        String prevDefaultVersion = getDefaultVersion(product.getId());
+        Identifier identifier = product.getId();
+        identifier.setOrganization(product.getOrganization());
+        String prevDefaultVersion = getDefaultVersion(identifier);
         String publishedDefaultVersion = getPublishedDefaultVersion(product.getId());
         for (APIProductResource apiProductResource : resources) {
             API api;
@@ -6036,6 +6043,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new APIMgtResourceNotFoundException("Couldn't retrieve existing API with API UUID: "
                     + apiId, ExceptionCodes.from(ExceptionCodes.API_NOT_FOUND, apiId));
         }
+        apiIdentifier.setOrganization(organization);
         APIRevision apiRevision = apiMgtDAO.getRevisionByRevisionUUID(apiRevisionId);
         if (apiRevision == null) {
             throw new APIMgtResourceNotFoundException("Couldn't retrieve existing API Revision with Revision UUID: "
@@ -6378,6 +6386,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new APIMgtResourceNotFoundException("Couldn't retrieve existing API Product with ID: "
                     + apiProductId, ExceptionCodes.from(ExceptionCodes.API_NOT_FOUND, apiProductId));
         }
+        apiProductIdentifier.setOrganization(tenantDomain);
         APIRevision apiRevision = apiMgtDAO.getRevisionByRevisionUUID(apiRevisionId);
         if (apiRevision == null) {
             throw new APIMgtResourceNotFoundException("Couldn't retrieve existing API Revision with Revision UUID: "

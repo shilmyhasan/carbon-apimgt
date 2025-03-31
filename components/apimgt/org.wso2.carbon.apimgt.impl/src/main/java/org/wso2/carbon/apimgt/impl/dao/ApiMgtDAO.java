@@ -2108,7 +2108,7 @@ public class ApiMgtDAO {
         try (Connection connection = APIMgtDBUtil.getConnection();
                 PreparedStatement ps = connection.prepareStatement(SQLConstants.GET_SUBSCRIBERS_OF_API_SQL);) {
 
-            ps.setString(1, APIUtil.replaceEmailDomainBack(identifier.getProviderName()));
+            ps.setString(1, identifier.getOrganization());
             ps.setString(2, identifier.getName());
             ps.setString(3, identifier.getVersion());
 
@@ -5115,7 +5115,7 @@ public class ApiMgtDAO {
         if (versionCount == 0) {
             return subscribedAPISet;
         }
-
+        String organization = apiTypeWrapper.getOrganization();
         String getSubscriptionDataQuery = SQLConstants.GET_SUBSCRIPTION_DATA_SQL.replaceAll("_API_VERSION_LIST_",
                 String.join(",", Collections.nCopies(versionCount, "?")));
 
@@ -5124,8 +5124,7 @@ public class ApiMgtDAO {
             try (Connection connection = APIMgtDBUtil.getConnection()) {
                 connection.setAutoCommit(false);
                 try (PreparedStatement prepStmt = connection.prepareStatement(getSubscriptionDataQuery)) {
-                    prepStmt.setString(1,
-                            APIUtil.replaceEmailDomainBack(apiTypeWrapper.getId().getProviderName()));
+                    prepStmt.setString(1, organization);
                     prepStmt.setString(2, apiTypeWrapper.getId().getName());
                     int index = 3;
                     for (API oldAPI : oldAPIVersions) {
@@ -5163,7 +5162,7 @@ public class ApiMgtDAO {
         if (versionCount == 0) {
             return subscribedAPISet;
         }
-
+        String organization = apiTypeWrapper.getOrganization();
         String getSubscriptionDataQuery = SQLConstants.GET_SUBSCRIPTION_DATA_SQL.replaceAll("_API_VERSION_LIST_",
                 String.join(",", Collections.nCopies(versionCount, "?")));
 
@@ -5172,8 +5171,7 @@ public class ApiMgtDAO {
             try (Connection connection = APIMgtDBUtil.getConnection()) {
                 connection.setAutoCommit(false);
                 try (PreparedStatement prepStmt = connection.prepareStatement(getSubscriptionDataQuery)) {
-                    prepStmt.setString(1,
-                            APIUtil.replaceEmailDomainBack(apiTypeWrapper.getId().getProviderName()));
+                    prepStmt.setString(1, organization);
                     prepStmt.setString(2, apiTypeWrapper.getId().getName());
                     int index = 3;
                     for (APIProduct oldAPIProduct : oldAPIProductVersions) {
@@ -5455,8 +5453,7 @@ public class ApiMgtDAO {
             boolean initialAutoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
             ps.setString(1, apiName);
-            ps.setString(2, username);
-            ps.setString(3, organization);
+            ps.setString(2, organization);
             try (ResultSet resultSet = ps.executeQuery()) {
                 while (resultSet.next()) {
                     versionList.add(resultSet.getString("API_VERSION"));
@@ -5625,7 +5622,7 @@ public class ApiMgtDAO {
         String query = SQLConstants.GET_DEFAULT_VERSION_SQL;
         try (PreparedStatement prepStmt = connection.prepareStatement(query)) {
             prepStmt.setString(1, apiId.getName());
-            prepStmt.setString(2, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+            prepStmt.setString(2, apiId.getOrganization());
             try (ResultSet rs = prepStmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString("DEFAULT_API_VERSION");
@@ -5640,7 +5637,7 @@ public class ApiMgtDAO {
         String query = SQLConstants.GET_DEFAULT_VERSION_SQL;
         try (PreparedStatement prepStmt = connection.prepareStatement(query)) {
             prepStmt.setString(1, apiId.getName());
-            prepStmt.setString(2, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+            prepStmt.setString(2, apiId.getOrganization());
             try (ResultSet rs = prepStmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString("DEFAULT_API_VERSION");
@@ -5657,7 +5654,7 @@ public class ApiMgtDAO {
         String query = SQLConstants.GET_MIGRATED_API_PRODUCT_DEFAULT_VERSION_SQL;
         try (PreparedStatement prepStmt = connection.prepareStatement(query)) {
             prepStmt.setString(1, apiId.getName());
-            prepStmt.setString(2, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+            prepStmt.setString(2, apiId.getOrganization());
             prepStmt.setString(3, APIConstants.API_PRODUCT_VERSION_1_0_0);
             try (ResultSet rs = prepStmt.executeQuery()) {
                 if (rs.next()) {
@@ -5849,7 +5846,7 @@ public class ApiMgtDAO {
             prepStmtDefVersionUpdate = connection.prepareStatement(queryDefaultVersionUpdate);
             prepStmtDefVersionUpdate.setString(1, value);
             prepStmtDefVersionUpdate.setString(2, apiId.getName());
-            prepStmtDefVersionUpdate.setString(3, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+            prepStmtDefVersionUpdate.setString(3, apiId.getOrganization());
             prepStmtDefVersionUpdate.execute();
         } catch (SQLException e) {
             handleException("Error while deleting the API default version entry: " + apiId.getName() + " from the " +
@@ -5877,8 +5874,7 @@ public class ApiMgtDAO {
 
             for (Identifier apiId : apiIdList) {
                 prepStmtDefVersionDelete.setString(1, apiId.getName());
-                prepStmtDefVersionDelete.setString(2, APIUtil.
-                        replaceEmailDomainBack(apiId.getProviderName()));
+                prepStmtDefVersionDelete.setString(2, apiId.getOrganization());
                 prepStmtDefVersionDelete.addBatch();
             }
             prepStmtDefVersionDelete.executeBatch();
@@ -5906,7 +5902,7 @@ public class ApiMgtDAO {
             connection = APIMgtDBUtil.getConnection();
             prepStmt = connection.prepareStatement(query);
             prepStmt.setString(1, apiId.getName());
-            prepStmt.setString(2, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+            prepStmt.setString(2, apiId.getOrganization());
 
             rs = prepStmt.executeQuery();
 
@@ -5926,7 +5922,7 @@ public class ApiMgtDAO {
         String query = SQLConstants.GET_PUBLISHED_DEFAULT_VERSION_SQL;
         try (PreparedStatement prepStmt = connection.prepareStatement(query)) {
             prepStmt.setString(1, apiId.getName());
-            prepStmt.setString(2, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+            prepStmt.setString(2, apiId.getOrganization());
             try (ResultSet rs = prepStmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getString("PUBLISHED_DEFAULT_API_VERSION");
@@ -5944,7 +5940,7 @@ public class ApiMgtDAO {
         try (Connection connection = APIMgtDBUtil.getConnection();
                 PreparedStatement prepStmt = connection.prepareStatement(query)) {
             prepStmt.setString(1, apiId.getName());
-            prepStmt.setString(2, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+            prepStmt.setString(2, apiId.getOrganization());
             try (ResultSet rs = prepStmt.executeQuery()) {
                 if (rs.next()) {
                     publishedDefaultVersion = rs.getString("PUBLISHED_DEFAULT_API_VERSION");
@@ -5964,7 +5960,7 @@ public class ApiMgtDAO {
         String query = SQLConstants.GET_MIGRATED_API_PRODUCT_PUBLISHED_DEFAULT_VERSION_SQL;
         try (PreparedStatement prepStmt = connection.prepareStatement(query)) {
             prepStmt.setString(1, apiId.getName());
-            prepStmt.setString(2, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+            prepStmt.setString(2, apiId.getOrganization());
             prepStmt.setString(3, APIConstants.API_PRODUCT_VERSION_1_0_0);
             try (ResultSet rs = prepStmt.executeQuery()) {
                 if (rs.next()) {
@@ -5981,15 +5977,19 @@ public class ApiMgtDAO {
 
         String publishedDefaultVersion;
         try {
+            Identifier identifier = apiTypeWrapper.getId();
+            identifier.setOrganization(apiTypeWrapper.getOrganization());
             if (apiTypeWrapper.isAPIProduct()) {
-                publishedDefaultVersion = getPublishedDefaultVersion((APIProductIdentifier) apiTypeWrapper.getId(),
+                publishedDefaultVersion = getPublishedDefaultVersion((APIProductIdentifier) identifier,
                         connection);
             } else {
-                publishedDefaultVersion = getPublishedDefaultVersion((APIIdentifier) apiTypeWrapper.getId());
+                publishedDefaultVersion = getPublishedDefaultVersion((APIIdentifier) identifier);
             }
             boolean deploymentAvailable = isDeploymentAvailableByAPIUUID(connection, apiTypeWrapper.getUuid());
             ArrayList<Identifier> apiIdList = new ArrayList<Identifier>() {{
-                add(apiTypeWrapper.getId());
+                Identifier id = apiTypeWrapper.getId();
+                id.setOrganization(apiTypeWrapper.getOrganization());
+                add(id);
             }};
             removeAPIFromDefaultVersion(apiIdList, connection);
 
@@ -7022,7 +7022,9 @@ public class ApiMgtDAO {
         Connection connection = null;
         PreparedStatement prepStmt = null;
 
-        String previousDefaultVersion = getDefaultVersion(api.getId());
+        Identifier identifier = api.getId();
+        identifier.setOrganization(api.getOrganization());
+        String previousDefaultVersion = getDefaultVersion(identifier);
 
         boolean isServiceInfoAvailable = false;
         int apiId = 0;
@@ -7074,7 +7076,9 @@ public class ApiMgtDAO {
                     addUpdateAPIAsDefaultVersion(apiTypeWrapper, connection);
                 } else { //tick is removed
                     ArrayList<Identifier> apiIdList = new ArrayList<Identifier>() {{
-                        add(api.getId());
+                        Identifier id = api.getId();
+                        id.setOrganization(api.getOrganization());
+                        add(id);
                     }};
                     removeAPIFromDefaultVersion(apiIdList, connection);
                 }
@@ -8302,7 +8306,9 @@ public class ApiMgtDAO {
                     String provider = resultSet.getString(1);
                     String name = resultSet.getString(2);
                     String version = resultSet.getString(3);
+                    String organization = resultSet.getString(4);
                     identifier = new APIIdentifier(APIUtil.replaceEmailDomain(provider), name, version, uuid);
+                    identifier.setOrganization(organization);
                 }
             }
         } catch (SQLException e) {
@@ -8330,7 +8336,9 @@ public class ApiMgtDAO {
                     String provider = resultSet.getString(1);
                     String name = resultSet.getString(2);
                     String version = resultSet.getString(3);
+                    String organization = resultSet.getString(4);
                     identifier = new APIProductIdentifier(APIUtil.replaceEmailDomain(provider), name, version, uuid);
+                    identifier.setOrganization(organization);
                 }
             }
         } catch (SQLException e) {
@@ -9989,7 +9997,7 @@ public class ApiMgtDAO {
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(SQLConstants.RETRIEVE_DEFAULT_VERSION)) {
                 preparedStatement.setString(1, apiId.getApiName());
-                preparedStatement.setString(2, APIUtil.replaceEmailDomainBack(apiId.getProviderName()));
+                preparedStatement.setString(2, api.getOrganization());
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         api.setDefaultVersion(apiId.getVersion().equals(resultSet.getString("DEFAULT_API_VERSION")));
@@ -10011,8 +10019,7 @@ public class ApiMgtDAO {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     SQLConstants.RETRIEVE_DEFAULT_VERSION_WITH_API_INFO)) {
                 preparedStatement.setString(1, apiProduct.getId().getName());
-                preparedStatement.setString(2,
-                        APIUtil.replaceEmailDomainBack(apiProduct.getId().getProviderName()));
+                preparedStatement.setString(2, apiProduct.getOrganization());
                 preparedStatement.setString(3, apiProduct.getId().getVersion());
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -10044,10 +10051,9 @@ public class ApiMgtDAO {
         try (Connection connection = APIMgtDBUtil.getConnection()) {
             try (PreparedStatement preparedStatement =
                          connection.prepareStatement(SQLConstants.GET_LIGHT_WEIGHT_API_INFO_BY_API_IDENTIFIER)) {
-                preparedStatement.setString(1, APIUtil.replaceEmailDomainBack(apiIdentifier.getProviderName()));
-                preparedStatement.setString(2, apiIdentifier.getName());
-                preparedStatement.setString(3, apiIdentifier.getVersion());
-                preparedStatement.setString(4, organization);
+                preparedStatement.setString(1, apiIdentifier.getName());
+                preparedStatement.setString(2, apiIdentifier.getVersion());
+                preparedStatement.setString(3, organization);
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         apiIdentifier.setId(resultSet.getInt("API_ID"));
@@ -15233,7 +15239,9 @@ public class ApiMgtDAO {
                     addUpdateAPIAsDefaultVersion(apiTypeWrapper, conn);
                 } else { //tick is removed
                     ArrayList<Identifier> apiIdList = new ArrayList<Identifier>() {{
-                        add(product.getId());
+                        Identifier id = product.getId();
+                        id.setOrganization(product.getOrganization());
+                        add(id);
                     }};
                     removeAPIFromDefaultVersion(apiIdList, conn);
                 }
@@ -16555,9 +16563,8 @@ public class ApiMgtDAO {
 
         try (Connection connection = APIMgtDBUtil.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLConstants.GET_API_VERSIONS)) {
-            statement.setString(1, APIUtil.replaceEmailDomainBack(apiProvider));
-            statement.setString(2, apiName);
-            statement.setString(3, organization);
+            statement.setString(1, apiName);
+            statement.setString(2, organization);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 versions.add(resultSet.getString("API_VERSION"));
@@ -16574,16 +16581,17 @@ public class ApiMgtDAO {
      *
      * @param apiName     api name
      * @param apiProvider provider
+     * @param organization organization
      * @return set ids
      * @throws APIManagementException
      */
-    public List<API> getAllAPIVersions(String apiName, String apiProvider) throws APIManagementException {
+    public List<API> getAllAPIVersions(String apiName, String apiProvider, String organization) throws APIManagementException {
 
         List<API> apiVersions = new ArrayList<API>();
 
         try (Connection connection = APIMgtDBUtil.getConnection();
              PreparedStatement statement = connection.prepareStatement(SQLConstants.GET_API_VERSIONS_UUID)) {
-            statement.setString(1, APIUtil.replaceEmailDomainBack(apiProvider));
+            statement.setString(1, organization);
             statement.setString(2, apiName);
             ResultSet resultSet = statement.executeQuery();
 
@@ -16619,19 +16627,20 @@ public class ApiMgtDAO {
     /**
      * Return ids of the versions for the given name for the given provider
      *
-     * @param apiProductName     apiProduct name
-     * @param apiProvider provider
+     * @param apiProductName    apiProduct name
+     * @param apiProvider       provider
+     * @param organization      organization
      * @return set ids
      * @throws APIManagementException
      */
-    public List<APIProduct> getAllAPIProductVersions(String apiProductName, String apiProvider)
+    public List<APIProduct> getAllAPIProductVersions(String apiProductName, String apiProvider, String organization)
             throws APIManagementException {
 
         List<APIProduct> apiProductVersions = new ArrayList<APIProduct>();
 
         try (Connection connection = APIMgtDBUtil.getConnection();
                 PreparedStatement statement = connection.prepareStatement(SQLConstants.GET_API_VERSIONS_UUID)) {
-            statement.setString(1, APIUtil.replaceEmailDomainBack(apiProvider));
+            statement.setString(1, organization);
             statement.setString(2, apiProductName);
             ResultSet resultSet = statement.executeQuery();
 
