@@ -16549,7 +16549,7 @@ public class ApiMgtDAO {
     }
 
     /**
-     * Return the existing versions for the given api name for the provider
+     * Return the existing versions for the given api name for the organization
      *
      * @param apiName     api name
      * @param apiProvider provider
@@ -16570,8 +16570,8 @@ public class ApiMgtDAO {
                 versions.add(resultSet.getString("API_VERSION"));
             }
         } catch (SQLException e) {
-            handleException("Error while retrieving versions for api " + apiName + " for the provider " + apiProvider,
-                    e);
+            handleException("Error while retrieving versions for api " + apiName + " for the organization "
+                            + organization, e);
         }
         return versions;
     }
@@ -16580,12 +16580,11 @@ public class ApiMgtDAO {
      * Return ids of the versions for the given name for the given provider
      *
      * @param apiName     api name
-     * @param apiProvider provider
      * @param organization organization
      * @return set ids
      * @throws APIManagementException
      */
-    public List<API> getAllAPIVersions(String apiName, String apiProvider, String organization) throws APIManagementException {
+    public List<API> getAllAPIVersions(String apiName, String organization) throws APIManagementException {
 
         List<API> apiVersions = new ArrayList<API>();
 
@@ -16601,24 +16600,25 @@ public class ApiMgtDAO {
                 String versionTimestamp = resultSet.getString("VERSION_COMPARABLE");
                 String context = resultSet.getString("CONTEXT");
                 String contextTemplate = resultSet.getString("CONTEXT_TEMPLATE");
+                String apiProvider = resultSet.getString("API_PROVIDER");
 
                 String uuid = resultSet.getString("API_UUID");
                 if (APIConstants.API_PRODUCT.equalsIgnoreCase(resultSet.getString("API_TYPE"))) {
                     // skip api products
                     continue;
                 }
-                API api = new API(new APIIdentifier(apiProvider, apiName,
-                        version, uuid));
+                API api = new API(new APIIdentifier(apiProvider, apiName, version, uuid));
                 api.setUuid(uuid);
                 api.setStatus(status);
                 api.setVersionTimestamp(versionTimestamp);
                 api.setContext(context);
                 api.setContextTemplate(contextTemplate);
+                api.setOrganization(organization);
                 apiVersions.add(api);
             }
         } catch (SQLException e) {
-            handleException("Error while retrieving versions for api " + apiName + " for the provider " + apiProvider,
-                    e);
+            handleException("Error while retrieving versions for api " + apiName + " for the organization "
+                            + organization, e);
         }
         return apiVersions;
     }
@@ -16628,12 +16628,11 @@ public class ApiMgtDAO {
      * Return ids of the versions for the given name for the given provider
      *
      * @param apiProductName    apiProduct name
-     * @param apiProvider       provider
      * @param organization      organization
      * @return set ids
      * @throws APIManagementException
      */
-    public List<APIProduct> getAllAPIProductVersions(String apiProductName, String apiProvider, String organization)
+    public List<APIProduct> getAllAPIProductVersions(String apiProductName, String organization)
             throws APIManagementException {
 
         List<APIProduct> apiProductVersions = new ArrayList<APIProduct>();
@@ -16650,6 +16649,7 @@ public class ApiMgtDAO {
                 String versionTimestamp = resultSet.getString("VERSION_COMPARABLE");
                 String context = resultSet.getString("CONTEXT");
                 String contextTemplate = resultSet.getString("CONTEXT_TEMPLATE");
+                String apiProvider = resultSet.getString("API_PROVIDER");
 
                 String uuid = resultSet.getString("API_UUID");
                 if (!APIConstants.API_PRODUCT.equals(resultSet.getString("API_TYPE"))) {
@@ -16663,11 +16663,12 @@ public class ApiMgtDAO {
                 apiProduct.setVersionTimestamp(versionTimestamp);
                 apiProduct.setContext(context);
                 apiProduct.setContextTemplate(contextTemplate);
+                apiProduct.setOrganization(organization);
                 apiProductVersions.add(apiProduct);
             }
         } catch (SQLException e) {
             handleException("Error while retrieving versions for apiProduct " + apiProductName +
-                            " for the provider " + apiProvider, e);
+                            " for the organization " + organization, e);
         }
         return apiProductVersions;
     }

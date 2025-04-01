@@ -290,7 +290,7 @@ public class LifeCycleUtils {
             log.debug("Deprecating old versions of API " + apiName + " of provider " + provider);
         }
 
-        List<API> apiList = getAPIVersionsByProviderAndName(provider, api.getOrganization(), apiName);
+        List<API> apiList = getAPIVersionsByOrganizationAndName(api.getOrganization(), apiName);
         APIVersionComparator versionComparator = new APIVersionComparator();
         for (API oldAPI : apiList) {
             if (oldAPI.getId().getApiName().equals(api.getId().getName())
@@ -312,8 +312,8 @@ public class LifeCycleUtils {
                     "Deprecating old versions of APIProduct " + apiProductName + " of provider " + provider);
         }
 
-        List<APIProduct> apiProductList = getAPIProductVersionsByProviderAndName(provider,
-                apiProduct.getOrganization(), apiProductName);
+        List<APIProduct> apiProductList = getAPIProductVersionsByOrganizationAndName(apiProduct.getOrganization(),
+                apiProductName);
         APIProductVersionComparator versionComparator = new APIProductVersionComparator();
         for (APIProduct oldAPIProduct : apiProductList) {
             if (oldAPIProduct.getId().getName()
@@ -438,8 +438,8 @@ public class LifeCycleUtils {
 
         if (!apiTypeWrapper.isAPIProduct()) {
             List<API> apiList;
-            apiList = getAPIVersionsByProviderAndName(apiTypeWrapper.getId().getProviderName(),
-                    apiTypeWrapper.getOrganization(), apiTypeWrapper.getId().getName());
+            apiList = getAPIVersionsByOrganizationAndName(apiTypeWrapper.getOrganization(),
+                    apiTypeWrapper.getId().getName());
             for (API oldAPI : apiList) {
                 if (oldAPI.getId().getApiName().equals(apiTypeWrapper.getId().getName()) && versionComparator.compare(
                         oldAPI, apiTypeWrapper.getApi()) < 0 && (oldAPI.getStatus().equals(APIConstants.PUBLISHED))) {
@@ -447,8 +447,7 @@ public class LifeCycleUtils {
                 }
             }
         } else {
-            List<APIProduct> apiProductList = getAPIProductVersionsByProviderAndName(
-                    apiTypeWrapper.getId().getProviderName(),
+            List<APIProduct> apiProductList = getAPIProductVersionsByOrganizationAndName(
                     apiTypeWrapper.getOrganization(), apiTypeWrapper.getId().getName());
 
             for (APIProduct oldAPIProduct : apiProductList) {
@@ -463,15 +462,14 @@ public class LifeCycleUtils {
         return oldPublishedAPIList;
     }
 
-    private static List<API> getAPIVersionsByProviderAndName(String provider, String organization, String apiName)
+    private static List<API> getAPIVersionsByOrganizationAndName(String organization, String apiName)
             throws APIManagementException {
-        return apiMgtDAO.getAllAPIVersions(apiName, provider, organization);
+        return apiMgtDAO.getAllAPIVersions(apiName, organization);
     }
 
-    private static List<APIProduct> getAPIProductVersionsByProviderAndName(String provider, String organization,
-                                                                           String apiProductName)
-            throws APIManagementException {
-        return apiMgtDAO.getAllAPIProductVersions(apiProductName, provider, organization);
+    private static List<APIProduct> getAPIProductVersionsByOrganizationAndName(
+            String organization, String apiProductName) throws APIManagementException {
+        return apiMgtDAO.getAllAPIProductVersions(apiProductName, organization);
     }
 
     private static void makeAPIKeysForwardCompatible(APIProvider apiProvider, ApiTypeWrapper apiTypeWrapper)
@@ -479,7 +477,8 @@ public class LifeCycleUtils {
 
         String provider = apiTypeWrapper.getId().getProviderName();
         String apiName = apiTypeWrapper.getId().getName();
-        Set<String> versions = apiProvider.getAPIVersions(provider, apiName, apiTypeWrapper.getOrganization());
+        String organization = apiTypeWrapper.getOrganization();
+        Set<String> versions = apiProvider.getAPIVersions(provider, apiName, organization);
         APIVersionComparator apiComparator = new APIVersionComparator();
         APIProductVersionComparator apiProductComparator = new APIProductVersionComparator();
 
@@ -491,12 +490,14 @@ public class LifeCycleUtils {
             }
             if (!apiTypeWrapper.isAPIProduct()) {
                 API otherApi = new API(new APIIdentifier(provider, apiName, version));
+                otherApi.setOrganization(organization);
                 if (apiComparator.compare(otherApi, apiTypeWrapper.getApi()) < 0 &&
                         !APIConstants.RETIRED.equals(otherApi.getStatus())) {
                     sortedAPIs.add(otherApi);
                 }
             } else {
                 APIProduct otherAPIProduct = new APIProduct(new APIProductIdentifier(provider, apiName, version));
+                otherAPIProduct.setOrganization(organization);
                 if (apiProductComparator.compare(otherAPIProduct, apiTypeWrapper.getApiProduct()) < 0 &&
                         !APIConstants.RETIRED.equals(otherAPIProduct.getState())) {
                     sortedAPIProducts.add(otherAPIProduct);

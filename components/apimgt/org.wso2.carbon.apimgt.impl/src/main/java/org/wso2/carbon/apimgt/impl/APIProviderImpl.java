@@ -3213,9 +3213,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return stateWorkflowDTO;
     }
 
-    private List<API> getAPIVersionsByProviderAndName(String provider, String apiName, String organization)
+    private List<API> getAPIVersionsByOrganizationAndName(String apiName, String organization)
             throws APIManagementException {
-        return apiMgtDAO.getAllAPIVersions(apiName, provider, organization);
+        return apiMgtDAO.getAllAPIVersions(apiName, organization);
     }
 
 
@@ -4351,8 +4351,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     " organization=" + org);
         }
         TreeMap<String, API> apiSortedMap = new TreeMap<>();
-        List<API> apiList = getAPIVersionsByProviderAndName(provider,
-                name, org);
+        List<API> apiList = getAPIVersionsByOrganizationAndName(name, org);
         for (API mappedAPI : apiList) {
             apiSortedMap.put(mappedAPI.getVersionTimestamp(), mappedAPI);
         }

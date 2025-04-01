@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.apimgt.impl.utils;
 
-import org.wso2.carbon.apimgt.api.model.API;
 import org.wso2.carbon.apimgt.api.model.APIProduct;
 
 import java.io.Serializable;
@@ -51,13 +50,16 @@ public class APIProductVersionComparator implements Comparator<APIProduct>,Seria
 
     @Override
     public int compare(APIProduct apiProduct1, APIProduct apiProduct2) {
-        if (apiProduct1.getId().getProviderName().equals(apiProduct2.getId().getProviderName()) &&
-                apiProduct1.getId().getName().equals(apiProduct2.getId().getName())) {
-            return stringComparator.compare(apiProduct1.getId().getVersion(), apiProduct2.getId().getVersion());
-        } else {
-            APIProductNameComparator apiproductNameComparator = new APIProductNameComparator();
-            return apiproductNameComparator.compare(apiProduct1, apiProduct2);
+        // In tenant mode, we could have same api published by two tenants to public store. So we need to check the
+        // provider as well.
+        // However, in the same tenant we could have 2 APIs with same API name and different providers.
+        if (apiProduct1.getId().getName().equals(apiProduct2.getId().getName())) {
+            if (apiProduct1.getId().getProviderName().equals(apiProduct2.getId().getProviderName()) ||
+                    (apiProduct1.getOrganization() != null
+                            && apiProduct1.getOrganization().equals(apiProduct2.getOrganization()))) {
+                return stringComparator.compare(apiProduct1.getId().getVersion(), apiProduct2.getId().getVersion());
+            }
         }
-
+        return new APIProductNameComparator().compare(apiProduct1, apiProduct2);
     }
 }
