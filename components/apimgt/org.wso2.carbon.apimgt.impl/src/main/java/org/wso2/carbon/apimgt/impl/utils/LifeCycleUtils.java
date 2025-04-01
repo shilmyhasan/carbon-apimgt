@@ -287,7 +287,7 @@ public class LifeCycleUtils {
             throws APIManagementException {
         String apiName = api.getId().getName();
         if (log.isDebugEnabled()) {
-            log.debug("Deprecating old versions of API " + apiName + " of provider " + provider);
+            log.debug("Deprecating old versions of API " + apiName + " of organization " + api.getOrganization());
         }
 
         List<API> apiList = getAPIVersionsByOrganizationAndName(api.getOrganization(), apiName);
@@ -308,8 +308,8 @@ public class LifeCycleUtils {
             throws APIManagementException {
         String apiProductName = apiProduct.getId().getName();
         if (log.isDebugEnabled()) {
-            log.debug(
-                    "Deprecating old versions of APIProduct " + apiProductName + " of provider " + provider);
+            log.debug("Deprecating old versions of APIProduct " + apiProductName + " of organization "
+                            + apiProduct.getOrganization());
         }
 
         List<APIProduct> apiProductList = getAPIProductVersionsByOrganizationAndName(apiProduct.getOrganization(),
