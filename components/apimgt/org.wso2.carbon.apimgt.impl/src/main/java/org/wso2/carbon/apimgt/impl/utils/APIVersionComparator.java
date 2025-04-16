@@ -50,13 +50,13 @@ public class APIVersionComparator implements Comparator<API>,Serializable {
     public int compare(API api1, API api2) {
         // In tenant mode, we could have same api published by two tenants to public store. So we need to check the
         // provider as well.
-        if (api1.getId().getProviderName().equals(api2.getId().getProviderName()) &&
-                api1.getId().getApiName().equals(api2.getId().getApiName())) {
-            return stringComparator.compare(api1.getId().getVersion(), api2.getId().getVersion());
-        } else {
-            APINameComparator apiNameComparator = new APINameComparator();
-            return apiNameComparator.compare(api1, api2);
+        // However, in the same tenant we could have 2 APIs with same API name and different providers.
+        if (api1.getId().getApiName().equals(api2.getId().getApiName())) {
+            if (api1.getId().getProviderName().equals(api2.getId().getProviderName()) ||
+                    (api1.getOrganization() != null && api1.getOrganization().equals(api2.getOrganization()))) {
+                return stringComparator.compare(api1.getId().getVersion(), api2.getId().getVersion());
+            }
         }
-
+        return new APINameComparator().compare(api1, api2);
     }
 }

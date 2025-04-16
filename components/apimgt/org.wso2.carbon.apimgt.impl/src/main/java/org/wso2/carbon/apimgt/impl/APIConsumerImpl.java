@@ -2884,23 +2884,27 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                                 KeyManagerHolder.getTenantKeyManagerInstance(tenantDomain, apiKey.getKeyManager());
                     }
                     /* retrieving OAuth application information for specific consumer key */
-                    consumerKey = apiKey.getConsumerKey();
-                    OAuthApplicationInfo oAuthApplicationInfo = keyManager.retrieveApplication(consumerKey);
-                    if (oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_NAME) != null) {
-                        OAuthAppRequest oauthAppRequest = ApplicationUtils.createOauthAppRequest(oAuthApplicationInfo.
-                                        getParameter(ApplicationConstants.OAUTH_CLIENT_NAME).toString(), null,
-                                oAuthApplicationInfo.getCallBackURL(), null,
-                                null, application.getTokenType(), this.tenantDomain, apiKey.getKeyManager());
-                        oauthAppRequest.getOAuthApplicationInfo().setAppOwner(userId);
-                        oauthAppRequest.getOAuthApplicationInfo().setClientId(consumerKey);
-                        /* updating the owner of the OAuth application with userId */
-                        OAuthApplicationInfo updatedAppInfo = keyManager.updateApplicationOwner(oauthAppRequest,
-                                userId);
-                        isAppUpdated = true;
-                        audit.info("Successfully updated the owner of application " + application.getName() +
-                                " from " + oldUserName + " to " + userId + ".");
-                    } else {
-                        throw new APIManagementException("Unable to retrieve OAuth application information.");
+                    if (!APIConstants.OAuthAppMode.MAPPED.name().equalsIgnoreCase(apiKey.getCreateMode())) {
+                        consumerKey = apiKey.getConsumerKey();
+                        OAuthApplicationInfo oAuthApplicationInfo = keyManager.retrieveApplication(consumerKey);
+                        Object oauthClientName =
+                                oAuthApplicationInfo.getParameter(ApplicationConstants.OAUTH_CLIENT_NAME);
+                        if (oauthClientName != null) {
+                            OAuthAppRequest oauthAppRequest = ApplicationUtils.createOauthAppRequest(
+                                    oauthClientName.toString(), null, oAuthApplicationInfo.getCallBackURL(),
+                                    null, null, application.getTokenType(), this.tenantDomain,
+                                    apiKey.getKeyManager());
+                            oauthAppRequest.getOAuthApplicationInfo().setAppOwner(userId);
+                            oauthAppRequest.getOAuthApplicationInfo().setClientId(consumerKey);
+                            /* updating the owner of the OAuth application with userId */
+                            OAuthApplicationInfo updatedAppInfo = keyManager.updateApplicationOwner(oauthAppRequest,
+                                    userId);
+                            isAppUpdated = true;
+                            audit.info("Successfully updated the owner of application " + application.getName() +
+                                    " from " + oldUserName + " to " + userId + ".");
+                        } else {
+                            throw new APIManagementException("Unable to retrieve OAuth application information.");
+                        }
                     }
                 }
             } else {
@@ -3678,6 +3682,12 @@ public class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 throw new APIManagementException(genericErrorMessage);
             }
         }
+    }
+
+    @Override
+    public Map<String, Object> searchPaginatedAPIs(String searchQuery, String organization, int start, int end,
+                                                   String sortBy, String sortOrder) throws APIManagementException {
+        return searchPaginatedAPIs(searchQuery, organization, start, end);
     }
 
     @Override

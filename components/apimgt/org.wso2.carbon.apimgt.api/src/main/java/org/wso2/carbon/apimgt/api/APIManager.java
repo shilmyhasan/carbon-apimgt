@@ -276,6 +276,15 @@ public interface APIManager {
     void addSubscriber(String username, String groupingId) throws APIManagementException;
 
     /**
+     * Creates a new subscriber without default application given the username and the grouping Id
+     *
+     * @param username   Username of the subscriber to be added
+     * @param groupingId - the groupId to which the subscriber belongs to
+     * @throws org.wso2.carbon.apimgt.api.APIManagementException if failed add subscriber
+     */
+    void addSubscriberOnly(String username, String groupingId) throws APIManagementException;
+
+    /**
      * Updates the details of the given subscriber.
      *
      * @param subscriber The subscriber to be updated
@@ -507,6 +516,19 @@ public interface APIManager {
      * @throws APIManagementException
      */
     Map<String, Object> searchPaginatedAPIs(String searchQuery, String organization, int start, int end) throws APIManagementException;
+
+    /**
+     * @param searchQuery search query. ex : provider:admin
+     * @param organization Identifier of an organization
+     * @param start starting number
+     * @param end ending number
+     * @param sortBy sort by field
+     * @param sortOrder sort order. ex : desc
+     * @return
+     * @throws APIManagementException
+     */
+    Map<String, Object> searchPaginatedAPIs(String searchQuery, String organization, int start, int end,
+                                            String sortBy, String sortOrder) throws APIManagementException;
 
     /**
      * Search in content of apis, api products and documents and provide the results

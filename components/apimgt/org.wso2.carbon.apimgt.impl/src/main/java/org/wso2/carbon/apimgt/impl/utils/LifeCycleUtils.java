@@ -287,10 +287,10 @@ public class LifeCycleUtils {
             throws APIManagementException {
         String apiName = api.getId().getName();
         if (log.isDebugEnabled()) {
-            log.debug("Deprecating old versions of API " + apiName + " of provider " + provider);
+            log.debug("Deprecating old versions of API " + apiName + " of organization " + api.getOrganization());
         }
 
-        List<API> apiList = getAPIVersionsByProviderAndName(provider, apiName);
+        List<API> apiList = getAPIVersionsByOrganizationAndName(api.getOrganization(), apiName);
         APIVersionComparator versionComparator = new APIVersionComparator();
         for (API oldAPI : apiList) {
             if (oldAPI.getId().getApiName().equals(api.getId().getName())
@@ -308,11 +308,12 @@ public class LifeCycleUtils {
             throws APIManagementException {
         String apiProductName = apiProduct.getId().getName();
         if (log.isDebugEnabled()) {
-            log.debug(
-                    "Deprecating old versions of APIProduct " + apiProductName + " of provider " + provider);
+            log.debug("Deprecating old versions of APIProduct " + apiProductName + " of organization "
+                            + apiProduct.getOrganization());
         }
 
-        List<APIProduct> apiProductList = getAPIProductVersionsByProviderAndName(provider, apiProductName);
+        List<APIProduct> apiProductList = getAPIProductVersionsByOrganizationAndName(apiProduct.getOrganization(),
+                apiProductName);
         APIProductVersionComparator versionComparator = new APIProductVersionComparator();
         for (APIProduct oldAPIProduct : apiProductList) {
             if (oldAPIProduct.getId().getName()
@@ -354,6 +355,7 @@ public class LifeCycleUtils {
                     prop.put(NotifierConstants.API_KEY, identifier);
                     prop.put(NotifierConstants.NEW_API_KEY, apiTypeWrapper.getId());
 
+                    identifier.setOrganization(organization);
                     Set<Subscriber> subscribersOfAPI = apiMgtDAO.getSubscribersOfAPIWithoutDuplicates(identifier,
                             subscriberMap);
                     prop.put(NotifierConstants.SUBSCRIBERS_PER_API, subscribersOfAPI);
@@ -436,7 +438,7 @@ public class LifeCycleUtils {
 
         if (!apiTypeWrapper.isAPIProduct()) {
             List<API> apiList;
-            apiList = getAPIVersionsByProviderAndName(apiTypeWrapper.getId().getProviderName(),
+            apiList = getAPIVersionsByOrganizationAndName(apiTypeWrapper.getOrganization(),
                     apiTypeWrapper.getId().getName());
             for (API oldAPI : apiList) {
                 if (oldAPI.getId().getApiName().equals(apiTypeWrapper.getId().getName()) && versionComparator.compare(
@@ -445,8 +447,8 @@ public class LifeCycleUtils {
                 }
             }
         } else {
-            List<APIProduct> apiProductList = getAPIProductVersionsByProviderAndName(
-                    apiTypeWrapper.getId().getProviderName(), apiTypeWrapper.getId().getName());
+            List<APIProduct> apiProductList = getAPIProductVersionsByOrganizationAndName(
+                    apiTypeWrapper.getOrganization(), apiTypeWrapper.getId().getName());
 
             for (APIProduct oldAPIProduct : apiProductList) {
                 if (oldAPIProduct.getId().getName()
@@ -460,14 +462,14 @@ public class LifeCycleUtils {
         return oldPublishedAPIList;
     }
 
-    private static List<API> getAPIVersionsByProviderAndName(String provider, String apiName)
+    private static List<API> getAPIVersionsByOrganizationAndName(String organization, String apiName)
             throws APIManagementException {
-        return apiMgtDAO.getAllAPIVersions(apiName, provider);
+        return apiMgtDAO.getAllAPIVersions(apiName, organization);
     }
 
-    private static List<APIProduct> getAPIProductVersionsByProviderAndName(String provider, String apiProductName)
-            throws APIManagementException {
-        return apiMgtDAO.getAllAPIProductVersions(apiProductName, provider);
+    private static List<APIProduct> getAPIProductVersionsByOrganizationAndName(
+            String organization, String apiProductName) throws APIManagementException {
+        return apiMgtDAO.getAllAPIProductVersions(apiProductName, organization);
     }
 
     private static void makeAPIKeysForwardCompatible(APIProvider apiProvider, ApiTypeWrapper apiTypeWrapper)
@@ -475,7 +477,8 @@ public class LifeCycleUtils {
 
         String provider = apiTypeWrapper.getId().getProviderName();
         String apiName = apiTypeWrapper.getId().getName();
-        Set<String> versions = apiProvider.getAPIVersions(provider, apiName, apiTypeWrapper.getOrganization());
+        String organization = apiTypeWrapper.getOrganization();
+        Set<String> versions = apiProvider.getAPIVersions(provider, apiName, organization);
         APIVersionComparator apiComparator = new APIVersionComparator();
         APIProductVersionComparator apiProductComparator = new APIProductVersionComparator();
 
@@ -487,12 +490,14 @@ public class LifeCycleUtils {
             }
             if (!apiTypeWrapper.isAPIProduct()) {
                 API otherApi = new API(new APIIdentifier(provider, apiName, version));
+                otherApi.setOrganization(organization);
                 if (apiComparator.compare(otherApi, apiTypeWrapper.getApi()) < 0 &&
                         !APIConstants.RETIRED.equals(otherApi.getStatus())) {
                     sortedAPIs.add(otherApi);
                 }
             } else {
                 APIProduct otherAPIProduct = new APIProduct(new APIProductIdentifier(provider, apiName, version));
+                otherAPIProduct.setOrganization(organization);
                 if (apiProductComparator.compare(otherAPIProduct, apiTypeWrapper.getApiProduct()) < 0 &&
                         !APIConstants.RETIRED.equals(otherAPIProduct.getState())) {
                     sortedAPIProducts.add(otherAPIProduct);
@@ -503,18 +508,18 @@ public class LifeCycleUtils {
         if (apiTypeWrapper.isAPIProduct()) {
             // Get the subscriptions from the latest api product version first
             Collections.sort(sortedAPIProducts, apiProductComparator);
-            SendNotification(apiMgtDAO.makeKeysForwardCompatibleForNewAPIProductVersion(apiTypeWrapper, sortedAPIProducts),
+            sendNotification(apiMgtDAO.makeKeysForwardCompatibleForNewAPIProductVersion(apiTypeWrapper, sortedAPIProducts),
                     apiTypeWrapper.getOrganization());
 
         } else {
             // Get the subscriptions from the latest api version first
             Collections.sort(sortedAPIs, apiComparator);
-            SendNotification(apiMgtDAO.makeKeysForwardCompatibleForNewAPIVersion(apiTypeWrapper, sortedAPIs),
+            sendNotification(apiMgtDAO.makeKeysForwardCompatibleForNewAPIVersion(apiTypeWrapper, sortedAPIs),
                     apiTypeWrapper.getOrganization());
         }
     }
 
-    private static void SendNotification(List<SubscribedAPI> subscribedAPIs, String organization)
+    private static void sendNotification(List<SubscribedAPI> subscribedAPIs, String organization)
             throws APIManagementException {
         for (SubscribedAPI subscribedAPI : subscribedAPIs) {
             SubscriptionEvent subscriptionEvent = new SubscriptionEvent(
@@ -542,9 +547,11 @@ public class LifeCycleUtils {
 
             if (APIConstants.PUBLISHED.equals(newStatus) || !currentStatus.equals(newStatus)) {
                 api.setStatus(newStatus);
+                APIIdentifier id = api.getId();
+                id.setOrganization(api.getOrganization());
 
                 api.setAsPublishedDefaultVersion(api.getId().getVersion()
-                        .equals(apiMgtDAO.getPublishedDefaultVersion(api.getId())));
+                        .equals(apiMgtDAO.getPublishedDefaultVersion(id)));
 
                 apiProvider.loadMediationPoliciesToAPI(api, tenantDomain);
 
@@ -668,8 +675,10 @@ public class LifeCycleUtils {
                         .getCache(APIConstants.RECENTLY_ADDED_API_CACHE_NAME).removeAll();
 
 
+                APIIdentifier apiIdentifier = api.getId();
+                apiIdentifier.setOrganization(api.getOrganization());
                 api.setAsPublishedDefaultVersion(api.getId().getVersion()
-                        .equals(apiMgtDAO.getPublishedDefaultVersion(api.getId())));
+                        .equals(apiMgtDAO.getPublishedDefaultVersion(apiIdentifier)));
                 if (APIConstants.RETIRED.equals(newStatus)) {
                     cleanUpPendingSubscriptionCreationProcessesByAPI(api.getUuid());
                 }

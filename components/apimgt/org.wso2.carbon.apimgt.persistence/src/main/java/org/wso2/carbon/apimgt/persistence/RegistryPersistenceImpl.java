@@ -923,6 +923,12 @@ public class RegistryPersistenceImpl implements APIPersistence {
 
     @Override
     public PublisherAPISearchResult searchAPIsForPublisher(Organization org, String searchQuery, int start, int offset,
+                                                           UserContext ctx, String sortBy, String sortOrder) throws APIPersistenceException {
+        return searchAPIsForPublisher(org, searchQuery, start, offset, ctx);
+    }
+
+    @Override
+    public PublisherAPISearchResult searchAPIsForPublisher(Organization org, String searchQuery, int start, int offset,
                                                            UserContext ctx) throws APIPersistenceException {
         String requestedTenantDomain = org.getName();
 

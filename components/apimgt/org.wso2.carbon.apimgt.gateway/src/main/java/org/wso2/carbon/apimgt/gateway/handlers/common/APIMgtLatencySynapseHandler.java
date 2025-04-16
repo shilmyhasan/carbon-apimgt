@@ -19,6 +19,8 @@
 package org.wso2.carbon.apimgt.gateway.handlers.common;
 
 import io.opentelemetry.context.Context;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.AbstractSynapseHandler;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -38,6 +40,7 @@ import java.util.Map;
 
 public class APIMgtLatencySynapseHandler extends AbstractSynapseHandler {
 
+    private static final Log log = LogFactory.getLog(APIMgtLatencySynapseHandler.class);
 
     @Override
     public boolean handleRequestInFlow(MessageContext messageContext) {
@@ -129,15 +132,21 @@ public class APIMgtLatencySynapseHandler extends AbstractSynapseHandler {
             }
             TelemetrySpan responseLatencySpan =
                     (TelemetrySpan) messageContext.getProperty(APIMgtGatewayConstants.RESPONSE_LATENCY);
-            GatewayUtils.setAPIRelatedTags(responseLatencySpan, messageContext);
-            API api = GatewayUtils.getAPI(messageContext);
-            String tenantDomain = (String) messageContext.getProperty(APIMgtGatewayConstants.TENANT_DOMAIN);
-            if (api != null) {
-                TelemetryUtil.updateOperation(responseLatencySpan,
-                        api.getApiName().concat("--").concat(api.getApiVersion()).concat("--")
-                                .concat(tenantDomain));
+            if (responseLatencySpan != null) {
+                GatewayUtils.setAPIRelatedTags(responseLatencySpan, messageContext);
+                API api = GatewayUtils.getAPI(messageContext);
+                String tenantDomain = (String) messageContext.getProperty(APIMgtGatewayConstants.TENANT_DOMAIN);
+                if (api != null) {
+                    TelemetryUtil.updateOperation(responseLatencySpan,
+                            api.getApiName().concat("--").concat(api.getApiVersion()).concat("--")
+                                    .concat(tenantDomain));
+                }
+                TelemetryUtil.finishSpan(responseLatencySpan);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Response latency span is null. Skipping tracing for this flow.");
+                }
             }
-            TelemetryUtil.finishSpan(responseLatencySpan);
         } else if (Util.tracingEnabled()) {
             Object resourceSpanObject = messageContext.getProperty(APIMgtGatewayConstants.RESOURCE_SPAN);
             if (resourceSpanObject != null) {
@@ -146,14 +155,20 @@ public class APIMgtLatencySynapseHandler extends AbstractSynapseHandler {
             }
             TracingSpan responseLatencySpan =
                     (TracingSpan) messageContext.getProperty(APIMgtGatewayConstants.RESPONSE_LATENCY);
-            GatewayUtils.setAPIRelatedTags(responseLatencySpan, messageContext);
-            API api = GatewayUtils.getAPI(messageContext);
-            String tenantDomain = (String) messageContext.getProperty(APIMgtGatewayConstants.TENANT_DOMAIN);
-            if (api != null) {
-                Util.updateOperation(responseLatencySpan, api.getApiName().concat("--").concat(api
-                        .getApiVersion()).concat("--").concat(tenantDomain));
+            if (responseLatencySpan != null) {
+                GatewayUtils.setAPIRelatedTags(responseLatencySpan, messageContext);
+                API api = GatewayUtils.getAPI(messageContext);
+                String tenantDomain = (String) messageContext.getProperty(APIMgtGatewayConstants.TENANT_DOMAIN);
+                if (api != null) {
+                    Util.updateOperation(responseLatencySpan, api.getApiName().concat("--").concat(api
+                            .getApiVersion()).concat("--").concat(tenantDomain));
+                }
+                Util.finishSpan(responseLatencySpan);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Response latency span is null. Skipping tracing for this flow.");
+                }
             }
-            Util.finishSpan(responseLatencySpan);
         }
         return true;
     }
