@@ -220,9 +220,13 @@ public class ApiProductsApiServiceImpl implements ApiProductsApiService {
                 if (!documentation.getSourceType().equals(Documentation.DocumentSourceType.FILE)) {
                     RestApiUtil.handleBadRequest("Source type of product document " + documentId + " is not FILE", log);
                 }
-                RestApiPublisherUtils
-                        .attachFileToProductDocument(apiProductId, documentation, fileInputStream, fileDetail,
-                                organization);
+                String filename = fileDetail.getContentDisposition().getFilename();
+                if (APIUtil.isSupportedFileType(filename)) {
+                    RestApiPublisherUtils.attachFileToProductDocument(apiProductId, documentation, fileInputStream,
+                            fileDetail, organization);
+                } else {
+                    RestApiUtil.handleBadRequest("Unsupported extension type of document file: " + filename, log);
+                }
             } else if (inlineContent != null) {
                 if (!documentation.getSourceType().equals(Documentation.DocumentSourceType.INLINE) && !documentation
                         .getSourceType().equals(Documentation.DocumentSourceType.MARKDOWN)) {
