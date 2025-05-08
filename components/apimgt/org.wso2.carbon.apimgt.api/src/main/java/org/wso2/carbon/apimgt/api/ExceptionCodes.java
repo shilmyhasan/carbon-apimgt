@@ -706,7 +706,10 @@ public enum ExceptionCodes implements ErrorHandler {
             "Operation type/http method is not specified for the operation/resource: %s", false),
 
     RESOURCE_URI_TEMPLATE_NOT_DEFINED(902032, "Resource URI template value not defined", 400,
-            "Resource URI template value (target) not defined", false);
+            "Resource URI template value (target) not defined", false),
+
+    INVALID_MEDIA_TYPE_VALIDATION(903300, "Invalid or mismatched media type detected.", 400,
+            "File extension '%s' does not match detected MIME type '%s'");
 
     private final long errorCode;
     private final String errorMessage;

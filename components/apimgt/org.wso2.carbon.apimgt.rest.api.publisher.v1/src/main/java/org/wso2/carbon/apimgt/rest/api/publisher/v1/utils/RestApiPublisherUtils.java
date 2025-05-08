@@ -35,6 +35,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MimeTypes;
 import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.api.APIProvider;
+import org.wso2.carbon.apimgt.api.ExceptionCodes;
 import org.wso2.carbon.apimgt.api.model.Documentation;
 import org.wso2.carbon.apimgt.api.model.OperationPolicyData;
 import org.wso2.carbon.apimgt.impl.APIConstants;
@@ -107,10 +108,6 @@ public class RestApiPublisherUtils {
             RestApiUtil.transferFile(inputStream, resolvedPath.getFileName().toString(), resolvedPath.getParent().toString());
             byte[] fileBytes = FileUtils.readFileToByteArray(new File(resolvedPath.toString()));
             String mediaType = detectAndValidateMediaType(fileBytes, filename);
-            if (mediaType == null) {
-                RestApiUtil.handleBadRequest(
-                        "Rejected file upload for document " + documentId + ": Invalid file type or mismatch.", log);
-            }
             try (InputStream uploadStream = new ByteArrayInputStream(fileBytes)) {
                 PublisherCommonUtils.addDocumentationContentForFile(uploadStream, mediaType, filename, apiProvider,
                         apiId, documentId, organization);
@@ -201,10 +198,6 @@ public class RestApiPublisherUtils {
             RestApiUtil.transferFile(inputStream, resolvedPath.getFileName().toString(), resolvedPath.getParent().toString());
             byte[] fileBytes = FileUtils.readFileToByteArray(new File(resolvedPath.toString()));
             String mediaType = detectAndValidateMediaType(fileBytes, filename);
-            if (mediaType == null) {
-                RestApiUtil.handleBadRequest(
-                        "Rejected file upload for document " + documentId + ": Invalid file type or mismatch.", log);
-            }
             try (InputStream uploadStream = new ByteArrayInputStream(fileBytes)) {
                 PublisherCommonUtils.addDocumentationContentForFile(uploadStream, mediaType, filename, apiProvider,
                         productId, documentId, organization);
@@ -351,12 +344,12 @@ public class RestApiPublisherUtils {
      *
      * @param fileBytes the byte content of the file to validate
      * @param filename  the name of the file, used to extract the extension for validation
-     * @return the detected MIME type as a string if the extension matches the MIME type; otherwise, returns null
+     * @return the detected MIME type as a string if the extension matches the MIME type
+     * @throws APIManagementException if the fileBytes or filename is null, or if the MIME type detection or validation fails
      */
-    public static String detectAndValidateMediaType(byte[] fileBytes, String filename) {
+    public static String detectAndValidateMediaType(byte[] fileBytes, String filename) throws APIManagementException {
         if (fileBytes == null || filename == null) {
-            log.warn("File validation failed: fileBytes or filename is null.");
-            return null;
+            throw new APIManagementException(ExceptionCodes.INVALID_MEDIA_TYPE_VALIDATION);
         }
 
         String detectedMimeType;
@@ -364,8 +357,8 @@ public class RestApiPublisherUtils {
             detectedMimeType = TikaConfig.getDefaultConfig().getDetector()
                     .detect(TikaInputStream.get(mimeDetectStream), new Metadata()).toString();
         } catch (Exception e) {
-            log.error("File validation failed: error during MIME detection", e);
-            return null;
+            throw new APIManagementException("Error detecting media type", e,
+                    ExceptionCodes.INVALID_MEDIA_TYPE_VALIDATION);
         }
 
         int lastDot = filename.lastIndexOf('.');
@@ -373,17 +366,16 @@ public class RestApiPublisherUtils {
 
         String expectedExtension = "";
         try {
-            expectedExtension =
-                    MimeTypes.getDefaultMimeTypes().forName(detectedMimeType).getExtension().replace(".", "");
+            expectedExtension = MimeTypes.getDefaultMimeTypes().forName(detectedMimeType).getExtension()
+                    .replace(".", "");
         } catch (Exception e) {
-            log.warn("Unable to map detected MIME type to extension using Tika.", e);
+            throw new APIManagementException("Error resolving expected extension", e,
+                    ExceptionCodes.INVALID_MEDIA_TYPE_VALIDATION);
         }
 
-        boolean match = expectedExtension.equalsIgnoreCase(fileExtension);
-        if (!match) {
-            log.warn(String.format("File validation failed: extension '%s' does not match MIME type '%s'.",
-                    fileExtension, detectedMimeType));
-            return null;
+        if (!expectedExtension.equalsIgnoreCase(fileExtension)) {
+            throw new APIManagementException(
+                    ExceptionCodes.from(ExceptionCodes.INVALID_MEDIA_TYPE_VALIDATION, fileExtension, detectedMimeType));
         }
 
         return detectedMimeType;
