@@ -708,7 +708,7 @@ public enum ExceptionCodes implements ErrorHandler {
     RESOURCE_URI_TEMPLATE_NOT_DEFINED(902032, "Resource URI template value not defined", 400,
             "Resource URI template value (target) not defined", false),
 
-    INVALID_MEDIA_TYPE_VALIDATION(903300, "Invalid or mismatched media type detected.", 400,
+    INVALID_MEDIA_TYPE_VALIDATION(902050, "Invalid or mismatched media type detected.", 400,
             "File extension '%s' does not match detected MIME type '%s'");
 
     private final long errorCode;
