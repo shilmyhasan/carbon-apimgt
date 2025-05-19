@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.wso2.carbon.apimgt.api.NewPostLoginExecutor;
 import org.wso2.carbon.apimgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.apimgt.impl.utils.APIUtil;
 import org.wso2.carbon.core.security.AuthenticatorsConfiguration;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
@@ -74,11 +75,7 @@ public class SAMLGroupIDExtractorImpl implements NewPostLoginExecutor {
                 claim = "http://wso2.org/claims/organization";
             }
             samlResponseStream = getByteArrayInputStream(loginResponse);
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            builderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            builderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            builderFactory.setNamespaceAware(true);
+            DocumentBuilderFactory builderFactory = APIUtil.getSecuredDocumentBuilder();
             docBuilder = builderFactory.newDocumentBuilder();
             Document document = docBuilder.parse(samlResponseStream);
             Element element = document.getDocumentElement();
@@ -255,9 +252,7 @@ public class SAMLGroupIDExtractorImpl implements NewPostLoginExecutor {
                 claim = "http://wso2.org/claims/organization";
             }
             samlResponseStream = getByteArrayInputStream(loginResponse);
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            builderFactory.setNamespaceAware(true);
+            DocumentBuilderFactory builderFactory = APIUtil.getSecuredDocumentBuilder();
             docBuilder = builderFactory.newDocumentBuilder();
             Document document = docBuilder.parse(samlResponseStream);
             Element element = document.getDocumentElement();
