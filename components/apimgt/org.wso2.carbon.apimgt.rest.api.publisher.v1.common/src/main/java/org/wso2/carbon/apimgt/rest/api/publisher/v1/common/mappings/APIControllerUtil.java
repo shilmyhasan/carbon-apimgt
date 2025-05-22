@@ -430,6 +430,23 @@ public class APIControllerUtil {
                     ExceptionCodes.ERROR_READING_PARAMS_FILE);
         }
 
+        // Validate custom parameters
+        if (endpointSecurityDetails.has(
+                APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) && endpointSecurityDetails.get(
+                APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) != null && !endpointSecurityDetails.get(
+                APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS).isJsonNull()) {
+            JsonObject customParams = endpointSecurityDetails.getAsJsonObject(
+                    APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+            for (Map.Entry<String, JsonElement> entry : customParams.entrySet()) {
+                JsonElement valObj = entry.getValue();
+                if (valObj.isJsonObject() && !valObj.getAsJsonObject().has("value")) {
+                    throw new APIManagementException(
+                            "Error parsing custom parameters. Parameter '" + entry.getKey() + "' has invalid format.",
+                            ExceptionCodes.ERROR_READING_PARAMS_FILE);
+                }
+            }
+        }
+
         if (!endpointSecurityDetails.has(APIConstants.OAuthConstants.OAUTH_CLIENT_ID)
                 || endpointSecurityDetails.get(APIConstants.OAuthConstants.OAUTH_CLIENT_ID) == null
                 || endpointSecurityDetails.get(APIConstants.OAuthConstants.OAUTH_CLIENT_ID).isJsonNull()) {

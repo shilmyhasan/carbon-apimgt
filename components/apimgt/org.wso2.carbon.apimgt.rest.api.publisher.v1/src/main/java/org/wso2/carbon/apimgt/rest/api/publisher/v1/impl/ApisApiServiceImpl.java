@@ -2837,7 +2837,8 @@ public class ApisApiServiceImpl implements ApisApiService {
             // OAuth 2.0 backend protection: API Key and API Secret encryption
             PublisherCommonUtils
                     .encryptEndpointSecurityOAuthCredentials(endpointConfig, CryptoUtil.getDefaultCryptoUtil(),
-                            StringUtils.EMPTY, StringUtils.EMPTY, apiDTOFromProperties);
+                            StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
+                            apiDTOFromProperties);
 
             // Import the API and Definition
             String organization = RestApiUtil.getValidatedOrganization(messageContext);
