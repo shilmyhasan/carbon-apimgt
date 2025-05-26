@@ -3299,12 +3299,14 @@ public class ApisApiServiceImpl implements ApisApiService {
      * @param format                Format of output documents. Can be YAML or JSON
      * @param preserveStatus        Preserve API status on export
      * @param gatewayEnvironment    Gateway environment of the API to be exported
+     * @param preserveCredentials   Preserve endpoint configuration credentials and secret parameters on Export
      * @return API export response as an archive
      */
     @Override
     public Response exportAPI(String apiId, String name, String version, String revisionNum, String providerName,
                               String format, Boolean preserveStatus, Boolean exportLatestRevision,
-                              String gatewayEnvironment, MessageContext messageContext) throws APIManagementException {
+                              String gatewayEnvironment, Boolean preserveCredentials,
+                              MessageContext messageContext) throws APIManagementException {
 
         if (StringUtils.isEmpty(gatewayEnvironment)) {
             //If not specified status is preserved by default
@@ -3319,7 +3321,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                 ImportExportAPI importExportAPI = APIImportExportUtil.getImportExportAPI();
                 File file = importExportAPI
                         .exportAPI(apiId, name, version, revisionNum, providerName, preserveStatus, exportFormat,
-                                Boolean.TRUE, Boolean.FALSE, exportLatestRevision, StringUtils.EMPTY, organization);
+                                Boolean.TRUE, preserveCredentials, exportLatestRevision, StringUtils.EMPTY, organization);
                 return Response.ok(file).header(RestApiConstants.HEADER_CONTENT_DISPOSITION,
                         "attachment; filename=\"" + file.getName() + "\"").build();
             } catch (APIImportExportException e) {
