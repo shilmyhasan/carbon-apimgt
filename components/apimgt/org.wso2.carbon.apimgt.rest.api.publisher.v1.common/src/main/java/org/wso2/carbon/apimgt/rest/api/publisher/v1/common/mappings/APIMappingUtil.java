@@ -3171,12 +3171,14 @@ public class APIMappingUtil {
 
     private static void decryptCustomOauthParameters(JSONObject customParameters, CryptoUtil cryptoUtil)
             throws CryptoException {
-        for (Object keyObj : customParameters.keySet()) {
-            String key = (String) keyObj;
-            Object value = customParameters.get(key);
+        if (customParameters == null || customParameters.isEmpty()) {
+            return;
+        }
 
-            if (value instanceof JSONObject) {
-                JSONObject valueObj = (JSONObject) value;
+        for (Object valObj : customParameters.values()) {
+            // If value is an extended custom parameter object
+            if (valObj instanceof JSONObject) {
+                JSONObject valueObj = (JSONObject) valObj;
                 if (APIConstants.OAuthConstants.SECRET.equals(
                         valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_TYPE))) {
                     String encryptedValue = (String) valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
@@ -3189,18 +3191,14 @@ public class APIMappingUtil {
         }
     }
 
-    private static void maskSecretCustomParameters(JSONObject endpointSecurityBlock) {
-        Object customParamsObj = endpointSecurityBlock.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+    private static void maskSecretCustomParameters(JSONObject endpointSecurity) {
+        Object customParamsObj = endpointSecurity.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
         if (customParamsObj instanceof JSONObject) {
             JSONObject customParams = (JSONObject) customParamsObj;
-
-            for (Object keyObj : customParams.keySet()) {
-                String key = (String) keyObj;
-                Object value = customParams.get(key);
-
-                // Check if value is a complex object with type
-                if (value instanceof JSONObject) {
-                    JSONObject valueObj = (JSONObject) value;
+            for (Object valObj : customParams.values()) {
+                // If value is an extended custom parameter object
+                if (valObj instanceof JSONObject) {
+                    JSONObject valueObj = (JSONObject) valObj;
                     if (APIConstants.OAuthConstants.SECRET.equals(
                             valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_TYPE))) {
                         valueObj.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, "");
