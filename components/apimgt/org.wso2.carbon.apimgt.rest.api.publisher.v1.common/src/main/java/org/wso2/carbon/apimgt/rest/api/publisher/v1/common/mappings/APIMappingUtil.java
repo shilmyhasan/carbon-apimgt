@@ -1051,7 +1051,7 @@ public class APIMappingUtil {
                             String customParametersString = (String) productionEndpointSecurity
                                     .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
                             JSONObject customParameters = (JSONObject) parser.parse(customParametersString);
-                            decryptOauthCustomParameters(customParameters, cryptoUtil);
+                            decryptCustomOauthParameters(customParameters, cryptoUtil);
                             productionEndpointSecurity.put(
                                     APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS, customParameters);
                         }
@@ -1081,7 +1081,7 @@ public class APIMappingUtil {
                             String customParametersString = (String) sandboxEndpointSecurity
                                     .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
                             JSONObject customParameters = (JSONObject) parser.parse(customParametersString);
-                            decryptOauthCustomParameters(customParameters, cryptoUtil);
+                            decryptCustomOauthParameters(customParameters, cryptoUtil);
                             sandboxEndpointSecurity.put(
                                     APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS, customParameters);
                         }
@@ -1110,7 +1110,8 @@ public class APIMappingUtil {
                 log.error("Cannot convert endpoint configurations when setting endpoint for API. " +
                         "API ID = " + model.getId(), e);
             } catch (CryptoException e) {
-                log.error("Error while decrypting client credentials or secret parameters for API: " + model.getId(), e);
+                log.error("Error while decrypting client credentials or secret parameters for API: "
+                                + model.getId(), e);
             }
         }
         dto.setHasThumbnail(!StringUtils.isBlank(model.getThumbnailUrl()));
@@ -3168,14 +3169,16 @@ public class APIMappingUtil {
         return awsEndpointConfig;
     }
 
-    private static void decryptOauthCustomParameters(JSONObject customParameters, CryptoUtil cryptoUtil) throws CryptoException {
+    private static void decryptCustomOauthParameters(JSONObject customParameters, CryptoUtil cryptoUtil)
+            throws CryptoException {
         for (Object keyObj : customParameters.keySet()) {
             String key = (String) keyObj;
             Object value = customParameters.get(key);
 
             if (value instanceof JSONObject) {
                 JSONObject valueObj = (JSONObject) value;
-                if (APIConstants.OAuthConstants.SECRET.equals(valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_TYPE))) {
+                if (APIConstants.OAuthConstants.SECRET.equals(
+                        valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_TYPE))) {
                     String encryptedValue = (String) valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
                     if (StringUtils.isNotEmpty(encryptedValue)) {
                         String decryptedValue = new String(cryptoUtil.base64DecodeAndDecrypt(encryptedValue));

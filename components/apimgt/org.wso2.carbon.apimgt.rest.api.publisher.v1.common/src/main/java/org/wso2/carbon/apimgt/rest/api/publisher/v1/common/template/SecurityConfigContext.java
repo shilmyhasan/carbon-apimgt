@@ -239,14 +239,16 @@ public class SecurityConfigContext extends ConfigContextDecorator {
                             if (value instanceof JSONObject) {
                                 JSONObject valueJson = (JSONObject) value;
                                 if (valueJson.containsKey(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE)) {
-                                    standardizedCustomParams.put(key, valueJson.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE));
+                                    standardizedCustomParams.put(key,
+                                            valueJson.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE));
                                 }
                             } else {
                                 standardizedCustomParams.put(key, value);
                             }
                         }
 
-                        endpointSecurityJson.put(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS, standardizedCustomParams.toString());
+                        endpointSecurityJson.put(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS,
+                                standardizedCustomParams.toString());
                     } catch (ParseException e) {
                         this.handleException("Unable to parse custom parameters in endpoint security configuration");
                     }

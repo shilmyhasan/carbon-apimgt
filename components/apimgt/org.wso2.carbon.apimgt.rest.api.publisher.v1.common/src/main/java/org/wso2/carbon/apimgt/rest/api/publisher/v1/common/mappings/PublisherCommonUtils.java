@@ -251,10 +251,12 @@ public class PublisherCommonUtils {
                     }
 
                     // Keep old custom parameters data for future usage
-                    if (oldEndpointSecurityProduction.containsKey(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) &&
-                            oldEndpointSecurityProduction.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) != null) {
-                        oldProductionCustomParams = parser.parse(oldEndpointSecurityProduction
-                                .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS).toString());
+                    if (oldEndpointSecurityProduction.containsKey(
+                            APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) && oldEndpointSecurityProduction.get(
+                            APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) != null) {
+                        oldProductionCustomParams = parser.parse(
+                                oldEndpointSecurityProduction.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS)
+                                        .toString());
                     }
                 }
                 if (oldEndpointSecurity != null &&
@@ -270,10 +272,12 @@ public class PublisherCommonUtils {
                     }
 
                     // Keep old custom parameters data for future usage
-                    if (oldEndpointSecuritySandbox.containsKey(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) &&
-                            oldEndpointSecuritySandbox.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) != null) {
-                        oldSandboxCustomParams = parser.parse(oldEndpointSecuritySandbox
-                                .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS).toString());
+                    if (oldEndpointSecuritySandbox.containsKey(
+                            APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) && oldEndpointSecuritySandbox.get(
+                            APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) != null) {
+                        oldSandboxCustomParams = parser.parse(
+                                oldEndpointSecuritySandbox.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS)
+                                        .toString());
                     }
                 }
             }
