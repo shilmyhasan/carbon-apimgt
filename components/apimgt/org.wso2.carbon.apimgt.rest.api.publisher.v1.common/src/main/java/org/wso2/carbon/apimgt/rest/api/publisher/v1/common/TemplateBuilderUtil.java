@@ -719,37 +719,6 @@ public class TemplateBuilderUtil {
                     gatewayAPIDTO.getLocalEntriesToBeAdd()));
         }
 
-        // Standardize the oauth custom parameters
-        if (endpointConfig != null && endpointConfig.has(APIConstants.ENDPOINT_SECURITY)) {
-            org.json.JSONObject endpointSecurity = (org.json.JSONObject) endpointConfig.get(APIConstants.ENDPOINT_SECURITY);
-            
-            // Process production endpoint security if it exists
-            if (endpointSecurity.has(APIConstants.ENDPOINT_SECURITY_PRODUCTION)) {
-                org.json.JSONObject productionEndpointSecurity = 
-                        (org.json.JSONObject) endpointSecurity.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION);
-                
-                // Check if it's an OAuth secured endpoint
-                if (productionEndpointSecurity.has(APIConstants.ENDPOINT_SECURITY_TYPE) && 
-                        APIConstants.OAuthConstants.OAUTH.equals(
-                            productionEndpointSecurity.getString(APIConstants.ENDPOINT_SECURITY_TYPE))) {
-                    standardizeOAuthCustomParams(productionEndpointSecurity);
-                }
-            }
-            
-            // Process sandbox endpoint security if it exists
-            if (endpointSecurity.has(APIConstants.ENDPOINT_SECURITY_SANDBOX)) {
-                org.json.JSONObject sandboxEndpointSecurity = 
-                        (org.json.JSONObject) endpointSecurity.get(APIConstants.ENDPOINT_SECURITY_SANDBOX);
-                
-                // Check if it's an OAuth secured endpoint
-                if (sandboxEndpointSecurity.has(APIConstants.ENDPOINT_SECURITY_TYPE) && 
-                        APIConstants.OAuthConstants.OAUTH.equals(
-                            sandboxEndpointSecurity.getString(APIConstants.ENDPOINT_SECURITY_TYPE))) {
-                    standardizeOAuthCustomParams(sandboxEndpointSecurity);
-                }
-            }
-        }
-
         // If the API exists in the Gateway and If the Gateway type is 'production' and a production url has not been
         // specified Or if the Gateway type is 'sandbox' and a sandbox url has not been specified
 
@@ -912,39 +881,6 @@ public class TemplateBuilderUtil {
         }
         gatewayAPIDTO.setSequencesToBeRemove(
                 GatewayUtils.addStringToList(faultSeqExt, gatewayAPIDTO.getSequencesToBeRemove()));
-    }
-
-    /**
-     * Standardize OAuth custom parameters by converting into key-value pairs
-     *
-     * @param endpointSecurity The endpoint security object containing OAuth custom parameters
-     */
-    private static void standardizeOAuthCustomParams(org.json.JSONObject endpointSecurity) {
-        if (endpointSecurity.has(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS)) {
-            Object customParamsObj = endpointSecurity.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
-            
-            if (customParamsObj instanceof org.json.JSONObject) {
-                org.json.JSONObject rawCustomParamsJson = (org.json.JSONObject) customParamsObj;
-                org.json.JSONObject standardizedCustomParams = new org.json.JSONObject();
-
-                for (Object keyObj : rawCustomParamsJson.keySet()) {
-                    String key = (String) keyObj;
-                    Object value = rawCustomParamsJson.get(key);
-
-                    if (value instanceof JSONObject) {
-                        JSONObject valueJson = (JSONObject) value;
-                        if (valueJson.containsKey("value")) {
-                            standardizedCustomParams.put(key, valueJson.get("value"));
-                        }
-                    } else {
-                        standardizedCustomParams.put(key, value);
-                    }
-                }
-
-                endpointSecurity.put(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS,
-                        standardizedCustomParams.toString());
-            }
-        }
     }
 
     /**
