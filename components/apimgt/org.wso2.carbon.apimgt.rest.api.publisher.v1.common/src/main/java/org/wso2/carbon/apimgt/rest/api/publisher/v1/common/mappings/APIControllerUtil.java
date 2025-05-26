@@ -439,7 +439,8 @@ public class APIControllerUtil {
                     APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
             for (Map.Entry<String, JsonElement> entry : customParams.entrySet()) {
                 JsonElement valObj = entry.getValue();
-                if (valObj.isJsonObject() && !valObj.getAsJsonObject().has("value")) {
+                if (valObj.isJsonObject() && !valObj.getAsJsonObject()
+                        .has(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE)) {
                     throw new APIManagementException(
                             "Error parsing custom parameters. Parameter '" + entry.getKey() + "' has invalid format.",
                             ExceptionCodes.ERROR_READING_PARAMS_FILE);

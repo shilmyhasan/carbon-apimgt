@@ -185,6 +185,9 @@ public class ApisApiServiceImpl implements ApisApiService {
             String errorMessage = "Error while encrypting the secret key of API : " + body.getProvider() + "-" +
                     body.getName() + "-" + body.getVersion() + " - " + e.getMessage();
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (ParseException e){
+            String errorMessage = "Error while parsing the endpoint configuration";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }
@@ -2862,7 +2865,9 @@ public class ApisApiServiceImpl implements ApisApiService {
             } else {
                 throw new APIManagementException(errorMessage, e);
             }
-
+        } catch (ParseException e) {
+            String errorMessage = "Error while parsing the endpoint configuration";
+            throw new APIManagementException(errorMessage, e);
         }
         return null;
     }
