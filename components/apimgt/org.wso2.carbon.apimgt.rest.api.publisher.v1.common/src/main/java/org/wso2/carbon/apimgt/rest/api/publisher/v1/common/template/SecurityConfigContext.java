@@ -216,10 +216,15 @@ public class SecurityConfigContext extends ConfigContextDecorator {
     }
 
     /**
-     * Standardize custom parameters in endpoint security configuration
+     * Standardizes custom OAuth parameters for compatibility with the OAuth mediator.
+     * <p>
+     * The OAuth mediator expects custom parameters in a simple key-value format (e.g.,
+     * {@code "key1": "value1", "key2": "value2"}).
+     * This method removes the {@code secured} field if present and extracts only the actual values
+     * from parameter objects. The result is stored as a JSON string containing just the key-value pairs.
      *
-     * @param endpointSecurityJson The endpoint security JSON object
-     * @throws APITemplateException If standardization fails
+     * @param endpointSecurityJson The endpoint security JSON object containing the custom parameters.
+     * @throws APITemplateException If the custom parameters cannot be parsed.
      */
     private void standardizeCustomParameters(JSONObject endpointSecurityJson) throws APITemplateException {
         if (endpointSecurityJson != null) {

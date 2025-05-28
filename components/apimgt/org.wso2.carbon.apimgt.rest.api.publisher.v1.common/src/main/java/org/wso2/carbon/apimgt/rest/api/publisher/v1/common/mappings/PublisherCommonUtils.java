@@ -619,40 +619,60 @@ public class PublisherCommonUtils {
         }
     }
 
-    private static void encryptSecretCustomParameters(CryptoUtil cryptoUtil, Object oldCustomParamsString,
-            LinkedHashMap<String, Object> customParametersHashMap) throws CryptoException {
+    /**
+     * Encrypts the values of secured custom OAuth parameters in the provided custom parameters. If the custom parameter
+     * value is non-empty and marked as secured, this encrypts it. If the value is empty, attempt to retrieve and reuse
+     * the previously encrypted value from oldCustomParamsObj, if available.
+     *
+     * @param cryptoUtil              The utility used for encryption and base64 encoding.
+     * @param oldCustomParamsObj      A map containing previous custom parameter values, used for fallback if the
+     *                                current value is empty.
+     * @param customParametersHashMap The current custom parameters to be processed and updated in-place.
+     * @throws CryptoException If an error occurs during encryption.
+     */
+    private static void encryptSecretCustomParameters(CryptoUtil cryptoUtil, Object oldCustomParamsObj,
+            LinkedHashMap<String, Object> customParametersHashMap) throws CryptoException, APIManagementException {
+
         for (Map.Entry<String, Object> entry : customParametersHashMap.entrySet()) {
             Object value = entry.getValue();
 
-            // Check if the value is an extended object with type
             if (value instanceof Map) {
-                Map<String, String> valueMap = (Map<String, String>) value;
-                if (valueMap.containsKey(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_TYPE) && valueMap.get(
-                                APIConstants.OAuthConstants.CUSTOM_PARAMETERS_TYPE)
-                        .equals(APIConstants.OAuthConstants.SECRET)) {
-                    String rawValue = valueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
+                Map<String, Object> valueMap = (Map<String, Object>) value;
+
+                if (Boolean.TRUE.equals(valueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_SECURED))) {
+                    String rawValue = (String) valueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
+
                     if (rawValue != null && !rawValue.isEmpty()) {
+                        // When a non-empty value is provided
                         String encryptedValue = cryptoUtil.encryptAndBase64Encode(rawValue.getBytes());
                         valueMap.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, encryptedValue);
-                    } else if (rawValue != null && oldCustomParamsString != null) {
-                        // Retrieve the value from old custom parameters if available
-                        JSONObject oldCustomParams = (JSONObject) oldCustomParamsString;
-                        if (oldCustomParams.containsKey(entry.getKey())) {
-                            Object oldCustomParamsValue = oldCustomParams.get(entry.getKey());
-                            if (oldCustomParamsValue instanceof String) {
-                                valueMap.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE,
-                                        (String) oldCustomParamsValue);
-                            } else {
-                                Map<String, String> oldValueMap = (Map<String, String>) oldCustomParamsValue;
-                                if (oldValueMap.containsKey(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE)) {
-                                    String oldValue = oldValueMap.get(
-                                            APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
-                                    valueMap.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, oldValue);
-                                }
+                        continue;
+                    } else if (rawValue != null && oldCustomParamsObj instanceof Map) {
+                        // When the provided value is empty
+                        Map<String, Object> oldCustomParams = (Map<String, Object>) oldCustomParamsObj;
+                        Object oldCustomParamsValue = oldCustomParams.get(entry.getKey());
+
+                        if (oldCustomParamsValue instanceof Map) {
+                            Map<String, String> oldValueMap = (Map<String, String>) oldCustomParamsValue;
+                            if (oldValueMap.containsKey(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE)) {
+                                // When an old value is available
+                                String oldValue = oldValueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
+                                valueMap.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, oldValue);
+                                continue;
                             }
                         }
                     }
+                } else {
+                    if (valueMap.containsKey(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE)) {
+                        // When the secure flag is not given
+                        entry.setValue(valueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE));
+                        continue;
+                    }
                 }
+
+                // If none of the above succeeded
+                throw new APIManagementException(
+                        "Error updating custom parameter '" + entry.getKey() + "': required value is missing.");
             }
         }
     }

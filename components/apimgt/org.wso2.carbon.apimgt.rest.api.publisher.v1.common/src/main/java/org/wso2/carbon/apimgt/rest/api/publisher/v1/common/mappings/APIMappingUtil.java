@@ -3169,6 +3169,13 @@ public class APIMappingUtil {
         return awsEndpointConfig;
     }
 
+    /**
+     * Decrypts the secret custom oauth parameters in the customParameters.
+     *
+     * @param customParameters The JSON object containing custom OAuth parameters.
+     * @param cryptoUtil       Utility for handling decryption logic (including base64 decoding).
+     * @throws CryptoException If an error occurs during the decryption process.
+     */
     private static void decryptCustomOauthParameters(JSONObject customParameters, CryptoUtil cryptoUtil)
             throws CryptoException {
         if (customParameters == null || customParameters.isEmpty()) {
@@ -3179,8 +3186,7 @@ public class APIMappingUtil {
             // If value is an extended custom parameter object
             if (valObj instanceof JSONObject) {
                 JSONObject valueObj = (JSONObject) valObj;
-                if (APIConstants.OAuthConstants.SECRET.equals(
-                        valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_TYPE))) {
+                if (Boolean.TRUE.equals(valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_SECURED))) {
                     String encryptedValue = (String) valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
                     if (StringUtils.isNotEmpty(encryptedValue)) {
                         String decryptedValue = new String(cryptoUtil.base64DecodeAndDecrypt(encryptedValue));
@@ -3191,6 +3197,12 @@ public class APIMappingUtil {
         }
     }
 
+    /**
+     * Masks (clears) the values of secret custom OAuth parameters in the given endpoint security configuration.
+     *
+     * @param endpointSecurity The JSON object representing the endpoint security configuration,
+     *                         which includes custom parameters.
+     */
     private static void maskSecretCustomParameters(JSONObject endpointSecurity) {
         Object customParamsObj = endpointSecurity.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
         if (customParamsObj instanceof JSONObject) {
@@ -3199,8 +3211,7 @@ public class APIMappingUtil {
                 // If value is an extended custom parameter object
                 if (valObj instanceof JSONObject) {
                     JSONObject valueObj = (JSONObject) valObj;
-                    if (APIConstants.OAuthConstants.SECRET.equals(
-                            valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_TYPE))) {
+                    if (Boolean.TRUE.equals((valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_SECURED)))) {
                         valueObj.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, "");
                     }
                 }
