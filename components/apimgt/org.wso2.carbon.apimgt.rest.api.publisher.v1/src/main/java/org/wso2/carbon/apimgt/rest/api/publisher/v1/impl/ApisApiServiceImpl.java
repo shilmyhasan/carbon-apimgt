@@ -185,6 +185,10 @@ public class ApisApiServiceImpl implements ApisApiService {
             String errorMessage = "Error while encrypting the secret key of API : " + body.getProvider() + "-" +
                     body.getName() + "-" + body.getVersion() + " - " + e.getMessage();
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (ParseException e){
+            String errorMessage = "Error while parsing the endpoint configuration of API : " + body.getProvider() +
+                    "-" + body.getName() + "-" + body.getVersion() + " - " + e.getMessage();
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
     }
@@ -2837,7 +2841,8 @@ public class ApisApiServiceImpl implements ApisApiService {
             // OAuth 2.0 backend protection: API Key and API Secret encryption
             PublisherCommonUtils
                     .encryptEndpointSecurityOAuthCredentials(endpointConfig, CryptoUtil.getDefaultCryptoUtil(),
-                            StringUtils.EMPTY, StringUtils.EMPTY, apiDTOFromProperties);
+                            StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY,
+                            apiDTOFromProperties);
 
             // Import the API and Definition
             String organization = RestApiUtil.getValidatedOrganization(messageContext);
@@ -2861,7 +2866,9 @@ public class ApisApiServiceImpl implements ApisApiService {
             } else {
                 throw new APIManagementException(errorMessage, e);
             }
-
+        } catch (ParseException e) {
+            String errorMessage = "Error while parsing the endpoint configuration";
+            throw new APIManagementException(errorMessage, e);
         }
         return null;
     }
@@ -3298,12 +3305,14 @@ public class ApisApiServiceImpl implements ApisApiService {
      * @param format                Format of output documents. Can be YAML or JSON
      * @param preserveStatus        Preserve API status on export
      * @param gatewayEnvironment    Gateway environment of the API to be exported
+     * @param preserveCredentials   Preserve endpoint configuration credentials and secret parameters on Export
      * @return API export response as an archive
      */
     @Override
     public Response exportAPI(String apiId, String name, String version, String revisionNum, String providerName,
                               String format, Boolean preserveStatus, Boolean exportLatestRevision,
-                              String gatewayEnvironment, MessageContext messageContext) throws APIManagementException {
+                              String gatewayEnvironment, Boolean preserveCredentials,
+                              MessageContext messageContext) throws APIManagementException {
 
         if (StringUtils.isEmpty(gatewayEnvironment)) {
             //If not specified status is preserved by default
@@ -3318,7 +3327,7 @@ public class ApisApiServiceImpl implements ApisApiService {
                 ImportExportAPI importExportAPI = APIImportExportUtil.getImportExportAPI();
                 File file = importExportAPI
                         .exportAPI(apiId, name, version, revisionNum, providerName, preserveStatus, exportFormat,
-                                Boolean.TRUE, Boolean.FALSE, exportLatestRevision, StringUtils.EMPTY, organization);
+                                Boolean.TRUE, preserveCredentials, exportLatestRevision, StringUtils.EMPTY, organization);
                 return Response.ok(file).header(RestApiConstants.HEADER_CONTENT_DISPOSITION,
                         "attachment; filename=\"" + file.getName() + "\"").build();
             } catch (APIImportExportException e) {

@@ -232,6 +232,8 @@ public class PublisherCommonUtils {
         }
         String oldProductionApiSecret = null;
         String oldSandboxApiSecret = null;
+        Object oldProductionCustomParams = null;
+        Object oldSandboxCustomParams = null;
 
         if (oldEndpointConfig != null) {
             if ((oldEndpointConfig.containsKey(APIConstants.ENDPOINT_SECURITY))) {
@@ -247,6 +249,15 @@ public class PublisherCommonUtils {
                         oldProductionApiSecret = oldEndpointSecurityProduction
                                 .get(APIConstants.OAuthConstants.OAUTH_CLIENT_SECRET).toString();
                     }
+
+                    // Keep old custom parameters data for future usage
+                    if (oldEndpointSecurityProduction.containsKey(
+                            APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) && oldEndpointSecurityProduction.get(
+                            APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) != null) {
+                        oldProductionCustomParams = parser.parse(
+                                oldEndpointSecurityProduction.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS)
+                                        .toString());
+                    }
                 }
                 if (oldEndpointSecurity != null &&
                         oldEndpointSecurity.containsKey(APIConstants.OAuthConstants.ENDPOINT_SECURITY_SANDBOX)) {
@@ -259,6 +270,15 @@ public class PublisherCommonUtils {
                         oldSandboxApiSecret = oldEndpointSecuritySandbox
                                 .get(APIConstants.OAuthConstants.OAUTH_CLIENT_SECRET).toString();
                     }
+
+                    // Keep old custom parameters data for future usage
+                    if (oldEndpointSecuritySandbox.containsKey(
+                            APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) && oldEndpointSecuritySandbox.get(
+                            APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) != null) {
+                        oldSandboxCustomParams = parser.parse(
+                                oldEndpointSecuritySandbox.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS)
+                                        .toString());
+                    }
                 }
             }
         }
@@ -268,7 +288,7 @@ public class PublisherCommonUtils {
 
         // OAuth 2.0 backend protection: API Key and API Secret encryption
         encryptEndpointSecurityOAuthCredentials(endpointConfig, cryptoUtil, oldProductionApiSecret, oldSandboxApiSecret,
-                apiDtoToUpdate);
+                oldProductionCustomParams, oldSandboxCustomParams, apiDtoToUpdate);
 
         // AWS Lambda: secret key encryption while updating the API
         if (apiDtoToUpdate.getEndpointConfig() != null) {
@@ -459,17 +479,20 @@ public class PublisherCommonUtils {
     /**
      * This method will encrypt the OAuth 2.0 API Key and API Secret
      *
-     * @param endpointConfig         endpoint configuration of API
-     * @param cryptoUtil             cryptography util
-     * @param oldProductionApiSecret existing production API secret
-     * @param oldSandboxApiSecret    existing sandbox API secret
-     * @param apidto                 API DTO
+     * @param endpointConfig            endpoint configuration of API
+     * @param cryptoUtil                cryptography util
+     * @param oldProductionApiSecret    existing production API secret
+     * @param oldSandboxApiSecret       existing sandbox API secret
+     * @param oldProductionCustomParams existing production custom parameters
+     * @param oldSandboxCustomParams    existing sandbox custom parameters
+     * @param apidto                    API DTO
      * @throws CryptoException        if an error occurs while encrypting and base64 encode
      * @throws APIManagementException if an error occurs due to a problem in the endpointConfig payload
      */
     public static void encryptEndpointSecurityOAuthCredentials(Map endpointConfig, CryptoUtil cryptoUtil,
-            String oldProductionApiSecret, String oldSandboxApiSecret, APIDTO apidto)
-            throws CryptoException, APIManagementException {
+            String oldProductionApiSecret, String oldSandboxApiSecret, Object oldProductionCustomParams,
+            Object oldSandboxCustomParams, APIDTO apidto)
+            throws CryptoException, APIManagementException, ParseException {
         // OAuth 2.0 backend protection: API Key and API Secret encryption
         String customParametersString;
         if (endpointConfig != null) {
@@ -484,13 +507,23 @@ public class PublisherCommonUtils {
                     // Change default value of customParameters JSONObject to String
                     if (!(endpointSecurityProduction
                             .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) instanceof String)) {
-                        LinkedHashMap<String, String> customParametersHashMap = (LinkedHashMap<String, String>)
+                        LinkedHashMap<String, Object> customParametersHashMap = (LinkedHashMap<String, Object>)
                                 endpointSecurityProduction.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+
+                        // Process secret custom parameters
+                        encryptSecretCustomParameters(cryptoUtil, oldProductionCustomParams, customParametersHashMap);
                         customParametersString = JSONObject.toJSONString(customParametersHashMap);
                     } else if (endpointSecurityProduction.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS)
                             != null) {
-                        customParametersString = (String) endpointSecurityProduction
+                        String existingCustomParametersString = (String) endpointSecurityProduction
                                 .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+                        JSONParser parser = new JSONParser();
+                        LinkedHashMap<String, Object> customParametersMap = new LinkedHashMap<String, Object>(
+                                (JSONObject) parser.parse(existingCustomParametersString));
+
+                        // Process secret custom parameters
+                        encryptSecretCustomParameters(cryptoUtil, oldProductionCustomParams, customParametersMap);
+                        customParametersString = JSONObject.toJSONString(customParametersMap);
                     } else {
                         customParametersString = "{}";
                     }
@@ -531,13 +564,27 @@ public class PublisherCommonUtils {
                     // Change default value of customParameters JSONObject to String
                     if (!(endpointSecuritySandbox
                             .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) instanceof String)) {
-                        Map<String, String> customParametersHashMap = (Map<String, String>) endpointSecuritySandbox
-                                .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+                        LinkedHashMap<String, Object> customParametersHashMap =
+                                (LinkedHashMap<String, Object>) endpointSecuritySandbox
+                                        .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+
+                        // Process secret custom parameters
+                        encryptSecretCustomParameters(cryptoUtil, oldSandboxCustomParams, customParametersHashMap);
+
                         customParametersString = JSONObject.toJSONString(customParametersHashMap);
                     } else if (endpointSecuritySandbox.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS)
                             != null) {
-                        customParametersString = (String) endpointSecuritySandbox
+                        String existingCustomParametersString = (String) endpointSecuritySandbox
                                 .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+
+                        // Parse the JSON string to a Map
+                        JSONParser parser = new JSONParser();
+                        LinkedHashMap<String, Object> customParametersMap = new LinkedHashMap<String, Object>(
+                                (JSONObject) parser.parse(existingCustomParametersString));
+
+                        // Process secret custom parameters
+                        encryptSecretCustomParameters(cryptoUtil, oldSandboxCustomParams, customParametersMap);
+                        customParametersString = JSONObject.toJSONString(customParametersMap);
                     } else {
                         customParametersString = "{}";
                     }
@@ -568,6 +615,64 @@ public class PublisherCommonUtils {
                     endpointConfig.put(APIConstants.ENDPOINT_SECURITY, endpointSecurity);
                     apidto.setEndpointConfig(endpointConfig);
                 }
+            }
+        }
+    }
+
+    /**
+     * Encrypts the values of secured custom OAuth parameters in the provided custom parameters. If the custom parameter
+     * value is non-empty and marked as secured, this encrypts it. If the value is empty, attempt to retrieve and reuse
+     * the previously encrypted value from oldCustomParamsObj, if available.
+     *
+     * @param cryptoUtil              The utility used for encryption and base64 encoding.
+     * @param oldCustomParamsObj      A map containing previous custom parameter values, used for fallback if the
+     *                                current value is empty.
+     * @param customParametersHashMap The current custom parameters to be processed and updated in-place.
+     * @throws CryptoException If an error occurs during encryption.
+     */
+    private static void encryptSecretCustomParameters(CryptoUtil cryptoUtil, Object oldCustomParamsObj,
+            LinkedHashMap<String, Object> customParametersHashMap) throws CryptoException, APIManagementException {
+
+        for (Map.Entry<String, Object> entry : customParametersHashMap.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof Map) {
+                Map<String, Object> valueMap = (Map<String, Object>) value;
+
+                if (Boolean.TRUE.equals(valueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_SECURED))) {
+                    String rawValue = (String) valueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
+
+                    if (rawValue != null && !rawValue.isEmpty()) {
+                        // When a non-empty value is provided
+                        String encryptedValue = cryptoUtil.encryptAndBase64Encode(rawValue.getBytes());
+                        valueMap.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, encryptedValue);
+                        continue;
+                    } else if (rawValue != null && oldCustomParamsObj instanceof Map) {
+                        // When the provided value is empty
+                        Map<String, Object> oldCustomParams = (Map<String, Object>) oldCustomParamsObj;
+                        Object oldCustomParamsValue = oldCustomParams.get(entry.getKey());
+
+                        if (oldCustomParamsValue instanceof Map) {
+                            Map<String, String> oldValueMap = (Map<String, String>) oldCustomParamsValue;
+                            if (oldValueMap.containsKey(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE)) {
+                                // When an old value is available
+                                String oldValue = oldValueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE);
+                                valueMap.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, oldValue);
+                                continue;
+                            }
+                        }
+                    }
+                } else {
+                    if (valueMap.containsKey(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE)) {
+                        // When the secure flag is not given
+                        entry.setValue(valueMap.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE));
+                        continue;
+                    }
+                }
+
+                // If none of the above succeeded
+                throw new APIManagementException(
+                        "Error updating custom parameter '" + entry.getKey() + "': required value is missing.");
             }
         }
     }
@@ -888,7 +993,7 @@ public class PublisherCommonUtils {
      */
     public static API addAPIWithGeneratedSwaggerDefinition(APIDTO apiDto, String oasVersion, String username,
                                                            String organization)
-            throws APIManagementException, CryptoException {
+            throws APIManagementException, CryptoException, ParseException {
         if (APIUtil.isOnPremResolver()) {
             String name = apiDto.getName();
             //replace all white spaces in the API Name
@@ -930,7 +1035,7 @@ public class PublisherCommonUtils {
 
         // OAuth 2.0 backend protection: API Key and API Secret encryption
         encryptEndpointSecurityOAuthCredentials(endpointConfig, cryptoUtil, StringUtils.EMPTY, StringUtils.EMPTY,
-                apiDto);
+                StringUtils.EMPTY, StringUtils.EMPTY, apiDto);
 
         // AWS Lambda: secret key encryption while creating the API
         if (apiDto.getEndpointConfig() != null) {
