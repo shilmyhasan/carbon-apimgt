@@ -438,7 +438,7 @@ public class APIControllerUtil {
                 JsonObject customParams = customParamsElement.getAsJsonObject();
                 for (Map.Entry<String, JsonElement> entry : customParams.entrySet()) {
                     JsonElement value = entry.getValue();
-                    if (value.isJsonObject() && !value.getAsJsonObject()
+                    if (value != null && value.isJsonObject() && !value.getAsJsonObject()
                             .has(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE)) {
                         throw new APIManagementException(
                                 "Error parsing custom parameters. Parameter '"
