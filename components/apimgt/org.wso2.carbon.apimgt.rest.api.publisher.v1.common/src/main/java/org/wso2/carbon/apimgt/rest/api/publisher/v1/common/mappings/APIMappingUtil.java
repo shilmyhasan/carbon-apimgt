@@ -3137,7 +3137,8 @@ public class APIMappingUtil {
                 productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_PASSWORD, EMPTY_STRING);
             }
 
-            Object customParamsObj = productionEndpointSecurity.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+            Object customParamsObj =
+                    productionEndpointSecurity.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
             if (customParamsObj instanceof JSONObject) {
                 maskSecretCustomParameters((JSONObject) customParamsObj);
             }
