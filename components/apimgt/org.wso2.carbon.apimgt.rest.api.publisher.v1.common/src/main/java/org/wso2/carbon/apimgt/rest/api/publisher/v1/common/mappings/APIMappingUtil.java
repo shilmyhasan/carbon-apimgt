@@ -3121,7 +3121,10 @@ public class APIMappingUtil {
                 sandboxEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_PASSWORD, EMPTY_STRING);
             }
 
-            maskSecretCustomParameters(sandboxEndpointSecurity);
+            Object customParamsObj = sandboxEndpointSecurity.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+            if (customParamsObj instanceof JSONObject) {
+                maskSecretCustomParameters((JSONObject) customParamsObj);
+            }
         }
         if (endpointSecurityElement.get(APIConstants.ENDPOINT_SECURITY_PRODUCTION) != null) {
             JSONObject productionEndpointSecurity =
@@ -3134,7 +3137,10 @@ public class APIMappingUtil {
                 productionEndpointSecurity.put(APIConstants.ENDPOINT_SECURITY_PASSWORD, EMPTY_STRING);
             }
 
-            maskSecretCustomParameters(productionEndpointSecurity);
+            Object customParamsObj = productionEndpointSecurity.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
+            if (customParamsObj instanceof JSONObject) {
+                maskSecretCustomParameters((JSONObject) customParamsObj);
+            }
         }
         return endpointSecurityElement;
     }
@@ -3200,20 +3206,15 @@ public class APIMappingUtil {
     /**
      * Masks (clears) the values of secret custom OAuth parameters in the given endpoint security configuration.
      *
-     * @param endpointSecurity The JSON object representing the endpoint security configuration,
-     *                         which includes custom parameters.
+     * @param customParams The JSON object that includes custom parameters.
      */
-    private static void maskSecretCustomParameters(JSONObject endpointSecurity) {
-        Object customParamsObj = endpointSecurity.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
-        if (customParamsObj instanceof JSONObject) {
-            JSONObject customParams = (JSONObject) customParamsObj;
-            for (Object valObj : customParams.values()) {
-                // If value is an extended custom parameter object
-                if (valObj instanceof JSONObject) {
-                    JSONObject valueObj = (JSONObject) valObj;
-                    if (Boolean.TRUE.equals((valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_SECURED)))) {
-                        valueObj.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, "");
-                    }
+    private static void maskSecretCustomParameters(JSONObject customParams) {
+        for (Object valObj : customParams.values()) {
+            // If value is an extended custom parameter object
+            if (valObj instanceof JSONObject) {
+                JSONObject valueObj = (JSONObject) valObj;
+                if (Boolean.TRUE.equals((valueObj.get(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_SECURED)))) {
+                    valueObj.put(APIConstants.OAuthConstants.CUSTOM_PARAMETERS_VALUE, "");
                 }
             }
         }
