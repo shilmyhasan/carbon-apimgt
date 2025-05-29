@@ -505,8 +505,8 @@ public class PublisherCommonUtils {
                             .get(APIConstants.OAuthConstants.ENDPOINT_SECURITY_TYPE);
 
                     // Change default value of customParameters JSONObject to String
-                    if (!(endpointSecurityProduction
-                            .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) instanceof String)) {
+                    if (endpointSecurityProduction
+                            .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) instanceof Map) {
                         LinkedHashMap<String, Object> customParametersHashMap = (LinkedHashMap<String, Object>)
                                 endpointSecurityProduction.get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
 
@@ -562,8 +562,8 @@ public class PublisherCommonUtils {
                             .get(APIConstants.OAuthConstants.ENDPOINT_SECURITY_TYPE);
 
                     // Change default value of customParameters JSONObject to String
-                    if (!(endpointSecuritySandbox
-                            .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) instanceof String)) {
+                    if (endpointSecuritySandbox
+                            .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS) instanceof Map) {
                         LinkedHashMap<String, Object> customParametersHashMap =
                                 (LinkedHashMap<String, Object>) endpointSecuritySandbox
                                         .get(APIConstants.OAuthConstants.OAUTH_CUSTOM_PARAMETERS);
@@ -632,6 +632,9 @@ public class PublisherCommonUtils {
      */
     private static void encryptSecretCustomParameters(CryptoUtil cryptoUtil, Object oldCustomParamsObj,
             LinkedHashMap<String, Object> customParametersHashMap) throws CryptoException, APIManagementException {
+        if (customParametersHashMap == null || customParametersHashMap.isEmpty()) {
+            return;
+        }
 
         for (Map.Entry<String, Object> entry : customParametersHashMap.entrySet()) {
             Object value = entry.getValue();
