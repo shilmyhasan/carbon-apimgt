@@ -28,15 +28,15 @@ public class MSPowerpointIndexer implements Indexer {
 		try {
             String ppText = null;
             try {
-				//Extract PowerPoint 2003 (.ppt) document files
-				HSLFSlideShow slideShow = new HSLFSlideShow(new ByteArrayInputStream(fileData.data));
-				SlideShowExtractor extractor = new SlideShowExtractor(slideShow);
-			    ppText = extractor.getText();
+		//Extract PowerPoint 2003 (.ppt) document files
+		HSLFSlideShow slideShow = new HSLFSlideShow(new ByteArrayInputStream(fileData.data));
+		SlideShowExtractor extractor = new SlideShowExtractor(slideShow);
+	        ppText = extractor.getText();
             } catch (OfficeXmlFileException e){
-				//if 2003 PowerPoint (.ppt) extraction failed, try with PowerPoint 2007 (.pptx) document file extractor
-				XMLSlideShow slideShow = new XMLSlideShow(new ByteArrayInputStream(fileData.data));
-				SlideShowExtractor extractor = new SlideShowExtractor(slideShow);
-				ppText = extractor.getText();
+		//if 2003 PowerPoint (.ppt) extraction failed, try with PowerPoint 2007 (.pptx) document file extractor
+		XMLSlideShow slideShow = new XMLSlideShow(new ByteArrayInputStream(fileData.data));
+		SlideShowExtractor extractor = new SlideShowExtractor(slideShow);
+		ppText = extractor.getText();
             } catch (Exception e){
                 String msg = "Failed to extract the document";
                 log.error(msg, e);
